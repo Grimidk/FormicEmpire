@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResearchTreeGraphTest {
@@ -445,6 +446,30 @@ class ResearchTreeGraphTest {
         assertEquals(
                 GameUnlocks.SUPER_VENOM_SYNERGY,
                 ResearchTreeGraph.synergyForReward(GameUnlocks.SYNERGY_SUPER_VENOM));
+    }
+
+    @Test
+    void buyButtonTooltipNamesAssimilationForSubtypeRoles() {
+        dynasty.setRank(GameConstants.RANK_COLONY);
+        colony.unlockUpgrade(GameUnlocks.TYPE_WORKER);
+        colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+
+        String potterTip = ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.ROLE_POTTER);
+        assertNotNull(potterTip);
+        assertTrue(potterTip.contains(GameUnlocks.ASSIMILATION_HONEYPOT.getName()), potterTip);
+
+        String defenderTip = ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.ROLE_DEFENDER);
+        assertNotNull(defenderTip);
+        assertTrue(defenderTip.contains(GameUnlocks.ASSIMILATION_DOORHEAD.getName()), defenderTip);
+
+        assertEquals(GameUnlocks.ASSIMILATION_HONEYPOT,
+                GameUnlocks.getAssimilationRequiredForSubtypeRoleUpgrade(GameUnlocks.ROLE_POTTER));
+        assertEquals(GameUnlocks.ASSIMILATION_DOORHEAD,
+                GameUnlocks.getAssimilationRequiredForSubtypeRoleUpgrade(GameUnlocks.ROLE_DEFENDER));
+        assertFalse(GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, GameUnlocks.ROLE_POTTER));
+
+        colony.unlockUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
+        assertTrue(GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, GameUnlocks.ROLE_POTTER));
     }
 
     @Test

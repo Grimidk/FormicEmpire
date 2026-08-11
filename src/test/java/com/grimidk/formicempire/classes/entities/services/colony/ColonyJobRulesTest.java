@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -81,5 +82,36 @@ class ColonyJobRulesTest {
         assertTrue(found);
         assertTrue(hex.getNonWaterResourceSourcesGenerated() > 0
                 || colony.getLocationService().getSourcesByType(GameConstants.RESOURCE_WATER).size() > 0);
+    }
+
+    @Test
+    void hourlyLiteProducesResinFromPlantForagingWhenAbilityUnlocked() {
+        Dynasty dynasty = colony.getDynasty();
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_RESIN);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_FORAGER);
+        colony.unlockBuilding(GameUnlocks.RESIN_RESERVOIR_0);
+        colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 200);
+        colony.getLocationService().addSource(colony,
+                new ResourceSource(GameConstants.RESOURCE_PLANT, 100000, 10, 20));
+
+        boolean gainedResin = false;
+        for (int i = 0; i < 200 && !gainedResin; i++) {
+            ColonyJobRules.applyHourlyProduction(colony);
+            gainedResin = colony.getResins() > 0;
+        }
+        assertTrue(gainedResin, "lite plant foraging should yield resin with ABILITY_RESIN + capacity");
+    }
+
+    @Test
+    void hourlyLiteDoesNotProduceResinWithoutAbility() {
+        colony.unlockBuilding(GameUnlocks.RESIN_RESERVOIR_0);
+        colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 200);
+        colony.getLocationService().addSource(colony,
+                new ResourceSource(GameConstants.RESOURCE_PLANT, 100000, 10, 20));
+
+        for (int i = 0; i < 50; i++) {
+            ColonyJobRules.applyHourlyProduction(colony);
+        }
+        assertEquals(0, colony.getResins());
     }
 }

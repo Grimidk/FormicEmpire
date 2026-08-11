@@ -1047,26 +1047,22 @@ public final class WarProgressService {
         if (world == null || war == null || victor == null || contested == null) {
             return;
         }
-        String progress = formatWarProgressPercent(war.getProgressPercent());
         String message;
         if (outcome == StageOutcome.ATTACKER_RETREAT) {
             message = LanguageStrings.format(
                     LanguageStrings.WAR_STAGE_FORFEITED_FMT,
                     victor.getName(),
-                    contested.getName(),
-                    progress);
+                    contested.getName());
         } else if (outcome == StageOutcome.DEFENDER_HOLD) {
             message = LanguageStrings.format(
                     LanguageStrings.WAR_STAGE_DEFENDER_HELD_FMT,
                     victor.getName(),
-                    contested.getName(),
-                    progress);
+                    contested.getName());
         } else {
             message = LanguageStrings.format(
                     LanguageStrings.WAR_STAGE_CAPTURED_FMT,
                     victor.getName(),
-                    contested.getName(),
-                    progress);
+                    contested.getName());
         }
         Dynasty player = findPlayerDynasty(world);
         if (player != null && war.involves(player.getId())) {
@@ -1143,9 +1139,5 @@ public final class WarProgressService {
             }
         }
         return null;
-    }
-
-    private static String formatWarProgressPercent(float progressPercent) {
-        return String.valueOf(Math.round(progressPercent));
     }
 }

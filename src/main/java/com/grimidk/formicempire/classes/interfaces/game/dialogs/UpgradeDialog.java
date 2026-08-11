@@ -431,7 +431,10 @@ public class UpgradeDialog extends ZeroDialog {
                 }
 
                 if (available.isEmpty()) {
-                    JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.ASSIMILATION_NO_GENOMES));
+                    String emptyKey = GameUnlocks.canAssimilateForeignSpecies(dynasty)
+                            ? LanguageStrings.ASSIMILATION_NO_PENDING_GENOMES
+                            : LanguageStrings.ASSIMILATION_NO_GENOMES;
+                    JLabel emptyLabel = new JLabel(LanguageStrings.get(emptyKey));
                     emptyLabel.setForeground(AssetStyles.FONT_COLOR);
                     listPanel.add(emptyLabel);
                 } else {

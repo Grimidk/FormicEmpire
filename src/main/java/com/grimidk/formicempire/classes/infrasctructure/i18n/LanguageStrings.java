@@ -627,6 +627,7 @@ public final class LanguageStrings {
     public static final String ASSIMILATION_CURRENT = "ASSIMILATION_CURRENT";
     public static final String ASSIMILATION_NONE = "ASSIMILATION_NONE";
     public static final String ASSIMILATION_NO_GENOMES = "ASSIMILATION_NO_GENOMES";
+    public static final String ASSIMILATION_NO_PENDING_GENOMES = "ASSIMILATION_NO_PENDING_GENOMES";
     public static final String ASSIMILATION_TARGET = "ASSIMILATION_TARGET";
     public static final String ASSIMILATION_ACTIVE = "ASSIMILATION_ACTIVE";
     public static final String ASSIMILATION_PROGRESS = "ASSIMILATION_PROGRESS";
@@ -698,6 +699,7 @@ public final class LanguageStrings {
     public static final String SUBTYPE_FOOD_COST_PER_TRAIT = "SUBTYPE_FOOD_COST_PER_TRAIT";
 
     public static final String SUBTYPE_NOTHING = "SUBTYPE_NOTHING";
+    public static final String SUBTYPE_NOTHING_DESC = "SUBTYPE_NOTHING_DESC";
     public static final String SUBTYPE_HEAD_TRAPJAW = "SUBTYPE_HEAD_TRAPJAW";
     public static final String SUBTYPE_HEAD_DOORHEAD = "SUBTYPE_HEAD_DOORHEAD";
     public static final String SUBTYPE_HEAD_FARSIGHT = "SUBTYPE_HEAD_FARSIGHT";

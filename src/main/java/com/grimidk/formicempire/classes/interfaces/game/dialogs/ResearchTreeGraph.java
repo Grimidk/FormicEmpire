@@ -262,9 +262,24 @@ public final class ResearchTreeGraph {
                     LanguageStrings.UPGRADE_REQUIRES_SYNERGY_FMT, synergy.getName()));
         }
 
+        Assimilation subtypeAssimilation = GameUnlocks.getAssimilationRequiredForSubtypeRoleUpgrade(upgrade);
+        if (subtypeAssimilation != null
+                && (colony.getDynasty() == null
+                        || subtypeAssimilation.getReward() == null
+                        || !colony.hasUpgrade(subtypeAssimilation.getReward()))) {
+            String assimilationPart = LanguageStrings.format(
+                    LanguageStrings.UPGRADE_REQUIRES_ASSIMILATION_FMT, subtypeAssimilation.getName());
+            if (!parts.contains(assimilationPart)) {
+                parts.add(assimilationPart);
+            }
+        }
+
         if (assimilation == null && synergy == null) {
             Upgrade requirement = upgrade.getRequirement();
-            if (requirement != null && !colony.hasUpgrade(requirement)) {
+            boolean requirementIsSubtypeAssimilationReward = subtypeAssimilation != null
+                    && requirement != null
+                    && requirement == subtypeAssimilation.getReward();
+            if (requirement != null && !colony.hasUpgrade(requirement) && !requirementIsSubtypeAssimilationReward) {
                 parts.add(requirement.getDisplayName());
             }
             Dynasty dynasty = colony.getDynasty();
@@ -284,7 +299,8 @@ public final class ResearchTreeGraph {
             }
             boolean gatesMet = (requirement == null || colony.hasUpgrade(requirement))
                     && upgrade.isAvailableFor(dynasty)
-                    && GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade);
+                    && GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade)
+                    && GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, upgrade);
             if (gatesMet && upgrade.getCost() > 0 && colony.getResearchPoints() < upgrade.getCost()) {
                 parts.add(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
             } else if (parts.isEmpty() && upgrade.getCost() <= 0) {
@@ -325,7 +341,8 @@ public final class ResearchTreeGraph {
         boolean reqMet = upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement());
         boolean extraMet = GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade);
         boolean tierMet = upgrade.isAvailableFor(dynasty);
-        boolean gatesMet = reqMet && extraMet && tierMet;
+        boolean subtypeAssimMet = GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, upgrade);
+        boolean gatesMet = reqMet && extraMet && tierMet && subtypeAssimMet;
 
         if (gatesMet && upgrade.getCost() > 0 && colony.getResearchPoints() >= upgrade.getCost()) {
             return NodeState.AFFORDABLE;

@@ -25,6 +25,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -328,10 +329,10 @@ public class MapDialog extends ZeroDialog {
             activeWarsContent.removeAll();
             boolean playerCanManageWars = canPlayerManageWars();
             for (War war : wars) {
-                Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
-                Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
-                String label = war.getDisplayName();
+                String label = world.getWarService().formatWarNameForDisplay(war, null);
                 if (label == null || label.isEmpty()) {
+                    Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
+                    Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
                     String nameA = dynastyA != null ? dynastyA.getName() : "?";
                     String nameB = dynastyB != null ? dynastyB.getName() : "?";
                     label = LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, nameA, nameB);
@@ -562,8 +563,10 @@ public class MapDialog extends ZeroDialog {
                     AssetStyles.markClickable(name);
                     name.addMouseListener(new MouseAdapter() {
                         @Override
-                        public void mouseClicked(MouseEvent e) {
-                            changeHex(capitalHex, true);
+                        public void mouseReleased(MouseEvent e) {
+                            if (SwingUtilities.isLeftMouseButton(e)) {
+                                changeHex(capitalHex, true);
+                            }
                         }
                     });
                 }
@@ -666,9 +669,12 @@ public class MapDialog extends ZeroDialog {
     }
 
     private class HexMapPanel extends JPanel {
+        private static final int CLICK_SLOP_PX = 6;
+
         private int hexRadius = 26;
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
         private final Map<Point, Hex> hexLookup = new HashMap<>();
+        private Point pressPoint;
 
         private final int[][] NEIGHBOR_OFFSETS = {
             {1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {0, -1}, {1, -1}
@@ -677,11 +683,37 @@ public class MapDialog extends ZeroDialog {
         public HexMapPanel() {
             setBackground(AssetStyles.BACKGROUND_COLOR);
             ToolTipManager.sharedInstance().registerComponent(this);
+            AssetStyles.markClickable(this);
 
             addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
-                    handleMouseClick(e.getPoint());
+                public void mousePressed(MouseEvent e) {
+                    if (!SwingUtilities.isLeftMouseButton(e)) {
+                        return;
+                    }
+                    pressPoint = e.getPoint();
+                    ToolTipManager.sharedInstance().mousePressed(e);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (!SwingUtilities.isLeftMouseButton(e) || pressPoint == null) {
+                        return;
+                    }
+                    Point release = e.getPoint();
+                    int dx = release.x - pressPoint.x;
+                    int dy = release.y - pressPoint.y;
+                    Point click = pressPoint;
+                    pressPoint = null;
+                    if (dx * dx + dy * dy > CLICK_SLOP_PX * CLICK_SLOP_PX) {
+                        return;
+                    }
+                    handleMouseClick(click);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    pressPoint = null;
                 }
             });
         }
@@ -715,6 +747,7 @@ public class MapDialog extends ZeroDialog {
         public String getToolTipText(MouseEvent e) {
             if (world == null || world.getHexes() == null) return null;
 
+            calculateHexSize();
             Point p = e.getPoint();
             Point centerOffset = getCenterOffset();
 
@@ -795,11 +828,24 @@ public class MapDialog extends ZeroDialog {
         }
 
         private void handleMouseClick(Point p) {
-            if (world == null || world.getHexes() == null) return;
+            if (world == null || world.getHexes() == null || p == null) {
+                return;
+            }
 
+            calculateHexSize();
             Point centerOffset = getCenterOffset();
+            List<Hex> snapshot;
+            try {
+                snapshot = new ArrayList<>(world.getHexes());
+            } catch (ConcurrentModificationException ignored) {
+                return;
+            }
 
-            for (Hex hex : world.getHexes()) {
+            for (int i = snapshot.size() - 1; i >= 0; i--) {
+                Hex hex = snapshot.get(i);
+                if (hex == null) {
+                    continue;
+                }
                 Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
                 if (poly.contains(p)) {
                     changeHex(hex, true);

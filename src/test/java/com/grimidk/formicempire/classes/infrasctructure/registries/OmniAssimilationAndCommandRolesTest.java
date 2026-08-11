@@ -44,6 +44,23 @@ class OmniAssimilationAndCommandRolesTest {
     }
 
     @Test
+    void assimilationUiStaysVisibleAfterMoreThanTwoCompletedAssimilations() {
+        Dynasty dynasty = new Dynasty(1, "Omni", true, GameConstants.SPECIES_OMNI);
+        dynasty.getStarterService().initializeDynasty(dynasty);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+
+        dynasty.completeAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
+        assertEquals(2, dynasty.getCompletedAssimilations().size());
+        assertFalse(GameUnlocks.hasAssimilationUiContent(dynasty));
+        assertFalse(GameUnlocks.shouldShowAssimilationUi(dynasty));
+
+        dynasty.completeAssimilation(GameUnlocks.ASSIMILATION_PHARAOH);
+        assertTrue(dynasty.getCompletedAssimilations().size() > 2);
+        assertFalse(GameUnlocks.hasAssimilationUiContent(dynasty));
+        assertTrue(GameUnlocks.shouldShowAssimilationUi(dynasty));
+    }
+
+    @Test
     void leafcutterStartsWithNativeAssimilationCompleted() {
         Dynasty dynasty = new Dynasty(2, "Leaf", false, GameConstants.SPECIES_LEAFCUTTER);
         dynasty.getStarterService().initializeDynasty(dynasty);

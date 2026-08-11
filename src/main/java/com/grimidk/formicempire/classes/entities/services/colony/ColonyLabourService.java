@@ -102,7 +102,7 @@ public class ColonyLabourService {
                         worker.setCarrying(type);
 
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                            if (GameRandom.nextInt(100) < 1) {
+                            if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
                                 double addedResin = resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
                                 if (addedResin > 0) {
                                     worker.setCarryingSec(GameConstants.RESOURCE_RESIN);

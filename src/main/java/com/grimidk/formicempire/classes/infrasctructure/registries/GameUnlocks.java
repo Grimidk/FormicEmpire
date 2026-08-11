@@ -684,7 +684,8 @@ public final class GameUnlocks {
         public static boolean shouldShowAssimilationUi(Dynasty dynasty) {
                 return dynasty != null
                         && dynasty.hasUpgrade(ABILITY_ASSIMILATION)
-                        && hasAssimilationUiContent(dynasty);
+                        && (hasAssimilationUiContent(dynasty)
+                                || dynasty.getCompletedAssimilations().size() > 2);
         }
 
         public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "ASSIMILATION_LEAFCUTTER", "ASSIMILATION_LEAFCUTTER_DESC", ASSIMILATED_FARMING, ASSIMILATION_COST, loadIcon("icons/assimilations/Leafcutter.png"));
@@ -764,6 +765,24 @@ public final class GameUnlocks {
         public static List<Synergy> getSynergies() { return Collections.unmodifiableList(synergies); }
 
         public static List<Assimilation> getAssimilations() { return Collections.unmodifiableList(assimilations); }
+
+        public static Assimilation getAssimilationRequiredForSubtypeRoleUpgrade(Upgrade upgrade) {
+                if (upgrade == ROLE_POTTER) {
+                        return ASSIMILATION_HONEYPOT;
+                }
+                if (upgrade == ROLE_DEFENDER) {
+                        return ASSIMILATION_DOORHEAD;
+                }
+                return null;
+        }
+
+        public static boolean meetsSubtypeRoleAssimilationRequirement(Dynasty dynasty, Upgrade upgrade) {
+                Assimilation required = getAssimilationRequiredForSubtypeRoleUpgrade(upgrade);
+                if (required == null) {
+                        return true;
+                }
+                return dynasty != null && required.getReward() != null && dynasty.hasUpgrade(required.getReward());
+        }
 
         public static boolean meetsBuildingUnlockRequirement(Colony colony, Building building) {
                 if (colony == null || building == null) {

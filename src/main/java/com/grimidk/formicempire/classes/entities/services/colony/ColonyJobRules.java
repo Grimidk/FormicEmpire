@@ -92,6 +92,15 @@ public final class ColonyJobRules {
         resources.addResource(colony, GameConstants.RESOURCE_MEAT, meatGain);
         resources.addResource(colony, GameConstants.RESOURCE_ROCK, rockGain);
 
+        if (plantGain > 0
+                && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
+                && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN)) {
+            int resinGain = probabilisticRound(plantGain * GameNumbers.RESIN_FORAGE_BONUS_CHANCE);
+            if (resinGain > 0) {
+                resources.addResource(colony, GameConstants.RESOURCE_RESIN, resinGain);
+            }
+        }
+
         if (resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) {
             int farmerCount = stats.getEffectiveFarmerCount(colony);
             float convertRate = stats.getConversionRate(colony);

@@ -101,6 +101,44 @@ public class WorldTest {
     }
 
     @Test
+    void generateWorldBalancesNpcSpeciesCounts() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                7,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        Map<Integer, Integer> counts = new HashMap<>();
+        for (var species : GameConstants.getWorldSpawnableNpcSpecies()) {
+            counts.put(species.getId(), 0);
+        }
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() || dynasty.getSpecies() == null) {
+                continue;
+            }
+            int id = dynasty.getSpecies().getId();
+            if (counts.containsKey(id)) {
+                counts.put(id, counts.get(id) + 1);
+            }
+        }
+
+        int min = Integer.MAX_VALUE;
+        int max = 0;
+        int total = 0;
+        for (int count : counts.values()) {
+            min = Math.min(min, count);
+            max = Math.max(max, count);
+            total += count;
+        }
+        assertTrue(total > 0, "Expected at least one NPC dynasty");
+        assertTrue(max - min <= 1,
+                "NPC species counts should differ by at most 1, got " + counts);
+    }
+
+    @Test
     void generateWorldIncludesEachNonOmniSpecies() {
         World world = new World();
         Colony colony = new Colony(1, "Test Prime", true);

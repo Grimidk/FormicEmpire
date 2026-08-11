@@ -1125,19 +1125,21 @@ public class World {
     }
 
     private List<AntSpecies> assignNpcSpecies(int colonyCount) {
-        List<AntSpecies> nonOmni = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
-        if (colonyCount == 0 || nonOmni.isEmpty()) {
+        List<AntSpecies> pool = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
+        if (colonyCount == 0 || pool.isEmpty()) {
             return List.of();
         }
-        Collections.shuffle(nonOmni, GameRandom.getShuffleRandom());
         List<AntSpecies> assignment = new ArrayList<>(colonyCount);
-        for (int i = 0; i < colonyCount; i++) {
-            if (i < nonOmni.size()) {
-                assignment.add(nonOmni.get(i));
-            } else {
-                assignment.add(nonOmni.get(GameRandom.nextInt(nonOmni.size())));
+        while (assignment.size() < colonyCount) {
+            Collections.shuffle(pool, GameRandom.getShuffleRandom());
+            for (AntSpecies species : pool) {
+                if (assignment.size() >= colonyCount) {
+                    break;
+                }
+                assignment.add(species);
             }
         }
+        Collections.shuffle(assignment, GameRandom.getShuffleRandom());
         return assignment;
     }
     

@@ -1672,7 +1672,7 @@ public class Colony {
     public void runPolicing() { labourService.runPolicing(this); }
     
     public int getNuptialFlightCost() {
-        int base = 1000;
+        int base = GameNumbers.FORCED_FLIGHT_BASE_COST;
         int colonyCount = (dynasty != null) ? dynasty.getColonies().size() : 1;
         long scaledCost = (long) base * (1L + (long) colonyCount * colonyCount);
         

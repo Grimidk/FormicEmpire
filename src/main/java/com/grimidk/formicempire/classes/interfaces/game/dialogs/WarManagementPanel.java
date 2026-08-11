@@ -234,7 +234,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         String declaredBy = declarer != null ? declarer.getName() : notApplicable;
         String pairLabel = LanguageStrings.format(
                 LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, dynastyA.getName(), dynastyB.getName());
-        String warName = war.getDisplayName();
+        String warName = warService.formatWarNameForDisplay(war, dynasty);
         if (warName == null || warName.isEmpty()) {
             warName = pairLabel;
         }

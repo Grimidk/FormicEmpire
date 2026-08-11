@@ -29,6 +29,8 @@ Needed for launch (v1.0) (Launch Version):
 	Everything else :
 		debug settings (turbo, shows audit, infinite research, free abilities, easy conquering, enable console)
 		auto logistics withing dyansty (excess materials go to neighboring lacking colonies)
+		show all conections in logistics toggle
+		more aggresive ai and maybe mass war
 		rework how carrying looks completely, maybe have an resource icon (do not scale) inside jaws
 		mushroom detection and mushroom and resin abudance for biomes
 		swarm vs creature battles

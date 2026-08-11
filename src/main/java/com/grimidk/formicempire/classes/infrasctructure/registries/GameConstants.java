@@ -796,7 +796,7 @@ public final class GameConstants {
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
 
     public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_HEAD_NONE); }
     public static final AntSubtype SUBTYPE_HEAD_TRAPJAW = new AntSubtype(2, LanguageStrings.SUBTYPE_HEAD_TRAPJAW, AntSubtypeSlot.HEAD,
             2, GameUnlocks.ASSIMILATED_TRAPJAW, "trapjaw/", "trapjaw",
@@ -815,11 +815,11 @@ public final class GameConstants {
     static { antSubtypes.add(SUBTYPE_HEAD_FARSIGHT); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
 
     public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_ABDOMEN_NONE); }
     public static final AntSubtype SUBTYPE_ABDOMEN_STINGER = new AntSubtype(6, LanguageStrings.SUBTYPE_ABDOMEN_STINGER, AntSubtypeSlot.ABDOMEN,
             2, GameUnlocks.ASSIMILATED_STINGING, "bullet/", "bullet",
@@ -832,7 +832,7 @@ public final class GameConstants {
             1.15f, SKILL_BOOST_REGEN, null, loadIcon("icons/subtypes/honeypot.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_HONEYPOT); }
     public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
 
     static {

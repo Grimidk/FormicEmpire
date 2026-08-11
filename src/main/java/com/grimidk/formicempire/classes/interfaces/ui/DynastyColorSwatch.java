@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.ui;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -71,8 +72,8 @@ public class DynastyColorSwatch extends JPanel {
     private void installMouseHandlers() {
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if (clickable && onClick != null && isEnabled()) {
+            public void mouseReleased(MouseEvent e) {
+                if (clickable && onClick != null && isEnabled() && SwingUtilities.isLeftMouseButton(e)) {
                     onClick.run();
                 }
             }

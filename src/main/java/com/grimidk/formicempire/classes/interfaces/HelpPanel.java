@@ -1635,7 +1635,13 @@ public class HelpPanel extends JPanel {
                         body.append("<b>").append(u.getDisplayName()).append("</b><br><br>");
                         body.append(u.getDescription()).append("<br><br>");
                         body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(u.getCost())).append(" RP");
-                        if (u.getRequirement() != null) {
+                        Assimilation subtypeAssimilation = GameUnlocks.getAssimilationRequiredForSubtypeRoleUpgrade(u);
+                        if (subtypeAssimilation != null) {
+                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ")
+                                    .append(LanguageStrings.format(
+                                            LanguageStrings.UPGRADE_REQUIRES_ASSIMILATION_FMT,
+                                            subtypeAssimilation.getName()));
+                        } else if (u.getRequirement() != null) {
                             body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getDisplayName());
                         }
                     } else if (selected instanceof Building) {

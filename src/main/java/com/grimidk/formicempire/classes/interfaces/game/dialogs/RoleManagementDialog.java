@@ -609,7 +609,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 cell.setOpaque(false);
 
                 JLabel iconLabel = new JLabel(subtype.getIcon());
-                iconLabel.setToolTipText(subtype.getName());
+                iconLabel.setToolTipText(subtypeEffectTooltip(subtype));
                 cell.add(iconLabel);
 
                 boolean allowed = isSubtypeAllowed(role, subtype);
@@ -618,7 +618,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 check.setSelected(allowed || forced);
                 check.setEnabled(!forced);
                 check.setOpaque(false);
-                check.setToolTipText(LanguageStrings.format(LanguageStrings.ROLE_SUBTYPE_ALLOW_TIP, subtype.getName()));
+                check.setToolTipText(subtypeAllowTooltip(subtype));
                 AssetStyles.styleCheckBox(check);
                 if (!forced) {
                     check.addActionListener(e -> {
@@ -679,30 +679,78 @@ public class RoleManagementDialog extends ZeroDialog {
             availableSubtypesPanel.add(prefix);
 
             int nothingCount = AntSubtypeService.countStandardAntsOfType(colony, antType);
+            AntSubtype nothing = GameConstants.SUBTYPE_HEAD_NONE;
             availableSubtypesPanel.add(buildAvailableSubtypeChip(
-                    GameConstants.SUBTYPE_HEAD_NONE.getIcon(),
-                    LanguageStrings.get(LanguageStrings.SUBTYPE_NOTHING),
+                    nothing.getIcon(),
+                    nothing.getName(),
+                    nothing.getDesc(),
                     nothingCount));
 
             for (AntSubtype subtype : unlocked) {
                 int count = AntSubtypeService.countAntsWithSubtype(colony, antType, subtype);
-                availableSubtypesPanel.add(buildAvailableSubtypeChip(subtype.getIcon(), subtype.getName(), count));
+                availableSubtypesPanel.add(buildAvailableSubtypeChip(
+                        subtype.getIcon(), subtype.getName(), subtype.getDesc(), count));
             }
 
             availableSubtypesPanel.revalidate();
             availableSubtypesPanel.repaint();
         }
 
-        private JPanel buildAvailableSubtypeChip(Icon icon, String name, int count) {
+        private JPanel buildAvailableSubtypeChip(Icon icon, String name, String effect, int count) {
             JPanel chip = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
             chip.setOpaque(false);
             JLabel iconLabel = new JLabel(icon);
-            iconLabel.setToolTipText(name);
+            iconLabel.setToolTipText(formatStackedTooltip(name, effect));
             chip.add(iconLabel);
             JLabel text = new JLabel(name + ": " + AssetStyles.formatNumber(count));
             text.setForeground(AssetStyles.FONT_COLOR);
+            text.setToolTipText(formatStackedTooltip(name, effect));
             chip.add(text);
             return chip;
+        }
+
+        private static String subtypeEffectTooltip(AntSubtype subtype) {
+            if (subtype.isNone()) {
+                return formatStackedTooltip(subtype.getName(), subtype.getDesc());
+            }
+            return formatStackedTooltip(
+                    subtype.getName(),
+                    subtype.getDesc(),
+                    LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT));
+        }
+
+        private static String subtypeAllowTooltip(AntSubtype subtype) {
+            String allowLine = LanguageStrings.format(LanguageStrings.ROLE_SUBTYPE_ALLOW_TIP, subtype.getName());
+            if (subtype.isNone()) {
+                return formatStackedTooltip(allowLine, subtype.getDesc());
+            }
+            return formatStackedTooltip(
+                    allowLine,
+                    subtype.getDesc(),
+                    LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT));
+        }
+
+        private static String formatStackedTooltip(String title, String... details) {
+            StringBuilder sb = new StringBuilder("<html><body style='width:240px'><b>");
+            sb.append(escapeHtml(title == null ? "" : title));
+            sb.append("</b>");
+            if (details != null) {
+                for (String detail : details) {
+                    if (detail == null || detail.isEmpty()) {
+                        continue;
+                    }
+                    sb.append("<br>").append(escapeHtml(detail));
+                }
+            }
+            sb.append("</body></html>");
+            return sb.toString();
+        }
+
+        private static String escapeHtml(String text) {
+            return text
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
         }
 
         private int roleMaxAssignable(AntRole role) {

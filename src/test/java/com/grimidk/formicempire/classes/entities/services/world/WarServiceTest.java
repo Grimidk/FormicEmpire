@@ -54,6 +54,19 @@ class WarServiceTest {
     }
 
     @Test
+    void formatWarNameResolvesThemeKeysInsteadOfRawTags() {
+        player.setThemeBase(LanguageStrings.DYNASTY_THEME_MEAT);
+        neighbor.setThemeBase(LanguageStrings.DYNASTY_THEME_RUBY);
+        War war = world.getWarService().beginWar(player, neighbor);
+
+        assertNotNull(war);
+        String display = world.getWarService().formatWarNameForDisplay(war, player);
+        assertFalse(display.contains("DYNASTY_THEME_"), display);
+        assertTrue(display.contains(LanguageStrings.get(LanguageStrings.DYNASTY_THEME_MEAT)), display);
+        assertTrue(display.contains(LanguageStrings.get(LanguageStrings.DYNASTY_THEME_RUBY)), display);
+    }
+
+    @Test
     void beginWarIsIdempotent() {
         War first = world.getWarService().beginWar(player, neighbor);
         War second = world.getWarService().beginWar(player, neighbor);

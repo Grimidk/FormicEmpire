@@ -467,7 +467,14 @@ public final class DynastyRebellionService {
 
     public static String generateRebellionWarName(World world, Dynasty parent) {
         int ordinal = countRebellionWars(world, parent.getId()) + 1;
-        String theme = LanguageStrings.dynastyThemeBase(parent.getName(), parent.getTitleKey());
+        String theme = parent.getThemeBase();
+        if (theme == null || theme.isEmpty()) {
+            theme = LanguageStrings.dynastyThemeBase(parent.getName(), parent.getTitleKey());
+        }
+        theme = LanguageStrings.resolveDynastyThemeDisplay(theme);
+        if (theme == null || theme.isEmpty()) {
+            theme = parent.getName();
+        }
         return LanguageStrings.format(LanguageStrings.REBELLION_WAR_NAME_FMT,
                 LanguageStrings.getWarOrdinal(ordinal), theme);
     }

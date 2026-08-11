@@ -742,10 +742,12 @@ public class Dynasty {
     }
     
     public int getMassNuptialFlightCost() {
-        if (colonies.isEmpty()) return 10000;
+        if (colonies.isEmpty()) {
+            return GameNumbers.FORCED_FLIGHT_BASE_COST * GameNumbers.MASS_FLIGHT_COST_MULTIPLIER;
+        }
         
         long baseCost = (long) colonies.get(0).getNuptialFlightCost();
-        long scaledCost = baseCost * 10L;
+        long scaledCost = baseCost * (long) GameNumbers.MASS_FLIGHT_COST_MULTIPLIER;
         
         if (scaledCost > Integer.MAX_VALUE - 100000) {
             return Integer.MAX_VALUE - 100000;

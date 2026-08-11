@@ -51,9 +51,26 @@ public class MiniMapPanel extends ZeroGamePanel {
         setTitledBorder(LanguageStrings.PANEL_MINIMAP);
         AssetStyles.markClickable(this);
         addMouseListener(new MouseAdapter() {
+            private Point pressPoint;
+
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 if (e.getButton() != MouseEvent.BUTTON1) {
+                    return;
+                }
+                pressPoint = e.getPoint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() != MouseEvent.BUTTON1 || pressPoint == null) {
+                    return;
+                }
+                Point release = e.getPoint();
+                int dx = release.x - pressPoint.x;
+                int dy = release.y - pressPoint.y;
+                pressPoint = null;
+                if (dx * dx + dy * dy > 36) {
                     return;
                 }
                 if (engine == null || engine.getWorld() == null || openMapAction == null) {

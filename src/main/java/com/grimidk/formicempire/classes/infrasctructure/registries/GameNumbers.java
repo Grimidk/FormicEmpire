@@ -143,6 +143,8 @@ public final class GameNumbers {
     public static final int INTEGRATION_MIN_DIPLOMATS = 1;
     public static final int DAYS_PER_MONTH = 30;
     public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
+    public static final int FORCED_FLIGHT_BASE_COST = 200;
+    public static final int MASS_FLIGHT_COST_MULTIPLIER = 5;
 
     // --- War ---
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
@@ -206,6 +208,7 @@ public final class GameNumbers {
     public static final int TRIGGER_SCOUT_PLANT_COLLECTED = 6000;
     public static final int TRIGGER_MINER_TIER3_BUILDINGS = 10;
     public static final double MINING_GATHER_SUCCESS_CHANCE = 0.10;
+    public static final double RESIN_FORAGE_BONUS_CHANCE = 0.01;
     public static final int TRIGGER_DYNASTY_MIN_COLONIES = 2;
     public static final int TRIGGER_TRADE_MIN_COLONIES = 3;
     public static final int TRIGGER_MANAGEMENT_MIN_COLONIES = 4;

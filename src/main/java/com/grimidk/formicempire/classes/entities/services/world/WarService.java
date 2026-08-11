@@ -683,13 +683,22 @@ public class WarService {
         if (war == null) {
             return "";
         }
-        if (war.getDisplayName() != null && !war.getDisplayName().isEmpty()) {
-            return war.getDisplayName();
-        }
         Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
         Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
-        if (dynastyA != null && dynastyB != null) {
-            return generateDisplayName(dynastyA, dynastyB);
+        if (war.isRebellionWar()) {
+            Dynasty parent = resolveDeclarer(war);
+            if (parent == null) {
+                parent = dynastyA != null && dynastyA.getId() == war.getDeclaredByDynastyId()
+                        ? dynastyA : dynastyB;
+            }
+            if (parent != null) {
+                return generateRebellionDisplayName(war, parent);
+            }
+        } else if (dynastyA != null && dynastyB != null) {
+            return generateDisplayName(dynastyA, dynastyB, ordinalForRegularWar(war));
+        }
+        if (war.getDisplayName() != null && !war.getDisplayName().isEmpty()) {
+            return war.getDisplayName();
         }
         return LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, "?", "?");
     }
@@ -736,6 +745,10 @@ public class WarService {
 
     private String generateDisplayName(Dynasty dynastyA, Dynasty dynastyB) {
         int ordinal = countWarsBetweenPair(dynastyA.getId(), dynastyB.getId()) + 1;
+        return generateDisplayName(dynastyA, dynastyB, ordinal);
+    }
+
+    private String generateDisplayName(Dynasty dynastyA, Dynasty dynastyB, int ordinal) {
         String themeA = themeFromDynasty(dynastyA);
         String themeB = themeFromDynasty(dynastyB);
         if (themeA.compareToIgnoreCase(themeB) > 0) {
@@ -747,16 +760,65 @@ public class WarService {
                 LanguageStrings.getWarOrdinal(ordinal), themeA, themeB);
     }
 
+    private String generateRebellionDisplayName(War war, Dynasty parent) {
+        int ordinal = ordinalForRebellionWar(war, parent.getId());
+        String theme = themeFromDynasty(parent);
+        return LanguageStrings.format(LanguageStrings.REBELLION_WAR_NAME_FMT,
+                LanguageStrings.getWarOrdinal(ordinal), theme);
+    }
+
+    private int ordinalForRegularWar(War war) {
+        int count = 0;
+        for (War other : historicWars) {
+            if (other != null && !other.isRebellionWar()
+                    && other.getDynastyIdA() == war.getDynastyIdA()
+                    && other.getDynastyIdB() == war.getDynastyIdB()
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        for (War other : activeWars) {
+            if (other != null && !other.isRebellionWar()
+                    && other.getDynastyIdA() == war.getDynastyIdA()
+                    && other.getDynastyIdB() == war.getDynastyIdB()
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        return Math.max(1, count);
+    }
+
+    private int ordinalForRebellionWar(War war, int parentDynastyId) {
+        int count = 0;
+        for (War other : historicWars) {
+            if (other != null && other.isRebellionWar()
+                    && other.involves(parentDynastyId)
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        for (War other : activeWars) {
+            if (other != null && other.isRebellionWar()
+                    && other.involves(parentDynastyId)
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        return Math.max(1, count);
+    }
+
     private int countWarsBetweenPair(int dynastyIdOne, int dynastyIdTwo) {
         int[] pair = War.canonicalPair(dynastyIdOne, dynastyIdTwo);
         int count = 0;
         for (War war : activeWars) {
-            if (war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
+            if (!war.isRebellionWar()
+                    && war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
                 count++;
             }
         }
         for (War war : historicWars) {
-            if (war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
+            if (!war.isRebellionWar()
+                    && war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
                 count++;
             }
         }
@@ -769,8 +831,9 @@ public class WarService {
         }
         String theme = dynasty.getThemeBase();
         if (theme == null || theme.isEmpty()) {
-            theme = LanguageStrings.stripDynastyNameSuffix(dynasty.getName());
+            theme = LanguageStrings.stripDynastyNameSuffix(dynasty.getName(), dynasty.getTitleKey());
         }
+        theme = LanguageStrings.resolveDynastyThemeDisplay(theme);
         if (theme == null || theme.isEmpty()) {
             return dynasty.getName();
         }

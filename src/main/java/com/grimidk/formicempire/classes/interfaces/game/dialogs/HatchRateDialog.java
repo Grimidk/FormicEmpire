@@ -93,8 +93,9 @@ public class HatchRateDialog extends ZeroDialog {
             JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
             row.setOpaque(false);
 
+            String typeTip = typeTooltip(type);
             JLabel typeLabel = new JLabel(type.getIcon());
-            typeLabel.setToolTipText(type.getName());
+            typeLabel.setToolTipText(typeTip);
             row.add(typeLabel);
 
             float currentRate = colony.getHatchRate(type);
@@ -102,6 +103,7 @@ public class HatchRateDialog extends ZeroDialog {
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
             spinner.setPreferredSize(AssetStyles.preferredSpinnerSize(80));
+            spinner.setToolTipText(typeTip);
 
             spinner.addChangeListener(e -> handleSpinnerChange(type, spinner));
 
@@ -199,8 +201,9 @@ public class HatchRateDialog extends ZeroDialog {
             int column = 1;
             for (AntSubtype subtype : subtypes) {
                 header.gridx = column++;
+                String subtypeTip = subtypeTooltip(subtype);
                 JLabel subtypeHeader = new JLabel(subtype.getIcon());
-                subtypeHeader.setToolTipText(subtypeTooltip(subtype));
+                subtypeHeader.setToolTipText(subtypeTip);
                 matrixPanel.add(subtypeHeader, header);
             }
 
@@ -223,8 +226,9 @@ public class HatchRateDialog extends ZeroDialog {
             for (AntType type : subtypeTypes) {
                 cell.gridy = rowIndex;
                 cell.gridx = 0;
+                String typeTip = typeTooltip(type);
                 JLabel typeLabel = new JLabel(type.getIcon());
-                typeLabel.setToolTipText(type.getName());
+                typeLabel.setToolTipText(typeTip);
                 matrixPanel.add(typeLabel, cell);
 
                 Map<Integer, JSpinner> digitSpinners = new HashMap<>();
@@ -238,6 +242,7 @@ public class HatchRateDialog extends ZeroDialog {
                     JSpinner spinner = new JSpinner(model);
                     AssetStyles.styleSpinner(spinner);
                     spinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
+                    spinner.setToolTipText(matrixCellTooltip(type, subtype));
                     spinner.addChangeListener(e -> handleSubtypeSpinnerChange(slot, type, subtype.getDigit(), spinner));
                     disableSpinnerLetterInput(spinner);
                     digitSpinners.put(subtype.getDigit(), spinner);
@@ -267,17 +272,75 @@ public class HatchRateDialog extends ZeroDialog {
         };
     }
 
+    private static String typeTooltip(AntType type) {
+        return formatStackedTooltip(type.getName(), helpDescForType(type));
+    }
+
     private static String subtypeTooltip(AntSubtype subtype) {
-        String desc = subtype.getDesc();
-        String name = subtype.getName();
-        String foodNote = LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT);
-        if (desc == null || desc.isEmpty()) {
-            return subtype.isNone() ? name : name + " — " + foodNote;
-        }
+        String effect = subtype.getDesc();
         if (subtype.isNone()) {
-            return name + " — " + desc;
+            return formatStackedTooltip(subtype.getName(), effect);
         }
-        return name + " — " + desc + " " + foodNote;
+        return formatStackedTooltip(
+                subtype.getName(),
+                effect,
+                LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT));
+    }
+
+    private static String matrixCellTooltip(AntType type, AntSubtype subtype) {
+        String effect = subtype.getDesc();
+        if (subtype.isNone()) {
+            return formatStackedTooltip(type.getName() + " — " + subtype.getName(), effect);
+        }
+        return formatStackedTooltip(
+                type.getName() + " — " + subtype.getName(),
+                effect,
+                LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT));
+    }
+
+    private static String helpDescForType(AntType type) {
+        if (type == GameConstants.TYPE_WORKER) {
+            return LanguageStrings.get(LanguageStrings.HELP_TYPE_WORKER_DESC);
+        }
+        if (type == GameConstants.TYPE_SOLDIER) {
+            return LanguageStrings.get(LanguageStrings.HELP_TYPE_SOLDIER_DESC);
+        }
+        if (type == GameConstants.TYPE_MAJOR) {
+            return LanguageStrings.get(LanguageStrings.HELP_TYPE_MAJOR_DESC);
+        }
+        if (type == GameConstants.TYPE_PRINCESS) {
+            return LanguageStrings.get(LanguageStrings.HELP_TYPE_PRINCESS_DESC);
+        }
+        if (type == GameConstants.TYPE_DRONE) {
+            return LanguageStrings.get(LanguageStrings.HELP_TYPE_DRONE_DESC);
+        }
+        if (type == GameConstants.TYPE_QUEEN) {
+            return LanguageStrings.get(LanguageStrings.HELP_TYPE_QUEEN_DESC);
+        }
+        return "";
+    }
+
+    private static String formatStackedTooltip(String title, String... details) {
+        StringBuilder sb = new StringBuilder("<html><body style='width:240px'><b>");
+        sb.append(escapeHtml(title == null ? "" : title));
+        sb.append("</b>");
+        if (details != null) {
+            for (String detail : details) {
+                if (detail == null || detail.isEmpty()) {
+                    continue;
+                }
+                sb.append("<br>").append(escapeHtml(detail));
+            }
+        }
+        sb.append("</body></html>");
+        return sb.toString();
+    }
+
+    private static String escapeHtml(String text) {
+        return text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
     }
 
     private void handleSpinnerChange(AntType type, JSpinner spinner) {

@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgress
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import javax.swing.BorderFactory;
@@ -374,6 +375,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             Upgrade requirement = upgrade.getRequirement();
             Assimilation assimilation = ResearchTreeGraph.assimilationForReward(upgrade);
             Synergy synergy = ResearchTreeGraph.synergyForReward(upgrade);
+            Assimilation subtypeAssimilation = GameUnlocks.getAssimilationRequiredForSubtypeRoleUpgrade(upgrade);
             String reqDetail = null;
             if (assimilation != null) {
                 reqDetail = LanguageStrings.format(
@@ -381,6 +383,9 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             } else if (synergy != null) {
                 reqDetail = LanguageStrings.format(
                         LanguageStrings.UPGRADE_REQUIRES_SYNERGY_FMT, synergy.getName());
+            } else if (subtypeAssimilation != null) {
+                reqDetail = LanguageStrings.format(
+                        LanguageStrings.UPGRADE_REQUIRES_ASSIMILATION_FMT, subtypeAssimilation.getName());
             } else if (requirement != null) {
                 reqDetail = requirement.getDisplayName();
             }
