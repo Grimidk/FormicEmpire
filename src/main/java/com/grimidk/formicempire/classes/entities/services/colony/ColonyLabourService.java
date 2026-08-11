@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Tunnel;
@@ -38,11 +38,16 @@ public class ColonyLabourService {
     // --- Actual Ant Objects ---
     private List<Ant> getWorkingAnts(Colony colony, AntRole role) {
         workingAntsScratch.clear();
-        for (List<Ant> group : colony.getAntGroups().values()) {
-            for (Ant ant : group) {
-                if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
-                    workingAntsScratch.add(ant);
-                }
+        if (role == null) {
+            return workingAntsScratch;
+        }
+        List<Ant> group = colony.getAntsByType(role.getAntType());
+        if (group == null || group.isEmpty()) {
+            return workingAntsScratch;
+        }
+        for (Ant ant : group) {
+            if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
+                workingAntsScratch.add(ant);
             }
         }
         return workingAntsScratch;
@@ -97,7 +102,7 @@ public class ColonyLabourService {
                         worker.setCarrying(type);
 
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                            if (GameRandom.nextInt(100) < 1) {
+                            if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
                                 double addedResin = resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
                                 if (addedResin > 0) {
                                     worker.setCarryingSec(GameConstants.RESOURCE_RESIN);
@@ -171,9 +176,11 @@ public class ColonyLabourService {
             List<Ant> miners = getWorkingAnts(colony, GameConstants.ROLE_MINER);
             if (!miners.isEmpty()) {
                 for(Ant a : miners) a.clearLoad();
-                int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
-                List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);
-                processGathering(colony, sources, totalPower, GameConstants.RESOURCE_ROCK, miners);
+                if (GameRandom.nextDouble() < GameNumbers.MINING_GATHER_SUCCESS_CHANCE) {
+                    int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
+                    List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);
+                    processGathering(colony, sources, totalPower, GameConstants.RESOURCE_ROCK, miners);
+                }
             }
         }
 
@@ -363,6 +370,9 @@ public class ColonyLabourService {
             if (neighbor.getBiome() == GameConstants.BIOME_OCEAN || neighbor.getBiome() == GameConstants.BIOME_LAKE) {
                 continue;
             }
+            if (neighbor.isIsland()) {
+                continue;
+            }
             
             Colony existingColony = neighbor.getColony();
             boolean reclaimable = ColonyStarterService.isReclaimableDeadColony(existingColony);
@@ -511,7 +521,8 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_MEAT)) {
             possibleTypes.add(GameConstants.RESOURCE_MEAT);
         }
-        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_ROCK)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_ROCK)
+                && biome != null && biome.getMineralAbundance() > 0) {
             possibleTypes.add(GameConstants.RESOURCE_ROCK);
         }
         if (!locations.isSourceFull(colony, GameConstants.RESOURCE_WATER)) {

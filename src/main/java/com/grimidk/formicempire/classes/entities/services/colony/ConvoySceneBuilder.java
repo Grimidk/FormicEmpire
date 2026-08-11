@@ -1,14 +1,14 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
@@ -42,8 +42,8 @@ public final class ConvoySceneBuilder {
         ConvoyScene.BackgroundKind backgroundKind = resolveBackgroundKind(method);
 
         Dynasty dynasty = originColony.getDynasty();
-        Species species = dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI;
-        Map<AntType, Integer> typeCounts = aggregateAntTypes(trade);
+        AntSpecies species = dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI;
+        Map<AntType, Integer> typeCounts = aggregateAntTypes(trade, method);
 
         int totalHours = Math.max(1, trade.getTotalHours());
         int remainingHours = Math.max(0, trade.getRemainingHours());
@@ -125,14 +125,15 @@ public final class ConvoySceneBuilder {
         return GameConstants.BIOME_PLAINS;
     }
 
-    private static Map<AntType, Integer> aggregateAntTypes(Trade trade) {
+    private static Map<AntType, Integer> aggregateAntTypes(Trade trade, TradeMethod method) {
         Map<AntType, Integer> byType = new HashMap<>();
+        boolean sky = method == GameConstants.METHOD_AIR;
         for (Ant ant : trade.getAntsOnTrip()) {
             if (ant == null || !ant.isAlive() || ant.getAntType() == null) {
                 continue;
             }
             AntType type = ant.getAntType();
-            if (type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE) {
+            if (!includeConvoyType(type, sky)) {
                 continue;
             }
             byType.merge(type, 1, Integer::sum);
@@ -141,12 +142,27 @@ public final class ConvoySceneBuilder {
             Map<AntType, Integer> transport = trade.getTransport();
             if (transport != null) {
                 for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
-                    if (entry.getKey() != null && entry.getValue() != null && entry.getValue() > 0) {
-                        byType.put(entry.getKey(), entry.getValue());
+                    AntType type = entry.getKey();
+                    if (type == null || entry.getValue() == null || entry.getValue() <= 0) {
+                        continue;
                     }
+                    if (!includeConvoyType(type, sky)) {
+                        continue;
+                    }
+                    byType.put(type, entry.getValue());
                 }
             }
         }
         return byType;
+    }
+
+    private static boolean includeConvoyType(AntType type, boolean sky) {
+        if (type == null || type == GameConstants.TYPE_DEAD) {
+            return false;
+        }
+        if (sky) {
+            return type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS;
+        }
+        return type != GameConstants.TYPE_DRONE;
     }
 }

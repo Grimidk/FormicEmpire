@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.ui.util;
 
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.awt.Component;
@@ -148,6 +150,7 @@ public final class UiOptionPane {
 
     private static void showBlockingDialog(JDialog dialog, Component parent) {
         UiDialogUtils.prepareDialog(dialog, parent);
+        SfxService.play(SoundEffects.POPUP);
         dialog.setVisible(true);
         dialog.dispose();
     }
@@ -156,6 +159,7 @@ public final class UiOptionPane {
         UiDialogUtils.prepareDialog(dialog, parent);
         dialog.setModal(true);
         dialog.setAlwaysOnTop(true);
+        SfxService.play(SoundEffects.POPUP);
         dialog.setVisible(true);
         dialog.dispose();
     }

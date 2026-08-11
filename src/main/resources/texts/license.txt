@@ -1,0 +1,56 @@
+FormicEmpire License
+Copyright (c) Juan Mendez Larrazabal
+also known as GrimIDK / Grim Unknown
+
+All code, images, sounds, and other assets in this project were made by
+the author.
+
+1. Ownership and monetization
+
+The author holds the sole right to monetize all code, assets, and other
+materials in this project.
+
+Only the author may grant permission to others to monetize this project or
+any part of it. That includes distributors and storefronts such as Steam,
+itch.io, or similar platforms. No one else may sell, commercially
+distribute, or otherwise commercially exploit this project without prior
+written permission from the author.
+
+2. Non-commercial use
+
+All code and assets in this project may be used freely for any purpose other
+than monetary gain. This includes personal use, learning, sharing, and
+non-commercial projects.
+
+3. Name
+
+Anyone may use the name FormicEmpire. It is composed of common words and is
+not restricted by this license.
+
+4. Modifications and mods
+
+Modifications are allowed. Custom mods are supported and encouraged.
+
+A modified version may not be monetized unless the author has expressly
+approved that monetization. If monetization is approved, the project must
+be credited (FormicEmpire, and the author).
+
+5. Playing the game
+
+Anyone who wants to play FormicEmpire may do so for free by simply asking
+the author. Playing the game does not require payment.
+
+6. Permission and contact
+
+To request free play access, monetization rights, commercial redistribution,
+or approval to monetize a modification, contact the author at:
+
+thegrimidk@gmail.com
+
+7. No warranty
+
+THE SOFTWARE AND ASSETS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY ARISING FROM USE OF THIS PROJECT.

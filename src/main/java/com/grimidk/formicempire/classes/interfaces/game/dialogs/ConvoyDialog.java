@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -55,6 +55,10 @@ public class ConvoyDialog extends ZeroDialog {
             return;
         }
         convoyPanel.refreshScene();
+    }
+
+    public void applyVisualFrameRate() {
+        convoyPanel.applyVisualFrameRate();
     }
 
     @Override

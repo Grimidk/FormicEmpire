@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.shared;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -14,7 +14,9 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class TriggerProgressService {
 
@@ -36,6 +38,21 @@ public final class TriggerProgressService {
                 .comparing(TriggerProgress::isUnlocked)
                 .thenComparing((a, b) -> Double.compare(b.ratio(), a.ratio())));
         return visible;
+    }
+
+    public static Map<Upgrade, TriggerProgress> indexByUpgrade(Colony colony, Engine engine) {
+        Map<Upgrade, TriggerProgress> indexed = new HashMap<>();
+        for (TriggerProgress progress : buildAll(colony, engine)) {
+            indexed.put(progress.getUpgrade(), progress);
+        }
+        return indexed;
+    }
+
+    public static TriggerProgress find(Colony colony, Engine engine, Upgrade upgrade) {
+        if (colony == null || upgrade == null) {
+            return null;
+        }
+        return indexByUpgrade(colony, engine).get(upgrade);
     }
 
     public static boolean isVisible(TriggerProgress progress) {
@@ -96,11 +113,11 @@ public final class TriggerProgressService {
                 GameUnlocks.ROLE_POLICE,
                 LanguageStrings.TRIGGER_POLICE_ROLE_TITLE,
                 LanguageStrings.TRIGGER_PROGRESS_HINT_POLICE,
-                LanguageStrings.TRIGGER_PROGRESS_METRIC_POPULATION,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_RANK,
                 colony.hasUpgrade(GameUnlocks.ROLE_POLICE),
                 true,
-                colony.getRank() != null ? (int) Math.min(Integer.MAX_VALUE, colony.getRank().getPopulation()) : 0,
-                GameNumbers.TRIGGER_POLICE_MIN_POPULATION));
+                colony.getRank() != null ? colony.getRank().getId() : 0,
+                GameConstants.RANK_DUCHY.getId()));
 
         int colonyCount = dynasty != null ? dynasty.getColonies().size() : 0;
         boolean hasDynasty = dynasty != null;
@@ -220,7 +237,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_CLONING),
                 hasDynasty,
                 rankId,
-                GameConstants.TRIGGER_CLONING_MIN_RANK.getId()));
+                GameConstants.RANK_EMPIRE.getId()));
 
         entries.add(numeric(
                 GameUnlocks.ROLE_SCOUT,
@@ -232,6 +249,16 @@ public final class TriggerProgressService {
                 plantHarvestProgress(colony),
                 GameNumbers.TRIGGER_SCOUT_PLANT_COLLECTED));
 
+        entries.add(numeric(
+                GameUnlocks.ROLE_MINER,
+                LanguageStrings.TRIGGER_MINER_ROLE_TITLE,
+                LanguageStrings.TRIGGER_PROGRESS_HINT_MINER,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_TIER3_BUILDINGS,
+                colony.hasUpgrade(GameUnlocks.ROLE_MINER),
+                colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER),
+                GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3),
+                GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS));
+
         boolean parasiticMiteUnlocked = colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
         entries.add(numeric(
                 GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
@@ -242,6 +269,20 @@ public final class TriggerProgressService {
                 true,
                 dynastyStoredResourceProgress(colony),
                 GameNumbers.PARASITIC_MITE_RESOURCE_THRESHOLD));
+
+        int warsParticipated = 0;
+        if (dynasty != null && world != null && world.getWarService() != null) {
+            warsParticipated = world.getWarService().countWarsForDynasty(dynasty.getId());
+        }
+        entries.add(numeric(
+                GameUnlocks.ROLE_COMMANDER,
+                LanguageStrings.TRIGGER_COMMANDER_ROLE_TITLE,
+                LanguageStrings.TRIGGER_PROGRESS_HINT_COMMANDER,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_WARS,
+                colony.hasUpgrade(GameUnlocks.ROLE_COMMANDER),
+                hasDynasty,
+                warsParticipated,
+                GameNumbers.TRIGGER_COMMANDER_MIN_WARS));
 
         return entries;
     }

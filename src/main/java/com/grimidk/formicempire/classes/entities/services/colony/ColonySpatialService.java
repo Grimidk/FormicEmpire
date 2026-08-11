@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.entities.services.colony;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.entities.spatial.Room;

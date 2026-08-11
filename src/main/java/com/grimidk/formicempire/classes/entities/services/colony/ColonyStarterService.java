@@ -1,10 +1,10 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -43,7 +43,6 @@ public class ColonyStarterService {
                 index = d.getColonies().size();
             }
 
-            // Capitals may already be named by World; satellites always use city titles.
             if (index == 0) {
                 if (colony.getName() == null || colony.getName().isEmpty()) {
                     colony.setName(d.generateColonyName(0));
@@ -90,7 +89,7 @@ public class ColonyStarterService {
         if (!colony.isPlayer()) {
             colony.setAutomationEnabled(true);
             System.out.println("[ColonyStarterService] Automation ENABLED for NPC colony.");
-            Species species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : null;
+            AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : null;
             if (species != null) {
                 AntSubtypeService.applyNaturalSpeciesSubtypeRates(colony, species);
             }
@@ -142,7 +141,7 @@ public class ColonyStarterService {
 
         clearColonyLists(colony);
         if (colony.getDeadAnts() != null) colony.getDeadAnts().clear();
-        if (colony.getBugs() != null) colony.getBugs().clear();
+        if (colony.getCritters() != null) colony.getCritters().clear();
 
         hex.setColony(null);
     }
@@ -171,8 +170,8 @@ public class ColonyStarterService {
         if (colony.getDeadAnts() != null) {
             colony.getDeadAnts().clear();
         }
-        if (colony.getBugs() != null) {
-            colony.getBugs().clear();
+        if (colony.getCritters() != null) {
+            colony.getCritters().clear();
         }
     }
 

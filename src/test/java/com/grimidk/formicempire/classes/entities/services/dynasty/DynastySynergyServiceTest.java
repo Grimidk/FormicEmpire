@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import org.junit.jupiter.api.Test;
 
@@ -108,6 +108,47 @@ class DynastySynergyServiceTest {
         dynasty.revokeUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
 
         assertTrue(dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM));
-        assertEquals(5f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(1.5f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+    }
+
+    @Test
+    void acidArtillerySynergyUnlocksArtilleryRole() {
+        Dynasty dynasty = new Dynasty(10, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_ACIDSPIT);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_MAJOR);
+
+        assertTrue(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.ACID_ARTILLERY_SYNERGY));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ROLE_ARTILLERY));
+        assertTrue(GameConstants.isObtainableRole(GameConstants.ROLE_ARTILLERY));
+    }
+
+    @Test
+    void corrosiveBombsSynergyUnlocksAcidicSelfdestruct() {
+        Dynasty dynasty = new Dynasty(11, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_SELFDESTRUCT);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_ACIDSPIT);
+
+        assertTrue(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.CORROSIVE_BOMBS_SYNERGY));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.SYNERGY_CORROSIVE_BOMBS));
+        assertTrue(dynasty.hasSkill(GameConstants.SKILL_ACIDIC_SELFDESTRUCT));
+    }
+
+    @Test
+    void airBomberSynergyUnlocksAirBomberRoleAndSkill() {
+        Dynasty dynasty = new Dynasty(12, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_AIR_SUPPORT);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_BOMBER);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_ACIDSPIT);
+
+        assertTrue(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.AIR_BOMBER_SYNERGY));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ROLE_AIR_BOMBER));
+        assertTrue(dynasty.hasSkill(GameConstants.SKILL_AIR_BOMBING));
+        assertTrue(GameConstants.SKILL_AIR_BOMBING.sacrificesSelf());
+        assertEquals(20f, GameConstants.SKILL_AIR_BOMBING.getDamageMult(), 0.0001f);
+        assertEquals(0.9f, GameConstants.SKILL_AIR_BOMBING.getAccuracyMult(), 0.0001f);
+        assertEquals(GameConstants.BATTLE_LINE_AIR_SUPPORT, GameConstants.SKILL_AIR_BOMBING.getBattleLine());
     }
 }

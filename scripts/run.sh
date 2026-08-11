@@ -20,9 +20,10 @@ else
     exit 1
 fi
 
-echo "[Build] Syncing roadmap.txt and credits.txt from the project root into src/main/resources/meta/..."
-cp -f roadmap.txt src/main/resources/meta/roadmap.txt
-cp -f credits.txt src/main/resources/meta/credits.txt
+echo "[Build] Syncing music tracks..."
+java "$ROOT/tools/MusicTracksCodegen.java" \
+    "$ROOT/src/main/resources/audio/music" \
+    "$ROOT/src/main/java/com/grimidk/formicempire/classes/infrasctructure/registries/MusicTracks.java"
 
 echo "[Build] Building Formic Empire..."
 $MVN_EXEC clean install

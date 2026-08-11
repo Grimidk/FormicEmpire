@@ -6,8 +6,8 @@ import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEven
 import java.util.ArrayList;
 import java.util.List;
 
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;

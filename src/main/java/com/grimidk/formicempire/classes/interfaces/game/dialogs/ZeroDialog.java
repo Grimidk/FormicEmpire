@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
@@ -14,6 +15,7 @@ public abstract class ZeroDialog extends JDialog {
     
     private final String titleKey;
     private final JButton closeButton;
+    private boolean hideOnClose;
 
     public ZeroDialog(JFrame owner, String titleKey, Dimension preferredSize) {
         super(owner, LanguageStrings.get(titleKey), true);
@@ -35,15 +37,30 @@ public abstract class ZeroDialog extends JDialog {
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
         AssetStyles.styleButton(closeButton);
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> requestClose());
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
 
-        getRootPane().registerKeyboardAction(e -> handleEscapeKey(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        EdgeTriggeredKeyBindings.bind(
+                getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+                getRootPane().getActionMap(),
+                KeyEvent.VK_ESCAPE,
+                "escapeClose",
+                this::handleEscapeKey);
         
         setFocusable(true);
+    }
+
+    protected void setHideOnClose(boolean hideOnClose) {
+        this.hideOnClose = hideOnClose;
+    }
+
+    public void requestClose() {
+        if (hideOnClose) {
+            setVisible(false);
+        } else {
+            dispose();
+        }
     }
     
     public void refreshTranslations() {
@@ -72,17 +89,27 @@ public abstract class ZeroDialog extends JDialog {
     }
 
     private void handleEscapeKey() {
+        if (consumeEscape()) {
+            return;
+        }
         if (getOwner() instanceof MainFrame frame && frame.getGamePanel() != null
                 && frame.getGamePanel().handleEscapeKey()) {
             return;
         }
-        dispose();
+        requestClose();
+    }
+
+    protected boolean consumeEscape() {
+        return false;
     }
 
     protected void registerCloseKey(int keyEvent) {
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(keyEvent, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        EdgeTriggeredKeyBindings.bind(
+                getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+                getRootPane().getActionMap(),
+                keyEvent,
+                "closeKey",
+                this::requestClose);
     }
 
     protected void addToSouthPanel(JComponent component) {

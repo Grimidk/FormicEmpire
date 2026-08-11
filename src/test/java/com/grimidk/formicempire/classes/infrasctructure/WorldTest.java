@@ -1,16 +1,20 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,7 +72,7 @@ public class WorldTest {
 
         // 2. Load World
         World world = new World();
-        world.setEngine(null); // No engine needed for tunnel test
+        world.setEngine(null);
         world.loadWorld(savefile);
 
         // 3. Verify
@@ -97,12 +101,50 @@ public class WorldTest {
     }
 
     @Test
+    void generateWorldBalancesNpcSpeciesCounts() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                7,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        Map<Integer, Integer> counts = new HashMap<>();
+        for (var species : GameConstants.getWorldSpawnableNpcSpecies()) {
+            counts.put(species.getId(), 0);
+        }
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() || dynasty.getSpecies() == null) {
+                continue;
+            }
+            int id = dynasty.getSpecies().getId();
+            if (counts.containsKey(id)) {
+                counts.put(id, counts.get(id) + 1);
+            }
+        }
+
+        int min = Integer.MAX_VALUE;
+        int max = 0;
+        int total = 0;
+        for (int count : counts.values()) {
+            min = Math.min(min, count);
+            max = Math.max(max, count);
+            total += count;
+        }
+        assertTrue(total > 0, "Expected at least one NPC dynasty");
+        assertTrue(max - min <= 1,
+                "NPC species counts should differ by at most 1, got " + counts);
+    }
+
+    @Test
     void generateWorldIncludesEachNonOmniSpecies() {
         World world = new World();
         Colony colony = new Colony(1, "Test Prime", true);
         world.generateWorld(
                 GameConstants.BIOME_PLAINS,
-                8,
+                7,
                 colony,
                 "Test",
                 LanguageStrings.DYNASTY_TITLE_DYNASTY);
@@ -157,5 +199,213 @@ public class WorldTest {
 
         assertEquals(1, world.minDynastyHexDistance(dynastyA, dynastyB));
         assertEquals(Integer.MAX_VALUE, world.minDynastyHexDistance(dynastyA, null));
+    }
+
+    @Test
+    void generateWorldUsesContinentCorePlusCoastalAndOuterOceanRings() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        int core = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                core,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        assertEquals(core, world.getContinentCoreRadius());
+        assertEquals(GameNumbers.worldRadiusForContinentCore(core), world.getWorldRadius());
+        assertTrue(world.getContinentCount() >= 1);
+        assertTrue(world.getIslandCount() >= GameNumbers.WORLD_MIN_ISLAND_COUNT,
+                "Expected at least " + GameNumbers.WORLD_MIN_ISLAND_COUNT + " islands, got " + world.getIslandCount());
+        assertBiomeMinimums(world);
+
+        int outerDist = world.getWorldRadius();
+        for (Hex hex : world.getHexes()) {
+            int dist = (Math.abs(hex.getQ()) + Math.abs(hex.getQ() + hex.getR()) + Math.abs(hex.getR())) / 2;
+            if (dist == outerDist) {
+                assertEquals(GameConstants.BIOME_OCEAN, hex.getBiome(),
+                        "Outer ring must be pure ocean at " + hex.getQ() + "," + hex.getR());
+            }
+            if (hex.isIsland()) {
+                assertNull(hex.getColony(), "Islands must not spawn colonies");
+                assertNotEquals(GameConstants.BIOME_OCEAN, hex.getBiome());
+                assertNotEquals(GameConstants.BIOME_LAKE, hex.getBiome());
+            }
+        }
+    }
+
+    @Test
+    void generateWorldEnsuresMinimumIslandsForSmallCore() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                0,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        assertTrue(world.getIslandCount() >= GameNumbers.WORLD_MIN_ISLAND_COUNT,
+                "Expected at least " + GameNumbers.WORLD_MIN_ISLAND_COUNT + " islands, got " + world.getIslandCount());
+        for (Hex hex : world.getHexes()) {
+            if (hex.isIsland()) {
+                assertNull(hex.getColony(), "Islands must not spawn colonies");
+            }
+        }
+    }
+
+    private static void assertBiomeMinimums(World world) {
+        Map<Biome, Integer> counts = new HashMap<>();
+        for (Hex hex : world.getHexes()) {
+            counts.merge(hex.getBiome(), 1, Integer::sum);
+        }
+        for (Biome biome : GameConstants.getBiomes()) {
+            int count = counts.getOrDefault(biome, 0);
+            assertTrue(count >= GameNumbers.WORLD_MIN_HEXES_PER_BIOME,
+                    "Expected at least " + GameNumbers.WORLD_MIN_HEXES_PER_BIOME
+                            + " hexes of " + biome.getId() + ", got " + count);
+        }
+    }
+
+    @Test
+    void classifyLandmassesMarksDisconnectedLandAsIslands() {
+        World world = new World();
+        world.setContinentCoreRadius(1);
+
+        Hex core = new Hex();
+        core.setQ(0);
+        core.setR(0);
+        core.setBiome(GameConstants.BIOME_PLAINS);
+
+        Hex island = new Hex();
+        island.setQ(3);
+        island.setR(0);
+        island.setBiome(GameConstants.BIOME_PLAINS);
+
+        Hex ocean = new Hex();
+        ocean.setQ(1);
+        ocean.setR(0);
+        ocean.setBiome(GameConstants.BIOME_OCEAN);
+
+        core.setSouthEast(ocean);
+        ocean.setNorthWest(core);
+        ocean.setSouthEast(island);
+        island.setNorthWest(ocean);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(core);
+        hexes.add(ocean);
+        hexes.add(island);
+        world.setHexes(hexes);
+
+        world.classifyLandmasses();
+
+        assertEquals(1, world.getContinentCount());
+        assertEquals(1, world.getIslandCount());
+        assertFalse(core.isIsland());
+        assertTrue(island.isIsland());
+    }
+
+    @Test
+    void convertEnclosedOceansToLakesLeavesOpenOcean() {
+        World world = new World();
+
+        Hex inlandOcean = new Hex();
+        inlandOcean.setQ(0);
+        inlandOcean.setR(0);
+        inlandOcean.setBiome(GameConstants.BIOME_OCEAN);
+
+        Hex[] ring = new Hex[6];
+        for (int i = 0; i < 6; i++) {
+            Hex land = new Hex();
+            land.setQ(i + 1);
+            land.setR(0);
+            land.setBiome(GameConstants.BIOME_PLAINS);
+            ring[i] = land;
+        }
+        inlandOcean.setNorth(ring[0]);
+        inlandOcean.setNorthEast(ring[1]);
+        inlandOcean.setSouthEast(ring[2]);
+        inlandOcean.setSouth(ring[3]);
+        inlandOcean.setSouthWest(ring[4]);
+        inlandOcean.setNorthWest(ring[5]);
+        ring[0].setSouth(inlandOcean);
+        ring[1].setSouthWest(inlandOcean);
+        ring[2].setNorthWest(inlandOcean);
+        ring[3].setNorth(inlandOcean);
+        ring[4].setNorthEast(inlandOcean);
+        ring[5].setSouthEast(inlandOcean);
+
+        Hex openOcean = new Hex();
+        openOcean.setQ(10);
+        openOcean.setR(0);
+        openOcean.setBiome(GameConstants.BIOME_OCEAN);
+
+        Hex channelOcean = new Hex();
+        channelOcean.setQ(11);
+        channelOcean.setR(0);
+        channelOcean.setBiome(GameConstants.BIOME_OCEAN);
+        openOcean.setSouthEast(channelOcean);
+        channelOcean.setNorthWest(openOcean);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(inlandOcean);
+        for (Hex land : ring) {
+            hexes.add(land);
+        }
+        hexes.add(openOcean);
+        hexes.add(channelOcean);
+        world.setHexes(hexes);
+
+        world.convertEnclosedOceansToLakes();
+
+        assertEquals(GameConstants.BIOME_LAKE, inlandOcean.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, openOcean.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, channelOcean.getBiome());
+    }
+
+    @Test
+    void convertLakesTouchingOceanToOceanCascadesThroughConnectedLakes() {
+        World world = new World();
+
+        Hex ocean = new Hex();
+        ocean.setQ(0);
+        ocean.setR(0);
+        ocean.setBiome(GameConstants.BIOME_OCEAN);
+
+        Hex lakeTouching = new Hex();
+        lakeTouching.setQ(1);
+        lakeTouching.setR(0);
+        lakeTouching.setBiome(GameConstants.BIOME_LAKE);
+
+        Hex lakeBehind = new Hex();
+        lakeBehind.setQ(2);
+        lakeBehind.setR(0);
+        lakeBehind.setBiome(GameConstants.BIOME_LAKE);
+
+        Hex inlandLake = new Hex();
+        inlandLake.setQ(5);
+        inlandLake.setR(0);
+        inlandLake.setBiome(GameConstants.BIOME_LAKE);
+
+        ocean.setSouthEast(lakeTouching);
+        lakeTouching.setNorthWest(ocean);
+        lakeTouching.setSouthEast(lakeBehind);
+        lakeBehind.setNorthWest(lakeTouching);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(ocean);
+        hexes.add(lakeTouching);
+        hexes.add(lakeBehind);
+        hexes.add(inlandLake);
+        world.setHexes(hexes);
+
+        world.convertLakesTouchingOceanToOcean();
+
+        assertEquals(GameConstants.BIOME_OCEAN, ocean.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, lakeTouching.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, lakeBehind.getBiome());
+        assertEquals(GameConstants.BIOME_LAKE, inlandLake.getBiome());
     }
 }

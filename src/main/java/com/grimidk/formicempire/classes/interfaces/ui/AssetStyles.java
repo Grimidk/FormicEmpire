@@ -55,15 +55,19 @@ public class AssetStyles {
     public static final String META_APP_ICON = "/meta/icon.ico";
     public static final String META_DIALOG_ICON = "/meta/icon.iconset/icon_32x32@2x.png";
     public static final String META_FONT = "/meta/fonts/font.ttf";
-    public static final String META_ROADMAP = "/meta/roadmap.txt";
-    public static final String META_CREDITS = "/meta/credits.txt";
-    public static final String META_AUDIT = "/meta/audit.txt";
+    public static final String META_ROADMAP = "/texts/roadmap.txt";
+    public static final String META_CREDITS = "/texts/credits.txt";
+    public static final String META_AUDIT = "/texts/audit.txt";
+    public static final String META_VERSION = "/texts/version.txt";
+    public static final String META_LICENSE = "/texts/license.txt";
 
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
+    public static final String MENU_BUTTON_CLIENT_KEY = "formicempire.menuButton";
 
-    /** Matches cursor PNG size; no interactive control should be smaller on either axis. */
     public static final int MIN_CONTROL_HIT_SIZE = 20;
     public static final int MIN_SPINNER_HEIGHT = MIN_CONTROL_HIT_SIZE * 2;
+    public static final int MENU_BUTTON_WIDTH = 400;
+    public static final int MENU_BUTTON_ALPHA = 180;
 
     // --- Palette ---
     public static final Color COLOR_ABSOLUTE_BLACK = UiPalette.COLOR_ABSOLUTE_BLACK;
@@ -247,6 +251,10 @@ public class AssetStyles {
 
     public static void styleIconButton(AbstractButton button) {
         UiButtonStyles.styleIcon(button);
+    }
+
+    public static void styleMenuButton(AbstractButton button) {
+        UiButtonStyles.styleMenu(button);
     }
 
     public static void styleSectionTabButton(AbstractButton button) {

@@ -1,11 +1,11 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -14,10 +14,10 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -72,7 +72,6 @@ public class RoleManagementDialog extends ZeroDialog {
         headerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         headerPanel.add(warEconomyCheck);
         headerPanel.add(copyPeaceToWarButton);
-        // Keep header height stable when war-economy controls hide/show.
         headerPanel.setPreferredSize(new Dimension(
                 AssetStyles.ROLE_DIALOG_SIZE.width,
                 Math.max(AssetStyles.MIN_CONTROL_HIT_SIZE + 16, copyPeaceToWarButton.getPreferredSize().height + 12)));
@@ -241,15 +240,11 @@ public class RoleManagementDialog extends ZeroDialog {
     }
     
     private void addTabSwitchAction(InputMap im, ActionMap am, String name, int key, int tabType) {
-        im.put(KeyStroke.getKeyStroke(key, 0), name);
-        am.put(name, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(tabType)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(tabType)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
-                }
+        EdgeTriggeredKeyBindings.bind(im, am, key, name, () -> {
+            if (isTabOpen(tabType)) {
+                dispose();
+            } else if (tabIndexMap.containsKey(tabType)) {
+                tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
             }
         });
     }
@@ -287,6 +282,10 @@ public class RoleManagementDialog extends ZeroDialog {
         if (role == GameConstants.ROLE_TRANSPORT) return GameUnlocks.ROLE_TRANSPORT;
         if (role == GameConstants.ROLE_DIPLOMAT) return GameUnlocks.ROLE_DIPLOMAT;
         if (role == GameConstants.ROLE_SKYTRANS) return GameUnlocks.ROLE_SKYTRANS;
+        if (role == GameConstants.ROLE_COMMANDER) return GameUnlocks.ROLE_COMMANDER;
+        if (role == GameConstants.ROLE_CAPTAIN) return GameUnlocks.ROLE_CAPTAIN;
+        if (role == GameConstants.ROLE_AIR_SUPPORT) return GameUnlocks.ROLE_AIR_SUPPORT;
+        if (role == GameConstants.ROLE_AIR_BOMBER) return GameUnlocks.ROLE_AIR_BOMBER;
 
         return null; 
     }
@@ -393,15 +392,12 @@ public class RoleManagementDialog extends ZeroDialog {
                 Upgrade roleUpgrade = getUpgradeForRole(role);
                 boolean unlocked = roleUpgrade != null && colony.hasUpgrade(roleUpgrade);
 
-                if (GameConstants.isWarEconomyExclusiveRole(role)) {
-                    // War-only roles must still appear on their type tab once unlocked.
-                    // Quotas always read/write the war distribution (see usesWarRoleCounts).
-                    if (!unlocked) {
+                if (role.isActiveMilitary()) {
+                    if (!owner.isEditingWarRoles() || !unlocked) {
                         removeRoleRow(role);
                         continue;
                     }
                     if (!displayedRoles.contains(role)) {
-                        // Must mark displayed before addRoleRow — rebuildRolesGrid skips unmarked roles.
                         displayedRoles.add(role);
                         addRoleRow(role);
                         addedAny = true;
@@ -413,7 +409,6 @@ public class RoleManagementDialog extends ZeroDialog {
                 }
 
                 if (unlocked) {
-                    // Must mark displayed before addRoleRow — rebuildRolesGrid skips unmarked roles.
                     displayedRoles.add(role);
                     addRoleRow(role);
                     addedAny = true;
@@ -440,7 +435,9 @@ public class RoleManagementDialog extends ZeroDialog {
 
         private void addRoleRow(AntRole role) {
             int currentAssigned = getRoleCount(role);
-            SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
+            int spinnerMax = roleMaxAssignable(role);
+            int initial = Math.min(currentAssigned, spinnerMax);
+            SpinnerModel model = new SpinnerNumberModel(initial, 0, spinnerMax, 1); 
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
             Dimension spinnerSize = AssetStyles.preferredSpinnerSize(80);
@@ -451,6 +448,16 @@ public class RoleManagementDialog extends ZeroDialog {
             spinner.addChangeListener(e -> {
                 if (isUpdating) return;
                 int newValue = (Integer) spinner.getValue();
+                int roleMax = roleMaxAssignable(role);
+                if (newValue > roleMax) {
+                    newValue = roleMax;
+                    isUpdating = true;
+                    try {
+                        spinner.setValue(roleMax);
+                    } finally {
+                        isUpdating = false;
+                    }
+                }
                 boolean warCounts = usesWarRoleCounts(role);
                 
                 int otherSpinnersTotal = 0;
@@ -602,7 +609,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 cell.setOpaque(false);
 
                 JLabel iconLabel = new JLabel(subtype.getIcon());
-                iconLabel.setToolTipText(subtype.getName());
+                iconLabel.setToolTipText(subtypeEffectTooltip(subtype));
                 cell.add(iconLabel);
 
                 boolean allowed = isSubtypeAllowed(role, subtype);
@@ -611,7 +618,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 check.setSelected(allowed || forced);
                 check.setEnabled(!forced);
                 check.setOpaque(false);
-                check.setToolTipText(LanguageStrings.format(LanguageStrings.ROLE_SUBTYPE_ALLOW_TIP, subtype.getName()));
+                check.setToolTipText(subtypeAllowTooltip(subtype));
                 AssetStyles.styleCheckBox(check);
                 if (!forced) {
                     check.addActionListener(e -> {
@@ -672,34 +679,89 @@ public class RoleManagementDialog extends ZeroDialog {
             availableSubtypesPanel.add(prefix);
 
             int nothingCount = AntSubtypeService.countStandardAntsOfType(colony, antType);
+            AntSubtype nothing = GameConstants.SUBTYPE_HEAD_NONE;
             availableSubtypesPanel.add(buildAvailableSubtypeChip(
-                    GameConstants.SUBTYPE_HEAD_NONE.getIcon(),
-                    LanguageStrings.get(LanguageStrings.SUBTYPE_NOTHING),
+                    nothing.getIcon(),
+                    nothing.getName(),
+                    nothing.getDesc(),
                     nothingCount));
 
             for (AntSubtype subtype : unlocked) {
                 int count = AntSubtypeService.countAntsWithSubtype(colony, antType, subtype);
-                availableSubtypesPanel.add(buildAvailableSubtypeChip(subtype.getIcon(), subtype.getName(), count));
+                availableSubtypesPanel.add(buildAvailableSubtypeChip(
+                        subtype.getIcon(), subtype.getName(), subtype.getDesc(), count));
             }
 
             availableSubtypesPanel.revalidate();
             availableSubtypesPanel.repaint();
         }
 
-        private JPanel buildAvailableSubtypeChip(Icon icon, String name, int count) {
+        private JPanel buildAvailableSubtypeChip(Icon icon, String name, String effect, int count) {
             JPanel chip = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
             chip.setOpaque(false);
             JLabel iconLabel = new JLabel(icon);
-            iconLabel.setToolTipText(name);
+            iconLabel.setToolTipText(formatStackedTooltip(name, effect));
             chip.add(iconLabel);
             JLabel text = new JLabel(name + ": " + AssetStyles.formatNumber(count));
             text.setForeground(AssetStyles.FONT_COLOR);
+            text.setToolTipText(formatStackedTooltip(name, effect));
             chip.add(text);
             return chip;
         }
 
+        private static String subtypeEffectTooltip(AntSubtype subtype) {
+            if (subtype.isNone()) {
+                return formatStackedTooltip(subtype.getName(), subtype.getDesc());
+            }
+            return formatStackedTooltip(
+                    subtype.getName(),
+                    subtype.getDesc(),
+                    LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT));
+        }
+
+        private static String subtypeAllowTooltip(AntSubtype subtype) {
+            String allowLine = LanguageStrings.format(LanguageStrings.ROLE_SUBTYPE_ALLOW_TIP, subtype.getName());
+            if (subtype.isNone()) {
+                return formatStackedTooltip(allowLine, subtype.getDesc());
+            }
+            return formatStackedTooltip(
+                    allowLine,
+                    subtype.getDesc(),
+                    LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT));
+        }
+
+        private static String formatStackedTooltip(String title, String... details) {
+            StringBuilder sb = new StringBuilder("<html><body style='width:240px'><b>");
+            sb.append(escapeHtml(title == null ? "" : title));
+            sb.append("</b>");
+            if (details != null) {
+                for (String detail : details) {
+                    if (detail == null || detail.isEmpty()) {
+                        continue;
+                    }
+                    sb.append("<br>").append(escapeHtml(detail));
+                }
+            }
+            sb.append("</body></html>");
+            return sb.toString();
+        }
+
+        private static String escapeHtml(String text) {
+            return text
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
+        }
+
+        private int roleMaxAssignable(AntRole role) {
+            if (role == GameConstants.ROLE_COMMANDER) {
+                return colony.getMaxAssignableCommanders();
+            }
+            return Integer.MAX_VALUE;
+        }
+
         private boolean usesWarRoleCounts(AntRole role) {
-            return owner.isEditingWarRoles() || GameConstants.isWarEconomyExclusiveRole(role);
+            return owner.isEditingWarRoles() || role.isActiveMilitary();
         }
 
         private boolean isSubtypeAllowed(AntRole role, AntSubtype subtype) {
@@ -737,11 +799,21 @@ public class RoleManagementDialog extends ZeroDialog {
                 checkAndAddRoles();
                 
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                    int colonyValue = getRoleCount(entry.getKey());
-                    if ((Integer)entry.getValue().getValue() != colonyValue) {
-                        entry.getValue().setValue(colonyValue);
+                    AntRole role = entry.getKey();
+                    JSpinner spinner = entry.getValue();
+                    int roleMax = roleMaxAssignable(role);
+                    SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+                    if (model.getMaximum() == null || ((Number) model.getMaximum()).intValue() != roleMax) {
+                        model.setMaximum(roleMax);
                     }
-                    syncSubtypeAllowControls(entry.getKey());
+                    int colonyValue = Math.min(getRoleCount(role), roleMax);
+                    if (getRoleCount(role) != colonyValue) {
+                        setRoleCount(role, colonyValue);
+                    }
+                    if ((Integer) spinner.getValue() != colonyValue) {
+                        spinner.setValue(colonyValue);
+                    }
+                    syncSubtypeAllowControls(role);
                 }
                 
                 int totalAnts = colony.getAntsByType(antType).size();
@@ -749,9 +821,7 @@ public class RoleManagementDialog extends ZeroDialog {
 
                 int totalAssigned = 0;
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                    // In peace view, war-exclusive rows edit war prep quotas — exclude from peace totals.
-                    if (!owner.isEditingWarRoles()
-                            && GameConstants.isWarEconomyExclusiveRole(entry.getKey())) {
+                    if (!owner.isEditingWarRoles() && entry.getKey().isActiveMilitary()) {
                         continue;
                     }
                     totalAssigned += (Integer) entry.getValue().getValue();

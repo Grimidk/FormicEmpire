@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 
 public class Hex {
     private Biome biome;
@@ -22,6 +23,7 @@ public class Hex {
     private int timeOffset; 
     private Weather localWeather;
     private boolean isActive;
+    private boolean island;
 
     private int nonWaterResourceSourcesGenerated;
 
@@ -98,6 +100,10 @@ public class Hex {
     public boolean isActive() { return isActive; }
     
     public void setActive(boolean isActive) { this.isActive = isActive; }
+
+    public boolean isIsland() { return island; }
+
+    public void setIsland(boolean island) { this.island = island; }
 
     public int getNonWaterResourceSourcesGenerated() {
         return nonWaterResourceSourcesGenerated;

@@ -1,15 +1,15 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
@@ -17,6 +17,8 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals.ConvoyResourceProp;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 
@@ -43,8 +45,10 @@ public class ConvoyViewPanel extends JPanel {
     private final Map<Integer, Image> biomeTileCache = new HashMap<>();
     private ConvoyScene scene;
     private List<ConvoyAnt> convoyAnts = List.of();
+    private List<ConvoyResourceProp> convoyResources = List.of();
     private Timer animationTimer;
     private float animationSeconds;
+    private long lastTickNanos;
 
     public ConvoyViewPanel(Trade trade, Engine engine) {
         super(new BorderLayout());
@@ -68,9 +72,13 @@ public class ConvoyViewPanel extends JPanel {
         scene = ConvoySceneBuilder.build(world, trade);
         if (scene.isAvailable()) {
             convoyAnts = buildAntPool(scene);
+            convoyResources = RouteViewVisuals.buildConvoyResourceProps(
+                    scene.getOriginName().hashCode() ^ scene.getDestinationName().hashCode(),
+                    scene.getBackgroundKind());
             statusLabel.setText(buildHeaderText(scene));
         } else {
             convoyAnts = List.of();
+            convoyResources = List.of();
             statusLabel.setText(LanguageStrings.get(LanguageStrings.CONVOY_NOT_AVAILABLE));
         }
         repaint();
@@ -80,8 +88,17 @@ public class ConvoyViewPanel extends JPanel {
         if (animationTimer != null) {
             return;
         }
-        animationTimer = new Timer(ANIMATION_FRAME_MS, e -> {
-            animationSeconds += ANIMATION_FRAME_MS / 1000f;
+        lastTickNanos = System.nanoTime();
+        int intervalMs = engine != null ? engine.getVisualFrameIntervalMs() : ANIMATION_FRAME_MS;
+        animationTimer = new Timer(intervalMs, e -> {
+            long now = System.nanoTime();
+            float delta = (now - lastTickNanos) / 1_000_000_000f;
+            lastTickNanos = now;
+            if (delta <= 0f || delta > 0.25f) {
+                int fallbackMs = animationTimer != null ? animationTimer.getDelay() : intervalMs;
+                delta = Math.max(1, fallbackMs) / 1000f;
+            }
+            animationSeconds += delta;
             if (animationSeconds > 10_000f) {
                 animationSeconds = 0f;
             }
@@ -89,6 +106,12 @@ public class ConvoyViewPanel extends JPanel {
         });
         animationTimer.setCoalesce(true);
         animationTimer.start();
+    }
+
+    public void applyVisualFrameRate() {
+        if (animationTimer != null && engine != null) {
+            animationTimer.setDelay(engine.getVisualFrameIntervalMs());
+        }
     }
 
     public void stopAnimation() {
@@ -130,8 +153,11 @@ public class ConvoyViewPanel extends JPanel {
         }
 
         boolean travelingRight = !scene.isReturning();
+        float scrollPixels = animationSeconds * SCROLL_SPEED_PX;
         int scrollOffset = computeScrollOffset(fieldW, travelingRight);
         drawScrollingField(g2d, fieldX, fieldY, fieldW, fieldH, scrollOffset, scene);
+        RouteViewVisuals.paintConvoyResources(g2d, convoyResources, fieldX, fieldY, fieldW, fieldH, scrollPixels,
+                travelingRight, this);
 
         Rectangle field = new Rectangle(fieldX, fieldY, fieldW, fieldH);
         drawConvoyFormation(g2d, convoyAnts, field, travelingRight);
@@ -225,10 +251,20 @@ public class ConvoyViewPanel extends JPanel {
         int centerY = field.y + field.height / 2;
         float radiusX = Math.min(field.width * 0.2f, 56f + ants.size() * 0.5f);
         float radiusY = Math.min(field.height * 0.34f, 44f + ants.size() * 0.38f);
-        double faceRadians = travelingRight ? Math.toRadians(90) : Math.toRadians(270);
+        float faceAngle = RouteViewVisuals.convoyFacingDegrees(travelingRight);
+        boolean skyConvoy = scene != null && scene.getBackgroundKind() == ConvoyScene.BackgroundKind.SKY;
 
         for (ConvoyAnt ant : ants) {
-            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile);
+            boolean winged = RouteViewVisuals.isWinged(ant.type);
+            boolean flying = skyConvoy && winged;
+            int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, flying, true, ant.wobblePhase, animationSeconds,
+                    ant.motionRate);
+            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, animationSeconds,
+                    ant.motionRate);
+            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, winged, ant.wobblePhase, animationSeconds,
+                    ant.motionRate);
+            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, legFrame, jawFrame,
+                    wingFrame);
             if (icon == null) {
                 continue;
             }
@@ -243,21 +279,21 @@ public class ConvoyViewPanel extends JPanel {
             double cx = drawX + w / 2.0;
             double cy = drawY + h / 2.0;
             g2d.translate(cx, cy);
-            g2d.rotate(faceRadians);
+            g2d.rotate(Math.toRadians(faceAngle));
             g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
             g2d.setTransform(old);
         }
     }
 
     private List<ConvoyAnt> buildAntPool(ConvoyScene scene) {
+        boolean skyConvoy = scene.getBackgroundKind() == ConvoyScene.BackgroundKind.SKY;
         List<Ant> tripAnts = new ArrayList<>();
         if (trade != null && trade.getAntsOnTrip() != null) {
             for (Ant ant : trade.getAntsOnTrip()) {
                 if (ant == null || !ant.isAlive() || ant.getAntType() == null) {
                     continue;
                 }
-                AntType type = ant.getAntType();
-                if (type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE) {
+                if (!includeConvoyVisualType(ant.getAntType(), skyConvoy)) {
                     continue;
                 }
                 tripAnts.add(ant);
@@ -277,7 +313,9 @@ public class ConvoyViewPanel extends JPanel {
                         : AntSubtypeProfile.standard();
                 ants.add(new ConvoyAnt(source.getAntType(), scene.getSpecies(), profile,
                         (float) Math.cos(angle) * dist,
-                        (float) Math.sin(angle) * dist));
+                        (float) Math.sin(angle) * dist,
+                        random.nextFloat() * (float) (Math.PI * 2),
+                        0.85f + random.nextFloat() * 0.3f));
             }
             return ants;
         }
@@ -285,21 +323,31 @@ public class ConvoyViewPanel extends JPanel {
         if (scene.typeCounts().isEmpty()) {
             return List.of();
         }
-        int total = scene.typeCounts().values().stream().mapToInt(Integer::intValue).sum();
+        Map<AntType, Integer> filteredCounts = new HashMap<>();
+        for (Map.Entry<AntType, Integer> entry : scene.typeCounts().entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) {
+                continue;
+            }
+            if (!includeConvoyVisualType(entry.getKey(), skyConvoy)) {
+                continue;
+            }
+            filteredCounts.put(entry.getKey(), entry.getValue());
+        }
+        int total = filteredCounts.values().stream().mapToInt(Integer::intValue).sum();
         if (total <= 0) {
             return List.of();
         }
 
         int visualCap = ConvoyScene.MAX_VISUAL_ANTS;
         int visualTotal = Math.min(total, visualCap);
-        Map<AntType, Integer> allocated = allocateVisualCounts(scene.typeCounts(), total, visualTotal);
+        Map<AntType, Integer> allocated = allocateVisualCounts(filteredCounts, total, visualTotal);
         Colony originColony = trade != null && trade.getOrigin() != null ? trade.getOrigin().getColony() : null;
 
         List<ConvoyAnt> ants = new ArrayList<>(visualTotal);
         Random random = new Random(scene.getOriginName().hashCode() ^ scene.getDestinationName().hashCode());
         for (Map.Entry<AntType, Integer> entry : allocated.entrySet()) {
             AntType type = entry.getKey();
-            if (type == null || type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE) {
+            if (type == null || entry.getValue() == null) {
                 continue;
             }
             for (int i = 0; i < entry.getValue(); i++) {
@@ -310,10 +358,22 @@ public class ConvoyViewPanel extends JPanel {
                         : AntSubtypeProfile.standard();
                 ants.add(new ConvoyAnt(type, scene.getSpecies(), profile,
                         (float) Math.cos(angle) * dist,
-                        (float) Math.sin(angle) * dist));
+                        (float) Math.sin(angle) * dist,
+                        random.nextFloat() * (float) (Math.PI * 2),
+                        0.85f + random.nextFloat() * 0.3f));
             }
         }
         return ants;
+    }
+
+    private static boolean includeConvoyVisualType(AntType type, boolean skyConvoy) {
+        if (type == null || type == GameConstants.TYPE_DEAD) {
+            return false;
+        }
+        if (skyConvoy) {
+            return RouteViewVisuals.isWinged(type);
+        }
+        return type != GameConstants.TYPE_DRONE;
     }
 
     private static Map<AntType, Integer> allocateVisualCounts(Map<AntType, Integer> typeCounts, int total,
@@ -418,17 +478,22 @@ public class ConvoyViewPanel extends JPanel {
 
     private static final class ConvoyAnt {
         private final AntType type;
-        private final Species species;
+        private final AntSpecies species;
         private final AntSubtypeProfile profile;
         private final float offsetX;
         private final float offsetY;
+        private final float wobblePhase;
+        private final float motionRate;
 
-        private ConvoyAnt(AntType type, Species species, AntSubtypeProfile profile, float offsetX, float offsetY) {
+        private ConvoyAnt(AntType type, AntSpecies species, AntSubtypeProfile profile, float offsetX, float offsetY,
+                float wobblePhase, float motionRate) {
             this.type = type;
             this.species = species;
             this.profile = profile != null ? profile : AntSubtypeProfile.standard();
             this.offsetX = offsetX;
             this.offsetY = offsetY;
+            this.wobblePhase = wobblePhase;
+            this.motionRate = motionRate;
         }
     }
 }

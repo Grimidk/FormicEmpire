@@ -16,12 +16,13 @@ public class Assimilation extends Constant{
         this.cost = cost;
     }
 
-    // (no icon)
-    public Assimilation(int id, String nameKey, String descriptionKey, Upgrade reward, int cost) {
-        this(id, nameKey, descriptionKey, reward, cost, null);
-    }
-
     public String getDescription() {
+        if (reward != null) {
+            String rewardDescription = reward.getDescription();
+            if (rewardDescription != null && !rewardDescription.isBlank()) {
+                return rewardDescription;
+            }
+        }
         return LanguageStrings.get(descriptionKey);
     }
 

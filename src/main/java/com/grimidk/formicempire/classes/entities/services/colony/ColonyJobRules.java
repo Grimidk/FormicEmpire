@@ -1,13 +1,13 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -91,6 +91,15 @@ public final class ColonyJobRules {
         resources.addResource(colony, GameConstants.RESOURCE_WATER, waterGain);
         resources.addResource(colony, GameConstants.RESOURCE_MEAT, meatGain);
         resources.addResource(colony, GameConstants.RESOURCE_ROCK, rockGain);
+
+        if (plantGain > 0
+                && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
+                && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN)) {
+            int resinGain = probabilisticRound(plantGain * GameNumbers.RESIN_FORAGE_BONUS_CHANCE);
+            if (resinGain > 0) {
+                resources.addResource(colony, GameConstants.RESOURCE_RESIN, resinGain);
+            }
+        }
 
         if (resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) {
             int farmerCount = stats.getEffectiveFarmerCount(colony);

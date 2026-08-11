@@ -1,11 +1,11 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
-import com.grimidk.formicempire.classes.entities.services.world.WarStanding;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -234,7 +234,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         String declaredBy = declarer != null ? declarer.getName() : notApplicable;
         String pairLabel = LanguageStrings.format(
                 LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, dynastyA.getName(), dynastyB.getName());
-        String warName = war.getDisplayName();
+        String warName = warService.formatWarNameForDisplay(war, dynasty);
         if (warName == null || warName.isEmpty()) {
             warName = pairLabel;
         }
@@ -255,12 +255,12 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
     private static String formatNeutralStanding(WarService warService, War war) {
         Dynasty leader = warService.getLeadingDynasty(war);
         if (leader == null) {
-            return warService.formatStanding(WarStanding.EVEN);
+            return warService.formatStanding(GameConstants.WAR_STANDING_EVEN);
         }
         return LanguageStrings.format(
                 LanguageStrings.WAR_STANDING_LEADER_FMT,
                 leader.getName(),
-                warService.formatStanding(WarStanding.WINNING));
+                warService.formatStanding(GameConstants.WAR_STANDING_WINNING));
     }
 
     private void updateHistoricWars() {
@@ -373,6 +373,43 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         updateData();
     }
 
+    private void performWithdrawToHex(ActiveWarRowData rowData) {
+        World world = engine != null ? engine.getWorld() : null;
+        WarService warService = world != null ? world.getWarService() : null;
+        if (rowData == null || warService == null) {
+            return;
+        }
+        Colony contested = null;
+        if (world != null && rowData.war.getContestedColonyId() > 0) {
+            for (var dynasty : world.getDynastys()) {
+                for (Colony colony : dynasty.getColonies()) {
+                    if (colony.getId() == rowData.war.getContestedColonyId()) {
+                        contested = colony;
+                        break;
+                    }
+                }
+                if (contested != null) {
+                    break;
+                }
+            }
+        }
+        String place = contested != null ? contested.getName()
+                : (rowData.opponent != null ? rowData.opponent.getName() : "");
+        int confirm = UiOptionPane.showConfirmDialog(this,
+                LanguageStrings.format(LanguageStrings.WAR_WITHDRAW_HEX_CONFIRM_FMT, place),
+                LanguageStrings.get(LanguageStrings.WAR_ACTION_WITHDRAW_HEX),
+                JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        if (warService.withdrawToHexDefense(rowData.war, dynasty)) {
+            if (callbacks != null) {
+                callbacks.onWarsChanged();
+            }
+            updateData();
+        }
+    }
+
     private void performFallback(ActiveWarRowData rowData) {
         World world = engine != null ? engine.getWorld() : null;
         WarService warService = world != null ? world.getWarService() : null;
@@ -434,6 +471,13 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
             peaceItem.addActionListener(e -> performOfferPeace(rowData));
             AssetStyles.styleMenuItem(peaceItem);
             menu.add(peaceItem);
+        }
+
+        if (warService != null && warService.canWithdrawToHexDefense(rowData.war, dynasty)) {
+            JMenuItem withdrawItem = new JMenuItem(LanguageStrings.get(LanguageStrings.WAR_ACTION_WITHDRAW_HEX));
+            withdrawItem.addActionListener(e -> performWithdrawToHex(rowData));
+            AssetStyles.styleMenuItem(withdrawItem);
+            menu.add(withdrawItem);
         }
 
         if (warService != null && warService.canForfeitStage(rowData.war, dynasty)) {

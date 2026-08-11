@@ -7,9 +7,9 @@ import java.awt.Rectangle;
 
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 class ViewportPhysicsLodTest {
@@ -45,5 +45,20 @@ class ViewportPhysicsLodTest {
             }
         }
         assertTrue(any);
+    }
+
+    @Test
+    void shouldRunOffViewportPosition_periodMatchesConstant() {
+        Colony colony = new Colony(1, "c", true);
+        Dynasty d = new Dynasty(1, "d", true, GameConstants.SPECIES_OMNI);
+        colony.setDynasty(d);
+        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        int hits = 0;
+        for (long step = 0; step < ViewportPhysicsLod.OFF_VIEWPORT_MOVE_PERIOD * 8; step++) {
+            if (ViewportPhysicsLod.shouldRunOffViewportPosition(step, ant)) {
+                hits++;
+            }
+        }
+        assertTrue(hits >= 6 && hits <= 10);
     }
 }

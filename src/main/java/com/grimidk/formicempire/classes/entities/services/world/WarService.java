@@ -1,9 +1,10 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
@@ -427,6 +428,40 @@ public class WarService {
         return wars;
     }
 
+    public int countWarsForDynasty(int dynastyId) {
+        int count = 0;
+        for (War war : activeWars) {
+            if (war.involves(dynastyId)) {
+                count++;
+            }
+        }
+        for (War war : historicWars) {
+            if (war.involves(dynastyId)) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public int countWarsDeclaredBy(int dynastyId) {
+        int count = 0;
+        for (War war : activeWars) {
+            if (war.getDeclaredByDynastyId() == dynastyId) {
+                count++;
+            }
+        }
+        for (War war : historicWars) {
+            if (war.getDeclaredByDynastyId() == dynastyId) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean isWarmonger(int dynastyId) {
+        return countWarsDeclaredBy(dynastyId) >= GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD;
+    }
+
     public boolean hasWarHistoryForDynasty(int dynastyId) {
         for (War war : historicWars) {
             if (war.involves(dynastyId)) {
@@ -506,11 +541,11 @@ public class WarService {
 
     public WarStanding getStandingForDynasty(War war, Dynasty viewer) {
         if (war == null || viewer == null || !war.involves(viewer.getId())) {
-            return WarStanding.EVEN;
+            return GameConstants.WAR_STANDING_EVEN;
         }
         Dynasty opponent = resolveOpponent(war, viewer);
         if (opponent == null) {
-            return WarStanding.EVEN;
+            return GameConstants.WAR_STANDING_EVEN;
         }
         return compareMilitaryStanding(
                 ColonyMilitaryService.powerForWarStanding(viewer),
@@ -529,10 +564,10 @@ public class WarService {
         WarStanding fromA = compareMilitaryStanding(
                 ColonyMilitaryService.powerForWarStanding(dynastyA),
                 ColonyMilitaryService.powerForWarStanding(dynastyB));
-        if (fromA == WarStanding.WINNING) {
+        if (fromA == GameConstants.WAR_STANDING_WINNING) {
             return dynastyA;
         }
-        if (fromA == WarStanding.LOSING) {
+        if (fromA == GameConstants.WAR_STANDING_LOSING) {
             return dynastyB;
         }
         return null;
@@ -548,7 +583,7 @@ public class WarService {
         if (war.getPendingPeaceOfferFromDynastyId() != 0) {
             return false;
         }
-        return getStandingForDynasty(war, offerer) == WarStanding.WINNING;
+        return getStandingForDynasty(war, offerer) == GameConstants.WAR_STANDING_WINNING;
     }
 
     public boolean offerPeace(War war, Dynasty offerer) {
@@ -578,7 +613,7 @@ public class WarService {
         if (offererId <= 0 || offererId == accepter.getId()) {
             return false;
         }
-        return getStandingForDynasty(war, accepter) == WarStanding.LOSING;
+        return getStandingForDynasty(war, accepter) == GameConstants.WAR_STANDING_LOSING;
     }
 
     public void acceptPeaceOffer(War war, Dynasty accepter) {
@@ -587,7 +622,7 @@ public class WarService {
         }
         Dynasty offerer = world.findDynastyById(war.getPendingPeaceOfferFromDynastyId());
         int winnerId = offerer != null ? offerer.getId() : 0;
-        if (offerer == null || getStandingForDynasty(war, offerer) != WarStanding.WINNING) {
+        if (offerer == null || getStandingForDynasty(war, offerer) != GameConstants.WAR_STANDING_WINNING) {
             Dynasty leader = getLeadingDynasty(war);
             winnerId = leader != null ? leader.getId() : 0;
         }
@@ -607,6 +642,14 @@ public class WarService {
 
     public boolean canForfeitStage(War war, Dynasty forfeitier) {
         return WarProgressService.canForfeitStage(world, war, forfeitier);
+    }
+
+    public boolean withdrawToHexDefense(War war, Dynasty withdrawer) {
+        return WarProgressService.withdrawToHexDefense(world, war, withdrawer);
+    }
+
+    public boolean canWithdrawToHexDefense(War war, Dynasty withdrawer) {
+        return WarProgressService.canWithdrawToHexDefense(world, war, withdrawer);
     }
 
     public void tickWarProgressHourly() {
@@ -631,32 +674,37 @@ public class WarService {
 
     public String formatStanding(WarStanding standing) {
         if (standing == null) {
-            return LanguageStrings.get(LanguageStrings.WAR_STANDING_EVEN);
+            return GameConstants.WAR_STANDING_EVEN.getName();
         }
-        return switch (standing) {
-            case WINNING -> LanguageStrings.get(LanguageStrings.WAR_STANDING_WINNING);
-            case LOSING -> LanguageStrings.get(LanguageStrings.WAR_STANDING_LOSING);
-            case EVEN -> LanguageStrings.get(LanguageStrings.WAR_STANDING_EVEN);
-        };
+        return standing.getName();
     }
 
     public String formatWarNameForDisplay(War war, Dynasty viewer) {
         if (war == null) {
             return "";
         }
-        if (war.getDisplayName() != null && !war.getDisplayName().isEmpty()) {
-            return war.getDisplayName();
-        }
         Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
         Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
-        if (dynastyA != null && dynastyB != null) {
-            return generateDisplayName(dynastyA, dynastyB);
+        if (war.isRebellionWar()) {
+            Dynasty parent = resolveDeclarer(war);
+            if (parent == null) {
+                parent = dynastyA != null && dynastyA.getId() == war.getDeclaredByDynastyId()
+                        ? dynastyA : dynastyB;
+            }
+            if (parent != null) {
+                return generateRebellionDisplayName(war, parent);
+            }
+        } else if (dynastyA != null && dynastyB != null) {
+            return generateDisplayName(dynastyA, dynastyB, ordinalForRegularWar(war));
+        }
+        if (war.getDisplayName() != null && !war.getDisplayName().isEmpty()) {
+            return war.getDisplayName();
         }
         return LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, "?", "?");
     }
 
     private void evaluateAiPeaceResponse(War war, Dynasty ai, Dynasty offerer) {
-        if (getStandingForDynasty(war, ai) == WarStanding.LOSING
+        if (getStandingForDynasty(war, ai) == GameConstants.WAR_STANDING_LOSING
                 && GameRandom.nextDouble() < GameNumbers.AI_ACCEPT_PEACE_CHANCE) {
             acceptPeaceOffer(war, ai);
         } else {
@@ -683,20 +731,24 @@ public class WarService {
 
     private WarStanding compareMilitaryStanding(int powerA, int powerB) {
         if (powerA <= 0 && powerB <= 0) {
-            return WarStanding.EVEN;
+            return GameConstants.WAR_STANDING_EVEN;
         }
         float ratio = GameNumbers.WAR_STANDING_MILITARY_RATIO;
         if (powerA >= powerB * ratio) {
-            return WarStanding.WINNING;
+            return GameConstants.WAR_STANDING_WINNING;
         }
         if (powerB >= powerA * ratio) {
-            return WarStanding.LOSING;
+            return GameConstants.WAR_STANDING_LOSING;
         }
-        return WarStanding.EVEN;
+        return GameConstants.WAR_STANDING_EVEN;
     }
 
     private String generateDisplayName(Dynasty dynastyA, Dynasty dynastyB) {
         int ordinal = countWarsBetweenPair(dynastyA.getId(), dynastyB.getId()) + 1;
+        return generateDisplayName(dynastyA, dynastyB, ordinal);
+    }
+
+    private String generateDisplayName(Dynasty dynastyA, Dynasty dynastyB, int ordinal) {
         String themeA = themeFromDynasty(dynastyA);
         String themeB = themeFromDynasty(dynastyB);
         if (themeA.compareToIgnoreCase(themeB) > 0) {
@@ -708,16 +760,65 @@ public class WarService {
                 LanguageStrings.getWarOrdinal(ordinal), themeA, themeB);
     }
 
+    private String generateRebellionDisplayName(War war, Dynasty parent) {
+        int ordinal = ordinalForRebellionWar(war, parent.getId());
+        String theme = themeFromDynasty(parent);
+        return LanguageStrings.format(LanguageStrings.REBELLION_WAR_NAME_FMT,
+                LanguageStrings.getWarOrdinal(ordinal), theme);
+    }
+
+    private int ordinalForRegularWar(War war) {
+        int count = 0;
+        for (War other : historicWars) {
+            if (other != null && !other.isRebellionWar()
+                    && other.getDynastyIdA() == war.getDynastyIdA()
+                    && other.getDynastyIdB() == war.getDynastyIdB()
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        for (War other : activeWars) {
+            if (other != null && !other.isRebellionWar()
+                    && other.getDynastyIdA() == war.getDynastyIdA()
+                    && other.getDynastyIdB() == war.getDynastyIdB()
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        return Math.max(1, count);
+    }
+
+    private int ordinalForRebellionWar(War war, int parentDynastyId) {
+        int count = 0;
+        for (War other : historicWars) {
+            if (other != null && other.isRebellionWar()
+                    && other.involves(parentDynastyId)
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        for (War other : activeWars) {
+            if (other != null && other.isRebellionWar()
+                    && other.involves(parentDynastyId)
+                    && other.getId() <= war.getId()) {
+                count++;
+            }
+        }
+        return Math.max(1, count);
+    }
+
     private int countWarsBetweenPair(int dynastyIdOne, int dynastyIdTwo) {
         int[] pair = War.canonicalPair(dynastyIdOne, dynastyIdTwo);
         int count = 0;
         for (War war : activeWars) {
-            if (war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
+            if (!war.isRebellionWar()
+                    && war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
                 count++;
             }
         }
         for (War war : historicWars) {
-            if (war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
+            if (!war.isRebellionWar()
+                    && war.getDynastyIdA() == pair[0] && war.getDynastyIdB() == pair[1]) {
                 count++;
             }
         }
@@ -730,8 +831,9 @@ public class WarService {
         }
         String theme = dynasty.getThemeBase();
         if (theme == null || theme.isEmpty()) {
-            theme = LanguageStrings.stripDynastyNameSuffix(dynasty.getName());
+            theme = LanguageStrings.stripDynastyNameSuffix(dynasty.getName(), dynasty.getTitleKey());
         }
+        theme = LanguageStrings.resolveDynastyThemeDisplay(theme);
         if (theme == null || theme.isEmpty()) {
             return dynasty.getName();
         }

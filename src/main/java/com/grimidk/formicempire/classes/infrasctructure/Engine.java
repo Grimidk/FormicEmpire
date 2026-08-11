@@ -5,13 +5,16 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.audio.MusicService;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Engine extends Thread {
@@ -23,6 +26,8 @@ public class Engine extends Thread {
     
     // --- Managers ---
     private final TradeManager tradeManager;
+    private final MusicService musicService;
+    private final SfxService sfxService;
 
     // --- Listeners ---
     private final CopyOnWriteArrayList<Runnable> minuteTickListeners = new CopyOnWriteArrayList<>();
@@ -43,9 +48,11 @@ public class Engine extends Thread {
     private boolean weatherColorOverlayEnabled = true;
     private boolean arachnophobiaMode = false;
     
-    private int masterVolume = 50;
-    private int musicVolume = 50;
-    private int sfxVolume = 50;
+    private int masterVolume = GameNumbers.VOLUME_DEFAULT_PERCENT;
+    private int musicVolume = GameNumbers.VOLUME_DEFAULT_PERCENT;
+    private int sfxVolume = GameNumbers.VOLUME_DEFAULT_PERCENT;
+    private boolean musicMuted = false;
+    private boolean musicShuffle = true;
     
     private boolean pauseOnFocusLoss = true;
     private boolean confirmOnQuit = true;
@@ -56,11 +63,12 @@ public class Engine extends Thread {
     private boolean showAuditMenu = false;
     private boolean overworldAutoRecenter = true;
     private boolean darkMode = false;
-    private int defaultRoleWorker = 1; // ROLE_FORAGER
-    private int defaultRoleSoldier = 16; // ROLE_HUNTER
-    private int defaultRoleMajor = 29; // ROLE_CRANE
-    private int defaultRolePrincess = 23; // ROLE_BREEDER
-    private int defaultRoleQueen = 25; // ROLE_LAYER
+    private int frameRateCap = 0;
+    private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
+    private int defaultRoleSoldier = GameConstants.ROLE_HUNTER.getId();
+    private int defaultRoleMajor = GameConstants.ROLE_CRANE.getId();
+    private int defaultRolePrincess = GameConstants.ROLE_BREEDER.getId();
+    private int defaultRoleQueen = GameConstants.ROLE_LAYER.getId();
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
@@ -74,10 +82,20 @@ public class Engine extends Thread {
         this.addHourTickListener(this.tradeManager);
         this.settingsSaveManager = new SaveManager();
         this.loadGlobalSettings();
+        this.musicService = new MusicService(this);
+        this.sfxService = new SfxService(this);
     }
 
     public TradeManager getTradeManager() {
         return tradeManager;
+    }
+
+    public MusicService getMusicService() {
+        return musicService;
+    }
+
+    public SfxService getSfxService() {
+        return sfxService;
     }
 
     public SaveManager getSaveManager() {
@@ -342,8 +360,7 @@ public class Engine extends Thread {
 
     public void setLanguage(String language) {
         this.language = (language != null) ? language : "en";
-        LanguageStrings.setLanguage(this.language);
-        if (this.world != null) {
+        if (LanguageStrings.setLanguage(this.language) && this.world != null) {
             this.world.relocalizeDynastyNames();
         }
     }
@@ -412,7 +429,13 @@ public class Engine extends Thread {
     }
 
     public void setMasterVolume(int masterVolume) {
-        this.masterVolume = masterVolume;
+        this.masterVolume = GameNumbers.snapVolumePercent(masterVolume);
+        if (musicService != null) {
+            musicService.refreshVolume();
+        }
+        if (sfxService != null) {
+            sfxService.refreshVolume();
+        }
     }
 
     public int getMusicVolume() {
@@ -420,7 +443,10 @@ public class Engine extends Thread {
     }
 
     public void setMusicVolume(int musicVolume) {
-        this.musicVolume = musicVolume;
+        this.musicVolume = GameNumbers.snapVolumePercent(musicVolume);
+        if (musicService != null) {
+            musicService.refreshVolume();
+        }
     }
 
     public int getSfxVolume() {
@@ -428,7 +454,29 @@ public class Engine extends Thread {
     }
 
     public void setSfxVolume(int sfxVolume) {
-        this.sfxVolume = sfxVolume;
+        this.sfxVolume = GameNumbers.snapVolumePercent(sfxVolume);
+        if (sfxService != null) {
+            sfxService.refreshVolume();
+        }
+    }
+
+    public boolean isMusicMuted() {
+        return musicMuted;
+    }
+
+    public void setMusicMuted(boolean musicMuted) {
+        this.musicMuted = musicMuted;
+        if (musicService != null) {
+            musicService.refreshVolume();
+        }
+    }
+
+    public boolean isMusicShuffle() {
+        return musicShuffle;
+    }
+
+    public void setMusicShuffle(boolean musicShuffle) {
+        this.musicShuffle = musicShuffle;
     }
 
     public boolean isPauseOnFocusLoss() {
@@ -495,6 +543,35 @@ public class Engine extends Thread {
         this.darkMode = darkMode;
     }
 
+    public int getFrameRateCap() {
+        return frameRateCap;
+    }
+
+    public void setFrameRateCap(int frameRateCap) {
+        this.frameRateCap = sanitizeFrameRateCap(frameRateCap);
+    }
+
+    public static int sanitizeFrameRateCap(int hz) {
+        if (hz <= 0) {
+            return 0;
+        }
+        if (hz <= 30) {
+            return 30;
+        }
+        if (hz <= 60) {
+            return 60;
+        }
+        return 120;
+    }
+
+    public int getVisualFrameIntervalMs() {
+        int hz = frameRateCap;
+        if (hz <= 0) {
+            return 1;
+        }
+        return Math.max(1, 1000 / hz);
+    }
+
     public int getDefaultRoleWorker() {
         return defaultRoleWorker;
     }
@@ -559,19 +636,18 @@ public class Engine extends Thread {
             } else if (type == GameConstants.TYPE_QUEEN) {
                 roleId = engine.getDefaultRoleQueen();
             } else {
-                return legacyDefaultRoleForAntType(type);
+                return builtinDefaultRoleForAntType(type);
             }
             AntRole chosen = GameConstants.getAntRoleById(roleId);
             if (chosen != null && chosen.getAntType() == type
-                    && !GameConstants.isWarEconomyExclusiveRole(chosen)
-                    && GameConstants.isObtainableRole(chosen)) {
+                    && GameConstants.isEligibleDefaultHatchRole(chosen)) {
                 return chosen;
             }
         }
-        return legacyDefaultRoleForAntType(type);
+        return builtinDefaultRoleForAntType(type);
     }
 
-    private static AntRole legacyDefaultRoleForAntType(AntType type) {
+    public static AntRole builtinDefaultRoleForAntType(AntType type) {
         if (type == GameConstants.TYPE_WORKER) {
             return GameConstants.ROLE_FORAGER;
         }
@@ -595,18 +671,16 @@ public class Engine extends Thread {
 
     public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
         AntRole r = GameConstants.getAntRoleById(desiredRoleId);
-        if (r != null && r.getAntType() == type && !GameConstants.isWarEconomyExclusiveRole(r)
-                && GameConstants.isObtainableRole(r)) {
+        if (r != null && r.getAntType() == type && GameConstants.isEligibleDefaultHatchRole(r)) {
             return desiredRoleId;
         }
         AntRole fallback = GameConstants.getAntRoleById(fallbackRoleId);
         if (fallback != null && fallback.getAntType() == type
-                && !GameConstants.isWarEconomyExclusiveRole(fallback)
-                && GameConstants.isObtainableRole(fallback)) {
+                && GameConstants.isEligibleDefaultHatchRole(fallback)) {
             return fallbackRoleId;
         }
-        AntRole legacy = legacyDefaultRoleForAntType(type);
-        return legacy != null ? legacy.getId() : fallbackRoleId;
+        AntRole builtin = builtinDefaultRoleForAntType(type);
+        return builtin != null ? builtin.getId() : fallbackRoleId;
     }
 
     public static int defaultRoleIdForAntType(AntType type, Engine engine) {

@@ -8,12 +8,12 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 class RoleSubtypeEligibilityTest {
 
@@ -42,10 +42,10 @@ class RoleSubtypeEligibilityTest {
         Colony colony = new Colony(12, "Elig", true);
         Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
         ant.setSubtypeProfile(AntSubtypeProfile.of(
-                GameNumbers.SUBTYPE_DIGIT_NONE,
-                GameNumbers.SUBTYPE_DIGIT_NONE,
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE,
                 GameConstants.SUBTYPE_ABDOMEN_HONEYPOT.getDigit(),
-                GameNumbers.SUBTYPE_DIGIT_NONE));
+                AntSubtype.DIGIT_NONE));
 
         assertTrue(AntSubtypeService.isAntEligibleForRole(
                 ant, GameConstants.ROLE_POTTER, Set.of(GameConstants.SUBTYPE_ABDOMEN_HONEYPOT.getId())));
@@ -57,9 +57,9 @@ class RoleSubtypeEligibilityTest {
         Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
         ant.setSubtypeProfile(AntSubtypeProfile.of(
                 GameConstants.SUBTYPE_HEAD_TRAPJAW.getDigit(),
-                GameNumbers.SUBTYPE_DIGIT_NONE,
-                GameNumbers.SUBTYPE_DIGIT_NONE,
-                GameNumbers.SUBTYPE_DIGIT_NONE));
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE));
 
         assertFalse(AntSubtypeService.isAntEligibleForRole(
                 ant, GameConstants.ROLE_FORAGER, Set.of()));
@@ -84,6 +84,25 @@ class RoleSubtypeEligibilityTest {
         assertFalse(GameConstants.ROLE_ARTILLERY.requiresSubtypes());
         assertTrue(GameConstants.ROLE_ARTILLERY.getRequiredSubtypes().isEmpty());
         assertTrue(GameConstants.ROLE_ARTILLERY.getForcedAllowedSubtypes().isEmpty());
+    }
+
+    @Test
+    void defenderRequiresDoorheadSubtype() {
+        Colony colony = new Colony(14, "Elig", true);
+        Ant ant = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        ant.setSubtypeProfile(AntSubtypeProfile.standard());
+
+        assertFalse(AntSubtypeService.isAntEligibleForRole(
+                ant, GameConstants.ROLE_DEFENDER, Set.of(GameConstants.SUBTYPE_HEAD_DOORHEAD.getId())));
+
+        ant.setSubtypeProfile(AntSubtypeProfile.of(
+                GameConstants.SUBTYPE_HEAD_DOORHEAD.getDigit(),
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE));
+        assertTrue(AntSubtypeService.isAntEligibleForRole(
+                ant, GameConstants.ROLE_DEFENDER, Set.of(GameConstants.SUBTYPE_HEAD_DOORHEAD.getId())));
+        assertTrue(GameConstants.ROLE_DEFENDER.isHexDefenseOnly());
     }
 
     @Test
@@ -131,9 +150,9 @@ class RoleSubtypeEligibilityTest {
         Ant trapjaw = new Ant(colony, GameConstants.TYPE_WORKER);
         trapjaw.setSubtypeProfile(AntSubtypeProfile.of(
                 GameConstants.SUBTYPE_HEAD_TRAPJAW.getDigit(),
-                GameNumbers.SUBTYPE_DIGIT_NONE,
-                GameNumbers.SUBTYPE_DIGIT_NONE,
-                GameNumbers.SUBTYPE_DIGIT_NONE));
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE));
         colony.getWorkers().add(plain);
         colony.getWorkers().add(trapjaw);
 

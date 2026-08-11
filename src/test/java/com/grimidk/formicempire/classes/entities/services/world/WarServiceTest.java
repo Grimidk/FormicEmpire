@@ -1,10 +1,10 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
@@ -51,6 +51,19 @@ class WarServiceTest {
                 || war.getDisplayName().toLowerCase().contains("guerra")
                 || war.getDisplayName().contains("First")
                 || war.getDisplayName().contains("Primera"));
+    }
+
+    @Test
+    void formatWarNameResolvesThemeKeysInsteadOfRawTags() {
+        player.setThemeBase(LanguageStrings.DYNASTY_THEME_MEAT);
+        neighbor.setThemeBase(LanguageStrings.DYNASTY_THEME_RUBY);
+        War war = world.getWarService().beginWar(player, neighbor);
+
+        assertNotNull(war);
+        String display = world.getWarService().formatWarNameForDisplay(war, player);
+        assertFalse(display.contains("DYNASTY_THEME_"), display);
+        assertTrue(display.contains(LanguageStrings.get(LanguageStrings.DYNASTY_THEME_MEAT)), display);
+        assertTrue(display.contains(LanguageStrings.get(LanguageStrings.DYNASTY_THEME_RUBY)), display);
     }
 
     @Test
@@ -230,13 +243,15 @@ class WarServiceTest {
         World leafWorld = buildBorderWorld(leafcutterDynasty);
         leafcutterDynasty.absorbSpecies(GameConstants.SPECIES_PHARAOH.getId());
         leafcutterDynasty.completeAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
+        leafcutterDynasty.completeAssimilation(GameUnlocks.ASSIMILATION_PHARAOH);
 
         War war = leafWorld.getWarService().beginWar(player, leafcutterDynasty);
         leafWorld.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY);
 
         assertTrue(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_LEAFCUTTER.getId()));
         assertTrue(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_PHARAOH.getId()));
-        assertTrue(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_LEAFCUTTER));
+        assertFalse(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_LEAFCUTTER));
+        assertTrue(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_PHARAOH));
         assertEquals(2, player.getDefeatedSpeciesIds().size());
     }
 

@@ -1,16 +1,19 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
@@ -18,10 +21,10 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
@@ -72,7 +75,11 @@ public class World {
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
-    private int worldRadius = 8; 
+    private int worldRadius = GameNumbers.worldRadiusForContinentCore(
+            GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
+    private int continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
+    private int continentCount;
+    private int islandCount;
     private int colonyIdCounter = 1;
     private int dynastyIdCounter = 1;
     private final DynastyNamingService namingService;
@@ -256,10 +263,6 @@ public class World {
         return GameNumbers.axialHexDistance(fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
     }
 
-    /**
-     * Minimum axial hex distance between any colony of {@code a} and any colony of {@code b}.
-     * Returns {@link Integer#MAX_VALUE} when either dynasty has no placeable colony hexes.
-     */
     public int minDynastyHexDistance(Dynasty a, Dynasty b) {
         if (a == null || b == null) {
             return Integer.MAX_VALUE;
@@ -317,6 +320,22 @@ public class World {
     
     public void setWorldRadius(int worldRadius) {
         this.worldRadius = worldRadius;
+    }
+
+    public int getContinentCoreRadius() {
+        return continentCoreRadius;
+    }
+
+    public void setContinentCoreRadius(int continentCoreRadius) {
+        this.continentCoreRadius = Math.max(0, continentCoreRadius);
+    }
+
+    public int getContinentCount() {
+        return continentCount;
+    }
+
+    public int getIslandCount() {
+        return islandCount;
     }
 
     public Hex getSpawnHex() {
@@ -394,11 +413,15 @@ public class World {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName, String playerTitleKey) {
-        System.out.println("Generating World... Size: " + size + " rings.");
-        this.worldRadius = size;
+    public void generateWorld(Biome startBiome, int continentCoreRadius, Colony startColony, String baseName, String playerTitleKey) {
+        this.continentCoreRadius = Math.max(0, continentCoreRadius);
+        this.worldRadius = GameNumbers.worldRadiusForContinentCore(this.continentCoreRadius);
+        System.out.println("Generating World... Continent core: " + this.continentCoreRadius
+                + " rings, total radius: " + this.worldRadius + ".");
         this.hexes.clear();
         this.dynastys.clear();
+        this.continentCount = 0;
+        this.islandCount = 0;
         Map<String, Hex> hexMap = new HashMap<>();
         ColonyStarterService starterService = ColonyStarterService.shared();
         
@@ -426,8 +449,7 @@ public class World {
         
         this.colonyIdCounter = startColony.getId() + 1;
 
-        List<Hex> eligibleNpcHexes = new ArrayList<>();
-
+        int size = this.worldRadius;
         for (int q = -size; q <= size; q++) {
             int r1 = Math.max(-size, -q - size);
             int r2 = Math.min(size, -q + size);
@@ -437,32 +459,63 @@ public class World {
                 Hex hex = new Hex();
                 hex.setQ(q);
                 hex.setR(r);
-                hex.setTimeOffset(q); 
-                
-                Biome ringBiome = (dist == 0) ? startBiome : getBiomeForRing(dist);
-                hex.setBiome(ringBiome);
-                hex.setLocalWeather(getRandomWeather(ringBiome));
-                hex.setActive(false); 
+                hex.setTimeOffset(q);
+                hex.setActive(false);
+                hex.setColony(null);
+                hex.setIsland(false);
 
-                if (dist == 0) {
-                    hex.setColony(startColony); 
-                    startColony.setActive(true);
-                } else if (dist > 1 && !isWaterBiome(ringBiome)) {
-                    eligibleNpcHexes.add(hex);
+                if (dist <= this.continentCoreRadius) {
+                    Biome ringBiome = (dist == 0) ? startBiome : getBiomeForRing(dist);
+                    hex.setBiome(ringBiome);
+                    hex.setLocalWeather(getRandomWeather(ringBiome));
+                    if (dist == 0) {
+                        hex.setColony(startColony);
+                        startColony.setActive(true);
+                    }
                 } else {
-                    hex.setColony(null);
+                    hex.setBiome(GameConstants.BIOME_OCEAN);
+                    hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
                 }
-                
+
                 hexMap.put(q + "," + r, hex);
                 this.hexes.add(hex);
             }
         }
 
+        linkNeighbors(hexMap);
+        applyCoastalLandRings();
+        convertEnclosedOceansToLakes();
+        convertLakesTouchingOceanToOcean();
+        ensureMinimumIslands(GameNumbers.WORLD_MIN_ISLAND_COUNT);
+        convertEnclosedOceansToLakes();
+        convertLakesTouchingOceanToOcean();
+        classifyLandmasses();
+        if (this.continentCoreRadius >= GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS) {
+            ensureMinimumBiomeCounts(GameNumbers.WORLD_MIN_HEXES_PER_BIOME);
+            classifyLandmasses();
+            if (this.islandCount < GameNumbers.WORLD_MIN_ISLAND_COUNT) {
+                ensureMinimumIslands(GameNumbers.WORLD_MIN_ISLAND_COUNT);
+                convertEnclosedOceansToLakes();
+                convertLakesTouchingOceanToOcean();
+                classifyLandmasses();
+                ensureMinimumBiomeCounts(GameNumbers.WORLD_MIN_HEXES_PER_BIOME);
+                classifyLandmasses();
+            }
+        }
+
+        List<Hex> eligibleNpcHexes = new ArrayList<>();
+        for (Hex hex : this.hexes) {
+            int dist = hexDistanceFromOrigin(hex);
+            if (dist > 1 && isLandHex(hex) && !hex.isIsland()) {
+                eligibleNpcHexes.add(hex);
+            }
+        }
+
         List<Hex> npcColonyHexes = selectNpcColonyHexes(eligibleNpcHexes);
-        List<Species> npcSpeciesAssignments = assignNpcSpecies(npcColonyHexes.size());
+        List<AntSpecies> npcSpeciesAssignments = assignNpcSpecies(npcColonyHexes.size());
         for (int i = 0; i < npcColonyHexes.size(); i++) {
             Hex hex = npcColonyHexes.get(i);
-            Species npcSpecies = npcSpeciesAssignments.get(i);
+            AntSpecies npcSpecies = npcSpeciesAssignments.get(i);
 
             int dynastyId = this.dynastyIdCounter++;
             DynastyTitle npcTitle = namingService.pickRandomTitle();
@@ -489,8 +542,564 @@ public class World {
                     WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
         }
 
-        linkNeighbors(hexMap);
         bindDynastyTradeServices();
+        System.out.println("[World] Landmasses: " + this.continentCount + " continent(s), "
+                + this.islandCount + " island(s).");
+    }
+
+    private void applyCoastalLandRings() {
+        Set<Hex> mainland = new HashSet<>();
+        for (Hex hex : this.hexes) {
+            if (hexDistanceFromOrigin(hex) <= this.continentCoreRadius && isLandHex(hex)) {
+                mainland.add(hex);
+            }
+        }
+
+        int coastalCount = GameNumbers.WORLD_COASTAL_RING_COUNT;
+        int[] chances = GameNumbers.WORLD_COASTAL_LAND_CHANCE_PERCENT;
+        for (int coastalIndex = 0; coastalIndex < coastalCount; coastalIndex++) {
+            int ringDist = this.continentCoreRadius + 1 + coastalIndex;
+            int landChance = coastalIndex < chances.length ? chances[coastalIndex] : 0;
+            boolean requireMainlandConnection = coastalIndex < coastalCount - 1;
+
+            List<Hex> ringHexes = new ArrayList<>();
+            for (Hex hex : this.hexes) {
+                if (hexDistanceFromOrigin(hex) == ringDist) {
+                    ringHexes.add(hex);
+                }
+            }
+            Collections.shuffle(ringHexes, GameRandom.getShuffleRandom());
+
+            List<Hex> newlyLand = new ArrayList<>();
+            for (Hex hex : ringHexes) {
+                if (GameRandom.nextInt(100) >= landChance) {
+                    continue;
+                }
+                if (requireMainlandConnection && !touchesMainland(hex, mainland)) {
+                    continue;
+                }
+                Biome landBiome = getBiomeForRing(Math.min(ringDist, this.continentCoreRadius));
+                if (isWaterBiome(landBiome)) {
+                    landBiome = GameConstants.BIOME_PLAINS;
+                }
+                hex.setBiome(landBiome);
+                hex.setLocalWeather(getRandomWeather(landBiome));
+                newlyLand.add(hex);
+            }
+            if (requireMainlandConnection) {
+                mainland.addAll(newlyLand);
+            } else {
+                for (Hex hex : newlyLand) {
+                    if (touchesMainland(hex, mainland)) {
+                        mainland.add(hex);
+                    }
+                }
+            }
+        }
+
+        int outerOceanDist = this.continentCoreRadius + coastalCount + 1;
+        for (Hex hex : this.hexes) {
+            if (hexDistanceFromOrigin(hex) == outerOceanDist) {
+                hex.setBiome(GameConstants.BIOME_OCEAN);
+                hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
+                hex.setIsland(false);
+            }
+        }
+    }
+
+    private boolean touchesMainland(Hex hex, Set<Hex> mainland) {
+        if (hex == null || mainland == null || mainland.isEmpty()) {
+            return false;
+        }
+        for (Hex neighbor : hex.getAdjacentNeighbors()) {
+            if (neighbor != null && mainland.contains(neighbor)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void ensureMinimumIslands(int minCount) {
+        if (minCount <= 0) {
+            return;
+        }
+        classifyLandmasses();
+        if (this.islandCount >= minCount) {
+            return;
+        }
+
+        int outerOceanDist = this.continentCoreRadius
+                + GameNumbers.WORLD_COASTAL_RING_COUNT
+                + GameNumbers.WORLD_OUTER_OCEAN_RING_COUNT;
+        int islandRingDist = this.continentCoreRadius + GameNumbers.WORLD_COASTAL_RING_COUNT;
+
+        int needed = minCount - this.islandCount;
+        needed -= placeDisconnectedIslandHexes(collectIsolatedOceanCandidates(islandRingDist, outerOceanDist), islandRingDist, needed);
+        if (needed > 0) {
+            needed -= placeDisconnectedIslandHexes(collectIsolatedOceanCandidates(-1, outerOceanDist), islandRingDist, needed);
+        }
+        while (needed > 0 && carveOneIslandFromMainland(islandRingDist, outerOceanDist)) {
+            needed--;
+        }
+    }
+
+    private int placeDisconnectedIslandHexes(List<Hex> candidates, int biomeRingDist, int needed) {
+        if (needed <= 0 || candidates.isEmpty()) {
+            return 0;
+        }
+        Collections.shuffle(candidates, GameRandom.getShuffleRandom());
+        int placed = 0;
+        for (Hex hex : candidates) {
+            if (placed >= needed) {
+                break;
+            }
+            if (!isWaterBiome(hex.getBiome()) || touchesAnyLand(hex)) {
+                continue;
+            }
+            int ring = biomeRingDist > 0 ? biomeRingDist : hexDistanceFromOrigin(hex);
+            Biome landBiome = getBiomeForRing(Math.min(ring, Math.max(1, this.continentCoreRadius)));
+            if (isWaterBiome(landBiome)) {
+                landBiome = GameConstants.BIOME_PLAINS;
+            }
+            hex.setBiome(landBiome);
+            hex.setLocalWeather(getRandomWeather(landBiome));
+            placed++;
+        }
+        return placed;
+    }
+
+    private List<Hex> collectIsolatedOceanCandidates(int requiredDist, int outerOceanDist) {
+        List<Hex> candidates = new ArrayList<>();
+        for (Hex hex : this.hexes) {
+            int dist = hexDistanceFromOrigin(hex);
+            if (dist <= this.continentCoreRadius || dist >= outerOceanDist) {
+                continue;
+            }
+            if (requiredDist >= 0 && dist != requiredDist) {
+                continue;
+            }
+            if (!isWaterBiome(hex.getBiome()) || touchesAnyLand(hex)) {
+                continue;
+            }
+            candidates.add(hex);
+        }
+        return candidates;
+    }
+
+    private boolean carveOneIslandFromMainland(int islandRingDist, int outerOceanDist) {
+        List<Hex> tips = new ArrayList<>();
+        for (Hex hex : this.hexes) {
+            int dist = hexDistanceFromOrigin(hex);
+            if (dist != islandRingDist || dist >= outerOceanDist) {
+                continue;
+            }
+            if (!isLandHex(hex) || hex.getColony() != null) {
+                continue;
+            }
+            tips.add(hex);
+        }
+        Collections.shuffle(tips, GameRandom.getShuffleRandom());
+        for (Hex tip : tips) {
+            List<Hex> bridges = new ArrayList<>();
+            boolean blocked = false;
+            for (Hex neighbor : tip.getAdjacentNeighbors()) {
+                if (neighbor == null || !isLandHex(neighbor)) {
+                    continue;
+                }
+                if (hexDistanceFromOrigin(neighbor) <= this.continentCoreRadius || neighbor.getColony() != null) {
+                    blocked = true;
+                    break;
+                }
+                bridges.add(neighbor);
+            }
+            if (blocked || bridges.isEmpty()) {
+                continue;
+            }
+            for (Hex bridge : bridges) {
+                bridge.setBiome(GameConstants.BIOME_OCEAN);
+                bridge.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
+            }
+            if (!touchesAnyLand(tip)) {
+                return true;
+            }
+            for (Hex bridge : bridges) {
+                Biome restored = getBiomeForRing(Math.min(hexDistanceFromOrigin(bridge), Math.max(1, this.continentCoreRadius)));
+                if (isWaterBiome(restored)) {
+                    restored = GameConstants.BIOME_PLAINS;
+                }
+                bridge.setBiome(restored);
+                bridge.setLocalWeather(getRandomWeather(restored));
+            }
+        }
+        return false;
+    }
+
+    private boolean touchesAnyLand(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Hex neighbor : hex.getAdjacentNeighbors()) {
+            if (neighbor != null && isLandHex(neighbor)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void ensureMinimumBiomeCounts(int minPerBiome) {
+        if (minPerBiome <= 0) {
+            return;
+        }
+        Map<Biome, Integer> counts = new HashMap<>();
+        Map<Biome, List<Hex>> byBiome = new HashMap<>();
+        for (Biome biome : GameConstants.getBiomes()) {
+            counts.put(biome, 0);
+            byBiome.put(biome, new ArrayList<>());
+        }
+        for (Hex hex : this.hexes) {
+            Biome biome = hex.getBiome();
+            if (biome == null) {
+                continue;
+            }
+            counts.merge(biome, 1, Integer::sum);
+            byBiome.computeIfAbsent(biome, ignored -> new ArrayList<>()).add(hex);
+        }
+
+        boolean progress = true;
+        while (progress) {
+            progress = false;
+            for (Biome target : GameConstants.getBiomes()) {
+                if (counts.getOrDefault(target, 0) >= minPerBiome) {
+                    continue;
+                }
+                Set<Biome> skipDonors = new HashSet<>();
+                skipDonors.add(GameConstants.BIOME_OCEAN);
+                skipDonors.add(target);
+                while (counts.getOrDefault(target, 0) < minPerBiome) {
+                    Biome donor = findRichestBiomeDonor(counts, skipDonors, minPerBiome);
+                    if (donor == null) {
+                        break;
+                    }
+                    List<Hex> donorHexes = byBiome.get(donor);
+                    Hex hex = pickBiomeRebalanceHex(donorHexes, target);
+                    if (hex == null && target == GameConstants.BIOME_LAKE) {
+                        hex = forceCreateInlandLakeHex(donorHexes, counts, byBiome, donor);
+                    }
+                    if (hex == null) {
+                        skipDonors.add(donor);
+                        continue;
+                    }
+                    if (hex.getBiome() != target) {
+                        Biome previous = hex.getBiome();
+                        List<Hex> previousList = byBiome.get(previous);
+                        if (previousList != null) {
+                            previousList.remove(hex);
+                        }
+                        counts.put(previous, Math.max(0, counts.getOrDefault(previous, 0) - 1));
+                        hex.setBiome(target);
+                        hex.setLocalWeather(getRandomWeather(target));
+                        byBiome.computeIfAbsent(target, ignored -> new ArrayList<>()).add(hex);
+                        counts.put(target, counts.getOrDefault(target, 0) + 1);
+                        progress = true;
+                    } else {
+                        skipDonors.add(donor);
+                    }
+                }
+            }
+        }
+    }
+
+    private Biome findRichestBiomeDonor(Map<Biome, Integer> counts, Set<Biome> skipDonors, int minPerBiome) {
+        Biome best = null;
+        int bestCount = -1;
+        for (Biome biome : GameConstants.getBiomes()) {
+            if (skipDonors.contains(biome)) {
+                continue;
+            }
+            int count = counts.getOrDefault(biome, 0);
+            if (count <= minPerBiome) {
+                continue;
+            }
+            if (count > bestCount) {
+                best = biome;
+                bestCount = count;
+            }
+        }
+        return best;
+    }
+
+    private Hex pickBiomeRebalanceHex(List<Hex> donorHexes, Biome target) {
+        if (donorHexes == null || donorHexes.isEmpty() || target == null) {
+            return null;
+        }
+        int outerOceanDist = this.continentCoreRadius
+                + GameNumbers.WORLD_COASTAL_RING_COUNT
+                + GameNumbers.WORLD_OUTER_OCEAN_RING_COUNT;
+        List<Hex> preferred = new ArrayList<>();
+        List<Hex> fallback = new ArrayList<>();
+        for (Hex hex : donorHexes) {
+            if (hex == null || hexDistanceFromOrigin(hex) >= outerOceanDist) {
+                continue;
+            }
+            if (hex.getBiome() == GameConstants.BIOME_OCEAN) {
+                continue;
+            }
+            if (!canConvertHexToBiome(hex, target)) {
+                continue;
+            }
+            if (hex.getColony() != null || hex.isIsland()) {
+                fallback.add(hex);
+            } else {
+                preferred.add(hex);
+            }
+        }
+        List<Hex> pool = !preferred.isEmpty() ? preferred : fallback;
+        if (pool.isEmpty()) {
+            return null;
+        }
+        return pool.get(GameRandom.nextInt(pool.size()));
+    }
+
+    private boolean canConvertHexToBiome(Hex hex, Biome target) {
+        if (hex == null || target == null) {
+            return false;
+        }
+        if (isWaterBiome(target)) {
+            if (hex.getColony() != null || hex.isIsland()) {
+                return false;
+            }
+            if (target == GameConstants.BIOME_LAKE && touchesOcean(hex)) {
+                return false;
+            }
+        }
+        if (hex.getBiome() == GameConstants.BIOME_LAKE && !isWaterBiome(target) && wouldLinkMainlandAndIsland(hex)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean touchesOcean(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Hex neighbor : hex.getAdjacentNeighbors()) {
+            if (neighbor != null && neighbor.getBiome() == GameConstants.BIOME_OCEAN) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean wouldLinkMainlandAndIsland(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        boolean touchesMainland = false;
+        boolean touchesIsland = false;
+        for (Hex neighbor : hex.getAdjacentNeighbors()) {
+            if (neighbor == null || !isLandHex(neighbor)) {
+                continue;
+            }
+            if (neighbor.isIsland()) {
+                touchesIsland = true;
+            } else {
+                touchesMainland = true;
+            }
+        }
+        return touchesMainland && touchesIsland;
+    }
+
+    private Hex forceCreateInlandLakeHex(
+            List<Hex> donorHexes,
+            Map<Biome, Integer> counts,
+            Map<Biome, List<Hex>> byBiome,
+            Biome donor) {
+        if (donorHexes == null || donorHexes.isEmpty() || donor == null) {
+            return null;
+        }
+        int outerOceanDist = this.continentCoreRadius
+                + GameNumbers.WORLD_COASTAL_RING_COUNT
+                + GameNumbers.WORLD_OUTER_OCEAN_RING_COUNT;
+        List<Hex> ranked = new ArrayList<>();
+        for (Hex hex : donorHexes) {
+            if (hex == null || hex.getColony() != null || hex.isIsland()) {
+                continue;
+            }
+            if (hexDistanceFromOrigin(hex) >= outerOceanDist) {
+                continue;
+            }
+            ranked.add(hex);
+        }
+        ranked.sort((a, b) -> Integer.compare(countOceanNeighbors(a), countOceanNeighbors(b)));
+        for (Hex center : ranked) {
+            boolean sealed = true;
+            for (Hex neighbor : center.getAdjacentNeighbors()) {
+                if (neighbor == null) {
+                    sealed = false;
+                    break;
+                }
+                if (neighbor.getBiome() != GameConstants.BIOME_OCEAN) {
+                    continue;
+                }
+                if (hexDistanceFromOrigin(neighbor) >= outerOceanDist) {
+                    sealed = false;
+                    break;
+                }
+                Biome fillBiome = donor;
+                if (isWaterBiome(fillBiome)) {
+                    fillBiome = GameConstants.BIOME_PLAINS;
+                }
+                List<Hex> oceanList = byBiome.get(GameConstants.BIOME_OCEAN);
+                if (oceanList != null) {
+                    oceanList.remove(neighbor);
+                }
+                counts.put(GameConstants.BIOME_OCEAN, Math.max(0, counts.getOrDefault(GameConstants.BIOME_OCEAN, 0) - 1));
+                neighbor.setBiome(fillBiome);
+                neighbor.setLocalWeather(getRandomWeather(fillBiome));
+                byBiome.computeIfAbsent(fillBiome, ignored -> new ArrayList<>()).add(neighbor);
+                counts.put(fillBiome, counts.getOrDefault(fillBiome, 0) + 1);
+            }
+            if (sealed && !touchesOcean(center)) {
+                return center;
+            }
+        }
+        return null;
+    }
+
+    private int countOceanNeighbors(Hex hex) {
+        int count = 0;
+        if (hex == null) {
+            return count;
+        }
+        for (Hex neighbor : hex.getAdjacentNeighbors()) {
+            if (neighbor != null && neighbor.getBiome() == GameConstants.BIOME_OCEAN) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void convertEnclosedOceansToLakes() {
+        Set<Hex> openOcean = new HashSet<>();
+        ArrayDeque<Hex> queue = new ArrayDeque<>();
+        for (Hex hex : this.hexes) {
+            if (hex.getBiome() != GameConstants.BIOME_OCEAN) {
+                continue;
+            }
+            if (!isMapEdgeHex(hex)) {
+                continue;
+            }
+            if (openOcean.add(hex)) {
+                queue.add(hex);
+            }
+        }
+        while (!queue.isEmpty()) {
+            Hex current = queue.poll();
+            for (Hex neighbor : current.getAdjacentNeighbors()) {
+                if (neighbor == null || neighbor.getBiome() != GameConstants.BIOME_OCEAN) {
+                    continue;
+                }
+                if (openOcean.add(neighbor)) {
+                    queue.add(neighbor);
+                }
+            }
+        }
+        for (Hex hex : this.hexes) {
+            if (hex.getBiome() == GameConstants.BIOME_OCEAN && !openOcean.contains(hex)) {
+                hex.setBiome(GameConstants.BIOME_LAKE);
+                hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_LAKE));
+            }
+        }
+    }
+
+    public void convertLakesTouchingOceanToOcean() {
+        ArrayDeque<Hex> queue = new ArrayDeque<>();
+        for (Hex hex : this.hexes) {
+            if (hex.getBiome() == GameConstants.BIOME_OCEAN) {
+                queue.add(hex);
+            }
+        }
+        while (!queue.isEmpty()) {
+            Hex current = queue.poll();
+            for (Hex neighbor : current.getAdjacentNeighbors()) {
+                if (neighbor == null || neighbor.getBiome() != GameConstants.BIOME_LAKE) {
+                    continue;
+                }
+                neighbor.setBiome(GameConstants.BIOME_OCEAN);
+                neighbor.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
+                queue.add(neighbor);
+            }
+        }
+    }
+
+    private static boolean isMapEdgeHex(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Hex neighbor : hex.getAdjacentNeighbors()) {
+            if (neighbor == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void classifyLandmasses() {
+        this.continentCount = 0;
+        this.islandCount = 0;
+        for (Hex hex : this.hexes) {
+            hex.setIsland(false);
+        }
+
+        Set<Hex> visited = new HashSet<>();
+        for (Hex start : this.hexes) {
+            if (!isLandHex(start) || visited.contains(start)) {
+                continue;
+            }
+            List<Hex> component = new ArrayList<>();
+            ArrayDeque<Hex> queue = new ArrayDeque<>();
+            queue.add(start);
+            visited.add(start);
+            boolean touchesCore = false;
+            while (!queue.isEmpty()) {
+                Hex current = queue.poll();
+                component.add(current);
+                if (hexDistanceFromOrigin(current) <= this.continentCoreRadius) {
+                    touchesCore = true;
+                }
+                for (Hex neighbor : current.getAdjacentNeighbors()) {
+                    if (neighbor == null || !isLandHex(neighbor) || visited.contains(neighbor)) {
+                        continue;
+                    }
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                }
+            }
+            if (touchesCore) {
+                this.continentCount++;
+                for (Hex hex : component) {
+                    hex.setIsland(false);
+                }
+            } else {
+                this.islandCount++;
+                for (Hex hex : component) {
+                    hex.setIsland(true);
+                }
+            }
+        }
+    }
+
+    private static int hexDistanceFromOrigin(Hex hex) {
+        if (hex == null) {
+            return Integer.MAX_VALUE;
+        }
+        int q = hex.getQ();
+        int r = hex.getR();
+        return (Math.abs(q) + Math.abs(q + r) + Math.abs(r)) / 2;
+    }
+
+    private boolean isLandHex(Hex hex) {
+        return hex != null && !isWaterBiome(hex.getBiome());
     }
 
     private List<Hex> selectNpcColonyHexes(List<Hex> eligible) {
@@ -515,20 +1124,22 @@ public class World {
         return selected;
     }
 
-    private List<Species> assignNpcSpecies(int colonyCount) {
-        List<Species> nonOmni = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
-        if (colonyCount == 0 || nonOmni.isEmpty()) {
+    private List<AntSpecies> assignNpcSpecies(int colonyCount) {
+        List<AntSpecies> pool = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
+        if (colonyCount == 0 || pool.isEmpty()) {
             return List.of();
         }
-        Collections.shuffle(nonOmni, GameRandom.getShuffleRandom());
-        List<Species> assignment = new ArrayList<>(colonyCount);
-        for (int i = 0; i < colonyCount; i++) {
-            if (i < nonOmni.size()) {
-                assignment.add(nonOmni.get(i));
-            } else {
-                assignment.add(nonOmni.get(GameRandom.nextInt(nonOmni.size())));
+        List<AntSpecies> assignment = new ArrayList<>(colonyCount);
+        while (assignment.size() < colonyCount) {
+            Collections.shuffle(pool, GameRandom.getShuffleRandom());
+            for (AntSpecies species : pool) {
+                if (assignment.size() >= colonyCount) {
+                    break;
+                }
+                assignment.add(species);
             }
         }
+        Collections.shuffle(assignment, GameRandom.getShuffleRandom());
         return assignment;
     }
     
@@ -665,7 +1276,7 @@ public class World {
         System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
 
         baseName = formatName(baseName);
-        generateWorld(biome, 8, colony, baseName, playerTitleKey);
+        generateWorld(biome, GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS, colony, baseName, playerTitleKey);
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }
@@ -685,7 +1296,12 @@ public class World {
         this.day = savefile.getDay();
         this.month = savefile.getMonth();
         this.year = savefile.getYear();  
-        this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
+        this.worldRadius = (savefile.getWorldRadius() > 0)
+                ? savefile.getWorldRadius()
+                : GameNumbers.worldRadiusForContinentCore(GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
+        this.continentCoreRadius = (savefile.getContinentCoreRadius() > 0)
+                ? savefile.getContinentCoreRadius()
+                : this.worldRadius;
         
         String playerTitleKey = GameConstants.getDynastyTitleById(savefile.resolvePlayerDynastyTitleId()).getNameKey();
 
@@ -783,7 +1399,10 @@ public class World {
                 this.hexes.add(hex);
             }
             linkNeighbors(hexMap);
+            classifyLandmasses();
             System.out.println("[World] Loaded world grid from savefile (" + this.hexes.size() + " hexes, " + loadedColonies.size() + " colonies).");
+            System.out.println("[World] Landmasses: " + this.continentCount + " continent(s), "
+                    + this.islandCount + " island(s).");
         } else {
             System.out.println("[World] No map data in save (or old save version). Generating fresh world map for existing colony.");
             
@@ -805,7 +1424,10 @@ public class World {
                 starter.initializeNewColony(colony);
             }
 
-            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName, playerTitleKey);
+            int coreRadius = this.continentCoreRadius > 0
+                    ? this.continentCoreRadius
+                    : GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
+            generateWorld(GameConstants.BIOME_PLAINS, coreRadius, colony, baseName, playerTitleKey);
         }
 
         if (savefile.getDynastys() != null) {

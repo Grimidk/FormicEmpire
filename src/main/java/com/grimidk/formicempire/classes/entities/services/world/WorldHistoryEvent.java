@@ -1,10 +1,10 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
-import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -122,7 +122,7 @@ public final class WorldHistoryEvent {
         return ARG_ASSIMILATION + assimilationId;
     }
 
-    public static String rankArg(ColonyRank rank) {
+    public static String rankArg(Rank rank) {
         if (rank == null || rank.getNameKey() == null) {
             return ARG_RANK;
         }
@@ -175,7 +175,7 @@ public final class WorldHistoryEvent {
             if (key.isEmpty()) {
                 return "";
             }
-            for (ColonyRank rank : GameConstants.getColonyRanks()) {
+            for (Rank rank : GameConstants.getColonyRanks()) {
                 if (key.equals(rank.getNameKey())) {
                     return rank.getName();
                 }

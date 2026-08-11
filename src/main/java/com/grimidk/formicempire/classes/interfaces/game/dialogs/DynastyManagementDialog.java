@@ -1,20 +1,20 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
-import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.War;
-import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiNameSearchBar;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
@@ -137,6 +138,15 @@ public class DynastyManagementDialog extends ZeroDialog {
         super.dispose();
     }
 
+    @Override
+    protected boolean consumeEscape() {
+        if (tradeCreationDialog != null && tradeCreationDialog.isShowing()) {
+            disposeTradeCreationDialog();
+            return true;
+        }
+        return false;
+    }
+
     private void disposeTradeCreationDialog() {
         if (tradeCreationDialog != null) {
             tradeCreationDialog.dispose();
@@ -152,8 +162,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         if (!isShowing()) return;
 
-        boolean hasTrade = dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE);
-        int expectedTabs = 3 + (hasTrade ? 1 : 0);
+        int expectedTabs = 4;
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
         boolean currentAutoTunnels = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
@@ -203,29 +212,27 @@ public class DynastyManagementDialog extends ZeroDialog {
             overviewPanel = new OverviewPanel(currentAutoBuild, currentAuto, currentAutoTunnels, currentAutoDiplomacy);
         }
         overviewPanel.updateData();
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_OVERVIEW), overviewPanel);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_OVERVIEW), GameUnlocks.ABILITY_DYNASTY.getIcon(), overviewPanel);
         tabIndexMap.put(TAB_OVERVIEW, currentIndex++);
 
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
-            if (tradePanel == null) {
-                tradePanel = new TradePanel();
-            }
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_LOGISTICS), tradePanel);
-            tabIndexMap.put(TAB_TRADE, currentIndex++);
+        if (tradePanel == null) {
+            tradePanel = new TradePanel();
         }
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_LOGISTICS), GameConstants.ICON_TRADE, tradePanel);
+        tabIndexMap.put(TAB_TRADE, currentIndex++);
 
         if (diplomacyPanel == null) {
             diplomacyPanel = new DiplomacyPanel();
         }
         diplomacyPanel.updateData();
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_DIPLOMACY), diplomacyPanel);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_DIPLOMACY), GameConstants.ROLE_DIPLOMAT.getIcon(), diplomacyPanel);
         tabIndexMap.put(TAB_DIPLOMACY, currentIndex++);
 
         if (warsPanel == null) {
             warsPanel = new WarManagementPanel(dynasty, engine, createWarCallbacks());
         }
         warsPanel.updateData();
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_WARS), warsPanel);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_WARS), GameConstants.ICON_STAT_MILITARY_POWER, warsPanel);
         tabIndexMap.put(TAB_WARS, currentIndex++);
 
         if (selectedIndex < tabbedPane.getTabCount()) {
@@ -246,15 +253,8 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private void registerTabKeyBinding(InputMap windowMap, InputMap tabMap, ActionMap actionMap,
             int keyCode, int tabIndex, String actionId) {
-        KeyStroke stroke = KeyStroke.getKeyStroke(keyCode, 0);
-        windowMap.put(stroke, actionId);
-        tabMap.put(stroke, actionId);
-        actionMap.put(actionId, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                switchTabOrClose(tabIndex);
-            }
-        });
+        EdgeTriggeredKeyBindings.bind(windowMap, tabMap, actionMap, keyCode, actionId,
+                () -> switchTabOrClose(tabIndex));
     }
 
     private void switchTabOrClose(int tabIndex) {
@@ -323,8 +323,15 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private void openTradeDialog(Colony origin, Colony target, Trade existingTrade) {
         disposeTradeCreationDialog();
-        tradeCreationDialog = new TradeCreationDialog(
-                SwingUtilities.getWindowAncestor(this), origin, target, engine, existingTrade);
+        tradeCreationDialog = new TradeCreationDialog(this, origin, target, engine, existingTrade);
+        tradeCreationDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (tradeCreationDialog == e.getWindow()) {
+                    tradeCreationDialog = null;
+                }
+            }
+        });
         tradeCreationDialog.setVisible(true);
     }
 
@@ -518,7 +525,9 @@ public class DynastyManagementDialog extends ZeroDialog {
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             topPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             
-            JLabel label = new JLabel(LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_LOGISTICS));
+            JLabel label = new JLabel(LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_LOGISTICS),
+                    GameConstants.ICON_TRADE, SwingConstants.LEFT);
+            label.setIconTextGap(6);
             label.setForeground(AssetStyles.FONT_COLOR);
             topPanel.add(label);
             
@@ -1111,6 +1120,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, available, 10.0));
                 s.setFocusable(false);
                 AssetStyles.styleSpinner(s);
+                s.setPreferredSize(AssetStyles.preferredSpinnerSize(140));
                 s.addChangeListener(e -> updateStats());
                 resourceSpinners.put(rt, s);
                 p.add(s);
@@ -1149,6 +1159,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
                 s.setFocusable(false);
                 AssetStyles.styleSpinner(s);
+                s.setPreferredSize(AssetStyles.preferredSpinnerSize(140));
                 s.addChangeListener(e -> updateStats());
                 returnResourceSpinners.put(rt, s);
                 p.add(s);
@@ -1216,6 +1227,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
                 s.setFocusable(false);
                 AssetStyles.styleSpinner(s);
+                s.setPreferredSize(AssetStyles.preferredSpinnerSize(100));
                 s.addChangeListener(e -> {
                     updateAvailableMethods();
                     updateStats();
@@ -1280,7 +1292,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 updateStats();
             });
             configPanel.add(Box.createHorizontalStrut(20));
-            configPanel.add(bilateralCheck);
+            JPanel bilateralWrap = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+            bilateralWrap.setOpaque(false);
+            if (GameUnlocks.ABILITY_BILATERAL_TRADE.getIcon() != null) {
+                bilateralWrap.add(new JLabel(GameUnlocks.ABILITY_BILATERAL_TRADE.getIcon()));
+            }
+            bilateralWrap.add(bilateralCheck);
+            bilateralWrap.setVisible(bilateralCheck.isVisible());
+            configPanel.add(bilateralWrap);
             mainPanel.add(configPanel);
 
             if (crossDynasty) {
@@ -1318,6 +1337,12 @@ public class DynastyManagementDialog extends ZeroDialog {
             add(footerPanel, BorderLayout.SOUTH);
             
             UiDialogUtils.prepareDialog(this, owner);
+            EdgeTriggeredKeyBindings.bind(
+                    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+                    getRootPane().getActionMap(),
+                    KeyEvent.VK_ESCAPE,
+                    "escapeCloseTrade",
+                    this::dispose);
             updateStats();
         }
 
@@ -1718,7 +1743,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     if (columnIndex == COL_SPECIES) {
-                        return Species.class;
+                        return AntSpecies.class;
                     }
                     if (columnIndex == COL_STANCE) {
                         return Object.class;
@@ -2615,7 +2640,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (value instanceof Species species) {
+            if (value instanceof AntSpecies species) {
                 setText(species.getName());
                 setIcon(species.getIcon());
                 setIconTextGap(8);
@@ -2716,6 +2741,16 @@ public class DynastyManagementDialog extends ZeroDialog {
         public boolean isShowAutoDiplomacy() {
             return showAutoDiplomacy;
         }
+
+        private JPanel wrapCheckWithIcon(ImageIcon icon, JCheckBox check) {
+            JPanel wrap = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+            wrap.setOpaque(false);
+            if (icon != null) {
+                wrap.add(new JLabel(icon));
+            }
+            wrap.add(check);
+            return wrap;
+        }
         
         private void updateSorter() {
             int idx = sortCombo.getSelectedIndex();
@@ -2761,7 +2796,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 defaultAutoBuildCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_BUILD_TOOLTIP));
                 defaultAutoBuildCheck.setSelected(dynasty.isDefaultAutoBuildEnabled());
                 defaultAutoBuildCheck.addActionListener(e -> dynasty.setDefaultAutoBuildEnabled(defaultAutoBuildCheck.isSelected()));
-                topPanel.add(defaultAutoBuildCheck);
+                topPanel.add(wrapCheckWithIcon(GameUnlocks.ABILITY_MANAGEMENT.getIcon(), defaultAutoBuildCheck));
             }
             
             if (showAutomation) {
@@ -2772,7 +2807,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 defaultAutomationCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTOMATION_TOOLTIP));
                 defaultAutomationCheck.setSelected(dynasty.isDefaultAutomationEnabled());
                 defaultAutomationCheck.addActionListener(e -> dynasty.setDefaultAutomationEnabled(defaultAutomationCheck.isSelected()));
-                topPanel.add(defaultAutomationCheck);
+                topPanel.add(wrapCheckWithIcon(GameConstants.ICON_AUTOMATION, defaultAutomationCheck));
             }
 
             if (showAutoTunnels) {
@@ -2783,7 +2818,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 defaultAutoTunnelsCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP));
                 defaultAutoTunnelsCheck.setSelected(dynasty.isDefaultAutoTunnelsEnabled());
                 defaultAutoTunnelsCheck.addActionListener(e -> dynasty.setDefaultAutoTunnelsEnabled(defaultAutoTunnelsCheck.isSelected()));
-                topPanel.add(defaultAutoTunnelsCheck);
+                topPanel.add(wrapCheckWithIcon(GameUnlocks.ABILITY_AUTO_TUNNELS.getIcon(), defaultAutoTunnelsCheck));
             }
 
             if (showAutoDiplomacy) {
@@ -2794,7 +2829,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 autoDiplomacyCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_AUTO_DIPLOMACY_TOOLTIP));
                 autoDiplomacyCheck.setSelected(dynasty.isAutoDiplomacyEnabled());
                 autoDiplomacyCheck.addActionListener(e -> dynasty.setAutoDiplomacyEnabled(autoDiplomacyCheck.isSelected()));
-                topPanel.add(autoDiplomacyCheck);
+                topPanel.add(wrapCheckWithIcon(GameUnlocks.ABILITY_AUTO_DIPLOMACY.getIcon(), autoDiplomacyCheck));
             }
             
             add(topPanel, BorderLayout.NORTH);

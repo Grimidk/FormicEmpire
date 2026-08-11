@@ -1,17 +1,23 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
-import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.critter.Skill;
+import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
@@ -23,6 +29,11 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildingTreePanel;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchTreePanel;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
@@ -49,11 +60,18 @@ import java.util.stream.Collectors;
 
 public class HelpPanel extends JPanel {
     private final MainFrame frame;
+    private final boolean inDialog;
     private final JTabbedPane mainTabs;
     private final JButton backButton;
+    private boolean tabsContentDirty;
 
     public HelpPanel(MainFrame frame) {
+        this(frame, false);
+    }
+
+    public HelpPanel(MainFrame frame, boolean isInDialog) {
         this.frame = frame;
+        this.inDialog = isInDialog;
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
@@ -71,18 +89,28 @@ public class HelpPanel extends JPanel {
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
 
         AssetStyles.styleButton(backButton);
-        backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        backButton.addActionListener(e -> {
+            if (inDialog) {
+                Window window = SwingUtilities.getWindowAncestor(this);
+                if (window instanceof JDialog) {
+                    window.dispose();
+                }
+            } else {
+                this.frame.showCard(MainFrame.CARD_INIT);
+            }
+        });
         
         setupButtonNavigation(backButton);
         
         southPanel.add(backButton);
         add(southPanel, BorderLayout.SOUTH);
         
-        refreshTranslations();
+        backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
 
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
+                ensureTabsContentCurrent();
                 backButton.requestFocusInWindow();
             }
 
@@ -105,40 +133,47 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES), createAntRolesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE), createEmpirePanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
-                createDictionaryPanel(new ArrayList<>(GameUnlocks.getUpgrades())));
+                createResearchTreeHelpPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
-                createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
+                createBuildingTreeHelpPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getSynergies())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_COMBAT), createCombatPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD), createWorldPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UI), createUiControlsPanel());
     }
     
     public void refreshTranslations() {
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
-        
-        // Update tab titles
-        String[] titles = {
-            LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
-        };
-        
-        for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
-            mainTabs.setTitleAt(i, titles[i]);
+        tabsContentDirty = true;
+        if (isShowing()) {
+            ensureTabsContentCurrent();
+        } else {
+            String[] titles = {
+                LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_COMBAT),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
+            };
+            for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
+                mainTabs.setTitleAt(i, titles[i]);
+            }
         }
-        
-        // Fully re-init tabs to refresh internal content
+    }
+
+    public void ensureTabsContentCurrent() {
+        if (!tabsContentDirty) {
+            return;
+        }
+        tabsContentDirty = false;
         int selected = mainTabs.getSelectedIndex();
         initTabs();
         if (selected >= 0 && selected < mainTabs.getTabCount()) {
@@ -150,6 +185,7 @@ public class HelpPanel extends JPanel {
         setBackground(AssetStyles.BACKGROUND_COLOR);
         AssetStyles.styleTabbedPane(mainTabs);
         AssetStyles.styleButton(backButton);
+        tabsContentDirty = false;
         int selected = mainTabs.getSelectedIndex();
         initTabs();
         if (selected >= 0 && selected < mainTabs.getTabCount()) {
@@ -278,33 +314,43 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        for (Species s : GameConstants.getSpecies()) {
+        for (AntSpecies s : GameConstants.getSpecies()) {
             if (!GameConstants.hasAssimilatedDroneSprite(s)) {
                 continue;
             }
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
-            entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(), 
-                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
-                javax.swing.border.TitledBorder.DEFAULT_POSITION, 
+            entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+            entry.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            ImageIcon sprite = GameConstants.getAntSprite(GameConstants.TYPE_WORKER, s);
+            ImageIcon sprite = GameConstants.getRepresentativeAntSprite(s);
             JLabel spriteLabel = new JLabel(sprite != null ? sprite : s.getIcon());
             spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
             entry.add(spriteLabel, BorderLayout.WEST);
 
-            String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getFlavorName).collect(Collectors.joining(", "));
-            String info = helpHtml("width:350px;font-size:11pt;",
-                    "<b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>"
-                            + "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades);
-            
-            JLabel infoLabel = new JLabel(info);
-            infoLabel.setFont(AssetStyles.FONT_NORMAL);
-            infoLabel.setForeground(AssetStyles.FONT_COLOR);
-            infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            
-            entry.add(infoLabel, BorderLayout.CENTER);
+            JPanel info = new JPanel();
+            info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+            info.setBackground(AssetStyles.BACKGROUND_COLOR);
+            info.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+            JLabel scientificLabel = new JLabel(helpHtml("width:350px;font-size:11pt;",
+                    "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>"
+                            + s.getScientific() + "</i>"));
+            scientificLabel.setFont(AssetStyles.FONT_NORMAL);
+            scientificLabel.setForeground(AssetStyles.FONT_COLOR);
+            scientificLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            info.add(scientificLabel);
+
+            Assimilation assimilation = s.getAssimilation();
+            if (assimilation != null) {
+                info.add(Box.createRigidArea(new Dimension(0, 6)));
+                info.add(buildSpeciesAssimilationBlock(info, assimilation, s));
+            }
+
+            entry.add(info, BorderLayout.CENTER);
             panel.add(entry);
             panel.add(Box.createRigidArea(new Dimension(0, 5)));
         }
@@ -312,6 +358,43 @@ public class HelpPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private JPanel buildSpeciesAssimilationBlock(JPanel parent, Assimilation assimilation, AntSpecies species) {
+        JPanel block = new JPanel(new BorderLayout(8, 0));
+        block.setBackground(AssetStyles.BACKGROUND_COLOR);
+        block.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        ImageIcon assimilationIcon = assimilation.getIcon() != null ? assimilation.getIcon() : species.getIcon();
+        if (assimilationIcon != null) {
+            JLabel iconLabel = new JLabel(assimilationIcon);
+            iconLabel.setVerticalAlignment(SwingConstants.TOP);
+            block.add(iconLabel, BorderLayout.WEST);
+        }
+
+        JPanel text = new JPanel(new BorderLayout(0, 2));
+        text.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JLabel title = new JLabel(LanguageStrings.format(LanguageStrings.HELP_SPECIES_ASSIMILATION_FMT,
+                assimilation.getName()));
+        title.setFont(AssetStyles.FONT_BOLD);
+        title.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        text.add(title, BorderLayout.NORTH);
+
+        JTextArea descArea = new JTextArea(assimilation.getDescription());
+        descArea.setFont(AssetStyles.FONT_NORMAL);
+        descArea.setForeground(AssetStyles.FONT_COLOR);
+        descArea.setWrapStyleWord(true);
+        descArea.setLineWrap(true);
+        descArea.setEditable(false);
+        descArea.setFocusable(false);
+        descArea.setOpaque(false);
+        descArea.setBackground(parent.getBackground());
+        descArea.setBorder(new EmptyBorder(2, 0, 0, 0));
+        text.add(descArea, BorderLayout.CENTER);
+
+        block.add(text, BorderLayout.CENTER);
+        return block;
     }
 
     private JPanel buildHotkeysGrid() {
@@ -325,6 +408,9 @@ public class HelpPanel extends JPanel {
         class HotkeyRow {
             private int gridY = 0;
             void add(String key, String desc) {
+                add(key, desc, null);
+            }
+            void add(String key, String desc, ImageIcon icon) {
                 c.gridx = 0;
                 c.gridy = gridY;
                 JLabel keyLabel = new JLabel(key);
@@ -333,9 +419,12 @@ public class HelpPanel extends JPanel {
                 hotkeyPanel.add(keyLabel, c);
 
                 c.gridx = 1;
-                JLabel descLabel = new JLabel(desc);
+                JLabel descLabel = new JLabel(desc, icon, SwingConstants.LEFT);
                 descLabel.setFont(AssetStyles.FONT_NORMAL);
                 descLabel.setForeground(AssetStyles.FONT_COLOR);
+                if (icon != null) {
+                    descLabel.setIconTextGap(8);
+                }
                 hotkeyPanel.add(descLabel, c);
                 gridY++;
             }
@@ -361,9 +450,9 @@ public class HelpPanel extends JPanel {
         row.add("Q / W / E / R / T", LanguageStrings.get("HOTKEY_ROLES"));
         row.addSeparator();
         row.add("P", LanguageStrings.get("HOTKEY_P"));
-        row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"));
-        row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"));
-        row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"));
+        row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"), GameUnlocks.ABILITY_RESEARCH.getIcon());
+        row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"), GameUnlocks.ABILITY_ABILITY.getIcon());
+        row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"), GameUnlocks.ABILITY_DYNASTY.getIcon());
         row.add("M", LanguageStrings.get("HOTKEY_M"));
         row.add("X", LanguageStrings.get("HOTKEY_X"));
 
@@ -497,13 +586,228 @@ public class HelpPanel extends JPanel {
         return entry;
     }
 
+    private JComponent createCombatPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 10, 0));
+        intro.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(intro);
+
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_SKILLS, buildCombatSkillsSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_BATTLE_LINES, buildCombatBattleLinesSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_PHASES, buildCombatWarPhasesSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_STANDING, buildCombatWarStandingSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatUnitStatsSection());
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null);
+        return scrollPane;
+    }
+
+    private JPanel buildCombatSection(String titleKey, JPanel content) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(titleKey),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+        content.setOpaque(false);
+        section.add(content, BorderLayout.CENTER);
+        return section;
+    }
+
+    private JPanel buildCombatSkillsSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (Skill skill : GameConstants.getSkills()) {
+            panel.add(buildCombatConstantEntry(panel, skill.getName(), skill.getIcon(), formatSkillHelpBody(skill)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatBattleLinesSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            panel.add(buildCombatConstantEntry(panel, line.getName(), line.getIcon(), formatBattleLineHelpBody(line)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatWarPhasesSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (WarStagePhase phase : GameConstants.getWarStagePhases()) {
+            panel.add(buildCombatConstantEntry(panel, phase.getName(), phase.getIcon(),
+                    formatWarPhaseHelpBody(phase)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatWarStandingSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (WarStanding standing : GameConstants.getWarStandings()) {
+            panel.add(buildCombatConstantEntry(panel, standing.getName(), standing.getIcon(),
+                    formatWarStandingHelpBody(standing)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatUnitStatsSection() {
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(AssetStyles.BACKGROUND_COLOR);
+        content.add(buildCombatConstantEntry(content,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_ATTACK),
+                GameConstants.ICON_ATTACK,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_ATTACK_DESC)));
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(buildCombatConstantEntry(content,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE),
+                GameConstants.ICON_DEFENSE,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE_DESC)));
+        return buildCombatSection(LanguageStrings.HELP_COMBAT_UNIT_STATS, content);
+    }
+
+    private String formatWarPhaseHelpBody(WarStagePhase phase) {
+        if (phase == GameConstants.WAR_STAGE_ACTIVE_CLASH) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_PHASE_CLASH_DESC);
+        }
+        if (phase == GameConstants.WAR_STAGE_RESERVE_ASSAULT) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_PHASE_RESERVE_DESC);
+        }
+        if (phase == GameConstants.WAR_STAGE_REDEPLOYING) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_PHASE_REDEPLOY_DESC);
+        }
+        return "";
+    }
+
+    private String formatWarStandingHelpBody(WarStanding standing) {
+        if (standing == GameConstants.WAR_STANDING_WINNING) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_STANDING_WINNING_DESC);
+        }
+        if (standing == GameConstants.WAR_STANDING_LOSING) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_STANDING_LOSING_DESC);
+        }
+        if (standing == GameConstants.WAR_STANDING_EVEN) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_STANDING_EVEN_DESC);
+        }
+        return "";
+    }
+
+    private JPanel buildCombatConstantEntry(JPanel parent, String title, ImageIcon icon, String bodyText) {
+        JPanel entry = new JPanel(new BorderLayout(10, 0));
+        entry.setBackground(AssetStyles.BACKGROUND_COLOR);
+        entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, title,
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        entry.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        if (icon != null) {
+            JLabel iconLabel = new JLabel(icon);
+            iconLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(iconLabel, BorderLayout.WEST);
+        }
+
+        JTextArea descArea = new JTextArea(bodyText);
+        descArea.setFont(AssetStyles.FONT_NORMAL);
+        descArea.setForeground(AssetStyles.FONT_COLOR);
+        descArea.setWrapStyleWord(true);
+        descArea.setLineWrap(true);
+        descArea.setEditable(false);
+        descArea.setFocusable(false);
+        descArea.setBackground(parent.getBackground());
+        descArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        entry.add(descArea, BorderLayout.CENTER);
+        return entry;
+    }
+
+    private static String formatPercentMult(float mult) {
+        return String.format("%.0f%%", mult * 100f);
+    }
+
+    private String formatSkillHelpBody(Skill skill) {
+        StringBuilder body = new StringBuilder();
+        if (!skill.isAttack() || skill.isPassive()) {
+            if (skill.isPassive() && skill.getLaneDamageBonus() > 0f && skill.getBattleLine() != null) {
+                body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT,
+                        formatPercentMult(skill.getLaneDamageBonus()), skill.getBattleLine().getName()));
+            } else if (skill == GameConstants.SKILL_BOOST_REGEN) {
+                body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_BOOST_REGEN_EFFECT));
+            } else if (skill == GameConstants.SKILL_SHIELDING) {
+                body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_SHIELDING_EFFECT));
+            }
+            if (skill.getBattleLine() != null && !(skill.isPassive() && skill.getLaneDamageBonus() > 0f)) {
+                if (body.length() > 0) {
+                    body.append('\n');
+                }
+                body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_BATTLE_LINE_FMT, skill.getBattleLine().getName()));
+            }
+            return body.toString();
+        }
+        body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_ACCURACY_FMT, formatPercentMult(skill.getAccuracyMult())));
+        body.append('\n');
+        body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_DAMAGE_FMT, formatPercentMult(skill.getDamageMult())));
+        if (skill.getTargetCount() > 0) {
+            body.append('\n');
+            body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_TARGETS_FMT, skill.getTargetCount()));
+        }
+        if (skill.sacrificesSelf()) {
+            body.append('\n');
+            body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_SACRIFICES_SELF));
+        }
+        if (skill.getBattleLine() != null) {
+            body.append('\n');
+            body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_BATTLE_LINE_FMT, skill.getBattleLine().getName()));
+        }
+        return body.toString();
+    }
+
+    private String formatBattleLineHelpBody(BattleLine line) {
+        StringBuilder body = new StringBuilder();
+        body.append(LanguageStrings.format(LanguageStrings.HELP_BATTLE_LINE_ACCURACY_FMT,
+                String.format("%.0f%%", line.getBaseAccuracyPercent())));
+        body.append('\n');
+        if (line.getAllowedRoles().isEmpty()) {
+            body.append(LanguageStrings.get(LanguageStrings.HELP_BATTLE_LINE_ROLES_NONE));
+        } else {
+            String roles = line.getAllowedRoles().stream()
+                    .map(AntRole::getName)
+                    .collect(Collectors.joining(", "));
+            body.append(LanguageStrings.format(LanguageStrings.HELP_BATTLE_LINE_ROLES_FMT, roles));
+        }
+        return body.toString();
+    }
+
     private JComponent createBugsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        for (BugType type : GameConstants.getBugTypes()) {
+        for (Species type : GameConstants.getCritterSpecies()) {
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
             entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, type.getName(),
@@ -612,10 +916,61 @@ public class HelpPanel extends JPanel {
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_MILITARY_POWER, createMilitaryPowerSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_REPUTATION, createReputationSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_RANKS, createRanksSection()));
 
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private JPanel createRanksSection() {
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setBackground(AssetStyles.BACKGROUND_COLOR);
+        list.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (Rank rank : GameConstants.getColonyRanks()) {
+            Tier unlockedTier = GameConstants.getTierForRank(rank);
+
+            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+            row.setOpaque(false);
+            row.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            String label = rank.getName() + LanguageStrings.format(
+                    LanguageStrings.HELP_RANK_MIN_POPULATION, AssetStyles.formatNumber(rank.getPopulation()));
+            JLabel rankLabel = new JLabel(label, rank.getIcon(), SwingConstants.LEFT);
+            rankLabel.setFont(AssetStyles.FONT_NORMAL);
+            rankLabel.setForeground(AssetStyles.FONT_COLOR);
+            rankLabel.setIconTextGap(8);
+            row.add(rankLabel);
+
+            if (unlockedTier != null) {
+                JLabel unlocksLabel = new JLabel(LanguageStrings.get(LanguageStrings.HELP_RANK_UNLOCKS_TIER));
+                unlocksLabel.setFont(AssetStyles.FONT_NORMAL);
+                unlocksLabel.setForeground(AssetStyles.FONT_COLOR);
+                row.add(unlocksLabel);
+
+                JLabel tierIcon = new JLabel(unlockedTier.getIcon());
+                tierIcon.setToolTipText(unlockedTier.getName());
+                row.add(tierIcon);
+            }
+
+            if (rank.getUnlockOnAnnounce() != null) {
+                JLabel unlocksUpgradeLabel = new JLabel(LanguageStrings.get(LanguageStrings.HELP_RANK_UNLOCKS_UPGRADE));
+                unlocksUpgradeLabel.setFont(AssetStyles.FONT_NORMAL);
+                unlocksUpgradeLabel.setForeground(AssetStyles.FONT_COLOR);
+                row.add(unlocksUpgradeLabel);
+
+                Upgrade unlock = rank.getUnlockOnAnnounce();
+                JLabel upgradeIcon = new JLabel(unlock.getIcon());
+                upgradeIcon.setToolTipText(unlock.getDisplayName());
+                row.add(upgradeIcon);
+            }
+
+            list.add(row);
+        }
+        return list;
     }
 
     private JPanel wrapEmpireSection(String titleKey, JComponent content) {
@@ -875,7 +1230,6 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Resources: one header row (icon + name per resource, like original), then rows of pile sizes (small..huge) aligned in columns
         JPanel resourcesPanel = new JPanel();
         resourcesPanel.setLayout(new BoxLayout(resourcesPanel, BoxLayout.Y_AXIS));
         resourcesPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -1119,8 +1473,69 @@ public class HelpPanel extends JPanel {
         return label;
     }
 
+    private Colony resolveHelpColony() {
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.getWorld() == null || engine.getWorld().getActiveHex() == null) {
+            return null;
+        }
+        return engine.getWorld().getActiveHex().getColony();
+    }
+
+    private JComponent createResearchTreeHelpPanel() {
+        Engine engine = frame.getEngine();
+        ResearchTreePanel panel = new ResearchTreePanel(resolveHelpColony(), engine, null, true);
+        panel.updateData();
+        return panel;
+    }
+
+    private JComponent createBuildingTreeHelpPanel() {
+        BuildingTreePanel panel = new BuildingTreePanel(resolveHelpColony(), null, true);
+        panel.updateData();
+        return panel;
+    }
+
     private JComponent createDictionaryPanel(List<Constant> items) {
         return createDictionaryPanel(items, true);
+    }
+
+    private static String displayName(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getDisplayName();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getDisplayName();
+        }
+        return c.getName();
+    }
+
+    private static ImageIcon tierIconOf(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getTierIcon();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getTierIcon();
+        }
+        return null;
+    }
+
+    private static String tierNameOf(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getTier().getName();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getTier().getName();
+        }
+        return null;
+    }
+
+    private static int tierIdOf(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getTier().getId();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getTier().getId();
+        }
+        return Integer.MAX_VALUE;
     }
 
     private JComponent createDictionaryPanel(List<Constant> items, boolean showIcons) {
@@ -1139,9 +1554,11 @@ public class HelpPanel extends JPanel {
         
         List<Constant> sortedItems = new ArrayList<>(items);
         Collections.sort(sortedItems, (a, b) -> {
-            String nameA = (a instanceof Upgrade) ? ((Upgrade) a).getFlavorName() : a.getName();
-            String nameB = (b instanceof Upgrade) ? ((Upgrade) b).getFlavorName() : b.getName();
-            return nameA.compareTo(nameB);
+            int byTier = Integer.compare(tierIdOf(a), tierIdOf(b));
+            if (byTier != 0) {
+                return byTier;
+            }
+            return displayName(a).compareTo(displayName(b));
         });
         
         for (Constant item : sortedItems) {
@@ -1152,13 +1569,37 @@ public class HelpPanel extends JPanel {
         list.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Constant) {
-                    Constant c = (Constant) value;
-                    setText((c instanceof Upgrade) ? ((Upgrade) c).getFlavorName() : c.getName());
-                    setIcon(showIcons ? c.getIcon() : null);
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (!(value instanceof Constant)) {
+                    return label;
                 }
-                return this;
+                Constant c = (Constant) value;
+                label.setText(displayName(c));
+                ImageIcon tierIcon = tierIconOf(c);
+                if (showIcons && c.getIcon() != null) {
+                    label.setIcon(c.getIcon());
+                } else if (tierIcon != null) {
+                    label.setIcon(tierIcon);
+                    label.setToolTipText(tierNameOf(c));
+                } else {
+                    label.setIcon(null);
+                }
+                if (showIcons && tierIcon != null) {
+                    JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+                    row.setOpaque(true);
+                    row.setBackground(label.getBackground());
+                    JLabel itemIcon = new JLabel(c.getIcon());
+                    JLabel nameLabel = new JLabel(displayName(c));
+                    nameLabel.setFont(label.getFont());
+                    nameLabel.setForeground(label.getForeground());
+                    JLabel tierLabel = new JLabel(tierIcon);
+                    tierLabel.setToolTipText(tierNameOf(c));
+                    row.add(itemIcon);
+                    row.add(nameLabel);
+                    row.add(tierLabel);
+                    return row;
+                }
+                return label;
             }
         });
         
@@ -1191,15 +1632,21 @@ public class HelpPanel extends JPanel {
                     
                     if (selected instanceof Upgrade) {
                         Upgrade u = (Upgrade) selected;
-                        body.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
+                        body.append("<b>").append(u.getDisplayName()).append("</b><br><br>");
                         body.append(u.getDescription()).append("<br><br>");
                         body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(u.getCost())).append(" RP");
-                        if (u.getRequirement() != null) {
-                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
+                        Assimilation subtypeAssimilation = GameUnlocks.getAssimilationRequiredForSubtypeRoleUpgrade(u);
+                        if (subtypeAssimilation != null) {
+                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ")
+                                    .append(LanguageStrings.format(
+                                            LanguageStrings.UPGRADE_REQUIRES_ASSIMILATION_FMT,
+                                            subtypeAssimilation.getName()));
+                        } else if (u.getRequirement() != null) {
+                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getDisplayName());
                         }
                     } else if (selected instanceof Building) {
                         Building b = (Building) selected;
-                        body.append("<b>").append(b.getName()).append("</b><br><br>");
+                        body.append("<b>").append(b.getDisplayName()).append("</b><br><br>");
                         body.append(b.getDescription());
                         if (b.getBuildTime() > 0) {
                              body.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
@@ -1385,17 +1832,29 @@ public class HelpPanel extends JPanel {
 
     public static void showRoadmapDialog(Component parent) {
         showTextFileDialog(parent, LanguageStrings.ROADMAP_TITLE,
-                ClasspathTextFiles.load("/meta/roadmap.txt", LanguageStrings.ROADMAP_UNAVAILABLE));
+                ClasspathTextFiles.load(AssetStyles.META_ROADMAP, LanguageStrings.ROADMAP_UNAVAILABLE));
     }
 
     public static void showCreditsDialog(Component parent) {
         showTextFileDialog(parent, LanguageStrings.CREDITS_TITLE,
-                ClasspathTextFiles.load("/meta/credits.txt", LanguageStrings.CREDITS_UNAVAILABLE));
+                ClasspathTextFiles.load(AssetStyles.META_CREDITS, LanguageStrings.CREDITS_UNAVAILABLE));
     }
 
     public static void showAuditDialog(Component parent) {
         showTextFileDialog(parent, LanguageStrings.AUDIT_TITLE,
                 ClasspathTextFiles.load(AssetStyles.META_AUDIT, LanguageStrings.AUDIT_UNAVAILABLE));
+    }
+
+    public static void showLicenseDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.LICENSE_TITLE,
+                ClasspathTextFiles.load(AssetStyles.META_LICENSE, LanguageStrings.LICENSE_UNAVAILABLE));
+    }
+
+    public static String loadVersionText() {
+        String version = ClasspathTextFiles.load(AssetStyles.META_VERSION, LanguageStrings.VERSION_UNAVAILABLE).trim();
+        return version.isEmpty()
+                ? LanguageStrings.get(LanguageStrings.VERSION_UNAVAILABLE)
+                : version;
     }
 
     private static void showTextFileDialog(Component parent, String titleKey, String text) {
@@ -1426,6 +1885,32 @@ public class HelpPanel extends JPanel {
         buttonPanel.add(closeButton);
 
         dialog.add(buttonPanel, BorderLayout.SOUTH);
-        UiDialogUtils.show(dialog, parent);
+        UiDialogUtils.show(dialog, window != null ? window : parent);
+    }
+
+    public static class HelpDialog extends ZeroDialog {
+        private final HelpPanel helpPanel;
+
+        public HelpDialog(MainFrame frame) {
+            super(frame, LanguageStrings.UI_HELP, AssetStyles.DEFAULT_DIALOG_SIZE);
+
+            setLayout(new BorderLayout());
+
+            helpPanel = new HelpPanel(frame, true);
+            helpPanel.ensureTabsContentCurrent();
+
+            add(helpPanel, BorderLayout.CENTER);
+        }
+
+        @Override
+        protected void refreshDialog() {
+            helpPanel.refreshTranslations();
+        }
+
+        @Override
+        public void refreshTheme() {
+            super.refreshTheme();
+            helpPanel.refreshTheme();
+        }
     }
 }

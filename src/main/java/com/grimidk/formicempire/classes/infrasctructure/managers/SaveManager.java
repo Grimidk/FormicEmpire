@@ -10,22 +10,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
-import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -254,12 +253,9 @@ public class SaveManager {
 
         if (manualSave != null && autosave != null) {
             if (autosave.getTimestamp() > manualSave.getTimestamp()) {
-                System.out.println("[SaveManager] Loading autosave for slot " + slotId);
                 return autosave;
-            } else {
-                System.out.println("[SaveManager] Loading manual save for slot " + slotId);
-                return manualSave;
             }
+            return manualSave;
         } else if (manualSave != null) {
             return manualSave;
         } else if (autosave != null) {
@@ -337,6 +333,7 @@ public class SaveManager {
         save.setYear(w.getYear());
         save.setPlayTime(computePlayTime(w));
         save.setWorldRadius(w.getWorldRadius());
+        save.setContinentCoreRadius(w.getContinentCoreRadius());
 
         if (w.getDynastys() != null) {
             for (Dynasty dynasty : w.getDynastys()) {
@@ -432,6 +429,8 @@ public class SaveManager {
                         sc.unlockedUpgradeIds.add(u.getId());
                     }
                 }
+                sc.unlockedSkillIds = dynasty.copyUnlockedSkillIds();
+                sc.announcedRankIds = dynasty.copyAnnouncedRankIds();
                 sc.absorbedDynastyIds = (dynasty.getAbsorbedDynastyIds() != null) ? new ArrayList<>(dynasty.getAbsorbedDynastyIds()) : new ArrayList<>();
                 
                 sc.deathStatistics = (dynasty.getGlobalDeathStatistics() != null) ? new HashMap<>(dynasty.getGlobalDeathStatistics()) : new HashMap<>();
@@ -664,6 +663,7 @@ public class SaveManager {
         writeJsonLine(w, "month", s.getMonth(), false);
         writeJsonLine(w, "year", s.getYear(), false);
         writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
+        writeJsonLine(w, "continentCoreRadius", s.getContinentCoreRadius(), false);
         writeJsonLine(w, "playerDynastyTitleId", s.resolvePlayerDynastyTitleId(), false);
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         
@@ -762,6 +762,8 @@ public class SaveManager {
         w.write("      \"integrationProgressDays\": " + sc.integrationProgressDays + ","); w.newLine();
         w.write("      \"integrationDiplomatsManual\": " + sc.integrationDiplomatsManual + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
+        w.write("      \"unlockedSkillIds\": " + serializeListToJson(sc.unlockedSkillIds) + ","); w.newLine();
+        w.write("      \"announcedRankIds\": " + serializeListToJson(sc.announcedRankIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
         w.write("      \"completedAssimilationIds\": " + serializeListToJson(sc.completedAssimilationIds) + ","); w.newLine();
@@ -888,6 +890,7 @@ public class SaveManager {
         s.setMonth(Integer.parseInt(rootMap.getOrDefault("month", "1")));
         s.setYear(Integer.parseInt(rootMap.getOrDefault("year", "0")));
         s.setWorldRadius(Integer.parseInt(rootMap.getOrDefault("worldRadius", "8")));
+        s.setContinentCoreRadius(Integer.parseInt(rootMap.getOrDefault("continentCoreRadius", "0")));
         s.setPlayerDynastyTitleId(Integer.parseInt(rootMap.getOrDefault("playerDynastyTitleId", "0")));
         s.setPlayerDynastyTitleKey(rootMap.getOrDefault("playerDynastyTitleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY));
         
@@ -1049,6 +1052,16 @@ public class SaveManager {
         }
         sc.integrationDiplomatsManual = Boolean.parseBoolean(map.getOrDefault("integrationDiplomatsManual", "false"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
+        if (map.containsKey("unlockedSkillIds")) {
+            sc.unlockedSkillIds = deserializeJsonToList(map.get("unlockedSkillIds"));
+        } else {
+            sc.unlockedSkillIds = null;
+        }
+        if (map.containsKey("announcedRankIds")) {
+            sc.announcedRankIds = deserializeJsonToList(map.get("announcedRankIds"));
+        } else {
+            sc.announcedRankIds = null;
+        }
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
         sc.completedAssimilationIds = deserializeJsonToList(map.get("completedAssimilationIds"));
@@ -1515,15 +1528,17 @@ public class SaveManager {
 
     private Map<String, Double> deserializeJsonToDoubleMap(String json) {
         Map<String, Double> map = new HashMap<>();
-        if (json == null || json.length() <= 2) return map;
-        String content = json.substring(1, json.length() - 1);
-        String[] parts = content.split(",");
-        for (String part : parts) {
-            String[] kv = part.split(":");
-            if (kv.length == 2) {
-                String k = kv[0].trim().replace("\"", "");
-                double v = Double.parseDouble(kv[1].trim());
-                map.put(k, v);
+        if (json == null || json.length() <= 2) {
+            return map;
+        }
+        Matcher m = JSON_PAIR_PATTERN.matcher(json);
+        while (m.find()) {
+            try {
+                String key = unescapeJsonString(m.group(1));
+                double value = Double.parseDouble(m.group(2));
+                map.put(key, value);
+            } catch (Exception e) {
+                System.err.println("Error parsing double map pair: " + m.group(0));
             }
         }
         return map;
@@ -1828,6 +1843,8 @@ public class SaveManager {
             writeJsonLine(w, "masterVolume", engine.getMasterVolume(), false);
             writeJsonLine(w, "musicVolume", engine.getMusicVolume(), false);
             writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), false);
+            writeJsonLine(w, "musicMuted", engine.isMusicMuted(), false);
+            writeJsonLine(w, "musicShuffle", engine.isMusicShuffle(), false);
             writeJsonLine(w, "pauseOnFocusLoss", engine.isPauseOnFocusLoss(), false);
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
             writeJsonLine(w, "escapeKeyGameActions", engine.isEscapeKeyGameActions(), false);
@@ -1836,6 +1853,7 @@ public class SaveManager {
             writeJsonLine(w, "showAuditMenu", engine.isShowAuditMenu(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
             writeJsonLine(w, "darkMode", engine.isDarkMode(), false);
+            writeJsonLine(w, "frameRateCap", engine.getFrameRateCap(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
@@ -1924,6 +1942,8 @@ public class SaveManager {
             engine.setMasterVolume(Integer.parseInt(m.getOrDefault("masterVolume", String.valueOf(engine.getMasterVolume()))));
             engine.setMusicVolume(Integer.parseInt(m.getOrDefault("musicVolume", String.valueOf(engine.getMusicVolume()))));
             engine.setSfxVolume(Integer.parseInt(m.getOrDefault("sfxVolume", String.valueOf(engine.getSfxVolume()))));
+            engine.setMusicMuted(Boolean.parseBoolean(m.getOrDefault("musicMuted", String.valueOf(engine.isMusicMuted()))));
+            engine.setMusicShuffle(Boolean.parseBoolean(m.getOrDefault("musicShuffle", String.valueOf(engine.isMusicShuffle()))));
             engine.setPauseOnFocusLoss(Boolean.parseBoolean(m.getOrDefault("pauseOnFocusLoss", String.valueOf(engine.isPauseOnFocusLoss()))));
             engine.setConfirmOnQuit(Boolean.parseBoolean(m.getOrDefault("confirmOnQuit", String.valueOf(engine.isConfirmOnQuit()))));
             engine.setEscapeKeyGameActions(Boolean.parseBoolean(m.getOrDefault("escapeKeyGameActions",
@@ -1936,26 +1956,27 @@ public class SaveManager {
             engine.setOverworldAutoRecenter(Boolean.parseBoolean(m.getOrDefault("overworldAutoRecenter",
                     String.valueOf(engine.isOverworldAutoRecenter()))));
             engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));
+            engine.setFrameRateCap(Integer.parseInt(m.getOrDefault("frameRateCap", String.valueOf(engine.getFrameRateCap()))));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),
-                    GameConstants.ROLE_FORAGER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_WORKER).getId()));
             engine.setDefaultRoleSoldier(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_SOLDIER,
                     Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))),
-                    GameConstants.ROLE_HUNTER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_SOLDIER).getId()));
             engine.setDefaultRoleMajor(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_MAJOR,
                     Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))),
-                    GameConstants.ROLE_CRANE.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_MAJOR).getId()));
             engine.setDefaultRolePrincess(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_PRINCESS,
                     Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))),
-                    GameConstants.ROLE_BREEDER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_PRINCESS).getId()));
             engine.setDefaultRoleQueen(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_QUEEN,
                     Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))),
-                    GameConstants.ROLE_LAYER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_QUEEN).getId()));
 
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
@@ -1991,7 +2012,7 @@ public class SaveManager {
             sb.append("\"defenderStagesCaptured\":").append(war.defenderStagesCaptured).append(",");
             sb.append("\"stageProgress\":").append(war.stageProgress).append(",");
             sb.append("\"stagePhaseKey\":\"").append(escapeJsonString(
-                    war.stagePhaseKey != null ? war.stagePhaseKey : WarStagePhase.ACTIVE_CLASH.name())).append("\",");
+                    war.stagePhaseKey != null ? war.stagePhaseKey : GameConstants.WAR_STAGE_ACTIVE_CLASH.getPersistenceKey())).append("\",");
             sb.append("\"contestedColonyId\":").append(war.contestedColonyId).append(",");
             sb.append("\"stageAttackerDynastyId\":").append(war.stageAttackerDynastyId).append(",");
             sb.append("\"deployedActiveAttacker\":").append(war.deployedActiveAttacker).append(",");
@@ -2063,7 +2084,7 @@ public class SaveManager {
                         war.aggressorStagesCaptured = Integer.parseInt(map.getOrDefault("aggressorStagesCaptured", "0"));
                         war.defenderStagesCaptured = Integer.parseInt(map.getOrDefault("defenderStagesCaptured", "0"));
                         war.stageProgress = parseFloat(map.get("stageProgress"), 0f);
-                        war.stagePhaseKey = map.getOrDefault("stagePhaseKey", WarStagePhase.ACTIVE_CLASH.name());
+                        war.stagePhaseKey = map.getOrDefault("stagePhaseKey", GameConstants.WAR_STAGE_ACTIVE_CLASH.getPersistenceKey());
                         war.contestedColonyId = Integer.parseInt(map.getOrDefault("contestedColonyId", "0"));
                         war.stageAttackerDynastyId = Integer.parseInt(map.getOrDefault("stageAttackerDynastyId", "0"));
                         war.deployedActiveAttacker = Integer.parseInt(map.getOrDefault("deployedActiveAttacker", "0"));

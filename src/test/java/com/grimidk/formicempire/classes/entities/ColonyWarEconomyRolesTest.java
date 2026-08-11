@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 
 class ColonyWarEconomyRolesTest {
 
@@ -75,6 +78,7 @@ class ColonyWarEconomyRolesTest {
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_ARTILLERY, 2);
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_SIEGE, 1);
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_MILITIA, 6);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_COMMANDER, 2);
 
         assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_WARRIOR));
         assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_DEFENDER));
@@ -82,6 +86,7 @@ class ColonyWarEconomyRolesTest {
         assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_ARTILLERY));
         assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_SIEGE));
         assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_MILITIA));
+        assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_COMMANDER));
     }
 
     @Test

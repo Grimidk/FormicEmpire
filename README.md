@@ -1,14 +1,20 @@
-A game about ants developed solely on Java, autism, energy drinks (or coffee), and cigarettes. 
-I refuse to use an engine or learn proper UI/UX.
-Cursor is being used to help me debug and test, all pixelart made using Aseprite with my own trackpad. 
-I plan to make everything from scratch including the music, assets, fonts and more.
+GAME DESCRIPTION:
 
-Please enjoy it, and send feedback to: thegrimidk@gmail.com .
-Check the roadmap to see planned features and known bugs and credits for acknowledgments. 
+Formic Empire is an open-source ant management and simulation game completely made in Java by a single developer. This game is equal parts grand strategy, colony management, and incremental. Grow your ant dynasty from a few ants to millions and billions by conquering more territory and assimilating new abilities that allow you to expand further. Think of it as an unholy cross between Rimworld, Stellaris, and Spore.
 
-The game will eventually be published, but I don't care about profits. Donations are always welcome.
-I aim to publish the game around October 2026, maybe, until then betas are available at itch.io or github.
-After that expect regular but sparse updates including a Core Engine.
+All the assets from images, music, ui, font, and code were made by me, and so I give it freely to whoever wants to use it. Including a package of core reusable classes with code-gen tools so it's easier to make more games in the future; read the license for details, but in general just don't sell my stuff without permission. Tools used include: Aseprite to make pixelart, Cursor to code, LMMS to make audio, GitHub to host the project, and Java as the sole programming language with the relevant development tools.
+
+Formic Empire will eventually release on Steam for a few dollars at most; I'm aiming for Q4 of 2026, while the itch.io version will always stay at a donation-based price. Please be on the lookout for a demo version and wishlist on Steam soon. After the 1.0 release, there will be regular but not common major updates for as long as I have ideas; these may include community ideas or even forks. The project does not have a budget other than my own time and money spent on my vices, so all donations and Steam income will go to pay the fees and fuel the further development of Formic Empire and other projects.
+
+Please enjoy Formic Empire, and send feedback to: thegrimidk@gmail.com or leave a comment here. I'll answer every single inquiry I get, but please do be kind since this is my very first game.
+
+Check the roadmap to see planned features, known bugs, and credits for acknowledgments. If you want to help out, let me know, and I'll add you to the credits.
+
+Note that there is a version for each operating system; for the Linux version, you will have to go to the development repository (https://github.com/Grimidk/FormicEmpire) to compile locally or use the .jar with your own JRE. If you want to, you can add the App to your application folder or manage it through Steam; future updates will not overwrite your save files.
+
+DEVELOPMENT INSTRUCTIONS:
+
+This are instructions to modify or test the game, if you are instered in just playing please go to: https://grimidk.itch.io/formic-empire 
 
 Use 'production' branch for a stable version and 'development' branch for unstable beta features.
 
@@ -21,7 +27,7 @@ Running the game with Java installed (bash):
 
     ./scripts/run.sh
 
-Uses your system JDK and saves in `./saves/`.
+Uses your system JDK and saves in `./saves/` (dev / project checkout).
 
 Generating a release bundle (bash):
 
@@ -33,10 +39,20 @@ Produces **`outputs/`** with separate bundles per platform:
 
 | Path | Contents |
 |------|----------|
-| `outputs/FormicEmpire.jar.zip` | JAR + `FormicEmpire.sh` + `saves/` — **JAR download** (needs Java 17+ installed) |
+| `outputs/FormicEmpire.jar.zip` | JAR + `FormicEmpire.sh` — **JAR download** (needs Java 17+ installed) |
 | `outputs/FormicEmpire.windows.zip` | `FormicEmpire.exe` (game embedded) + `jre/` — **Windows download** |
 | `outputs/FormicEmpire.linux.zip` | jpackage app-image (`FormicEmpire/bin/FormicEmpire` + embedded runtime) — **Linux download** |
 | `outputs/FormicEmpire.app` | macOS app bundle (built on macOS via `jpackage`) |
+
+**Packaged saves/settings** are stored outside the app so replacing the `.app` / zip does not wipe progress:
+
+| Platform | Path |
+|----------|------|
+| macOS | `~/Library/Application Support/GrimIDK/FormicEmpire/saves/` |
+| Windows | `%APPDATA%\GrimIDK\FormicEmpire\saves\` |
+| Linux | `~/.local/share/GrimIDK/FormicEmpire/saves/` |
+
+On first launch after an upgrade, any older `saves/` files still found next to the previous install are copied into that folder **only when the destination file is missing** (existing App Support files are never overwritten).
 
 ### Bundled runtimes (not committed to git)
 
@@ -67,6 +83,15 @@ Produces **`outputs/`** with separate bundles per platform:
     iconutil -c icns src/main/resources/meta/icon.iconset -o src/main/resources/meta/icon.icns
 
 Run on macOS: `open outputs/FormicEmpire.app`  
-Run on Linux: ship `outputs/FormicEmpire.linux.zip` (unzip, then run `FormicEmpire/bin/FormicEmpire`). Saves are created beside the app folder at first run.  
-Run on Windows: ship `outputs/FormicEmpire.windows.zip` (unzip, then run `FormicEmpire.exe`). Saves are created beside the exe at first run.  
+Run on Linux: ship `outputs/FormicEmpire.linux.zip` (unzip, then run `FormicEmpire/bin/FormicEmpire`).  
+Run on Windows: ship `outputs/FormicEmpire.windows.zip` (unzip, then run `FormicEmpire.exe`).  
 Run anywhere with Java 17+: unzip `outputs/FormicEmpire.jar.zip` and run `./FormicEmpire.sh`
+
+In order to add new ant assets you need to use these colors in order to properly map the species: 
+    	head FF0000, torso 00FF00, abdomen 0000FF, wingPrimary FFFF00, wingSecondary 00FFFF, 
+        drone FF00FF, droneWingPrimary FF8000, droneWingSecondary 8000FF, honeypot FF0080;
+		borders (and appendages) 000000
+
+In case of wanting to edit or add new languages, please look into the translation_sheet.csv, there you can look for the string or add a new column (you still need to declare it in the codegen tool and for the settings).
+
+You can add new .mp3 to the audio/music/base in order to add them to the random track selection, the compile will add them as unknown artists, you will have to add that manually in the MusicTracks.java repository

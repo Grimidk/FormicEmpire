@@ -3,14 +3,15 @@ package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import java.util.function.BooleanSupplier;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
@@ -35,6 +36,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showDiplomacyDialogCallback;
     private final Runnable showWarDialogCallback;
     private final Runnable showSettingsDialogCallback;
+    private final Runnable showHelpDialogCallback;
     private final BooleanSupplier dynastyDialogOpenCheck;
 
     // --- UI Components ---
@@ -63,6 +65,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageDiplomacy;
     private JMenuItem manageWars;
     private JMenuItem openSettings;
+    private JMenuItem showHelp;
     private JMenuItem showTutorial;
     private JMenuItem showAudit;
     private JMenuItem quitToMenu;
@@ -88,6 +91,7 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showDiplomacyDialogCallback,
                         Runnable showWarDialogCallback,
                         Runnable showSettingsDialogCallback,
+                        Runnable showHelpDialogCallback,
                         BooleanSupplier dynastyDialogOpenCheck) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
@@ -108,6 +112,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showDiplomacyDialogCallback = showDiplomacyDialogCallback;
         this.showWarDialogCallback = showWarDialogCallback;
         this.showSettingsDialogCallback = showSettingsDialogCallback;
+        this.showHelpDialogCallback = showHelpDialogCallback;
         this.dynastyDialogOpenCheck = dynastyDialogOpenCheck;
 
         initComponents();
@@ -154,6 +159,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageDiplomacy = new JMenuItem();
         manageWars = new JMenuItem();
         openSettings = new JMenuItem();
+        showHelp = new JMenuItem();
         showTutorial = new JMenuItem();
         showAudit = new JMenuItem();
         quitToMenu = new JMenuItem();
@@ -186,15 +192,25 @@ public class ControlPanel extends ZeroGamePanel {
         manageRoles.setText(LanguageStrings.get(LanguageStrings.MENU_ROLES));
         manageHatchRates.setText(LanguageStrings.get(LanguageStrings.MENU_HATCH_RATES));
         manageResearch.setText(LanguageStrings.get(LanguageStrings.MENU_RESEARCH));
+        manageResearch.setIcon(GameUnlocks.ABILITY_RESEARCH.getIcon());
         manageBuilding.setText(LanguageStrings.get(LanguageStrings.MENU_BUILD));
+        manageBuilding.setIcon(GameUnlocks.ABILITY_BUILD.getIcon());
         manageAssimilation.setText(LanguageStrings.get(LanguageStrings.MENU_ASSIMILATION));
+        manageAssimilation.setIcon(GameUnlocks.ABILITY_ASSIMILATION.getIcon());
         manageSynergy.setText(LanguageStrings.get(LanguageStrings.MENU_SYNERGY));
+        manageSynergy.setIcon(GameUnlocks.ABILITY_SYNERGY.getIcon());
         manageAbilities.setText(LanguageStrings.get(LanguageStrings.MENU_ABILITIES));
+        manageAbilities.setIcon(GameUnlocks.ABILITY_ABILITY.getIcon());
         manageDynasty.setText(LanguageStrings.get(LanguageStrings.MENU_DYNASTY));
+        manageDynasty.setIcon(GameUnlocks.ABILITY_DYNASTY.getIcon());
         manageTrade.setText(LanguageStrings.get(LanguageStrings.MENU_TRADE));
+        manageTrade.setIcon(GameConstants.ICON_TRADE);
         manageDiplomacy.setText(LanguageStrings.get(LanguageStrings.MENU_DIPLOMACY));
+        manageDiplomacy.setIcon(GameConstants.ROLE_DIPLOMAT.getIcon());
         manageWars.setText(LanguageStrings.get(LanguageStrings.MENU_WARS));
+        manageWars.setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
         openSettings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
+        showHelp.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
         showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
         showAudit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         quitToMenu.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
@@ -333,6 +349,8 @@ public class ControlPanel extends ZeroGamePanel {
         openSettings.addActionListener(e -> {
             showSettingsDialogCallback.run();
         });
+
+        showHelp.addActionListener(e -> showHelpDialogCallback.run());
         
         showTutorial.addActionListener(e -> HelpPanel.showTutorialDialog(frame));
 
@@ -364,6 +382,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(dynastyMenu);
 
         gameMenu.add(openSettings);
+        gameMenu.add(showHelp);
         gameMenu.add(showTutorial);
         gameMenu.add(showAudit);
         gameMenu.add(AssetStyles.createInternalSeparator());
@@ -383,164 +402,78 @@ public class ControlPanel extends ZeroGamePanel {
         InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = this.getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0), "toggleView");
-        actionMap.put("toggleView", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleViewCallback.run();
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_Z, "toggleView", toggleViewCallback);
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_ESCAPE, "openMenu", () -> {
+            if (frame.getGamePanel() != null && frame.getGamePanel().handleEscapeKey()) {
+                return;
             }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "openMenu");
-        actionMap.put("openMenu", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (frame.getGamePanel() != null && frame.getGamePanel().handleEscapeKey()) {
-                    return;
-                }
-                Engine engine = frame.getEngine();
-                if (engine != null && engine.isEscapeKeyGameActions()) {
-                    toggleGameMenu();
-                }
+            Engine engine = frame.getEngine();
+            if (engine != null && engine.isEscapeKeyGameActions()) {
+                toggleGameMenu();
             }
         });
 
         addRoleKeyBinding(inputMap, actionMap, "openRoles1", KeyEvent.VK_Q, 0);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "handleWKey");
-        actionMap.put("handleWKey", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showRoleManagementDialogCallback.showDialog(1);
-            }
-        });
+        addRoleKeyBinding(inputMap, actionMap, "openRoles2", KeyEvent.VK_W, 1);
         addRoleKeyBinding(inputMap, actionMap, "openRoles3", KeyEvent.VK_E, 2);
         addRoleKeyBinding(inputMap, actionMap, "openRoles4", KeyEvent.VK_R, 3);
         addRoleKeyBinding(inputMap, actionMap, "openRoles5", KeyEvent.VK_T, 4);
-        
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "openHatchRates");
-        actionMap.put("openHatchRates", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showHatchRateDialogCallback.run();
-            }
-        });
-        
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0), "openResearch");
-        actionMap.put("openResearch", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageResearch.isVisible()) {
-                    showResearchDialogCallback.run();
-                }
-            }
-        });
-        
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "openBuilding");
-        actionMap.put("openBuilding", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageBuilding.isVisible()) {
-                    showBuildDialogCallback.run();
-                }
-            }
-        });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "openAssimilation");
-        actionMap.put("openAssimilation", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageAssimilation.isVisible()) {
-                    showAssimilationDialogCallback.run();
-                }
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_P, "openHatchRates",
+                showHatchRateDialogCallback);
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_Y, "openResearch", () -> {
+            if (manageResearch.isVisible()) {
+                showResearchDialogCallback.run();
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "openSynergy");
-        actionMap.put("openSynergy", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageSynergy.isVisible()) {
-                    showSynergyDialogCallback.run();
-                }
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_U, "openBuilding", () -> {
+            if (manageBuilding.isVisible()) {
+                showBuildDialogCallback.run();
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0), "openMap");
-        actionMap.put("openMap", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showMapDialogCallback.run();
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_I, "openAssimilation", () -> {
+            if (manageAssimilation.isVisible()) {
+                showAssimilationDialogCallback.run();
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, 0), "openStats");
-        actionMap.put("openStats", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showStatsDialogCallback.run();
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_O, "openSynergy", () -> {
+            if (manageSynergy.isVisible()) {
+                showSynergyDialogCallback.run();
             }
         });
-        
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0), "openAbilities");
-        actionMap.put("openAbilities", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageAbilities.isVisible()) {
-                    showAbilitiesDialogCallback.run();
-                }
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_M, "openMap", showMapDialogCallback);
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_X, "openStats", showStatsDialogCallback);
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_C, "openAbilities", () -> {
+            if (manageAbilities.isVisible()) {
+                showAbilitiesDialogCallback.run();
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "openDynasty");
-        actionMap.put("openDynasty", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageDynasty.isVisible()) {
-                    showDynastyDialogCallback.run();
-                }
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_A, "openDynasty", () -> {
+            if (manageDynasty.isVisible()) {
+                showDynastyDialogCallback.run();
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "openTrade");
-        actionMap.put("openTrade", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageTrade.isVisible()) {
-                    showTradeDialogCallback.run();
-                }
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_S, "openTrade", () -> {
+            if (manageTrade.isVisible()) {
+                showTradeDialogCallback.run();
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "openDiplomacy");
-        actionMap.put("openDiplomacy", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageDynasty.isVisible()) {
-                    showDiplomacyDialogCallback.run();
-                }
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_D, "openDiplomacy", () -> {
+            if (manageDynasty.isVisible()) {
+                showDiplomacyDialogCallback.run();
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0), "openWars");
-        actionMap.put("openWars", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if ((dynastyDialogOpenCheck != null && dynastyDialogOpenCheck.getAsBoolean())
-                        || manageWars.isVisible()) {
-                    showWarDialogCallback.run();
-                }
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_F, "openWars", () -> {
+            if ((dynastyDialogOpenCheck != null && dynastyDialogOpenCheck.getAsBoolean())
+                    || manageWars.isVisible()) {
+                showWarDialogCallback.run();
             }
         });
     }
-    
+
     private void addRoleKeyBinding(InputMap im, ActionMap am, String name, int key, int tab) {
-        im.put(KeyStroke.getKeyStroke(key, 0), name);
-        am.put(name, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showRoleManagementDialogCallback.showDialog(tab);
-            }
-        });
+        EdgeTriggeredKeyBindings.bind(im, am, key, name,
+                () -> showRoleManagementDialogCallback.showDialog(tab));
     }
 
     public void toggleGameMenu() {

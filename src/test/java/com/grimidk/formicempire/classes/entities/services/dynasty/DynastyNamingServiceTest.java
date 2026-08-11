@@ -1,9 +1,9 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.misc.CityTitle;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.CityTitle;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ class DynastyNamingServiceTest {
 
     @Test
     void preferredThemeKeysComeFromSpeciesTags() {
-        Species leafcutter = GameConstants.SPECIES_LEAFCUTTER;
+        AntSpecies leafcutter = GameConstants.SPECIES_LEAFCUTTER;
         assertTrue(leafcutter.getPreferredNameKeys().contains(LanguageStrings.DYNASTY_THEME_LEAF));
         assertFalse(leafcutter.getPreferredNameKeys().contains("Leaf"));
     }
@@ -33,7 +33,7 @@ class DynastyNamingServiceTest {
     @Test
     void claimThemeKeyPrefersSpeciesThenAvoidsRepeats() {
         DynastyNamingService naming = new DynastyNamingService();
-        Species species = GameConstants.SPECIES_FIRE;
+        AntSpecies species = GameConstants.SPECIES_FIRE;
         Set<String> claimed = new HashSet<>();
         for (int i = 0; i < species.getPreferredNameKeys().size(); i++) {
             String key = naming.claimThemeKey(species);

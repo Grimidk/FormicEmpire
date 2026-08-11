@@ -10,20 +10,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
-import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -524,6 +524,11 @@ public class DynastyDiplomacyService {
             lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getName(), friction));
         }
 
+        int warmonger = getWarmongerAdjustment(other, world);
+        if (warmonger != 0) {
+            lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_WARMONGER.getName(), warmonger));
+        }
+
         int militaryAdj = getMilitaryReputationAdjustment(other);
         if (militaryAdj != 0) {
             lines.add(new ReputationModifierLine(
@@ -600,12 +605,24 @@ public class DynastyDiplomacyService {
         return GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getReputationDelta();
     }
 
+    public int getWarmongerAdjustment(Dynasty other, World world) {
+        if (other == null || other == dynasty || world == null || world.getWarService() == null) {
+            return 0;
+        }
+        if (world.getWarService().isWarmonger(dynasty.getId())
+                || world.getWarService().isWarmonger(other.getId())) {
+            return GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta();
+        }
+        return 0;
+    }
+
     public int getEffectiveDiplomaticReputation(Dynasty other, World world) {
         if (other == null || other == dynasty) {
             return GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION;
         }
         int score = dynasty.getDiplomaticReputation(other.getId())
                 + getBorderFrictionAdjustment(other, world)
+                + getWarmongerAdjustment(other, world)
                 + getMilitaryReputationAdjustment(other)
                 + getDiplomatReputationAdjustment(other);
         return GameNumbers.clampDiplomaticReputation(score);
@@ -1318,8 +1335,10 @@ public class DynastyDiplomacyService {
         if (!canSendDiplomatsToColony(from, target, tradeManager, world) || requestedCount <= 0) {
             return 0;
         }
+        int room = Math.max(0, getMaxDiplomatsPerTarget() - countColonyMissionDiplomatsOn(target));
         int toSend = Math.min(requestedCount, Math.min(
-                countAvailableDiplomats(from), getMaxDiplomatsForColonyMission()));
+                countAvailableDiplomats(from),
+                Math.min(getMaxDiplomatsForColonyMission(), room)));
         if (toSend <= 0) {
             return 0;
         }
@@ -1358,7 +1377,12 @@ public class DynastyDiplomacyService {
                 if (source == target || !canSendDiplomatsToColony(source, target, tradeManager, world)) {
                     continue;
                 }
-                int max = Math.min(countAvailableDiplomats(source), getMaxDiplomatsForColonyMission());
+                int room = Math.max(0, getMaxDiplomatsPerTarget() - countColonyMissionDiplomatsOn(target));
+                if (room <= 0) {
+                    break;
+                }
+                int max = Math.min(countAvailableDiplomats(source),
+                        Math.min(getMaxDiplomatsForColonyMission(), room));
                 int sent = sendDiplomatsToColony(source, target, max, tradeManager, world);
                 if (sent > 0) {
                     int gain = sent * getDiplomatStabilityGainPerAnt();
@@ -1412,8 +1436,10 @@ public class DynastyDiplomacyService {
         if (!canSendDiplomatsToDynasty(from, other, world) || requestedCount <= 0) {
             return 0;
         }
+        int room = Math.max(0, getMaxDiplomatsPerTarget() - countDynastyMissionDiplomatsToward(other));
         int toSend = Math.min(requestedCount, Math.min(
-                countAvailableDiplomats(from), getMaxDiplomatsForDynastyMission()));
+                countAvailableDiplomats(from),
+                Math.min(getMaxDiplomatsForDynastyMission(), room)));
         if (toSend <= 0) {
             return 0;
         }

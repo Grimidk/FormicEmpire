@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatTabbedPaneUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.IconButtonUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.PanelBorderButtonUI;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Insets;
@@ -59,6 +60,24 @@ public final class UiButtonStyles {
         button.setMargin(NO_MARGIN);
         button.setBorder(new EmptyBorder(0, 0, 0, 0));
         button.putClientProperty(AssetStyles.ICON_BUTTON_CLIENT_KEY, Boolean.TRUE);
+    }
+
+    public static void styleMenu(AbstractButton button) {
+        style(button);
+        button.putClientProperty(AssetStyles.MENU_BUTTON_CLIENT_KEY, Boolean.TRUE);
+        Color bg = AssetStyles.BACKGROUND_COLOR;
+        button.setBackground(AssetStyles.colorFromRgba(
+                bg.getRed(), bg.getGreen(), bg.getBlue(), AssetStyles.MENU_BUTTON_ALPHA));
+        FontMetrics metrics = button.getFontMetrics(button.getFont());
+        Insets insets = AssetStyles.BUTTON_MARGIN_INSETS;
+        int height = insets.top + insets.bottom + metrics.getHeight()
+                + AssetStyles.BORDER_THICKNESS_BUTTON * 2;
+        Dimension size = new Dimension(
+                AssetStyles.MENU_BUTTON_WIDTH,
+                Math.max(height, AssetStyles.MIN_CONTROL_HIT_SIZE));
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
     }
 
     public static void styleSectionTab(AbstractButton button) {

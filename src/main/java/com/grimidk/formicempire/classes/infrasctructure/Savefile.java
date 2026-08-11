@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.entities.War;
-import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -27,6 +26,7 @@ public class Savefile implements Serializable {
     private int month;
     private int year;
     private int worldRadius;
+    private int continentCoreRadius;
     private String playerDynastyTitleKey;
     private int playerDynastyTitleId;
     
@@ -70,7 +70,8 @@ public class Savefile implements Serializable {
         this.day = 1;
         this.month = 1;
         this.year = 0; 
-        this.worldRadius = 8;
+        this.worldRadius = GameNumbers.worldRadiusForContinentCore(GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
+        this.continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
         this.playerDynastyTitleKey = LanguageStrings.DYNASTY_TITLE_DYNASTY;
     }
 
@@ -97,6 +98,8 @@ public class Savefile implements Serializable {
         public int lastIncomingPactRequestWorldDay = -1;
         public Map<String, Integer> diplomatSupportToDynasty = new HashMap<>();
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
+        public List<Integer> unlockedSkillIds;
+        public List<Integer> announcedRankIds;
         public List<Integer> absorbedDynastyIds = new ArrayList<>();
         public List<Integer> defeatedSpeciesIds = new ArrayList<>();
         public List<Integer> completedAssimilationIds = new ArrayList<>();
@@ -257,7 +260,7 @@ public class Savefile implements Serializable {
         public int aggressorStagesCaptured;
         public int defenderStagesCaptured;
         public float stageProgress;
-        public String stagePhaseKey = WarStagePhase.ACTIVE_CLASH.name();
+        public String stagePhaseKey = GameConstants.WAR_STAGE_ACTIVE_CLASH.getPersistenceKey();
         public int contestedColonyId;
         public int stageAttackerDynastyId;
         public int deployedActiveAttacker;
@@ -343,6 +346,8 @@ public class Savefile implements Serializable {
 
     public int getWorldRadius() { return worldRadius; }
     public void setWorldRadius(int worldRadius) { this.worldRadius = worldRadius; }
+    public int getContinentCoreRadius() { return continentCoreRadius; }
+    public void setContinentCoreRadius(int continentCoreRadius) { this.continentCoreRadius = continentCoreRadius; }
 
     public String getPlayerDynastyTitleKey() { return playerDynastyTitleKey; }
     public void setPlayerDynastyTitleKey(String playerDynastyTitleKey) {

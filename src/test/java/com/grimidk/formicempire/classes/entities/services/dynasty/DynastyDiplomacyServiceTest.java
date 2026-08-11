@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DynastyDiplomacyServiceTest {
@@ -242,7 +243,7 @@ class DynastyDiplomacyServiceTest {
 
         for (int i = 0; i < GameNumbers.WAR_DECLARATION_MIN_POPULATION; i++) {
             smallColony.getWorkers().add(
-                    new com.grimidk.formicempire.classes.entities.Ant(smallColony, GameConstants.TYPE_WORKER));
+                    new com.grimidk.formicempire.classes.entities.critter.Ant(smallColony, GameConstants.TYPE_WORKER));
         }
         assertTrue(DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(player));
     }
@@ -252,7 +253,7 @@ class DynastyDiplomacyServiceTest {
         World world = buildBorderWorld();
         player.getDiplomacyService().applyWar(neighbor, null, world);
 
-        List<com.grimidk.formicempire.classes.entities.War> wars = world.getWarService().getActiveWars();
+        List<com.grimidk.formicempire.classes.entities.dynasty.War> wars = world.getWarService().getActiveWars();
         assertEquals(1, wars.size());
         assertTrue(wars.get(0).involves(player.getId()));
     }
@@ -885,6 +886,81 @@ class DynastyDiplomacyServiceTest {
         assertTrue(player.getDiplomacyService().canOfferGeneticExchange(neighbor, world));
         assertTrue(player.getDiplomacyService().offerGeneticExchange(neighbor, world));
         assertEquals(0, player.getDiplomacyService().countDynastyLiveDrones());
+    }
+
+    @Test
+    void warmongerAppliesAfterFiveDeclaredWarsWithAllDynasties() {
+        World world = emptyWorld();
+        world.getDynastys().add(player);
+        world.getDynastys().add(neighbor);
+        List<Dynasty> victims = new ArrayList<>();
+        for (int i = 0; i < GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD; i++) {
+            Dynasty victim = new Dynasty(100 + i, "Victim " + i, false, GameConstants.SPECIES_OMNI);
+            seedDiplomaticPopulation(victim);
+            world.getDynastys().add(victim);
+            victims.add(victim);
+        }
+        Dynasty bystander = new Dynasty(200, "Bystander", false, GameConstants.SPECIES_OMNI);
+        seedDiplomaticPopulation(bystander);
+        world.getDynastys().add(bystander);
+
+        player.setDiplomaticReputation(bystander.getId(), GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION);
+        bystander.setDiplomaticReputation(player.getId(), GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION);
+
+        assertEquals(0, player.getDiplomacyService().getWarmongerAdjustment(bystander, world));
+        assertFalse(world.getWarService().isWarmonger(player.getId()));
+
+        for (int i = 0; i < GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD - 1; i++) {
+            assertNotNull(world.getWarService().beginWar(player, victims.get(i)));
+        }
+        assertFalse(world.getWarService().isWarmonger(player.getId()));
+        assertEquals(0, player.getDiplomacyService().getWarmongerAdjustment(bystander, world));
+
+        assertNotNull(world.getWarService().beginWar(player, victims.get(GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD - 1)));
+        assertTrue(world.getWarService().isWarmonger(player.getId()));
+        assertEquals(GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta(),
+                player.getDiplomacyService().getWarmongerAdjustment(bystander, world));
+        assertEquals(GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta(),
+                bystander.getDiplomacyService().getWarmongerAdjustment(player, world));
+        assertEquals(
+                GameNumbers.clampDiplomaticReputation(
+                        GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION
+                                + GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta()),
+                player.getDiplomacyService().getEffectiveDiplomaticReputation(bystander, world));
+        assertTrue(player.getDiplomacyService().collectVisibleReputationModifiers(bystander, world).stream()
+                .anyMatch(line -> line.delta() == GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta()));
+    }
+
+    @Test
+    void autoDiplomacyDoesNotExceedPerTargetDiplomatLimit() {
+        World world = emptyWorld();
+        TradeManager tradeManager = new TradeManager();
+        Colony capital = player.getCapital();
+        capital.setAge(7);
+        capital.setLoyalty(GameConstants.LOYALTY_MILITANT.getMinScore());
+        capital.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 5);
+
+        Colony militant = new Colony(103, "Militant", true);
+        player.addColony(militant);
+        militant.setAge(7);
+        militant.setLoyalty(GameConstants.LOYALTY_MILITANT.getMinScore());
+        militant.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        militant.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 5);
+
+        Colony target = new Colony(104, "Unstable", true);
+        player.addColony(target);
+        target.setAge(7);
+        target.setLoyalty(GameConstants.LOYALTY_DISLOYAL.getMinScore());
+
+        player.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        player.unlockUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY);
+        player.setAutoDiplomacyEnabled(true);
+
+        player.getDiplomacyService().runAutomatedColonyLoyalty(player, world, tradeManager);
+
+        assertEquals(GameNumbers.DIPLOMAT_MAX_PER_DYNASTY_MISSION,
+                player.getDiplomacyService().countColonyMissionDiplomatsOn(target));
     }
 
     private void advanceWorldDays(World world, int days) {

@@ -1,15 +1,15 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -63,7 +63,7 @@ public final class AntSubtypeService {
         Map<AntSubtypeSlot, Map<Integer, Float>> rates = new EnumMap<>(AntSubtypeSlot.class);
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
             Map<Integer, Float> slotRates = new HashMap<>();
-            slotRates.put(GameNumbers.SUBTYPE_DIGIT_NONE, 100f);
+            slotRates.put(AntSubtype.DIGIT_NONE, 100f);
             rates.put(slot, slotRates);
         }
         return rates;
@@ -80,10 +80,19 @@ public final class AntSubtypeService {
         if (colony == null) {
             return false;
         }
-        return colony.hasUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW)
-                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT)
-                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD)
-                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) {
+            return false;
+        }
+        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
+            if (subtype == null || subtype.isNone() || subtype.getRequiredUpgrade() == null) {
+                continue;
+            }
+            if (dynasty.hasUpgrade(subtype.getRequiredUpgrade())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static float consumptionMult(AntSubtypeProfile profile) {
@@ -118,37 +127,43 @@ public final class AntSubtypeService {
         }
 
         Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates = defaultSubtypeRates();
-        float scale = subtypeAutomationFoodScale(colony);
-        if (scale <= 0f) {
-            colony.setSubtypeHatchRates(rates);
-            return;
-        }
 
         boolean trapjaw = colony.hasUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
         boolean honeypot = colony.hasUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
         boolean doorhead = colony.hasUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD);
         boolean bullet = colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        boolean farsight = colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARSIGHT);
 
         if (honeypot) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f * scale);
-            setAutomatedSlotRate(rates, GameConstants.TYPE_PRINCESS, AntSubtypeSlot.ABDOMEN, 3, 10f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_PRINCESS, AntSubtypeSlot.ABDOMEN, 3, 10f);
         }
         if (trapjaw) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2, 100f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2, 100f);
             if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
-                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, 2, 100f * scale);
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, 2, 100f);
             }
         }
         if (doorhead) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 50f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 50f);
             if (!trapjaw && colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
-                setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 3, 50f * scale);
+                setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 3, 50f);
+            }
+        }
+        if (farsight && !trapjaw) {
+            if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+                setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD,
+                        GameConstants.SUBTYPE_HEAD_FARSIGHT.getDigit(), 50f);
+            }
+            if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD,
+                        GameConstants.SUBTYPE_HEAD_FARSIGHT.getDigit(), 50f);
             }
         }
         if (bullet) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 2, 100f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 2, 100f);
             if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
-                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.ABDOMEN, 2, 100f * scale);
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.ABDOMEN, 2, 100f);
             }
         }
 
@@ -165,7 +180,7 @@ public final class AntSubtypeService {
         Map<Integer, Float> slotRates = rates.computeIfAbsent(type, ignored -> defaultRatesForType()).get(slot);
         slotRates.clear();
         slotRates.put(digit, clamped);
-        slotRates.put(GameNumbers.SUBTYPE_DIGIT_NONE, 100f - clamped);
+        slotRates.put(AntSubtype.DIGIT_NONE, 100f - clamped);
     }
 
     public static Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> deepCopyRates(
@@ -180,7 +195,7 @@ public final class AntSubtypeService {
                 slotCopy.put(slotEntry.getKey(), new HashMap<>(slotEntry.getValue()));
             }
             for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
-                slotCopy.putIfAbsent(slot, new HashMap<>(Map.of(GameNumbers.SUBTYPE_DIGIT_NONE, 100f)));
+                slotCopy.putIfAbsent(slot, new HashMap<>(Map.of(AntSubtype.DIGIT_NONE, 100f)));
             }
             copy.put(entry.getKey(), slotCopy);
         }
@@ -190,7 +205,7 @@ public final class AntSubtypeService {
         return copy;
     }
 
-    public static void applyNaturalSpeciesSubtypeRates(Colony colony, Species species) {
+    public static void applyNaturalSpeciesSubtypeRates(Colony colony, AntSpecies species) {
         if (colony == null || species == null) {
             return;
         }
@@ -201,7 +216,7 @@ public final class AntSubtypeService {
                 continue;
             }
             Map<Integer, Float> slotRates = new HashMap<>();
-            slotRates.put(GameNumbers.SUBTYPE_DIGIT_NONE, 100f - NPC_NATURAL_SUBTYPE_RATE);
+            slotRates.put(AntSubtype.DIGIT_NONE, 100f - NPC_NATURAL_SUBTYPE_RATE);
             slotRates.put(subtype.getDigit(), NPC_NATURAL_SUBTYPE_RATE);
             for (AntType type : getSubtypeRateTypes()) {
                 rates.get(type).put(subtype.getSlot(), slotRates);
@@ -264,29 +279,36 @@ public final class AntSubtypeService {
 
     public static AntSubtypeProfile rollProfile(Colony colony, AntType type) {
         int head = rollSlotDigit(colony, type, AntSubtypeSlot.HEAD);
-        int torso = GameNumbers.SUBTYPE_DIGIT_NONE;
+        int torso = AntSubtype.DIGIT_NONE;
         int abdomen = rollSlotDigit(colony, type, AntSubtypeSlot.ABDOMEN);
-        int other = GameNumbers.SUBTYPE_DIGIT_NONE;
+        int other = AntSubtype.DIGIT_NONE;
         return AntSubtypeProfile.of(head, torso, abdomen, other);
     }
 
     private static int rollSlotDigit(Colony colony, AntType type, AntSubtypeSlot slot) {
         if (!GameConstants.getConfigurableSubtypeSlots().contains(slot)) {
-            return GameNumbers.SUBTYPE_DIGIT_NONE;
+            return AntSubtype.DIGIT_NONE;
         }
         List<AntSubtype> options = getAvailableSubtypes(colony, slot);
         if (options.size() <= 1) {
-            return GameNumbers.SUBTYPE_DIGIT_NONE;
+            return AntSubtype.DIGIT_NONE;
+        }
+        float foodScale = 1f;
+        if (colony != null && colony.isAutomationEnabled()) {
+            foodScale = subtypeAutomationFoodScale(colony);
+            if (foodScale <= 0f) {
+                return AntSubtype.DIGIT_NONE;
+            }
         }
         double rand = GameRandom.nextDouble() * 100.0;
         double cumulative = 0.0;
         for (AntSubtype subtype : options) {
-            cumulative += colony.getSubtypeHatchRate(type, slot, subtype.getDigit());
+            cumulative += colony.getSubtypeHatchRate(type, slot, subtype.getDigit()) * foodScale;
             if (rand < cumulative) {
                 return subtype.getDigit();
             }
         }
-        return GameNumbers.SUBTYPE_DIGIT_NONE;
+        return AntSubtype.DIGIT_NONE;
     }
 
     public static void applySubtypeStats(Ant ant, Colony colony) {
@@ -300,15 +322,16 @@ public final class AntSubtypeService {
             ant.setSubtypeProfile(profile);
         }
 
-        ant.setMaxHealth((int) (colony.getBaseHealth() * type.getHealtMult() * combinedHealthMult(profile)));
+        ant.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * type.getHealtMult() * combinedHealthMult(profile))));
         if (ant.getHealth() > ant.getMaxHealth()) {
             ant.setHealth(ant.getMaxHealth());
         }
-        ant.setRegen((int) (colony.getBaseRegen() * type.getRegenMult()));
+        ant.setRegen(Math.round(colony.getBaseRegen() * type.getRegenMult() * combinedRegenMult(profile)));
         ant.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult() * consumptionMult(profile));
-        ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult() * combinedAttackMult(profile)));
+        ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult()));
         ant.setAttackSpeed((int) (colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        ant.setDefense((int) (colony.getBaseDefense() * type.getDefenseMult() * combinedDefenseMult(profile)));
+        ant.setDefense(GameNumbers.clampDefensePercent(
+                type.getDefenseMult() + colony.getBaseDefense() + combinedDefenseBonus(profile)));
         ant.setSpeed(colony.getBaseSpeed() * type.getSpeedMult() * combinedSpeedMult(profile));
     }
 
@@ -326,12 +349,39 @@ public final class AntSubtypeService {
         return hasAttackSubtype ? total : 1f;
     }
 
-    public static float combinedDefenseMult(AntSubtypeProfile profile) {
+    public static float combinedAccuracyBonus(AntSubtypeProfile profile) {
+        float total = 0f;
+        if (profile == null) {
+            return total;
+        }
+        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
+            AntSubtype subtype = profile.getSubtype(slot);
+            if (subtype == null || subtype.isNone()) {
+                continue;
+            }
+            total += subtype.getAccuracyBonus();
+        }
+        return total;
+    }
+
+    public static float combinedDefenseBonus(AntSubtypeProfile profile) {
+        float total = 0f;
+        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
+            AntSubtype subtype = profile.getSubtype(slot);
+            if (subtype == null || subtype.isNone() || subtype.getDefenseMult() == 1f) {
+                continue;
+            }
+            total += subtype.getDefenseMult();
+        }
+        return total;
+    }
+
+    public static float combinedRegenMult(AntSubtypeProfile profile) {
         float mult = 1f;
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
             AntSubtype subtype = profile.getSubtype(slot);
             if (subtype != null && !subtype.isNone()) {
-                mult *= subtype.getDefenseMult();
+                mult *= subtype.getRegenMult();
             }
         }
         return mult;
@@ -361,9 +411,10 @@ public final class AntSubtypeService {
             return 0f;
         }
         AntSubtypeProfile resolved = profile != null ? profile : AntSubtypeProfile.standard();
-        int hp = (int) (stats.getBaseHealth(colony) * type.getHealtMult() * combinedHealthMult(resolved));
-        int atk = (int) (stats.getBaseAttack(colony) * type.getAttackMult() * combinedAttackMult(resolved));
-        int def = (int) (stats.getBaseDefense(colony) * type.getDefenseMult() * combinedDefenseMult(resolved));
+        int hp = Math.max(0, Math.round(stats.getBaseHealth(colony) * type.getHealtMult() * combinedHealthMult(resolved)));
+        int atk = (int) (stats.getBaseAttack(colony) * type.getAttackMult());
+        int def = Math.round(GameNumbers.clampDefensePercent(
+                type.getDefenseMult() + stats.getBaseDefense(colony) + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (stats.getBaseAttackSpeed(colony) * type.getAttackSpeedMult());
         return ColonyMilitaryService.computeStatMultiplierFromBases(hp, atk, def, atkSpd);
     }
@@ -382,9 +433,10 @@ public final class AntSubtypeService {
             return 0f;
         }
         AntSubtypeProfile resolved = profile != null ? profile : AntSubtypeProfile.standard();
-        int hp = (int) (baseHealth * type.getHealtMult() * combinedHealthMult(resolved));
-        int atk = (int) (baseAttack * type.getAttackMult() * combinedAttackMult(resolved));
-        int def = (int) (baseDefense * type.getDefenseMult() * combinedDefenseMult(resolved));
+        int hp = Math.max(0, Math.round(baseHealth * type.getHealtMult() * combinedHealthMult(resolved)));
+        int atk = (int) (baseAttack * type.getAttackMult());
+        int def = Math.round(GameNumbers.clampDefensePercent(
+                type.getDefenseMult() + baseDefense + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (baseAttackSpeed * type.getAttackSpeedMult());
         return ColonyMilitaryService.computeStatMultiplierFromBases(hp, atk, def, atkSpd);
     }
@@ -572,7 +624,7 @@ public final class AntSubtypeService {
             }
             for (Map.Entry<AntSubtypeSlot, Map<Integer, Float>> slotEntry : typeEntry.getValue().entrySet()) {
                 for (Map.Entry<Integer, Float> rateEntry : slotEntry.getValue().entrySet()) {
-                    flat.put(type.getNameKey() + ":" + slotEntry.getKey().name() + ":" + rateEntry.getKey(),
+                    flat.put(type.getNameKey() + "|" + slotEntry.getKey().name() + "|" + rateEntry.getKey(),
                             rateEntry.getValue().doubleValue());
                 }
             }
@@ -587,7 +639,8 @@ public final class AntSubtypeService {
         }
         Map<AntSubtypeSlot, Map<Integer, Float>> legacyRates = new EnumMap<>(AntSubtypeSlot.class);
         for (Map.Entry<String, Double> entry : flat.entrySet()) {
-            String[] parts = entry.getKey().split(":");
+            String key = entry.getKey();
+            String[] parts = key.contains("|") ? key.split("\\|", -1) : key.split(":", -1);
             if (parts.length == 2) {
                 try {
                     AntSubtypeSlot slot = AntSubtypeSlot.valueOf(parts[0]);
@@ -653,11 +706,6 @@ public final class AntSubtypeService {
         return profile == null || profile.countActiveSubtypes() == 0;
     }
 
-    /**
-     * Whether {@code ant} may fill {@code role} given the colony's allowed special subtypes.
-     * Standard ("nothing") ants are eligible only when the role has no required subtypes.
-     * Special ants need every active special trait allowed (forced-allowed always counts as allowed).
-     */
     public static boolean isAntEligibleForRole(Ant ant, AntRole role, Set<Integer> allowedSpecialSubtypeIds) {
         if (ant == null || role == null) {
             return false;

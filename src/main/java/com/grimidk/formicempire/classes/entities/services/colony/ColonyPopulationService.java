@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogTexts;
@@ -13,8 +13,8 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 import java.util.ArrayList;
@@ -369,7 +369,7 @@ public class ColonyPopulationService {
         if (!biome.hasNativeParasite(GameConstants.TYPE_PARASITE_ANT)) {
             return false;
         }
-        return colony.getAntTotal() >= 1000;
+        return colony.getAntTotal() >= GameNumbers.PARASITE_ANT_OUTBREAK_MIN_POPULATION;
     }
 
     public int calculateParasiteAntSpawnAmount(Colony colony) {

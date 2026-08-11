@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 

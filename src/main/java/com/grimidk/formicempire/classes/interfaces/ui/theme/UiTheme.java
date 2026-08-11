@@ -126,12 +126,18 @@ public final class UiTheme {
         } else if (component instanceof javax.swing.JButton button) {
             if (Boolean.TRUE.equals(button.getClientProperty(AssetStyles.ICON_BUTTON_CLIENT_KEY))) {
                 UiButtonStyles.styleIcon(button);
+            } else if (Boolean.TRUE.equals(button.getClientProperty(AssetStyles.MENU_BUTTON_CLIENT_KEY))) {
+                UiButtonStyles.styleMenu(button);
             } else {
                 UiButtonStyles.style(button);
             }
             button.repaint();
         } else if (component instanceof javax.swing.JToggleButton toggleButton) {
-            UiButtonStyles.style(toggleButton);
+            if (Boolean.TRUE.equals(toggleButton.getClientProperty(AssetStyles.MENU_BUTTON_CLIENT_KEY))) {
+                UiButtonStyles.styleMenu(toggleButton);
+            } else {
+                UiButtonStyles.style(toggleButton);
+            }
             toggleButton.repaint();
         } else if (component instanceof javax.swing.JMenuItem menuItem) {
             UiMenuStyles.style(menuItem);

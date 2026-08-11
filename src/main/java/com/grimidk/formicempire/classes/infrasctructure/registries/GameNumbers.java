@@ -1,17 +1,37 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 
 public final class GameNumbers {
     private GameNumbers() {}
 
     // --- Movement / gathering ---
-    public static final float BASE_SPRITE_SPEED = 2.5f;
     public static final int PARASITIC_MITES_ON_ANT_SPRITE = 5;
+    public static final double ANT_JAW_SNAP_CHANCE_PER_HOUR = 0.08;
+    public static final double ANT_WING_FLICK_CHANCE_PER_HOUR = 0.06;
+    public static final int ANT_SPRITE_SNAP_MINUTES = 30;
+    public static final int ANT_LEG_FRAME_COUNT = 4;
+    public static final int ANT_LEG_FRAME_FLYING = 0;
+    public static final float BASE_SPRITE_SPEED = 2.5f;
+    public static final int MAX_PHYSICS_STEPS_PER_GUI_DRAIN = 2;
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
+
+    // --- World generation ---
+    public static final int WORLD_DEFAULT_CONTINENT_CORE_RADIUS = 7;
+    public static final int WORLD_COASTAL_RING_COUNT = 5;
+    public static final int WORLD_OUTER_OCEAN_RING_COUNT = 1;
+    public static final int[] WORLD_COASTAL_LAND_CHANCE_PERCENT = { 80, 40, 20, 10, 5 };
+    public static final int WORLD_MIN_ISLAND_COUNT = 6;
+    public static final int WORLD_MIN_HEXES_PER_BIOME = 2;
+
+    public static int worldRadiusForContinentCore(int continentCoreRadius) {
+        return Math.max(0, continentCoreRadius)
+                + WORLD_COASTAL_RING_COUNT
+                + WORLD_OUTER_OCEAN_RING_COUNT;
+    }
 
     // --- Hex resources / spawn ---
     public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
@@ -53,13 +73,7 @@ public final class GameNumbers {
     public static final int PARASITIC_MITES_PER_SLOWED_ANT = 10;
     public static final float PARASITIC_MITE_SPEED_MULTIPLIER = 0.5f;
 
-    // --- Ant subtypes ---
-    public static final int SUBTYPE_DIGIT_NONE = 1;
-    public static final float SUBTYPE_DAMAGE_MULT_STINGER = 4f;
-    public static final float SUBTYPE_ATTACK_MULT_TRAPJAW = 3f;
-    public static final float SUBTYPE_DEFENSE_MULT_DOORHEAD = 5f;
-    public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
-    public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
+    // --- Ant subtypes (shared rules, not per-subtype attrs) ---
     public static final float SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT = 0.5f;
 
     // --- Diplomacy / reputation ---
@@ -102,19 +116,24 @@ public final class GameNumbers {
     public static final int RECENTLY_INTEGRATED_LOYALTY_MONTHS = 6;
 
     // --- Military ---
-    public static final int MILITARY_WEIGHT_WORKER = 1;
-    public static final int MILITARY_WEIGHT_SOLDIER = 5;
-    public static final int MILITARY_WEIGHT_MAJOR = 15;
-    public static final int MILITARY_WEIGHT_PRINCESS = 10;
-    public static final int MILITARY_WEIGHT_QUEEN = 50;
     public static final int MILITARY_BASELINE_HEALTH = 100;
     public static final int MILITARY_BASELINE_ATTACK = 10;
-    public static final int MILITARY_BASELINE_DEFENSE = 5;
+    public static final int MILITARY_BASELINE_DEFENSE = 0;
+    public static final float DEFENSE_PERCENT_MIN = 0f;
+    public static final float DEFENSE_PERCENT_MAX = 100f;
+    public static final int ANT_REGEN_PERCENT_BASE = 10;
+    public static final float BOOST_REGEN_NEXT_REDEPLOY_MULT = 2f;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
-    public static final float ASSIMILATED_DAMAGE_MULT_FIRE = 4f;
-    public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 4f;
-    public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 16f;
-    public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 3f;
+    public static final float STAT_HEALTH_1_BONUS = 0.50f;
+    public static final float STAT_HEALTH_2_BONUS = 0.80f;
+    public static final float STAT_ATTACK_1_BONUS = 0.30f;
+    public static final float STAT_ATTACK_2_BONUS = 0.50f;
+    public static final int STAT_DEFENSE_FLAT_BONUS = 5;
+    public static final int STAT_ATTACK_SPEED_1_FLAT = 1;
+    public static final float ASSIMILATED_DAMAGE_ADD_FIRE = 0.5f;
+    public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 0.5f;
+    public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 3f;
+    public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 2f;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
 
@@ -124,6 +143,8 @@ public final class GameNumbers {
     public static final int INTEGRATION_MIN_DIPLOMATS = 1;
     public static final int DAYS_PER_MONTH = 30;
     public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
+    public static final int FORCED_FLIGHT_BASE_COST = 200;
+    public static final int MASS_FLIGHT_COST_MULTIPLIER = 5;
 
     // --- War ---
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
@@ -138,17 +159,33 @@ public final class GameNumbers {
     public static final float WAR_BATTLE_WIN_CHANCE_AT_PARITY = 0.5f;
     public static final float WAR_BATTLE_LOSS_FRACTION_AT_PARITY = 0.006f;
     public static final float WAR_BATTLE_WINNER_LOSS_FRACTION_MAX = 0.035f;
-    /** Stage capture progress added each war hour (0–1 scale); ~8 hours per hex at 13%/hour. */
     public static final float WAR_STAGE_PROGRESS_PER_HOUR = 0.13f;
     public static final float WAR_STAGE_PROGRESS_PER_DAY = WAR_STAGE_PROGRESS_PER_HOUR * 24f;
     public static final int WAR_REDEPLOY_HOURS = 24;
-    /** Hex defenders fight at +50% effective military power during local reserve/hex defense. */
-    public static final float WAR_HEX_DEFENSE_POWER_MULTIPLIER = 1.5f;
+    public static final float WAR_HEX_DEFENDING_STAT_MULT = 1.5f;
+    public static final float WAR_HEX_DEFENDER_ROLE_STAT_MULT = 3f;
+    public static final float WAR_HEX_SIEGE_ATTACKER_STAT_MULT = 3f;
+    public static final float WAR_HEX_ATTACKER_STAT_MULT = 1f;
+    public static final float WAR_HEX_DEFENSE_POWER_MULTIPLIER = WAR_HEX_DEFENDING_STAT_MULT;
     public static final float WAR_AI_FALLBACK_MAX_POWER_RATIO = 1f;
     public static final float WAR_AI_FALLBACK_RECOVERY_RATIO = 0.75f;
     public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
     public static final int WAR_AI_FALLBACK_MIN_SPARE_COLONIES = 3;
     public static final double AI_WAR_FALLBACK_CHANCE = 0.06;
+    public static final double AI_WAR_HEX_BAIT_CHANCE = 0.14;
+    public static final float WAR_AI_HEX_BAIT_MIN_HEX_ODDS = 1.05f;
+    public static final float WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT = 1.2f;
+    public static final float WAR_AI_HEX_BAIT_MIN_COUNTER_ODDS = 0.9f;
+    public static final float WAR_BATTLE_ARMY_DEFEAT_RATIO = 0.9f;
+
+    public static final int COMBAT_CAPACITY_BASE = 1000;
+    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;  
+    public static final int COMMANDER_MAX_PER_COLONY = 1;
+    public static final int TRIGGER_COMMANDER_MIN_WARS = 3;
+    public static final int TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY = 2;
+    public static final float COMMANDER_ARTILLERY_DAMAGE_BONUS = 0.5f;
+    public static final float CAPTAIN_INFANTRY_DAMAGE_BONUS = 0.25f;
+    public static final int WARMONGER_DECLARED_WARS_THRESHOLD = 5;
 
     // --- AI / trade automation ---
     public static final int AI_EXPANSION_COLONY_TARGET = 6;
@@ -166,10 +203,12 @@ public final class GameNumbers {
     // --- Triggers ---
     public static final int TRIGGER_GRAVER_DEAD_ANTS = 100;
     public static final int TRIGGER_RESEARCH_MIN_RP = 100;
-    public static final int TRIGGER_POLICE_MIN_POPULATION = 1000;
     public static final int TRIGGER_MASS_FLIGHT_MIN_NUPTIALS = 10;
     public static final int TRIGGER_BILATERAL_MIN_TRADES = 5;
     public static final int TRIGGER_SCOUT_PLANT_COLLECTED = 6000;
+    public static final int TRIGGER_MINER_TIER3_BUILDINGS = 10;
+    public static final double MINING_GATHER_SUCCESS_CHANCE = 0.10;
+    public static final double RESIN_FORAGE_BONUS_CHANCE = 0.01;
     public static final int TRIGGER_DYNASTY_MIN_COLONIES = 2;
     public static final int TRIGGER_TRADE_MIN_COLONIES = 3;
     public static final int TRIGGER_MANAGEMENT_MIN_COLONIES = 4;
@@ -177,6 +216,12 @@ public final class GameNumbers {
     public static final int TRIGGER_AUTOMATION_MIN_COLONIES = 7;
     public static final int TRIGGER_RESEARCHER_MIN_MONTHS = 2;
     public static final int TRIGGER_ASSIMILATION_MIN_ABSORBED = 1;
+    public static final int TRIGGER_NPC_RESEARCHER_MIN_ANTS = 20;
+    public static final int TRIGGER_NPC_GRAVER_DEAD_ANTS = 20;
+    public static final int TRIGGER_NPC_SCOUT_MIN_ANTS = 50;
+    public static final double TRIGGER_NPC_SCOUT_FOOD_RATIO = 0.2;
+    public static final int TRIGGER_NPC_ABILITY_MENU_MIN_RP = 4000;
+    public static final int PARASITE_ANT_OUTBREAK_MIN_POPULATION = 1000;
     public static final int DIPLOMAT_STABILITY_GAIN_BASE = 1;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;
@@ -185,10 +230,21 @@ public final class GameNumbers {
     public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
 
     // --- Research ---
-    /** Lab assistants contribute at 1/N of researcher-queen efficiency. */
     public static final int RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR = 50;
 
+    // --- Audio ---
+    public static final int VOLUME_MIN_PERCENT = 0;
+    public static final int VOLUME_MAX_PERCENT = 100;
+    public static final int VOLUME_DEFAULT_PERCENT = 50;
+    public static final int VOLUME_STEP_PERCENT = 10;
+
     // --- Numeric helpers ---
+
+    public static int snapVolumePercent(int volume) {
+        int clamped = Math.max(VOLUME_MIN_PERCENT, Math.min(VOLUME_MAX_PERCENT, volume));
+        int stepped = ((clamped + VOLUME_STEP_PERCENT / 2) / VOLUME_STEP_PERCENT) * VOLUME_STEP_PERCENT;
+        return Math.max(VOLUME_MIN_PERCENT, Math.min(VOLUME_MAX_PERCENT, stepped));
+    }
 
     public static int capPenNonAntSprites(int count) {
         return Math.min(Math.max(0, count), MAX_PEN_NON_ANT_SPRITES);
@@ -255,17 +311,58 @@ public final class GameNumbers {
     }
 
     public static int warHexDefenseEffectivePower(int baseReservePower) {
-        if (baseReservePower <= 0) {
-            return 0;
+        return warHexDefenseEffectiveDefenderPower(baseReservePower, 0);
+    }
+
+    public static int warHexDefenseEffectiveDefenderPower(int standardDefendingPower, int defenderRolePower) {
+        int standard = Math.max(0, standardDefendingPower);
+        int defenders = Math.max(0, defenderRolePower);
+        long effective = Math.round(standard * (double) WAR_HEX_DEFENDING_STAT_MULT)
+                + Math.round(defenders * (double) WAR_HEX_DEFENDER_ROLE_STAT_MULT);
+        if (effective <= 0 && (standard > 0 || defenders > 0)) {
+            return 1;
         }
-        return Math.max(1, Math.round(baseReservePower * WAR_HEX_DEFENSE_POWER_MULTIPLIER));
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0, effective));
+    }
+
+    public static int warHexAssaultEffectiveAttackerPower(int nonSiegePower, int siegePower) {
+        int nonSiege = Math.max(0, nonSiegePower);
+        int siege = Math.max(0, siegePower);
+        long effective = Math.round(nonSiege * (double) WAR_HEX_ATTACKER_STAT_MULT)
+                + Math.round(siege * (double) WAR_HEX_SIEGE_ATTACKER_STAT_MULT);
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0, effective));
     }
 
     public static int warHexDefenseEffectiveLossToActual(int effectiveLoss) {
-        if (effectiveLoss <= 0) {
+        return warHexDefenseEffectiveLossToActual(effectiveLoss, WAR_HEX_DEFENDING_STAT_MULT);
+    }
+
+    public static int warHexDefenseEffectiveLossToActual(int effectiveLoss, float averageMultiplier) {
+        if (effectiveLoss <= 0 || averageMultiplier <= 0f) {
             return 0;
         }
-        return Math.max(0, Math.round(effectiveLoss / WAR_HEX_DEFENSE_POWER_MULTIPLIER));
+        return Math.max(0, Math.round(effectiveLoss / averageMultiplier));
+    }
+
+    public static int warHexDefenseEffectiveLossToActual(int effectiveLoss, int basePower, int effectivePower) {
+        if (effectiveLoss <= 0 || basePower <= 0 || effectivePower <= 0) {
+            return 0;
+        }
+        return Math.max(0, Math.round(effectiveLoss * (basePower / (float) effectivePower)));
+    }
+
+    public static float applyHexDefenseAttack(float baseAttack, float statMult) {
+        if (baseAttack <= 0f || statMult <= 0f) {
+            return 0f;
+        }
+        return baseAttack * statMult;
+    }
+
+    public static float applyHexDefenseDefense(float baseDefensePercent, float statMult) {
+        if (statMult <= 0f) {
+            return clampDefensePercent(0f);
+        }
+        return clampDefensePercent(baseDefensePercent * statMult);
     }
 
     public static int clampDiplomaticReputation(int score) {
@@ -274,6 +371,32 @@ public final class GameNumbers {
 
     public static int clampColonyLoyalty(int score) {
         return Math.max(COLONY_LOYALTY_MIN, Math.min(COLONY_LOYALTY_MAX, score));
+    }
+
+    public static float clampDefensePercent(float defensePercent) {
+        if (Float.isNaN(defensePercent) || Float.isInfinite(defensePercent)) {
+            return DEFENSE_PERCENT_MIN;
+        }
+        return Math.max(DEFENSE_PERCENT_MIN, Math.min(DEFENSE_PERCENT_MAX, defensePercent));
+    }
+
+    public static int clampDefensePercent(int defensePercent) {
+        return Math.round(clampDefensePercent((float) defensePercent));
+    }
+
+    public static float damageAfterDefense(float rawDamage, float defensePercent) {
+        if (rawDamage <= 0f) {
+            return 0f;
+        }
+        float reduction = clampDefensePercent(defensePercent) / 100f;
+        return rawDamage * (1f - reduction);
+    }
+
+    public static float regenAmountFromPercent(float maxHealth, float regenPercent) {
+        if (maxHealth <= 0f || regenPercent <= 0f) {
+            return 0f;
+        }
+        return maxHealth * (regenPercent / 100f);
     }
 
     public static double computeIntegrationMonthsPerColony(double diplomatsPerColony) {

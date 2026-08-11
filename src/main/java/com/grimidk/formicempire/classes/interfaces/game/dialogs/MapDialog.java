@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -23,9 +23,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -329,10 +329,10 @@ public class MapDialog extends ZeroDialog {
             activeWarsContent.removeAll();
             boolean playerCanManageWars = canPlayerManageWars();
             for (War war : wars) {
-                Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
-                Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
-                String label = war.getDisplayName();
+                String label = world.getWarService().formatWarNameForDisplay(war, null);
                 if (label == null || label.isEmpty()) {
+                    Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
+                    Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
                     String nameA = dynastyA != null ? dynastyA.getName() : "?";
                     String nameB = dynastyB != null ? dynastyB.getName() : "?";
                     label = LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, nameA, nameB);
@@ -509,7 +509,7 @@ public class MapDialog extends ZeroDialog {
                 JPanel item = new JPanel(new BorderLayout(4, 0));
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
-                item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+                item.setMaximumSize(new Dimension(Integer.MAX_VALUE, DynastyColorSwatch.HITBOX_SIZE + 8));
 
                 JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 badges.setOpaque(false);
@@ -563,8 +563,10 @@ public class MapDialog extends ZeroDialog {
                     AssetStyles.markClickable(name);
                     name.addMouseListener(new MouseAdapter() {
                         @Override
-                        public void mouseClicked(MouseEvent e) {
-                            changeHex(capitalHex, true);
+                        public void mouseReleased(MouseEvent e) {
+                            if (SwingUtilities.isLeftMouseButton(e)) {
+                                changeHex(capitalHex, true);
+                            }
                         }
                     });
                 }
@@ -667,9 +669,12 @@ public class MapDialog extends ZeroDialog {
     }
 
     private class HexMapPanel extends JPanel {
+        private static final int CLICK_SLOP_PX = 6;
+
         private int hexRadius = 26;
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
         private final Map<Point, Hex> hexLookup = new HashMap<>();
+        private Point pressPoint;
 
         private final int[][] NEIGHBOR_OFFSETS = {
             {1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {0, -1}, {1, -1}
@@ -678,11 +683,37 @@ public class MapDialog extends ZeroDialog {
         public HexMapPanel() {
             setBackground(AssetStyles.BACKGROUND_COLOR);
             ToolTipManager.sharedInstance().registerComponent(this);
+            AssetStyles.markClickable(this);
 
             addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
-                    handleMouseClick(e.getPoint());
+                public void mousePressed(MouseEvent e) {
+                    if (!SwingUtilities.isLeftMouseButton(e)) {
+                        return;
+                    }
+                    pressPoint = e.getPoint();
+                    ToolTipManager.sharedInstance().mousePressed(e);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (!SwingUtilities.isLeftMouseButton(e) || pressPoint == null) {
+                        return;
+                    }
+                    Point release = e.getPoint();
+                    int dx = release.x - pressPoint.x;
+                    int dy = release.y - pressPoint.y;
+                    Point click = pressPoint;
+                    pressPoint = null;
+                    if (dx * dx + dy * dy > CLICK_SLOP_PX * CLICK_SLOP_PX) {
+                        return;
+                    }
+                    handleMouseClick(click);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    pressPoint = null;
                 }
             });
         }
@@ -716,6 +747,7 @@ public class MapDialog extends ZeroDialog {
         public String getToolTipText(MouseEvent e) {
             if (world == null || world.getHexes() == null) return null;
 
+            calculateHexSize();
             Point p = e.getPoint();
             Point centerOffset = getCenterOffset();
 
@@ -796,11 +828,24 @@ public class MapDialog extends ZeroDialog {
         }
 
         private void handleMouseClick(Point p) {
-            if (world == null || world.getHexes() == null) return;
+            if (world == null || world.getHexes() == null || p == null) {
+                return;
+            }
 
+            calculateHexSize();
             Point centerOffset = getCenterOffset();
+            List<Hex> snapshot;
+            try {
+                snapshot = new ArrayList<>(world.getHexes());
+            } catch (ConcurrentModificationException ignored) {
+                return;
+            }
 
-            for (Hex hex : world.getHexes()) {
+            for (int i = snapshot.size() - 1; i >= 0; i--) {
+                Hex hex = snapshot.get(i);
+                if (hex == null) {
+                    continue;
+                }
                 Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
                 if (poly.contains(p)) {
                     changeHex(hex, true);
@@ -877,7 +922,7 @@ public class MapDialog extends ZeroDialog {
 
                 if (hex.getColony() != null) {
                     Colony c = hex.getColony();
-                    ColonyRank rank = c.getRank();
+                    Rank rank = c.getRank();
 
                     if (rank != null && rank.getIcon() != null) {
                         Image rankImg = rank.getIcon().getImage();
@@ -982,54 +1027,13 @@ public class MapDialog extends ZeroDialog {
                 return biomeColorCache.get(biome.getId());
             }
 
-            if (biome.getIcon() == null) {
+            Color mapColor = biome.getMapColor();
+            if (mapColor == null) {
                 return AssetStyles.BACKGROUND_COLOR;
             }
 
-            Color avgColor = calculateAverageColor(biome.getIcon());
-            avgColor = AssetStyles.lightenTowardBackground(avgColor, 0.5f);
-
-            biomeColorCache.put(biome.getId(), avgColor);
-            return avgColor;
-        }
-
-        private Color calculateAverageColor(ImageIcon icon) {
-            try {
-                Image img = icon.getImage();
-                BufferedImage bi = new BufferedImage(
-                    img.getWidth(null),
-                    img.getHeight(null),
-                    BufferedImage.TYPE_INT_ARGB
-                );
-
-                Graphics g = bi.createGraphics();
-                g.drawImage(img, 0, 0, null);
-                g.dispose();
-
-                long sumR = 0, sumG = 0, sumB = 0;
-                long count = 0;
-
-                for (int x = 0; x < bi.getWidth(); x++) {
-                    for (int y = 0; y < bi.getHeight(); y++) {
-                        int pixel = bi.getRGB(x, y);
-                        int alpha = (pixel >> 24) & 0xff;
-
-                        if (alpha < 20) continue;
-
-                        if ((x % 3 == 0) && (y % 3 == 0)) {
-                            sumR += (pixel >> 16) & 0xff;
-                            sumG += (pixel >> 8) & 0xff;
-                            sumB += (pixel) & 0xff;
-                            count++;
-                        }
-                    }
-                }
-
-                return AssetStyles.colorFromAveragedRgb(sumR, sumG, sumB, count);
-
-            } catch (Exception e) {
-                return AssetStyles.BACKGROUND_COLOR;
-            }
+            biomeColorCache.put(biome.getId(), mapColor);
+            return mapColor;
         }
     }
 }

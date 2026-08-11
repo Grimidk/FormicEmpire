@@ -1,14 +1,14 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
@@ -467,7 +467,14 @@ public final class DynastyRebellionService {
 
     public static String generateRebellionWarName(World world, Dynasty parent) {
         int ordinal = countRebellionWars(world, parent.getId()) + 1;
-        String theme = LanguageStrings.dynastyThemeBase(parent.getName(), parent.getTitleKey());
+        String theme = parent.getThemeBase();
+        if (theme == null || theme.isEmpty()) {
+            theme = LanguageStrings.dynastyThemeBase(parent.getName(), parent.getTitleKey());
+        }
+        theme = LanguageStrings.resolveDynastyThemeDisplay(theme);
+        if (theme == null || theme.isEmpty()) {
+            theme = parent.getName();
+        }
         return LanguageStrings.format(LanguageStrings.REBELLION_WAR_NAME_FMT,
                 LanguageStrings.getWarOrdinal(ordinal), theme);
     }

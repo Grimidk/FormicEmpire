@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
@@ -26,7 +26,7 @@ public final class ConvoyScene {
     private final TradeMethod method;
     private final BackgroundKind backgroundKind;
     private final Biome landBiome;
-    private final Species species;
+    private final AntSpecies species;
     private final Map<AntType, Integer> typeCounts;
     private final boolean returning;
     private final float legProgress;
@@ -35,7 +35,7 @@ public final class ConvoyScene {
     private final boolean available;
 
     public ConvoyScene(String originName, String destinationName, TradeMethod method, BackgroundKind backgroundKind,
-            Biome landBiome, Species species, Map<AntType, Integer> typeCounts, boolean returning, float legProgress,
+            Biome landBiome, AntSpecies species, Map<AntType, Integer> typeCounts, boolean returning, float legProgress,
             int remainingHours, int totalHours, boolean available) {
         this.originName = originName != null ? originName : "";
         this.destinationName = destinationName != null ? destinationName : "";
@@ -73,7 +73,7 @@ public final class ConvoyScene {
         return landBiome;
     }
 
-    public Species getSpecies() {
+    public AntSpecies getSpecies() {
         return species;
     }
 

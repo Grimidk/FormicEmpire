@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
@@ -22,44 +22,44 @@ class ColonyStatsServiceAssimilationTest {
     }
 
     @Test
-    void fireVenomQuadruplesDamage() {
+    void fireVenomAddsFiftyPercentDamage() {
         Dynasty dynasty = dynastyWith(GameUnlocks.ASSIMILATED_FIREVENOM);
-        assertEquals(4f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(1.5f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
         Colony colony = new Colony(1, "C", true);
         colony.setDynasty(dynasty);
-        assertEquals(40, new ColonyStatsService().getBaseAttack(colony));
+        assertEquals(15, new ColonyStatsService().getBaseAttack(colony));
     }
 
     @Test
     void fireVenomUnaffectedByStingingAssimilation() {
         Dynasty dynasty = dynastyWith(GameUnlocks.ASSIMILATED_FIREVENOM, GameUnlocks.ASSIMILATED_STINGING);
-        assertEquals(4f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(1.5f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test
-    void fireAndDeadlyStackAdditivelyToEightWithoutSuperVenom() {
+    void fireAndDeadlyStackAdditivelyToDoubleWithoutSuperVenom() {
         Dynasty dynasty = dynastyWith(GameUnlocks.ASSIMILATED_FIREVENOM, GameUnlocks.ASSIMILATED_DEADLYVENOM);
-        assertEquals(8f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(2f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test
-    void superVenomReplacesFireAndDeadlyStackingWithSixteen() {
+    void superVenomReplacesFireAndDeadlyStackingWithTriple() {
         Dynasty dynasty = dynastyWith(
                 GameUnlocks.ABILITY_SYNERGY,
                 GameUnlocks.ASSIMILATED_FIREVENOM,
                 GameUnlocks.ASSIMILATED_DEADLYVENOM);
         DynastySynergyService.refreshUnlocked(dynasty);
-        assertEquals(16f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(3f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test
-    void fireAndDeadlySynergyReplacesFourPlusFourWithSixteen() {
+    void fireAndDeadlySynergyReplacesFiftyPlusFiftyWithTwoHundredBonus() {
         Dynasty dynasty = dynastyWith(
                 GameUnlocks.ABILITY_SYNERGY,
                 GameUnlocks.ASSIMILATED_FIREVENOM,
                 GameUnlocks.ASSIMILATED_DEADLYVENOM,
                 GameUnlocks.SYNERGY_SUPER_VENOM);
-        assertEquals(16f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(3f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test
@@ -70,15 +70,15 @@ class ColonyStatsServiceAssimilationTest {
                 GameUnlocks.ASSIMILATED_DEADLYVENOM,
                 GameUnlocks.ASSIMILATED_STINGING,
                 GameUnlocks.SYNERGY_SUPER_VENOM);
-        assertEquals(16f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(3f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test
-    void fastBiteTriplesAttackSpeed() {
+    void fastBiteDoublesAttackSpeed() {
         Dynasty dynasty = dynastyWith(GameUnlocks.ASSIMILATED_FASTBITE);
-        assertEquals(3f, ColonyStatsService.getAssimilatedAttackSpeedMultiplier(dynasty), 0.0001f);
+        assertEquals(2f, ColonyStatsService.getAssimilatedAttackSpeedMultiplier(dynasty), 0.0001f);
         Colony colony = new Colony(2, "C", true);
         colony.setDynasty(dynasty);
-        assertEquals(3, new ColonyStatsService().getBaseAttackSpeed(colony));
+        assertEquals(2, new ColonyStatsService().getBaseAttackSpeed(colony));
     }
 }

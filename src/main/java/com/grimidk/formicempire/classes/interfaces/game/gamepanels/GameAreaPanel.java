@@ -1,13 +1,13 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.BugType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Bug;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.critter.Critter;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
 // import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
@@ -647,7 +647,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     /*
      * In-room building decoration overlay — disabled for now (see roadmap).
      * Re-enable by uncommenting the draw call in paint and restoring RoomDecorationRenderer import.
-     *
+     *  
     private void drawUnderworldRoomDecorationsOverlay(Graphics2D g2d) {
         if (colony == null) {
             return;
@@ -803,10 +803,14 @@ public class GameAreaPanel extends ZeroGamePanel {
                 continue;
             }
 
-            List<Species> assimilatedSpecies = new ArrayList<>();
+            ImageIcon typeSpriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());
+            int typeW = typeSpriteIcon != null ? typeSpriteIcon.getIconWidth() : 16;
+            int typeH = typeSpriteIcon != null ? typeSpriteIcon.getIconHeight() : 16;
+
+            List<AntSpecies> assimilatedSpecies = new ArrayList<>();
             if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null
                     && colony.getDynasty().hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
-                for (Species s : GameConstants.getSpecies()) {
+                for (AntSpecies s : GameConstants.getSpecies()) {
                     if (s == colony.getSpecies()) continue;
                     if (s.getAssimilation() != null && colony.getDynasty().isAssimilationCompleted(s.getAssimilation())
                             && GameConstants.hasAssimilatedDroneSprite(s)) {
@@ -819,22 +823,28 @@ public class GameAreaPanel extends ZeroGamePanel {
                 if (ant.getDimension() != currentDimension) continue;
                 if (ant.getDimension() == WorldSpaces.TUNNEL_WORLD) continue;
 
-                ImageIcon antSpriteIcon = GameConstants.getAntSprite(type, colony.getSpecies(), ant.getSubtypeProfile());
+                if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), typeW, typeH)) {
+                    continue;
+                }
+
+                ImageIcon antSpriteIcon = GameConstants.getAntSprite(
+                        type,
+                        colony.getSpecies(),
+                        ant.getSubtypeProfile(),
+                        ant.getLegFrame(),
+                        ant.getJawFrame(),
+                        ant.getWingFrame());
                 if (antSpriteIcon == null) continue;
                 Image sprite = antSpriteIcon.getImage();
                 int w = antSpriteIcon.getIconWidth();
                 int h = antSpriteIcon.getIconHeight();
-
-                if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), w, h)) {
-                    continue;
-                }
                 
                 Image currentSprite = sprite;
                 if (!assimilatedSpecies.isEmpty()) {
                     int seed = System.identityHashCode(ant);
                     if (Math.abs(seed) % 10 < 3) {
                         int index = (Math.abs(seed) / 10) % assimilatedSpecies.size();
-                        Species as = assimilatedSpecies.get(index);
+                        AntSpecies as = assimilatedSpecies.get(index);
                         ImageIcon asIcon = GameConstants.getAssimilatedDroneSprite(as);
                         if (asIcon != null) {
                             currentSprite = asIcon.getImage();
@@ -891,12 +901,12 @@ public class GameAreaPanel extends ZeroGamePanel {
         int dermestidSprites = 0;
         final int typeSpriteCap = GameNumbers.MAX_PEN_NON_ANT_SPRITES;
 
-        for (Bug bug : colony.getBugs()) {
+        for (Critter bug : colony.getCritters()) {
             if (bug.getDimension() != currentDimension) {
                 continue;
             }
 
-            ImageIcon spriteIcon = bug.getBugType().getSprite();
+            ImageIcon spriteIcon = GameConstants.getCritterSprite(bug.getSpecies(), bug.getLegFrame());
             if (spriteIcon == null) {
                 continue;
             }
@@ -909,7 +919,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 continue;
             }
 
-            BugType type = bug.getBugType();
+            Species type = bug.getSpecies();
             if (overworld) {
                 if (!isBugInTypePen(bug, type, w, h)) {
                     continue;
@@ -954,7 +964,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
     }
 
-    private boolean isBugInTypePen(Bug bug, BugType type, int w, int h) {
+    private boolean isBugInTypePen(Critter bug, Species type, int w, int h) {
         if (type == GameConstants.TYPE_APHID) {
             return isBugCenterInRect(bug, w, h, rancherYardBounds);
         }
@@ -967,13 +977,13 @@ public class GameAreaPanel extends ZeroGamePanel {
         return isBugInOverworldPen(bug, w, h);
     }
 
-    private boolean isBugInOverworldPen(Bug bug, int w, int h) {
+    private boolean isBugInOverworldPen(Critter bug, int w, int h) {
         return isBugCenterInRect(bug, w, h, rancherYardBounds)
                 || isBugCenterInRect(bug, w, h, graverYardBounds)
                 || isBugCenterInRect(bug, w, h, insectPenBounds);
     }
 
-    private static boolean isBugCenterInRect(Bug bug, int w, int h, Rectangle rect) {
+    private static boolean isBugCenterInRect(Critter bug, int w, int h, Rectangle rect) {
         if (rect == null) {
             return false;
         }

@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.ui;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -10,8 +11,8 @@ import java.awt.event.MouseEvent;
 
 public class DynastyColorSwatch extends JPanel {
 
-    public static final int HITBOX_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
-    public static final int SWATCH_SIZE = 12;
+    public static final int HITBOX_SIZE = (AssetStyles.MIN_CONTROL_HIT_SIZE * 3) / 2;
+    public static final int SWATCH_SIZE = 18;
 
     private Color dynastyColor = Color.GRAY;
     private boolean hovered;
@@ -62,7 +63,7 @@ public class DynastyColorSwatch extends JPanel {
     }
 
     private void applyFixedSize() {
-        Dimension size = AssetStyles.minControlHitSize();
+        Dimension size = new Dimension(HITBOX_SIZE, HITBOX_SIZE);
         setPreferredSize(size);
         setMinimumSize(size);
         setMaximumSize(size);
@@ -71,8 +72,8 @@ public class DynastyColorSwatch extends JPanel {
     private void installMouseHandlers() {
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if (clickable && onClick != null && isEnabled()) {
+            public void mouseReleased(MouseEvent e) {
+                if (clickable && onClick != null && isEnabled() && SwingUtilities.isLeftMouseButton(e)) {
                     onClick.run();
                 }
             }

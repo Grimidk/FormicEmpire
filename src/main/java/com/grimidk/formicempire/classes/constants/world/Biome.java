@@ -1,9 +1,10 @@
 package com.grimidk.formicempire.classes.constants.world;
 
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
+import java.awt.Color;
 import java.util.List;
 import javax.swing.ImageIcon;
 
@@ -15,11 +16,13 @@ public class Biome extends Constant{
     private final float mineralAbundance;
     private final int difficulty;
     private final ImageIcon background;
-    private List<BugType> nativeBugs = List.of();
-    private List<BugType> nativeParasites = List.of();
+    private final String mapColorHex;
+    private final Color mapColor;
+    private List<Species> nativeBugs = List.of();
+    private List<Species> nativeParasites = List.of();
 
     public Biome(int id, String name, int temperature, int humidity, float plantAbundance, float animalAbundance,
-            float mineralAbundance, int difficulty, ImageIcon icon, ImageIcon background) {
+            float mineralAbundance, int difficulty, String mapColorHex, ImageIcon icon, ImageIcon background) {
         super(id, name, icon);
         this.temperature = temperature;
         this.humidity = humidity;
@@ -27,30 +30,46 @@ public class Biome extends Constant{
         this.animalAbundance = animalAbundance;
         this.mineralAbundance = mineralAbundance;
         this.difficulty = difficulty;
+        this.mapColorHex = normalizeMapColorHex(mapColorHex);
+        this.mapColor = new Color(Integer.parseInt(this.mapColorHex, 16));
         this.background = background;
     }
 
-    public void setNativeBugs(List<BugType> nativeBugs) {
+    public static String normalizeMapColorHex(String hex) {
+        if (hex == null || hex.isBlank()) {
+            return "808080";
+        }
+        String h = hex.trim();
+        if (h.startsWith("#") || h.startsWith("0x") || h.startsWith("0X")) {
+            h = h.startsWith("#") ? h.substring(1) : h.substring(2);
+        }
+        if (h.length() != 6) {
+            throw new IllegalArgumentException("Expected RRGGBB hex color, got: " + hex);
+        }
+        return h.toLowerCase();
+    }
+
+    public void setNativeBugs(List<Species> nativeBugs) {
         this.nativeBugs = nativeBugs == null || nativeBugs.isEmpty()
                 ? List.of()
                 : List.copyOf(nativeBugs);
     }
 
-    public List<BugType> getNativeBugs() {
+    public List<Species> getNativeBugs() {
         return nativeBugs;
     }
 
-    public void setNativeParasites(List<BugType> nativeParasites) {
+    public void setNativeParasites(List<Species> nativeParasites) {
         this.nativeParasites = nativeParasites == null || nativeParasites.isEmpty()
                 ? List.of()
                 : List.copyOf(nativeParasites);
     }
 
-    public List<BugType> getNativeParasites() {
+    public List<Species> getNativeParasites() {
         return nativeParasites;
     }
 
-    public boolean hasNativeParasite(BugType type) {
+    public boolean hasNativeParasite(Species type) {
         return type != null && nativeParasites.contains(type);
     }
 
@@ -72,6 +91,14 @@ public class Biome extends Constant{
 
     public ImageIcon getBackground() {
         return background;
+    }
+
+    public String getMapColorHex() {
+        return mapColorHex;
+    }
+
+    public Color getMapColor() {
+        return mapColor;
     }
 
     public int getTemperature() { return temperature; }

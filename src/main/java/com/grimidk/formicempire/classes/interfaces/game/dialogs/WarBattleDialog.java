@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -55,6 +55,10 @@ public class WarBattleDialog extends ZeroDialog {
             return;
         }
         battlePanel.refreshScene();
+    }
+
+    public void applyVisualFrameRate() {
+        battlePanel.applyVisualFrameRate();
     }
 
     @Override

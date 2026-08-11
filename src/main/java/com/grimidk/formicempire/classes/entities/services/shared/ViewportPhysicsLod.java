@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.entities.services.shared;
 
 import java.awt.Rectangle;
 
-import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
 
 public final class ViewportPhysicsLod {
 

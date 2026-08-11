@@ -9,8 +9,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
@@ -103,6 +103,62 @@ class TriggerProgressServiceTest {
         List<TriggerProgress> visible = TriggerProgressService.getVisible(colony, null, true);
         TriggerProgress mites = find(visible, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
         assertTrue(mites != null && mites.isUnlocked());
+    }
+
+    @Test
+    void minerHiddenUntilSoldierTypeUnlocked() {
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_3);
+        List<TriggerProgress> before = TriggerProgressService.getVisible(colony, null);
+        assertTrue(find(before, GameUnlocks.ROLE_MINER) == null);
+
+        colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        List<TriggerProgress> after = TriggerProgressService.getVisible(colony, null);
+        TriggerProgress miner = find(after, GameUnlocks.ROLE_MINER);
+        assertTrue(miner != null);
+        assertFalse(miner.isUnlocked());
+        assertEquals(1, miner.getCurrent());
+        assertEquals(GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS, miner.getRequired());
+    }
+
+    @Test
+    void minerCountsTier3BuildingsAcrossDynasty() {
+        colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_3);
+        colony.unlockBuilding(GameUnlocks.EGG_CHAMBER_3);
+        Colony satellite = new Colony(2, "Secundus", false);
+        dynasty.addColony(satellite);
+        satellite.setDynasty(dynasty);
+        satellite.unlockBuilding(GameUnlocks.EGG_CHAMBER_3);
+        satellite.unlockBuilding(GameUnlocks.BUILDING_COMPOSTER);
+        satellite.unlockBuilding(GameUnlocks.PLANT_CHAMBER_3);
+
+        List<TriggerProgress> visible = TriggerProgressService.getVisible(colony, null);
+        TriggerProgress miner = find(visible, GameUnlocks.ROLE_MINER);
+        assertTrue(miner != null);
+        assertEquals(5, miner.getCurrent());
+    }
+
+    @Test
+    void findReturnsProgressEvenWhenNotVisibleYet() {
+        TriggerProgress researcher = TriggerProgressService.find(colony, null, GameUnlocks.ROLE_RESEARCHER);
+        assertTrue(researcher != null);
+        assertFalse(researcher.isUnlocked());
+        assertEquals(GameNumbers.TRIGGER_RESEARCHER_MIN_MONTHS, researcher.getRequired());
+    }
+
+    @Test
+    void indexByUpgradeMatchesFindForEachEntry() {
+        var indexed = TriggerProgressService.indexByUpgrade(colony, null);
+        assertFalse(indexed.isEmpty());
+        for (var entry : indexed.entrySet()) {
+            TriggerProgress found = TriggerProgressService.find(colony, null, entry.getKey());
+            assertTrue(found != null);
+            assertEquals(entry.getValue().getUpgrade(), found.getUpgrade());
+            assertEquals(entry.getValue().getCurrent(), found.getCurrent());
+            assertEquals(entry.getValue().getRequired(), found.getRequired());
+            assertEquals(entry.getValue().isUnlocked(), found.isUnlocked());
+            assertEquals(entry.getValue().isGateMet(), found.isGateMet());
+        }
     }
 
     private static TriggerProgress find(List<TriggerProgress> list, Object upgrade) {
