@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 96% (347/363 checked)
+Completion: 95% (345/363 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -94,7 +94,7 @@ Side panels (live updates while playing):
 [X] Resources panel
 [X] Ant population panel
 [X] Alerts panel (icons + short labels; mite outbreaks, shortages, etc.)
-[X] Minimap panel above music (land hex biome colors + dynasty borders; ocean hexes hidden; click/release opens map reliably)
+[ ] Minimap panel above music (land hex biome colors; edges match hex color except dynasty-vs-dynasty frontiers; ocean hexes hidden; click/release opens map reliably)
 [X] Music panel below alerts (track name; prev / play-pause / next; shuffle; mute; shows No music when empty)
 [X] Menu music starts after intro (never during intro); session music starts when a game loads; volumes use Settings > Audio
 
@@ -120,7 +120,7 @@ Side panels (live updates while playing):
 [X] S — Dynasty Trade / Logistics tab (always available; toggle)
 [X] D — Dynasty Diplomacy tab (always available; toggle)
 [X] F — Dynasty Wars tab (always available; toggle)
-[X] M — World map (toggle; hex press/release changes focus even with slight mouse movement)
+[ ] M — World map (Layers: dynasty-border edge colors vs plain hex edges; biome/rank icons; hex press/release focus)
 [X] X — Statistics (toggle)
 [X] Repeat same hotkey closes the bound dialog/tab
 

@@ -10,10 +10,13 @@ import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.HexGridMesh;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapGeometry;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -36,9 +39,13 @@ public class MapDialog extends ZeroDialog {
     private final HexMapPanel mapPanel;
     private final LegendPanel legendPanel;
     private final JButton homeButton;
+    private final JButton layersButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
+    private boolean showBorders = true;
+    private boolean showBiomeIcons = true;
+    private boolean showColonyRanks = true;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
         super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.MAP_DIALOG_SIZE);
@@ -54,6 +61,11 @@ public class MapDialog extends ZeroDialog {
         AssetStyles.styleButton(homeButton);
         homeButton.addActionListener(e -> travelToHomeHex());
 
+        layersButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_LAYERS));
+        layersButton.setFocusable(false);
+        AssetStyles.styleButton(layersButton);
+        layersButton.addActionListener(e -> showLayersMenu());
+
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
         AssetStyles.styleButton(closeButton);
@@ -62,6 +74,7 @@ public class MapDialog extends ZeroDialog {
         bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(homeButton);
+        bottomPanel.add(layersButton);
         bottomPanel.add(closeButton);
 
         add(legendPanel, BorderLayout.WEST);
@@ -69,6 +82,53 @@ public class MapDialog extends ZeroDialog {
         add(bottomPanel, BorderLayout.SOUTH);
 
         registerCloseKey(KeyEvent.VK_M);
+    }
+
+    private void showLayersMenu() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                AssetStyles.BUTTON_BORDER,
+                new EmptyBorder(8, 10, 8, 10)));
+
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_BORDERS),
+                showBorders,
+                selected -> {
+                    showBorders = selected;
+                    mapPanel.repaint();
+                }));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_BIOME_ICONS),
+                showBiomeIcons,
+                selected -> {
+                    showBiomeIcons = selected;
+                    mapPanel.repaint();
+                }));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_COLONY_RANKS),
+                showColonyRanks,
+                selected -> {
+                    showColonyRanks = selected;
+                    mapPanel.repaint();
+                }));
+
+        JPopupMenu menu = new JPopupMenu();
+        menu.setBorder(BorderFactory.createEmptyBorder());
+        menu.setBackground(AssetStyles.BACKGROUND_COLOR);
+        menu.add(panel);
+        UiTableStyles.showComponentPopupMenu(menu, layersButton);
+    }
+
+    private JCheckBox createLayerCheckBox(String label, boolean selected, java.util.function.Consumer<Boolean> onToggle) {
+        JCheckBox box = new JCheckBox(label, selected);
+        AssetStyles.styleCheckBox(box);
+        box.setAlignmentX(Component.LEFT_ALIGNMENT);
+        box.addActionListener(e -> onToggle.accept(box.isSelected()));
+        return box;
     }
 
     private void travelToHomeHex() {
@@ -120,6 +180,7 @@ public class MapDialog extends ZeroDialog {
     public void refreshTheme() {
         super.refreshTheme();
         AssetStyles.styleButton(homeButton);
+        AssetStyles.styleButton(layersButton);
         AssetStyles.styleButton(closeButton);
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         if (mapPanel != null) {
@@ -671,14 +732,10 @@ public class MapDialog extends ZeroDialog {
     private class HexMapPanel extends JPanel {
         private static final int CLICK_SLOP_PX = 6;
 
-        private int hexRadius = 26;
+        private double hexSize = 26;
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
         private final Map<Point, Hex> hexLookup = new HashMap<>();
         private Point pressPoint;
-
-        private final int[][] NEIGHBOR_OFFSETS = {
-            {1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {0, -1}, {1, -1}
-        };
 
         public HexMapPanel() {
             setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -739,8 +796,10 @@ public class MapDialog extends ZeroDialog {
             double maxRadiusW = panelW / (hexesAcross * Math.sqrt(3));
             double maxRadiusH = panelH / (hexesHigh * 1.5);
 
-            this.hexRadius = (int) Math.min(Math.min(maxRadiusW, maxRadiusH), 55);
-            if (this.hexRadius < 10) this.hexRadius = 10;
+            this.hexSize = Math.min(Math.min(maxRadiusW, maxRadiusH), 55.0);
+            if (this.hexSize < 10.0) {
+                this.hexSize = 10.0;
+            }
         }
 
         @Override
@@ -869,17 +928,37 @@ public class MapDialog extends ZeroDialog {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
             Point centerOffset = getCenterOffset();
             Hex activeHex = world.getActiveHex();
+            List<Hex> hexes = world.getHexes();
 
-            for (Hex hex : world.getHexes()) {
-                drawHex(g2d, hex, centerOffset.x, centerOffset.y, false);
+            HexGridMesh mesh = HexGridMesh.build(
+                    hexes,
+                    centerOffset.x,
+                    centerOffset.y,
+                    hexSize,
+                    (q, r) -> hexLookup.get(new Point(q, r)));
+
+            mesh.paintFills(g2d, face -> resolveFillColor(face.hex));
+            mesh.paintDividers(
+                    g2d,
+                    showBorders,
+                    face -> resolveFillColor(face.hex),
+                    AssetStyles.BORDER_COLOR);
+
+            if (showBiomeIcons || showColonyRanks) {
+                for (HexGridMesh.Face face : mesh.faces()) {
+                    drawHexIcons(g2d, face);
+                }
             }
-
             if (activeHex != null) {
-                drawHex(g2d, activeHex, centerOffset.x, centerOffset.y, true);
+                HexGridMesh.Face activeFace = mesh.faceAt(activeHex.getQ(), activeHex.getR());
+                if (activeFace != null) {
+                    g2d.setColor(AssetStyles.FONT_COLOR_ERROR);
+                    g2d.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
+                    g2d.drawPolygon(activeFace.toPolygon());
+                }
             }
         }
 
@@ -887,139 +966,46 @@ public class MapDialog extends ZeroDialog {
             return new Point(getWidth() / 2, getHeight() / 2);
         }
 
-        private void drawHex(Graphics2D g2d, Hex hex, int centerX, int centerY, boolean isSelectionPass) {
-            Polygon poly = getHexPolygon(hex, centerX, centerY);
-
-            if (!isSelectionPass) {
-                Rectangle bounds = poly.getBounds();
-                int cx = (int)bounds.getCenterX();
-                int cy = (int)bounds.getCenterY();
-
-                Biome biome = hex.getBiome();
-                Color fillColor = AssetStyles.BACKGROUND_COLOR;
-
-                if (biome != null) {
-                    fillColor = getBiomeColor(biome);
-                }
-
-                if (hex != world.getActiveHex()) {
-                    float fade = AssetStyles.mapInactiveHexFade();
-                    fillColor = AssetStyles.fadeTowardBackground(fillColor, fade);
-                }
-
-                g2d.setColor(fillColor);
-                g2d.fillPolygon(poly);
-
-                float scale = 0.85f;
-                int iconSize = (int)(hexRadius * scale);
-
-                if (biome != null && biome.getIcon() != null) {
-                    Image icon = biome.getIcon().getImage();
-                    int iconX = cx - (iconSize / 2);
-                    int iconY = cy - (iconSize / 2);
-                    g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
-                }
-
-                if (hex.getColony() != null) {
-                    Colony c = hex.getColony();
-                    Rank rank = c.getRank();
-
-                    if (rank != null && rank.getIcon() != null) {
-                        Image rankImg = rank.getIcon().getImage();
-                        int rankSize = (int)(hexRadius * scale);
-                        int rankX = cx - (rankSize / 2);
-                        int rankY = cy - (rankSize / 2) - (int)(hexRadius * scale);
-                        g2d.drawImage(rankImg, rankX, rankY, rankSize, rankSize, null);
-                    }
-                }
-
-                drawMergedBorders(g2d, hex, poly);
-
-            } else {
-                g2d.setColor(AssetStyles.FONT_COLOR_ERROR);
-                g2d.setStroke(new BasicStroke(3));
-                g2d.drawPolygon(poly);
+        private Color resolveFillColor(Hex hex) {
+            Biome biome = hex.getBiome();
+            Color fillColor = AssetStyles.BACKGROUND_COLOR;
+            if (biome != null) {
+                fillColor = getBiomeColor(biome);
             }
+            if (hex != world.getActiveHex()) {
+                float fade = AssetStyles.mapInactiveHexFade();
+                fillColor = AssetStyles.fadeTowardBackground(fillColor, fade);
+            }
+            return fillColor;
         }
 
-        private void drawMergedBorders(Graphics2D g2d, Hex currentHex, Polygon poly) {
-            int currentDynastyId = -1;
-            Color dynastyColor = AssetStyles.BORDER_COLOR;
-            boolean hasDynasty = false;
+        private void drawHexIcons(Graphics2D g2d, HexGridMesh.Face face) {
+            Hex hex = face.hex;
+            int iconSize = Math.max(1, (int) Math.round(hexSize * 0.72));
 
-            if (currentHex.getColony() != null && currentHex.getColony().getDynasty() != null) {
-                currentDynastyId = currentHex.getColony().getDynasty().getId();
-                dynastyColor = currentHex.getColony().getDynasty().getColor();
-                hasDynasty = true;
-            }
-
-            Point[] drawPoints = new Point[6];
-            if (hasDynasty) {
-                Rectangle bounds = poly.getBounds();
-                double cx = bounds.getCenterX();
-                double cy = bounds.getCenterY();
-                double inset = 1.2;
-                double scale = (hexRadius - inset) / (double)hexRadius;
-
-                for(int i=0; i<6; i++) {
-                    double dx = poly.xpoints[i] - cx;
-                    double dy = poly.ypoints[i] - cy;
-                    drawPoints[i] = new Point((int)(cx + dx * scale), (int)(cy + dy * scale));
-                }
-            } else {
-                for(int i=0; i<6; i++) {
-                    drawPoints[i] = new Point(poly.xpoints[i], poly.ypoints[i]);
+            if (showBiomeIcons) {
+                Biome biome = hex.getBiome();
+                if (biome != null && biome.getIcon() != null) {
+                    Image icon = biome.getIcon().getImage();
+                    int iconX = HexMapGeometry.centeredIconOrigin(face.centerX, iconSize);
+                    int iconY = HexMapGeometry.centeredIconOrigin(face.centerY, iconSize);
+                    g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
                 }
             }
 
-            for (int i = 0; i < 6; i++) {
-                Point p1 = drawPoints[i];
-                Point p2 = drawPoints[(i + 1) % 6];
-
-                boolean shouldDrawEdge = true;
-
-                if (hasDynasty) {
-                    int[] offset = NEIGHBOR_OFFSETS[i];
-                    int nQ = currentHex.getQ() + offset[0];
-                    int nR = currentHex.getR() + offset[1];
-
-                    Hex neighbor = hexLookup.get(new Point(nQ, nR));
-
-                    if (neighbor != null && neighbor.getColony() != null && neighbor.getColony().getDynasty() != null) {
-                        int neighborDynastyId = neighbor.getColony().getDynasty().getId();
-                        if (neighborDynastyId == currentDynastyId) {
-                            shouldDrawEdge = false;
-                        }
-                    }
-
-                    g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2d.setColor(dynastyColor);
-                } else {
-                    g2d.setStroke(new BasicStroke(1f));
-                    g2d.setColor(AssetStyles.BORDER_COLOR);
-                }
-
-                if (shouldDrawEdge) {
-                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+            if (showColonyRanks && hex.getColony() != null) {
+                Rank rank = hex.getColony().getRank();
+                if (rank != null && rank.getIcon() != null) {
+                    Image rankImg = rank.getIcon().getImage();
+                    int rankX = HexMapGeometry.centeredIconOrigin(face.centerX, iconSize);
+                    int rankY = HexMapGeometry.centeredIconOrigin(face.centerY - hexSize * 0.78, iconSize);
+                    g2d.drawImage(rankImg, rankX, rankY, iconSize, iconSize, null);
                 }
             }
         }
 
         private Polygon getHexPolygon(Hex hex, int offsetX, int offsetY) {
-            double x = hexRadius * (Math.sqrt(3) * hex.getQ() + Math.sqrt(3) / 2.0 * hex.getR());
-            double y = hexRadius * (3.0 / 2.0 * hex.getR());
-
-            int centerX = (int) (x + offsetX);
-            int centerY = (int) (y + offsetY);
-
-            Polygon poly = new Polygon();
-            for (int i = 0; i < 6; i++) {
-                double angle_rad = Math.PI / 180 * (60 * i - 30);
-                int px = (int) (centerX + hexRadius * Math.cos(angle_rad));
-                int py = (int) (centerY + hexRadius * Math.sin(angle_rad));
-                poly.addPoint(px, py);
-            }
-            return poly;
+            return HexMapGeometry.flatTopPolygon(hex.getQ(), hex.getR(), offsetX, offsetY, hexSize);
         }
 
         private Color getBiomeColor(Biome biome) {

@@ -2,22 +2,19 @@ package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.HexGridMesh;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -28,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MiniMapPanel extends ZeroGamePanel {
-    private static final int[][] NEIGHBOR_OFFSETS = {
-            {1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {0, -1}, {1, -1}
-    };
-
     private final Engine engine;
     private final Runnable openMapAction;
     private final Map<Integer, Color> biomeColorCache = new HashMap<>();
@@ -172,99 +165,27 @@ public class MiniMapPanel extends ZeroGamePanel {
 
         double midCx = (minCx + maxCx) * 0.5;
         double midCy = (minCy + maxCy) * 0.5;
-        int originX = insets.left + 2 + availW / 2;
-        int originY = insets.top + 2 + availH / 2;
+        double originX = insets.left + 2 + availW / 2.0 - midCx * hexRadius;
+        double originY = insets.top + 2 + availH / 2.0 - midCy * hexRadius;
 
         Graphics2D g2d = (Graphics2D) g.create();
         try {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            for (Hex hex : landHexes) {
-                drawHex(g2d, hex, originX, originY, midCx, midCy, hexRadius);
-            }
+            HexGridMesh mesh = HexGridMesh.build(
+                    landHexes,
+                    originX,
+                    originY,
+                    hexRadius,
+                    (q, r) -> hexLookup.get(packKey(q, r)));
+            mesh.paintFills(g2d, face -> getBiomeColor(face.hex.getBiome()));
+            mesh.paintDividers(
+                    g2d,
+                    true,
+                    face -> getBiomeColor(face.hex.getBiome()),
+                    AssetStyles.BORDER_COLOR);
         } finally {
             g2d.dispose();
         }
-    }
-
-    private void drawHex(
-            Graphics2D g2d,
-            Hex hex,
-            int originX,
-            int originY,
-            double midCx,
-            double midCy,
-            double hexRadius) {
-        Polygon poly = getHexPolygon(hex, originX, originY, midCx, midCy, hexRadius);
-        Color fill = getBiomeColor(hex.getBiome());
-        g2d.setColor(fill);
-        g2d.fillPolygon(poly);
-        drawDynastyBorders(g2d, hex, poly, hexRadius);
-    }
-
-    private void drawDynastyBorders(Graphics2D g2d, Hex currentHex, Polygon poly, double hexRadius) {
-        Colony colony = currentHex.getColony();
-        Dynasty dynasty = colony != null ? colony.getDynasty() : null;
-        if (dynasty == null) {
-            return;
-        }
-
-        int currentDynastyId = dynasty.getId();
-        Color dynastyColor = dynasty.getColor() != null ? dynasty.getColor() : AssetStyles.BORDER_COLOR;
-
-        double cx = poly.getBounds().getCenterX();
-        double cy = poly.getBounds().getCenterY();
-        double inset = Math.min(1.0, hexRadius * 0.15);
-        double scale = hexRadius > inset ? (hexRadius - inset) / hexRadius : 1.0;
-
-        int[] xs = new int[6];
-        int[] ys = new int[6];
-        for (int i = 0; i < 6; i++) {
-            double dx = poly.xpoints[i] - cx;
-            double dy = poly.ypoints[i] - cy;
-            xs[i] = (int) (cx + dx * scale);
-            ys[i] = (int) (cy + dy * scale);
-        }
-
-        g2d.setStroke(new BasicStroke(
-                (float) Math.max(1.0, hexRadius * 0.18),
-                BasicStroke.CAP_ROUND,
-                BasicStroke.JOIN_ROUND));
-        g2d.setColor(dynastyColor);
-
-        for (int i = 0; i < 6; i++) {
-            int[] offset = NEIGHBOR_OFFSETS[i];
-            Hex neighbor = hexLookup.get(packKey(currentHex.getQ() + offset[0], currentHex.getR() + offset[1]));
-            boolean sameDynasty = false;
-            if (neighbor != null && neighbor.getColony() != null && neighbor.getColony().getDynasty() != null) {
-                sameDynasty = neighbor.getColony().getDynasty().getId() == currentDynastyId;
-            }
-            if (!sameDynasty) {
-                int j = (i + 1) % 6;
-                g2d.drawLine(xs[i], ys[i], xs[j], ys[j]);
-            }
-        }
-    }
-
-    private Polygon getHexPolygon(
-            Hex hex,
-            int originX,
-            int originY,
-            double midCx,
-            double midCy,
-            double hexRadius) {
-        double cx = axialX(hex.getQ(), hex.getR());
-        double cy = axialY(hex.getR());
-        int centerX = (int) Math.round(originX + (cx - midCx) * hexRadius);
-        int centerY = (int) Math.round(originY + (cy - midCy) * hexRadius);
-
-        Polygon poly = new Polygon();
-        for (int i = 0; i < 6; i++) {
-            double angleRad = Math.PI / 180.0 * (60 * i - 30);
-            int px = (int) Math.round(centerX + hexRadius * Math.cos(angleRad));
-            int py = (int) Math.round(centerY + hexRadius * Math.sin(angleRad));
-            poly.addPoint(px, py);
-        }
-        return poly;
     }
 
     private Color getBiomeColor(Biome biome) {

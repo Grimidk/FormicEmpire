@@ -10,7 +10,6 @@ To Fix (By decreasing priority):
 		change icons for music player to be like the other (add them to help)
 		music: main menu song, more songs in general
 		sounds: building done, research done, basic click,
-		map hexes look kinda yank (maybe by removing second border layer) paint line as the hex color unless a border
 		improve settings and social buttons with icons
 		antennae (placeholder PNGs + compositor wired; art TODO):
 			TODO: draw AntennaNone1/2 for Worker, Soldier, Major, Drone, Princess, Queen

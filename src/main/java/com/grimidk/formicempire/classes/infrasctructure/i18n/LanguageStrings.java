@@ -934,6 +934,10 @@ public final class LanguageStrings {
     public static final String MAP_ACTIVE_WARS_SHOW = "MAP_ACTIVE_WARS_SHOW";
     public static final String MAP_ACTIVE_WARS_HIDE = "MAP_ACTIVE_WARS_HIDE";
     public static final String MAP_ACTIVE_WAR_OPEN = "MAP_ACTIVE_WAR_OPEN";
+    public static final String MAP_LAYERS = "MAP_LAYERS";
+    public static final String MAP_LAYER_BORDERS = "MAP_LAYER_BORDERS";
+    public static final String MAP_LAYER_BIOME_ICONS = "MAP_LAYER_BIOME_ICONS";
+    public static final String MAP_LAYER_COLONY_RANKS = "MAP_LAYER_COLONY_RANKS";
 
     public static final String DIALOG_WAR_TITLE = "DIALOG_WAR_TITLE";
     public static final String DIALOG_BATTLE_TITLE = "DIALOG_BATTLE_TITLE";
