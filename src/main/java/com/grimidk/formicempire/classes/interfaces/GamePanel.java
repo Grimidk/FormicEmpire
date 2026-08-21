@@ -1613,6 +1613,9 @@ public class GamePanel extends ZeroGamePanel {
         if (miniMapPanel != null) {
             miniMapPanel.refreshMap();
         }
+        if (mapDialog != null && mapDialog.isShowing()) {
+            mapDialog.liveUpdate();
+        }
         
         if (colony != null && colony.belongsToPlayerDynasty()) {
             updateGameAreaSize();

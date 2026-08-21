@@ -169,6 +169,14 @@ public final class HexGridMesh {
         return layoutSize;
     }
 
+    public double mapCenterX() {
+        return mapCenterX;
+    }
+
+    public double mapCenterY() {
+        return mapCenterY;
+    }
+
     public Face faceAt(int q, int r) {
         for (Face face : faces) {
             if (face.q == q && face.r == r) {

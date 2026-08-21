@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 95% (345/363 checked)
+Completion: 94% (345/366 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -120,7 +120,7 @@ Side panels (live updates while playing):
 [X] S — Dynasty Trade / Logistics tab (always available; toggle)
 [X] D — Dynasty Diplomacy tab (always available; toggle)
 [X] F — Dynasty Wars tab (always available; toggle)
-[ ] M — World map (Layers: dynasty-border edge colors vs plain hex edges; biome/rank icons; hex press/release focus)
+[X] M — World map (Layers: dynasty borders, biome/rank icons, trades, tunnels, active battles; hex press/release focus)
 [X] X — Statistics (toggle)
 [X] Repeat same hotkey closes the bound dialog/tab
 
@@ -406,6 +406,9 @@ Per foreign dynasty Actions menu:
 [X] Dynasty badges: color, species icon, stance, defeated marker
 [X] Mouse wheel zoom on map
 [X] Legend / overlay toggles if present
+[ ] Layers: trades (neighbor hex center-to-center line + progress dot; tunnel badge when applicable)
+[ ] Layers: tunnels (short dual rails across shared neighbor border; incomplete dashed)
+[ ] Layers: active battles (MilitaryPower icon on every shared border between dynasties at war)
 [X] Go Back Home button — recenters map on player capital
 [X] New colonies after capital use randomized city titles (City/Berg/Grad/Burg/Haven/Nest/Hold/Ford), no repeats within dynasty
 

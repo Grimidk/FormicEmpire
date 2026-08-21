@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexGridMesh;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapGeometry;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapOverlays;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
@@ -46,6 +47,9 @@ public class MapDialog extends ZeroDialog {
     private boolean showBorders = true;
     private boolean showBiomeIcons = true;
     private boolean showColonyRanks = true;
+    private boolean showTrades = true;
+    private boolean showTunnels = true;
+    private boolean showBattles = true;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
         super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.MAP_DIALOG_SIZE);
@@ -115,6 +119,30 @@ public class MapDialog extends ZeroDialog {
                     showColonyRanks = selected;
                     mapPanel.repaint();
                 }));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_TRADES),
+                showTrades,
+                selected -> {
+                    showTrades = selected;
+                    mapPanel.repaint();
+                }));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_TUNNELS),
+                showTunnels,
+                selected -> {
+                    showTunnels = selected;
+                    mapPanel.repaint();
+                }));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_BATTLES),
+                showBattles,
+                selected -> {
+                    showBattles = selected;
+                    mapPanel.repaint();
+                }));
 
         JPopupMenu menu = new JPopupMenu();
         menu.setBorder(BorderFactory.createEmptyBorder());
@@ -174,6 +202,10 @@ public class MapDialog extends ZeroDialog {
         if (legendPanel != null) {
             legendPanel.updateLegend();
         }
+    }
+
+    public void liveUpdate() {
+        refreshDialog();
     }
 
     @Override
@@ -951,6 +983,15 @@ public class MapDialog extends ZeroDialog {
                 for (HexGridMesh.Face face : mesh.faces()) {
                     drawHexIcons(g2d, face);
                 }
+            }
+            if (showTunnels) {
+                HexMapOverlays.paintTunnels(g2d, world, mesh);
+            }
+            if (showTrades) {
+                HexMapOverlays.paintTrades(g2d, world, mesh);
+            }
+            if (showBattles) {
+                HexMapOverlays.paintBattles(g2d, world, mesh);
             }
             if (activeHex != null) {
                 HexGridMesh.Face activeFace = mesh.faceAt(activeHex.getQ(), activeHex.getR());

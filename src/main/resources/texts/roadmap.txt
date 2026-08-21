@@ -51,7 +51,9 @@ Needed for launch (v1.0) (Launch Version):
 		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)
 		more biomes (beach, wetlands, mangrove, prairie, burnt forest (resin source, no water, cant start), ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain, lock species to certain biome, need an ant that only eats protein and biome rarity
 	Everything else :
+		bridges
 		rethink hatching to other types taking more time 
+		reserve ants to ant exauhstion and punishing 100% worker capacity
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
 		more stats (kills, historic productions, graphs?)
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
@@ -76,7 +78,6 @@ Needed for launch (v1.0) (Launch Version):
 Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package) with addiontal codegen tools for saves and repositories etc
 	editable stat panel 
-	logistic lines in map with tunnels and progress and method, and war overlays by stage
 	world editing (size, islands, dynasty amounts and size) and further dynasty editing like color species and starting upgrades, starting biome and species assimilation
 	console and commands for debugging (to include in core)
 	native universal modding support (to include in core)
