@@ -150,6 +150,7 @@ public final class GameNumbers {
     // --- War ---
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
     public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
+    public static final int DIPLO_PENDING_PACT_REQUEST_QUEUE_MAX = 1;
     public static final int WAS_AT_WAR_MODIFIER_MONTHS = 12;
     public static final int WAR_DECLARATION_MIN_POPULATION = 1000;
     public static final float WAR_STANDING_MILITARY_RATIO = 1.15f;

@@ -7,12 +7,10 @@ To Fix (By decreasing priority):
 		TODO: icons for stats (Skeleton, Acid, Longevity, Research/Growth/Thirst/Laying/Scouting/Farming/Contamination/Graving/Policing 1–3, Logistics 1, Passive 1, Symbiotic Mite 1, Dermestid 1, Hex Sustain, Worker Speed 2, Health/Attack/Defense 1–2, Attack Speed 1)
 		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave, Composter) — separate from sprites/buildings/rooms/
 		TODO: tune AntSpeciesPalette hexcodes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
-		fullscreen aint working and resolutions not working and cant adjust window size
 		change icons for music player to be like the other (add them to help)
 		music: main menu song, more songs in general
 		sounds: building done, research done, basic click,
 		map hexes look kinda yank (maybe by removing second border layer) paint line as the hex color unless a border
-		limit queue for NAP so rank up doesnt spam them
 		improve settings and social buttons with icons
 		antennae (placeholder PNGs + compositor wired; art TODO):
 			TODO: draw AntennaNone1/2 for Worker, Soldier, Major, Drone, Princess, Queen
@@ -20,7 +18,6 @@ To Fix (By decreasing priority):
 			TODO: draw AntennaDoorhead1/2 per type (except Drone)
 			TODO: draw AntennaFarsight1/2 per type (except Drone)
 			TODO: review 2-frame twitch timing vs jaws once art is in
-		game focus mode
 	Mid:
 		(none right now)
 	Low:
@@ -55,6 +52,7 @@ Needed for launch (v1.0) (Launch Version):
 		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)
 		more biomes (beach, wetlands, mangrove, prairie, burnt forest (resin source, no water, cant start), ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain, lock species to certain biome, need an ant that only eats protein and biome rarity
 	Everything else :
+		rethink hatching to other types taking more time 
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
 		more stats (kills, historic productions, graphs?)
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )

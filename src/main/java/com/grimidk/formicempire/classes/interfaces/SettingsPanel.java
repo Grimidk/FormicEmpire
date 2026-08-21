@@ -15,14 +15,17 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
 public class SettingsPanel extends JPanel {
     private static final String SECTION_GENERAL = "general";
     private static final String SECTION_VIDEO = "video";
     private static final String SECTION_AUDIO = "audio";
     private static final String SECTION_ROLES = "roles";
+    private static final String[] WINDOW_SIZE_PRESETS = {
+            "1000x700", "1280x720", "1366x768", "1440x900", "1600x900", "1920x1080", "2560x1440"
+    };
 
     private final MainFrame frame;
     private final Engine engine;
@@ -637,10 +640,10 @@ public class SettingsPanel extends JPanel {
         sizeLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(sizeLabel, c);
         
-        String[] commonResolutions = {"1000x700", "1280x720", "1366x768", "1440x900", "1600x900", "1920x1080", "2560x1440"};
-        sizeCombo = new JComboBox<>(commonResolutions);
+        sizeCombo = new JComboBox<>();
         styleComboBox(sizeCombo);
         sizeCombo.setEditable(false);
+        refreshScreenSizeCombo(null);
         c.gridx = 1; panel.add(sizeCombo, c);
 
         // Full Screen
@@ -933,11 +936,7 @@ public class SettingsPanel extends JPanel {
         fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
         showAuditMenuCheck.setSelected(engine.isShowAuditMenu());
         
-        sizeCombo.setSelectedItem(engine.getScreenSize());
-        if (sizeCombo.getSelectedItem() == null) {
-            ensureScreenSizeInCombo(engine.getScreenSize());
-            sizeCombo.setSelectedItem(engine.getScreenSize());
-        }
+        refreshScreenSizeCombo(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
         daylightColorOverlayCheck.setSelected(engine.isDaylightColorOverlayEnabled());
         weatherColorOverlayCheck.setSelected(engine.isWeatherColorOverlayEnabled());
@@ -952,6 +951,39 @@ public class SettingsPanel extends JPanel {
 
         loadedFullScreen = engine.isFullScreen();
         loadedScreenSize = engine.getScreenSize();
+    }
+
+    private void refreshScreenSizeCombo(String preferredSize) {
+        Rectangle usable = MainFrame.resolveUsableWindowBounds();
+        sizeCombo.removeAllItems();
+        for (String preset : WINDOW_SIZE_PRESETS) {
+            if (fitsUsableBounds(preset, usable)) {
+                sizeCombo.addItem(preset);
+            }
+        }
+        String maxSize = usable.width + "x" + usable.height;
+        ensureScreenSizeInCombo(maxSize);
+        if (preferredSize != null && !preferredSize.isBlank()) {
+            ensureScreenSizeInCombo(preferredSize);
+            sizeCombo.setSelectedItem(preferredSize);
+        }
+        if (sizeCombo.getSelectedItem() == null && sizeCombo.getItemCount() > 0) {
+            sizeCombo.setSelectedIndex(0);
+        }
+    }
+
+    private static boolean fitsUsableBounds(String size, Rectangle usable) {
+        if (size == null || !size.contains("x") || usable == null) {
+            return false;
+        }
+        String[] parts = size.split("x");
+        try {
+            int width = Integer.parseInt(parts[0].trim());
+            int height = Integer.parseInt(parts[1].trim());
+            return width <= usable.width && height <= usable.height;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private void ensureScreenSizeInCombo(String size) {

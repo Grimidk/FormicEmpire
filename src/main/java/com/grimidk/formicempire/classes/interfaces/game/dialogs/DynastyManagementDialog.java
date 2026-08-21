@@ -1874,6 +1874,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                         (PactRequestIncomingPolicy) pactIncomingPolicyCombo.getSelectedItem();
                 if (selected != null) {
                     dynasty.setPactRequestIncomingPolicy(selected);
+                    World world = engine.getWorld();
+                    if (world != null && dynasty.getDiplomacyService() != null) {
+                        dynasty.getDiplomacyService().applyIncomingPactPolicyToPendingRequests(world);
+                    }
                 }
             });
 

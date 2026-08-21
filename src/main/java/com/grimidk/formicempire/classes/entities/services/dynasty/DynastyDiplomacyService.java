@@ -217,7 +217,7 @@ public class DynastyDiplomacyService {
         if (dynasty.isPactRequestPromptOpen()) {
             return false;
         }
-        if (!dynasty.copyPendingPactRequestFromIds().isEmpty()) {
+        if (dynasty.copyPendingPactRequestFromIds().size() >= GameNumbers.DIPLO_PENDING_PACT_REQUEST_QUEUE_MAX) {
             return false;
         }
         int today = DynastyIntegrationService.worldDayIndex(world);
@@ -239,6 +239,29 @@ public class DynastyDiplomacyService {
             declineNonAggressionPact(requester, world);
         } else {
             dynasty.addPendingPactRequest(requester.getId());
+        }
+    }
+
+    public void applyIncomingPactPolicyToPendingRequests(World world) {
+        if (world == null) {
+            return;
+        }
+        PactRequestIncomingPolicy policy = dynasty.getPactRequestIncomingPolicy();
+        if (policy == PactRequestIncomingPolicy.MANUAL) {
+            return;
+        }
+        List<Integer> pending = dynasty.copyPendingPactRequestFromIds();
+        for (int fromId : pending) {
+            Dynasty requester = world.findDynastyById(fromId);
+            if (requester == null || requester.isDefeated()) {
+                dynasty.removePendingPactRequest(fromId);
+                continue;
+            }
+            if (policy == PactRequestIncomingPolicy.AUTO_ACCEPT) {
+                acceptNonAggressionPact(requester, world);
+            } else if (policy == PactRequestIncomingPolicy.AUTO_DECLINE) {
+                declineNonAggressionPact(requester, world);
+            }
         }
     }
 

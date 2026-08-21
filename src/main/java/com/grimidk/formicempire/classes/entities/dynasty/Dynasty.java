@@ -357,6 +357,7 @@ public class Dynasty {
 
         if (savedDynasty.pendingPactRequestFromIds != null) {
             this.pendingPactRequestFromIds.addAll(savedDynasty.pendingPactRequestFromIds);
+            trimPendingPactRequestQueue();
         }
         if (savedDynasty.pendingWarDeclarationFromIds != null) {
             this.pendingWarDeclarationFromIds.addAll(savedDynasty.pendingWarDeclarationFromIds);
@@ -1176,9 +1177,16 @@ public class Dynasty {
     }
 
     public void addPendingPactRequest(int fromDynastyId) {
-        if (fromDynastyId != id) {
-            pendingPactRequestFromIds.add(fromDynastyId);
+        if (fromDynastyId == id) {
+            return;
         }
+        if (pendingPactRequestFromIds.contains(fromDynastyId)) {
+            return;
+        }
+        if (pendingPactRequestFromIds.size() >= GameNumbers.DIPLO_PENDING_PACT_REQUEST_QUEUE_MAX) {
+            return;
+        }
+        pendingPactRequestFromIds.add(fromDynastyId);
     }
 
     public void removePendingPactRequest(int fromDynastyId) {
@@ -1187,6 +1195,18 @@ public class Dynasty {
 
     public List<Integer> copyPendingPactRequestFromIds() {
         return new ArrayList<>(pendingPactRequestFromIds);
+    }
+
+    public void trimPendingPactRequestQueue() {
+        int max = Math.max(0, GameNumbers.DIPLO_PENDING_PACT_REQUEST_QUEUE_MAX);
+        if (pendingPactRequestFromIds.size() <= max) {
+            return;
+        }
+        List<Integer> kept = new ArrayList<>(pendingPactRequestFromIds);
+        pendingPactRequestFromIds.clear();
+        for (int i = 0; i < max && i < kept.size(); i++) {
+            pendingPactRequestFromIds.add(kept.get(i));
+        }
     }
 
     public boolean isAtWar() {

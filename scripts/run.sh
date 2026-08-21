@@ -44,4 +44,10 @@ if [ -d "$TARGET_SAVES" ]; then
 fi
 
 echo "[Run] Starting the Game..."
-java -jar target/FormicEmpire-1.0-SNAPSHOT.jar
+JAVA_OPTS=()
+case "$(uname -s)" in
+    Darwin)
+        JAVA_OPTS+=(--add-exports java.desktop/com.apple.eawt=ALL-UNNAMED)
+        ;;
+esac
+java "${JAVA_OPTS[@]}" -jar target/FormicEmpire-1.0-SNAPSHOT.jar

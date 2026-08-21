@@ -121,7 +121,13 @@ else
     echo "Error: Java 17+ is required."
     exit 1
 fi
-exec "\$JAVA_BIN" -jar "$JAR_NAME"
+JAVA_OPTS=()
+case "\$(uname -s)" in
+    Darwin)
+        JAVA_OPTS+=(--add-exports java.desktop/com.apple.eawt=ALL-UNNAMED)
+        ;;
+esac
+exec "\$JAVA_BIN" "\${JAVA_OPTS[@]}" -jar "$JAR_NAME"
 EOF
     chmod +x "$JAR_STAGING/FormicEmpire.sh"
     rm -f "$JAR_ZIP"
@@ -188,9 +194,11 @@ pack_macos_app() {
         --app-version 1.0
         --vendor GrimIDK
         --description "A game about ants."
+        --mac-app-category "games"
         --java-options "-Dapple.awt.application.name=FormicEmpire"
         --java-options "-Dawt.useSystemAAFontSettings=on"
         --java-options "-Dswing.aatext=true"
+        --java-options "--add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED"
     )
 
     if [ -d "jre-mac" ] && [ -x "jre-mac/bin/java" ]; then

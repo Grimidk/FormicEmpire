@@ -1811,20 +1811,17 @@ public class GamePanel extends ZeroGamePanel {
             return;
         }
 
+        PactRequestIncomingPolicy policy = playerDynasty.getPactRequestIncomingPolicy();
+        if (policy == PactRequestIncomingPolicy.AUTO_ACCEPT
+                || policy == PactRequestIncomingPolicy.AUTO_DECLINE) {
+            playerDynasty.getDiplomacyService().applyIncomingPactPolicyToPendingRequests(world);
+            return;
+        }
+
         int fromId = pending.get(0);
         Dynasty requester = world.findDynastyById(fromId);
         if (requester == null || requester.isDefeated()) {
             playerDynasty.removePendingPactRequest(fromId);
-            return;
-        }
-
-        PactRequestIncomingPolicy policy = playerDynasty.getPactRequestIncomingPolicy();
-        if (policy == PactRequestIncomingPolicy.AUTO_ACCEPT) {
-            playerDynasty.getDiplomacyService().acceptNonAggressionPact(requester, world);
-            return;
-        }
-        if (policy == PactRequestIncomingPolicy.AUTO_DECLINE) {
-            playerDynasty.getDiplomacyService().declineNonAggressionPact(requester, world);
             return;
         }
 
