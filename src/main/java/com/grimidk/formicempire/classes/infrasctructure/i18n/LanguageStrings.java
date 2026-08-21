@@ -474,6 +474,9 @@ public final class LanguageStrings {
     public static final String UI_DELETE = "UI_DELETE";
     public static final String UI_CANCEL = "UI_CANCEL";
     public static final String UI_CONFIRM = "UI_CONFIRM";
+    public static final String UI_YES = "UI_YES";
+    public static final String UI_NO = "UI_NO";
+    public static final String UI_OK = "UI_OK";
     public static final String UI_LEVEL = "UI_LEVEL";
     public static final String UI_TOTAL = "UI_TOTAL";
     public static final String UI_UPGRADE = "UI_UPGRADE";

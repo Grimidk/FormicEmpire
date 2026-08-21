@@ -833,7 +833,9 @@ public class GameAreaPanel extends ZeroGamePanel {
                         ant.getSubtypeProfile(),
                         ant.getLegFrame(),
                         ant.getJawFrame(),
-                        ant.getWingFrame());
+                        ant.getWingFrame(),
+                        ant.getAntennaFrame(),
+                        ant.isParasiticMiteInfected());
                 if (antSpriteIcon == null) continue;
                 Image sprite = antSpriteIcon.getImage();
                 int w = antSpriteIcon.getIconWidth();
@@ -858,32 +860,9 @@ public class GameAreaPanel extends ZeroGamePanel {
                 g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(currentSprite, -w / 2, -h / 2, this);
-                if (ant.isParasiticMiteInfected()) {
-                    drawParasiticMiteOverlay(g2d);
-                }
 
                 g2d.setTransform(oldTransform);
             }
-        }
-    }
-
-    private void drawParasiticMiteOverlay(Graphics2D g2d) {
-        ImageIcon miteIcon = GameConstants.TYPE_PARASITIC_MITE.getSprite();
-        if (miteIcon == null) {
-            miteIcon = GameConstants.ICON_PARASITIC_MITE;
-        }
-        if (miteIcon == null) {
-            return;
-        }
-        Image mite = miteIcon.getImage();
-        int miteW = miteIcon.getIconWidth();
-        int miteH = miteIcon.getIconHeight();
-        int halfW = miteW / 2;
-        int halfH = miteH / 2;
-        int[][] offsets = {{-4, -5}, {4, -4}, {-5, 2}, {5, 3}, {0, 5}};
-        int count = Math.min(GameNumbers.PARASITIC_MITES_ON_ANT_SPRITE, offsets.length);
-        for (int i = 0; i < count; i++) {
-            g2d.drawImage(mite, offsets[i][0] - halfW, offsets[i][1] - halfH, this);
         }
     }
 

@@ -234,8 +234,9 @@ public class MenuChaoticPanel extends JPanel {
         int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
         int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, RouteViewVisuals.isWinged(ant.type),
                 ant.wobblePhase, anim, ant.motionRate);
+        int antennaFrame = RouteViewVisuals.resolveAntennaFrame(ant.type, ant.wobblePhase, anim, ant.motionRate);
         float angle = RouteViewVisuals.movementFacingDegrees(ant.vx, ant.vy);
-        drawCachedAnt(g2d, ant, legFrame, jawFrame, wingFrame, Math.round(ant.xNorm * fieldW),
+        drawCachedAnt(g2d, ant, legFrame, jawFrame, wingFrame, antennaFrame, Math.round(ant.xNorm * fieldW),
                 Math.round(ant.yNorm * fieldH), angle);
     }
 
@@ -284,7 +285,8 @@ public class MenuChaoticPanel extends JPanel {
             int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, ant.reserve, ant.wobblePhase, anim, ant.motionRate);
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, airSupport && winged, ant.wobblePhase, anim,
                     ant.motionRate);
-            ensureCachedSprite(ant, legFrame, jawFrame, wingFrame);
+            int antennaFrame = RouteViewVisuals.resolveAntennaFrame(ant.type, ant.wobblePhase, anim, ant.motionRate);
+            ensureCachedSprite(ant, legFrame, jawFrame, wingFrame, antennaFrame);
             int w = ant.cachedDrawW > 0 ? ant.cachedDrawW : 12;
             int h = ant.cachedDrawH > 0 ? ant.cachedDrawH : 12;
 
@@ -352,9 +354,10 @@ public class MenuChaoticPanel extends JPanel {
             int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, flying, true, ant.wobblePhase, anim, ant.motionRate);
             int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, winged, ant.wobblePhase, anim, ant.motionRate);
+            int antennaFrame = RouteViewVisuals.resolveAntennaFrame(ant.type, ant.wobblePhase, anim, ant.motionRate);
             int drawX = centerX + Math.round(ant.offsetX * radiusX);
             int drawY = centerY + Math.round(ant.offsetY * radiusY);
-            drawCachedAnt(g2d, ant, legFrame, jawFrame, wingFrame, drawX, drawY, faceAngle);
+            drawCachedAnt(g2d, ant, legFrame, jawFrame, wingFrame, antennaFrame, drawX, drawY, faceAngle);
         }
     }
 
@@ -462,8 +465,8 @@ public class MenuChaoticPanel extends JPanel {
     }
 
     private void drawCachedAnt(Graphics2D g2d, MenuChaoticWorld.ShowcaseAnt ant, int legFrame, int jawFrame,
-            int wingFrame, int drawX, int drawY, float angleDegrees) {
-        ensureCachedSprite(ant, legFrame, jawFrame, wingFrame);
+            int wingFrame, int antennaFrame, int drawX, int drawY, float angleDegrees) {
+        ensureCachedSprite(ant, legFrame, jawFrame, wingFrame, antennaFrame);
         if (ant.cachedSprite == null) {
             return;
         }
@@ -476,17 +479,20 @@ public class MenuChaoticPanel extends JPanel {
         g2d.setTransform(old);
     }
 
-    private void ensureCachedSprite(MenuChaoticWorld.ShowcaseAnt ant, int legFrame, int jawFrame, int wingFrame) {
+    private void ensureCachedSprite(MenuChaoticWorld.ShowcaseAnt ant, int legFrame, int jawFrame, int wingFrame,
+            int antennaFrame) {
         if (ant.cachedSprite != null && ant.cachedLegFrame == legFrame && ant.cachedJawFrame == jawFrame
-                && ant.cachedWingFrame == wingFrame) {
+                && ant.cachedWingFrame == wingFrame && ant.cachedAntennaFrame == antennaFrame) {
             return;
         }
-        ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, legFrame, jawFrame, wingFrame);
+        ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, legFrame, jawFrame, wingFrame,
+                antennaFrame, false);
         if (icon == null) {
             ant.cachedSprite = null;
             ant.cachedLegFrame = legFrame;
             ant.cachedJawFrame = jawFrame;
             ant.cachedWingFrame = wingFrame;
+            ant.cachedAntennaFrame = antennaFrame;
             return;
         }
         ant.cachedSprite = icon.getImage();
@@ -495,6 +501,7 @@ public class MenuChaoticPanel extends JPanel {
         ant.cachedLegFrame = legFrame;
         ant.cachedJawFrame = jawFrame;
         ant.cachedWingFrame = wingFrame;
+        ant.cachedAntennaFrame = antennaFrame;
     }
 
     private Image tileForBiome(Biome biome) {

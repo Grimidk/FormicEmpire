@@ -301,6 +301,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     
     private void refreshTranslations() {
         setTitle(LanguageStrings.APP_DISPLAY_NAME);
+        UiOptionPane.applyLocalizedButtonTexts();
         saveSelectPanel.refreshTranslations();
         introPanel.refreshTranslations();
         initPanel.refreshTranslations();

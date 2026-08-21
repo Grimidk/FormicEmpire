@@ -67,6 +67,32 @@ public class LocalizationTest {
     }
 
     @Test
+    void antSpeciesCommonNamesAreLocalized() {
+        LanguageStrings.setLanguage("es");
+        assertEquals("Hormiga cortadora de hojas", GameConstants.SPECIES_LEAFCUTTER.getName());
+        assertEquals("Hormiga toro", GameConstants.SPECIES_BULLDOG.getName());
+        assertEquals("Hormiga saltadora", GameConstants.SPECIES_JET.getName());
+        assertEquals("Hormiga legionaria", GameConstants.SPECIES_ARMY.getName());
+
+        LanguageStrings.setLanguage("pt");
+        assertEquals("Formiga cortadeira de folhas", GameConstants.SPECIES_LEAFCUTTER.getName());
+        assertEquals("Formiga-touro", GameConstants.SPECIES_BULLDOG.getName());
+        assertEquals("Formiga saltadora", GameConstants.SPECIES_JET.getName());
+        assertEquals("Formiga-faraó", GameConstants.SPECIES_PHARAOH.getName());
+        assertEquals("Formiga saqueadora", GameConstants.SPECIES_MARAUDER.getName());
+
+        LanguageStrings.setLanguage("fr");
+        assertEquals("Fourmi coupe-feuille", GameConstants.SPECIES_LEAFCUTTER.getName());
+        assertEquals("Fourmi bouledogue", GameConstants.SPECIES_BULLDOG.getName());
+        assertEquals("Fourmi sauteuse", GameConstants.SPECIES_JET.getName());
+        assertEquals("Fourmi légionnaire", GameConstants.SPECIES_ARMY.getName());
+
+        LanguageStrings.setLanguage("en");
+        assertEquals("Leafcutter Ant", GameConstants.SPECIES_LEAFCUTTER.getName());
+        assertEquals("Bulldog Ant", GameConstants.SPECIES_BULLDOG.getName());
+    }
+
+    @Test
     void formicEmpireBrandNameIsNeverTranslated() {
         String brand = LanguageStrings.APP_DISPLAY_NAME;
         assertEquals("Formic Empire", brand);

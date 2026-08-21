@@ -33,8 +33,10 @@ public class Ant extends Critter {
     private boolean shieldingActive;
     private int jawFrame = 1;
     private int wingFrame = 1;
+    private int antennaFrame = 1;
     private int jawOpenMinutesRemaining;
     private int wingOpenMinutesRemaining;
+    private int antennaOpenMinutesRemaining;
 
     public Ant(Colony colony, AntType type) {
         super(GameConstants.TYPE_ANT); 
@@ -226,6 +228,10 @@ public class Ant extends Critter {
         return wingFrame;
     }
 
+    public int getAntennaFrame() {
+        return antennaFrame;
+    }
+
     @Override
     public void updatePosition(float speedMultiplier) {
         boolean wingedFlyer = isNuptial()
@@ -268,6 +274,12 @@ public class Ant extends Critter {
                 wingFrame = 1;
             }
         }
+        if (antennaOpenMinutesRemaining > 0) {
+            antennaOpenMinutesRemaining--;
+            if (antennaOpenMinutesRemaining <= 0) {
+                antennaFrame = 1;
+            }
+        }
     }
 
     public void rollHourlySpriteAnim() {
@@ -275,6 +287,11 @@ public class Ant extends Critter {
                 && GameRandom.nextDouble() < GameNumbers.ANT_JAW_SNAP_CHANCE_PER_HOUR) {
             jawFrame = 2;
             jawOpenMinutesRemaining = GameNumbers.ANT_SPRITE_SNAP_MINUTES;
+        }
+        if (antennaOpenMinutesRemaining <= 0
+                && GameRandom.nextDouble() < GameNumbers.ANT_ANTENNA_TWITCH_CHANCE_PER_HOUR) {
+            antennaFrame = 2;
+            antennaOpenMinutesRemaining = GameNumbers.ANT_SPRITE_SNAP_MINUTES;
         }
 
         boolean winged = type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS;

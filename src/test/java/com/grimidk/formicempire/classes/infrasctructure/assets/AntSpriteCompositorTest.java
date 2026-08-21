@@ -117,4 +117,67 @@ class AntSpriteCompositorTest {
         assertNotNull(icon);
         assertEquals(GameConstants.SUBTYPE_HEAD_TRAPJAW, profile.getSubtype(AntSubtypeSlot.HEAD));
     }
+
+    @Test
+    void composeWorkerAntennaFramesOneAndTwo() {
+        AntSubtypeProfile profile = AntSubtypeProfile.standard();
+        for (int antenna = 1; antenna <= 2; antenna++) {
+            ImageIcon icon = AntSpriteCompositor.getSprite(
+                    GameConstants.TYPE_WORKER,
+                    GameConstants.SPECIES_OMNI,
+                    profile,
+                    1,
+                    1,
+                    1,
+                    antenna,
+                    false);
+            assertNotNull(icon, "antenna frame " + antenna);
+            assertTrue(icon.getIconWidth() > 0);
+            assertTrue(icon.getIconHeight() > 0);
+        }
+    }
+
+    @Test
+    void composeTrapjawAntennaUsesHeadVariantLayer() {
+        AntSubtypeProfile profile = AntSubtypeProfile.of(
+                GameConstants.SUBTYPE_HEAD_TRAPJAW.getDigit(),
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE);
+        ImageIcon icon = AntSpriteCompositor.getSprite(
+                GameConstants.TYPE_WORKER,
+                GameConstants.SPECIES_FIRE,
+                profile,
+                1,
+                1,
+                1,
+                2,
+                false);
+        assertNotNull(icon);
+    }
+
+    @Test
+    void composeWithParasiticMitesBakesOverlayIntoSprite() {
+        ImageIcon clean = AntSpriteCompositor.getSprite(
+                GameConstants.TYPE_WORKER,
+                GameConstants.SPECIES_OMNI,
+                AntSubtypeProfile.standard(),
+                1,
+                1,
+                1,
+                1,
+                false);
+        ImageIcon infected = AntSpriteCompositor.getSprite(
+                GameConstants.TYPE_WORKER,
+                GameConstants.SPECIES_OMNI,
+                AntSubtypeProfile.standard(),
+                1,
+                1,
+                1,
+                1,
+                true);
+        assertNotNull(clean);
+        assertNotNull(infected);
+        assertTrue(clean != infected);
+    }
 }

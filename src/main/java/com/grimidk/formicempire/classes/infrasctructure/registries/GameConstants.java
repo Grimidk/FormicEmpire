@@ -148,7 +148,7 @@ public final class GameConstants {
     }
 
     public static ImageIcon getAntSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
-        return getAntSprite(type, species, profile, 1, 1, 1);
+        return getAntSprite(type, species, profile, 1, 1, 1, 1, false);
     }
 
     public static ImageIcon getAntSprite(
@@ -158,6 +158,18 @@ public final class GameConstants {
             int legFrame,
             int jawFrame,
             int wingFrame) {
+        return getAntSprite(type, species, profile, legFrame, jawFrame, wingFrame, 1, false);
+    }
+
+    public static ImageIcon getAntSprite(
+            AntType type,
+            AntSpecies species,
+            AntSubtypeProfile profile,
+            int legFrame,
+            int jawFrame,
+            int wingFrame,
+            int antennaFrame,
+            boolean parasiticMites) {
         if (type == null) {
             return null;
         }
@@ -167,7 +179,7 @@ public final class GameConstants {
         AntSpecies resolveSpecies = species != null ? species : SPECIES_OMNI;
         if (resolveSpecies.getPalette() != null) {
             return AntSpriteCompositor.getSprite(
-                    type, resolveSpecies, profile, legFrame, jawFrame, wingFrame);
+                    type, resolveSpecies, profile, legFrame, jawFrame, wingFrame, antennaFrame, parasiticMites);
         }
         return null;
     }

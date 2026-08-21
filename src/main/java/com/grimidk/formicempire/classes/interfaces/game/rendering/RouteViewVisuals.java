@@ -19,6 +19,7 @@ import java.util.Random;
 public final class RouteViewVisuals {
 
     private static final float ATTACK_JAW_SNAP_SPEED = 4.2f;
+    private static final float ANTENNA_TWITCH_SPEED = 3.1f;
     private static final float WING_FLICKER_CYCLE_SEC = 5.5f;
     private static final float WING_FLICKER_CLOSED_START_SEC = 4.2f;
     private static final float WING_FLICKER_CLOSED_END_SEC = 5.2f;
@@ -56,6 +57,14 @@ public final class RouteViewVisuals {
         }
         double attackPulse = Math.sin(wobblePhase + animationSeconds * ATTACK_JAW_SNAP_SPEED * motionRate);
         return attackPulse > 0.82 ? 2 : 1;
+    }
+
+    public static int resolveAntennaFrame(AntType type, float wobblePhase, float animationSeconds, float motionRate) {
+        if (type == null) {
+            return 1;
+        }
+        double twitchPulse = Math.sin(wobblePhase * 1.3f + animationSeconds * ANTENNA_TWITCH_SPEED * motionRate);
+        return twitchPulse > 0.88 ? 2 : 1;
     }
 
     public static int resolveLegFrame(AntType type, boolean flying, boolean moving, float wobblePhase,

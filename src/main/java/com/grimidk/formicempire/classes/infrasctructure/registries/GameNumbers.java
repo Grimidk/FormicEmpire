@@ -9,6 +9,7 @@ public final class GameNumbers {
     // --- Movement / gathering ---
     public static final int PARASITIC_MITES_ON_ANT_SPRITE = 5;
     public static final double ANT_JAW_SNAP_CHANCE_PER_HOUR = 0.08;
+    public static final double ANT_ANTENNA_TWITCH_CHANCE_PER_HOUR = 0.10;
     public static final double ANT_WING_FLICK_CHANCE_PER_HOUR = 0.06;
     public static final int ANT_SPRITE_SNAP_MINUTES = 30;
     public static final int ANT_LEG_FRAME_COUNT = 4;

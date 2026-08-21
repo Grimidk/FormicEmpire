@@ -45,6 +45,7 @@ public final class MenuChaoticWorld {
         public int cachedLegFrame = -1;
         public int cachedJawFrame = -1;
         public int cachedWingFrame = -1;
+        public int cachedAntennaFrame = -1;
         public int cachedDrawW;
         public int cachedDrawH;
 

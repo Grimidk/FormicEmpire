@@ -263,8 +263,10 @@ public class ConvoyViewPanel extends JPanel {
                     ant.motionRate);
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, winged, ant.wobblePhase, animationSeconds,
                     ant.motionRate);
+            int antennaFrame = RouteViewVisuals.resolveAntennaFrame(ant.type, ant.wobblePhase, animationSeconds,
+                    ant.motionRate);
             ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, legFrame, jawFrame,
-                    wingFrame);
+                    wingFrame, antennaFrame, false);
             if (icon == null) {
                 continue;
             }

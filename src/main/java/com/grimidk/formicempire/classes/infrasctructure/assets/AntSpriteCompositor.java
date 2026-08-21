@@ -32,9 +32,12 @@ public final class AntSpriteCompositor {
     public static final int UNIVERSAL_BLACK = 0x000000;
 
     private static final String SHARED_ROOT = "sprites/ants/zero-shared/";
+    private static final String PARASITIC_MITE_PATH = "sprites/critters/parasiticMite/ParasiticMite.png";
+    private static final int[][] PARASITIC_MITE_OFFSETS = {{-4, -5}, {4, -4}, {-5, 2}, {5, 3}, {0, 5}};
     private static final int DEFAULT_LEG_FRAME = 1;
     private static final int DEFAULT_JAW_FRAME = 1;
     private static final int DEFAULT_WING_FRAME = 1;
+    private static final int DEFAULT_ANTENNA_FRAME = 1;
 
     private static final Map<String, ImageIcon> COMPOSITE_CACHE = new ConcurrentHashMap<>();
     private static final Map<String, BufferedImage> LAYER_CACHE = new ConcurrentHashMap<>();
@@ -43,7 +46,8 @@ public final class AntSpriteCompositor {
     }
 
     public static ImageIcon getSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
-        return getSprite(type, species, profile, DEFAULT_LEG_FRAME, DEFAULT_JAW_FRAME, DEFAULT_WING_FRAME);
+        return getSprite(type, species, profile, DEFAULT_LEG_FRAME, DEFAULT_JAW_FRAME, DEFAULT_WING_FRAME,
+                DEFAULT_ANTENNA_FRAME, false);
     }
 
     public static ImageIcon getSprite(
@@ -53,6 +57,18 @@ public final class AntSpriteCompositor {
             int legFrame,
             int jawFrame,
             int wingFrame) {
+        return getSprite(type, species, profile, legFrame, jawFrame, wingFrame, DEFAULT_ANTENNA_FRAME, false);
+    }
+
+    public static ImageIcon getSprite(
+            AntType type,
+            AntSpecies species,
+            AntSubtypeProfile profile,
+            int legFrame,
+            int jawFrame,
+            int wingFrame,
+            int antennaFrame,
+            boolean parasiticMites) {
         if (type == null || species == null || species.getPalette() == null) {
             return null;
         }
@@ -67,10 +83,12 @@ public final class AntSpriteCompositor {
         int safeLeg = flyingLegs ? GameNumbers.ANT_LEG_FRAME_FLYING : clampFrame(legFrame, 1, 4);
         int safeJaw = clampFrame(jawFrame, 1, 2);
         int safeWing = clampFrame(wingFrame, 1, 2);
+        int safeAntenna = clampFrame(antennaFrame, 1, 2);
         String cacheKey = species.getId() + "|" + type.getId() + "|" + safeProfile.getCode()
-                + "|L" + safeLeg + "|J" + safeJaw + "|W" + safeWing;
+                + "|L" + safeLeg + "|J" + safeJaw + "|W" + safeWing + "|A" + safeAntenna
+                + "|M" + (parasiticMites ? 1 : 0);
         return COMPOSITE_CACHE.computeIfAbsent(cacheKey,
-                k -> buildIcon(type, species, safeProfile, safeLeg, safeJaw, safeWing));
+                k -> buildIcon(type, species, safeProfile, safeLeg, safeJaw, safeWing, safeAntenna, parasiticMites));
     }
 
     public static boolean canCompose(AntType type) {
@@ -88,8 +106,11 @@ public final class AntSpriteCompositor {
             AntSubtypeProfile profile,
             int legFrame,
             int jawFrame,
-            int wingFrame) {
-        BufferedImage composed = compose(type, species, profile, legFrame, jawFrame, wingFrame);
+            int wingFrame,
+            int antennaFrame,
+            boolean parasiticMites) {
+        BufferedImage composed = compose(type, species, profile, legFrame, jawFrame, wingFrame, antennaFrame,
+                parasiticMites);
         if (composed == null) {
             return null;
         }
@@ -102,7 +123,9 @@ public final class AntSpriteCompositor {
             AntSubtypeProfile profile,
             int legFrame,
             int jawFrame,
-            int wingFrame) {
+            int wingFrame,
+            int antennaFrame,
+            boolean parasiticMites) {
         String typeName = typeFolderName(type);
         if (typeName == null) {
             return null;
@@ -112,6 +135,7 @@ public final class AntSpriteCompositor {
         String headVariant = headVariantName(profile, drone);
         String abdomenVariant = abdomenVariantName(profile, drone);
         String jawVariant = headVariant;
+        String antennaVariant = headVariant;
 
         BufferedImage legs;
         if (legFrame == GameNumbers.ANT_LEG_FRAME_FLYING) {
@@ -126,6 +150,8 @@ public final class AntSpriteCompositor {
         BufferedImage torso = loadLayer("torso/" + typeName + "/TorsoNone.png");
         BufferedImage head = loadLayer("head/" + typeName + "/Head" + headVariant + ".png");
         BufferedImage jaws = loadLayer("jaws/" + typeName + "/Jaw" + jawVariant + jawFrame + ".png");
+        BufferedImage antennae = loadLayer(
+                "antennae/" + typeName + "/Antenna" + antennaVariant + antennaFrame + ".png");
 
         BufferedImage wings = null;
         if (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS) {
@@ -136,8 +162,8 @@ public final class AntSpriteCompositor {
             return null;
         }
 
-        int width = firstWidth(legs, abdomen, torso, head, jaws, wings);
-        int height = firstHeight(legs, abdomen, torso, head, jaws, wings);
+        int width = firstWidth(legs, abdomen, torso, head, jaws, antennae, wings);
+        int height = firstHeight(legs, abdomen, torso, head, jaws, antennae, wings);
         if (width <= 0 || height <= 0) {
             return null;
         }
@@ -151,11 +177,34 @@ public final class AntSpriteCompositor {
             drawRecolored(g, torso, palette, drone);
             drawRecolored(g, head, palette, drone);
             drawRecolored(g, jaws, palette, drone);
+            drawRecolored(g, antennae, palette, drone);
             drawRecolored(g, wings, palette, drone);
+            if (parasiticMites) {
+                drawParasiticMites(g, width, height);
+            }
         } finally {
             g.dispose();
         }
         return out;
+    }
+
+    private static void drawParasiticMites(Graphics2D g, int antWidth, int antHeight) {
+        BufferedImage mite = loadAbsoluteLayer(PARASITIC_MITE_PATH);
+        if (mite == null) {
+            return;
+        }
+        int miteW = mite.getWidth();
+        int miteH = mite.getHeight();
+        int halfW = miteW / 2;
+        int halfH = miteH / 2;
+        int centerX = antWidth / 2;
+        int centerY = antHeight / 2;
+        int count = Math.min(GameNumbers.PARASITIC_MITES_ON_ANT_SPRITE, PARASITIC_MITE_OFFSETS.length);
+        for (int i = 0; i < count; i++) {
+            int x = centerX + PARASITIC_MITE_OFFSETS[i][0] - halfW;
+            int y = centerY + PARASITIC_MITE_OFFSETS[i][1] - halfH;
+            g.drawImage(mite, x, y, null);
+        }
     }
 
     private static void drawRecolored(Graphics2D g, BufferedImage src, AntSpeciesPalette palette, boolean drone) {
@@ -208,11 +257,14 @@ public final class AntSpriteCompositor {
     }
 
     private static BufferedImage loadLayer(String relativePath) {
-        return LAYER_CACHE.computeIfAbsent(relativePath, AntSpriteCompositor::readLayer);
+        return LAYER_CACHE.computeIfAbsent(SHARED_ROOT + relativePath, AntSpriteCompositor::readLayer);
     }
 
-    private static BufferedImage readLayer(String relativePath) {
-        String path = SHARED_ROOT + relativePath;
+    private static BufferedImage loadAbsoluteLayer(String classpathPath) {
+        return LAYER_CACHE.computeIfAbsent(classpathPath, AntSpriteCompositor::readLayer);
+    }
+
+    private static BufferedImage readLayer(String path) {
         URL url = Thread.currentThread().getContextClassLoader().getResource(path);
         if (url == null) {
             return null;
