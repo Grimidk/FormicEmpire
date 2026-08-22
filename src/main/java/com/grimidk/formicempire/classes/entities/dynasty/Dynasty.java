@@ -38,6 +38,7 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeSe
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
@@ -761,9 +762,18 @@ public class Dynasty {
         if (!hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) return;
         
         int cost = getMassNuptialFlightCost();
-        if (getResearchPoints() < cost) return;
+        Engine eng = (owningWorld != null ? owningWorld.getEngine() : null);
+        if (eng == null && world != null) {
+            eng = world.getEngine();
+        }
+        boolean free = eng != null && eng.isFreeAbilities();
+        if (!free && getResearchPoints() < cost) return;
         
-        addResearchPoints(-cost);
+        if (!free) {
+            addResearchPoints(-cost);
+        } else {
+            eng.applySandboxTaintToActiveWorld();
+        }
         
         for (Colony colony : new ArrayList<>(colonies)) {
             Hex hex = null;

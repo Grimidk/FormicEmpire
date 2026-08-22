@@ -2148,9 +2148,17 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return;
             }
             TradeManager tradeManager = engine.getTradeManager();
-            if (DynastyIntegrationService.startIntegration(world, dynasty, other, tradeManager)) {
+            boolean instant = engine.isInstantIntegration();
+            if (DynastyIntegrationService.startIntegration(world, dynasty, other, tradeManager, instant)) {
+                if (instant) {
+                    engine.applySandboxTaintToActiveWorld();
+                }
                 UiOptionPane.showMessageDialog(this,
-                        LanguageStrings.format(LanguageStrings.DIPLO_INTEGRATION_STARTED_FMT, other.getName()),
+                        LanguageStrings.format(
+                                instant
+                                        ? LanguageStrings.DIPLO_INTEGRATION_INSTANT_FMT
+                                        : LanguageStrings.DIPLO_INTEGRATION_STARTED_FMT,
+                                other.getName()),
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE),
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -2505,7 +2513,9 @@ public class DynastyManagementDialog extends ZeroDialog {
                 menu.add(manageDiplomatsItem);
             } else if (!diplo.isAtWarWith(other)) {
                 JMenuItem integrateItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE));
-                if (DynastyIntegrationService.canStartIntegration(dynasty, other, world, engine.getTradeManager())) {
+                boolean instant = engine.isInstantIntegration();
+                if (DynastyIntegrationService.canStartIntegration(
+                        dynasty, other, world, engine.getTradeManager(), instant)) {
                     integrateItem.addActionListener(e -> performIntegrateAction(other));
                 } else {
                     integrateItem.setEnabled(false);

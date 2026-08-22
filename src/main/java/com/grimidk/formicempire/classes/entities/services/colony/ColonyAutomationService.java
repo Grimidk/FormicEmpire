@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -115,12 +116,17 @@ public class ColonyAutomationService {
         if (colony.getCurrentBuildingProject() != null) return;
 
         List<Building> candidates = new ArrayList<>();
+        Engine eng = colony.getDynasty() != null && colony.getDynasty().getOwningWorld() != null
+                ? colony.getDynasty().getOwningWorld().getEngine()
+                : null;
+        boolean instant = eng != null && eng.isInstantBuildings();
         for (Building b : GameUnlocks.getBuildings()) {
             boolean notOwned = !colony.hasBuilding(b);
             boolean reqMet = (b.getRequirement() == null || colony.hasBuilding(b.getRequirement()));
-            boolean tierMet = b.isAvailableFor(colony.getDynasty());
+            boolean tierMet = instant || b.isAvailableFor(colony.getDynasty());
             boolean unlockMet = GameUnlocks.meetsBuildingUnlockRequirement(colony, b);
-            boolean canAfford = colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost();
+            boolean canAfford = instant
+                    || (colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost());
 
             if (notOwned && reqMet && tierMet && unlockMet && canAfford) {
                 candidates.add(b);

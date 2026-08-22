@@ -1001,19 +1001,28 @@ public class Colony {
     public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; }
 
     public boolean startBuildingProject(Building building) {
-        if (currentBuildingProject != null) return false;
-        if (building == null || !building.isAvailableFor(getDynasty())) return false;
+        if (building == null || currentBuildingProject != null) return false;
+        Engine eng = (getDynasty() != null && getDynasty().getOwningWorld() != null)
+                ? getDynasty().getOwningWorld().getEngine()
+                : null;
+        boolean instant = eng != null && eng.isInstantBuildings();
+        if (!instant && !building.isAvailableFor(getDynasty())) return false;
         if (!GameUnlocks.meetsBuildingUnlockRequirement(this, building)) return false;
         if (building.getRequirement() != null && !hasBuilding(building.getRequirement())) return false;
-        if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
-            return false; 
+        if (!instant) {
+            if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
+                return false;
+            }
+            resourceService.consumeResource(this, GameConstants.RESOURCE_ROCK, building.getMineralCost());
+            resourceService.consumeResource(this, GameConstants.RESOURCE_RESIN, building.getResinCost());
+            setCurrentBuildingProject(building);
+            this.buildingProgressHours = 0.0;
+            return true;
         }
-        
-        resourceService.consumeResource(this, GameConstants.RESOURCE_ROCK, building.getMineralCost());
-        resourceService.consumeResource(this, GameConstants.RESOURCE_RESIN, building.getResinCost());
-
-        setCurrentBuildingProject(building);
-        this.buildingProgressHours = 0.0;
+        unlockBuilding(building);
+        if (eng != null) {
+            eng.applySandboxTaintToActiveWorld();
+        }
         return true;
     }
     
@@ -1687,14 +1696,22 @@ public class Colony {
         if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
         
         int cost = getNuptialFlightCost();
-        if (getResearchPoints() < cost) return;
+        Engine eng = (getDynasty() != null && getDynasty().getOwningWorld() != null)
+                ? getDynasty().getOwningWorld().getEngine()
+                : (world != null ? world.getEngine() : null);
+        boolean free = eng != null && eng.isFreeAbilities();
+        if (!free && getResearchPoints() < cost) return;
 
         if (!ColonyLabourService.meetsNuptialRequirements(this)) {
             logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_FORCE_FLIGHT_BLOCKED));
             return;
         }
 
-        addResearchPoints(-cost);
+        if (!free) {
+            addResearchPoints(-cost);
+        } else if (eng != null) {
+            eng.applySandboxTaintToActiveWorld();
+        }
         this.labourService.runNuptial(this, world, currentHex);
     }
 
@@ -1819,11 +1836,19 @@ public class Colony {
         if (!hasUpgrade(GameUnlocks.ABILITY_PHEROMONE_STORM) || isPheromoneStormActive()) {
             return false;
         }
+        Engine eng = (getDynasty() != null && getDynasty().getOwningWorld() != null)
+                ? getDynasty().getOwningWorld().getEngine()
+                : null;
+        boolean free = eng != null && eng.isFreeAbilities();
         int cost = GameNumbers.PHEROMONE_STORM_SYRUP_COST;
-        if (getSyrups() < cost) {
+        if (!free && getSyrups() < cost) {
             return false;
         }
-        setSyrups(getSyrupsPrecise() - cost);
+        if (!free) {
+            setSyrups(getSyrupsPrecise() - cost);
+        } else {
+            eng.applySandboxTaintToActiveWorld();
+        }
         applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM);
         logEvent(ColonyLogPrefixes.INFO + " "
                 + LanguageStrings.format(LanguageStrings.LOG_PHEROMONE_STORM_STARTED_FMT,
@@ -1836,11 +1861,19 @@ public class Colony {
         if (!hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET) || isCreatineDietActive()) {
             return false;
         }
+        Engine eng = (getDynasty() != null && getDynasty().getOwningWorld() != null)
+                ? getDynasty().getOwningWorld().getEngine()
+                : null;
+        boolean free = eng != null && eng.isFreeAbilities();
         int cost = GameNumbers.CREATINE_DIET_PROTEIN_COST;
-        if (getProtein() < cost) {
+        if (!free && getProtein() < cost) {
             return false;
         }
-        setProtein(getProteinPrecise() - cost);
+        if (!free) {
+            setProtein(getProteinPrecise() - cost);
+        } else {
+            eng.applySandboxTaintToActiveWorld();
+        }
         creatineDietMonthsRemaining = GameNumbers.CREATINE_DIET_DURATION_MONTHS;
         logEvent(ColonyLogPrefixes.INFO + " "
                 + LanguageStrings.format(LanguageStrings.LOG_CREATINE_DIET_STARTED_FMT,

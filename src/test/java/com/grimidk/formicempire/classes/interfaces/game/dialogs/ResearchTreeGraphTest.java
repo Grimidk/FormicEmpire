@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -488,5 +489,56 @@ class ResearchTreeGraphTest {
 
         colony.setResearchPoints(GameUnlocks.ROLE_ASSISTANT.getCost());
         assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.ROLE_ASSISTANT));
+    }
+
+    @Test
+    void infiniteResearchIgnoresTierRequirement() {
+        dynasty.setRank(GameConstants.RANK_COLONY);
+        colony.setResearchPoints(0);
+
+        assertEquals(ResearchTreeGraph.NodeState.UNAVAILABLE,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.TYPE_PRINCESS));
+
+        Engine engine = new Engine();
+        engine.setInfiniteResearch(true);
+        assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
+                ResearchTreeGraph.stateFor(colony, engine, GameUnlocks.TYPE_PRINCESS));
+        assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, engine, GameUnlocks.TYPE_PRINCESS));
+    }
+
+    @Test
+    void infiniteResearchUnlocksTriggerUpgradesWithoutTrigger() {
+        assertFalse(colony.hasUpgrade(GameUnlocks.ROLE_GRAVER));
+        assertTrue(colony.getDeadAnts().isEmpty());
+
+        assertEquals(ResearchTreeGraph.NodeState.UNAVAILABLE,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ROLE_GRAVER));
+
+        Engine engine = new Engine();
+        engine.setInfiniteResearch(true);
+        assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
+                ResearchTreeGraph.stateFor(colony, engine, GameUnlocks.ROLE_GRAVER));
+        assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, engine, GameUnlocks.ROLE_GRAVER));
+    }
+
+    @Test
+    void infiniteResearchBuysParasiticMiteAlertWithoutAbilityHubOrOutbreak() {
+        assertFalse(colony.hasUpgrade(GameUnlocks.ABILITY_ABILITY));
+        assertFalse(colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+
+        assertEquals(ResearchTreeGraph.NodeState.UNAVAILABLE,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+
+        Engine engine = new Engine();
+        engine.setInfiniteResearch(true);
+        assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
+                ResearchTreeGraph.stateFor(colony, engine, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+        assertTrue(ResearchTreeGraph.isVisible(colony, engine, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+        assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, engine, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, engine);
+        assertTrue(result.getNodes().stream()
+                .anyMatch(n -> n.getUpgrade() == GameUnlocks.ABILITY_PARASITIC_MITE_ALERT
+                        && n.getState() == ResearchTreeGraph.NodeState.AFFORDABLE));
     }
 }

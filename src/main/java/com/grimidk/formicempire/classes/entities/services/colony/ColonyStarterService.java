@@ -7,6 +7,9 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -158,6 +161,40 @@ public class ColonyStarterService {
             return true;
         }
         return colony.getDynasty() == null;
+    }
+
+    public Colony foundColonyOnEmptyHex(World world, Dynasty dynasty, Hex hex) {
+        if (world == null || dynasty == null || hex == null) {
+            return null;
+        }
+        if (hex.getBiome() == GameConstants.BIOME_OCEAN || hex.getBiome() == GameConstants.BIOME_LAKE) {
+            return null;
+        }
+        Colony existing = hex.getColony();
+        if (existing != null && !isReclaimableDeadColony(existing)) {
+            return null;
+        }
+        if (isReclaimableDeadColony(existing)) {
+            reclaimDeadColonyForSpread(hex, dynasty, dynasty.getCapital());
+        }
+
+        Colony colony = new Colony(world.getNextColonyId(), "", dynasty.isPlayer());
+        colony.setDynasty(dynasty);
+        colony.setActive(false);
+        colony.setRank(GameConstants.RANK_COLONY);
+        initializeNewColony(colony);
+        hex.setColony(colony);
+        if (world.getHistoryService() != null) {
+            world.getHistoryService().record(
+                    WorldHistoryEventType.COLONY_FOUNDED,
+                    LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                    dynasty.getId(),
+                    colony.getId(),
+                    -1,
+                    WorldHistoryEvent.colonyArg(colony.getId()),
+                    WorldHistoryEvent.dynastyArg(dynasty.getId()));
+        }
+        return colony;
     }
 
     public void finalizeDeadRemnant(Colony colony) {

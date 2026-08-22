@@ -1,8 +1,8 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 94% (345/366 checked)
+Completion: 91% (343/376 checked)
 Use this checklist to exercise every player-facing interaction.
-Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
+Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
 Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic changes)
 
@@ -17,7 +17,7 @@ Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic change
 [X] Main menu version text (bottom left, black)
 [X] Main menu License (bottom right) — opens full license dialog
 [X] Discord — opens Discord invite in browser
-[X] Mechanics Audit — this file (only when enabled in Settings > General)
+[X] Mechanics Audit — this file (only when enabled in Settings > Sandbox)
 [X] Settings — full settings panel (see section 2)
 [X] Quit — exit app (respects confirm-on-quit when a game session is active)
 
@@ -27,7 +27,6 @@ Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic change
 General:
 [X] Language (en / es / fr / pt)
 [X] Autosave frequency (monthly, 3/6/12 months, off)
-[X] Allow turbo speed mode
 [X] Arachnophobia mode (replaces spider-like visuals)
 [X] Pause on focus loss
 [X] Confirm on quit (active session)
@@ -35,7 +34,6 @@ General:
 [X] Show tooltips
 [X] Overworld auto-recenter on idle
 [X] Fuzz parasite ant numbers
-[X] Show mechanics audit (main-menu and in-game ESC menu button for this file)
 [X] Reset tab to defaults
 
 Video:
@@ -62,6 +60,17 @@ Roles (default hatch roles for new ants):
 [X] Default queen role combo (all implemented peacetime queen roles; shows actual default)
 [X] Reset tab to defaults
 
+Sandbox:
+[ ] Allow turbo speed mode
+[ ] Show mechanics audit (main-menu and in-game ESC menu button for this file)
+[ ] ★ Free abilities (disables achievements on saves that use it)
+[ ] ★ Infinite research (unlocks Research tab; ignores dynasty tier, parent, and trigger gates including Parasitic Mite Alert; disables achievements on saves that use it)
+[ ] ★ Instant buildings (unlocks Construction tab; ignores dynasty tier; disables achievements on saves that use it)
+[ ] ★ Assimilate all (unlocks Assimilation tab; disables achievements on saves that use it)
+[ ] ★ Easy conquering (disables achievements on saves that use it)
+[ ] ★ Instant integration (disables achievements on saves that use it)
+[ ] Reset tab to defaults
+
 [X] Save & Apply persists to settings.json and applies live
 
 ================================================================================
@@ -69,6 +78,8 @@ Roles (default hatch roles for new ants):
 ================================================================================
 [X] Three save slots — empty slot shows Create; packaged builds use GrimIDK/FormicEmpire under OS Application Support / AppData (not inside .app)
 [X] Create new save — name + title, live dynasty preview (EN: Theme Title; ES/FR/PT: Title Theme), confirm prompt; full dynasty name shown in slot list
+[ ] ★ on save slots that have achievements disabled (used with Sandbox ★ options)
+[ ] Warning when Create/Load with Sandbox ★ options on (Cancel aborts; only for saves that still allow achievements)
 [X] Tutorial dialog auto-opens on first create
 [X] Load existing save — resumes session; re-reads latest file from disk
 [X] Delete save — removes slot data
@@ -149,7 +160,7 @@ Dynasty submenu (always available in session):
 [X] Settings
 [X] Help — encyclopedia (in-game dialog)
 [X] Tutorial (in-game)
-[X] Mechanics Audit (when enabled in Settings > General)
+[X] Mechanics Audit (when enabled in Settings > Sandbox)
 [X] Back to main menu
 
 ================================================================================
@@ -193,7 +204,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[X] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), status bar shows available RP and current dynasty tier (icon+name); detail card (centered bold title via translated name with flavor fallback + icon, centered flavor when distinct from title + description; left-aligned tier icon/name with ant-count tip, requirement incl. assimilation/synergy when that is the unlock path, RP/trigger progress bar; Buy on every non-owned node — disabled with tip for unmet parent/tier(ants)/assimilation/synergy/RP/trigger; tip shows specific requirements accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
+[ ] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), status bar shows research icon + quantity RP and current dynasty tier (icon+name); detail card (centered bold title via translated name with flavor fallback + icon, centered flavor when distinct from title + description; left-aligned tier icon/name with ant-count tip, requirement incl. assimilation/synergy when that is the unlock path, RP/trigger progress bar; Buy on every non-owned node — disabled with tip for unmet parent/tier(ants)/assimilation/synergy/RP/trigger; tip shows specific requirements accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -407,8 +418,9 @@ Per foreign dynasty Actions menu:
 [X] Mouse wheel zoom on map
 [X] Legend / overlay toggles if present
 [ ] Layers: trades (neighbor hex center-to-center line + progress dot; tunnel badge when applicable)
-[ ] Layers: tunnels (short dual rails across shared neighbor border; incomplete dashed)
+[ ] Layers: tunnels (short dual rails in the same dynasty border color; incomplete dashed)
 [ ] Layers: active battles (MilitaryPower icon on every shared border between dynasties at war)
+[ ] Easy conquering: Conquer button — with ★ Easy conquering on, click a foreign colony or empty land hex (map stays open), then Conquer
 [X] Go Back Home button — recenters map on player capital
 [X] New colonies after capital use randomized city titles (City/Berg/Grad/Burg/Haven/Nest/Hold/Ford), no repeats within dynasty
 

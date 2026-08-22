@@ -941,6 +941,9 @@ public final class LanguageStrings {
     public static final String MAP_LAYER_TRADES = "MAP_LAYER_TRADES";
     public static final String MAP_LAYER_TUNNELS = "MAP_LAYER_TUNNELS";
     public static final String MAP_LAYER_BATTLES = "MAP_LAYER_BATTLES";
+    public static final String MAP_CONQUER_COLONY = "MAP_CONQUER_COLONY";
+    public static final String MAP_CONQUER_COLONY_TT = "MAP_CONQUER_COLONY_TT";
+    public static final String MAP_CONQUER_COLONY_SELECT_TT = "MAP_CONQUER_COLONY_SELECT_TT";
 
     public static final String DIALOG_WAR_TITLE = "DIALOG_WAR_TITLE";
     public static final String DIALOG_BATTLE_TITLE = "DIALOG_BATTLE_TITLE";
@@ -1429,6 +1432,9 @@ public final class LanguageStrings {
     public static final String SAVE_DELETE_CONFIRM = "SAVE_DELETE_CONFIRM";
     public static final String SAVE_DELETE_TITLE = "SAVE_DELETE_TITLE";
     public static final String SAVE_DELETE_ERROR = "SAVE_DELETE_ERROR";
+    public static final String SAVE_ACHIEVEMENTS_WARN_TITLE = "SAVE_ACHIEVEMENTS_WARN_TITLE";
+    public static final String SAVE_ACHIEVEMENTS_WARN_CREATE = "SAVE_ACHIEVEMENTS_WARN_CREATE";
+    public static final String SAVE_ACHIEVEMENTS_WARN_LOAD = "SAVE_ACHIEVEMENTS_WARN_LOAD";
 
     public static final String SETTINGS_LANGUAGE = "SETTINGS_LANGUAGE";
     public static final String SETTINGS_SCREEN_SIZE = "SETTINGS_SCREEN_SIZE";
@@ -1447,6 +1453,15 @@ public final class LanguageStrings {
     public static final String SETTINGS_TAB_VIDEO = "SETTINGS_TAB_VIDEO";
     public static final String SETTINGS_TAB_AUDIO = "SETTINGS_TAB_AUDIO";
     public static final String SETTINGS_TAB_ROLES = "SETTINGS_TAB_ROLES";
+    public static final String SETTINGS_TAB_SANDBOX = "SETTINGS_TAB_SANDBOX";
+    public static final String SETTINGS_SANDBOX_NOTE = "SETTINGS_SANDBOX_NOTE";
+    public static final String SETTINGS_SANDBOX_STAR_PREFIX = "SETTINGS_SANDBOX_STAR_PREFIX";
+    public static final String SETTINGS_FREE_ABILITIES = "SETTINGS_FREE_ABILITIES";
+    public static final String SETTINGS_INFINITE_RESEARCH = "SETTINGS_INFINITE_RESEARCH";
+    public static final String SETTINGS_INSTANT_BUILDINGS = "SETTINGS_INSTANT_BUILDINGS";
+    public static final String SETTINGS_ASSIMILATE_ALL = "SETTINGS_ASSIMILATE_ALL";
+    public static final String SETTINGS_EASY_CONQUERING = "SETTINGS_EASY_CONQUERING";
+    public static final String SETTINGS_INSTANT_INTEGRATION = "SETTINGS_INSTANT_INTEGRATION";
     
     public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY = "SETTINGS_DAYLIGHT_COLOR_OVERLAY";
     public static final String SETTINGS_WEATHER_COLOR_OVERLAY = "SETTINGS_WEATHER_COLOR_OVERLAY";
@@ -1484,6 +1499,12 @@ public final class LanguageStrings {
     public static final String SETTINGS_OVERWORLD_AUTO_RECENTER_TT = "SETTINGS_OVERWORLD_AUTO_RECENTER_TT";
     public static final String SETTINGS_FUZZ_PARASITE_ANTS_TT = "SETTINGS_FUZZ_PARASITE_ANTS_TT";
     public static final String SETTINGS_SHOW_AUDIT_MENU_TT = "SETTINGS_SHOW_AUDIT_MENU_TT";
+    public static final String SETTINGS_FREE_ABILITIES_TT = "SETTINGS_FREE_ABILITIES_TT";
+    public static final String SETTINGS_INFINITE_RESEARCH_TT = "SETTINGS_INFINITE_RESEARCH_TT";
+    public static final String SETTINGS_INSTANT_BUILDINGS_TT = "SETTINGS_INSTANT_BUILDINGS_TT";
+    public static final String SETTINGS_ASSIMILATE_ALL_TT = "SETTINGS_ASSIMILATE_ALL_TT";
+    public static final String SETTINGS_EASY_CONQUERING_TT = "SETTINGS_EASY_CONQUERING_TT";
+    public static final String SETTINGS_INSTANT_INTEGRATION_TT = "SETTINGS_INSTANT_INTEGRATION_TT";
     public static final String SETTINGS_SCREEN_SIZE_TT = "SETTINGS_SCREEN_SIZE_TT";
     public static final String SETTINGS_FULLSCREEN_TT = "SETTINGS_FULLSCREEN_TT";
     public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT = "SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT";
@@ -1779,6 +1800,7 @@ public final class LanguageStrings {
     public static final String DIPLO_INTEGRATION_DIPLOMATS_PROMPT = "DIPLO_INTEGRATION_DIPLOMATS_PROMPT";
     public static final String DIPLO_INTEGRATION_STANCE = "DIPLO_INTEGRATION_STANCE";
     public static final String DIPLO_INTEGRATION_STARTED_FMT = "DIPLO_INTEGRATION_STARTED_FMT";
+    public static final String DIPLO_INTEGRATION_INSTANT_FMT = "DIPLO_INTEGRATION_INSTANT_FMT";
     public static final String DIPLO_INTEGRATION_CANCEL_CONFIRM_FMT = "DIPLO_INTEGRATION_CANCEL_CONFIRM_FMT";
     public static final String DIPLO_ERROR_INTEGRATION_ACTIVE = "DIPLO_ERROR_INTEGRATION_ACTIVE";
     public static final String DIPLO_ERROR_INTEGRATION_TARGET_BUSY = "DIPLO_ERROR_INTEGRATION_TARGET_BUSY";

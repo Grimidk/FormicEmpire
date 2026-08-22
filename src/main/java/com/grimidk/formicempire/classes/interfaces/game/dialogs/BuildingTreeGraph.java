@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
@@ -208,7 +209,11 @@ public final class BuildingTreeGraph {
         }
 
         boolean reqMet = building.getRequirement() == null || colony.hasBuilding(building.getRequirement());
-        boolean tierMet = building.isAvailableFor(colony.getDynasty());
+        Engine eng = colony.getDynasty() != null && colony.getDynasty().getOwningWorld() != null
+                ? colony.getDynasty().getOwningWorld().getEngine()
+                : null;
+        boolean instant = eng != null && eng.isInstantBuildings();
+        boolean tierMet = instant || building.isAvailableFor(colony.getDynasty());
         boolean unlockMet = GameUnlocks.meetsBuildingUnlockRequirement(colony, building);
         if (!reqMet || !tierMet || !unlockMet) {
             return NodeState.UNAVAILABLE;
@@ -216,13 +221,14 @@ public final class BuildingTreeGraph {
 
         int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
         int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
-        if (builders <= 0 && cranes <= 0) {
+        if (!instant && builders <= 0 && cranes <= 0) {
             return NodeState.UNAVAILABLE;
         }
-        if (colony.getMinerals() < building.getMineralCost() || colony.getResins() < building.getResinCost()) {
+        if (!instant && (colony.getMinerals() < building.getMineralCost()
+                || colony.getResins() < building.getResinCost())) {
             return NodeState.UNAVAILABLE;
         }
-        if (colony.getCurrentBuildingProject() != null) {
+        if (!instant && colony.getCurrentBuildingProject() != null) {
             return NodeState.UNAVAILABLE;
         }
         return NodeState.AFFORDABLE;

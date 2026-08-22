@@ -1,5 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -15,9 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 
 public final class HexGridMesh {
     public static final float DIVIDER_STROKE = 2f;
@@ -255,19 +256,22 @@ public final class HexGridMesh {
     public void paintDividers(Graphics2D g2d, boolean dynastyBorderMode, Function<Face, Color> plainEdgeColor, Color dynastyFallback) {
         Objects.requireNonNull(g2d, "g2d");
         Objects.requireNonNull(plainEdgeColor, "plainEdgeColor");
+        Object previousAa = g2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         BasicStroke stroke = new BasicStroke(DIVIDER_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
         g2d.setStroke(stroke);
         for (Edge edge : edges) {
+            Color color = null;
             Color plain = plainColor(edge, plainEdgeColor);
             if (dynastyBorderMode && edge.isRivalDynastyFrontier()) {
                 paintAlternatingRivalEdge(g2d, edge, dynastyFallback != null ? dynastyFallback : plain);
                 continue;
             }
-            Color color;
             if (dynastyBorderMode && edge.isDynastyFrontier()) {
                 color = edge.dynastyBorderColor(mapCenterX, mapCenterY, dynastyFallback != null ? dynastyFallback : plain);
             } else {
-                color = plain;
+                Color ocean = oceanBorderColor(edge, plainEdgeColor);
+                color = ocean != null ? ocean : plain;
             }
             if (color == null) {
                 continue;
@@ -289,6 +293,7 @@ public final class HexGridMesh {
                     nodeRadius * 2.0,
                     nodeRadius * 2.0));
         }
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, previousAa);
     }
 
     private void paintAlternatingRivalEdge(Graphics2D g2d, Edge edge, Color fallback) {
@@ -332,7 +337,38 @@ public final class HexGridMesh {
                 }
             }
         }
+        for (Edge edge : vertex.edges) {
+            Color ocean = oceanBorderColor(edge, plainEdgeColor);
+            if (ocean != null) {
+                return ocean;
+            }
+        }
         return plainColor(vertex.edges.get(0), plainEdgeColor);
+    }
+
+    static Color oceanBorderColor(Edge edge, Function<Face, Color> plainEdgeColor) {
+        if (edge == null) {
+            return null;
+        }
+        boolean touchesOcean = isOceanFace(edge.faceA) || isOceanFace(edge.faceB)
+                || (edge.faceA == null) != (edge.faceB == null);
+        if (!touchesOcean) {
+            return null;
+        }
+        Face oceanFace = isOceanFace(edge.faceA) ? edge.faceA : (isOceanFace(edge.faceB) ? edge.faceB : null);
+        if (oceanFace != null && plainEdgeColor != null) {
+            Color fill = plainEdgeColor.apply(oceanFace);
+            if (fill != null) {
+                return fill;
+            }
+        }
+        return GameConstants.BIOME_OCEAN.getMapColor();
+    }
+
+    private static boolean isOceanFace(Face face) {
+        return face != null
+                && face.hex != null
+                && face.hex.getBiome() == GameConstants.BIOME_OCEAN;
     }
 
     private static Color plainColor(Edge edge, Function<Face, Color> plainEdgeColor) {
@@ -344,11 +380,7 @@ public final class HexGridMesh {
     }
 
     private static Color dynastyColorOf(Face face, Color fallback) {
-        Dynasty dynasty = HexMapGeometry.dynastyOf(face != null ? face.hex : null);
-        if (dynasty != null && dynasty.getColor() != null) {
-            return dynasty.getColor();
-        }
-        return fallback;
+        return HexMapGeometry.dynastyPaintColor(HexMapGeometry.dynastyOf(face != null ? face.hex : null), fallback);
     }
 
     private static double distanceSquared(Face face, double mapCenterX, double mapCenterY) {

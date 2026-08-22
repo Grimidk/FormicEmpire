@@ -75,6 +75,7 @@ public class World {
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
+    private boolean allowsAchievements = true;
     private int worldRadius = GameNumbers.worldRadiusForContinentCore(
             GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
     private int continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
@@ -137,6 +138,24 @@ public class World {
 
     public void setEngine(Engine engine) {
         this.engine = engine;
+        if (engine != null && engine.hasAchievementTaintingSandbox()) {
+            disableAchievements();
+        }
+    }
+
+    public boolean allowsAchievements() {
+        return allowsAchievements;
+    }
+
+    public void setAllowsAchievements(boolean allowsAchievements) {
+        if (!this.allowsAchievements) {
+            return;
+        }
+        this.allowsAchievements = allowsAchievements;
+    }
+
+    public void disableAchievements() {
+        this.allowsAchievements = false;
     }
 
     public int getSaveSlotId() {
@@ -355,7 +374,13 @@ public class World {
     }
     
     public void changeActiveHex(Hex newHex) {
-        if (newHex == null || !hexes.contains(newHex)) return;
+        if (newHex == null) {
+            return;
+        }
+        Hex resolved = resolveHex(newHex);
+        if (resolved == null) {
+            return;
+        }
 
         if (this.activeHex != null) {
             this.activeHex.setActive(false);
@@ -364,13 +389,35 @@ public class World {
             }
         }
 
-        this.activeHex = newHex;
+        this.activeHex = resolved;
         this.activeHex.setActive(true);
         if (this.activeHex.getColony() != null) {
             this.activeHex.getColony().setActive(true);
         }
         
         updateEnvironmentalConditions();
+    }
+
+    public Hex resolveHex(Hex hex) {
+        if (hex == null || hexes == null) {
+            return null;
+        }
+        if (hexes.contains(hex)) {
+            return hex;
+        }
+        return findHex(hex.getQ(), hex.getR());
+    }
+
+    public Hex findHex(int q, int r) {
+        if (hexes == null) {
+            return null;
+        }
+        for (Hex hex : hexes) {
+            if (hex != null && hex.getQ() == q && hex.getR() == r) {
+                return hex;
+            }
+        }
+        return null;
     }
 
     public Temperature getTemperatureIcon() {
@@ -1295,7 +1342,10 @@ public class World {
         this.hour = savefile.getHour();
         this.day = savefile.getDay();
         this.month = savefile.getMonth();
-        this.year = savefile.getYear();  
+        this.year = savefile.getYear();
+        if (!savefile.allowsAchievements()) {
+            disableAchievements();
+        }
         this.worldRadius = (savefile.getWorldRadius() > 0)
                 ? savefile.getWorldRadius()
                 : GameNumbers.worldRadiusForContinentCore(GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);

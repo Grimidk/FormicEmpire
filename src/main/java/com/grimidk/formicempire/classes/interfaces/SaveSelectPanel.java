@@ -199,6 +199,9 @@ public class SaveSelectPanel extends JPanel {
                 int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
                 String displayName = LanguageStrings.formatSaveSlotDisplayName(
                         s.getName(), s.resolvePlayerDynastyTitleId(), slotId);
+                if (!s.allowsAchievements()) {
+                    displayName = LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_STAR_PREFIX) + displayName;
+                }
                 slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, displayName, totalDays));
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
@@ -208,15 +211,53 @@ public class SaveSelectPanel extends JPanel {
         }
     }
 
+    private boolean confirmAchievementTaintIfNeeded(boolean creatingNewSave, Savefile existing) {
+        if (!frame.getEngine().hasAchievementTaintingSandbox()) {
+            return true;
+        }
+        if (existing != null && !existing.allowsAchievements()) {
+            return true;
+        }
+        if (!creatingNewSave && existing == null) {
+            return true;
+        }
+        int result = UiOptionPane.showConfirmDialog(
+                frame,
+                LanguageStrings.get(creatingNewSave
+                        ? LanguageStrings.SAVE_ACHIEVEMENTS_WARN_CREATE
+                        : LanguageStrings.SAVE_ACHIEVEMENTS_WARN_LOAD),
+                LanguageStrings.get(LanguageStrings.SAVE_ACHIEVEMENTS_WARN_TITLE),
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        return result == JOptionPane.OK_OPTION;
+    }
+
+    private void taintSavefileIfSandboxActive(Savefile save) {
+        if (save == null || !frame.getEngine().hasAchievementTaintingSandbox()) {
+            return;
+        }
+        if (!save.allowsAchievements()) {
+            return;
+        }
+        save.disableAchievements();
+        saveManager.saveUserSlotAsync(save, ignored -> SwingUtilities.invokeLater(this::refreshSlots));
+    }
+
     private void onCreateOrLoad(int slotId, int idx) {
         Savefile existing = cachedSaves[idx];
         
         if (existing == null) {
+            if (!confirmAchievementTaintIfNeeded(true, null)) {
+                return;
+            }
             NewSaveRequest request = promptNewSave();
             if (request == null) return;
 
             Savefile save = new Savefile(slotId, request.baseName());
             save.setPlayerDynastyTitleId(request.titleId());
+            if (frame.getEngine().hasAchievementTaintingSandbox()) {
+                save.disableAchievements();
+            }
             saveManager.saveUserSlotAsync(save, success -> {
                 if (!success) {
                     UiOptionPane.showMessageDialog(frame,
@@ -245,6 +286,10 @@ public class SaveSelectPanel extends JPanel {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            if (!confirmAchievementTaintIfNeeded(false, fresh)) {
+                return;
+            }
+            taintSavefileIfSandboxActive(fresh);
             cachedSaves[idx] = fresh;
             applySlotLabels();
             frame.openGameWithSave(fresh);

@@ -107,6 +107,30 @@ class HexGridMeshTest {
         assertEquals(Color.BLUE, edge.dynastyBorderColor(rightCenterX, 0, Color.BLACK));
     }
 
+    @Test
+    void dynastyCoastTakesPriorityOverOcean() {
+        Hex land = hex(0, 0);
+        land.setBiome(GameConstants.BIOME_PLAINS);
+        attachDynasty(land, 3, Color.MAGENTA);
+        Hex ocean = hex(1, 0);
+        ocean.setBiome(GameConstants.BIOME_OCEAN);
+        HexGridMesh.Edge edge = sharedEdge(land, ocean, 0, 0);
+        assertTrue(edge.isDynastyFrontier());
+        assertEquals(Color.MAGENTA, edge.dynastyBorderColor(0, 0, Color.BLACK));
+    }
+
+    @Test
+    void emptyLandOceanCoastUsesOceanMapColor() {
+        Hex land = hex(0, 0);
+        land.setBiome(GameConstants.BIOME_PLAINS);
+        Hex ocean = hex(1, 0);
+        ocean.setBiome(GameConstants.BIOME_OCEAN);
+        HexGridMesh.Edge edge = sharedEdge(land, ocean, 0, 0);
+        assertFalse(edge.isDynastyFrontier());
+        assertEquals(GameConstants.BIOME_OCEAN.getMapColor(),
+                HexGridMesh.oceanBorderColor(edge, face -> face.hex.getBiome().getMapColor()));
+    }
+
     private static Hex hex(int q, int r) {
         Hex hex = new Hex();
         hex.setQ(q);

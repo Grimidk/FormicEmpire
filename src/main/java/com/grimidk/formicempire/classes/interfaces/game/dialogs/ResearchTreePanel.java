@@ -97,6 +97,9 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         researchPointsLabel = new JLabel();
         researchPointsLabel.setFont(AssetStyles.FONT_BOLD);
         researchPointsLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
+        researchPointsLabel.setIconTextGap(6);
+        researchPointsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
 
         tierLabel = new JLabel();
         tierLabel.setFont(AssetStyles.FONT_BOLD);
@@ -171,7 +174,10 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             return;
         }
         researchPointsLabel.setText(LanguageStrings.format(
-                LanguageStrings.UPGRADE_RESEARCH_AVAILABLE, colony.getResearchPoints()));
+                LanguageStrings.UPGRADE_COST_RP,
+                (engine != null && engine.isInfiniteResearch())
+                        ? "\u221E"
+                        : AssetStyles.formatNumber(colony.getResearchPoints())));
         Dynasty dynasty = colony.getDynasty();
         Tier tier = dynasty != null ? GameConstants.getHighestUnlockedTier(dynasty.getRank()) : null;
         if (tier == null) {
@@ -445,6 +451,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                     : TriggerProgressService.find(colony, engine, upgrade);
             boolean showTrigger = progress != null
                     && progress.getRequired() > 0
+                    && selectedState != ResearchTreeGraph.NodeState.AFFORDABLE
                     && (selectedState == ResearchTreeGraph.NodeState.TRIGGER_PROGRESS
                     || selectedState == ResearchTreeGraph.NodeState.SPECIAL_PROGRESS
                     || upgrade.getCost() <= 0);
@@ -545,13 +552,18 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 return;
             }
             Upgrade upgrade = selectedUpgrade;
-            if (upgrade.getCost() <= 0 || colony.getResearchPoints() < upgrade.getCost()) {
+            boolean infinite = engine != null && engine.isInfiniteResearch();
+            if (!infinite && (upgrade.getCost() <= 0 || colony.getResearchPoints() < upgrade.getCost())) {
                 return;
             }
             if (ResearchTreeGraph.stateFor(colony, engine, upgrade) != ResearchTreeGraph.NodeState.AFFORDABLE) {
                 return;
             }
-            colony.setResearchPoints(colony.getResearchPoints() - upgrade.getCost());
+            if (!infinite && upgrade.getCost() > 0) {
+                colony.setResearchPoints(colony.getResearchPoints() - upgrade.getCost());
+            } else if (infinite && engine != null) {
+                engine.applySandboxTaintToActiveWorld();
+            }
             colony.unlockUpgrade(upgrade);
             closeDetail();
             if (onTreeChanged != null) {

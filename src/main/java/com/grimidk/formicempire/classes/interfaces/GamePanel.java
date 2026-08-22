@@ -849,9 +849,15 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void openMapDialog(World world) {
-        if (mapDialog == null || mapDialog.getOwner() != frame) {
-            if (mapDialog != null) mapDialog.dispose();
-            mapDialog = new MapDialog(frame, world, this::refreshAllGUIData, this::showWarDialog);
+        Engine engine = frame.getEngine();
+        if (mapDialog != null && (mapDialog.getOwner() != frame || mapDialog.getWorld() != world)) {
+            mapDialog.dispose();
+            mapDialog = null;
+        }
+        if (mapDialog == null) {
+            mapDialog = new MapDialog(frame, engine, world, this::refreshAllGUIData, this::showWarDialog);
+        } else {
+            mapDialog.bindWorld(world);
         }
         mapDialog.showDialog();
     }
@@ -1641,9 +1647,13 @@ public class GamePanel extends ZeroGamePanel {
                 convoyDialog.liveUpdate();
             }
             if (controlPanel != null) {
-                controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
-                controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
-                controlPanel.updateAssimilationMenu(GameUnlocks.shouldShowAssimilationUi(colony.getDynasty()));
+                Engine eng = frame.getEngine();
+                controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)
+                        || (eng != null && eng.isInfiniteResearch()));
+                controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)
+                        || (eng != null && eng.isInstantBuildings()));
+                controlPanel.updateAssimilationMenu(GameUnlocks.shouldShowAssimilationUi(colony.getDynasty())
+                        || (eng != null && eng.isAssimilateAll()));
                 controlPanel.updateSynergyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_ABILITY));
                 controlPanel.updateDynastyMenu(true);

@@ -7,6 +7,8 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -18,6 +20,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -36,11 +39,13 @@ import java.util.Map;
 
 public class MapDialog extends ZeroDialog {
 
-    private final World world;
+    private final Engine engine;
+    private World world;
     private final HexMapPanel mapPanel;
     private final LegendPanel legendPanel;
     private final JButton homeButton;
     private final JButton layersButton;
+    private final JButton conquerButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
@@ -51,8 +56,9 @@ public class MapDialog extends ZeroDialog {
     private boolean showTunnels = true;
     private boolean showBattles = true;
 
-    public MapDialog(JFrame owner, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
+    public MapDialog(JFrame owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
         super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.MAP_DIALOG_SIZE);
+        this.engine = engine;
         this.world = world;
         this.onHexChange = onHexChange;
         this.onOpenWarDialog = onOpenWarDialog;
@@ -70,6 +76,13 @@ public class MapDialog extends ZeroDialog {
         AssetStyles.styleButton(layersButton);
         layersButton.addActionListener(e -> showLayersMenu());
 
+        conquerButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY));
+        conquerButton.setFocusable(false);
+        AssetStyles.styleButton(conquerButton);
+        conquerButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_TT));
+        conquerButton.addActionListener(e -> conquerActiveHex());
+        updateConquerButton();
+
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
         AssetStyles.styleButton(closeButton);
@@ -79,6 +92,7 @@ public class MapDialog extends ZeroDialog {
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(homeButton);
         bottomPanel.add(layersButton);
+        bottomPanel.add(conquerButton);
         bottomPanel.add(closeButton);
 
         add(legendPanel, BorderLayout.WEST);
@@ -86,6 +100,47 @@ public class MapDialog extends ZeroDialog {
         add(bottomPanel, BorderLayout.SOUTH);
 
         registerCloseKey(KeyEvent.VK_M);
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public void bindWorld(World world) {
+        this.world = world;
+        updateConquerButton();
+        if (mapPanel != null) {
+            mapPanel.repaint();
+        }
+        if (legendPanel != null) {
+            legendPanel.updateLegend();
+        }
+    }
+
+    private Engine resolveEngine() {
+        if (engine != null) {
+            return engine;
+        }
+        World current = world;
+        if (current != null && current.getEngine() != null) {
+            return current.getEngine();
+        }
+        return null;
+    }
+
+    private World currentWorld() {
+        Engine eng = resolveEngine();
+        if (eng != null && eng.getWorld() != null) {
+            return eng.getWorld();
+        }
+        return world;
+    }
+
+    private void syncWorldFromEngine() {
+        World current = currentWorld();
+        if (current != null) {
+            this.world = current;
+        }
     }
 
     private void showLayersMenu() {
@@ -160,15 +215,76 @@ public class MapDialog extends ZeroDialog {
     }
 
     private void travelToHomeHex() {
+        syncWorldFromEngine();
         if (world == null) return;
         Hex homeHex = world.getSpawnHex();
         if (homeHex != null) {
-            changeHex(homeHex, true);
+            changeHex(homeHex, !keepMapOpenForSandbox());
+        }
+    }
+
+    private boolean keepMapOpenForSandbox() {
+        Engine eng = resolveEngine();
+        return eng != null && eng.isEasyConquering();
+    }
+
+    private Hex selectedHex() {
+        syncWorldFromEngine();
+        return world != null ? world.getActiveHex() : null;
+    }
+
+    private void updateConquerButton() {
+        if (conquerButton == null) {
+            return;
+        }
+        Engine eng = resolveEngine();
+        boolean sandbox = eng != null && eng.isEasyConquering();
+        boolean canConquer = sandbox && SandboxCheatService.canCheatConquerHex(world, selectedHex());
+        conquerButton.setVisible(sandbox);
+        conquerButton.setEnabled(sandbox);
+        if (sandbox) {
+            conquerButton.setToolTipText(canConquer
+                    ? LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_TT)
+                    : LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_SELECT_TT));
+        }
+        if (bottomPanel != null) {
+            bottomPanel.revalidate();
+            bottomPanel.repaint();
+        }
+    }
+
+    private void conquerActiveHex() {
+        Engine eng = resolveEngine();
+        syncWorldFromEngine();
+        if (eng == null || !eng.isEasyConquering() || world == null) {
+            return;
+        }
+        Hex hex = selectedHex();
+        if (!SandboxCheatService.canCheatConquerHex(world, hex)) {
+            UiOptionPane.showMessageDialog(
+                    this,
+                    LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_SELECT_TT));
+            return;
+        }
+        if (SandboxCheatService.cheatConquerHex(eng, world, hex)) {
+            if (onHexChange != null) {
+                onHexChange.run();
+            }
+            if (mapPanel != null) {
+                mapPanel.repaint();
+            }
+            if (legendPanel != null) {
+                legendPanel.updateLegend();
+            }
+            updateConquerButton();
         }
     }
 
     private void changeHex(Hex newHex, boolean closeDialog) {
-        if (newHex == null) return;
+        syncWorldFromEngine();
+        if (newHex == null || world == null) {
+            return;
+        }
         world.changeActiveHex(newHex);
 
         if (onHexChange != null) {
@@ -179,29 +295,25 @@ public class MapDialog extends ZeroDialog {
         }
         if (closeDialog) {
             dispose();
+        } else {
+            updateConquerButton();
         }
     }
 
     private Dynasty findPlayerDynasty() {
-        if (world == null || world.getDynastys() == null) {
-            return null;
-        }
-        for (Dynasty dynasty : world.getDynastys()) {
-            if (dynasty.isPlayer()) {
-                return dynasty;
-            }
-        }
-        return null;
+        return SandboxCheatService.findPlayerDynasty(currentWorld());
     }
 
     @Override
     protected void refreshDialog() {
+        syncWorldFromEngine();
         if (mapPanel != null) {
             mapPanel.repaint();
         }
         if (legendPanel != null) {
             legendPanel.updateLegend();
         }
+        updateConquerButton();
     }
 
     public void liveUpdate() {
@@ -213,6 +325,7 @@ public class MapDialog extends ZeroDialog {
         super.refreshTheme();
         AssetStyles.styleButton(homeButton);
         AssetStyles.styleButton(layersButton);
+        AssetStyles.styleButton(conquerButton);
         AssetStyles.styleButton(closeButton);
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         if (mapPanel != null) {
@@ -557,6 +670,7 @@ public class MapDialog extends ZeroDialog {
         }
 
         public void updateLegend() {
+            syncWorldFromEngine();
             updateActiveWarsSection();
             content.removeAll();
             if (world == null || world.getHexes() == null) return;
@@ -642,7 +756,7 @@ public class MapDialog extends ZeroDialog {
                 Colony capital = d.getCapital();
                 Hex capitalHex = capital != null ? world.getHexOfColony(capital) : null;
                 if (capitalHex != null) {
-                    Runnable goToCapital = () -> changeHex(capitalHex, true);
+                    Runnable goToCapital = () -> changeHex(capitalHex, !keepMapOpenForSandbox());
                     colorSwatch.setClickAction(goToCapital, clickTooltip);
                 } else {
                     colorSwatch.clearClickAction();
@@ -658,7 +772,7 @@ public class MapDialog extends ZeroDialog {
                         @Override
                         public void mouseReleased(MouseEvent e) {
                             if (SwingUtilities.isLeftMouseButton(e)) {
-                                changeHex(capitalHex, true);
+                                changeHex(capitalHex, !keepMapOpenForSandbox());
                             }
                         }
                     });
@@ -836,6 +950,7 @@ public class MapDialog extends ZeroDialog {
 
         @Override
         public String getToolTipText(MouseEvent e) {
+            syncWorldFromEngine();
             if (world == null || world.getHexes() == null) return null;
 
             calculateHexSize();
@@ -919,6 +1034,7 @@ public class MapDialog extends ZeroDialog {
         }
 
         private void handleMouseClick(Point p) {
+            syncWorldFromEngine();
             if (world == null || world.getHexes() == null || p == null) {
                 return;
             }
@@ -939,7 +1055,7 @@ public class MapDialog extends ZeroDialog {
                 }
                 Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
                 if (poly.contains(p)) {
-                    changeHex(hex, true);
+                    changeHex(hex, !keepMapOpenForSandbox());
                     return;
                 }
             }
@@ -948,6 +1064,7 @@ public class MapDialog extends ZeroDialog {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+            syncWorldFromEngine();
             if (world == null || world.getHexes() == null) return;
 
             calculateHexSize();

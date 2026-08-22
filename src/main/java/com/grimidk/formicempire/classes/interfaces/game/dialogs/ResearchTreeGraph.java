@@ -210,6 +210,7 @@ public final class ResearchTreeGraph {
         Map<Upgrade, TriggerProgress> triggers = TriggerProgressService.indexByUpgrade(colony, engine);
         return stateFor(
                 colony,
+                engine,
                 upgrade,
                 triggers,
                 assimilationRewardIndex(),
@@ -276,17 +277,21 @@ public final class ResearchTreeGraph {
 
         if (assimilation == null && synergy == null) {
             Upgrade requirement = upgrade.getRequirement();
+            Dynasty dynasty = colony.getDynasty();
+            boolean infinite = engine != null && engine.isInfiniteResearch();
             boolean requirementIsSubtypeAssimilationReward = subtypeAssimilation != null
                     && requirement != null
                     && requirement == subtypeAssimilation.getReward();
-            if (requirement != null && !colony.hasUpgrade(requirement) && !requirementIsSubtypeAssimilationReward) {
+            if (!infinite
+                    && requirement != null
+                    && !colony.hasUpgrade(requirement)
+                    && !requirementIsSubtypeAssimilationReward) {
                 parts.add(requirement.getDisplayName());
             }
-            Dynasty dynasty = colony.getDynasty();
-            if (!upgrade.isAvailableFor(dynasty)) {
+            if (!infinite && !upgrade.isAvailableFor(dynasty)) {
                 parts.add(formatTierRequirement(upgrade.getTier()));
             }
-            if (!GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade)) {
+            if (!infinite && !GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade)) {
                 TriggerProgress progress = TriggerProgressService.find(colony, engine, upgrade);
                 if (progress != null) {
                     String metric = progress.getMetricLabel();
@@ -298,12 +303,12 @@ public final class ResearchTreeGraph {
                 }
             }
             boolean gatesMet = (requirement == null || colony.hasUpgrade(requirement))
-                    && upgrade.isAvailableFor(dynasty)
-                    && GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade)
+                    && (infinite || upgrade.isAvailableFor(dynasty))
+                    && (infinite || GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade))
                     && GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, upgrade);
-            if (gatesMet && upgrade.getCost() > 0 && colony.getResearchPoints() < upgrade.getCost()) {
+            if (!infinite && gatesMet && upgrade.getCost() > 0 && colony.getResearchPoints() < upgrade.getCost()) {
                 parts.add(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
-            } else if (parts.isEmpty() && upgrade.getCost() <= 0) {
+            } else if (!infinite && parts.isEmpty() && upgrade.getCost() <= 0) {
                 TriggerProgress progress = TriggerProgressService.find(colony, engine, upgrade);
                 if (progress != null) {
                     String metric = progress.getMetricLabel();
@@ -326,6 +331,7 @@ public final class ResearchTreeGraph {
 
     private static NodeState stateFor(
             Colony colony,
+            Engine engine,
             Upgrade upgrade,
             Map<Upgrade, TriggerProgress> triggers,
             Map<Upgrade, Assimilation> assimilations,
@@ -338,13 +344,19 @@ public final class ResearchTreeGraph {
         }
 
         Dynasty dynasty = colony.getDynasty();
-        boolean reqMet = upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement());
-        boolean extraMet = GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade);
-        boolean tierMet = upgrade.isAvailableFor(dynasty);
+        boolean infinite = engine != null && engine.isInfiniteResearch();
+        boolean reqMet = infinite
+                || upgrade.getRequirement() == null
+                || colony.hasUpgrade(upgrade.getRequirement());
+        boolean extraMet = infinite || GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade);
+        boolean tierMet = infinite || upgrade.isAvailableFor(dynasty);
         boolean subtypeAssimMet = GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, upgrade);
         boolean gatesMet = reqMet && extraMet && tierMet && subtypeAssimMet;
 
         if (gatesMet && upgrade.getCost() > 0 && colony.getResearchPoints() >= upgrade.getCost()) {
+            return NodeState.AFFORDABLE;
+        }
+        if (gatesMet && infinite && assimilations.get(upgrade) == null && synergies.get(upgrade) == null) {
             return NodeState.AFFORDABLE;
         }
 
@@ -453,7 +465,9 @@ public final class ResearchTreeGraph {
             return true;
         }
         NodeState state = stateFor(colony, engine, upgrade);
-        return state == NodeState.TRIGGER_PROGRESS || state == NodeState.SPECIAL_PROGRESS;
+        return state == NodeState.AFFORDABLE
+                || state == NodeState.TRIGGER_PROGRESS
+                || state == NodeState.SPECIAL_PROGRESS;
     }
 
     private static boolean isVisible(Upgrade upgrade, Colony colony, Map<Upgrade, NodeState> nodeStates) {
@@ -471,7 +485,9 @@ public final class ResearchTreeGraph {
             return true;
         }
         NodeState state = nodeStates.get(upgrade);
-        return state == NodeState.TRIGGER_PROGRESS || state == NodeState.SPECIAL_PROGRESS;
+        return state == NodeState.AFFORDABLE
+                || state == NodeState.TRIGGER_PROGRESS
+                || state == NodeState.SPECIAL_PROGRESS;
     }
 
     public static Result build(Colony colony, Engine engine) {
@@ -498,7 +514,7 @@ public final class ResearchTreeGraph {
             } else if (colony == null) {
                 state = NodeState.UNAVAILABLE;
             } else {
-                state = stateFor(colony, upgrade, triggers, assimilations, synergies);
+                state = stateFor(colony, engine, upgrade, triggers, assimilations, synergies);
             }
             nodeStates.put(upgrade, state);
         }

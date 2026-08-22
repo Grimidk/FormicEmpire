@@ -711,6 +711,10 @@ public final class WarProgressService {
         ColonyStarterService.shared().stabilizeConqueredColony(victor, colony);
     }
 
+    public static void cheatCaptureColony(World world, Colony colony, Dynasty victor, Dynasty loser) {
+        captureColony(world, world != null ? world.getWarService() : null, null, colony, victor, loser, true);
+    }
+
     private static Colony findBorderColonyFacing(World world, Dynasty owner, Dynasty facing) {
         Colony best = null;
         int bestDist = Integer.MAX_VALUE;

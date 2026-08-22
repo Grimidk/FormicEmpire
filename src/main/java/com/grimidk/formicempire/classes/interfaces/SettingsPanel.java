@@ -2,13 +2,14 @@ package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
-import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
-import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -23,6 +24,7 @@ public class SettingsPanel extends JPanel {
     private static final String SECTION_VIDEO = "video";
     private static final String SECTION_AUDIO = "audio";
     private static final String SECTION_ROLES = "roles";
+    private static final String SECTION_SANDBOX = "sandbox";
     private static final String[] WINDOW_SIZE_PRESETS = {
             "1000x700", "1280x720", "1366x768", "1440x900", "1600x900", "1920x1080", "2560x1440"
     };
@@ -38,20 +40,29 @@ public class SettingsPanel extends JPanel {
     private JButton videoTabButton;
     private JButton audioTabButton;
     private JButton rolesTabButton;
+    private JButton sandboxTabButton;
     private String selectedSection = SECTION_GENERAL;
     
     // --- General Tab ---
     private JComboBox<LanguageOption> languageCombo;
     private JComboBox<AutosaveOption> autosaveCombo;
-    private JCheckBox turboCheck;
     private JCheckBox arachnophobiaCheck;
     private JCheckBox pauseFocusCheck;
     private JCheckBox confirmQuitCheck;
     private JCheckBox escapeKeyGameActionsCheck;
     private JCheckBox showTooltipsCheck;
     private JCheckBox fuzzParasiteAntsCheck;
-    private JCheckBox showAuditMenuCheck;
     private JCheckBox overworldAutoRecenterCheck;
+
+    // --- Sandbox Tab ---
+    private JCheckBox turboCheck;
+    private JCheckBox showAuditMenuCheck;
+    private JCheckBox freeAbilitiesCheck;
+    private JCheckBox infiniteResearchCheck;
+    private JCheckBox instantBuildingsCheck;
+    private JCheckBox assimilateAllCheck;
+    private JCheckBox easyConqueringCheck;
+    private JCheckBox instantIntegrationCheck;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -66,7 +77,8 @@ public class SettingsPanel extends JPanel {
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel, showAuditMenuLabel;
+    private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
+    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, easyConqueringLabel, instantIntegrationLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -78,6 +90,7 @@ public class SettingsPanel extends JPanel {
     private JButton resetVideoButton;
     private JButton resetAudioButton;
     private JButton resetRolesButton;
+    private JButton resetSandboxButton;
     private boolean loadedFullScreen;
     private String loadedScreenSize;
 
@@ -125,7 +138,7 @@ public class SettingsPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
-        sectionTabs.setLayout(new java.awt.GridLayout(1, 4, -1, 0));
+        sectionTabs.setLayout(new java.awt.GridLayout(1, 5, -1, 0));
         sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
         sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
 
@@ -135,10 +148,12 @@ public class SettingsPanel extends JPanel {
         videoTabButton = createSectionTab(SECTION_VIDEO);
         audioTabButton = createSectionTab(SECTION_AUDIO);
         rolesTabButton = createSectionTab(SECTION_ROLES);
+        sandboxTabButton = createSectionTab(SECTION_SANDBOX);
         sectionTabs.add(generalTabButton);
         sectionTabs.add(videoTabButton);
         sectionTabs.add(audioTabButton);
         sectionTabs.add(rolesTabButton);
+        sectionTabs.add(sandboxTabButton);
 
         JPanel body = new JPanel(new BorderLayout());
         body.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -195,6 +210,7 @@ public class SettingsPanel extends JPanel {
         sectionCards.add(createVideoTab(), SECTION_VIDEO);
         sectionCards.add(createAudioTab(), SECTION_AUDIO);
         sectionCards.add(createRolesTab(), SECTION_ROLES);
+        sectionCards.add(createSandboxTab(), SECTION_SANDBOX);
     }
 
     private JButton createSectionTab(String sectionId) {
@@ -212,6 +228,7 @@ public class SettingsPanel extends JPanel {
         styleSectionTab(videoTabButton, SECTION_VIDEO.equals(sectionId));
         styleSectionTab(audioTabButton, SECTION_AUDIO.equals(sectionId));
         styleSectionTab(rolesTabButton, SECTION_ROLES.equals(sectionId));
+        styleSectionTab(sandboxTabButton, SECTION_SANDBOX.equals(sectionId));
     }
 
     private void styleSectionTab(JButton button, boolean selected) {
@@ -253,19 +270,8 @@ public class SettingsPanel extends JPanel {
         styleComboBox(autosaveCombo);
         c.gridx = 1; panel.add(autosaveCombo, c);
         
-        // Turbo Mode
-        c.gridy = 2; c.gridx = 0; 
-        turboLabel = new JLabel();
-        turboLabel.setFont(AssetStyles.FONT_NORMAL);
-        turboLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(turboLabel, c);
-        
-        turboCheck = new JCheckBox();
-        styleCheckBox(turboCheck);
-        c.gridx = 1; panel.add(turboCheck, c);
-        
         // Arachnophobia
-        c.gridy = 3; c.gridx = 0;
+        c.gridy = 2; c.gridx = 0;
         arachLabel = new JLabel();
         arachLabel.setFont(AssetStyles.FONT_NORMAL);
         arachLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -276,7 +282,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(arachnophobiaCheck, c);
         
         // Pause on Focus Loss
-        c.gridy = 4; c.gridx = 0;
+        c.gridy = 3; c.gridx = 0;
         pauseFocusLabel = new JLabel();
         pauseFocusLabel.setFont(AssetStyles.FONT_NORMAL);
         pauseFocusLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -287,7 +293,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(pauseFocusCheck, c);
         
         // Confirm on Quit
-        c.gridy = 5; c.gridx = 0;
+        c.gridy = 4; c.gridx = 0;
         confirmQuitLabel = new JLabel();
         confirmQuitLabel.setFont(AssetStyles.FONT_NORMAL);
         confirmQuitLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -298,7 +304,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(confirmQuitCheck, c);
 
         // Escape key: close dialogs / open menu
-        c.gridy = 6; c.gridx = 0;
+        c.gridy = 5; c.gridx = 0;
         escapeKeyGameActionsLabel = new JLabel();
         escapeKeyGameActionsLabel.setFont(AssetStyles.FONT_NORMAL);
         escapeKeyGameActionsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -309,7 +315,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(escapeKeyGameActionsCheck, c);
         
         // Show Tooltips
-        c.gridy = 7; c.gridx = 0;
+        c.gridy = 6; c.gridx = 0;
         tooltipsLabel = new JLabel();
         tooltipsLabel.setFont(AssetStyles.FONT_NORMAL);
         tooltipsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -320,7 +326,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(showTooltipsCheck, c);
         
         // Overworld auto-recenter
-        c.gridy = 8; c.gridx = 0;
+        c.gridy = 7; c.gridx = 0;
         overworldAutoRecenterLabel = new JLabel();
         overworldAutoRecenterLabel.setFont(AssetStyles.FONT_NORMAL);
         overworldAutoRecenterLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -331,7 +337,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(overworldAutoRecenterCheck, c);
 
         // Fuzz parasite ants
-        c.gridy = 9; c.gridx = 0;
+        c.gridy = 8; c.gridx = 0;
         fuzzParasiteAntsLabel = new JLabel();
         fuzzParasiteAntsLabel.setFont(AssetStyles.FONT_NORMAL);
         fuzzParasiteAntsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -341,17 +347,7 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(fuzzParasiteAntsCheck);
         c.gridx = 1; panel.add(fuzzParasiteAntsCheck, c);
 
-        c.gridy = 10; c.gridx = 0;
-        showAuditMenuLabel = new JLabel();
-        showAuditMenuLabel.setFont(AssetStyles.FONT_NORMAL);
-        showAuditMenuLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(showAuditMenuLabel, c);
-
-        showAuditMenuCheck = new JCheckBox();
-        styleCheckBox(showAuditMenuCheck);
-        c.gridx = 1; panel.add(showAuditMenuCheck, c);
-
-        c.gridy = 11;
+        c.gridy = 9;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -362,6 +358,133 @@ public class SettingsPanel extends JPanel {
         setupNavigation(resetGeneralButton);
         panel.add(resetGeneralButton, c);
         
+        return panel;
+    }
+
+    private JPanel createSandboxTab() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(5, 15, 5, 15);
+        c.anchor = GridBagConstraints.WEST;
+
+        c.gridy = 0;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        sandboxNoteLabel = new JLabel();
+        sandboxNoteLabel.setFont(AssetStyles.FONT_NORMAL);
+        sandboxNoteLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(sandboxNoteLabel, c);
+
+        c.gridwidth = 1;
+        c.gridy = 1;
+        c.gridx = 0;
+        turboLabel = new JLabel();
+        turboLabel.setFont(AssetStyles.FONT_NORMAL);
+        turboLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(turboLabel, c);
+
+        turboCheck = new JCheckBox();
+        styleCheckBox(turboCheck);
+        c.gridx = 1;
+        panel.add(turboCheck, c);
+
+        c.gridy = 2;
+        c.gridx = 0;
+        showAuditMenuLabel = new JLabel();
+        showAuditMenuLabel.setFont(AssetStyles.FONT_NORMAL);
+        showAuditMenuLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(showAuditMenuLabel, c);
+
+        showAuditMenuCheck = new JCheckBox();
+        styleCheckBox(showAuditMenuCheck);
+        c.gridx = 1;
+        panel.add(showAuditMenuCheck, c);
+
+        c.gridy = 3;
+        c.gridx = 0;
+        freeAbilitiesLabel = new JLabel();
+        freeAbilitiesLabel.setFont(AssetStyles.FONT_NORMAL);
+        freeAbilitiesLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(freeAbilitiesLabel, c);
+
+        freeAbilitiesCheck = new JCheckBox();
+        styleCheckBox(freeAbilitiesCheck);
+        c.gridx = 1;
+        panel.add(freeAbilitiesCheck, c);
+
+        c.gridy = 4;
+        c.gridx = 0;
+        infiniteResearchLabel = new JLabel();
+        infiniteResearchLabel.setFont(AssetStyles.FONT_NORMAL);
+        infiniteResearchLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(infiniteResearchLabel, c);
+
+        infiniteResearchCheck = new JCheckBox();
+        styleCheckBox(infiniteResearchCheck);
+        c.gridx = 1;
+        panel.add(infiniteResearchCheck, c);
+
+        c.gridy = 5;
+        c.gridx = 0;
+        instantBuildingsLabel = new JLabel();
+        instantBuildingsLabel.setFont(AssetStyles.FONT_NORMAL);
+        instantBuildingsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(instantBuildingsLabel, c);
+
+        instantBuildingsCheck = new JCheckBox();
+        styleCheckBox(instantBuildingsCheck);
+        c.gridx = 1;
+        panel.add(instantBuildingsCheck, c);
+
+        c.gridy = 6;
+        c.gridx = 0;
+        assimilateAllLabel = new JLabel();
+        assimilateAllLabel.setFont(AssetStyles.FONT_NORMAL);
+        assimilateAllLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(assimilateAllLabel, c);
+
+        assimilateAllCheck = new JCheckBox();
+        styleCheckBox(assimilateAllCheck);
+        c.gridx = 1;
+        panel.add(assimilateAllCheck, c);
+
+        c.gridy = 7;
+        c.gridx = 0;
+        easyConqueringLabel = new JLabel();
+        easyConqueringLabel.setFont(AssetStyles.FONT_NORMAL);
+        easyConqueringLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(easyConqueringLabel, c);
+
+        easyConqueringCheck = new JCheckBox();
+        styleCheckBox(easyConqueringCheck);
+        c.gridx = 1;
+        panel.add(easyConqueringCheck, c);
+
+        c.gridy = 8;
+        c.gridx = 0;
+        instantIntegrationLabel = new JLabel();
+        instantIntegrationLabel.setFont(AssetStyles.FONT_NORMAL);
+        instantIntegrationLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(instantIntegrationLabel, c);
+
+        instantIntegrationCheck = new JCheckBox();
+        styleCheckBox(instantIntegrationCheck);
+        c.gridx = 1;
+        panel.add(instantIntegrationCheck, c);
+
+        c.gridy = 9;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(16, 15, 5, 15);
+        resetSandboxButton = new JButton();
+        styleButton(resetSandboxButton);
+        resetSandboxButton.addActionListener(e -> resetSandboxTabToDefaults());
+        setupNavigation(resetSandboxButton);
+        panel.add(resetSandboxButton, c);
+
         return panel;
     }
 
@@ -528,7 +651,6 @@ public class SettingsPanel extends JPanel {
     private void resetGeneralTabToDefaults() {
         selectLanguageByCode("en");
         selectAutosaveByValue(1);
-        turboCheck.setSelected(false);
         arachnophobiaCheck.setSelected(false);
         pauseFocusCheck.setSelected(true);
         confirmQuitCheck.setSelected(true);
@@ -536,7 +658,17 @@ public class SettingsPanel extends JPanel {
         showTooltipsCheck.setSelected(true);
         overworldAutoRecenterCheck.setSelected(true);
         fuzzParasiteAntsCheck.setSelected(true);
+    }
+
+    private void resetSandboxTabToDefaults() {
+        turboCheck.setSelected(false);
         showAuditMenuCheck.setSelected(false);
+        freeAbilitiesCheck.setSelected(false);
+        infiniteResearchCheck.setSelected(false);
+        instantBuildingsCheck.setSelected(false);
+        assimilateAllCheck.setSelected(false);
+        easyConqueringCheck.setSelected(false);
+        instantIntegrationCheck.setSelected(false);
     }
 
     private void resetVideoTabToDefaults() {
@@ -800,12 +932,12 @@ public class SettingsPanel extends JPanel {
             videoTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
             audioTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
             rolesTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
+            sandboxTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_SANDBOX));
             showSection(selectedSection);
         }
         
         langLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
         autoLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
-        turboLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
         arachLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ARACHNOPHOBIA));
         pauseFocusLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_PAUSE_FOCUS));
         confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
@@ -813,7 +945,17 @@ public class SettingsPanel extends JPanel {
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
         overworldAutoRecenterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER));
         fuzzParasiteAntsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS));
+
+        sandboxNoteLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_NOTE));
+        turboLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
         showAuditMenuLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_AUDIT_MENU));
+        String starPrefix = LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_STAR_PREFIX);
+        freeAbilitiesLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_FREE_ABILITIES));
+        infiniteResearchLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INFINITE_RESEARCH));
+        instantBuildingsLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_BUILDINGS));
+        assimilateAllLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_ASSIMILATE_ALL));
+        easyConqueringLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_EASY_CONQUERING));
+        instantIntegrationLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_INTEGRATION));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -840,6 +982,7 @@ public class SettingsPanel extends JPanel {
         resetVideoButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetAudioButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetRolesButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
+        resetSandboxButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         
         // Refresh autosave combo options
         int currentFreq = (autosaveCombo.getSelectedItem() != null) ? ((AutosaveOption)autosaveCombo.getSelectedItem()).value : 0;
@@ -879,7 +1022,6 @@ public class SettingsPanel extends JPanel {
     private void applySettingTooltips() {
         setSettingTooltip(langLabel, languageCombo, LanguageStrings.SETTINGS_LANGUAGE_TT);
         setSettingTooltip(autoLabel, autosaveCombo, LanguageStrings.SETTINGS_AUTOSAVE_TT);
-        setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
         setSettingTooltip(arachLabel, arachnophobiaCheck, LanguageStrings.SETTINGS_ARACHNOPHOBIA_TT);
         setSettingTooltip(pauseFocusLabel, pauseFocusCheck, LanguageStrings.SETTINGS_PAUSE_FOCUS_TT);
         setSettingTooltip(confirmQuitLabel, confirmQuitCheck, LanguageStrings.SETTINGS_CONFIRM_QUIT_TT);
@@ -887,7 +1029,14 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(tooltipsLabel, showTooltipsCheck, LanguageStrings.SETTINGS_SHOW_TOOLTIPS_TT);
         setSettingTooltip(overworldAutoRecenterLabel, overworldAutoRecenterCheck, LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER_TT);
         setSettingTooltip(fuzzParasiteAntsLabel, fuzzParasiteAntsCheck, LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS_TT);
+        setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
         setSettingTooltip(showAuditMenuLabel, showAuditMenuCheck, LanguageStrings.SETTINGS_SHOW_AUDIT_MENU_TT);
+        setSettingTooltip(freeAbilitiesLabel, freeAbilitiesCheck, LanguageStrings.SETTINGS_FREE_ABILITIES_TT);
+        setSettingTooltip(infiniteResearchLabel, infiniteResearchCheck, LanguageStrings.SETTINGS_INFINITE_RESEARCH_TT);
+        setSettingTooltip(instantBuildingsLabel, instantBuildingsCheck, LanguageStrings.SETTINGS_INSTANT_BUILDINGS_TT);
+        setSettingTooltip(assimilateAllLabel, assimilateAllCheck, LanguageStrings.SETTINGS_ASSIMILATE_ALL_TT);
+        setSettingTooltip(easyConqueringLabel, easyConqueringCheck, LanguageStrings.SETTINGS_EASY_CONQUERING_TT);
+        setSettingTooltip(instantIntegrationLabel, instantIntegrationCheck, LanguageStrings.SETTINGS_INSTANT_INTEGRATION_TT);
         setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
         setSettingTooltip(fsLabel, fullScreenCheck, LanguageStrings.SETTINGS_FULLSCREEN_TT);
         setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
@@ -926,7 +1075,6 @@ public class SettingsPanel extends JPanel {
         selectLanguageByCode(engine.getLanguage());
         selectAutosaveByValue(engine.getAutosaveFrequency());
         
-        turboCheck.setSelected(engine.isAllowTurboMode());
         arachnophobiaCheck.setSelected(engine.isArachnophobiaMode());
         pauseFocusCheck.setSelected(engine.isPauseOnFocusLoss());
         confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
@@ -934,7 +1082,15 @@ public class SettingsPanel extends JPanel {
         showTooltipsCheck.setSelected(engine.isShowTooltips());
         overworldAutoRecenterCheck.setSelected(engine.isOverworldAutoRecenter());
         fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
+
+        turboCheck.setSelected(engine.isAllowTurboMode());
         showAuditMenuCheck.setSelected(engine.isShowAuditMenu());
+        freeAbilitiesCheck.setSelected(engine.isFreeAbilities());
+        infiniteResearchCheck.setSelected(engine.isInfiniteResearch());
+        instantBuildingsCheck.setSelected(engine.isInstantBuildings());
+        assimilateAllCheck.setSelected(engine.isAssimilateAll());
+        easyConqueringCheck.setSelected(engine.isEasyConquering());
+        instantIntegrationCheck.setSelected(engine.isInstantIntegration());
         
         refreshScreenSizeCombo(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
@@ -1036,7 +1192,6 @@ public class SettingsPanel extends JPanel {
             engine.setAutosaveFrequency(selectedFreq.value);
         }
         
-        engine.setAllowTurboMode(turboCheck.isSelected());
         engine.setArachnophobiaMode(arachnophobiaCheck.isSelected());
         engine.setPauseOnFocusLoss(pauseFocusCheck.isSelected());
         engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
@@ -1044,7 +1199,20 @@ public class SettingsPanel extends JPanel {
         engine.setShowTooltips(showTooltipsCheck.isSelected());
         engine.setOverworldAutoRecenter(overworldAutoRecenterCheck.isSelected());
         engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
+
+        engine.setAllowTurboMode(turboCheck.isSelected());
         engine.setShowAuditMenu(showAuditMenuCheck.isSelected());
+        engine.setFreeAbilities(freeAbilitiesCheck.isSelected());
+        engine.setInfiniteResearch(infiniteResearchCheck.isSelected());
+        engine.setInstantBuildings(instantBuildingsCheck.isSelected());
+        engine.setAssimilateAll(assimilateAllCheck.isSelected());
+        engine.setEasyConquering(easyConqueringCheck.isSelected());
+        engine.setInstantIntegration(instantIntegrationCheck.isSelected());
+        engine.applySandboxTaintToActiveWorld();
+        SandboxCheatService.applyEnabledCheats(engine);
+        if (frame.getGamePanel() != null) {
+            frame.getGamePanel().refreshAllGUIData();
+        }
         
         engine.setScreenSize(resolveSelectedScreenSize());
         engine.setFullScreen(fullScreenCheck.isSelected());
@@ -1115,6 +1283,7 @@ public class SettingsPanel extends JPanel {
         styleButton(resetVideoButton);
         styleButton(resetAudioButton);
         styleButton(resetRolesButton);
+        styleButton(resetSandboxButton);
         AssetStyles.applyThemeToContainer(this);
     }
 

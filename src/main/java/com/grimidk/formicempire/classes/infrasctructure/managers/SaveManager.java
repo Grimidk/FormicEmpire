@@ -334,6 +334,14 @@ public class SaveManager {
         save.setPlayTime(computePlayTime(w));
         save.setWorldRadius(w.getWorldRadius());
         save.setContinentCoreRadius(w.getContinentCoreRadius());
+        if (engine != null && engine.hasAchievementTaintingSandbox()) {
+            w.disableAchievements();
+        }
+        if (!w.allowsAchievements()) {
+            save.disableAchievements();
+        } else {
+            save.setAllowsAchievements(true);
+        }
 
         if (w.getDynastys() != null) {
             for (Dynasty dynasty : w.getDynastys()) {
@@ -666,6 +674,7 @@ public class SaveManager {
         writeJsonLine(w, "continentCoreRadius", s.getContinentCoreRadius(), false);
         writeJsonLine(w, "playerDynastyTitleId", s.resolvePlayerDynastyTitleId(), false);
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
+        writeJsonLine(w, "allowsAchievements", s.allowsAchievements(), false);
         
         // - Root Summary Data - 
         writeJsonLine(w, "colonyId", s.getColonyId(), false);
@@ -893,6 +902,9 @@ public class SaveManager {
         s.setContinentCoreRadius(Integer.parseInt(rootMap.getOrDefault("continentCoreRadius", "0")));
         s.setPlayerDynastyTitleId(Integer.parseInt(rootMap.getOrDefault("playerDynastyTitleId", "0")));
         s.setPlayerDynastyTitleKey(rootMap.getOrDefault("playerDynastyTitleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY));
+        if (!Boolean.parseBoolean(rootMap.getOrDefault("allowsAchievements", "true"))) {
+            s.disableAchievements();
+        }
         
         // --- Populate Root Summary Data ---
         s.setColonyId(Integer.parseInt(rootMap.getOrDefault("colonyId", "0")));
@@ -1854,6 +1866,12 @@ public class SaveManager {
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
             writeJsonLine(w, "darkMode", engine.isDarkMode(), false);
             writeJsonLine(w, "frameRateCap", engine.getFrameRateCap(), false);
+            writeJsonLine(w, "freeAbilities", engine.isFreeAbilities(), false);
+            writeJsonLine(w, "infiniteResearch", engine.isInfiniteResearch(), false);
+            writeJsonLine(w, "instantBuildings", engine.isInstantBuildings(), false);
+            writeJsonLine(w, "assimilateAll", engine.isAssimilateAll(), false);
+            writeJsonLine(w, "easyConquering", engine.isEasyConquering(), false);
+            writeJsonLine(w, "instantIntegration", engine.isInstantIntegration(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
@@ -1957,6 +1975,12 @@ public class SaveManager {
                     String.valueOf(engine.isOverworldAutoRecenter()))));
             engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));
             engine.setFrameRateCap(Integer.parseInt(m.getOrDefault("frameRateCap", String.valueOf(engine.getFrameRateCap()))));
+            engine.setFreeAbilities(Boolean.parseBoolean(m.getOrDefault("freeAbilities", "false")));
+            engine.setInfiniteResearch(Boolean.parseBoolean(m.getOrDefault("infiniteResearch", "false")));
+            engine.setInstantBuildings(Boolean.parseBoolean(m.getOrDefault("instantBuildings", "false")));
+            engine.setAssimilateAll(Boolean.parseBoolean(m.getOrDefault("assimilateAll", "false")));
+            engine.setEasyConquering(Boolean.parseBoolean(m.getOrDefault("easyConquering", "false")));
+            engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),

@@ -54,6 +54,7 @@ public class Savefile implements Serializable {
     private List<SavedTrade> trades;
     private List<SavedWar> wars;
     private List<SavedWorldHistoryEvent> worldHistory;
+    private boolean allowsAchievements = true;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -424,4 +425,17 @@ public class Savefile implements Serializable {
 
     public List<SavedWorldHistoryEvent> getWorldHistory() { return worldHistory; }
     public void setWorldHistory(List<SavedWorldHistoryEvent> worldHistory) { this.worldHistory = worldHistory; }
+
+    public boolean allowsAchievements() { return allowsAchievements; }
+
+    public void setAllowsAchievements(boolean allowsAchievements) {
+        if (!this.allowsAchievements) {
+            return;
+        }
+        this.allowsAchievements = allowsAchievements;
+    }
+
+    public void disableAchievements() {
+        this.allowsAchievements = false;
+    }
 }

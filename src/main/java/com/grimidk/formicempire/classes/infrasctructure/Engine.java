@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.audio.MusicService;
 import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
@@ -64,6 +65,12 @@ public class Engine extends Thread {
     private boolean overworldAutoRecenter = true;
     private boolean darkMode = false;
     private int frameRateCap = 0;
+    private boolean freeAbilities = false;
+    private boolean infiniteResearch = false;
+    private boolean instantBuildings = false;
+    private boolean assimilateAll = false;
+    private boolean easyConquering = false;
+    private boolean instantIntegration = false;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
     private int defaultRoleSoldier = GameConstants.ROLE_HUNTER.getId();
     private int defaultRoleMajor = GameConstants.ROLE_CRANE.getId();
@@ -320,6 +327,7 @@ public class Engine extends Thread {
         this.setWorld(world);
 
         this.loadFile(savefile);
+        SandboxCheatService.applyEnabledCheats(this);
         
         try {
             if (savefile != null && this.world != null) {
@@ -525,6 +533,69 @@ public class Engine extends Thread {
 
     public void setShowAuditMenu(boolean showAuditMenu) {
         this.showAuditMenu = showAuditMenu;
+    }
+
+    public boolean isFreeAbilities() {
+        return freeAbilities;
+    }
+
+    public void setFreeAbilities(boolean freeAbilities) {
+        this.freeAbilities = freeAbilities;
+    }
+
+    public boolean isInfiniteResearch() {
+        return infiniteResearch;
+    }
+
+    public void setInfiniteResearch(boolean infiniteResearch) {
+        this.infiniteResearch = infiniteResearch;
+    }
+
+    public boolean isInstantBuildings() {
+        return instantBuildings;
+    }
+
+    public void setInstantBuildings(boolean instantBuildings) {
+        this.instantBuildings = instantBuildings;
+    }
+
+    public boolean isAssimilateAll() {
+        return assimilateAll;
+    }
+
+    public void setAssimilateAll(boolean assimilateAll) {
+        this.assimilateAll = assimilateAll;
+    }
+
+    public boolean isEasyConquering() {
+        return easyConquering;
+    }
+
+    public void setEasyConquering(boolean easyConquering) {
+        this.easyConquering = easyConquering;
+    }
+
+    public boolean isInstantIntegration() {
+        return instantIntegration;
+    }
+
+    public void setInstantIntegration(boolean instantIntegration) {
+        this.instantIntegration = instantIntegration;
+    }
+
+    public boolean hasAchievementTaintingSandbox() {
+        return freeAbilities
+                || infiniteResearch
+                || instantBuildings
+                || assimilateAll
+                || easyConquering
+                || instantIntegration;
+    }
+
+    public void applySandboxTaintToActiveWorld() {
+        if (world != null && hasAchievementTaintingSandbox()) {
+            world.disableAchievements();
+        }
     }
 
     public boolean isOverworldAutoRecenter() {

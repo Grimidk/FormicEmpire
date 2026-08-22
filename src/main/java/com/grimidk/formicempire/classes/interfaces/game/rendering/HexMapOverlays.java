@@ -4,6 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.Line2D;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +26,6 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 public final class HexMapOverlays {
     private static final float TRADE_LINE_STROKE = 2f;
-    private static final float TUNNEL_RAIL_STROKE = 2f;
     private static final float[] TUNNEL_DASH = {4f, 3f};
     private static final double TUNNEL_HALF_SPAN_FACTOR = 0.22;
     private static final double TUNNEL_RAIL_GAP_FACTOR = 0.16;
@@ -127,6 +128,8 @@ public final class HexMapOverlays {
         if (g2d == null || world == null || mesh == null || world.getDynastys() == null) {
             return;
         }
+        Object previousAa = g2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         double layoutSize = mesh.layoutSize();
         Set<Long> drawn = new HashSet<>();
 
@@ -134,7 +137,7 @@ public final class HexMapOverlays {
             if (dynasty == null || dynasty.getTunnels() == null) {
                 continue;
             }
-            Color lineColor = dynastyColor(dynasty, AssetStyles.FONT_COLOR);
+            Color lineColor = HexMapGeometry.dynastyPaintColor(dynasty, AssetStyles.BORDER_COLOR);
             for (Tunnel tunnel : dynasty.getTunnels()) {
                 if (tunnel == null) {
                     continue;
@@ -156,6 +159,7 @@ public final class HexMapOverlays {
                 paintTunnelBridge(g2d, faceA, faceB, layoutSize, lineColor, tunnel.isComplete());
             }
         }
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, previousAa);
     }
 
     public static void paintBattles(Graphics2D g2d, World world, HexGridMesh mesh) {
@@ -241,9 +245,9 @@ public final class HexMapOverlays {
         double railGap = layoutSize * TUNNEL_RAIL_GAP_FACTOR;
 
         BasicStroke stroke = complete
-                ? new BasicStroke(TUNNEL_RAIL_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+                ? new BasicStroke(HexGridMesh.DIVIDER_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
                 : new BasicStroke(
-                        TUNNEL_RAIL_STROKE,
+                        HexGridMesh.DIVIDER_STROKE,
                         BasicStroke.CAP_BUTT,
                         BasicStroke.JOIN_MITER,
                         10f,
@@ -255,11 +259,11 @@ public final class HexMapOverlays {
         for (int side = -1; side <= 1; side += 2) {
             double ox = bx * railGap * side;
             double oy = by * railGap * side;
-            g2d.drawLine(
-                    (int) Math.round(midX + ox - ux * halfSpan),
-                    (int) Math.round(midY + oy - uy * halfSpan),
-                    (int) Math.round(midX + ox + ux * halfSpan),
-                    (int) Math.round(midY + oy + uy * halfSpan));
+            g2d.draw(new Line2D.Double(
+                    midX + ox - ux * halfSpan,
+                    midY + oy - uy * halfSpan,
+                    midX + ox + ux * halfSpan,
+                    midY + oy + uy * halfSpan));
         }
     }
 
@@ -328,10 +332,7 @@ public final class HexMapOverlays {
     }
 
     private static Color dynastyColor(Dynasty dynasty, Color fallback) {
-        if (dynasty != null && dynasty.getColor() != null) {
-            return dynasty.getColor();
-        }
-        return fallback;
+        return HexMapGeometry.dynastyPaintColor(dynasty, fallback);
     }
 
     private static double distanceSquared(double x, double y, double cx, double cy) {

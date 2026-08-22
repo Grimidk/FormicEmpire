@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.Polygon;
 
@@ -78,5 +79,12 @@ public final class HexMapGeometry {
             return null;
         }
         return hex.getColony().getDynasty();
+    }
+
+    public static Color dynastyPaintColor(Dynasty dynasty, Color fallback) {
+        if (dynasty != null && dynasty.getColor() != null) {
+            return dynasty.getColor();
+        }
+        return fallback;
     }
 }
