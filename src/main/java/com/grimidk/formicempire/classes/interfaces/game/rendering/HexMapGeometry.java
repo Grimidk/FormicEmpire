@@ -87,4 +87,61 @@ public final class HexMapGeometry {
         }
         return fallback;
     }
+
+    public static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    public static double hexesAcross(int worldRadius) {
+        return (Math.max(0, worldRadius) * 2 + 1) + 1.5;
+    }
+
+    public static double fittedHexSize(
+            int worldRadius,
+            int panelW,
+            int panelH,
+            double minSize,
+            double maxSize) {
+        if (panelW <= 0 || panelH <= 0) {
+            return minSize;
+        }
+        double hexes = hexesAcross(worldRadius);
+        double maxRadiusW = panelW / (hexes * Math.sqrt(3.0));
+        double maxRadiusH = panelH / (hexes * 1.5);
+        double size = Math.min(maxRadiusW, maxRadiusH);
+        size = Math.min(size, maxSize);
+        if (size < minSize) {
+            size = minSize;
+        }
+        return size;
+    }
+
+    public static double worldWidth(int worldRadius, double hexSize) {
+        return hexesAcross(worldRadius) * Math.sqrt(3.0) * hexSize;
+    }
+
+    public static double worldHeight(int worldRadius, double hexSize) {
+        return hexesAcross(worldRadius) * 1.5 * hexSize;
+    }
+
+    public static double nextZoom(double zoom, double factor, double min, double max) {
+        if (!(factor > 0) || Double.isNaN(factor) || Double.isInfinite(factor)) {
+            return clamp(zoom, min, max);
+        }
+        return clamp(zoom * factor, min, max);
+    }
+
+    public static double panAfterZoom(double pan, double mouseFromCenter, double oldSize, double newSize) {
+        if (!(oldSize > 0) || !(newSize > 0)) {
+            return pan;
+        }
+        double scale = newSize / oldSize;
+        return mouseFromCenter * (1.0 - scale) + pan * scale;
+    }
+
+    public static double clampPan(double pan, double worldSpan, double panelSpan) {
+        double extra = Math.max(0.0, worldSpan - panelSpan);
+        double max = extra / 2.0;
+        return clamp(pan, -max, max);
+    }
 }

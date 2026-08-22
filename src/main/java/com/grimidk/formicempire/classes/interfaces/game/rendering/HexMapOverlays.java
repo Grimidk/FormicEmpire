@@ -14,7 +14,6 @@ import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
@@ -44,7 +43,6 @@ public final class HexMapOverlays {
         }
         double layoutSize = mesh.layoutSize();
         int dotRadius = Math.max(2, (int) Math.round(layoutSize * 0.12));
-        int badgeSize = Math.max(8, (int) Math.round(layoutSize * 0.4));
         BasicStroke stroke = new BasicStroke(TRADE_LINE_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
         g2d.setStroke(stroke);
 
@@ -112,15 +110,6 @@ public final class HexMapOverlays {
                     (int) Math.round(dotY - dotRadius),
                     dotRadius * 2,
                     dotRadius * 2);
-
-            if (tradeUsesTunnel(trade, origin, destination)) {
-                drawCenteredIcon(
-                        g2d,
-                        GameConstants.METHOD_TUNNEL.getIcon(),
-                        (originFace.centerX + destFace.centerX) * 0.5,
-                        (originFace.centerY + destFace.centerY) * 0.5,
-                        badgeSize);
-            }
         }
     }
 
@@ -317,18 +306,6 @@ public final class HexMapOverlays {
         HexGridMesh.Face closer = closerFace(faceA, faceB, mapCenterX, mapCenterY);
         Dynasty dynasty = closer == faceA ? dynastyA : dynastyB;
         return dynastyColor(dynasty, fallback);
-    }
-
-    private static boolean tradeUsesTunnel(Trade trade, Hex origin, Hex destination) {
-        if (trade.getMethod() == GameConstants.METHOD_TUNNEL) {
-            return true;
-        }
-        Colony originColony = origin.getColony();
-        if (originColony == null || originColony.getDynasty() == null) {
-            return false;
-        }
-        Tunnel tunnel = originColony.getDynasty().getTunnelBetween(origin, destination);
-        return tunnel != null && tunnel.isComplete();
     }
 
     private static Color dynastyColor(Dynasty dynasty, Color fallback) {

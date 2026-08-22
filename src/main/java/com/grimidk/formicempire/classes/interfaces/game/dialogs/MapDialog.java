@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexGridMesh;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapGeometry;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapOverlays;
@@ -25,9 +26,12 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
@@ -44,6 +48,8 @@ public class MapDialog extends ZeroDialog {
     private final HexMapPanel mapPanel;
     private final LegendPanel legendPanel;
     private final JButton homeButton;
+    private final JButton zoomOutButton;
+    private final JButton zoomInButton;
     private final JButton layersButton;
     private final JButton conquerButton;
     private final JButton closeButton;
@@ -71,6 +77,18 @@ public class MapDialog extends ZeroDialog {
         AssetStyles.styleButton(homeButton);
         homeButton.addActionListener(e -> travelToHomeHex());
 
+        zoomOutButton = new JButton("\u2212");
+        zoomOutButton.setFocusable(false);
+        AssetStyles.styleButton(zoomOutButton);
+        zoomOutButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_OUT_TT));
+        zoomOutButton.addActionListener(e -> mapPanel.zoomBy(-1.0));
+
+        zoomInButton = new JButton("+");
+        zoomInButton.setFocusable(false);
+        AssetStyles.styleButton(zoomInButton);
+        zoomInButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_IN_TT));
+        zoomInButton.addActionListener(e -> mapPanel.zoomBy(1.0));
+
         layersButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_LAYERS));
         layersButton.setFocusable(false);
         AssetStyles.styleButton(layersButton);
@@ -91,6 +109,8 @@ public class MapDialog extends ZeroDialog {
         bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(homeButton);
+        bottomPanel.add(zoomOutButton);
+        bottomPanel.add(zoomInButton);
         bottomPanel.add(layersButton);
         bottomPanel.add(conquerButton);
         bottomPanel.add(closeButton);
@@ -100,6 +120,7 @@ public class MapDialog extends ZeroDialog {
         add(bottomPanel, BorderLayout.SOUTH);
 
         registerCloseKey(KeyEvent.VK_M);
+        updateZoomButtons();
     }
 
     public World getWorld() {
@@ -219,6 +240,7 @@ public class MapDialog extends ZeroDialog {
         if (world == null) return;
         Hex homeHex = world.getSpawnHex();
         if (homeHex != null) {
+            mapPanel.centerOn(homeHex);
             changeHex(homeHex, !keepMapOpenForSandbox());
         }
     }
@@ -251,6 +273,14 @@ public class MapDialog extends ZeroDialog {
             bottomPanel.revalidate();
             bottomPanel.repaint();
         }
+    }
+
+    private void updateZoomButtons() {
+        if (zoomInButton == null || zoomOutButton == null || mapPanel == null) {
+            return;
+        }
+        zoomOutButton.setEnabled(mapPanel.canZoomOut());
+        zoomInButton.setEnabled(mapPanel.canZoomIn());
     }
 
     private void conquerActiveHex() {
@@ -314,6 +344,13 @@ public class MapDialog extends ZeroDialog {
             legendPanel.updateLegend();
         }
         updateConquerButton();
+        if (zoomOutButton != null) {
+            zoomOutButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_OUT_TT));
+        }
+        if (zoomInButton != null) {
+            zoomInButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_IN_TT));
+        }
+        updateZoomButtons();
     }
 
     public void liveUpdate() {
@@ -324,6 +361,8 @@ public class MapDialog extends ZeroDialog {
     public void refreshTheme() {
         super.refreshTheme();
         AssetStyles.styleButton(homeButton);
+        AssetStyles.styleButton(zoomOutButton);
+        AssetStyles.styleButton(zoomInButton);
         AssetStyles.styleButton(layersButton);
         AssetStyles.styleButton(conquerButton);
         AssetStyles.styleButton(closeButton);
@@ -879,9 +918,14 @@ public class MapDialog extends ZeroDialog {
         private static final int CLICK_SLOP_PX = 6;
 
         private double hexSize = 26;
+        private double zoom = GameNumbers.MAP_ZOOM_MIN;
+        private double panX;
+        private double panY;
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
         private final Map<Point, Hex> hexLookup = new HashMap<>();
         private Point pressPoint;
+        private Point lastDragPoint;
+        private boolean dragging;
 
         public HexMapPanel() {
             setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -895,6 +939,8 @@ public class MapDialog extends ZeroDialog {
                         return;
                     }
                     pressPoint = e.getPoint();
+                    lastDragPoint = pressPoint;
+                    dragging = false;
                     ToolTipManager.sharedInstance().mousePressed(e);
                 }
 
@@ -903,11 +949,17 @@ public class MapDialog extends ZeroDialog {
                     if (!SwingUtilities.isLeftMouseButton(e) || pressPoint == null) {
                         return;
                     }
-                    Point release = e.getPoint();
-                    int dx = release.x - pressPoint.x;
-                    int dy = release.y - pressPoint.y;
+                    boolean wasDragging = dragging;
                     Point click = pressPoint;
                     pressPoint = null;
+                    lastDragPoint = null;
+                    dragging = false;
+                    if (wasDragging) {
+                        return;
+                    }
+                    Point release = e.getPoint();
+                    int dx = release.x - click.x;
+                    int dy = release.y - click.y;
                     if (dx * dx + dy * dy > CLICK_SLOP_PX * CLICK_SLOP_PX) {
                         return;
                     }
@@ -916,9 +968,105 @@ public class MapDialog extends ZeroDialog {
 
                 @Override
                 public void mouseExited(MouseEvent e) {
+                    if (dragging) {
+                        return;
+                    }
                     pressPoint = null;
+                    lastDragPoint = null;
                 }
             });
+            addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    if (!SwingUtilities.isLeftMouseButton(e) || pressPoint == null) {
+                        return;
+                    }
+                    Point now = e.getPoint();
+                    if (!dragging) {
+                        int dx = now.x - pressPoint.x;
+                        int dy = now.y - pressPoint.y;
+                        if (dx * dx + dy * dy <= CLICK_SLOP_PX * CLICK_SLOP_PX) {
+                            return;
+                        }
+                        dragging = true;
+                        lastDragPoint = pressPoint;
+                    }
+                    if (lastDragPoint != null) {
+                        panX += now.x - lastDragPoint.x;
+                        panY += now.y - lastDragPoint.y;
+                        clampCamera();
+                        lastDragPoint = now;
+                        repaint();
+                    }
+                }
+            });
+            addMouseWheelListener(e -> {
+                applyZoom(-e.getPreciseWheelRotation(), e.getPoint());
+                e.consume();
+            });
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    refreshHexSize();
+                    clampCamera();
+                    updateZoomButtons();
+                    repaint();
+                }
+            });
+        }
+
+        boolean canZoomIn() {
+            return zoom < GameNumbers.MAP_ZOOM_MAX - 1e-6;
+        }
+
+        boolean canZoomOut() {
+            return zoom > GameNumbers.MAP_ZOOM_MIN + 1e-6;
+        }
+
+        void zoomBy(double notches) {
+            applyZoom(notches, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
+        }
+
+        void centerOn(Hex hex) {
+            if (hex == null) {
+                return;
+            }
+            refreshHexSize();
+            panX = -HexMapGeometry.flatTopCenterX(hex.getQ(), hex.getR(), hexSize);
+            panY = -HexMapGeometry.flatTopCenterY(hex.getQ(), hex.getR(), hexSize);
+            clampCamera();
+            updateZoomButtons();
+            repaint();
+        }
+
+        private void applyZoom(double notches, Point focus) {
+            if (focus == null || world == null || Math.abs(notches) < 1e-9) {
+                return;
+            }
+            double fit = fittedHexSize();
+            if (!(fit > 0)) {
+                return;
+            }
+            double oldZoom = zoom;
+            double factor = Math.pow(GameNumbers.MAP_ZOOM_STEP, notches);
+            zoom = HexMapGeometry.nextZoom(
+                    oldZoom,
+                    factor,
+                    GameNumbers.MAP_ZOOM_MIN,
+                    GameNumbers.MAP_ZOOM_MAX);
+            if (Math.abs(zoom - oldZoom) < 1e-9) {
+                return;
+            }
+            double oldSize = fit * oldZoom;
+            double newSize = fit * zoom;
+            double centerX = getWidth() / 2.0;
+            double centerY = getHeight() / 2.0;
+            panX = HexMapGeometry.panAfterZoom(panX, focus.x - centerX, oldSize, newSize);
+            panY = HexMapGeometry.panAfterZoom(panY, focus.y - centerY, oldSize, newSize);
+            hexSize = newSize;
+            clampCamera();
+            updateZoomButtons();
+            repaint();
         }
 
         void onThemeChanged() {
@@ -927,25 +1075,44 @@ public class MapDialog extends ZeroDialog {
             repaint();
         }
 
-        private void calculateHexSize() {
-            if (world == null) return;
+        private double fittedHexSize() {
+            if (world == null) {
+                return GameNumbers.MAP_HEX_FIT_MIN;
+            }
+            return HexMapGeometry.fittedHexSize(
+                    world.getWorldRadius(),
+                    getWidth(),
+                    getHeight(),
+                    GameNumbers.MAP_HEX_FIT_MIN,
+                    GameNumbers.MAP_HEX_FIT_MAX);
+        }
 
-            int worldR = world.getWorldRadius();
-
+        private void refreshHexSize() {
+            if (world == null) {
+                return;
+            }
             int panelW = getWidth();
             int panelH = getHeight();
-
-            if (panelW <= 0 || panelH <= 0) return;
-
-            double hexesAcross = (worldR * 2 + 1) + 1.5;
-            double hexesHigh = (worldR * 2 + 1) + 1.5;
-            double maxRadiusW = panelW / (hexesAcross * Math.sqrt(3));
-            double maxRadiusH = panelH / (hexesHigh * 1.5);
-
-            this.hexSize = Math.min(Math.min(maxRadiusW, maxRadiusH), 55.0);
-            if (this.hexSize < 10.0) {
-                this.hexSize = 10.0;
+            if (panelW <= 0 || panelH <= 0) {
+                return;
             }
+            hexSize = fittedHexSize() * zoom;
+        }
+
+        private void clampCamera() {
+            if (world == null) {
+                panX = 0;
+                panY = 0;
+                return;
+            }
+            refreshHexSize();
+            panX = HexMapGeometry.clampPan(panX, HexMapGeometry.worldWidth(world.getWorldRadius(), hexSize), getWidth());
+            panY = HexMapGeometry.clampPan(panY, HexMapGeometry.worldHeight(world.getWorldRadius(), hexSize), getHeight());
+        }
+
+        private void calculateHexSize() {
+            refreshHexSize();
+            clampCamera();
         }
 
         @Override
@@ -1121,7 +1288,9 @@ public class MapDialog extends ZeroDialog {
         }
 
         private Point getCenterOffset() {
-            return new Point(getWidth() / 2, getHeight() / 2);
+            return new Point(
+                    (int) Math.round(getWidth() / 2.0 + panX),
+                    (int) Math.round(getHeight() / 2.0 + panY));
         }
 
         private Color resolveFillColor(Hex hex) {

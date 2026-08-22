@@ -34,6 +34,12 @@ public final class GameNumbers {
                 + WORLD_OUTER_OCEAN_RING_COUNT;
     }
 
+    public static final double MAP_ZOOM_MIN = 1.0;
+    public static final double MAP_ZOOM_MAX = 4.0;
+    public static final double MAP_ZOOM_STEP = 1.15;
+    public static final double MAP_HEX_FIT_MIN = 10.0;
+    public static final double MAP_HEX_FIT_MAX = 55.0;
+
     // --- Hex resources / spawn ---
     public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
     public static final int HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX = 500;

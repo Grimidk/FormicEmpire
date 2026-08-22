@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 91% (343/376 checked)
+Completion: 95% (359/376 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -37,8 +37,8 @@ General:
 [X] Reset tab to defaults
 
 Video:
-[ ] Window size preset (clamped to usable display; list filtered to sizes that fit)
-[ ] Full screen toggle (macOS: native Space fullscreen; other OS: borderless maximized)
+[X] Window size preset (clamped to usable display; list filtered to sizes that fit)
+[X] Full screen toggle (macOS: native Space fullscreen; other OS: borderless maximized)
 [X] Daylight color overlay
 [X] Weather color overlay
 [X] Dark mode
@@ -61,15 +61,15 @@ Roles (default hatch roles for new ants):
 [X] Reset tab to defaults
 
 Sandbox:
-[ ] Allow turbo speed mode
-[ ] Show mechanics audit (main-menu and in-game ESC menu button for this file)
-[ ] ★ Free abilities (disables achievements on saves that use it)
-[ ] ★ Infinite research (unlocks Research tab; ignores dynasty tier, parent, and trigger gates including Parasitic Mite Alert; disables achievements on saves that use it)
-[ ] ★ Instant buildings (unlocks Construction tab; ignores dynasty tier; disables achievements on saves that use it)
-[ ] ★ Assimilate all (unlocks Assimilation tab; disables achievements on saves that use it)
-[ ] ★ Easy conquering (disables achievements on saves that use it)
-[ ] ★ Instant integration (disables achievements on saves that use it)
-[ ] Reset tab to defaults
+[X] Allow turbo speed mode
+[X] Show mechanics audit (main-menu and in-game ESC menu button for this file)
+[X] ★ Free abilities (disables achievements on saves that use it)
+[X] ★ Infinite research (unlocks Research tab; ignores dynasty tier, parent, and trigger gates including Parasitic Mite Alert; disables achievements on saves that use it)
+[X] ★ Instant buildings (unlocks Construction tab; ignores dynasty tier; disables achievements on saves that use it)
+[X] ★ Assimilate all (unlocks Assimilation tab; disables achievements on saves that use it)
+[X] ★ Easy conquering (disables achievements on saves that use it)
+[X] ★ Instant integration (disables achievements on saves that use it)
+[X] Reset tab to defaults
 
 [X] Save & Apply persists to settings.json and applies live
 
@@ -78,8 +78,8 @@ Sandbox:
 ================================================================================
 [X] Three save slots — empty slot shows Create; packaged builds use GrimIDK/FormicEmpire under OS Application Support / AppData (not inside .app)
 [X] Create new save — name + title, live dynasty preview (EN: Theme Title; ES/FR/PT: Title Theme), confirm prompt; full dynasty name shown in slot list
-[ ] ★ on save slots that have achievements disabled (used with Sandbox ★ options)
-[ ] Warning when Create/Load with Sandbox ★ options on (Cancel aborts; only for saves that still allow achievements)
+[X] ★ on save slots that have achievements disabled (used with Sandbox ★ options)
+[X] Warning when Create/Load with Sandbox ★ options on (Cancel aborts; only for saves that still allow achievements)
 [X] Tutorial dialog auto-opens on first create
 [X] Load existing save — resumes session; re-reads latest file from disk
 [X] Delete save — removes slot data
@@ -105,7 +105,7 @@ Side panels (live updates while playing):
 [X] Resources panel
 [X] Ant population panel
 [X] Alerts panel (icons + short labels; mite outbreaks, shortages, etc.)
-[ ] Minimap panel above music (land hex biome colors; edges match hex color except dynasty-vs-dynasty frontiers; ocean hexes hidden; click/release opens map reliably)
+[X] Minimap panel above music (land hex biome colors; edges match hex color except dynasty-vs-dynasty frontiers; ocean hexes hidden; click/release opens map reliably)
 [X] Music panel below alerts (track name; prev / play-pause / next; shuffle; mute; shows No music when empty)
 [X] Menu music starts after intro (never during intro); session music starts when a game loads; volumes use Settings > Audio
 
@@ -131,7 +131,7 @@ Side panels (live updates while playing):
 [X] S — Dynasty Trade / Logistics tab (always available; toggle)
 [X] D — Dynasty Diplomacy tab (always available; toggle)
 [X] F — Dynasty Wars tab (always available; toggle)
-[X] M — World map (Layers: dynasty borders, biome/rank icons, trades, tunnels, active battles; hex press/release focus)
+[ ] M — World map (Layers: dynasty borders, biome/rank icons, trades, tunnels, active battles; wheel or +/− zoom toward cursor; drag pans when zoomed; hex press/release focus)
 [X] X — Statistics (toggle)
 [X] Repeat same hotkey closes the bound dialog/tab
 
@@ -140,7 +140,7 @@ Side panels (live updates while playing):
 ================================================================================
 [X] Back to game
 [X] Toggle Overworld / Underworld (Z)
-[X] World map (M)
+[ ] World map (M)
 [X] Statistics (X)
 
 Colony submenu (items appear when unlocked):
@@ -204,7 +204,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[ ] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), status bar shows research icon + quantity RP and current dynasty tier (icon+name); detail card (centered bold title via translated name with flavor fallback + icon, centered flavor when distinct from title + description; left-aligned tier icon/name with ant-count tip, requirement incl. assimilation/synergy when that is the unlock path, RP/trigger progress bar; Buy on every non-owned node — disabled with tip for unmet parent/tier(ants)/assimilation/synergy/RP/trigger; tip shows specific requirements accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
+[X] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), status bar shows research icon + quantity RP and current dynasty tier (icon+name); detail card (centered bold title via translated name with flavor fallback + icon, centered flavor when distinct from title + description; left-aligned tier icon/name with ant-count tip, requirement incl. assimilation/synergy when that is the unlock path, RP/trigger progress bar; Buy on every non-owned node — disabled with tip for unmet parent/tier(ants)/assimilation/synergy/RP/trigger; tip shows specific requirements accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -415,12 +415,12 @@ Per foreign dynasty Actions menu:
 [X] Active wars header expand / collapse
 [X] Click war in sidebar — focus war target
 [X] Dynasty badges: color, species icon, stance, defeated marker
-[X] Mouse wheel zoom on map
+[ ] Mouse wheel zoom on map (toward cursor; +/− buttons; drag to pan when zoomed)
 [X] Legend / overlay toggles if present
-[ ] Layers: trades (neighbor hex center-to-center line + progress dot; tunnel badge when applicable)
-[ ] Layers: tunnels (short dual rails in the same dynasty border color; incomplete dashed)
-[ ] Layers: active battles (MilitaryPower icon on every shared border between dynasties at war)
-[ ] Easy conquering: Conquer button — with ★ Easy conquering on, click a foreign colony or empty land hex (map stays open), then Conquer
+[ ] Layers: trades (neighbor hex center-to-center line + progress dot)
+[X] Layers: tunnels (short dual rails in the same dynasty border color; incomplete dashed)
+[X] Layers: active battles (MilitaryPower icon on every shared border between dynasties at war)
+[X] Easy conquering: Conquer button — with ★ Easy conquering on, click a foreign colony or empty land hex (map stays open), then Conquer
 [X] Go Back Home button — recenters map on player capital
 [X] New colonies after capital use randomized city titles (City/Berg/Grad/Burg/Haven/Nest/Hold/Ford), no repeats within dynasty
 
@@ -518,7 +518,7 @@ World:
 [X] Day / month / year / hour ticks
 [X] Weather changes
 [X] Biome differences on hexes
-[ ] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean; enclosed ocean pockets become lakes; lakes touching ocean become ocean; at least 6 islands guaranteed; on standard+ core size, at least 2 hexes per biome (shortfalls taken from the most common non-ocean biome); NPC species seeded round-robin so no species gets a second dynasty before every other spawnable species has one (same for 3rd, …)
+[X] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean; enclosed ocean pockets become lakes; lakes touching ocean become ocean; at least 6 islands guaranteed; on standard+ core size, at least 2 hexes per biome (shortfalls taken from the most common non-ocean biome); NPC species seeded round-robin so no species gets a second dynasty before every other spawnable species has one (same for 3rd, …)
 [X] Continents vs islands counted; colonies never spawn or spread onto islands
 [X] Map biome hex colors come from Biome mapColorHex (editable in GameConstants)
 [X] Resource sources on map — hover tooltip shows type, size tier, remaining amount

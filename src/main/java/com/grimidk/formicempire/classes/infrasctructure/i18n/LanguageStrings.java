@@ -944,6 +944,8 @@ public final class LanguageStrings {
     public static final String MAP_CONQUER_COLONY = "MAP_CONQUER_COLONY";
     public static final String MAP_CONQUER_COLONY_TT = "MAP_CONQUER_COLONY_TT";
     public static final String MAP_CONQUER_COLONY_SELECT_TT = "MAP_CONQUER_COLONY_SELECT_TT";
+    public static final String MAP_ZOOM_IN_TT = "MAP_ZOOM_IN_TT";
+    public static final String MAP_ZOOM_OUT_TT = "MAP_ZOOM_OUT_TT";
 
     public static final String DIALOG_WAR_TITLE = "DIALOG_WAR_TITLE";
     public static final String DIALOG_BATTLE_TITLE = "DIALOG_BATTLE_TITLE";
