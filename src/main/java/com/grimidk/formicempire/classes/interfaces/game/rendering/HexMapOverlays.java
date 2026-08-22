@@ -42,9 +42,10 @@ public final class HexMapOverlays {
             return;
         }
         double layoutSize = mesh.layoutSize();
-        int dotRadius = Math.max(2, (int) Math.round(layoutSize * 0.12));
+        int dotRadius = Math.max(3, (int) Math.round(layoutSize * 0.2));
         BasicStroke stroke = new BasicStroke(TRADE_LINE_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
         g2d.setStroke(stroke);
+        int minuteOfHour = Math.max(0, Math.min(59, world.getMinute()));
 
         for (Trade trade : tradeManager.getActiveTrades()) {
             if (trade == null || !trade.isActive()) {
@@ -91,7 +92,7 @@ public final class HexMapOverlays {
             double fromY = returning ? destFace.centerY : originFace.centerY;
             double toX = returning ? originFace.centerX : destFace.centerX;
             double toY = returning ? originFace.centerY : destFace.centerY;
-            double progress = tradeLegProgress(trade);
+            double progress = tradeLegProgress(trade, minuteOfHour);
             double dotX = fromX + (toX - fromX) * progress;
             double dotY = fromY + (toY - fromY) * progress;
             Color dotColor = crossDynasty
@@ -104,12 +105,7 @@ public final class HexMapOverlays {
                             mesh.mapCenterY(),
                             AssetStyles.FONT_COLOR)
                     : dynastyColor(originDynasty != null ? originDynasty : destDynasty, AssetStyles.FONT_COLOR);
-            g2d.setColor(dotColor);
-            g2d.fillOval(
-                    (int) Math.round(dotX - dotRadius),
-                    (int) Math.round(dotY - dotRadius),
-                    dotRadius * 2,
-                    dotRadius * 2);
+            paintTradeProgressDot(g2d, dotX, dotY, dotRadius, dotColor);
         }
     }
 
@@ -202,12 +198,40 @@ public final class HexMapOverlays {
     }
 
     static double tradeLegProgress(Trade trade) {
+        return tradeLegProgress(trade, 0);
+    }
+
+    static double tradeLegProgress(Trade trade, int minuteOfHour) {
         if (trade == null) {
             return 0.0;
         }
         int total = Math.max(1, trade.getTotalHours());
         int remaining = Math.max(0, trade.getRemainingHours());
-        return 1.0 - (remaining / (double) total);
+        double fractionalHour = HexMapGeometry.clamp(minuteOfHour / 60.0, 0.0, 59.0 / 60.0);
+        double hoursLeft = HexMapGeometry.clamp(remaining - fractionalHour, 0.0, total);
+        return 1.0 - (hoursLeft / (double) total);
+    }
+
+    private static void paintTradeProgressDot(
+            Graphics2D g2d,
+            double centerX,
+            double centerY,
+            int radius,
+            Color fill) {
+        int outer = radius + Math.max(1, radius / 3);
+        int ox = (int) Math.round(centerX - outer);
+        int oy = (int) Math.round(centerY - outer);
+        int ow = outer * 2;
+        g2d.setColor(AssetStyles.BACKGROUND_COLOR);
+        g2d.fillOval(ox, oy, ow, ow);
+        int ix = (int) Math.round(centerX - radius);
+        int iy = (int) Math.round(centerY - radius);
+        int iw = radius * 2;
+        g2d.setColor(fill != null ? fill : AssetStyles.FONT_COLOR);
+        g2d.fillOval(ix, iy, iw, iw);
+        g2d.setColor(AssetStyles.BORDER_COLOR);
+        g2d.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
+        g2d.drawOval(ix, iy, iw, iw);
     }
 
     private static void paintTunnelBridge(

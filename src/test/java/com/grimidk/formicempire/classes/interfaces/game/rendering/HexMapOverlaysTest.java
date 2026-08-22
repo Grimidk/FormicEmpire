@@ -40,6 +40,29 @@ class HexMapOverlaysTest {
     }
 
     @Test
+    void tradeLegProgressAdvancesWithinCurrentHour() {
+        Hex origin = new Hex();
+        origin.setQ(0);
+        origin.setR(0);
+        Hex destination = new Hex();
+        destination.setQ(1);
+        destination.setR(0);
+        Trade trade = new Trade(
+                origin,
+                destination,
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+                false,
+                false,
+                GameConstants.METHOD_LAND);
+        trade.restoreTripState(10, 5, false);
+        assertEquals(0.5, HexMapOverlays.tradeLegProgress(trade, 0), 1e-9);
+        assertEquals(0.55, HexMapOverlays.tradeLegProgress(trade, 30), 1e-9);
+        assertEquals(0.5 + (59.0 / 60.0) / 10.0, HexMapOverlays.tradeLegProgress(trade, 59), 1e-9);
+    }
+
+    @Test
     void areNeighborsMatchesFlatTopAdjacency() {
         Hex a = new Hex();
         a.setQ(0);

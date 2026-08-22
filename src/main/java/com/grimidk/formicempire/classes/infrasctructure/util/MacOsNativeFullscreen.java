@@ -121,4 +121,18 @@ public final class MacOsNativeFullscreen {
             return false;
         }
     }
+
+    public static boolean requestForeground() {
+        if (!isEawtAvailable()) {
+            return false;
+        }
+        try {
+            Class<?> appClass = Class.forName("com.apple.eawt.Application");
+            Object app = appClass.getMethod("getApplication").invoke(null);
+            appClass.getMethod("requestForeground", boolean.class).invoke(app, Boolean.TRUE);
+            return true;
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
 }

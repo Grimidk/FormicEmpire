@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 95% (359/376 checked)
+Completion: 95% (358/376 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -38,7 +38,7 @@ General:
 
 Video:
 [X] Window size preset (clamped to usable display; list filtered to sizes that fit)
-[X] Full screen toggle (macOS: native Space fullscreen; other OS: borderless maximized)
+[ ] Full screen toggle (macOS: native Space fullscreen; retries when launched without a focused window / Mission Control desktop; other OS: borderless maximized)
 [X] Daylight color overlay
 [X] Weather color overlay
 [X] Dark mode
@@ -417,7 +417,7 @@ Per foreign dynasty Actions menu:
 [X] Dynasty badges: color, species icon, stance, defeated marker
 [ ] Mouse wheel zoom on map (toward cursor; +/− buttons; drag to pan when zoomed)
 [X] Legend / overlay toggles if present
-[ ] Layers: trades (neighbor hex center-to-center line + progress dot)
+[ ] Layers: trades (neighbor hex center-to-center line + contrasting progress dot; advances each minute within the hourly leg)
 [X] Layers: tunnels (short dual rails in the same dynasty border color; incomplete dashed)
 [X] Layers: active battles (MilitaryPower icon on every shared border between dynasties at war)
 [X] Easy conquering: Conquer button — with ★ Easy conquering on, click a foreign colony or empty land hex (map stays open), then Conquer

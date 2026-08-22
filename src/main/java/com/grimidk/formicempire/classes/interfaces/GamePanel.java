@@ -1606,6 +1606,9 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);
         gameAreaPanel.repaint();
+        if (mapDialog != null && mapDialog.isShowing()) {
+            mapDialog.liveUpdate();
+        }
     }
 
     private void updateHourGUI() {

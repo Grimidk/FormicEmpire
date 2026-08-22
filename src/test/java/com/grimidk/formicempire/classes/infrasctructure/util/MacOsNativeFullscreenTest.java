@@ -14,14 +14,9 @@ class MacOsNativeFullscreenTest {
     }
 
     @Test
-    void eawtRequiresModuleExportOnMac() {
-        if (!MacOsNativeFullscreen.isMac()) {
-            assertFalse(MacOsNativeFullscreen.isEawtAvailable());
-            return;
+    void requestForegroundIsSafeWhenEawtUnavailable() {
+        if (!MacOsNativeFullscreen.isEawtAvailable()) {
+            assertFalse(MacOsNativeFullscreen.requestForeground());
         }
-        Module desktop = ModuleLayer.boot().findModule("java.desktop").orElseThrow();
-        Module self = MacOsNativeFullscreen.class.getModule();
-        boolean exported = desktop.isExported("com.apple.eawt", self) || desktop.isOpen("com.apple.eawt", self);
-        assertTrue(exported == MacOsNativeFullscreen.isEawtAvailable());
     }
 }

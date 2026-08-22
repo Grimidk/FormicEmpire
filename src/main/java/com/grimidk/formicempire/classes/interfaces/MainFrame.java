@@ -53,6 +53,12 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private boolean macNativeFullscreenActive;
     private boolean macFullscreenTransition;
     private boolean macFullscreenSupportInstalled;
+    private boolean macFullscreenEnsurePending;
+    private int macFullscreenRetryCount;
+    private Timer macFullscreenVerifyTimer;
+
+    private static final int MAC_FULLSCREEN_MAX_RETRIES = 6;
+    private static final int MAC_FULLSCREEN_VERIFY_MS = 1600;
 
     private boolean isGameWindow(Window window) {
         if (window == null) {
@@ -225,6 +231,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         addWindowFocusListener(new WindowFocusListener() {
             @Override
             public void windowGainedFocus(WindowEvent e) {
+                maybeRetryMacFullscreenAfterFocus();
                 if (!engine.isPauseOnFocusLoss() || !gamePanel.isEngineStarted() || !pausedForFocusLoss) {
                     return;
                 }
@@ -372,6 +379,84 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         if (!MacOsNativeFullscreen.isMac()) {
             return;
         }
+        macFullscreenEnsurePending = engine.isFullScreen();
+        macFullscreenRetryCount = 0;
+        prepareMacWindowForFullscreen();
+        SwingUtilities.invokeLater(() -> {
+            prepareMacWindowForFullscreen();
+            syncMacNativeFullscreenToEngine();
+        });
+    }
+
+    private void prepareMacWindowForFullscreen() {
+        if (!MacOsNativeFullscreen.isMac()) {
+            return;
+        }
+        MacOsNativeFullscreen.requestForeground();
+        if (isVisible()) {
+            toFront();
+            requestFocus();
+        }
+    }
+
+    private void maybeRetryMacFullscreenAfterFocus() {
+        if (!macFullscreenEnsurePending || !MacOsNativeFullscreen.isMac()) {
+            return;
+        }
+        if (!engine.isFullScreen() || macNativeFullscreenActive || macFullscreenTransition) {
+            return;
+        }
+        SwingUtilities.invokeLater(this::syncMacNativeFullscreenToEngine);
+    }
+
+    private void cancelMacFullscreenVerifyTimer() {
+        if (macFullscreenVerifyTimer != null) {
+            macFullscreenVerifyTimer.stop();
+            macFullscreenVerifyTimer = null;
+        }
+    }
+
+    private void scheduleMacFullscreenVerification() {
+        cancelMacFullscreenVerifyTimer();
+        int delay = MAC_FULLSCREEN_VERIFY_MS + macFullscreenRetryCount * 350;
+        macFullscreenVerifyTimer = new Timer(delay, e -> {
+            cancelMacFullscreenVerifyTimer();
+            verifyMacFullscreenTransition();
+        });
+        macFullscreenVerifyTimer.setRepeats(false);
+        macFullscreenVerifyTimer.start();
+    }
+
+    private void verifyMacFullscreenTransition() {
+        if (!macFullscreenTransition) {
+            if (engine.isFullScreen() == macNativeFullscreenActive) {
+                macFullscreenEnsurePending = false;
+                macFullscreenRetryCount = 0;
+            }
+            return;
+        }
+        macFullscreenTransition = false;
+        boolean want = engine.isFullScreen();
+        if (want == macNativeFullscreenActive) {
+            macFullscreenEnsurePending = false;
+            macFullscreenRetryCount = 0;
+            return;
+        }
+        if (!macFullscreenEnsurePending || macFullscreenRetryCount >= MAC_FULLSCREEN_MAX_RETRIES) {
+            macFullscreenEnsurePending = false;
+            macFullscreenRetryCount = 0;
+            if (want && !macNativeFullscreenActive) {
+                GraphicsConfiguration gc = getGraphicsConfiguration();
+                if (gc != null) {
+                    setBounds(gc.getBounds());
+                }
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
+                notifyGeometryChanged();
+            }
+            return;
+        }
+        macFullscreenRetryCount++;
+        prepareMacWindowForFullscreen();
         SwingUtilities.invokeLater(this::syncMacNativeFullscreenToEngine);
     }
 
@@ -409,16 +494,22 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         MacOsNativeFullscreen.markFullscreenable(this);
         MacOsNativeFullscreen.addFullscreenListener(this,
                 () -> {
+                    cancelMacFullscreenVerifyTimer();
                     macFullscreenTransition = false;
                     macNativeFullscreenActive = true;
+                    macFullscreenEnsurePending = false;
+                    macFullscreenRetryCount = 0;
                     if (!engine.isFullScreen()) {
                         engine.setFullScreen(true);
                     }
                     notifyGeometryChanged();
                 },
                 () -> {
+                    cancelMacFullscreenVerifyTimer();
                     macFullscreenTransition = false;
                     macNativeFullscreenActive = false;
+                    macFullscreenEnsurePending = false;
+                    macFullscreenRetryCount = 0;
                     if (engine.isFullScreen()) {
                         engine.setFullScreen(false);
                     }
@@ -460,14 +551,23 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
         setResizable(true);
         if (!engine.isFullScreen()) {
+            macFullscreenEnsurePending = false;
+            macFullscreenRetryCount = 0;
+            cancelMacFullscreenVerifyTimer();
             applyWindowedSizeFromEngine();
+        } else if (!macNativeFullscreenActive) {
+            macFullscreenEnsurePending = true;
+            macFullscreenRetryCount = 0;
         }
+        prepareMacWindowForFullscreen();
         syncMacNativeFullscreenToEngine();
     }
 
     private void syncMacNativeFullscreenToEngine() {
         boolean want = engine.isFullScreen();
         if (!MacOsNativeFullscreen.isEawtAvailable()) {
+            macFullscreenEnsurePending = false;
+            macFullscreenRetryCount = 0;
             if (want) {
                 GraphicsConfiguration gc = getGraphicsConfiguration();
                 if (gc != null) {
@@ -485,6 +585,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
 
         if (macFullscreenTransition || want == macNativeFullscreenActive) {
+            if (want == macNativeFullscreenActive) {
+                macFullscreenEnsurePending = false;
+                macFullscreenRetryCount = 0;
+            }
             return;
         }
 
@@ -493,13 +597,18 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             return;
         }
 
+        prepareMacWindowForFullscreen();
         macFullscreenTransition = true;
         if (!MacOsNativeFullscreen.requestToggle(this)) {
             macFullscreenTransition = false;
             if (want) {
                 setExtendedState(JFrame.MAXIMIZED_BOTH);
             }
+            macFullscreenEnsurePending = false;
+            macFullscreenRetryCount = 0;
+            return;
         }
+        scheduleMacFullscreenVerification();
     }
 
     private void reapplyBorderlessFullscreen() {

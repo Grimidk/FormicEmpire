@@ -29,7 +29,6 @@ To Fix (By decreasing priority):
 To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		map zoom (done: wheel toward cursor, +/− buttons, drag pan)
 		auto logistics withing dyansty (excess materials go to neighboring lacking colonies)
 		show all conections in logistics toggle
 		more aggresive ai and maybe mass war
