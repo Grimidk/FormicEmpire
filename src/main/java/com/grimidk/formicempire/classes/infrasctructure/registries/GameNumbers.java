@@ -12,10 +12,15 @@ public final class GameNumbers {
     public static final double ANT_ANTENNA_TWITCH_CHANCE_PER_HOUR = 0.10;
     public static final double ANT_WING_FLICK_CHANCE_PER_HOUR = 0.06;
     public static final int ANT_SPRITE_SNAP_MINUTES = 30;
+    public static final int ANT_CARRY_SPRITE_NATIVE_PX = 40;
+    public static final int ANT_CARRY_ICON_PX = 16;
+    public static final int ANT_CARRY_JAW_OFFSET_Y = -17;
+    public static final int ANT_CARRY_DUAL_OFFSET_X = 5;
     public static final int ANT_LEG_FRAME_COUNT = 4;
     public static final int ANT_LEG_FRAME_FLYING = 0;
     public static final float BASE_SPRITE_SPEED = 2.5f;
     public static final int MAX_PHYSICS_STEPS_PER_GUI_DRAIN = 2;
+    public static final int MAX_PENDING_MINUTE_GUI_STEPS = 2;
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;

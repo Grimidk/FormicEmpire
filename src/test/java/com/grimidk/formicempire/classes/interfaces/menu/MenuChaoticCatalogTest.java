@@ -1,6 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces.menu;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -62,5 +65,44 @@ class MenuChaoticCatalogTest {
             Biome primary = world.getPrimaryBiome();
             assertNotNull(primary);
         }
+    }
+
+    @Test
+    void colonyGatherersPickUpAtTheEdgeAndDropAtTheHill() {
+        MenuChaoticDefinition colony = MenuChaoticCatalog.getScenarios().stream()
+                .filter(scenario -> scenario.kind() == MenuChaoticKind.COLONY)
+                .findFirst()
+                .orElseThrow();
+        MenuChaoticWorld world = MenuChaoticWorld.fromDefinition(colony);
+        MenuChaoticWorld.ShowcaseAnt gatherer = world.getAnts().stream()
+                .filter(ant -> RouteViewVisuals.canHoldJawCargo(ant.type))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(null, gatherer.carrying);
+
+        gatherer.xNorm = 0.02f;
+        gatherer.yNorm = 0.5f;
+        gatherer.vx = -0.2f;
+        gatherer.vy = 0f;
+        world.update(0.05f, 1280, 720);
+        assertNotNull(gatherer.carrying);
+        assertTrue(gatherer.vx > 0f);
+
+        gatherer.xNorm = MenuChaoticWorld.colonyEntranceXNorm();
+        gatherer.yNorm = MenuChaoticWorld.colonyEntranceYNorm();
+        world.update(0.05f, 1280, 720);
+        assertEquals(null, gatherer.carrying);
+    }
+
+    @Test
+    void landConvoyWorkersCarryCargoOnTheOutboundLeg() {
+        MenuChaoticDefinition land = MenuChaoticCatalog.getScenarios().stream()
+                .filter(scenario -> scenario.kind() == MenuChaoticKind.CONVOY
+                        && scenario.convoyBackground() == ConvoyScene.BackgroundKind.LAND_BIOME)
+                .findFirst()
+                .orElseThrow();
+        MenuChaoticWorld world = MenuChaoticWorld.fromDefinition(land);
+        assertTrue(world.isConvoyTravelingRight());
+        assertTrue(world.getAnts().stream().anyMatch(ant -> ant.carrying != null));
     }
 }

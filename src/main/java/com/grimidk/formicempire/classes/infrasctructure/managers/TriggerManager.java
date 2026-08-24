@@ -160,16 +160,13 @@ public class TriggerManager {
     private void checkHourlyTriggers() {
         checkResearchAbilityUnlock();
         checkBuildAbilityUnlock();
-        checkHunterRoleUnlock();
-        checkMilitiaRoleRetrofit();
-        checkBreederRoleUnlock();
+        checkSoldierRoleUnlocks();
+        checkBreederAndSpreadUnlock();
         checkBruteRoleUnlock();
         checkCommanderRoleUnlock();
-        checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
         checkMinerRoleUnlock();
         checkDynastyTriggers();
-        checkTradeRoleTriggers();
         checkTunnelRoleUnlock();
         checkAssimilationAbilityUnlock();
         checkSubtypeHatchUnlock();
@@ -315,14 +312,27 @@ public class TriggerManager {
     }
 
     private void checkNPCUnitRoles(Colony npc) {
-        if (!npc.hasUpgrade(GameUnlocks.ROLE_HUNTER) && npc.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
-            npc.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
+        if (npc.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+            if (!npc.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ROLE_WARRIOR)) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_WARRIOR);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ROLE_MILITIA)) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_MILITIA);
+            }
         }
         if (!npc.hasUpgrade(GameUnlocks.ROLE_BREEDER) && npc.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             npc.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
         }
-        if (!npc.hasUpgrade(GameUnlocks.ROLE_BRUTE) && npc.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
-            npc.unlockUpgrade(GameUnlocks.ROLE_BRUTE);
+        if (npc.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+            if (!npc.hasUpgrade(GameUnlocks.ROLE_BRUTE)) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_BRUTE);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_CRANE);
+            }
         }
     }
 
@@ -343,6 +353,9 @@ public class TriggerManager {
             }
             if (!npc.hasUpgrade(GameUnlocks.ABILITY_TRADE) && colonies >= GameNumbers.TRIGGER_TRADE_MIN_COLONIES) {
                 npc.unlockUpgrade(GameUnlocks.ABILITY_TRADE);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ROLE_COURIER) && npc.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_COURIER);
             }
             if (!npc.hasUpgrade(GameUnlocks.ABILITY_ABILITY) && npc.getResearchPoints() >= GameNumbers.TRIGGER_NPC_ABILITY_MENU_MIN_RP) {
                 npc.unlockUpgrade(GameUnlocks.ABILITY_ABILITY);
@@ -391,42 +404,71 @@ public class TriggerManager {
         }
     }
     
-    private void checkHunterRoleUnlock() {
-        if (playerColony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) return;
-        
-        if (playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
-            fireLocalizedTrigger(GameUnlocks.ROLE_HUNTER,
-                LanguageStrings.TRIGGER_HUNTER_ROLE_TITLE,
-                LanguageStrings.TRIGGER_HUNTER_ROLE_MSG);
-        }
-    }
-
-    private void checkMilitiaRoleRetrofit() {
-        if (playerColony.hasUpgrade(GameUnlocks.ROLE_MILITIA)) {
+    private void checkSoldierRoleUnlocks() {
+        if (!playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             return;
         }
-        if (playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+        boolean needHunter = !playerColony.hasUpgrade(GameUnlocks.ROLE_HUNTER);
+        boolean needWarrior = !playerColony.hasUpgrade(GameUnlocks.ROLE_WARRIOR);
+        boolean needMilitia = !playerColony.hasUpgrade(GameUnlocks.ROLE_MILITIA);
+        if (!needHunter && !needWarrior && !needMilitia) {
+            return;
+        }
+        if (needWarrior) {
+            playerColony.unlockUpgrade(GameUnlocks.ROLE_WARRIOR);
+        }
+        if (needMilitia) {
             playerColony.unlockUpgrade(GameUnlocks.ROLE_MILITIA);
+        }
+        if (needHunter) {
+            fireLocalizedTrigger(GameUnlocks.ROLE_HUNTER,
+                    LanguageStrings.TRIGGER_HUNTER_ROLE_TITLE,
+                    LanguageStrings.TRIGGER_HUNTER_ROLE_MSG);
         }
     }
     
-    private void checkBreederRoleUnlock() {
-        if (playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) return;
-        
-        if (playerColony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
-            fireLocalizedTrigger(GameUnlocks.ROLE_BREEDER,
-                LanguageStrings.TRIGGER_BREEDER_ROLE_TITLE,
-                LanguageStrings.TRIGGER_BREEDER_ROLE_MSG);
+    private void checkBreederAndSpreadUnlock() {
+        boolean needBreeder = !playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER)
+                && playerColony.hasUpgrade(GameUnlocks.TYPE_PRINCESS);
+        boolean needSpread = !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)
+                && (playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER) || needBreeder);
+        if (!needBreeder && !needSpread) {
+            return;
         }
+        if (needBreeder && needSpread) {
+            playerColony.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
+            fireLocalizedTrigger(GameUnlocks.ABILITY_SPREAD,
+                    LanguageStrings.TRIGGER_BREEDER_ROLE_TITLE,
+                    LanguageStrings.TRIGGER_BREEDER_ROLE_MSG);
+            return;
+        }
+        if (needBreeder) {
+            fireLocalizedTrigger(GameUnlocks.ROLE_BREEDER,
+                    LanguageStrings.TRIGGER_BREEDER_ROLE_TITLE,
+                    LanguageStrings.TRIGGER_BREEDER_ROLE_MSG);
+            return;
+        }
+        fireLocalizedTrigger(GameUnlocks.ABILITY_SPREAD,
+                LanguageStrings.TRIGGER_SPREAD_ABILITY_TITLE,
+                LanguageStrings.TRIGGER_SPREAD_ABILITY_MSG);
     }
     
     private void checkBruteRoleUnlock() {
-        if (playerColony.hasUpgrade(GameUnlocks.ROLE_BRUTE)) return;
-        
-        if (playerColony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+        if (!playerColony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+            return;
+        }
+        boolean needBrute = !playerColony.hasUpgrade(GameUnlocks.ROLE_BRUTE);
+        boolean needCrane = !playerColony.hasUpgrade(GameUnlocks.ROLE_CRANE);
+        if (!needBrute && !needCrane) {
+            return;
+        }
+        if (needCrane) {
+            playerColony.unlockUpgrade(GameUnlocks.ROLE_CRANE);
+        }
+        if (needBrute) {
             fireLocalizedTrigger(GameUnlocks.ROLE_BRUTE,
-                LanguageStrings.TRIGGER_BRUTE_ROLE_TITLE,
-                LanguageStrings.TRIGGER_BRUTE_ROLE_MSG);
+                    LanguageStrings.TRIGGER_BRUTE_ROLE_TITLE,
+                    LanguageStrings.TRIGGER_BRUTE_ROLE_MSG);
         }
     }
 
@@ -446,16 +488,6 @@ public class TriggerManager {
             fireLocalizedTrigger(GameUnlocks.ROLE_COMMANDER,
                     LanguageStrings.TRIGGER_COMMANDER_ROLE_TITLE,
                     LanguageStrings.TRIGGER_COMMANDER_ROLE_MSG);
-        }
-    }
-    
-    private void checkSpreadAbilityUnlock() {
-        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)) return;
-        
-        if (playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
-            fireLocalizedTrigger(GameUnlocks.ABILITY_SPREAD,
-                LanguageStrings.TRIGGER_SPREAD_ABILITY_TITLE,
-                LanguageStrings.TRIGGER_SPREAD_ABILITY_MSG);
         }
     }
     
@@ -617,10 +649,23 @@ public class TriggerManager {
                 LanguageStrings.TRIGGER_DYNASTY_ABILITY_MSG);
         }
         
-        if (colonyCount >= GameNumbers.TRIGGER_TRADE_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
-            fireLocalizedTrigger(GameUnlocks.ABILITY_TRADE,
-                LanguageStrings.TRIGGER_TRADE_ABILITY_TITLE,
-                LanguageStrings.TRIGGER_TRADE_ABILITY_MSG);
+        if (colonyCount >= GameNumbers.TRIGGER_TRADE_MIN_COLONIES) {
+            boolean needTrade = !playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE);
+            boolean needCourier = !playerColony.hasUpgrade(GameUnlocks.ROLE_COURIER);
+            if (needTrade && needCourier) {
+                playerColony.unlockUpgrade(GameUnlocks.ROLE_COURIER);
+                fireLocalizedTrigger(GameUnlocks.ABILITY_TRADE,
+                        LanguageStrings.TRIGGER_TRADE_ABILITY_TITLE,
+                        LanguageStrings.TRIGGER_TRADE_ABILITY_MSG);
+            } else if (needTrade) {
+                fireLocalizedTrigger(GameUnlocks.ABILITY_TRADE,
+                        LanguageStrings.TRIGGER_TRADE_ABILITY_TITLE,
+                        LanguageStrings.TRIGGER_TRADE_ABILITY_MSG);
+            } else if (needCourier) {
+                fireLocalizedTrigger(GameUnlocks.ROLE_COURIER,
+                        LanguageStrings.TRIGGER_COURIER_ROLE_TITLE,
+                        LanguageStrings.TRIGGER_COURIER_ROLE_MSG);
+            }
         }
 
         if (colonyCount >= GameNumbers.TRIGGER_MANAGEMENT_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
@@ -648,16 +693,6 @@ public class TriggerManager {
                     LanguageStrings.TRIGGER_BILATERAL_TRADE_TITLE,
                     LanguageStrings.TRIGGER_BILATERAL_TRADE_MSG);
             }
-        }
-    }
-
-    private void checkTradeRoleTriggers() {
-        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) return;
-
-        if (!playerColony.hasUpgrade(GameUnlocks.ROLE_COURIER)) {
-            fireLocalizedTrigger(GameUnlocks.ROLE_COURIER,
-                LanguageStrings.TRIGGER_COURIER_ROLE_TITLE,
-                LanguageStrings.TRIGGER_COURIER_ROLE_MSG);
         }
     }
 

@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
@@ -41,6 +42,8 @@ public final class MenuChaoticWorld {
         public float offsetX;
         public float offsetY;
         public float wanderTimer;
+        public ResourceType carrying;
+        public ResourceType carryingSec;
         public Image cachedSprite;
         public int cachedLegFrame = -1;
         public int cachedJawFrame = -1;
@@ -155,6 +158,7 @@ public final class MenuChaoticWorld {
             return;
         }
         convoyTravelingRight = random.nextBoolean();
+        assignConvoyCargo(random);
     }
 
     public List<ConvoyResourceProp> getConvoyResources() {
@@ -188,6 +192,9 @@ public final class MenuChaoticWorld {
             ant.xNorm = random.nextFloat();
             ant.yNorm = random.nextFloat();
             assignWanderVelocity(ant, random);
+            if (random.nextFloat() < 0.45f) {
+                assignShowcaseCargo(ant, random);
+            }
         }
         for (ShowcaseCritter critter : critters) {
             critter.xNorm = 0.1f + random.nextFloat() * 0.8f;
@@ -242,6 +249,7 @@ public final class MenuChaoticWorld {
             ant.offsetX = (float) Math.cos(angle) * dist;
             ant.offsetY = (float) Math.sin(angle) * dist;
         }
+        assignConvoyCargo(random);
     }
 
     private void updateOverworld(float deltaSeconds) {
@@ -266,21 +274,41 @@ public final class MenuChaoticWorld {
 
     private void updateColony(float deltaSeconds) {
         float speedScale = MenuChaoticCatalog.COLONY_SPEED_SCALE;
-        Random random = null;
+        Random random = new Random(definition.layoutSeed() ^ Float.floatToIntBits(ants.isEmpty() ? 0f : ants.get(0).wobblePhase));
         for (int i = 0; i < ants.size(); i++) {
             ShowcaseAnt ant = ants.get(i);
-            tickWander(ant, deltaSeconds);
+            random.setSeed(definition.layoutSeed() ^ (i * 0x9E37_79B9L) ^ (long) (ant.wobblePhase * 1000));
+            if (!RouteViewVisuals.canHoldJawCargo(ant.type)) {
+                tickWander(ant, deltaSeconds);
+                ant.xNorm += ant.vx * deltaSeconds * speedScale;
+                ant.yNorm += ant.vy * deltaSeconds * speedScale;
+                if (ant.xNorm < 0f || ant.xNorm > 1f || ant.yNorm < 0f || ant.yNorm > 1f) {
+                    ant.xNorm = COLONY_ENTRANCE_X;
+                    ant.yNorm = COLONY_ENTRANCE_Y;
+                    assignWanderVelocity(ant, random);
+                    ant.wanderTimer = 0.2f + ant.laneJitter * 0.6f;
+                }
+                continue;
+            }
             ant.xNorm += ant.vx * deltaSeconds * speedScale;
             ant.yNorm += ant.vy * deltaSeconds * speedScale;
-            if (ant.xNorm < 0f || ant.xNorm > 1f || ant.yNorm < 0f || ant.yNorm > 1f) {
-                ant.xNorm = COLONY_ENTRANCE_X;
-                ant.yNorm = COLONY_ENTRANCE_Y;
-                if (random == null) {
-                    random = new Random();
+            if (ant.carrying == null) {
+                if (outsideColonyField(ant)) {
+                    pointToward(ant, COLONY_ENTRANCE_X, COLONY_ENTRANCE_Y);
+                    assignShowcaseCargo(ant, random);
                 }
-                random.setSeed(definition.layoutSeed() ^ (i * 0x9E37_79B9L) ^ (long) (ant.wobblePhase * 1000));
-                assignWanderVelocity(ant, random);
-                ant.wanderTimer = 0.2f + ant.laneJitter * 0.6f;
+            } else {
+                float dx = ant.xNorm - COLONY_ENTRANCE_X;
+                float dy = ant.yNorm - COLONY_ENTRANCE_Y;
+                if (dx * dx + dy * dy < 0.012f || outsideColonyField(ant)) {
+                    if (outsideColonyField(ant)) {
+                        pointToward(ant, COLONY_ENTRANCE_X, COLONY_ENTRANCE_Y);
+                    } else {
+                        ant.carrying = null;
+                        ant.carryingSec = null;
+                        assignWanderVelocity(ant, random);
+                    }
+                }
             }
         }
     }
@@ -317,7 +345,75 @@ public final class MenuChaoticWorld {
             ant.vy = (float) Math.sin(angle) * speed;
             ant.wanderTimer = 0.6f + ant.laneJitter * 1.8f;
             ant.wobblePhase += 1.37f;
+            Random carryRandom = new Random(Float.floatToIntBits(ant.wobblePhase) ^ System.identityHashCode(ant.type));
+            if (carryRandom.nextFloat() < 0.4f) {
+                assignShowcaseCargo(ant, carryRandom);
+            } else {
+                ant.carrying = null;
+                ant.carryingSec = null;
+            }
         }
+    }
+
+    private void assignConvoyCargo(Random random) {
+        boolean loaded = convoyTravelingRight || random.nextFloat() < 0.55f;
+        for (ShowcaseAnt ant : ants) {
+            if (loaded) {
+                assignShowcaseCargo(ant, random);
+            } else {
+                ant.carrying = null;
+                ant.carryingSec = null;
+            }
+        }
+    }
+
+    private static void assignShowcaseCargo(ShowcaseAnt ant, Random random) {
+        if (ant == null || random == null || !RouteViewVisuals.canHoldJawCargo(ant.type)) {
+            if (ant != null) {
+                ant.carrying = null;
+                ant.carryingSec = null;
+            }
+            return;
+        }
+        if (ant.type == GameConstants.TYPE_WORKER) {
+            ResourceType[] pool = {
+                    GameConstants.RESOURCE_PLANT,
+                    GameConstants.RESOURCE_WATER,
+                    GameConstants.RESOURCE_FUNGI,
+                    GameConstants.RESOURCE_RESIN
+            };
+            ant.carrying = pool[random.nextInt(pool.length)];
+            ant.carryingSec = ant.carrying == GameConstants.RESOURCE_PLANT && random.nextFloat() < 0.25f
+                    ? GameConstants.RESOURCE_RESIN
+                    : null;
+            return;
+        }
+        if (ant.type == GameConstants.TYPE_SOLDIER) {
+            ant.carrying = random.nextBoolean() ? GameConstants.RESOURCE_MEAT : GameConstants.RESOURCE_ROCK;
+            ant.carryingSec = null;
+            return;
+        }
+        ant.carrying = random.nextBoolean() ? GameConstants.RESOURCE_ROCK : GameConstants.RESOURCE_MEAT;
+        ant.carryingSec = null;
+    }
+
+    private static boolean outsideColonyField(ShowcaseAnt ant) {
+        return ant.xNorm < 0.04f || ant.xNorm > 0.96f || ant.yNorm < 0.04f || ant.yNorm > 0.96f;
+    }
+
+    private static void pointToward(ShowcaseAnt ant, float xNorm, float yNorm) {
+        float dx = xNorm - ant.xNorm;
+        float dy = yNorm - ant.yNorm;
+        float length = (float) Math.hypot(dx, dy);
+        if (length < 0.001f) {
+            return;
+        }
+        float speed = (float) Math.hypot(ant.vx, ant.vy);
+        if (speed < 0.06f) {
+            speed = 0.1f;
+        }
+        ant.vx = dx / length * speed;
+        ant.vy = dy / length * speed;
     }
 
     private static void assignWanderVelocity(ShowcaseAnt ant, Random random) {

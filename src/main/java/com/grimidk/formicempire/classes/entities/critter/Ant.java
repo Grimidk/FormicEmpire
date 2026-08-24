@@ -244,8 +244,12 @@ public class Ant extends Critter {
         boolean wasMoving = isMoving();
         super.updatePosition(speedMultiplier);
         if (wasMoving) {
-            int next = getLegFrame() >= GameNumbers.ANT_LEG_FRAME_COUNT ? 1 : getLegFrame() + 1;
-            setLegFrame(next);
+            int advances = Math.max(1, Math.round(speedMultiplier / GameNumbers.BASE_SPRITE_SPEED));
+            int frame = getLegFrame();
+            for (int i = 0; i < advances; i++) {
+                frame = frame >= GameNumbers.ANT_LEG_FRAME_COUNT ? 1 : frame + 1;
+            }
+            setLegFrame(frame);
         } else {
             setLegFrame(1);
         }

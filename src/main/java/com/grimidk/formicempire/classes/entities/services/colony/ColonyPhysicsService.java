@@ -314,11 +314,16 @@ public class ColonyPhysicsService {
         if (d < 50 && ant.getDimension() == WorldSpaces.OVERWORLD) {
             if (colony.getLocationService().isActiveSource(target)) {
                 ant.setCarrying(target.getResourceType());
+                if (target.getResourceType() == GameConstants.RESOURCE_PLANT
+                        && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
+                        && GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
+                    ant.setCarryingSec(GameConstants.RESOURCE_RESIN);
+                } else {
+                    ant.setCarryingSec(null);
+                }
             }
             ant.clearRoute();
         } else {
-            ant.clearLoad();
-
             if (!ant.hasRoute()) {
                 Room current = getRoomContainingAnt(colony, ant);
                 Room sourceRoom = colony.getLocationService().createTempRoomAtPoint(

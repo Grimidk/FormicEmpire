@@ -1893,17 +1893,6 @@ public class Dynasty {
         }
         unlockedUpgrades.add(upgrade);
         applySkillUnlocksForUpgrade(upgrade);
-        if (upgrade == GameUnlocks.TYPE_SOLDIER) {
-            if (!hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-                unlockedUpgrades.add(GameUnlocks.ROLE_HUNTER);
-            }
-            if (!hasUpgrade(GameUnlocks.ROLE_WARRIOR)) {
-                unlockedUpgrades.add(GameUnlocks.ROLE_WARRIOR);
-            }
-            if (!hasUpgrade(GameUnlocks.ROLE_MILITIA)) {
-                unlockedUpgrades.add(GameUnlocks.ROLE_MILITIA);
-            }
-        }
         DynastySynergyService.refreshUnlocked(this);
         if (affectsAntCombatStats(upgrade)) {
             for (Colony colony : colonies) {

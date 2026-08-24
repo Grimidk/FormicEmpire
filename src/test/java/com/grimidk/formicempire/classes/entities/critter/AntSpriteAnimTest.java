@@ -38,6 +38,19 @@ class AntSpriteAnimTest {
     }
 
     @Test
+    void legWalkAdvancesExtraFramesWhenMoveSpeedExceedsBase() {
+        Colony colony = new Colony(1, "C", true);
+        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        ant.setSpeed(10f);
+        ant.setPosition(new Point(0, 0));
+        ant.moveTo(new Point(1000, 0));
+
+        assertEquals(1, ant.getLegFrame());
+        ant.updatePosition(GameNumbers.BASE_SPRITE_SPEED * 2f);
+        assertEquals(3, ant.getLegFrame());
+    }
+
+    @Test
     void idleAntResetsToLegFrameOne() {
         Colony colony = new Colony(1, "C", true);
         Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);

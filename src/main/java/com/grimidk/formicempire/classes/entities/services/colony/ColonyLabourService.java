@@ -93,30 +93,18 @@ public class ColonyLabourService {
             if (actualGathered > 0) {
                 resources.addResource(colony, type, actualGathered);
                 
-                if (type == GameConstants.RESOURCE_PLANT) {
+                if (type == GameConstants.RESOURCE_PLANT
+                        && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
                     for (int i = 0; i < actualGathered; ) {
                         if (workerIndex >= workers.size()) {
                             workerIndex = 0;
                         }
                         Ant worker = workers.get(workerIndex);
-                        worker.setCarrying(type);
-
-                        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                            if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
-                                double addedResin = resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
-                                if (addedResin > 0) {
-                                    worker.setCarryingSec(GameConstants.RESOURCE_RESIN);
-                                }
-                            }
+                        if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
+                            resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
                         }
                         i += AntSubtypeService.forageCarrySlots(worker);
                         workerIndex++;
-                    }
-                    
-                } else {
-                    for(Ant w : workers) {
-                        w.setCarrying(type);
-                        w.setCarryingSec(null);
                     }
                 }
                 
@@ -136,8 +124,6 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
             List<Ant> foragers = getWorkingAnts(colony, GameConstants.ROLE_FORAGER);
             if (!foragers.isEmpty()) {
-                for(Ant a : foragers) a.clearLoad();
-                
                 int totalPower = AntSubtypeService.sumCollectingPower(colony, foragers);
                 List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
                 List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
@@ -182,7 +168,6 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             List<Ant> hunters = getWorkingAnts(colony, GameConstants.ROLE_HUNTER);
             if (!hunters.isEmpty()) {
-                for(Ant a : hunters) a.clearLoad();
                 int totalPower = (int) (hunters.size() * stats.getCollectingRate(colony));
                 List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_MEAT);
                 processGathering(colony, sources, totalPower, GameConstants.RESOURCE_MEAT, hunters);
@@ -193,7 +178,6 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
             List<Ant> miners = getWorkingAnts(colony, GameConstants.ROLE_MINER);
             if (!miners.isEmpty()) {
-                for(Ant a : miners) a.clearLoad();
                 if (GameRandom.nextDouble() < GameNumbers.MINING_GATHER_SUCCESS_CHANCE) {
                     int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
                     List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);

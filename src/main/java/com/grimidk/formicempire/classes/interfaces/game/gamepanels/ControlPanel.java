@@ -291,6 +291,7 @@ public class ControlPanel extends ZeroGamePanel {
             return;
         }
         engine.togglePause();
+        frame.getGamePanel().onGameSpeedChanged();
         setPlayPauseButtonText(engine.isPaused());
         updateTickLabel(engine);
         frame.getGamePanel().updateStatusIndicator(engine.isPaused());
@@ -302,6 +303,7 @@ public class ControlPanel extends ZeroGamePanel {
             return;
         }
         eng.adjustSpeedStep(direction);
+        frame.getGamePanel().onGameSpeedChanged();
         applySpeedLevel();
     }
 

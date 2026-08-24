@@ -124,7 +124,7 @@ public final class GameUnlocks {
         static { upgrades.add(ROLE_MILITIA); }
         public static final Upgrade ROLE_CATCHER = new Upgrade(33, "ROLE_CATCHER_UPGRADE", "ROLE_CATCHER_FLAVOR", "ROLE_CATCHER_DESC", ROLE_HUNTER, 500, loadIcon("icons/upgrades/RoleCatcher.png"), 1);
         static { upgrades.add(ROLE_CATCHER); }
-        public static final Upgrade ROLE_CRANE = new Upgrade(34, "ROLE_CRANE_UPGRADE", "ROLE_CRANE_FLAVOR", "ROLE_CRANE_DESC", TYPE_MAJOR, 250000, loadIcon("icons/upgrades/RoleCrane.png"), 4);
+        public static final Upgrade ROLE_CRANE = new Upgrade(34, "ROLE_CRANE_UPGRADE", "ROLE_CRANE_FLAVOR", "ROLE_CRANE_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleCrane.png"), 0);
         static { upgrades.add(ROLE_CRANE); }
         public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "ROLE_ASSISTANT_UPGRADE", "ROLE_ASSISTANT_FLAVOR", "ROLE_ASSISTANT_DESC", TYPE_PRINCESS, 1200, loadIcon("icons/upgrades/RoleAssistant.png"), 2);
         static { upgrades.add(ROLE_ASSISTANT); }

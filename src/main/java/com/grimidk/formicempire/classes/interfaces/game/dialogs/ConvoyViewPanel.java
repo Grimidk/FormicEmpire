@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -259,8 +260,12 @@ public class ConvoyViewPanel extends JPanel {
             boolean flying = skyConvoy && winged;
             int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, flying, true, ant.wobblePhase, animationSeconds,
                     ant.motionRate);
-            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, animationSeconds,
-                    ant.motionRate);
+            ResourceType[] cargo = convoyCarryIcons();
+            boolean showCarry = RouteViewVisuals.canHoldJawCargo(ant.type) && cargo.length > 0;
+            int jawFrame = RouteViewVisuals.jawFrameForCarry(
+                    RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, animationSeconds,
+                            ant.motionRate),
+                    showCarry);
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, winged, ant.wobblePhase, animationSeconds,
                     ant.motionRate);
             int antennaFrame = RouteViewVisuals.resolveAntennaFrame(ant.type, ant.wobblePhase, animationSeconds,
@@ -283,6 +288,9 @@ public class ConvoyViewPanel extends JPanel {
             g2d.translate(cx, cy);
             g2d.rotate(Math.toRadians(faceAngle));
             g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
+            if (showCarry) {
+                RouteViewVisuals.paintJawCarryIcons(g2d, cargo, w, h, this);
+            }
             g2d.setTransform(old);
         }
     }
@@ -366,6 +374,14 @@ public class ConvoyViewPanel extends JPanel {
             }
         }
         return ants;
+    }
+
+    private ResourceType[] convoyCarryIcons() {
+        if (trade == null) {
+            return new ResourceType[0];
+        }
+        boolean returning = scene != null && scene.isReturning();
+        return RouteViewVisuals.cargoIcons(returning ? trade.getReturnLoad() : trade.getLoad());
     }
 
     private static boolean includeConvoyVisualType(AntType type, boolean skyConvoy) {

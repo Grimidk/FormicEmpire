@@ -22,6 +22,7 @@ import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreload
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import javax.swing.*;
@@ -827,12 +828,13 @@ public class GameAreaPanel extends ZeroGamePanel {
                     continue;
                 }
 
+                boolean showCarry = RouteViewVisuals.showsGathererCarry(ant);
                 ImageIcon antSpriteIcon = GameConstants.getAntSprite(
                         type,
                         colony.getSpecies(),
                         ant.getSubtypeProfile(),
                         ant.getLegFrame(),
-                        ant.getJawFrame(),
+                        RouteViewVisuals.jawFrameForCarry(ant.getJawFrame(), showCarry),
                         ant.getWingFrame(),
                         ant.getAntennaFrame(),
                         ant.isParasiticMiteInfected());
@@ -860,6 +862,9 @@ public class GameAreaPanel extends ZeroGamePanel {
                 g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(currentSprite, -w / 2, -h / 2, this);
+                if (showCarry) {
+                    RouteViewVisuals.paintJawCarryIcons(g2d, RouteViewVisuals.gathererCarryIcons(ant), w, h, this);
+                }
 
                 g2d.setTransform(oldTransform);
             }

@@ -1441,7 +1441,10 @@ public class GamePanel extends ZeroGamePanel {
         if (engine == null) return;
 
         pendingMinuteGuiSteps.set(0);
-        minuteTickListener = () -> pendingMinuteGuiSteps.incrementAndGet();
+        minuteTickListener = () -> pendingMinuteGuiSteps.updateAndGet(v ->
+                v >= GameNumbers.MAX_PENDING_MINUTE_GUI_STEPS
+                        ? GameNumbers.MAX_PENDING_MINUTE_GUI_STEPS
+                        : v + 1);
         hourTickListener = () -> SwingUtilities.invokeLater(this::updateHourGUI);
         dayTickListener = () -> SwingUtilities.invokeLater(this::updateDayGUI);
         monthTickListener = () -> SwingUtilities.invokeLater(this::updateMonthGUI);
@@ -1530,6 +1533,11 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.setPlayPauseButtonText(eng.isPaused());
             }
         }
+    }
+
+    public void onGameSpeedChanged() {
+        pendingMinuteGuiSteps.set(0);
+        applyVisualFrameRateSetting();
     }
 
     public void refreshAllGUIData() {

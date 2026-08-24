@@ -231,7 +231,9 @@ public class MenuChaoticPanel extends JPanel {
         float anim = quantizedAnimSeconds();
         boolean moving = Math.abs(ant.vx) > 0.001f || Math.abs(ant.vy) > 0.001f;
         int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, false, moving, ant.wobblePhase, anim, ant.motionRate);
-        int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
+        int jawFrame = RouteViewVisuals.jawFrameForCarry(
+                RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate),
+                showingCarry(ant));
         int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, RouteViewVisuals.isWinged(ant.type),
                 ant.wobblePhase, anim, ant.motionRate);
         int antennaFrame = RouteViewVisuals.resolveAntennaFrame(ant.type, ant.wobblePhase, anim, ant.motionRate);
@@ -336,6 +338,10 @@ public class MenuChaoticPanel extends JPanel {
         }
     }
 
+    private static boolean showingCarry(MenuChaoticWorld.ShowcaseAnt ant) {
+        return ant != null && RouteViewVisuals.canHoldJawCargo(ant.type) && ant.carrying != null;
+    }
+
     private void drawConvoyFormation(Graphics2D g2d, List<MenuChaoticWorld.ShowcaseAnt> ants, Rectangle field,
             boolean travelingRight, ConvoyScene.BackgroundKind backgroundKind) {
         if (ants.isEmpty() || field.width <= 4 || field.height <= 4) {
@@ -352,7 +358,9 @@ public class MenuChaoticPanel extends JPanel {
             boolean winged = RouteViewVisuals.isWinged(ant.type);
             boolean flying = skyConvoy && winged;
             int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, flying, true, ant.wobblePhase, anim, ant.motionRate);
-            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
+            int jawFrame = RouteViewVisuals.jawFrameForCarry(
+                    RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate),
+                    showingCarry(ant));
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, winged, ant.wobblePhase, anim, ant.motionRate);
             int antennaFrame = RouteViewVisuals.resolveAntennaFrame(ant.type, ant.wobblePhase, anim, ant.motionRate);
             int drawX = centerX + Math.round(ant.offsetX * radiusX);
@@ -476,6 +484,10 @@ public class MenuChaoticPanel extends JPanel {
         g2d.translate(drawX, drawY);
         g2d.rotate(Math.toRadians(angleDegrees));
         g2d.drawImage(ant.cachedSprite, -w / 2, -h / 2, w, h, this);
+        if (showingCarry(ant)) {
+            RouteViewVisuals.paintJawCarryIcons(g2d, RouteViewVisuals.carryIcons(ant.carrying, ant.carryingSec), w, h,
+                    this);
+        }
         g2d.setTransform(old);
     }
 

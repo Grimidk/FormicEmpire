@@ -1,7 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -13,7 +15,9 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public final class RouteViewVisuals {
@@ -101,6 +105,84 @@ public final class RouteViewVisuals {
 
     public static boolean isWinged(AntType type) {
         return type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS;
+    }
+
+    public static boolean canHoldJawCargo(AntType type) {
+        return type != null && !isWinged(type);
+    }
+
+    public static boolean isGathererRole(AntRole role) {
+        return role == GameConstants.ROLE_FORAGER
+                || role == GameConstants.ROLE_HUNTER
+                || role == GameConstants.ROLE_MINER;
+    }
+
+    public static boolean showsGathererCarry(Ant ant) {
+        return ant != null && isGathererRole(ant.getRole()) && ant.getCarrying() != null;
+    }
+
+    public static int jawFrameForCarry(int resolvedJawFrame, boolean showingCarry) {
+        return showingCarry ? 2 : resolvedJawFrame;
+    }
+
+    public static ResourceType[] gathererCarryIcons(Ant ant) {
+        if (!showsGathererCarry(ant)) {
+            return new ResourceType[0];
+        }
+        return carryIcons(ant.getCarrying(), ant.getCarryingSec());
+    }
+
+    public static ResourceType[] carryIcons(ResourceType primary, ResourceType secondary) {
+        if (primary == null) {
+            return secondary != null ? new ResourceType[] { secondary } : new ResourceType[0];
+        }
+        if (secondary != null && secondary.getId() != primary.getId()) {
+            return new ResourceType[] { primary, secondary };
+        }
+        return new ResourceType[] { primary };
+    }
+
+    public static ResourceType[] cargoIcons(Map<ResourceType, Double> cargo) {
+        if (cargo == null || cargo.isEmpty()) {
+            return new ResourceType[0];
+        }
+        List<ResourceType> types = new ArrayList<>();
+        for (Map.Entry<ResourceType, Double> entry : cargo.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0d) {
+                continue;
+            }
+            types.add(entry.getKey());
+        }
+        types.sort(Comparator.comparingInt(ResourceType::getId));
+        if (types.size() > 2) {
+            return new ResourceType[] { types.get(0), types.get(1) };
+        }
+        return types.toArray(ResourceType[]::new);
+    }
+
+    public static void paintJawCarryIcons(Graphics2D g2d, ResourceType[] resources, int spriteWidth, int spriteHeight,
+            ImageObserver observer) {
+        if (g2d == null || resources == null || resources.length == 0 || spriteWidth <= 0 || spriteHeight <= 0) {
+            return;
+        }
+        int iconPx = GameNumbers.ANT_CARRY_ICON_PX;
+        float scale = spriteHeight / (float) GameNumbers.ANT_CARRY_SPRITE_NATIVE_PX;
+        int jawY = Math.round(GameNumbers.ANT_CARRY_JAW_OFFSET_Y * scale);
+        int dualX = Math.round(GameNumbers.ANT_CARRY_DUAL_OFFSET_X * scale);
+        Object oldInterp = g2d.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        int count = Math.min(2, resources.length);
+        for (int i = 0; i < count; i++) {
+            ResourceType type = resources[i];
+            if (type == null || type.getIcon() == null || type.getIcon().getImage() == null) {
+                continue;
+            }
+            int x = count == 1 ? 0 : (i == 0 ? -dualX : dualX);
+            g2d.drawImage(type.getIcon().getImage(), x - iconPx / 2, jawY - iconPx / 2, iconPx, iconPx, observer);
+        }
+        if (oldInterp != null) {
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, oldInterp);
+        }
     }
 
     public static List<ConvoyResourceProp> buildConvoyResourceProps(long seed, ConvoyScene.BackgroundKind backgroundKind) {

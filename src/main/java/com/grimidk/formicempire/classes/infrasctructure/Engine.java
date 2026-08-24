@@ -79,7 +79,7 @@ public class Engine extends Thread {
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
-    private static final long SPEED_STEP_COALESCE_MS = 120;
+    private static final long SPEED_STEP_COALESCE_MS = 40;
 
     public Engine() {
         this.semaphore = new Semaphore(1);

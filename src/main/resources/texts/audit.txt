@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 93% (358/386 checked)
+Completion: 92% (355/387 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -117,6 +117,7 @@ Side panels (live updates while playing):
 [X] Space — pause / resume
 [X] + / = / - — increase / decrease speed
 [X] Z — toggle Overworld / Underworld view
+[ ] Forager, hunter, and miner ants show resource icon(s) in open jaws only when returning with cargo (outbound empty; eggs/brood not shown)
 [X] ESC — game menu (Colony & Dynasty submenus) or close top dialog
 [X] Q — Workers role dialog (toggle)
 [X] W — Soldiers role dialog (toggle)
@@ -220,7 +221,7 @@ Soldier roles:
 [ ] Bomber (unlocked by Exploding Ant / Selfdestruct assimilation; war-economy active military)
 
 Major roles:
-[X] Brute, Crane
+[ ] Brute + Construction Crane (both unlock automatically with Major type; one combined popup)
 [ ] Siege (RP purchase; Tier 4; hex-assault only)
 
 Princess roles:
@@ -371,6 +372,7 @@ Neighbor trade rows (per adjacent hex):
 [X] Excess cargo over destination capacity returns to origin (discarded if origin is also full)
 [X] Active trade edit from table actions (Manage / Establish)
 [X] See convoy option in logistics Actions menu (opens convoy transit view)
+[ ] Convoy ants show current-leg cargo icons in open jaws (outbound load / return load; empty leg has none)
 [X] Make two-way trade option in logistics Actions menu (enabled when matching incoming one-way route exists)
 [ ] Show all dynasty connections toggle (lists every adjacent same-dynasty link; unchecked = map-active colony neighbors only)
 [ ] Automated recurrent routes refresh pending cargo when surpluses shift (fungi, plants, water, resin, minerals)
@@ -484,14 +486,16 @@ Daily:
 [X] Graver role unlock
 [X] Scout unlock from plant harvest (any plant source)
 [ ] Miner unlock from 10 Tier 3 buildings across dynasty (requires Soldier type; scouts then spot minerals)
-[X] Hunter / Breeder / Brute role unlocks
+[ ] Hunter + Warrior + Militia role unlocks (one popup with Soldier type)
+[ ] Breeder + Spread unlock together (one popup with Princess type)
+[ ] Brute + Construction Crane (both unlock automatically with Major type; one combined popup)
 [X] Queendom rank unlocks Air Support princess role
 [X] Commander role unlock (3 wars participated + multi-queen colony)
 [X] Commander assignment: max 1 per colony; requires spare queen off combat; raises dynasty combat capacity 1k→2.5k once
-[X] Research / Build / Spread ability unlocks
-[X] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
+[X] Research / Build ability unlocks
+[ ] Dynasty / Trade+Courier / Management / Spread 2 / Automation unlocks by colony count (Trade and Courier share one popup)
 [X] Bilateral Trade unlock from active trade count
-[X] Courier / Borer role unlocks
+[X] Borer role unlock
 [X] Assimilation ability unlock from absorbed dynasties
 [X] Omni starts with Genome Bridge completed; other species assimilations still gated until Genome Bridge; Assimilation UI only when a new genome is researchable
 [X] Subtype hatch ability unlock after body-part assimilation

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingUtilities;
@@ -122,5 +123,120 @@ class TriggerManagerTest {
         assertTrue(npc.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE));
         assertTrue(npc.hasUpgrade(GameUnlocks.ROLE_CATCHER));
         assertEquals(null, unlocked.get());
+    }
+
+    @Test
+    void soldierUnlockGrantsHunterWarriorMilitiaInOnePopup() throws Exception {
+        Engine engine = new Engine();
+        World world = new World();
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        Colony colony = new Colony(1, "Capital", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+        colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+
+        TriggerManager manager = new TriggerManager(world, colony, engine);
+        AtomicReference<Upgrade> unlocked = new AtomicReference<>();
+        AtomicInteger popups = new AtomicInteger();
+        manager.addListener(new TriggerManager.TriggerListener() {
+            @Override
+            public void onUpgradeTriggered(Upgrade upgrade, String title, String message) {
+                unlocked.set(upgrade);
+                popups.incrementAndGet();
+            }
+
+            @Override
+            public void onColonyDeath() {
+            }
+        });
+
+        Method check = TriggerManager.class.getDeclaredMethod("checkSoldierRoleUnlocks");
+        check.setAccessible(true);
+        check.invoke(manager);
+        SwingUtilities.invokeAndWait(() -> { });
+
+        assertEquals(1, popups.get());
+        assertEquals(GameUnlocks.ROLE_HUNTER, unlocked.get());
+        assertTrue(colony.hasUpgrade(GameUnlocks.ROLE_HUNTER));
+        assertTrue(colony.hasUpgrade(GameUnlocks.ROLE_WARRIOR));
+        assertTrue(colony.hasUpgrade(GameUnlocks.ROLE_MILITIA));
+    }
+
+    @Test
+    void breederAndSpreadUnlockInOnePopup() throws Exception {
+        Engine engine = new Engine();
+        World world = new World();
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        Colony colony = new Colony(1, "Capital", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+        colony.unlockUpgrade(GameUnlocks.TYPE_PRINCESS);
+
+        TriggerManager manager = new TriggerManager(world, colony, engine);
+        AtomicInteger popups = new AtomicInteger();
+        AtomicReference<Upgrade> unlocked = new AtomicReference<>();
+        manager.addListener(new TriggerManager.TriggerListener() {
+            @Override
+            public void onUpgradeTriggered(Upgrade upgrade, String title, String message) {
+                unlocked.set(upgrade);
+                popups.incrementAndGet();
+            }
+
+            @Override
+            public void onColonyDeath() {
+            }
+        });
+
+        Method check = TriggerManager.class.getDeclaredMethod("checkBreederAndSpreadUnlock");
+        check.setAccessible(true);
+        check.invoke(manager);
+        SwingUtilities.invokeAndWait(() -> { });
+
+        assertEquals(1, popups.get());
+        assertEquals(GameUnlocks.ABILITY_SPREAD, unlocked.get());
+        assertTrue(colony.hasUpgrade(GameUnlocks.ROLE_BREEDER));
+        assertTrue(colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD));
+    }
+
+    @Test
+    void tradeAndCourierUnlockInOnePopup() throws Exception {
+        Engine engine = new Engine();
+        World world = new World();
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        Colony capital = new Colony(1, "Capital", true);
+        Colony a = new Colony(2, "A", true);
+        Colony b = new Colony(3, "B", true);
+        dynasty.addColony(capital);
+        dynasty.addColony(a);
+        dynasty.addColony(b);
+        capital.setDynasty(dynasty);
+        a.setDynasty(dynasty);
+        b.setDynasty(dynasty);
+        capital.unlockUpgrade(GameUnlocks.ABILITY_DYNASTY);
+
+        TriggerManager manager = new TriggerManager(world, capital, engine);
+        AtomicInteger popups = new AtomicInteger();
+        AtomicReference<Upgrade> unlocked = new AtomicReference<>();
+        manager.addListener(new TriggerManager.TriggerListener() {
+            @Override
+            public void onUpgradeTriggered(Upgrade upgrade, String title, String message) {
+                unlocked.set(upgrade);
+                popups.incrementAndGet();
+            }
+
+            @Override
+            public void onColonyDeath() {
+            }
+        });
+
+        Method check = TriggerManager.class.getDeclaredMethod("checkDynastyTriggers");
+        check.setAccessible(true);
+        check.invoke(manager);
+        SwingUtilities.invokeAndWait(() -> { });
+
+        assertEquals(1, popups.get());
+        assertEquals(GameUnlocks.ABILITY_TRADE, unlocked.get());
+        assertTrue(capital.hasUpgrade(GameUnlocks.ABILITY_TRADE));
+        assertTrue(capital.hasUpgrade(GameUnlocks.ROLE_COURIER));
     }
 }
