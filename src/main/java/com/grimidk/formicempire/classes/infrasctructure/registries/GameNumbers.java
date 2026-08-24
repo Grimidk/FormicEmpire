@@ -207,6 +207,7 @@ public final class GameNumbers {
     public static final int DIPLOMAT_MAX_PER_COLONY_MISSION = 3;
     public static final int AUTO_UPGRADE_MIN_COMPLETE_TUNNELS = 5;
     public static final int AUTO_UPGRADE_MIN_DIPLOMATS_SENT = 10;
+    public static final int AUTO_UPGRADE_MIN_RECURRENT_ROUTES = 10;
 
     // --- Triggers ---
     public static final int TRIGGER_GRAVER_DEAD_ANTS = 100;

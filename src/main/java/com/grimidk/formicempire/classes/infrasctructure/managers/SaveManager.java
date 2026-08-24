@@ -382,6 +382,7 @@ public class SaveManager {
                 sc.defaultAutoBuildEnabled = dynasty.isDefaultAutoBuildEnabled();
                 sc.autoDiplomacyEnabled = dynasty.isAutoDiplomacyEnabled();
                 sc.defaultAutoTunnelsEnabled = dynasty.isDefaultAutoTunnelsEnabled();
+                sc.defaultAutoLogisticsEnabled = dynasty.isDefaultAutoLogisticsEnabled();
                 sc.pactRequestIncomingPolicy = dynasty.getPactRequestIncomingPolicy().name();
                 sc.lastIncomingPactRequestWorldDay = dynasty.getLastIncomingPactRequestWorldDay();
                 sc.diplomatSupportToDynasty = new HashMap<>();
@@ -544,6 +545,7 @@ public class SaveManager {
                     sc.isAutomated = c.isAutomationEnabled();
                     sc.autoBuildEnabled = c.isAutoBuildEnabled();
                     sc.autoTunnelsEnabled = c.isAutoTunnelsEnabled();
+                    sc.autoLogisticsEnabled = c.isAutoLogisticsEnabled();
                     sc.age = c.getAge();
                     sc.daysWithoutQueen = c.getDaysWithoutQueen();
                     sc.loyalty = c.getLoyalty();
@@ -747,6 +749,7 @@ public class SaveManager {
         writeJsonLine(w, "defaultAutoBuildEnabled", sc.defaultAutoBuildEnabled, false);
         writeJsonLine(w, "autoDiplomacyEnabled", sc.autoDiplomacyEnabled, false);
         writeJsonLine(w, "defaultAutoTunnelsEnabled", sc.defaultAutoTunnelsEnabled, false);
+        writeJsonLine(w, "defaultAutoLogisticsEnabled", sc.defaultAutoLogisticsEnabled, false);
         writeJsonLine(w, "pactRequestIncomingPolicy", sc.pactRequestIncomingPolicy, false);
         writeJsonLine(w, "lastIncomingPactRequestWorldDay", sc.lastIncomingPactRequestWorldDay, false);
         writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
@@ -796,6 +799,7 @@ public class SaveManager {
         writeJsonLine(w, "isAutomated", sc.isAutomated, false);
         writeJsonLine(w, "autoBuildEnabled", sc.autoBuildEnabled, false);
         writeJsonLine(w, "autoTunnelsEnabled", sc.autoTunnelsEnabled, false);
+        writeJsonLine(w, "autoLogisticsEnabled", sc.autoLogisticsEnabled, false);
         writeJsonLine(w, "age", sc.age, false);
         writeJsonLine(w, "daysWithoutQueen", sc.daysWithoutQueen, false);
         writeJsonLine(w, "loyalty", sc.loyalty, false);
@@ -1024,6 +1028,7 @@ public class SaveManager {
         sc.defaultAutoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoBuildEnabled", "false"));
         sc.autoDiplomacyEnabled = Boolean.parseBoolean(map.getOrDefault("autoDiplomacyEnabled", "false"));
         sc.defaultAutoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoTunnelsEnabled", "false"));
+        sc.defaultAutoLogisticsEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoLogisticsEnabled", "false"));
         sc.pactRequestIncomingPolicy = map.getOrDefault("pactRequestIncomingPolicy", "MANUAL");
         sc.lastIncomingPactRequestWorldDay = Integer.parseInt(
                 map.getOrDefault("lastIncomingPactRequestWorldDay", "-1"));
@@ -1123,6 +1128,7 @@ public class SaveManager {
         sc.isAutomated = Boolean.parseBoolean(map.getOrDefault("isAutomated", "false"));
         sc.autoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("autoBuildEnabled", "false"));
         sc.autoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("autoTunnelsEnabled", "false"));
+        sc.autoLogisticsEnabled = Boolean.parseBoolean(map.getOrDefault("autoLogisticsEnabled", "false"));
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
         sc.daysWithoutQueen = Integer.parseInt(map.getOrDefault("daysWithoutQueen", "0"));
         sc.loyalty = Integer.parseInt(map.getOrDefault("loyalty", String.valueOf(GameNumbers.DEFAULT_COLONY_LOYALTY)));

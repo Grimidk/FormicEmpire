@@ -141,21 +141,39 @@ public class ColonyLabourService {
                 int totalPower = AntSubtypeService.sumCollectingPower(colony, foragers);
                 List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
                 List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
+                List<ResourceSource> fungiSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)
+                        ? locations.getSourcesByType(GameConstants.RESOURCE_FUNGI) : List.of();
+                List<ResourceSource> resinSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3)
+                        ? locations.getSourcesByType(GameConstants.RESOURCE_RESIN) : List.of();
 
                 boolean canCollectPlants = !plantSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_PLANT);
                 boolean canCollectWater = !waterSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_WATER);
-                
-                if (canCollectPlants && canCollectWater) {
-                    int halfPower = totalPower / 2;
-                    int remainingPower = totalPower - halfPower;
-                    int plantsGathered = processGathering(colony, plantSources, halfPower, GameConstants.RESOURCE_PLANT, foragers);
-                    int waterPower = remainingPower + (halfPower - plantsGathered);
-                    
-                    processGathering(colony, waterSources, waterPower, GameConstants.RESOURCE_WATER, foragers);
-                } else if (canCollectPlants) {
-                    processGathering(colony, plantSources, totalPower, GameConstants.RESOURCE_PLANT, foragers);
-                } else if (canCollectWater) {
-                    processGathering(colony, waterSources, totalPower, GameConstants.RESOURCE_WATER, foragers);
+                boolean canCollectFungi = !fungiSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI);
+                boolean canCollectResin = !resinSources.isEmpty() && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
+                        && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN);
+
+                int activeTypes = (canCollectPlants ? 1 : 0) + (canCollectWater ? 1 : 0)
+                        + (canCollectFungi ? 1 : 0) + (canCollectResin ? 1 : 0);
+                if (activeTypes > 0) {
+                    int share = totalPower / activeTypes;
+                    int remainder = totalPower;
+                    if (canCollectPlants) {
+                        int gathered = processGathering(colony, plantSources, share, GameConstants.RESOURCE_PLANT, foragers);
+                        remainder = remainder - share + (share - gathered);
+                    }
+                    if (canCollectWater) {
+                        int power = activeTypes == 1 ? remainder : share;
+                        int gathered = processGathering(colony, waterSources, power, GameConstants.RESOURCE_WATER, foragers);
+                        remainder = remainder - power + (power - gathered);
+                    }
+                    if (canCollectFungi) {
+                        int power = (canCollectPlants || canCollectWater) ? share : remainder;
+                        processGathering(colony, fungiSources, power, GameConstants.RESOURCE_FUNGI, foragers);
+                    }
+                    if (canCollectResin) {
+                        int power = activeTypes == 1 ? totalPower : share;
+                        processGathering(colony, resinSources, power, GameConstants.RESOURCE_RESIN, foragers);
+                    }
                 }
             }
         }
@@ -525,6 +543,14 @@ public class ColonyLabourService {
                 && biome != null && biome.getMineralAbundance() > 0) {
             possibleTypes.add(GameConstants.RESOURCE_ROCK);
         }
+        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2) && !locations.isSourceFull(colony, GameConstants.RESOURCE_FUNGI)
+                && biome != null && biome.getMushroomAbundance() > 0) {
+            possibleTypes.add(GameConstants.RESOURCE_FUNGI);
+        }
+        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3) && !locations.isSourceFull(colony, GameConstants.RESOURCE_RESIN)
+                && biome != null && biome.getResinAbundance() > 0) {
+            possibleTypes.add(GameConstants.RESOURCE_RESIN);
+        }
         if (!locations.isSourceFull(colony, GameConstants.RESOURCE_WATER)) {
             possibleTypes.add(GameConstants.RESOURCE_WATER); 
         }
@@ -538,6 +564,8 @@ public class ColonyLabourService {
             if (selectedType == GameConstants.RESOURCE_PLANT) abundance = biome.getPlantAbundance();
             else if (selectedType == GameConstants.RESOURCE_MEAT) abundance = biome.getAnimalAbundance();
             else if (selectedType == GameConstants.RESOURCE_ROCK) abundance = biome.getMineralAbundance();
+            else if (selectedType == GameConstants.RESOURCE_FUNGI) abundance = biome.getMushroomAbundance();
+            else if (selectedType == GameConstants.RESOURCE_RESIN) abundance = biome.getResinAbundance();
             else if (selectedType == GameConstants.RESOURCE_WATER) {
                 int h = biome.isIsHumid();
                 if (h >= 5) abundance = 0.9f;     

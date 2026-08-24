@@ -14,6 +14,8 @@ public class Biome extends Constant{
     private final float plantAbundance;
     private final float animalAbundance;
     private final float mineralAbundance;
+    private final float mushroomAbundance;
+    private final float resinAbundance;
     private final int difficulty;
     private final ImageIcon background;
     private final String mapColorHex;
@@ -22,13 +24,16 @@ public class Biome extends Constant{
     private List<Species> nativeParasites = List.of();
 
     public Biome(int id, String name, int temperature, int humidity, float plantAbundance, float animalAbundance,
-            float mineralAbundance, int difficulty, String mapColorHex, ImageIcon icon, ImageIcon background) {
+            float mineralAbundance, float mushroomAbundance, float resinAbundance, int difficulty, String mapColorHex,
+            ImageIcon icon, ImageIcon background) {
         super(id, name, icon);
         this.temperature = temperature;
         this.humidity = humidity;
         this.plantAbundance = plantAbundance;
         this.animalAbundance = animalAbundance;
         this.mineralAbundance = mineralAbundance;
+        this.mushroomAbundance = mushroomAbundance;
+        this.resinAbundance = resinAbundance;
         this.difficulty = difficulty;
         this.mapColorHex = normalizeMapColorHex(mapColorHex);
         this.mapColor = new Color(Integer.parseInt(this.mapColorHex, 16));
@@ -106,4 +111,6 @@ public class Biome extends Constant{
     public float getPlantAbundance() { return plantAbundance; }
     public float getAnimalAbundance() { return animalAbundance; }
     public float getMineralAbundance() { return mineralAbundance; }
+    public float getMushroomAbundance() { return mushroomAbundance; }
+    public float getResinAbundance() { return resinAbundance; }
 }

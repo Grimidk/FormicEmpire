@@ -1180,7 +1180,61 @@ public class SettingsPanel extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE));
     }
 
+    private boolean isActiveGameSession() {
+        return frame.getGamePanel() != null && frame.getGamePanel().isEngineStarted();
+    }
+
+    private boolean wouldEnableNewTaintingSandbox() {
+        return (freeAbilitiesCheck.isSelected() && !engine.isFreeAbilities())
+                || (infiniteResearchCheck.isSelected() && !engine.isInfiniteResearch())
+                || (instantBuildingsCheck.isSelected() && !engine.isInstantBuildings())
+                || (assimilateAllCheck.isSelected() && !engine.isAssimilateAll())
+                || (easyConqueringCheck.isSelected() && !engine.isEasyConquering())
+                || (instantIntegrationCheck.isSelected() && !engine.isInstantIntegration());
+    }
+
+    private void clearNewlySelectedTaintingSandboxChecks() {
+        if (freeAbilitiesCheck.isSelected() && !engine.isFreeAbilities()) {
+            freeAbilitiesCheck.setSelected(false);
+        }
+        if (infiniteResearchCheck.isSelected() && !engine.isInfiniteResearch()) {
+            infiniteResearchCheck.setSelected(false);
+        }
+        if (instantBuildingsCheck.isSelected() && !engine.isInstantBuildings()) {
+            instantBuildingsCheck.setSelected(false);
+        }
+        if (assimilateAllCheck.isSelected() && !engine.isAssimilateAll()) {
+            assimilateAllCheck.setSelected(false);
+        }
+        if (easyConqueringCheck.isSelected() && !engine.isEasyConquering()) {
+            easyConqueringCheck.setSelected(false);
+        }
+        if (instantIntegrationCheck.isSelected() && !engine.isInstantIntegration()) {
+            instantIntegrationCheck.setSelected(false);
+        }
+    }
+
+    private boolean confirmSandboxCheatsForActiveSession() {
+        if (!isActiveGameSession() || !wouldEnableNewTaintingSandbox()) {
+            return true;
+        }
+        Component parent = inDialog ? frame : this;
+        int result = UiOptionPane.showConfirmDialog(
+                parent,
+                LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_WARN_IN_GAME),
+                LanguageStrings.get(LanguageStrings.SAVE_ACHIEVEMENTS_WARN_TITLE),
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+            return true;
+        }
+        clearNewlySelectedTaintingSandboxChecks();
+        return false;
+    }
+
     private void saveSettings() {
+        confirmSandboxCheatsForActiveSession();
+
         LanguageOption selectedLang = (LanguageOption) languageCombo.getSelectedItem();
         if (selectedLang != null) {
             // Engine.setLanguage already updates LanguageStrings and notifies UI once.

@@ -31,7 +31,7 @@ public final class AntSpriteCompositor {
     public static final int MARKER_HONEYPOT = 0xFF0080;
     public static final int UNIVERSAL_BLACK = 0x000000;
 
-    private static final String SHARED_ROOT = "sprites/ants/zero-shared/";
+    private static final String SHARED_ROOT = "sprites/ants/shared/";
     private static final String PARASITIC_MITE_PATH = "sprites/critters/parasiticMite/ParasiticMite.png";
     private static final int[][] PARASITIC_MITE_OFFSETS = {{-4, -5}, {4, -4}, {-5, 2}, {5, 3}, {0, 5}};
     private static final int DEFAULT_LEG_FRAME = 1;

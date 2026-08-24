@@ -2,13 +2,16 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -64,8 +67,63 @@ public final class DynastyTradeAutomation {
         addIfSurplus(load, GameConstants.RESOURCE_PLANT, origin.getPlantsPrecise(),
                 stats.getPlantsCapacity(origin), destination.getPlantsPrecise(),
                 stats.getPlantsCapacity(destination));
+        addIfSurplus(load, GameConstants.RESOURCE_RESIN, origin.getResinsPrecise(),
+                stats.getResinsCapacity(origin), destination.getResinsPrecise(),
+                stats.getResinsCapacity(destination));
+        addIfSurplus(load, GameConstants.RESOURCE_ROCK, origin.getMineralsPrecise(),
+                stats.getMineralsCapacity(origin), destination.getMineralsPrecise(),
+                stats.getMineralsCapacity(destination));
 
         return load;
+    }
+
+    public static boolean loadsDiffer(Map<ResourceType, Double> current, Map<ResourceType, Double> proposed) {
+        Set<ResourceType> keys = new HashSet<>();
+        if (current != null) {
+            keys.addAll(current.keySet());
+        }
+        if (proposed != null) {
+            keys.addAll(proposed.keySet());
+        }
+        for (ResourceType type : keys) {
+            double cur = current != null ? current.getOrDefault(type, 0.0) : 0.0;
+            double next = proposed != null ? proposed.getOrDefault(type, 0.0) : 0.0;
+            if (Math.abs(cur - next) >= 1.0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void queueRecurrentLoadUpdate(Trade trade, Colony origin, Colony destination) {
+        if (trade == null || origin == null || destination == null) {
+            return;
+        }
+        boolean bilateral = trade.hasPendingUpdate() ? trade.isPendingBilateral() : trade.isBilateral();
+        boolean recurrent = trade.hasPendingUpdate() ? trade.isPendingRecurrent() : trade.isRecurrent();
+        if (!recurrent) {
+            return;
+        }
+
+        Map<ResourceType, Double> newLoad = computeOutboundLoad(origin, destination);
+        Map<ResourceType, Double> newReturn = bilateral ? computeOutboundLoad(destination, origin) : null;
+        if (newLoad.isEmpty() && (newReturn == null || newReturn.isEmpty())) {
+            return;
+        }
+
+        Map<ResourceType, Double> currentLoad = trade.hasPendingUpdate() && trade.getPendingLoad() != null
+                ? trade.getPendingLoad() : trade.getLoad();
+        Map<ResourceType, Double> currentReturn = trade.hasPendingUpdate() && trade.getPendingReturnLoad() != null
+                ? trade.getPendingReturnLoad() : trade.getReturnLoad();
+        if (!loadsDiffer(currentLoad, newLoad) && !loadsDiffer(currentReturn, newReturn)) {
+            return;
+        }
+
+        Map<AntType, Integer> transport = trade.hasPendingUpdate() && trade.getPendingTransport() != null
+                ? new HashMap<>(trade.getPendingTransport())
+                : new HashMap<>(trade.getTransport());
+        TradeMethod method = trade.hasPendingUpdate() ? trade.getPendingMethod() : trade.getMethod();
+        trade.setPendingUpdate(newLoad, newReturn, transport, true, bilateral, method);
     }
 
     private static void addIfSurplus(Map<ResourceType, Double> load, ResourceType type,

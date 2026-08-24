@@ -72,6 +72,7 @@ public class Dynasty {
     private boolean defaultAutoBuildEnabled;
     private boolean autoDiplomacyEnabled;
     private boolean defaultAutoTunnelsEnabled;
+    private boolean defaultAutoLogisticsEnabled;
     private PactRequestIncomingPolicy pactRequestIncomingPolicy;
     private int lastIncomingPactRequestWorldDay;
     private transient boolean pactRequestPromptOpen;
@@ -158,6 +159,7 @@ public class Dynasty {
         this.defaultAutoBuildEnabled = false;
         this.autoDiplomacyEnabled = false;
         this.defaultAutoTunnelsEnabled = false;
+        this.defaultAutoLogisticsEnabled = false;
         this.pactRequestIncomingPolicy = PactRequestIncomingPolicy.MANUAL;
         this.lastIncomingPactRequestWorldDay = -1;
         this.pactRequestPromptOpen = false;
@@ -217,6 +219,7 @@ public class Dynasty {
         this.defaultAutoBuildEnabled = savedDynasty.defaultAutoBuildEnabled;
         this.autoDiplomacyEnabled = savedDynasty.autoDiplomacyEnabled;
         this.defaultAutoTunnelsEnabled = savedDynasty.defaultAutoTunnelsEnabled;
+        this.defaultAutoLogisticsEnabled = savedDynasty.defaultAutoLogisticsEnabled;
         this.pactRequestIncomingPolicy = PactRequestIncomingPolicy.fromPersistenceKey(
                 savedDynasty.pactRequestIncomingPolicy);
         this.lastIncomingPactRequestWorldDay = savedDynasty.lastIncomingPactRequestWorldDay;
@@ -733,6 +736,7 @@ public class Dynasty {
         setDefaultAutoBuildEnabled(parent.isDefaultAutoBuildEnabled());
         setAutoDiplomacyEnabled(parent.isAutoDiplomacyEnabled());
         setDefaultAutoTunnelsEnabled(parent.isDefaultAutoTunnelsEnabled());
+        setDefaultAutoLogisticsEnabled(parent.isDefaultAutoLogisticsEnabled());
     }
     
     public void incrementNuptialFlights() {
@@ -1685,6 +1689,14 @@ public class Dynasty {
         return diplomatsSentTotal >= GameNumbers.AUTO_UPGRADE_MIN_DIPLOMATS_SENT;
     }
 
+    public boolean meetsAutoLogisticsPrerequisites() {
+        DynastyTradeService tradeService = getTradeService();
+        if (tradeService == null) {
+            return false;
+        }
+        return tradeService.countActiveRecurrentRoutes() >= GameNumbers.AUTO_UPGRADE_MIN_RECURRENT_ROUTES;
+    }
+
     public boolean isDefeated() { return isDefeated; }
     public void setDefeated(boolean isDefeated) { this.isDefeated = isDefeated; }
 
@@ -1731,6 +1743,9 @@ public class Dynasty {
 
     public boolean isDefaultAutoTunnelsEnabled() { return defaultAutoTunnelsEnabled; }
     public void setDefaultAutoTunnelsEnabled(boolean enabled) { this.defaultAutoTunnelsEnabled = enabled; }
+
+    public boolean isDefaultAutoLogisticsEnabled() { return defaultAutoLogisticsEnabled; }
+    public void setDefaultAutoLogisticsEnabled(boolean enabled) { this.defaultAutoLogisticsEnabled = enabled; }
 
     public int getDiplomatSupportTo(int otherDynastyId) {
         return diplomatSupportToDynasty.getOrDefault(otherDynastyId, 0);

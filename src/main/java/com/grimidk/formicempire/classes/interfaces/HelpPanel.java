@@ -1310,7 +1310,9 @@ public class HelpPanel extends JPanel {
                             + LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>"
                             + LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>"
                             + LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>"
-                            + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x");
+                            + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_FUNGI") + ": " + b.getMushroomAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_RESIN") + ": " + b.getResinAbundance() + "x");
             JLabel bLabel = new JLabel(bInfo, b.getIcon(), SwingConstants.LEFT);
             bLabel.setFont(AssetStyles.FONT_SMALL);
             bLabel.setForeground(AssetStyles.FONT_COLOR);

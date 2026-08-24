@@ -89,6 +89,8 @@ public class ColonyPanel extends ZeroGamePanel {
     private int lastProteinAvailable = -1;
     private int lastWaterAvailable = -1;
     private int lastMineralsAvailable = -1;
+    private int lastMushroomsAvailable = -1;
+    private int lastResinsAvailable = -1;
     
     private int lastTotalConsumption = -1;
     private int lastEggs = -1;
@@ -403,9 +405,19 @@ public class ColonyPanel extends ZeroGamePanel {
         int proteinAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) : 0;
         int waterAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) : 0;
         int mineralsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_ROCK) : 0;
+        int fungiAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_FUNGI) : 0;
+        int resinAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_RESIN) : 0;
 
         totalResourcesLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_RESOURCES, totalResources));
-        if (mushrooms != lastMushrooms) mushroomsLabel.setText(AssetStyles.formatNumber(mushrooms));
+        boolean showFungiSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2);
+        if (mushrooms != lastMushrooms || (showFungiSources && fungiAvail != lastMushroomsAvailable)) {
+            if (showFungiSources) {
+                mushroomsLabel.setText(AssetStyles.formatNumber(mushrooms) + " / (" + AssetStyles.formatNumber(fungiAvail) + ")");
+                lastMushroomsAvailable = fungiAvail;
+            } else {
+                mushroomsLabel.setText(AssetStyles.formatNumber(mushrooms));
+            }
+        }
         
         if (plants != lastPlants || plantsAvail != lastPlantsAvailable) {
             plantLabel.setText(AssetStyles.formatNumber(plants) + " / (" + AssetStyles.formatNumber(plantsAvail) + ")");
@@ -427,8 +439,16 @@ public class ColonyPanel extends ZeroGamePanel {
         if (hasRanching && syrups != lastSyrups) syrupLabel.setText(AssetStyles.formatNumber(syrups));
 
         boolean hasResinResonation = colony.hasUpgrade(GameUnlocks.ABILITY_RESIN);
+        boolean showResinSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3);
         resinLabel.setVisible(hasResinResonation);
-        if (hasResinResonation && resins != lastResins) resinLabel.setText(AssetStyles.formatNumber(resins));
+        if (hasResinResonation && (resins != lastResins || (showResinSources && resinAvail != lastResinsAvailable))) {
+            if (showResinSources) {
+                resinLabel.setText(AssetStyles.formatNumber(resins) + " / (" + AssetStyles.formatNumber(resinAvail) + ")");
+                lastResinsAvailable = resinAvail;
+            } else {
+                resinLabel.setText(AssetStyles.formatNumber(resins));
+            }
+        }
 
         boolean hasMining = colony.hasUpgrade(GameUnlocks.ROLE_MINER);
         mineralLabel.setVisible(hasMining);

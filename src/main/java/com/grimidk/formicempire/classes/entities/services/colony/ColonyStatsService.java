@@ -411,6 +411,22 @@ public class ColonyStatsService {
         return minerCount * getCollectingRate(colony) * GameNumbers.MINING_GATHER_SUCCESS_CHANCE;
     }
 
+    public double getFungiProductionHourly(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) {
+            return 0;
+        }
+        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+        return foragerCount * getCollectingRate(colony) * 0.25;
+    }
+
+    public double getResinProductionHourly(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3) || !colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+            return 0;
+        }
+        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+        return foragerCount * getCollectingRate(colony) * 0.15;
+    }
+
     
     public int getPlantProduction(Colony colony) {
         return (int) (getPlantProductionHourly(colony) * 24.0);

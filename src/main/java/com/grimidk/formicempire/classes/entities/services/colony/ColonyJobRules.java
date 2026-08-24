@@ -92,6 +92,26 @@ public final class ColonyJobRules {
         resources.addResource(colony, GameConstants.RESOURCE_MEAT, meatGain);
         resources.addResource(colony, GameConstants.RESOURCE_ROCK, rockGain);
 
+        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) {
+            int fungiGain = probabilisticRound(stats.getFungiProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
+            if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_FUNGI) <= 0) {
+                fungiGain = 0;
+            }
+            if (fungiGain > 0) {
+                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, fungiGain);
+            }
+        }
+
+        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3) && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+            int resinSourceGain = probabilisticRound(stats.getResinProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
+            if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_RESIN) <= 0) {
+                resinSourceGain = 0;
+            }
+            if (resinSourceGain > 0 && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN)) {
+                resources.addResource(colony, GameConstants.RESOURCE_RESIN, resinSourceGain);
+            }
+        }
+
         if (plantGain > 0
                 && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
                 && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN)) {

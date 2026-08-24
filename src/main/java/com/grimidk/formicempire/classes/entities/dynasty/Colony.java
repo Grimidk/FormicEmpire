@@ -60,6 +60,7 @@ public class Colony {
     private boolean automationEnabled = false; 
     private boolean autoBuildEnabled = false;
     private boolean autoTunnelsEnabled = false;
+    private boolean autoLogisticsEnabled = false;
     private boolean isCapital = false;
     private int age;
     private int daysWithoutQueen;
@@ -307,6 +308,7 @@ public class Colony {
         this.isActive = false;
         this.autoBuildEnabled = false;
         this.autoTunnelsEnabled = false;
+        this.autoLogisticsEnabled = false;
         this.loyalty = GameNumbers.DEFAULT_COLONY_LOYALTY;
     }
 
@@ -376,6 +378,7 @@ public class Colony {
         this.automationEnabled = savedColony.isAutomated;
         this.autoBuildEnabled = savedColony.autoBuildEnabled;
         this.autoTunnelsEnabled = savedColony.autoTunnelsEnabled;
+        this.autoLogisticsEnabled = savedColony.autoLogisticsEnabled;
         this.age = savedColony.age;
         this.daysWithoutQueen = savedColony.daysWithoutQueen;
         this.loyalty = GameNumbers.clampColonyLoyalty(savedColony.loyalty);
@@ -899,6 +902,8 @@ public class Colony {
     public void setAutoBuildEnabled(boolean autoBuildEnabled) { this.autoBuildEnabled = autoBuildEnabled; }
     public boolean isAutoTunnelsEnabled() { return autoTunnelsEnabled; }
     public void setAutoTunnelsEnabled(boolean autoTunnelsEnabled) { this.autoTunnelsEnabled = autoTunnelsEnabled; }
+    public boolean isAutoLogisticsEnabled() { return autoLogisticsEnabled; }
+    public void setAutoLogisticsEnabled(boolean autoLogisticsEnabled) { this.autoLogisticsEnabled = autoLogisticsEnabled; }
 
     public int getDeployedDiplomatCount() {
         int total = 0;

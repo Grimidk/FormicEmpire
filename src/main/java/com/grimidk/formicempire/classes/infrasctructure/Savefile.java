@@ -95,6 +95,7 @@ public class Savefile implements Serializable {
         public boolean defaultAutoBuildEnabled;
         public boolean autoDiplomacyEnabled;
         public boolean defaultAutoTunnelsEnabled;
+        public boolean defaultAutoLogisticsEnabled;
         public String pactRequestIncomingPolicy = "MANUAL";
         public int lastIncomingPactRequestWorldDay = -1;
         public Map<String, Integer> diplomatSupportToDynasty = new HashMap<>();
@@ -157,6 +158,7 @@ public class Savefile implements Serializable {
         public boolean isAutomated;
         public boolean autoBuildEnabled;
         public boolean autoTunnelsEnabled;
+        public boolean autoLogisticsEnabled;
         public Map<String, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
         public Map<String, Integer> incomingColonyDiplomatSupport = new HashMap<>();
         public Map<String, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();

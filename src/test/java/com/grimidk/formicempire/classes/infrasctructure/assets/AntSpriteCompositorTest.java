@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSpeciesPalette;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
@@ -134,6 +135,50 @@ class AntSpriteCompositorTest {
             assertNotNull(icon, "antenna frame " + antenna);
             assertTrue(icon.getIconWidth() > 0);
             assertTrue(icon.getIconHeight() > 0);
+        }
+    }
+
+    @Test
+    void composeAllAntennaHeadVariantsForEveryType() {
+        AntSubtype[] heads = {
+                GameConstants.SUBTYPE_HEAD_NONE,
+                GameConstants.SUBTYPE_HEAD_TRAPJAW,
+                GameConstants.SUBTYPE_HEAD_DOORHEAD,
+                GameConstants.SUBTYPE_HEAD_FARSIGHT
+        };
+        AntType[] types = {
+                GameConstants.TYPE_WORKER,
+                GameConstants.TYPE_SOLDIER,
+                GameConstants.TYPE_MAJOR,
+                GameConstants.TYPE_QUEEN,
+                GameConstants.TYPE_PRINCESS,
+                GameConstants.TYPE_DRONE
+        };
+        for (AntType type : types) {
+            for (AntSubtype head : heads) {
+                if (type == GameConstants.TYPE_DRONE && head != GameConstants.SUBTYPE_HEAD_NONE) {
+                    continue;
+                }
+                AntSubtypeProfile profile = AntSubtypeProfile.of(
+                        head.getDigit(),
+                        AntSubtype.DIGIT_NONE,
+                        AntSubtype.DIGIT_NONE,
+                        AntSubtype.DIGIT_NONE);
+                for (int antennaFrame = 1; antennaFrame <= 2; antennaFrame++) {
+                    ImageIcon icon = AntSpriteCompositor.getSprite(
+                            type,
+                            GameConstants.SPECIES_OMNI,
+                            profile,
+                            1,
+                            1,
+                            1,
+                            antennaFrame,
+                            false);
+                    assertNotNull(icon, type.getNameKey() + " " + head.getNameKey() + " antenna " + antennaFrame);
+                    assertTrue(icon.getIconWidth() > 0);
+                    assertTrue(icon.getIconHeight() > 0);
+                }
+            }
         }
     }
 

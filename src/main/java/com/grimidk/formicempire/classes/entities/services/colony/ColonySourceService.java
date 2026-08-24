@@ -134,6 +134,12 @@ public class ColonySourceService {
         if (role == GameConstants.ROLE_FORAGER) {
             targetTypes.add(GameConstants.RESOURCE_PLANT);
             targetTypes.add(GameConstants.RESOURCE_WATER);
+            if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) {
+                targetTypes.add(GameConstants.RESOURCE_FUNGI);
+            }
+            if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3) && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+                targetTypes.add(GameConstants.RESOURCE_RESIN);
+            }
         } else if (role == GameConstants.ROLE_HUNTER) {
             targetTypes.add(GameConstants.RESOURCE_MEAT);
         } else if (role == GameConstants.ROLE_MINER) {

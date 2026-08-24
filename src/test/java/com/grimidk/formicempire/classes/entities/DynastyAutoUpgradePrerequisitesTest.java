@@ -49,4 +49,10 @@ class DynastyAutoUpgradePrerequisitesTest {
         assertFalse(dynasty.meetsAutoTunnelsPrerequisites());
         assertFalse(GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, GameUnlocks.ABILITY_AUTO_TUNNELS));
     }
+
+    @Test
+    void autoLogisticsRequiresRecurrentRoutes() {
+        assertFalse(dynasty.meetsAutoLogisticsPrerequisites());
+        assertFalse(GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, GameUnlocks.ABILITY_AUTO_LOGISTICS));
+    }
 }

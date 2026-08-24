@@ -86,9 +86,18 @@ class DynastyLogisticsAutomationServiceTest {
     }
 
     @Test
-    void playerDynastyDoesNotAutoTrade() {
+    void playerDynastyDoesNotAutoTradeWithoutUpgrade() {
         dynasty.setPlayer(true);
         logisticsService.runDailyLogistics(dynasty, world, tradeManager);
         assertEquals(0, tradeManager.getActiveTrades().size());
+    }
+
+    @Test
+    void playerDynastyAutoTradesWithUpgradeAndToggle() {
+        dynasty.setPlayer(true);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS);
+        colonyA.setAutoLogisticsEnabled(true);
+        logisticsService.runDailyLogistics(dynasty, world, tradeManager);
+        assertEquals(1, tradeManager.getActiveTrades().size());
     }
 }

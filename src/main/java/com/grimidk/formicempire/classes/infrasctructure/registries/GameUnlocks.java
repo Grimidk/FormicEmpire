@@ -182,6 +182,8 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_AUTO_TUNNELS); }
         public static final Upgrade ABILITY_AUTO_DIPLOMACY = new Upgrade(523, "ABILITY_AUTO_DIPLOMACY", "ABILITY_AUTO_DIPLOMACY_FLAVOR", "ABILITY_AUTO_DIPLOMACY_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoDiplomacy.png"), 0);
         static { upgrades.add(ABILITY_AUTO_DIPLOMACY); }
+        public static final Upgrade ABILITY_AUTO_LOGISTICS = new Upgrade(525, "ABILITY_AUTO_LOGISTICS", "ABILITY_AUTO_LOGISTICS_FLAVOR", "ABILITY_AUTO_LOGISTICS_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoDiplomacy.png"), 0);
+        static { upgrades.add(ABILITY_AUTO_LOGISTICS); }
 
         public static final Upgrade ABILITY_SUBTYPE_HATCH = new Upgrade(524, "ABILITY_SUBTYPE_HATCH", "ABILITY_SUBTYPE_HATCH_FLAVOR", "ABILITY_SUBTYPE_HATCH_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AbilitySubtypeHatch.png"), 0);
         static { upgrades.add(ABILITY_SUBTYPE_HATCH); }
@@ -192,6 +194,9 @@ public final class GameUnlocks {
             }
             if (upgrade == ABILITY_AUTO_DIPLOMACY) {
                 return dynasty != null && dynasty.meetsAutoDiplomacyPrerequisites();
+            }
+            if (upgrade == ABILITY_AUTO_LOGISTICS) {
+                return dynasty != null && dynasty.meetsAutoLogisticsPrerequisites();
             }
             return true;
         }

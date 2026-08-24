@@ -31,6 +31,12 @@ public class DynastyTradeService {
             .collect(Collectors.toList());
     }
 
+    public int countActiveRecurrentRoutes() {
+        return (int) tradeManager.getActiveTrades().stream()
+                .filter(t -> t.isActive() && t.isRecurrent() && isTradeInDynasty(t))
+                .count();
+    }
+
     private boolean isTradeInDynasty(Trade trade) {
         Colony originColony = trade.getOrigin().getColony();
         return originColony != null && originColony.getDynasty() == dynasty;

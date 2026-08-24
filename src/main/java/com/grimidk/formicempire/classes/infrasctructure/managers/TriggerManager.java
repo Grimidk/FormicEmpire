@@ -154,6 +154,7 @@ public class TriggerManager {
         checkDynastyRankPopups();
         checkAutoTunnelsUnlock();
         checkAutoDiplomacyUnlock();
+        checkAutoLogisticsUnlock();
     }
 
     private void checkHourlyTriggers() {
@@ -588,6 +589,21 @@ public class TriggerManager {
                 LanguageStrings.TRIGGER_AUTO_DIPLOMACY_TITLE,
                 LanguageStrings.TRIGGER_AUTO_DIPLOMACY_MSG,
                 GameNumbers.AUTO_UPGRADE_MIN_DIPLOMATS_SENT);
+    }
+
+    private void checkAutoLogisticsUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS)) return;
+
+        Dynasty dynasty = playerColony.getDynasty();
+        dynasty.bindTradeManager(engine.getTradeManager());
+        if (!dynasty.meetsAutoLogisticsPrerequisites()) return;
+
+        fireLocalizedTrigger(GameUnlocks.ABILITY_AUTO_LOGISTICS,
+                LanguageStrings.TRIGGER_AUTO_LOGISTICS_TITLE,
+                LanguageStrings.TRIGGER_AUTO_LOGISTICS_MSG,
+                GameNumbers.AUTO_UPGRADE_MIN_RECURRENT_ROUTES);
     }
     
     private void checkDynastyTriggers() {

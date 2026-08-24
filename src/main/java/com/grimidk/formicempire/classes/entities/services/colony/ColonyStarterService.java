@@ -81,6 +81,9 @@ public class ColonyStarterService {
                 if (d.isDefaultAutoTunnelsEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
                     colony.setAutoTunnelsEnabled(true);
                 }
+                if (d.isDefaultAutoLogisticsEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS)) {
+                    colony.setAutoLogisticsEnabled(true);
+                }
             }
         } else {
             colony.setCapital(true);
@@ -331,6 +334,9 @@ public class ColonyStarterService {
             if (overlord.isDefaultAutoTunnelsEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
                 colony.setAutoTunnelsEnabled(true);
             }
+            if (overlord.isDefaultAutoLogisticsEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS)) {
+                colony.setAutoLogisticsEnabled(true);
+            }
             colony.invalidateActiveRoleCountCache();
             colony.runRoleAssignment(null);
         }
@@ -364,6 +370,9 @@ public class ColonyStarterService {
             }
             if (dynasty.isDefaultAutoTunnelsEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
                 target.setAutoTunnelsEnabled(true);
+            }
+            if (dynasty.isDefaultAutoLogisticsEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS)) {
+                target.setAutoLogisticsEnabled(true);
             }
         }
 

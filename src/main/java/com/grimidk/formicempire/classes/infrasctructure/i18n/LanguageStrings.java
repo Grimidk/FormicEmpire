@@ -845,8 +845,11 @@ public final class LanguageStrings {
     public static final String STAT_AUTOMATION = "STAT_AUTOMATION";
     public static final String STAT_AUTO_BUILD = "STAT_AUTO_BUILD";
     public static final String STAT_AUTO_TUNNELS = "STAT_AUTO_TUNNELS";
+    public static final String STAT_AUTO_LOGISTICS = "STAT_AUTO_LOGISTICS";
     public static final String DYNASTY_DEFAULT_AUTO_TUNNELS = "DYNASTY_DEFAULT_AUTO_TUNNELS";
     public static final String DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP = "DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP";
+    public static final String DYNASTY_DEFAULT_AUTO_LOGISTICS = "DYNASTY_DEFAULT_AUTO_LOGISTICS";
+    public static final String DYNASTY_DEFAULT_AUTO_LOGISTICS_TOOLTIP = "DYNASTY_DEFAULT_AUTO_LOGISTICS_TOOLTIP";
     public static final String DYNASTY_AUTO_DIPLOMACY = "DYNASTY_AUTO_DIPLOMACY";
     public static final String DYNASTY_AUTO_DIPLOMACY_TOOLTIP = "DYNASTY_AUTO_DIPLOMACY_TOOLTIP";
     public static final String LOYALTY_MODIFIER_DIPLOMAT_MISSION = "LOYALTY_MODIFIER_DIPLOMAT_MISSION";
@@ -1113,6 +1116,9 @@ public final class LanguageStrings {
     public static final String TRADE_FLYERS = "TRADE_FLYERS";
     public static final String TRADE_METHOD = "TRADE_METHOD";
     public static final String TRADE_RECURRENT = "TRADE_RECURRENT";
+    public static final String TRADE_SHOW_ALL_CONNECTIONS = "TRADE_SHOW_ALL_CONNECTIONS";
+    public static final String TRADE_SHOW_ALL_CONNECTIONS_TIP = "TRADE_SHOW_ALL_CONNECTIONS_TIP";
+    public static final String TRADE_ALL_DYNASTY_CONNECTIONS = "TRADE_ALL_DYNASTY_CONNECTIONS";
     public static final String TRADE_BILATERAL = "TRADE_BILATERAL";
     public static final String TRADE_CONFIRM = "TRADE_CONFIRM";
     public static final String TRADE_UPDATE = "TRADE_UPDATE";
@@ -1437,6 +1443,7 @@ public final class LanguageStrings {
     public static final String SAVE_ACHIEVEMENTS_WARN_TITLE = "SAVE_ACHIEVEMENTS_WARN_TITLE";
     public static final String SAVE_ACHIEVEMENTS_WARN_CREATE = "SAVE_ACHIEVEMENTS_WARN_CREATE";
     public static final String SAVE_ACHIEVEMENTS_WARN_LOAD = "SAVE_ACHIEVEMENTS_WARN_LOAD";
+    public static final String SETTINGS_SANDBOX_WARN_IN_GAME = "SETTINGS_SANDBOX_WARN_IN_GAME";
 
     public static final String SETTINGS_LANGUAGE = "SETTINGS_LANGUAGE";
     public static final String SETTINGS_SCREEN_SIZE = "SETTINGS_SCREEN_SIZE";
@@ -2150,6 +2157,8 @@ public final class LanguageStrings {
     public static final String ABILITY_AUTO_TUNNELS_DESC = "ABILITY_AUTO_TUNNELS_DESC";
     public static final String ABILITY_AUTO_DIPLOMACY_FLAVOR = "ABILITY_AUTO_DIPLOMACY_FLAVOR";
     public static final String ABILITY_AUTO_DIPLOMACY_DESC = "ABILITY_AUTO_DIPLOMACY_DESC";
+    public static final String ABILITY_AUTO_LOGISTICS_FLAVOR = "ABILITY_AUTO_LOGISTICS_FLAVOR";
+    public static final String ABILITY_AUTO_LOGISTICS_DESC = "ABILITY_AUTO_LOGISTICS_DESC";
     public static final String ABILITY_SUBTYPE_HATCH_FLAVOR = "ABILITY_SUBTYPE_HATCH_FLAVOR";
     public static final String ABILITY_SUBTYPE_HATCH_DESC = "ABILITY_SUBTYPE_HATCH_DESC";
     public static final String ABILITY_TUNNELS_FLAVOR = "ABILITY_TUNNELS_FLAVOR";
@@ -2626,6 +2635,10 @@ public final class LanguageStrings {
     public static final String TRIGGER_AUTO_TUNNELS_MSG = "TRIGGER_AUTO_TUNNELS_MSG";
     public static final String TRIGGER_AUTO_DIPLOMACY_TITLE = "TRIGGER_AUTO_DIPLOMACY_TITLE";
     public static final String TRIGGER_AUTO_DIPLOMACY_MSG = "TRIGGER_AUTO_DIPLOMACY_MSG";
+    public static final String TRIGGER_AUTO_LOGISTICS_TITLE = "TRIGGER_AUTO_LOGISTICS_TITLE";
+    public static final String TRIGGER_AUTO_LOGISTICS_MSG = "TRIGGER_AUTO_LOGISTICS_MSG";
+    public static final String TRIGGER_PROGRESS_HINT_RECURRENT_ROUTES = "TRIGGER_PROGRESS_HINT_RECURRENT_ROUTES";
+    public static final String TRIGGER_PROGRESS_METRIC_RECURRENT_ROUTES = "TRIGGER_PROGRESS_METRIC_RECURRENT_ROUTES";
     public static final String TRIGGER_BILATERAL_TRADE_TITLE = "TRIGGER_BILATERAL_TRADE_TITLE";
     public static final String TRIGGER_BILATERAL_TRADE_MSG = "TRIGGER_BILATERAL_TRADE_MSG";
     public static final String TRIGGER_COURIER_ROLE_TITLE = "TRIGGER_COURIER_ROLE_TITLE";

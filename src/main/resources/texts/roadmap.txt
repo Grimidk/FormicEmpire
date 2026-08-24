@@ -11,12 +11,6 @@ To Fix (By decreasing priority):
 		music: main menu song, more songs in general
 		sounds: building done, research done, basic click,
 		improve settings and social buttons with icons
-		antennae (placeholder PNGs + compositor wired; art TODO):
-			TODO: draw AntennaNone1/2 for Worker, Soldier, Major, Drone, Princess, Queen
-			TODO: draw AntennaTrapjaw1/2 per type (except Drone)
-			TODO: draw AntennaDoorhead1/2 per type (except Drone)
-			TODO: draw AntennaFarsight1/2 per type (except Drone)
-			TODO: review 2-frame twitch timing vs jaws once art is in
 	Mid:
 		(none right now)
 	Low:
@@ -29,11 +23,8 @@ To Fix (By decreasing priority):
 To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		auto logistics withing dyansty (excess materials go to neighboring lacking colonies)
-		show all conections in logistics toggle
 		more aggresive ai and maybe mass war
 		rework how carrying looks completely, maybe have an resource icon (do not scale) inside jaws
-		mushroom detection and mushroom and resin abudance for biomes
 		swarm vs creature battles
 		more enemies (single battle or swarm battles):
 			Bugs (Bombardier beetle, ant lions, soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, cuban and regfcockroach, goliath beetle, cricket moles, locust swarms, scalopendra)
@@ -43,14 +34,15 @@ Needed for launch (v1.0) (Launch Version):
 			Birds (Crow, Finch, Chicken)
 			Mammals (Rats, Possum, Anteater)
 			Zombie ant colonies (Cordiceps)
-		implement pending roles ( carrier) more roles (paratroopers to skip a stage)
+		implement pending roles ( carrier and therefore troop reinforcement) more roles (paratroopers to skip a stage)
 		Species (as above) and assimilations (Wood burrowing and mounds (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), reinforced Hive building (Shining black ants), Location sensing (Desert ants))
 		Silk weaving + Hive building = Web building (Passive proteing capture)
 		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)
 		more biomes (beach, wetlands, mangrove, prairie, burnt forest (resin source, no water, cant start), ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain, lock species to certain biome, need an ant that only eats protein and biome rarity
 	Everything else :
+		rework popups and dialogs to not be different windows
 		bridges
-		rethink hatching to other types taking more time 
+		rethink hatching to other types taking more time so its balanced to not just spam a type
 		reserve ants to ant exauhstion and punishing 100% worker capacity
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
 		more stats (kills, historic productions, graphs?)

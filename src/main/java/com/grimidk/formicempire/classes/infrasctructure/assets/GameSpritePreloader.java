@@ -10,10 +10,11 @@ import java.util.function.BooleanSupplier;
 
 import javax.swing.ImageIcon;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 
@@ -63,8 +64,15 @@ public final class GameSpritePreloader {
         }
         AntSpecies colonySpecies = colony != null ? colony.getSpecies() : GameConstants.SPECIES_OMNI;
         if (colonySpecies != null) {
+            AntSubtypeProfile standardProfile = AntSubtypeProfile.standard();
             for (AntType antType : GameConstants.getAntTypes()) {
                 collectIcon(images, GameConstants.getAntSprite(antType, colonySpecies));
+                if (AntSpriteCompositor.canCompose(antType)) {
+                    collectIcon(images, GameConstants.getAntSprite(
+                            antType, colonySpecies, standardProfile, 1, 2, 1, 1, false));
+                    collectIcon(images, GameConstants.getAntSprite(
+                            antType, colonySpecies, standardProfile, 1, 1, 1, 2, false));
+                }
             }
         }
         if (colony != null && colony.getDynasty() != null) {
