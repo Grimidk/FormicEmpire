@@ -359,15 +359,16 @@ public final class GameUnlocks {
         static { upgrades.add(ASSIMILATED_HONEYPOT); }
         public static final Upgrade ASSIMILATED_DOORHEAD = new Upgrade(1005, "ASSIMILATED_DOORHEAD", "ASSIMILATED_DOORHEAD_FLAVOR", "ASSIMILATED_DOORHEAD_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedDoorhead.png"), 0);
         static { upgrades.add(ASSIMILATED_DOORHEAD); }
-        // TODO mechanic: wood excavation / carpenter nesting — not implemented
         public static final Upgrade ASSIMILATED_WOODBURROW = new Upgrade(1006, "ASSIMILATED_WOODBURROW", "ASSIMILATED_WOODBURROW_FLAVOR", "ASSIMILATED_WOODBURROW_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedWoodburrow.png"), 0);
         static { upgrades.add(ASSIMILATED_WOODBURROW); }
-        // TODO mechanic: silk nest weaving — not implemented
         public static final Upgrade ASSIMILATED_SILKWEAVE = new Upgrade(1007, "ASSIMILATED_SILKWEAVE", "ASSIMILATED_SILKWEAVE_FLAVOR", "ASSIMILATED_SILKWEAVE_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedSilkweave.png"), 0);
         static { upgrades.add(ASSIMILATED_SILKWEAVE); }
-        // TODO mechanic: flood rafting — not implemented
         public static final Upgrade ASSIMILATED_RAFTING = new Upgrade(1008, "ASSIMILATED_RAFTING", "ASSIMILATED_RAFTING_FLAVOR", "ASSIMILATED_RAFTING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedRafting.png"), 0);
         static { upgrades.add(ASSIMILATED_RAFTING); }
+        public static final Upgrade ABILITY_RAFTING_2 = new Upgrade(528, "ABILITY_RAFTING_2", "ABILITY_RAFTING_2_FLAVOR", "ABILITY_RAFTING_2_DESC", ASSIMILATED_RAFTING, 2500, loadIcon("icons/upgrades/AbilityRafting2.png"), 4);
+        static { upgrades.add(ABILITY_RAFTING_2); }
+        public static final Upgrade ABILITY_RAFTING_3 = new Upgrade(529, "ABILITY_RAFTING_3", "ABILITY_RAFTING_3_FLAVOR", "ABILITY_RAFTING_3_DESC", ABILITY_RAFTING_2, 10000, loadIcon("icons/upgrades/AbilityRafting3.png"), 5);
+        static { upgrades.add(ABILITY_RAFTING_3); }
         public static final Upgrade ASSIMILATED_FIREVENOM = new Upgrade(1009, "ASSIMILATED_FIREVENOM", "ASSIMILATED_FIREVENOM_FLAVOR", "ASSIMILATED_FIREVENOM_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFirevenom.png"), 0);
         static { upgrades.add(ASSIMILATED_FIREVENOM); }
         public static final Upgrade ASSIMILATED_JUMPING = new Upgrade(1010, "ASSIMILATED_JUMPING", "ASSIMILATED_JUMPING_FLAVOR", "ASSIMILATED_JUMPING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0);
@@ -389,7 +390,6 @@ public final class GameUnlocks {
         static { upgrades.add(ASSIMILATED_SELFDESTRUCT); }
         public static final Upgrade ASSIMILATED_FARSIGHT = new Upgrade(1019, "ASSIMILATED_FARSIGHT", "ASSIMILATED_FARSIGHT_FLAVOR", "ASSIMILATED_FARSIGHT_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFarsight.png"), 0);
         static { upgrades.add(ASSIMILATED_FARSIGHT); }
-        // TODO mechanic: carton hive building — not implemented
         public static final Upgrade ASSIMILATED_HIVEBUILD = new Upgrade(1020, "ASSIMILATED_HIVEBUILD", "ASSIMILATED_HIVEBUILD_FLAVOR", "ASSIMILATED_HIVEBUILD_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedHivebuild.png"), 0);
         static { upgrades.add(ASSIMILATED_HIVEBUILD); }
         public static final Upgrade ASSIMILATED_LOCSENSE = new Upgrade(1021, "ASSIMILATED_LOCSENSE", "ASSIMILATED_LOCSENSE_FLAVOR", "ASSIMILATED_LOCSENSE_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedLocsense.png"), 0);
@@ -403,6 +403,8 @@ public final class GameUnlocks {
         static { upgrades.add(SYNERGY_SUPER_VENOM); }
         public static final Upgrade SYNERGY_CORROSIVE_BOMBS = new Upgrade(10002, "SYNERGY_CORROSIVE_BOMBS", "SYNERGY_CORROSIVE_BOMBS_FLAVOR", "SYNERGY_CORROSIVE_BOMBS_DESC", ROLE_BOMBER, 0, loadIcon("icons/synergies/CorrosiveBombs.png"), 0);
         static { upgrades.add(SYNERGY_CORROSIVE_BOMBS); }
+        public static final Upgrade SYNERGY_WEB_BUILDING = new Upgrade(10003, "SYNERGY_WEB_BUILDING", "SYNERGY_WEB_BUILDING_FLAVOR", "SYNERGY_WEB_BUILDING_DESC", ABILITY_SYNERGY, 0, loadIcon("icons/synergies/WebBuilding.png"), 0);
+        static { upgrades.add(SYNERGY_WEB_BUILDING); }
 
         // --- Buildings ---
 
@@ -593,9 +595,38 @@ public final class GameUnlocks {
         // TODO asset: icons/buildings/PassiveGrave.png
         public static final Building PASSIVE_GRAVE = new Building(106, "PASSIVE_GRAVE", 0, "PASSIVE_GRAVE_DESC", MEAT_CHAMBER_1, 150, 0, 600, ICON_TODO, GameConstants.ROOM_PASSIVE_GRAVE, 2);
         static { buildings.add(PASSIVE_GRAVE); }
+        // TODO asset: icons/buildings/PassiveWeb.png
+        public static final Building PASSIVE_WEB = new Building(108, "PASSIVE_WEB", 0, "PASSIVE_WEB_DESC", MEAT_CHAMBER_1, 200, 0, 800, loadIcon("icons/misc/PassiveWeb.png"), GameConstants.ROOM_PASSIVE_WEB, 2);
+        static { buildings.add(PASSIVE_WEB); }
         // TODO asset: icons/buildings/Composter.png
         public static final Building BUILDING_COMPOSTER = new Building(107, "BUILDING_COMPOSTER", 0, "BUILDING_COMPOSTER_DESC", PASSIVE_GRAVE, 500, 0, 1000, ICON_TODO, GameConstants.ROOM_PASSIVE_COMPOSTER, 3);
         static { buildings.add(BUILDING_COMPOSTER); }
+
+        // Silkweave leaf L3 storages (tandem with resin L3; plant cost = 10× resin of matching L3)
+        // TODO asset: icons/buildings + sprites/buildings/rooms for Silkweave L3 storages
+        public static final Building EGG_CHAMBER_3_SILK = new Building(201, "EGG_CHAMBER_3_SILK", 3, "EGG_CHAMBER_3_SILK_DESC", EGG_CHAMBER_2, 0, 0, 500 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 5000, ICON_TODO, GameConstants.ROOM_EGG_L3, 3);
+        static { buildings.add(EGG_CHAMBER_3_SILK); }
+        public static final Building MUSHROOM_CHAMBER_3_SILK = new Building(202, "MUSHROOM_CHAMBER_3_SILK", 3, "MUSHROOM_CHAMBER_3_SILK_DESC", MUSHROOM_CHAMBER_2, 0, 0, 800 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 5000, ICON_TODO, GameConstants.ROOM_MUSHROOM_L3, 3);
+        static { buildings.add(MUSHROOM_CHAMBER_3_SILK); }
+        public static final Building PLANT_CHAMBER_3_SILK = new Building(203, "PLANT_CHAMBER_3_SILK", 3, "PLANT_CHAMBER_3_SILK_DESC", PLANT_CHAMBER_2, 0, 0, 700 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 5000, ICON_TODO, GameConstants.ROOM_PLANT_L3, 3);
+        static { buildings.add(PLANT_CHAMBER_3_SILK); }
+        public static final Building WATER_RESERVOIR_3_SILK = new Building(204, "WATER_RESERVOIR_3_SILK", 3, "WATER_RESERVOIR_3_SILK_DESC", WATER_RESERVOIR_2, 0, 0, 900 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 5000, ICON_TODO, GameConstants.ROOM_WATER_L3, 3);
+        static { buildings.add(WATER_RESERVOIR_3_SILK); }
+        public static final Building MEAT_CHAMBER_3_SILK = new Building(205, "MEAT_CHAMBER_3_SILK", 3, "MEAT_CHAMBER_3_SILK_DESC", MEAT_CHAMBER_2, 0, 0, 850 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 10000, ICON_TODO, GameConstants.ROOM_MEAT_L3, 3);
+        static { buildings.add(MEAT_CHAMBER_3_SILK); }
+        public static final Building SYRUP_RESERVOIR_3_SILK = new Building(206, "SYRUP_RESERVOIR_3_SILK", 3, "SYRUP_RESERVOIR_3_SILK_DESC", SYRUP_RESERVOIR_2, 0, 0, 800 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 10000, ICON_TODO, GameConstants.ROOM_SYRUP_L3, 3);
+        static { buildings.add(SYRUP_RESERVOIR_3_SILK); }
+        public static final Building ROCK_WAREHOUSE_3_SILK = new Building(207, "ROCK_WAREHOUSE_3_SILK", 3, "ROCK_WAREHOUSE_3_SILK_DESC", ROCK_WAREHOUSE_2, 0, 0, 950 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 10000, ICON_TODO, GameConstants.ROOM_ROCK_L3, 3);
+        static { buildings.add(ROCK_WAREHOUSE_3_SILK); }
+        public static final Building RESIN_RESERVOIR_3_SILK = new Building(208, "RESIN_RESERVOIR_3_SILK", 3, "RESIN_RESERVOIR_3_SILK_DESC", RESIN_RESERVOIR_2, 0, 0, 900 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 10000, ICON_TODO, GameConstants.ROOM_RESIN_L3, 3);
+        static { buildings.add(RESIN_RESERVOIR_3_SILK); }
+
+        // Hivebuild mounds (capacity boosts; room/overworld art TBD)
+        // TODO asset: icons/buildings + sprites/buildings/rooms + overworld mound art for HiveMound2/4
+        public static final Building HIVE_MOUND_2 = new Building(210, "HIVE_MOUND_2", 2, "HIVE_MOUND_2_DESC", ROYAL_CHAMBER_1, 400, 0, 2000, ICON_TODO, GameConstants.ROOM_PASSIVE_LAB, 2);
+        static { buildings.add(HIVE_MOUND_2); }
+        public static final Building HIVE_MOUND_4 = new Building(211, "HIVE_MOUND_4", 4, "HIVE_MOUND_4_DESC", HIVE_MOUND_2, 1500, 800, 15000, ICON_TODO, GameConstants.ROOM_PASSIVE_LAB, 4);
+        static { buildings.add(HIVE_MOUND_4); }
 
         public static final Building[] BUILDING_CHAIN_ROYAL = {
                 ROYAL_CHAMBER_5, ROYAL_CHAMBER_4, ROYAL_CHAMBER_3, ROYAL_CHAMBER_2, ROYAL_CHAMBER_1, ROYAL_CHAMBER_0
@@ -704,13 +735,10 @@ public final class GameUnlocks {
         static { assimilations.add(ASSIMILATION_HONEYPOT); }
         public static final Assimilation ASSIMILATION_DOORHEAD = new Assimilation(6, "ASSIMILATION_DOORHEAD", "ASSIMILATION_DOORHEAD_DESC", ASSIMILATED_DOORHEAD, ASSIMILATION_COST, loadIcon("icons/assimilations/Turtle.png"));
         static { assimilations.add(ASSIMILATION_DOORHEAD); }
-        // TODO mechanic: reward ASSIMILATED_WOODBURROW — not implemented
         public static final Assimilation ASSIMILATION_WOODBURROW = new Assimilation(7, "ASSIMILATION_WOODBURROW", "ASSIMILATION_WOODBURROW_DESC", ASSIMILATED_WOODBURROW, ASSIMILATION_COST, loadIcon("icons/assimilations/Carpenter.png"));
         static { assimilations.add(ASSIMILATION_WOODBURROW); }
-        // TODO mechanic: reward ASSIMILATED_SILKWEAVE — not implemented
         public static final Assimilation ASSIMILATION_SILKWEAVE = new Assimilation(8, "ASSIMILATION_SILKWEAVE", "ASSIMILATION_SILKWEAVE_DESC", ASSIMILATED_SILKWEAVE, ASSIMILATION_COST, loadIcon("icons/assimilations/Weaver.png"));
         static { assimilations.add(ASSIMILATION_SILKWEAVE); }
-        // TODO mechanic: reward ASSIMILATED_RAFTING — not implemented
         public static final Assimilation ASSIMILATION_RAFTING = new Assimilation(9, "ASSIMILATION_RAFTING", "ASSIMILATION_RAFTING_DESC", ASSIMILATED_RAFTING, ASSIMILATION_COST, loadIcon("icons/assimilations/Floodplain.png"));
         static { assimilations.add(ASSIMILATION_RAFTING); }
         public static final Assimilation ASSIMILATION_FIREVENOM = new Assimilation(10, "ASSIMILATION_FIREVENOM", "ASSIMILATION_FIREVENOM_DESC", ASSIMILATED_FIREVENOM, ASSIMILATION_COST, loadIcon("icons/assimilations/Fire.png"));
@@ -733,7 +761,6 @@ public final class GameUnlocks {
         static { assimilations.add(ASSIMILATION_SELFDESTRUCT); }
         public static final Assimilation ASSIMILATION_FARSIGHT = new Assimilation(20, "ASSIMILATION_FARSIGHT", "ASSIMILATION_FARSIGHT_DESC", ASSIMILATED_FARSIGHT, ASSIMILATION_COST, loadIcon("icons/assimilations/Bulldog.png"));
         static { assimilations.add(ASSIMILATION_FARSIGHT); }
-        // TODO mechanic: reward ASSIMILATED_HIVEBUILD — not implemented
         public static final Assimilation ASSIMILATION_HIVEBUILD = new Assimilation(21, "ASSIMILATION_HIVEBUILD", "ASSIMILATION_HIVEBUILD_DESC", ASSIMILATED_HIVEBUILD, ASSIMILATION_COST, loadIcon("icons/assimilations/ShiningBlack.png"));
         static { assimilations.add(ASSIMILATION_HIVEBUILD); }
         public static final Assimilation ASSIMILATION_LOCSENSE = new Assimilation(22, "ASSIMILATION_LOCSENSE", "ASSIMILATION_LOCSENSE_DESC", ASSIMILATED_LOCSENSE, ASSIMILATION_COST, loadIcon("icons/assimilations/Desert.png"));
@@ -755,6 +782,9 @@ public final class GameUnlocks {
                 ROLE_AIR_BOMBER, loadIcon("icons/synergies/AirBomber.png"),
                 ROLE_AIR_SUPPORT, ROLE_BOMBER, ASSIMILATED_ACIDSPIT);
         static { synergies.add(AIR_BOMBER_SYNERGY); }
+        public static final Synergy WEB_BUILDING_SYNERGY = new Synergy(5, "SYNERGY_WEB_BUILDING", "SYNERGY_WEB_BUILDING_DESC",
+                SYNERGY_WEB_BUILDING, loadIcon("icons/synergies/WebBuilding.png"), ASSIMILATED_SILKWEAVE, ASSIMILATED_HIVEBUILD);
+        static { synergies.add(WEB_BUILDING_SYNERGY); }
 
         // --- Getters ---
         public static List<Upgrade> getUpgrades() { return Collections.unmodifiableList(upgrades); }
@@ -790,11 +820,63 @@ public final class GameUnlocks {
                 if (colony == null || building == null) {
                         return false;
                 }
+                if (isSilkweaveBuilding(building)) {
+                        if (!colony.hasUpgrade(ASSIMILATED_SILKWEAVE)) {
+                                return false;
+                        }
+                        if (building == ROCK_WAREHOUSE_3_SILK) {
+                                return colony.hasUpgrade(ROLE_MINER);
+                        }
+                        if (building == RESIN_RESERVOIR_3_SILK) {
+                                return colony.hasUpgrade(ABILITY_RESIN);
+                        }
+                        return true;
+                }
+                if (isHiveMoundBuilding(building)) {
+                        return colony.hasUpgrade(ASSIMILATED_HIVEBUILD);
+                }
+                if (building == PASSIVE_WEB || building == PASSIVE_WATER) {
+                        return colony.hasUpgrade(SYNERGY_WEB_BUILDING);
+                }
                 if (isInBuildingChain(building, BUILDING_CHAIN_ROCK)) {
                         return colony.hasUpgrade(ROLE_MINER);
                 }
                 if (isInBuildingChain(building, BUILDING_CHAIN_RESIN)) {
                         return colony.hasUpgrade(ABILITY_RESIN);
+                }
+                return true;
+        }
+
+        public static boolean isSilkweaveBuilding(Building building) {
+                return building == EGG_CHAMBER_3_SILK
+                        || building == MUSHROOM_CHAMBER_3_SILK
+                        || building == PLANT_CHAMBER_3_SILK
+                        || building == WATER_RESERVOIR_3_SILK
+                        || building == MEAT_CHAMBER_3_SILK
+                        || building == SYRUP_RESERVOIR_3_SILK
+                        || building == ROCK_WAREHOUSE_3_SILK
+                        || building == RESIN_RESERVOIR_3_SILK;
+        }
+
+        public static boolean isHiveMoundBuilding(Building building) {
+                return building == HIVE_MOUND_2 || building == HIVE_MOUND_4;
+        }
+
+        public static boolean isBuildingShownInTree(Colony colony, Building building) {
+                if (colony == null || building == null) {
+                        return false;
+                }
+                if (colony.hasBuilding(building)) {
+                        return true;
+                }
+                if (isSilkweaveBuilding(building)) {
+                        return colony.hasUpgrade(ASSIMILATED_SILKWEAVE);
+                }
+                if (isHiveMoundBuilding(building)) {
+                        return colony.hasUpgrade(ASSIMILATED_HIVEBUILD);
+                }
+                if (building == PASSIVE_WEB || building == PASSIVE_WATER) {
+                        return colony.hasUpgrade(SYNERGY_WEB_BUILDING);
                 }
                 return true;
         }
@@ -806,7 +888,13 @@ public final class GameUnlocks {
                 if (isInBuildingChain(building, BUILDING_CHAIN_ROCK) && !colony.hasUpgrade(ROLE_MINER)) {
                         return GameConstants.RESOURCE_ROCK;
                 }
+                if (building == ROCK_WAREHOUSE_3_SILK && !colony.hasUpgrade(ROLE_MINER)) {
+                        return GameConstants.RESOURCE_ROCK;
+                }
                 if (isInBuildingChain(building, BUILDING_CHAIN_RESIN) && !colony.hasUpgrade(ABILITY_RESIN)) {
+                        return GameConstants.RESOURCE_RESIN;
+                }
+                if (building == RESIN_RESERVOIR_3_SILK && !colony.hasUpgrade(ABILITY_RESIN)) {
                         return GameConstants.RESOURCE_RESIN;
                 }
                 if (building.getMineralCost() > 0
@@ -818,6 +906,9 @@ public final class GameUnlocks {
                                 && colony.getResins() < building.getResinCost()
                                 && !colony.hasUpgrade(ABILITY_RESIN)) {
                         return GameConstants.RESOURCE_RESIN;
+                }
+                if (building.getPlantCost() > 0 && colony.getPlants() < building.getPlantCost()) {
+                        return GameConstants.RESOURCE_PLANT;
                 }
                 return null;
         }

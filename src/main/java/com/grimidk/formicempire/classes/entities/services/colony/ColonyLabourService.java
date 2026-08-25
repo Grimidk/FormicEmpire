@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -186,12 +187,19 @@ public class ColonyLabourService {
             }
         }
 
-        // --- Passive Water ---
+        // --- Passive Water (requires Web Building synergy) ---
         if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
             double maxWater = stats.getWaterCapacity(colony);
             double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
             double gain = (maxWater * dailyPct) / 24.0;
             resources.addResource(colony, GameConstants.RESOURCE_WATER, gain);
+        }
+
+        // --- Passive Web (Web Building synergy): 10% of protein cap per day ---
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB)) {
+            double maxProtein = stats.getProteinCapacity(colony);
+            double gain = (maxProtein * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
+            resources.addResource(colony, GameConstants.RESOURCE_MEAT, gain);
         }
     }
 
@@ -352,15 +360,8 @@ public class ColonyLabourService {
 
         int satellitesToSpawn = Math.min(potentialSatellites, colony.getStatsService().getSpreadingLimit(colony));
 
-        List<Hex> neighbors = new ArrayList<>();
-        neighbors.add(currentHex.getNorth());
-        neighbors.add(currentHex.getNorthEast());
-        neighbors.add(currentHex.getSouthEast());
-        neighbors.add(currentHex.getSouth());
-        neighbors.add(currentHex.getSouthWest());
-        neighbors.add(currentHex.getNorthWest());
-        
-        neighbors.removeIf(h -> h == null);
+        List<Hex> neighbors = HexWaterCrossing.colonizableLandHexes(
+                currentHex, HexWaterCrossing.waterCrossRange(dynasty));
         Collections.shuffle(neighbors);
         
         int satellitesSpawned = 0;
@@ -368,13 +369,6 @@ public class ColonyLabourService {
         
         for (Hex neighbor : neighbors) {
             if (satellitesSpawned >= satellitesToSpawn) break; 
-            
-            if (neighbor.getBiome() == GameConstants.BIOME_OCEAN || neighbor.getBiome() == GameConstants.BIOME_LAKE) {
-                continue;
-            }
-            if (neighbor.isIsland()) {
-                continue;
-            }
             
             Colony existingColony = neighbor.getColony();
             boolean reclaimable = ColonyStarterService.isReclaimableDeadColony(existingColony);
@@ -895,7 +889,8 @@ public class ColonyLabourService {
         if (efficiency <= 0) return;
 
         colony.setBuildingProgressHours(colony.getBuildingProgressHours() + 1.0);
-        double requiredHours = colony.getCurrentBuildingProject().getBuildTime() / efficiency;
+        double requiredHours = colony.getStatsService().getEffectiveBuildTime(colony, colony.getCurrentBuildingProject())
+                / efficiency;
 
         if (colony.getBuildingProgressHours() >= requiredHours) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());

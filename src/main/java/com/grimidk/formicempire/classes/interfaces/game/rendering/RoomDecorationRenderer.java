@@ -171,6 +171,9 @@ public final class RoomDecorationRenderer {
         if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE) && GameUnlocks.PASSIVE_GRAVE.getSprite() != null) {
             topRow.add(GameUnlocks.PASSIVE_GRAVE.getSprite());
         }
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB) && GameUnlocks.PASSIVE_WEB.getSprite() != null) {
+            topRow.add(GameUnlocks.PASSIVE_WEB.getSprite());
+        }
         List<ImageIcon> bottomRow = new ArrayList<>();
         for (Building[] ch : chains) {
             Building b = highestUnlocked(colony, ch);

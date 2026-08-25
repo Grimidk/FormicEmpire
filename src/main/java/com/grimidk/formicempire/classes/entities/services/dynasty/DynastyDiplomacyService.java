@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradePropos
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -817,8 +818,9 @@ public class DynastyDiplomacyService {
         if (playerHex == null) {
             return null;
         }
-        for (Hex neighborHex : playerHex.getAdjacentNeighbors()) {
-            if (neighborHex == null || neighborHex.getColony() == null) {
+        int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
+        for (Hex neighborHex : HexWaterCrossing.tradeReachableLandHexes(playerHex, waterRange)) {
+            if (neighborHex.getColony() == null) {
                 continue;
             }
             Colony neighborColony = neighborHex.getColony();

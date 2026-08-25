@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourSer
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
@@ -338,20 +339,13 @@ public class DynastyAiService {
     }
 
     private boolean hasColonizableExpansionSpace(Dynasty dynasty, World world) {
+        int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
         for (Colony colony : dynasty.getColonies()) {
             Hex hex = world.getHexOfColony(colony);
             if (hex == null) {
                 continue;
             }
-            for (Hex neighbor : hex.getAdjacentNeighbors()) {
-                if (neighbor == null) {
-                    continue;
-                }
-                if (neighbor.getBiome() == GameConstants.BIOME_OCEAN
-                        || neighbor.getBiome() == GameConstants.BIOME_LAKE
-                        || neighbor.isIsland()) {
-                    continue;
-                }
+            for (Hex neighbor : HexWaterCrossing.colonizableLandHexes(hex, waterRange)) {
                 Colony existing = neighbor.getColony();
                 if (existing == null) {
                     return true;

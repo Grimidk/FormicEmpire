@@ -15,20 +15,26 @@ public class Building extends Constant {
     private final Building requirement;
     private final int resinCost;
     private final int mineralCost;
+    private final int plantCost;
     private final int buildTime;
     private final ImageIcon sprite;
     private final int tierIndex;
 
-    public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon icon, ImageIcon sprite, int tierIndex) {
+    public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int plantCost, int buildTime, ImageIcon icon, ImageIcon sprite, int tierIndex) {
         super(id, nameKey, icon);
         this.level = level;
         this.descriptionKey = descriptionKey;
         this.requirement = requirement;
         this.resinCost = resinCost;
         this.mineralCost = mineralCost;
+        this.plantCost = Math.max(0, plantCost);
         this.buildTime = buildTime;
         this.sprite = sprite;
         this.tierIndex = Math.max(0, tierIndex);
+    }
+
+    public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon icon, ImageIcon sprite, int tierIndex) {
+        this(id, nameKey, level, descriptionKey, requirement, resinCost, mineralCost, 0, buildTime, icon, sprite, tierIndex);
     }
 
     public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon icon, ImageIcon sprite) {
@@ -43,7 +49,6 @@ public class Building extends Constant {
         this(id, nameKey, level, descriptionKey, requirement, resinCost, mineralCost, buildTime, roomArt, roomArt, tierIndex);
     }
 
-    //(no icon/sprite)
     public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime) {
         this(id, nameKey, level, descriptionKey, requirement, resinCost, mineralCost, buildTime, null, null, 0);
     }
@@ -66,6 +71,10 @@ public class Building extends Constant {
 
     public int getMineralCost() {
         return mineralCost;
+    }
+
+    public int getPlantCost() {
+        return plantCost;
     }
 
     public int getBuildTime() {

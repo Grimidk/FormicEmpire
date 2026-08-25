@@ -30,11 +30,6 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
-/**
- * Long-horizon smoke test: small complete world (hourly through yearly ticks, AI,
- * trade, death, expansion). Must always run — do not disable, assume/skip, or
- * exclude from Surefire.
- */
 class WorldYearSimulationTest {
 
     private static final int MAP_RADIUS = 2;

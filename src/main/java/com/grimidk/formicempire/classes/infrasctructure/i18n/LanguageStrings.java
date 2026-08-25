@@ -650,6 +650,9 @@ public final class LanguageStrings {
     public static final String SYNERGY_ACID_ARTILLERY = "SYNERGY_ACID_ARTILLERY";
     public static final String SYNERGY_ACID_ARTILLERY_FLAVOR = "SYNERGY_ACID_ARTILLERY_FLAVOR";
     public static final String SYNERGY_ACID_ARTILLERY_DESC = "SYNERGY_ACID_ARTILLERY_DESC";
+    public static final String SYNERGY_WEB_BUILDING = "SYNERGY_WEB_BUILDING";
+    public static final String SYNERGY_WEB_BUILDING_FLAVOR = "SYNERGY_WEB_BUILDING_FLAVOR";
+    public static final String SYNERGY_WEB_BUILDING_DESC = "SYNERGY_WEB_BUILDING_DESC";
     public static final String SYNERGY_CORROSIVE_BOMBS = "SYNERGY_CORROSIVE_BOMBS";
     public static final String SYNERGY_CORROSIVE_BOMBS_FLAVOR = "SYNERGY_CORROSIVE_BOMBS_FLAVOR";
     public static final String SYNERGY_CORROSIVE_BOMBS_DESC = "SYNERGY_CORROSIVE_BOMBS_DESC";
@@ -754,6 +757,12 @@ public final class LanguageStrings {
     public static final String ABILITY_SWARMING = "ABILITY_SWARMING";
     public static final String ABILITY_SWARMING_FLAVOR = "ABILITY_SWARMING_FLAVOR";
     public static final String ABILITY_SWARMING_DESC = "ABILITY_SWARMING_DESC";
+    public static final String ABILITY_RAFTING_2 = "ABILITY_RAFTING_2";
+    public static final String ABILITY_RAFTING_2_FLAVOR = "ABILITY_RAFTING_2_FLAVOR";
+    public static final String ABILITY_RAFTING_2_DESC = "ABILITY_RAFTING_2_DESC";
+    public static final String ABILITY_RAFTING_3 = "ABILITY_RAFTING_3";
+    public static final String ABILITY_RAFTING_3_FLAVOR = "ABILITY_RAFTING_3_FLAVOR";
+    public static final String ABILITY_RAFTING_3_DESC = "ABILITY_RAFTING_3_DESC";
 
     public static final String DIALOG_STATS_TITLE = "DIALOG_STATS_TITLE";
     public static final String STATS_DYNASTY_MODE = "STATS_DYNASTY_MODE";
@@ -2434,10 +2443,34 @@ public final class LanguageStrings {
     public static final String RESIN_RESERVOIR_5 = "RESIN_RESERVOIR_5";
     public static final String RESIN_RESERVOIR_5_DESC = "RESIN_RESERVOIR_5_DESC";
 
+
+    public static final String EGG_CHAMBER_3_SILK = "EGG_CHAMBER_3_SILK";
+    public static final String EGG_CHAMBER_3_SILK_DESC = "EGG_CHAMBER_3_SILK_DESC";
+    public static final String MUSHROOM_CHAMBER_3_SILK = "MUSHROOM_CHAMBER_3_SILK";
+    public static final String MUSHROOM_CHAMBER_3_SILK_DESC = "MUSHROOM_CHAMBER_3_SILK_DESC";
+    public static final String PLANT_CHAMBER_3_SILK = "PLANT_CHAMBER_3_SILK";
+    public static final String PLANT_CHAMBER_3_SILK_DESC = "PLANT_CHAMBER_3_SILK_DESC";
+    public static final String WATER_RESERVOIR_3_SILK = "WATER_RESERVOIR_3_SILK";
+    public static final String WATER_RESERVOIR_3_SILK_DESC = "WATER_RESERVOIR_3_SILK_DESC";
+    public static final String MEAT_CHAMBER_3_SILK = "MEAT_CHAMBER_3_SILK";
+    public static final String MEAT_CHAMBER_3_SILK_DESC = "MEAT_CHAMBER_3_SILK_DESC";
+    public static final String SYRUP_RESERVOIR_3_SILK = "SYRUP_RESERVOIR_3_SILK";
+    public static final String SYRUP_RESERVOIR_3_SILK_DESC = "SYRUP_RESERVOIR_3_SILK_DESC";
+    public static final String ROCK_WAREHOUSE_3_SILK = "ROCK_WAREHOUSE_3_SILK";
+    public static final String ROCK_WAREHOUSE_3_SILK_DESC = "ROCK_WAREHOUSE_3_SILK_DESC";
+    public static final String RESIN_RESERVOIR_3_SILK = "RESIN_RESERVOIR_3_SILK";
+    public static final String RESIN_RESERVOIR_3_SILK_DESC = "RESIN_RESERVOIR_3_SILK_DESC";
+    public static final String HIVE_MOUND_2 = "HIVE_MOUND_2";
+    public static final String HIVE_MOUND_2_DESC = "HIVE_MOUND_2_DESC";
+    public static final String HIVE_MOUND_4 = "HIVE_MOUND_4";
+    public static final String HIVE_MOUND_4_DESC = "HIVE_MOUND_4_DESC";
+
     public static final String PASSIVE_LAB = "PASSIVE_LAB";
     public static final String PASSIVE_LAB_DESC = "PASSIVE_LAB_DESC";
     public static final String PASSIVE_WATER = "PASSIVE_WATER";
     public static final String PASSIVE_WATER_DESC = "PASSIVE_WATER_DESC";
+    public static final String PASSIVE_WEB = "PASSIVE_WEB";
+    public static final String PASSIVE_WEB_DESC = "PASSIVE_WEB_DESC";
     public static final String PASSIVE_APHID = "PASSIVE_APHID";
     public static final String PASSIVE_APHID_DESC = "PASSIVE_APHID_DESC";
     public static final String PASSIVE_NURSE = "PASSIVE_NURSE";

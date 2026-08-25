@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -16,77 +17,109 @@ import java.util.Map;
 public class ColonyStatsService {
     
     // --- Capacities ---
-    public int getPlantsCapacity(Colony colony) { 
-        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_5)) return 400000;
-        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_4)) return 150000;
-        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_3)) return 60000;
-        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_2)) return 25000;
-        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_1)) return 10000;
-        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_0)) return 4000; 
-        return 0;
+    public int getPlantsCapacity(Colony colony) {
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_5)) base = 400000;
+        else if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_4)) base = 150000;
+        else if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_3)) base = 60000;
+        else if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_2)) base = 25000;
+        else if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_1)) base = 10000;
+        else if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_0)) base = 4000;
+        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_3_SILK)) {
+            base += 60000;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
-    public int getMushroomsCapacity(Colony colony) { 
-        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_5)) return 600000;
-        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_4)) return 250000;
-        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_3)) return 100000;
-        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_2)) return 40000;
-        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_1)) return 15000;
-        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_0)) return 8000; 
-        return 0;
+    public int getMushroomsCapacity(Colony colony) {
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_5)) base = 600000;
+        else if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_4)) base = 250000;
+        else if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_3)) base = 100000;
+        else if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_2)) base = 40000;
+        else if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_1)) base = 15000;
+        else if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_0)) base = 8000;
+        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_3_SILK)) {
+            base += 100000;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
-    public int getProteinCapacity(Colony colony) { 
-        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_5)) return 250000;
-        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_4)) return 100000;
-        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_3)) return 40000;
-        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_2)) return 15000;
-        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_1)) return 5000;
-        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_0)) return 2000; 
-        return 0;
+    public int getProteinCapacity(Colony colony) {
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_5)) base = 250000;
+        else if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_4)) base = 100000;
+        else if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_3)) base = 40000;
+        else if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_2)) base = 15000;
+        else if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_1)) base = 5000;
+        else if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_0)) base = 2000;
+        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_3_SILK)) {
+            base += 40000;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
     public int getWaterCapacity(Colony colony) {
-        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_5)) return 150000;
-        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_4)) return 60000;
-        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_3)) return 25000;
-        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_2)) return 10000;
-        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_1)) return 2500;
-        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_0)) return 1000; 
-        return 0;
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_5)) base = 150000;
+        else if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_4)) base = 60000;
+        else if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_3)) base = 25000;
+        else if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_2)) base = 10000;
+        else if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_1)) base = 2500;
+        else if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_0)) base = 1000;
+        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_3_SILK)) {
+            base += 25000;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
-    public int getSyrupsCapacity(Colony colony) { 
-        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_5)) return 60000;
-        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_4)) return 25000;
-        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_3)) return 10000;
-        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_2)) return 3500;
-        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_1)) return 1200;
-        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_0)) return 500; 
-        return 0;
+    public int getSyrupsCapacity(Colony colony) {
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_5)) base = 60000;
+        else if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_4)) base = 25000;
+        else if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_3)) base = 10000;
+        else if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_2)) base = 3500;
+        else if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_1)) base = 1200;
+        else if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_0)) base = 500;
+        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_3_SILK)) {
+            base += 10000;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
-    public int getResinsCapacity(Colony colony) { 
-        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_5)) return 20000;
-        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_4)) return 7500;
-        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_3)) return 3000;
-        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_2)) return 1200;
-        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_1)) return 500;
-        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_0)) return 200; 
-        return 0;
+    public int getResinsCapacity(Colony colony) {
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_5)) base = 20000;
+        else if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_4)) base = 7500;
+        else if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_3)) base = 3000;
+        else if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_2)) base = 1200;
+        else if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_1)) base = 500;
+        else if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_0)) base = 200;
+        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_3_SILK)) {
+            base += 3000;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
-    public int getMineralsCapacity(Colony colony) { 
-        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_5)) return 15000;
-        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_4)) return 6000;
-        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_3)) return 2500;
-        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_2)) return 750;
-        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_1)) return 250;
-        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_0)) return 100; 
-        return 0;
+    public int getMineralsCapacity(Colony colony) {
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_5)) base = 15000;
+        else if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_4)) base = 6000;
+        else if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_3)) base = 2500;
+        else if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_2)) base = 750;
+        else if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_1)) base = 250;
+        else if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_0)) base = 100;
+        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_3_SILK)) {
+            base += 2500;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
     public int getEggsCapacity(Colony colony) {
-        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_5)) return 3000;
-        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_4)) return 1200;
-        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_3)) return 500;
-        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_2)) return 150;
-        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_1)) return 80;
-        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_0)) return 50; 
-        return 0;
+        int base = 0;
+        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_5)) base = 3000;
+        else if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_4)) base = 1200;
+        else if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_3)) base = 500;
+        else if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_2)) base = 150;
+        else if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_1)) base = 80;
+        else if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_0)) base = 50;
+        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_3_SILK)) {
+            base += 500;
+        }
+        return applyHivebuildCapacity(colony, base, true);
     }
     public int getQueensCapacity(Colony colony) {
         boolean canMultiQueen = colony.hasUpgrade(GameUnlocks.ASSIMILATED_MULTIQUEEN);
@@ -98,6 +131,54 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) return canMultiQueen ? 2 : 1;
         if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_0)) return 1; 
         return 0;
+    }
+
+    public static int countHiveMounds(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int count = 0;
+        if (colony.hasBuilding(GameUnlocks.HIVE_MOUND_2)) {
+            count++;
+        }
+        if (colony.hasBuilding(GameUnlocks.HIVE_MOUND_4)) {
+            count++;
+        }
+        return count;
+    }
+
+    private static int applyHivebuildCapacity(Colony colony, int base, boolean storage) {
+        if (base <= 0) {
+            return 0;
+        }
+        int mounds = countHiveMounds(colony);
+        if (mounds <= 0) {
+            return base;
+        }
+        double bonus = GameNumbers.HIVEBUILD_CAPACITY_BONUS_PER_MOUND * mounds;
+        if (storage) {
+            bonus += GameNumbers.HIVEBUILD_STORAGE_BONUS_PER_MOUND * mounds;
+        }
+        return (int) Math.round(base * (1.0 + bonus));
+    }
+
+    public static double woodburrowTimeMult(Dynasty dynasty) {
+        if (dynasty != null && dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_WOODBURROW)) {
+            return GameNumbers.WOODBURROW_TIME_MULT;
+        }
+        return 1.0;
+    }
+
+    public double getEffectiveBuildTime(Colony colony, Building building) {
+        if (building == null) {
+            return 0;
+        }
+        Dynasty dynasty = colony != null ? colony.getDynasty() : null;
+        return building.getBuildTime() * woodburrowTimeMult(dynasty);
+    }
+
+    public static double getTunnelWorkRequired(Dynasty dynasty) {
+        return GameNumbers.TUNNEL_WORK_REQUIRED * woodburrowTimeMult(dynasty);
     }
     public int getAphidCapacity(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return 10;
@@ -423,7 +504,11 @@ public class ColonyStatsService {
 
     public double getProteinProductionHourly(Colony colony) {
         int hunterCount = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
-        return hunterCount * getCollectingRate(colony);
+        double passive = 0;
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB)) {
+            passive = (getProteinCapacity(colony) * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
+        }
+        return (hunterCount * getCollectingRate(colony)) + passive;
     }
 
     public double getMineralProductionHourly(Colony colony) {

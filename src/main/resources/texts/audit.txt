@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 88% (345/394 checked)
+Completion: 86% (345/400 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -261,15 +261,18 @@ Stat upgrades (RP tiers):
 [X] Policing 1–3, Hex Sustain, Worker Speed 2
 
 Assimilated species passives (research tree):
-[ ] Farming, Multiqueen, Trapjaw (Powerful Bite; infantry attack), Woodburrow
+[ ] Farming, Multiqueen, Trapjaw (Powerful Bite; infantry attack)
+[ ] Woodburrow (−20% build and tunnel time)
 [ ] Honeypot (Potter role + Boost Regen; research detail/buy tip requires Honeypot assimilation), Doorhead (Defender role + Shielding; research detail/buy tip requires Doorhead assimilation)
-[ ] Silkweave, Rafting, Firevenom, Jumping (Jumping ability: infantry melee reaches artillery line; 1.2x damage)
+[ ] Silkweave (leaf L3 storages tandem with resin L3; plant cost 10× resin), Firevenom, Jumping (Jumping ability: infantry melee reaches artillery line; 1.2x damage)
+[ ] Rafting (cross 1 water hex for trade/colonization; Rafting II/III raise range to 2/3)
 [ ] Stinging (Stinging skill; infantry attack)
 [ ] Swarming (Swarming ability: +50% combat capacity), Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist (80% thirst resistance; replaces Thirst III), Deadlyvenom
 [ ] Stealth (Spy role; intelligence dossier; CI = 5 + idle spies capped 50; theft at 100%)
 [X] Selfdestruct (Bomber role + Selfdestruct skill 500%/90%/5 targets; ant dies)
 [X] Farsight (Far Sight head subtype: +15% accuracy to all skills, capped at 100%)
-[ ] Hivebuild, Locsense (+50% movement speed; +20 flat convoy security %)
+[ ] Hivebuild (Mound II/IV: +10% capacity +25% storages each; not royal), Locsense (+50% movement speed; +20 flat convoy security %)
+[ ] Web Building synergy (Silkweave + Hivebuild → Passive Web + Passive Water unlock)
 [X] Acidspit (Green Ant — unlocks Acid Spitting skill)
 [X] Assimilation / Genome Bridge (Omni starts with it completed; still required before other species assimilations)
 
@@ -293,7 +296,8 @@ Room upgrade chains (each tier L0→L5 where applicable; L4–L5 cost minerals +
 [X] Resin Reservoir (gated behind Resin ability)
 
 Passive / special rooms:
-[X] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
+[X] Passive Lab, Passive Aphid, Passive Nurse
+[ ] Passive Water Collector, Passive Web (require Web Building synergy)
 [X] Passive Farm, Passive Grave, Composter
 
 [X] Build queues with rock + RP costs
@@ -306,10 +310,12 @@ Passive / special rooms:
 Start / progress assimilations (RP + time). Target RP cost scales +25% per completed assimilation (5th = 200% base). Each species:
 [X] Species start with their native assimilation already completed (including Omni Genome Bridge); Assimilation tab/menu (I) appears after Genetic Assimilation unlock when a genome is available, and stays visible once more than 2 assimilations are completed (empty list: “Currently there is no other species genomes to assimilate”)
 [X] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
-[ ] Woodburrow, Silkweave, Rafting, Firevenom, Jumping (Jumping ability: infantry melee reaches artillery line; 1.2x damage)
+[ ] Woodburrow (−20% build/tunnel time), Silkweave (leaf L3 storages; plant cost 10× resin), Firevenom, Jumping (Jumping ability: infantry melee reaches artillery line; 1.2x damage)
+[ ] Rafting (cross 1 water hex for trade/colonization; Rafting II/III raise range to 2/3)
 [ ] Stinging, Swarming (Swarming ability: +50% combat capacity), Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist (80% thirst resistance), Deadlyvenom
 [ ] Stealth (Spy role; Send Spies / Intelligence on Diplomacy Actions; daily intel & theft; monthly catch; AI spies disliked dynasties with idle≥sent)
-[ ] Selfdestruct, Farsight, Hivebuild, Locsense (+50% movement speed; +20 flat convoy security %)
+[ ] Selfdestruct, Farsight, Hivebuild (Mound II/IV capacity boosts), Locsense (+50% movement speed; +20 flat convoy security %)
+[ ] Web Building synergy (Silkweave + Hivebuild → Passive Web + Passive Water unlock)
 [ ] Acidspit (Green Ant)
 
 [X] Assimilation RP target cost scales +25% per completed assimilation (5th = 200% base)

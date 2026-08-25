@@ -984,7 +984,6 @@ public class SettingsPanel extends JPanel {
         resetRolesButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetSandboxButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         
-        // Refresh autosave combo options
         int currentFreq = (autosaveCombo.getSelectedItem() != null) ? ((AutosaveOption)autosaveCombo.getSelectedItem()).value : 0;
         autosaveCombo.setModel(new DefaultComboBoxModel<>(new AutosaveOption[]{
                 new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_MONTH), 1),
@@ -1237,7 +1236,6 @@ public class SettingsPanel extends JPanel {
 
         LanguageOption selectedLang = (LanguageOption) languageCombo.getSelectedItem();
         if (selectedLang != null) {
-            // Engine.setLanguage already updates LanguageStrings and notifies UI once.
             engine.setLanguage(selectedLang.code);
         }
         
@@ -1310,9 +1308,6 @@ public class SettingsPanel extends JPanel {
                 return;
             }
         } else if (chromeChanged) {
-            // Only tear down / recreate the window when size or fullscreen actually changed.
-            // Language-only saves used to always dispose the frame, which re-fired IntroPanel
-            // ancestor listeners and could yank the UI into Play → Load.
             frame.applyEngineSettings();
         } else {
             frame.applyRuntimeSettings();

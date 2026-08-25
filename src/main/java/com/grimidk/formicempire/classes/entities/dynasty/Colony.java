@@ -1041,11 +1041,14 @@ public class Colony {
         if (!GameUnlocks.meetsBuildingUnlockRequirement(this, building)) return false;
         if (building.getRequirement() != null && !hasBuilding(building.getRequirement())) return false;
         if (!instant) {
-            if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
+            if (getMinerals() < building.getMineralCost()
+                    || getResins() < building.getResinCost()
+                    || getPlants() < building.getPlantCost()) {
                 return false;
             }
             resourceService.consumeResource(this, GameConstants.RESOURCE_ROCK, building.getMineralCost());
             resourceService.consumeResource(this, GameConstants.RESOURCE_RESIN, building.getResinCost());
+            resourceService.consumeResource(this, GameConstants.RESOURCE_PLANT, building.getPlantCost());
             setCurrentBuildingProject(building);
             this.buildingProgressHours = 0.0;
             return true;
@@ -1075,7 +1078,8 @@ public class Colony {
     public double getMineralsPrecise() { return minerals; }
     
     public void setPlants(double plants) { 
-        this.plants = Math.max(0, plants); 
+        this.plants = Math.max(0, plants);
+        invalidateAffordableAlertCache();
     }
     public void setMushrooms(double mushrooms) { 
         this.mushrooms = Math.max(0, mushrooms); 
@@ -1497,9 +1501,11 @@ public class Colony {
         }
         int minerals = getMinerals();
         int resins = getResins();
+        int plants = getPlants();
         for (Building building : GameUnlocks.getBuildings()) {
             if (!hasBuilding(building) && minerals >= building.getMineralCost()
                     && resins >= building.getResinCost()
+                    && plants >= building.getPlantCost()
                     && (building.getRequirement() == null || hasBuilding(building.getRequirement()))
                     && building.isAvailableFor(getDynasty())
                     && GameUnlocks.meetsBuildingUnlockRequirement(this, building)) {

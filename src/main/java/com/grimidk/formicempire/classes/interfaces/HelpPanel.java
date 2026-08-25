@@ -315,9 +315,6 @@ public class HelpPanel extends JPanel {
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         for (AntSpecies s : GameConstants.getSpecies()) {
-            if (!GameConstants.hasAssimilatedDroneSprite(s)) {
-                continue;
-            }
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
             entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(),
@@ -1671,6 +1668,9 @@ public class HelpPanel extends JPanel {
                              body.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
                              body.append(AssetStyles.formatNumber(b.getMineralCost())).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
                              body.append(AssetStyles.formatNumber(b.getResinCost())).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
+                             if (b.getPlantCost() > 0) {
+                                 body.append(AssetStyles.formatNumber(b.getPlantCost())).append(" ").append(LanguageStrings.get("RESOURCE_PLANT")).append(", ");
+                             }
                              body.append(AssetStyles.formatNumber(b.getBuildTime())).append(" Hours");
                         }
                     } else if (selected instanceof Assimilation) {

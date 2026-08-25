@@ -424,7 +424,8 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                         if (builders <= 0 && cranes <= 0) {
                             tip = LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR);
                         } else if (colony.getMinerals() < building.getMineralCost()
-                                || colony.getResins() < building.getResinCost()) {
+                                || colony.getResins() < building.getResinCost()
+                                || colony.getPlants() < building.getPlantCost()) {
                             tip = LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR);
                         }
                     }
@@ -443,7 +444,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             if (inProgress) {
                 double efficiency = colony.getConstructionEfficiency();
                 double requiredHours = efficiency > 0
-                        ? building.getBuildTime() / efficiency
+                        ? colony.getStatsService().getEffectiveBuildTime(colony, building) / efficiency
                         : Double.POSITIVE_INFINITY;
                 double progressHours = colony.getBuildingProgressHours();
                 int max = requiredHours > 0 && Double.isFinite(requiredHours)
@@ -467,18 +468,22 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                     + AssetStyles.formatNumber(building.getMineralCost()) + "  "
                     + GameConstants.RESOURCE_RESIN.getName() + ": "
                     + AssetStyles.formatNumber(building.getResinCost()) + "  "
+                    + GameConstants.RESOURCE_PLANT.getName() + ": "
+                    + AssetStyles.formatNumber(building.getPlantCost()) + "  "
                     + LanguageStrings.get(LanguageStrings.HELP_BUILD_BASE_COST) + ": "
                     + AssetStyles.formatNumber(building.getBuildTime());
             int mineralNeed = Math.max(0, building.getMineralCost());
             int resinNeed = Math.max(0, building.getResinCost());
-            int totalNeed = mineralNeed + resinNeed;
+            int plantNeed = Math.max(0, building.getPlantCost());
+            int totalNeed = mineralNeed + resinNeed + plantNeed;
             if (totalNeed <= 0) {
                 costBar.setMaximum(1);
                 costBar.setValue(selectedState == BuildingTreeGraph.NodeState.OWNED ? 1 : 0);
             } else {
                 long minerals = colony != null ? Math.max(0L, colony.getMinerals()) : 0L;
                 long resins = colony != null ? Math.max(0L, colony.getResins()) : 0L;
-                long have = Math.min(minerals, mineralNeed) + Math.min(resins, resinNeed);
+                long plants = colony != null ? Math.max(0L, colony.getPlants()) : 0L;
+                long have = Math.min(minerals, mineralNeed) + Math.min(resins, resinNeed) + Math.min(plants, plantNeed);
                 costBar.setMaximum(totalNeed);
                 costBar.setValue((int) Math.min(totalNeed, have));
             }
@@ -515,6 +520,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             if (colony.getCurrentBuildingProject() == building) {
                 colony.setMinerals(colony.getMinerals() + building.getMineralCost());
                 colony.setResins(colony.getResins() + building.getResinCost());
+                colony.setPlants(colony.getPlants() + building.getPlantCost());
                 colony.setCurrentBuildingProject(null);
                 colony.setBuildingProgressHours(0.0);
                 closeDetail();

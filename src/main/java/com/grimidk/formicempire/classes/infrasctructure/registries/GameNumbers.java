@@ -73,6 +73,18 @@ public final class GameNumbers {
     public static final int CONVOY_TUNNEL_LEG_DISTANCE = 10_000;
     public static final int CONVOY_PORTAL_APPROACH_PX = 36;
 
+    // --- Rafting (Floodplain assimilation) ---
+    public static final int RAFTING_WATER_CROSS_RANGE_1 = 1;
+    public static final int RAFTING_WATER_CROSS_RANGE_2 = 2;
+    public static final int RAFTING_WATER_CROSS_RANGE_3 = 3;
+
+    // --- Woodburrow / Silkweave / Hivebuild / Web ---
+    public static final double WOODBURROW_TIME_MULT = 0.8;
+    public static final int SILKWEAVE_PLANT_COST_MULT = 10;
+    public static final double HIVEBUILD_CAPACITY_BONUS_PER_MOUND = 0.10;
+    public static final double HIVEBUILD_STORAGE_BONUS_PER_MOUND = 0.25;
+    public static final double WEB_BUILDING_PROTEIN_DAILY_FRACTION = 0.10;
+
     // --- Mites / parasites ---
     public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
     public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;

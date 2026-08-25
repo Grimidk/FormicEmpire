@@ -92,6 +92,12 @@ public final class ColonyJobRules {
         resources.addResource(colony, GameConstants.RESOURCE_MEAT, meatGain);
         resources.addResource(colony, GameConstants.RESOURCE_ROCK, rockGain);
 
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB)) {
+            double maxProtein = stats.getProteinCapacity(colony);
+            double webGain = (maxProtein * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
+            resources.addResource(colony, GameConstants.RESOURCE_MEAT, webGain);
+        }
+
         if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) {
             int fungiGain = probabilisticRound(stats.getFungiProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
             if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_FUNGI) <= 0) {
@@ -403,7 +409,8 @@ public final class ColonyJobRules {
 
         colony.setBuildingProgressHours(colony.getBuildingProgressHours() + 1.0);
 
-        double required = colony.getCurrentBuildingProject().getBuildTime() / efficiency;
+        double required = colony.getStatsService().getEffectiveBuildTime(colony, colony.getCurrentBuildingProject())
+                / efficiency;
         if (colony.getBuildingProgressHours() >= required) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
             colony.setCurrentBuildingProject(null);

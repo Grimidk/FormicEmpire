@@ -225,7 +225,8 @@ public final class BuildingTreeGraph {
             return NodeState.UNAVAILABLE;
         }
         if (!instant && (colony.getMinerals() < building.getMineralCost()
-                || colony.getResins() < building.getResinCost())) {
+                || colony.getResins() < building.getResinCost()
+                || colony.getPlants() < building.getPlantCost())) {
             return NodeState.UNAVAILABLE;
         }
         if (!instant && colony.getCurrentBuildingProject() != null) {
@@ -236,6 +237,9 @@ public final class BuildingTreeGraph {
 
     public static boolean isVisible(Colony colony, Building building) {
         if (colony == null || building == null) {
+            return false;
+        }
+        if (!GameUnlocks.isBuildingShownInTree(colony, building)) {
             return false;
         }
         if (colony.hasBuilding(building)) {

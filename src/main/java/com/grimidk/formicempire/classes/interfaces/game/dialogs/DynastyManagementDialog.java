@@ -16,6 +16,7 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
@@ -1099,7 +1100,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (activeColony.getCurrentTunnelProject() != null || dynasty.hasIncompleteTunnelAt(originHex)) {
                     return;
                 }
-                Tunnel tunnel = new Tunnel(originHex, targetHex, GameNumbers.TUNNEL_WORK_REQUIRED);
+                Tunnel tunnel = new Tunnel(originHex, targetHex, ColonyStatsService.getTunnelWorkRequired(dynasty));
                 dynasty.addTunnel(tunnel);
                 activeColony.setCurrentTunnelProject(tunnel);
             }

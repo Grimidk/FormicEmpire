@@ -121,6 +121,8 @@ public final class GameConstants {
     public static final ImageIcon ROOM_PASSIVE_FARM = loadIcon("sprites/buildings/rooms/PassiveFarm.png");
     public static final ImageIcon ROOM_PASSIVE_GRAVE = loadIcon("sprites/buildings/rooms/PassiveGrave.png");
     public static final ImageIcon ROOM_PASSIVE_COMPOSTER = loadIcon("sprites/buildings/rooms/PassiveComposter.png");
+    // TODO asset: sprites/buildings/rooms/PassiveWeb.png (placeholder)
+    public static final ImageIcon ROOM_PASSIVE_WEB = loadIcon("sprites/buildings/rooms/PassiveWeb.png");
 
     // --- Convoy view tiles ---
     public static final ImageIcon CONVOY_TILE_SEA = loadIcon("backgrounds/convoy/SeaConvoyTile.png");
@@ -1438,27 +1440,24 @@ public final class GameConstants {
         loadIcon("icons/species/Turtle.png"));
     static { species.add(SPECIES_TURTLE); }
 
-    // TODO asset: icons/species/Carpenter.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_CARPENTER = new AntSpecies(8, LanguageStrings.SPECIES_CARPENTER, LanguageStrings.SPECIES_CARPENTER_SCIENTIFIC, "carpenter/", GameUnlocks.ASSIMILATION_WOODBURROW,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_WOODBURROW),
         Set.of(LanguageStrings.DYNASTY_THEME_CARPENTER, LanguageStrings.DYNASTY_THEME_WOOD, LanguageStrings.DYNASTY_THEME_TREE),
-        palette("eb8931", "eb8931", "eb8931", "f7e26b", "a46422", "676767", "9d9d9d", "434343", "f7e26b"),
+        palette("a3ce27", "a3ce27", "eb8931", "d24f14", "32100a", "32100a", "a46422", "d24f14", "eb8931"),
         loadIcon("icons/species/Carpenter.png"));
     static { species.add(SPECIES_CARPENTER); }
 
-    // TODO asset: icons/species/Weaver.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_WEAVER = new AntSpecies(9, LanguageStrings.SPECIES_WEAVER, LanguageStrings.SPECIES_WEAVER_SCIENTIFIC, "weaver/", GameUnlocks.ASSIMILATION_SILKWEAVE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SILKWEAVE),
         Set.of(LanguageStrings.DYNASTY_THEME_WEAVER, LanguageStrings.DYNASTY_THEME_SILK, LanguageStrings.DYNASTY_THEME_SPIDER),
-        palette("751717", "751717", "751717", "eb8931", "a46422", "1b2632", "31a2f2", "005784", "eb8931"),
+        palette("493c2b", "493c2b", "be2633", "9427c4", "ae7ee5", "ae7ee5", "493c2b", "be2633", "be2633"),
         loadIcon("icons/species/Weaver.png"));
     static { species.add(SPECIES_WEAVER); }
 
-    // TODO asset: icons/species/Floodplain.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_FLOODPLAIN = new AntSpecies(10, LanguageStrings.SPECIES_FLOODPLAIN, LanguageStrings.SPECIES_FLOODPLAIN_SCIENTIFIC, "floodplain/", GameUnlocks.ASSIMILATION_RAFTING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_RAFTING),
         Set.of(LanguageStrings.DYNASTY_THEME_FLOODPLAIN, LanguageStrings.DYNASTY_THEME_RIVER, LanguageStrings.DYNASTY_THEME_WATER),
-        palette("be2633", "be2633", "be2633", "eb8931", "a46422", "676767", "31a2f2", "005784", "eb8931"),
+        palette("be2633", "d24f14", "be2633", "b2dcef", "005784", "005784", "32100a", "d24f14", "be2633"),
         loadIcon("icons/species/Floodplain.png"));
     static { species.add(SPECIES_FLOODPLAIN); }
 
@@ -1533,11 +1532,10 @@ public final class GameConstants {
         loadIcon("icons/species/Bulldog.png"));
     static { species.add(SPECIES_BULLDOG); }
 
-    // TODO asset: icons/species/ShiningBlack.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_SHININGBLACK = new AntSpecies(22, LanguageStrings.SPECIES_SHININGBLACK, LanguageStrings.SPECIES_SHININGBLACK_SCIENTIFIC, "shiningblack/", GameUnlocks.ASSIMILATION_HIVEBUILD,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HIVEBUILD),
         Set.of(LanguageStrings.DYNASTY_THEME_SHINING, LanguageStrings.DYNASTY_THEME_BLACK, LanguageStrings.DYNASTY_THEME_DARK),
-        palette("1b2632", "1b2632", "1b2632", "eb8931", "be2633", "676767", "31a2f2", "005784", "eb8931"),
+        palette("0e141a", "0e141a", "434343", "0e141a", "434343", "ffffff", "0e141a", "676767", "434343"),
         loadIcon("icons/species/ShiningBlack.png"));
     static { species.add(SPECIES_SHININGBLACK); }
 
@@ -2073,13 +2071,7 @@ public final class GameConstants {
     }
 
     public static List<AntSpecies> getWorldSpawnableNpcSpecies() {
-        List<AntSpecies> result = new ArrayList<>();
-        for (AntSpecies s : species) {
-            if (s.getId() != SPECIES_OMNI.getId() && hasAssimilatedDroneSprite(s)) {
-                result.add(s);
-            }
-        }
-        return Collections.unmodifiableList(result);
+        return getNonOmniSpecies();
     }
 
     public static List<TradeMethod> getTradeMethods() { return Collections.unmodifiableList(tradeMethods); }

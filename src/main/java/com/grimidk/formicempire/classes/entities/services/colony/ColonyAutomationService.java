@@ -127,7 +127,9 @@ public class ColonyAutomationService {
             boolean tierMet = instant || b.isAvailableFor(colony.getDynasty());
             boolean unlockMet = GameUnlocks.meetsBuildingUnlockRequirement(colony, b);
             boolean canAfford = instant
-                    || (colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost());
+                    || (colony.getMinerals() >= b.getMineralCost()
+                    && colony.getResins() >= b.getResinCost()
+                    && colony.getPlants() >= b.getPlantCost());
 
             if (notOwned && reqMet && tierMet && unlockMet && canAfford) {
                 candidates.add(b);
@@ -140,9 +142,9 @@ public class ColonyAutomationService {
             if (npcPriority) {
                 candidates.sort(Comparator
                         .comparingInt(DynastyAiPriorities::buildingPriorityScore)
-                        .thenComparingInt(b -> b.getMineralCost() + b.getResinCost()));
+                        .thenComparingInt(b -> b.getMineralCost() + b.getResinCost() + b.getPlantCost()));
             } else {
-                candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost()));
+                candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost() + b.getPlantCost()));
             }
             Building target = candidates.get(0);
 
@@ -170,7 +172,7 @@ public class ColonyAutomationService {
         Hex targetHex = findTunnelTarget(dynasty, currentHex);
         if (targetHex == null) return;
 
-        Tunnel tunnel = new Tunnel(currentHex, targetHex, GameNumbers.TUNNEL_WORK_REQUIRED);
+        Tunnel tunnel = new Tunnel(currentHex, targetHex, ColonyStatsService.getTunnelWorkRequired(dynasty));
         dynasty.addTunnel(tunnel);
         colony.setCurrentTunnelProject(tunnel);
         colony.logEvent(ColonyLogPrefixes.AUTOMATION + " "

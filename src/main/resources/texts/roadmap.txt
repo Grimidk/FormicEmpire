@@ -5,8 +5,10 @@ To Fix (By decreasing priority):
 		(none right now)
 	High:
 		TODO: icons for stats (Skeleton, Acid, Longevity, Research/Growth/Thirst 1–2/Laying/Scouting/Farming/Contamination/Graving/Policing 1–3, Logistics 1, Passive 1, Symbiotic Mite 1, Dermestid 1, Hex Sustain, Worker Speed 2, Health/Attack/Defense 1–2, Attack Speed 1)
-		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave, Composter) — separate from sprites/buildings/rooms/
-		TODO: tune AntSpeciesPalette hexcodes + icons for placeholder species (carpenter, weaver, floodplain, shining black)
+		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave/Web, Composter) — separate from sprites/buildings/rooms/
+		TODO asset: Silkweave L3 room/icons under icons/buildings + sprites/buildings/rooms
+		TODO asset: Hivebuild mound room/icons + overworld mound art (HiveMound2/4)
+		TODO asset: PassiveWeb room sprite + icons/buildings/PassiveWeb.png (placeholder room exists)
 		change icons for music player to be like the other (add them to help)
 		music: main menu song, more songs in general
 		sounds: building done, research done, basic click,
@@ -22,15 +24,6 @@ To Fix (By decreasing priority):
 		Font - self explanatory
 
 To Feature (to be done in priority order by blocks): 
-	Todo — Colony / world mechanic (assimilated upgrade exists; gameplay hook missing):
-		Carpenter — Woodburrow (decrease building and tunneling time by 20%)
-		Weaver — Silkweave (allows alternate tier 3 buidings that use leaves instead of resin, add to extra capacities and extra rooms)
-		Floodplain — Rafting (allows cross water trade and colinization but only range of 1 hex)
-		Shining Black — Hivebuild (allows other alternates of mounds for tier 2 and 4 which boost capacities and need extra overwolrd art)
-		
-	Todo — Synergy (after prerequisite assimilations):
-		Web building — Silkweave + Hivebuild → passive protein capture (not registered yet)
-
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 		swarm vs creature battles
@@ -48,7 +41,7 @@ Needed for launch (v1.0) (Launch Version):
 	Everything else :
 		fog of war, range of 1 at the start, cant interact with dynasties outside the fog, scouts (or explorer princess role with exploring range) have a small chance to venture to adjacent hexes to explore, cant colonize into fog, cheat to remove fog, action to exchange intel for trade (and rep)
 		rework popups and dialogs to not be different windows
-		bridges
+		bridges (needs rafting)
 		rethink hatching to other types taking more time so its balanced to not just spam a type
 		reserve ants to ant exauhstion and punishing 100% worker capacity
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events)) disasters penalie overworked colonies
