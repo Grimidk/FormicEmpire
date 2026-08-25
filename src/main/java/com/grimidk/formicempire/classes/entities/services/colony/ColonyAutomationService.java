@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiPriorities;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -134,7 +135,15 @@ public class ColonyAutomationService {
         }
 
         if (!candidates.isEmpty()) {
-            candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost()));
+            Dynasty dynasty = colony.getDynasty();
+            boolean npcPriority = dynasty != null && !dynasty.isPlayer();
+            if (npcPriority) {
+                candidates.sort(Comparator
+                        .comparingInt(DynastyAiPriorities::buildingPriorityScore)
+                        .thenComparingInt(b -> b.getMineralCost() + b.getResinCost()));
+            } else {
+                candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost()));
+            }
             Building target = candidates.get(0);
 
             colony.startBuildingProject(target);

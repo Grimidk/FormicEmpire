@@ -372,6 +372,9 @@ public class SaveManager {
                 }
                 sc.isPlayer = dynasty.isPlayer();
                 sc.wildDynasty = dynasty.isWildDynasty();
+                sc.aiPersonality = dynasty.getAiPersonality() != null
+                        ? dynasty.getAiPersonality().toPersistenceKey()
+                        : null;
                 sc.isDefeated = dynasty.isDefeated();
                 sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getNameKey() : LanguageStrings.RANK_ANT;
                 sc.researchPoints = dynasty.getResearchPoints();
@@ -388,6 +391,14 @@ public class SaveManager {
                 sc.diplomatSupportToDynasty = new HashMap<>();
                 for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomatSupportToDynasty().entrySet()) {
                     sc.diplomatSupportToDynasty.put(String.valueOf(entry.getKey()), entry.getValue());
+                }
+                sc.spySupportToDynasty = new HashMap<>();
+                for (Map.Entry<Integer, Integer> entry : dynasty.copySpySupportToDynasty().entrySet()) {
+                    sc.spySupportToDynasty.put(String.valueOf(entry.getKey()), entry.getValue());
+                }
+                sc.intelligenceToward = new HashMap<>();
+                for (Map.Entry<Integer, Double> entry : dynasty.copyIntelligenceToward().entrySet()) {
+                    sc.intelligenceToward.put(String.valueOf(entry.getKey()), entry.getValue());
                 }
                 sc.defeatedSpeciesIds = (dynasty.getDefeatedSpeciesIds() != null) ? new ArrayList<>(dynasty.getDefeatedSpeciesIds()) : new ArrayList<>();
                 sc.completedAssimilationIds = new ArrayList<>();
@@ -618,6 +629,9 @@ public class SaveManager {
                     for (Map.Entry<Integer, Integer> entry : c.getOutgoingDynastyDiplomatMissions().entrySet()) {
                         sc.outgoingDynastyDiplomatMissions.put(String.valueOf(entry.getKey()), entry.getValue());
                     }
+                    for (Map.Entry<Integer, Integer> entry : c.getOutgoingDynastySpyMissions().entrySet()) {
+                        sc.outgoingDynastySpyMissions.put(String.valueOf(entry.getKey()), entry.getValue());
+                    }
                     
                     if (c.getPopulationService() != null) {
                         sc.localDeathStatistics = new HashMap<>(c.getDeathService().getDeathStatistics());
@@ -739,6 +753,7 @@ public class SaveManager {
         writeJsonLine(w, "titleKey", sc.titleKey != null ? sc.titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
         writeJsonLine(w, "wildDynasty", sc.wildDynasty, false);
+        writeJsonLine(w, "aiPersonality", sc.aiPersonality != null ? sc.aiPersonality : "", false);
         writeJsonLine(w, "isDefeated", sc.isDefeated, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "speciesId", sc.speciesId, false);
@@ -758,6 +773,8 @@ public class SaveManager {
         writeJsonLine(w, "geneticIntegrity", sc.geneticIntegrity, false);
         writeJsonLine(w, "militaryPower", sc.militaryPower, false);
         w.write("      \"diplomatSupportToDynasty\": " + serializeMapToJson(sc.diplomatSupportToDynasty) + ","); w.newLine();
+        w.write("      \"spySupportToDynasty\": " + serializeMapToJson(sc.spySupportToDynasty) + ","); w.newLine();
+        w.write("      \"intelligenceToward\": " + serializeDoubleMapToJson(sc.intelligenceToward) + ","); w.newLine();
         w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
         w.write("      \"diplomaticModifierRemainingDays\": " + serializeNestedIntegerMapToJson(sc.diplomaticModifierRemainingDays) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
@@ -861,6 +878,7 @@ public class SaveManager {
         w.write("      \"outgoingColonyDiplomatMissions\": " + serializeMapToJson(sc.outgoingColonyDiplomatMissions) + ","); w.newLine();
         w.write("      \"incomingColonyDiplomatSupport\": " + serializeMapToJson(sc.incomingColonyDiplomatSupport) + ","); w.newLine();
         w.write("      \"outgoingDynastyDiplomatMissions\": " + serializeMapToJson(sc.outgoingDynastyDiplomatMissions) + ","); w.newLine();
+        w.write("      \"outgoingDynastySpyMissions\": " + serializeMapToJson(sc.outgoingDynastySpyMissions) + ","); w.newLine();
         w.write("      \"localDeathStatistics\": " + serializeMapToJson(sc.localDeathStatistics) + ","); w.newLine();
         w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
         w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); 
@@ -1018,6 +1036,7 @@ public class SaveManager {
         }
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
         sc.wildDynasty = Boolean.parseBoolean(map.getOrDefault("wildDynasty", "false"));
+        sc.aiPersonality = map.getOrDefault("aiPersonality", "");
         sc.isDefeated = Boolean.parseBoolean(map.getOrDefault("isDefeated", "false"));
         sc.rankName = map.getOrDefault("rank", LanguageStrings.RANK_ANT);
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
@@ -1038,6 +1057,8 @@ public class SaveManager {
         sc.geneticIntegrity = Double.parseDouble(map.getOrDefault("geneticIntegrity", "100.0"));
         sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
         sc.diplomatSupportToDynasty = deserializeJsonToMap(map.get("diplomatSupportToDynasty"));
+        sc.spySupportToDynasty = deserializeJsonToMap(map.get("spySupportToDynasty"));
+        sc.intelligenceToward = deserializeJsonToDoubleMap(map.get("intelligenceToward"));
         sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
         sc.diplomaticModifierRemainingDays = deserializeJsonToNestedIntegerMap(map.get("diplomaticModifierRemainingDays"));
         if (sc.diplomaticModifierRemainingDays.isEmpty()) {
@@ -1194,6 +1215,7 @@ public class SaveManager {
         sc.outgoingColonyDiplomatMissions = deserializeJsonToMap(map.get("outgoingColonyDiplomatMissions"));
         sc.incomingColonyDiplomatSupport = deserializeJsonToMap(map.get("incomingColonyDiplomatSupport"));
         sc.outgoingDynastyDiplomatMissions = deserializeJsonToMap(map.get("outgoingDynastyDiplomatMissions"));
+        sc.outgoingDynastySpyMissions = deserializeJsonToMap(map.get("outgoingDynastySpyMissions"));
         sc.localDeathStatistics = deserializeJsonToMap(map.get("localDeathStatistics"));
         sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
         sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));
@@ -1882,7 +1904,13 @@ public class SaveManager {
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
             writeJsonLine(w, "defaultRolePrincess", engine.getDefaultRolePrincess(), false);
-            writeJsonLine(w, "defaultRoleQueen", engine.getDefaultRoleQueen(), true);
+            writeJsonLine(w, "defaultRoleQueen", engine.getDefaultRoleQueen(), false);
+            writeJsonLine(w, "mapLayerBorders", engine.isMapLayerBorders(), false);
+            writeJsonLine(w, "mapLayerBiomeIcons", engine.isMapLayerBiomeIcons(), false);
+            writeJsonLine(w, "mapLayerColonyRanks", engine.isMapLayerColonyRanks(), false);
+            writeJsonLine(w, "mapLayerTrades", engine.isMapLayerTrades(), false);
+            writeJsonLine(w, "mapLayerTunnels", engine.isMapLayerTunnels(), false);
+            writeJsonLine(w, "mapLayerBattles", engine.isMapLayerBattles(), true);
             w.write("}");
             w.newLine();
             w.flush();
@@ -2007,6 +2035,18 @@ public class SaveManager {
                     GameConstants.TYPE_QUEEN,
                     Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))),
                     Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_QUEEN).getId()));
+            engine.setMapLayerBorders(Boolean.parseBoolean(m.getOrDefault("mapLayerBorders",
+                    String.valueOf(engine.isMapLayerBorders()))));
+            engine.setMapLayerBiomeIcons(Boolean.parseBoolean(m.getOrDefault("mapLayerBiomeIcons",
+                    String.valueOf(engine.isMapLayerBiomeIcons()))));
+            engine.setMapLayerColonyRanks(Boolean.parseBoolean(m.getOrDefault("mapLayerColonyRanks",
+                    String.valueOf(engine.isMapLayerColonyRanks()))));
+            engine.setMapLayerTrades(Boolean.parseBoolean(m.getOrDefault("mapLayerTrades",
+                    String.valueOf(engine.isMapLayerTrades()))));
+            engine.setMapLayerTunnels(Boolean.parseBoolean(m.getOrDefault("mapLayerTunnels",
+                    String.valueOf(engine.isMapLayerTunnels()))));
+            engine.setMapLayerBattles(Boolean.parseBoolean(m.getOrDefault("mapLayerBattles",
+                    String.valueOf(engine.isMapLayerBattles()))));
 
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {

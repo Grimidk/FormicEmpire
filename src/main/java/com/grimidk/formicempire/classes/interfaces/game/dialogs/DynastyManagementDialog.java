@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradePropos
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegrationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -1554,14 +1555,13 @@ public class DynastyManagementDialog extends ZeroDialog {
             World world = engine.getWorld();
             Tunnel tunnel = origin.getDynasty().getTunnelBetween(world.getHexOfColony(origin), world.getHexOfColony(target));
             if (tunnel != null && tunnel.isComplete()) speedFactor *= 1.5f;
+            speedFactor *= origin.getStatsService().getLocsenseSpeedMultiplier(origin);
 
             int hours = Math.max(1, Math.round(168f / speedFactor));
             
             double dangerFactor = method.getDangerFactor();
-            double mitigationPercent = 100.0;
-            if (dangerFactor > 0) {
-                mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
-            }
+            double mitigationPercent = origin.getStatsService()
+                    .getConvoySecurityMitigationPercent(origin, totalSec, dangerFactor);
 
             boolean overCap = totalLoad > totalCap || (bilateralCheck.isSelected() && totalReturnLoad > totalCap);
             boolean noLoad = totalLoad <= 0 && (!bilateralCheck.isSelected() || totalReturnLoad <= 0);
@@ -2721,6 +2721,31 @@ public class DynastyManagementDialog extends ZeroDialog {
                 menu.add(geneticExchangeItem);
             }
 
+            DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+            if (intel != null && intel.hasSpyRole()) {
+                JMenuItem spyItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_SPIES));
+                if (intel.canManageSpiesToward(other, world)) {
+                    spyItem.addActionListener(e -> promptManageDynastySpies(DynastyManagementDialog.this, other));
+                } else {
+                    spyItem.setEnabled(false);
+                    if (intel.countDynastyWideAvailableSpies() <= 0
+                            && intel.countSpiesToward(other) <= 0) {
+                        spyItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPIES));
+                    }
+                }
+                AssetStyles.styleMenuItem(spyItem);
+                menu.add(spyItem);
+
+                JMenuItem dossierItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTELLIGENCE));
+                dossierItem.addActionListener(e -> {
+                    IntelligenceDossierDialog dialog =
+                            new IntelligenceDossierDialog(DynastyManagementDialog.this, dynasty, other);
+                    dialog.setVisible(true);
+                });
+                AssetStyles.styleMenuItem(dossierItem);
+                menu.add(dossierItem);
+            }
+
             UiTableStyles.showCellPopupMenu(menu, table, row, column);
         }
     }
@@ -3396,6 +3421,31 @@ public class DynastyManagementDialog extends ZeroDialog {
             return;
         }
         diplo.assignDynastyMissionDiplomats(other, selected, world);
+        refreshDialog();
+    }
+
+    private void promptManageDynastySpies(Component parent, Dynasty other) {
+        DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+        World world = engine.getWorld();
+        if (intel == null || other == null || world == null) {
+            return;
+        }
+        if (!intel.hasSpyRole()) {
+            UiOptionPane.showMessageDialog(parent,
+                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPY_ROLE),
+                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_SPIES_TITLE),
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int current = intel.countSpiesToward(other);
+        int max = intel.computeMaxSpiesToward(other);
+        int available = intel.countDynastyWideAvailableSpies();
+        int gainPer = intel.getSpyPowerPerAnt();
+        Integer selected = promptManageDiplomatCount(parent, other.getName(), current, max, available, gainPer);
+        if (selected == null) {
+            return;
+        }
+        intel.assignSpiesToward(other, selected, world);
         refreshDialog();
     }
 

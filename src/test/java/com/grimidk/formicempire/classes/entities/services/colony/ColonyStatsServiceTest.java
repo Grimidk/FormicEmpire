@@ -47,6 +47,32 @@ public class ColonyStatsServiceTest {
     }
 
     @Test
+    public void heatresistAssimilationGivesThirstThreeResistance() {
+        for (int i = 0; i < 10; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
+
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST);
+
+        assertEquals(2, statsService.getWaterConsumption(colony));
+        assertEquals(80, statsService.getThirstResistance(colony, null));
+    }
+
+    @Test
+    public void locsenseBoostsSpeedAndConvoySecurityFlat() {
+        assertEquals(1f, statsService.getLocsenseSpeedMultiplier(colony), 0.0001f);
+        double baseMitigation = statsService.getConvoySecurityMitigationPercent(colony, 5.0, 1.0);
+        assertEquals(8.333, baseMitigation, 0.01);
+
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_LOCSENSE);
+
+        assertEquals(1.5f, statsService.getLocsenseSpeedMultiplier(colony), 0.0001f);
+        assertEquals(baseMitigation + 20.0,
+                statsService.getConvoySecurityMitigationPercent(colony, 5.0, 1.0), 0.01);
+        assertEquals(100.0, statsService.getConvoySecurityMitigationPercent(colony, 100.0, 1.0), 0.01);
+    }
+
+    @Test
     public void testTotalMushroomConsumption() {
         for (int i = 0; i < 10; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));

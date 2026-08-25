@@ -334,6 +334,10 @@ public final class GameConstants {
     static { misc.add(ICON_STAT_LOYALTY); }
     public static final ImageIcon ICON_STAT_REPUTATION = loadIcon("icons/misc/Reputation.png");
     static { misc.add(ICON_STAT_REPUTATION); }
+    public static final ImageIcon ICON_STAT_INTELLIGENCE = loadIcon("icons/misc/Intelligence.png");
+    static { misc.add(ICON_STAT_INTELLIGENCE); }
+    public static final ImageIcon ICON_STAT_COUNTER_INTELLIGENCE = loadIcon("icons/misc/CounterIntelligence.png");
+    static { misc.add(ICON_STAT_COUNTER_INTELLIGENCE); }
     public static final ImageIcon ICON_STAT_GENETIC_INTEGRITY = loadIcon("icons/misc/GeneticIntegrity.png");
     static { misc.add(ICON_STAT_GENETIC_INTEGRITY); }
     public static final ImageIcon ICON_STAT_MILITARY_POWER = loadIcon("icons/misc/MilitaryPower.png");
@@ -906,6 +910,8 @@ public final class GameConstants {
     static { antRoles.add(ROLE_BREEDER); }
     public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, LanguageStrings.ROLE_DIPLOMAT, loadIcon("icons/roles/Diplomat.png"));
     static { antRoles.add(ROLE_DIPLOMAT); }
+    public static final AntRole ROLE_SPY = new AntRole(39, TYPE_PRINCESS, LanguageStrings.ROLE_SPY, loadIcon("icons/roles/Spy.png"));
+    static { antRoles.add(ROLE_SPY); }
     public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, LanguageStrings.ROLE_LAYER, loadIcon("icons/roles/Layer.png"));
     static { antRoles.add(ROLE_LAYER); }
     public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER, loadIcon("icons/roles/Researcher.png"));
@@ -1111,6 +1117,9 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_WARMONGER = new DiplomaticReputationModifier(
         12, LanguageStrings.DIPLO_MODIFIER_WARMONGER, -20, 0, null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WARMONGER); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_CAUGHT_SPYING = new DiplomaticReputationModifier(
+        13, LanguageStrings.DIPLO_MODIFIER_CAUGHT_SPYING, -15, 0, null, GameNumbers.CAUGHT_SPYING_DURATION_DAYS);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_CAUGHT_SPYING); }
 
     public static final GeneticIntegrityModifier GI_MODIFIER_PACT = new GeneticIntegrityModifier(
         1, LanguageStrings.GI_MODIFIER_PACT, 10.0, DIPLO_MODIFIER_PACT.getNameKey());
@@ -1460,11 +1469,10 @@ public final class GameConstants {
         loadIcon("icons/species/Fire.png"));
     static { species.add(SPECIES_FIRE); }
 
-    // TODO asset: icons/species/Jet.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_JET = new AntSpecies(12, LanguageStrings.SPECIES_JET, LanguageStrings.SPECIES_JET_SCIENTIFIC, "jet/", GameUnlocks.ASSIMILATION_JUMPING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_JUMPING),
         Set.of(LanguageStrings.DYNASTY_THEME_JET, LanguageStrings.DYNASTY_THEME_TORNADO, LanguageStrings.DYNASTY_THEME_WIND),
-        palette("eb8931", "eb8931", "eb8931", "f7e26b", "a46422", "676767", "9d9d9d", "434343", "f7e26b"),
+        palette("0e141a", "0e141a", "0e141a", "32100a", "1b2632", "a46422", "0e141a", "44891a", "a46422"),
         loadIcon("icons/species/Jet.png"));
     static { species.add(SPECIES_JET); }
 
@@ -1475,19 +1483,18 @@ public final class GameConstants {
         loadIcon("icons/species/Bullet.png"));
     static { species.add(SPECIES_BULLET); }
 
-    // TODO asset: icons/species/Army.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_ARMY = new AntSpecies(15, LanguageStrings.SPECIES_ARMY, LanguageStrings.SPECIES_ARMY_SCIENTIFIC, "army/", GameUnlocks.ASSIMILATION_SWARMING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SWARMING),
         Set.of(LanguageStrings.DYNASTY_THEME_ARMY, LanguageStrings.DYNASTY_THEME_SOLDIER, LanguageStrings.DYNASTY_THEME_WARRIOR),
-        palette("f7e26b", "f7e26b", "f7e26b", "a46422", "eb8931", "751717", "e06f8b", "be2633", "eb8931"),
+        palette("d24f14", "eb8931", "eb8931", "eb8931", "31a2f2", "31a2f2", "d24f14", "f7e26b", "f7e26b"),
         loadIcon("icons/species/Army.png"));
     static { species.add(SPECIES_ARMY); }
 
-    // TODO asset: icons/species/Ghost.png (placeholder — replace final art)
+    // Ghost palette: white body, grey wings; dark brown drone with white/dark wings
     public static final AntSpecies SPECIES_GHOST = new AntSpecies(16, LanguageStrings.SPECIES_GHOST, LanguageStrings.SPECIES_GHOST_SCIENTIFIC, "ghost/", GameUnlocks.ASSIMILATION_STEALTH,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STEALTH),
         Set.of(LanguageStrings.DYNASTY_THEME_GHOST, LanguageStrings.DYNASTY_THEME_SHADOW, LanguageStrings.DYNASTY_THEME_PHANTOM),
-        palette("eb8931", "eb8931", "eb8931", "f7e26b", "a46422", "676767", "9d9d9d", "434343", "f7e26b"),
+        palette("ffffff", "ffffff", "ffffff", "676767", "434343", "32100a", "ffffff", "0e141a", "ffffff"),
         loadIcon("icons/species/Ghost.png"));
     static { species.add(SPECIES_GHOST); }
 
@@ -1498,11 +1505,10 @@ public final class GameConstants {
         loadIcon("icons/species/Dracula.png"));
     static { species.add(SPECIES_DRACULA); }
 
-    // TODO asset: icons/species/Silver.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_SILVER = new AntSpecies(18, LanguageStrings.SPECIES_SILVER, LanguageStrings.SPECIES_SILVER_SCIENTIFIC, "silver/", GameUnlocks.ASSIMILATION_HEATRESIST,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST),
         Set.of(LanguageStrings.DYNASTY_THEME_SILVER, LanguageStrings.DYNASTY_THEME_METAL, LanguageStrings.DYNASTY_THEME_GOLD),
-        palette("9d9d9d", "9d9d9d", "9d9d9d", "eb8931", "be2633", "676767", "31a2f2", "005784", "eb8931"),
+        palette("9d9d9d", "9d9d9d", "9d9d9d", "b2dcef", "ae7ee5", "44891a", "751717", "ae7ee5", "44891a"),
         loadIcon("icons/species/Silver.png"));
     static { species.add(SPECIES_SILVER); }
 
@@ -1535,11 +1541,10 @@ public final class GameConstants {
         loadIcon("icons/species/ShiningBlack.png"));
     static { species.add(SPECIES_SHININGBLACK); }
 
-    // TODO asset: icons/species/Desert.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_DESERT = new AntSpecies(23, LanguageStrings.SPECIES_DESERT, LanguageStrings.SPECIES_DESERT_SCIENTIFIC, "desert/", GameUnlocks.ASSIMILATION_LOCSENSE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_LOCSENSE),
         Set.of(LanguageStrings.DYNASTY_THEME_DESERT, LanguageStrings.DYNASTY_THEME_SAND, LanguageStrings.DYNASTY_THEME_DIRT),
-        palette("f7e26b", "f7e26b", "f7e26b", "a46422", "eb8931", "751717", "e06f8b", "be2633", "eb8931"),
+        palette("be2633", "751717", "751717", "f7e26b", "eb8931", "f7e26b", "a46422", "493c2b", "a46422"),
         loadIcon("icons/species/Desert.png"));
     static { species.add(SPECIES_DESERT); }
 

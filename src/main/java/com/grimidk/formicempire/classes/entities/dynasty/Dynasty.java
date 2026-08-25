@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.awt.Color;
 
+import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.CityTitle;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
@@ -30,6 +31,7 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyLogisticsAutomationService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatService;
@@ -57,6 +59,7 @@ public class Dynasty {
     private String titleKey;
     private boolean isPlayer;
     private boolean wildDynasty;
+    private AiPersonality aiPersonality;
     private AntSpecies species;
     private int researchPoints;
     private int totalNuptialFlights;
@@ -110,6 +113,8 @@ public class Dynasty {
     private final List<CrossDynastyTradeProposal> pendingTradeProposals;
     private int forcedFlightCooldownDays;
     private final Map<Integer, Integer> diplomatSupportToDynasty = new HashMap<>();
+    private final Map<Integer, Integer> spySupportToDynasty = new HashMap<>();
+    private final Map<Integer, Double> intelligenceToward = new HashMap<>();
     private int originDynastyId;
     private int activeRebellionDynastyId;
     private int pendingRebellionResponseFromId;
@@ -125,6 +130,7 @@ public class Dynasty {
     private transient DynastyStatService statService;
     private transient DynastyTradeService tradeService;
     private transient DynastyDiplomacyService diplomacyService;
+    private transient DynastyIntelligenceService intelligenceService;
     private transient World owningWorld;
 
     public Dynasty(int id, String name, boolean isPlayer, AntSpecies species) {
@@ -137,6 +143,7 @@ public class Dynasty {
         this.titleKey = titleKey != null ? titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY;
         this.isPlayer = isPlayer;
         this.species = species;
+        this.aiPersonality = isPlayer ? null : AiPersonality.random();
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
         this.unlockedSkills = new LinkedHashSet<>();
@@ -210,6 +217,12 @@ public class Dynasty {
         }
         this.isPlayer = savedDynasty.isPlayer;
         this.wildDynasty = savedDynasty.wildDynasty || inferLegacyWildDynasty(savedDynasty);
+        this.aiPersonality = this.isPlayer
+                ? null
+                : AiPersonality.fromPersistenceKey(savedDynasty.aiPersonality);
+        if (!this.isPlayer && this.aiPersonality == null) {
+            this.aiPersonality = AiPersonality.random();
+        }
         this.researchPoints = savedDynasty.researchPoints;
         this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
         this.diplomatsSentTotal = savedDynasty.diplomatsSentTotal;
@@ -462,6 +475,19 @@ public class Dynasty {
                 diplomatSupportToDynasty.put(Integer.parseInt(entry.getKey()), entry.getValue());
             }
         }
+        if (savedDynasty.spySupportToDynasty != null) {
+            for (Map.Entry<String, Integer> entry : savedDynasty.spySupportToDynasty.entrySet()) {
+                spySupportToDynasty.put(Integer.parseInt(entry.getKey()), entry.getValue());
+            }
+        }
+        if (savedDynasty.intelligenceToward != null) {
+            for (Map.Entry<String, Double> entry : savedDynasty.intelligenceToward.entrySet()) {
+                try {
+                    setIntelligenceToward(Integer.parseInt(entry.getKey()), entry.getValue());
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
 
         if (savedDynasty.unlockedUpgradeIds != null) {
             Map<Integer, Upgrade> allUpgrades = new HashMap<>();
@@ -514,6 +540,7 @@ public class Dynasty {
         this.starterService = new DynastyStarterService();
         this.statService = new DynastyStatService();
         this.diplomacyService = new DynastyDiplomacyService(this);
+        this.intelligenceService = new DynastyIntelligenceService(this);
     }
     
     private void initializeColor() {
@@ -596,6 +623,10 @@ public class Dynasty {
             this.logisticsAutomationService.runDailyLogistics(this, world, tradeManager);
             if (diplomacyService != null) {
                 diplomacyService.validateAllDiplomatDeployments(world);
+            }
+            if (intelligenceService != null) {
+                intelligenceService.validateAllSpyDeployments();
+                intelligenceService.runDailyIntelligence(world);
             }
             if (hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY) && isAutoDiplomacyEnabled()) {
                 this.diplomacyService.runAutomatedColonyLoyalty(this, world, tradeManager);
@@ -1635,6 +1666,21 @@ public class Dynasty {
     public boolean isWildDynasty() { return wildDynasty; }
     public void setWildDynasty(boolean wildDynasty) { this.wildDynasty = wildDynasty; }
 
+    public AiPersonality getAiPersonality() { return aiPersonality; }
+    public void setAiPersonality(AiPersonality aiPersonality) {
+        this.aiPersonality = isPlayer ? null : aiPersonality;
+    }
+
+    public int getAiExpansionColonyTarget() {
+        if (aiPersonality == AiPersonality.MILITARIST) {
+            return GameNumbers.AI_MILITARIST_EXPANSION_COLONY_TARGET;
+        }
+        if (aiPersonality == AiPersonality.PACIFIST) {
+            return GameNumbers.AI_PACIFIST_EXPANSION_COLONY_TARGET;
+        }
+        return GameNumbers.AI_EXPANSION_COLONY_TARGET;
+    }
+
     public void setName(String name) { this.name = name; }
     public boolean isPlayer() { return isPlayer; }
     public void setPlayer(boolean player) { 
@@ -1782,6 +1828,84 @@ public class Dynasty {
         }
     }
 
+    public int getSpySupportTo(int otherDynastyId) {
+        return spySupportToDynasty.getOrDefault(otherDynastyId, 0);
+    }
+
+    public void addSpySupportTo(int otherDynastyId, int count) {
+        if (count <= 0) {
+            return;
+        }
+        spySupportToDynasty.merge(otherDynastyId, count, Integer::sum);
+    }
+
+    public void removeSpySupportTo(int otherDynastyId, int count) {
+        if (count <= 0) {
+            return;
+        }
+        int current = spySupportToDynasty.getOrDefault(otherDynastyId, 0);
+        int next = Math.max(0, current - count);
+        if (next == 0) {
+            spySupportToDynasty.remove(otherDynastyId);
+        } else {
+            spySupportToDynasty.put(otherDynastyId, next);
+        }
+    }
+
+    public Map<Integer, Integer> copySpySupportToDynasty() {
+        return new HashMap<>(spySupportToDynasty);
+    }
+
+    public void restoreSpySupportToDynasty(Map<Integer, Integer> support) {
+        spySupportToDynasty.clear();
+        if (support != null) {
+            spySupportToDynasty.putAll(support);
+        }
+    }
+
+    public double getIntelligenceToward(int otherDynastyId) {
+        return intelligenceToward.getOrDefault(otherDynastyId, 0.0);
+    }
+
+    public void setIntelligenceToward(int otherDynastyId, double value) {
+        if (otherDynastyId == id) {
+            return;
+        }
+        double clamped = Math.max(0.0, Math.min(GameNumbers.INTELLIGENCE_MAX, value));
+        if (clamped <= 0.0) {
+            intelligenceToward.remove(otherDynastyId);
+        } else {
+            intelligenceToward.put(otherDynastyId, clamped);
+        }
+    }
+
+    public void addIntelligenceToward(int otherDynastyId, double delta) {
+        if (delta == 0) {
+            return;
+        }
+        setIntelligenceToward(otherDynastyId, getIntelligenceToward(otherDynastyId) + delta);
+    }
+
+    public Map<Integer, Double> copyIntelligenceToward() {
+        return new HashMap<>(intelligenceToward);
+    }
+
+    public void restoreIntelligenceToward(Map<Integer, Double> values) {
+        intelligenceToward.clear();
+        if (values != null) {
+            for (Map.Entry<Integer, Double> entry : values.entrySet()) {
+                setIntelligenceToward(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    public double getCounterIntelligence() {
+        if (intelligenceService != null) {
+            return intelligenceService.computeCounterIntelligence();
+        }
+        return GameNumbers.COUNTER_INTELLIGENCE_START;
+    }
+
     public Set<Upgrade> getUnlockedUpgrades() { return unlockedUpgrades; }
 
     public boolean hasAnnouncedRank(Rank rank) {
@@ -1849,6 +1973,18 @@ public class Dynasty {
             unlockSkill(GameConstants.SKILL_AIR_BOMBING);
         } else if (upgrade == GameUnlocks.SYNERGY_CORROSIVE_BOMBS) {
             unlockSkill(GameConstants.SKILL_ACIDIC_SELFDESTRUCT);
+        } else if (upgrade == GameUnlocks.ASSIMILATED_JUMPING) {
+            if (!hasUpgrade(GameUnlocks.ABILITY_JUMPING)) {
+                unlockedUpgrades.add(GameUnlocks.ABILITY_JUMPING);
+            }
+        } else if (upgrade == GameUnlocks.ASSIMILATED_SWARMING) {
+            if (!hasUpgrade(GameUnlocks.ABILITY_SWARMING)) {
+                unlockedUpgrades.add(GameUnlocks.ABILITY_SWARMING);
+            }
+        } else if (upgrade == GameUnlocks.ASSIMILATED_STEALTH) {
+            if (!hasUpgrade(GameUnlocks.ROLE_SPY)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_SPY);
+            }
         }
     }
 
@@ -2036,6 +2172,7 @@ public class Dynasty {
     public DynastyStatService getStatService() { return statService; }
     public DynastyTradeService getTradeService() { return tradeService; }
     public DynastyDiplomacyService getDiplomacyService() { return diplomacyService; }
+    public DynastyIntelligenceService getIntelligenceService() { return intelligenceService; }
 
     public double getDiplomaticGeneticIntegrityBonus() {
         double bonus = 0.0;

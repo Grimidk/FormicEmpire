@@ -76,6 +76,12 @@ public class Engine extends Thread {
     private int defaultRoleMajor = GameConstants.ROLE_CRANE.getId();
     private int defaultRolePrincess = GameConstants.ROLE_BREEDER.getId();
     private int defaultRoleQueen = GameConstants.ROLE_LAYER.getId();
+    private boolean mapLayerBorders = true;
+    private boolean mapLayerBiomeIcons = true;
+    private boolean mapLayerColonyRanks = true;
+    private boolean mapLayerTrades = true;
+    private boolean mapLayerTunnels = true;
+    private boolean mapLayerBattles = true;
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
@@ -681,6 +687,54 @@ public class Engine extends Thread {
 
     public void setDefaultRoleQueen(int defaultRoleQueen) {
         this.defaultRoleQueen = defaultRoleQueen;
+    }
+
+    public boolean isMapLayerBorders() {
+        return mapLayerBorders;
+    }
+
+    public void setMapLayerBorders(boolean mapLayerBorders) {
+        this.mapLayerBorders = mapLayerBorders;
+    }
+
+    public boolean isMapLayerBiomeIcons() {
+        return mapLayerBiomeIcons;
+    }
+
+    public void setMapLayerBiomeIcons(boolean mapLayerBiomeIcons) {
+        this.mapLayerBiomeIcons = mapLayerBiomeIcons;
+    }
+
+    public boolean isMapLayerColonyRanks() {
+        return mapLayerColonyRanks;
+    }
+
+    public void setMapLayerColonyRanks(boolean mapLayerColonyRanks) {
+        this.mapLayerColonyRanks = mapLayerColonyRanks;
+    }
+
+    public boolean isMapLayerTrades() {
+        return mapLayerTrades;
+    }
+
+    public void setMapLayerTrades(boolean mapLayerTrades) {
+        this.mapLayerTrades = mapLayerTrades;
+    }
+
+    public boolean isMapLayerTunnels() {
+        return mapLayerTunnels;
+    }
+
+    public void setMapLayerTunnels(boolean mapLayerTunnels) {
+        this.mapLayerTunnels = mapLayerTunnels;
+    }
+
+    public boolean isMapLayerBattles() {
+        return mapLayerBattles;
+    }
+
+    public void setMapLayerBattles(boolean mapLayerBattles) {
+        this.mapLayerBattles = mapLayerBattles;
     }
 
     public static List<AntRole> antRolesForAntType(AntType type) {

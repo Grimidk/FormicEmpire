@@ -85,6 +85,7 @@ public class Savefile implements Serializable {
         public String titleKey;
         public boolean isPlayer;
         public boolean wildDynasty;
+        public String aiPersonality;
         public boolean isDefeated;
         public String rankName;
         public int speciesId;
@@ -99,6 +100,8 @@ public class Savefile implements Serializable {
         public String pactRequestIncomingPolicy = "MANUAL";
         public int lastIncomingPactRequestWorldDay = -1;
         public Map<String, Integer> diplomatSupportToDynasty = new HashMap<>();
+        public Map<String, Integer> spySupportToDynasty = new HashMap<>();
+        public Map<String, Double> intelligenceToward = new HashMap<>();
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> unlockedSkillIds;
         public List<Integer> announcedRankIds;
@@ -162,6 +165,7 @@ public class Savefile implements Serializable {
         public Map<String, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
         public Map<String, Integer> incomingColonyDiplomatSupport = new HashMap<>();
         public Map<String, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
+        public Map<String, Integer> outgoingDynastySpyMissions = new HashMap<>();
         public int age;
         public int daysWithoutQueen;
         public int q; 

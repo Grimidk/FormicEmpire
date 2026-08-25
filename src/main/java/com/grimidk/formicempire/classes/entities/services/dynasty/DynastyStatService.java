@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -99,10 +100,19 @@ public class DynastyStatService {
         if (dynasty == null) {
             return GameNumbers.COMBAT_CAPACITY_BASE;
         }
-        if (hasAssignedCommanders(dynasty)) {
-            return GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER;
+        int capacity = hasAssignedCommanders(dynasty)
+                ? GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER
+                : GameNumbers.COMBAT_CAPACITY_BASE;
+        if (hasSwarmingAbility(dynasty)) {
+            capacity = Math.round(capacity * GameNumbers.ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT);
         }
-        return GameNumbers.COMBAT_CAPACITY_BASE;
+        return capacity;
+    }
+
+    public boolean hasSwarmingAbility(Dynasty dynasty) {
+        return dynasty != null
+                && (dynasty.hasUpgrade(GameUnlocks.ABILITY_SWARMING)
+                        || dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_SWARMING));
     }
 
     public boolean hasAssignedCommanders(Dynasty dynasty) {

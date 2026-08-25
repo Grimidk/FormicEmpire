@@ -113,6 +113,26 @@ public class ColonyStatsService {
 
     public double getBaseTradeSecurity(Colony colony) { return 0.5; }
 
+    public double getConvoySecurityMitigationPercent(Colony colony, double totalSec, double dangerFactor) {
+        double mitigationPercent = 100.0;
+        if (dangerFactor > 0) {
+            mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
+        }
+        if (hasLocsense(colony)) {
+            mitigationPercent = Math.min(100.0,
+                    mitigationPercent + GameNumbers.ASSIMILATED_LOCSENSE_CONVOY_SECURITY_FLAT);
+        }
+        return mitigationPercent;
+    }
+
+    public float getLocsenseSpeedMultiplier(Colony colony) {
+        return hasLocsense(colony) ? GameNumbers.ASSIMILATED_LOCSENSE_SPEED_MULT : 1f;
+    }
+
+    private static boolean hasLocsense(Colony colony) {
+        return colony != null && colony.hasUpgrade(GameUnlocks.ASSIMILATED_LOCSENSE);
+    }
+
     // --- Limits ---
     public int getSpreadingLimit(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) return 9999;
@@ -230,7 +250,7 @@ public class ColonyStatsService {
     }
     public int getThirstResistance(Colony colony, Temperature temp) {
         int resistance = 20; 
-        if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) resistance = 80;
+        if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST)) resistance = 80;
         else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_2)) resistance = 60;
         else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_1)) resistance = 40;
         
@@ -465,7 +485,7 @@ public class ColonyStatsService {
         adultAnts += colony.getQueens().size();
 
         double baseResistance = 0.20;
-        if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) baseResistance = 0.80;
+        if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST)) baseResistance = 0.80;
         else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_2)) baseResistance = 0.60;
         else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_1)) baseResistance = 0.40;
         

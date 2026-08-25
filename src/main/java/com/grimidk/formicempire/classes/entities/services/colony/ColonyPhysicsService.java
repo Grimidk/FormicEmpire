@@ -81,11 +81,13 @@ public class ColonyPhysicsService {
                     if (colony.isCreatineDietActive()) {
                         moveSpeed *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
                     }
+                    moveSpeed *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
                     if (lodSameDim && !inView) {
                         if (!ViewportPhysicsLod.shouldRunOffViewportPosition(physicsStepIndex, ant)) {
                             continue;
                         }
-                        moveSpeed = ViewportPhysicsLod.compensatedMoveSpeed(GameNumbers.BASE_SPRITE_SPEED);
+                        moveSpeed = ViewportPhysicsLod.compensatedMoveSpeed(GameNumbers.BASE_SPRITE_SPEED)
+                                * colony.getStatsService().getLocsenseSpeedMultiplier(colony);
                     }
                     if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                         moveSpeed *= 2f;

@@ -266,6 +266,7 @@ public class ColonySourceService {
             if (colony.isCreatineDietActive()) {
                 u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
             }
+            u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
             if (ant.getAntType() == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                 u *= 2f;
             }

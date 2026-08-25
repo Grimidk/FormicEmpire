@@ -77,6 +77,7 @@ public class ColonyConvoyTransitService {
                     if (colony.isCreatineDietActive()) {
                         moveSpeed *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
                     }
+                    moveSpeed *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
                     if (entry.getKey() == GameConstants.TYPE_WORKER
                             && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                         moveSpeed *= 2f;

@@ -146,6 +146,10 @@ public final class GameNumbers {
     public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 0.5f;
     public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 3f;
     public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 2f;
+    public static final float ASSIMILATED_JUMPING_MELEE_DAMAGE_MULT = 1.2f;
+    public static final float ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT = 1.5f;
+    public static final float ASSIMILATED_LOCSENSE_SPEED_MULT = 1.5f;
+    public static final double ASSIMILATED_LOCSENSE_CONVOY_SECURITY_FLAT = 20.0;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
 
@@ -202,6 +206,13 @@ public final class GameNumbers {
 
     // --- AI / trade automation ---
     public static final int AI_EXPANSION_COLONY_TARGET = 6;
+    public static final int AI_MILITARIST_EXPANSION_COLONY_TARGET = 8;
+    public static final int AI_PACIFIST_EXPANSION_COLONY_TARGET = 5;
+    public static final double AI_MILITARIST_WAR_CHANCE_MULT = 2.25;
+    public static final double AI_PACIFIST_WAR_CHANCE_MULT = 0.35;
+    public static final int AI_MILITARIST_REPUTATION_DELTA = -12;
+    public static final int AI_PACIFIST_REPUTATION_DELTA = 10;
+    public static final int AI_MIN_BREEDERS_FOR_FLIGHT = 1;
     public static final double AI_CREATINE_FOOD_STRESS_RATIO = 0.35;
     public static final double TRADE_AUTOMATION_SURPLUS_RATIO = 0.50;
     public static final double TRADE_AUTOMATION_DEFICIT_RATIO = 0.25;
@@ -239,6 +250,18 @@ public final class GameNumbers {
     public static final int DIPLOMAT_STABILITY_GAIN_BASE = 1;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;
+    public static final int SPY_POWER_BASE = DIPLOMAT_STABILITY_GAIN_BASE;
+    public static final int SPY_POWER_PRESSURE_2 = DIPLOMAT_STABILITY_GAIN_PRESSURE_2;
+    public static final int SPY_POWER_PRESSURE_3 = DIPLOMAT_STABILITY_GAIN_PRESSURE_3;
+    public static final int SPY_MAX_PER_DYNASTY_MISSION = DIPLOMAT_MAX_PER_DYNASTY_MISSION;
+    public static final double SPY_INTEL_POWER_DIVISOR = 10.0;
+    public static final double SPY_CI_REDUCTION_PER_POINT = 0.1;
+    public static final double COUNTER_INTELLIGENCE_START = 5.0;
+    public static final double COUNTER_INTELLIGENCE_MAX = 50.0;
+    public static final double INTELLIGENCE_MAX = 100.0;
+    public static final double SPY_THEFT_FRACTION_MIN = 0.01;
+    public static final double SPY_THEFT_FRACTION_MAX = 0.03;
+    public static final int CAUGHT_SPYING_DURATION_DAYS = DAYS_PER_MONTH * 12;
 
     // --- Construction ---
     public static final double TUNNEL_WORK_REQUIRED = 5000000.0;

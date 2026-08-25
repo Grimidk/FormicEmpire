@@ -68,6 +68,7 @@ public class MapDialog extends ZeroDialog {
         this.world = world;
         this.onHexChange = onHexChange;
         this.onOpenWarDialog = onOpenWarDialog;
+        loadLayerSettingsFromEngine();
 
         this.mapPanel = new HexMapPanel();
         this.legendPanel = new LegendPanel();
@@ -164,6 +165,33 @@ public class MapDialog extends ZeroDialog {
         }
     }
 
+    private void loadLayerSettingsFromEngine() {
+        Engine eng = resolveEngine();
+        if (eng == null) {
+            return;
+        }
+        showBorders = eng.isMapLayerBorders();
+        showBiomeIcons = eng.isMapLayerBiomeIcons();
+        showColonyRanks = eng.isMapLayerColonyRanks();
+        showTrades = eng.isMapLayerTrades();
+        showTunnels = eng.isMapLayerTunnels();
+        showBattles = eng.isMapLayerBattles();
+    }
+
+    private void persistLayerSettings() {
+        Engine eng = resolveEngine();
+        if (eng == null) {
+            return;
+        }
+        eng.setMapLayerBorders(showBorders);
+        eng.setMapLayerBiomeIcons(showBiomeIcons);
+        eng.setMapLayerColonyRanks(showColonyRanks);
+        eng.setMapLayerTrades(showTrades);
+        eng.setMapLayerTunnels(showTunnels);
+        eng.setMapLayerBattles(showBattles);
+        eng.saveGlobalSettings();
+    }
+
     private void showLayersMenu() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -175,56 +203,55 @@ public class MapDialog extends ZeroDialog {
         panel.add(createLayerCheckBox(
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_BORDERS),
                 showBorders,
-                selected -> {
-                    showBorders = selected;
-                    mapPanel.repaint();
-                }));
+                selected -> setLayerVisible(Layer.BORDERS, selected)));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLayerCheckBox(
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_BIOME_ICONS),
                 showBiomeIcons,
-                selected -> {
-                    showBiomeIcons = selected;
-                    mapPanel.repaint();
-                }));
+                selected -> setLayerVisible(Layer.BIOME_ICONS, selected)));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLayerCheckBox(
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_COLONY_RANKS),
                 showColonyRanks,
-                selected -> {
-                    showColonyRanks = selected;
-                    mapPanel.repaint();
-                }));
+                selected -> setLayerVisible(Layer.COLONY_RANKS, selected)));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLayerCheckBox(
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_TRADES),
                 showTrades,
-                selected -> {
-                    showTrades = selected;
-                    mapPanel.repaint();
-                }));
+                selected -> setLayerVisible(Layer.TRADES, selected)));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLayerCheckBox(
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_TUNNELS),
                 showTunnels,
-                selected -> {
-                    showTunnels = selected;
-                    mapPanel.repaint();
-                }));
+                selected -> setLayerVisible(Layer.TUNNELS, selected)));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLayerCheckBox(
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_BATTLES),
                 showBattles,
-                selected -> {
-                    showBattles = selected;
-                    mapPanel.repaint();
-                }));
+                selected -> setLayerVisible(Layer.BATTLES, selected)));
 
         JPopupMenu menu = new JPopupMenu();
         menu.setBorder(BorderFactory.createEmptyBorder());
         menu.setBackground(AssetStyles.BACKGROUND_COLOR);
         menu.add(panel);
         UiTableStyles.showComponentPopupMenu(menu, layersButton);
+    }
+
+    private enum Layer {
+        BORDERS, BIOME_ICONS, COLONY_RANKS, TRADES, TUNNELS, BATTLES
+    }
+
+    private void setLayerVisible(Layer layer, boolean visible) {
+        switch (layer) {
+            case BORDERS -> showBorders = visible;
+            case BIOME_ICONS -> showBiomeIcons = visible;
+            case COLONY_RANKS -> showColonyRanks = visible;
+            case TRADES -> showTrades = visible;
+            case TUNNELS -> showTunnels = visible;
+            case BATTLES -> showBattles = visible;
+        }
+        persistLayerSettings();
+        mapPanel.repaint();
     }
 
     private JCheckBox createLayerCheckBox(String label, boolean selected, java.util.function.Consumer<Boolean> onToggle) {

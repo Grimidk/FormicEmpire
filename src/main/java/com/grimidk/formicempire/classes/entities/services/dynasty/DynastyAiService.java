@@ -1,11 +1,12 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
+import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
-import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -37,7 +38,10 @@ public class DynastyAiService {
         }
 
         ensureDiplomatStaff(dynasty);
+        ensureSpyStaff(dynasty);
+        ensureBreederStaff(dynasty);
         runDiplomaticMissions(dynasty, world, tradeManager);
+        runSpyMissions(dynasty, world);
         runWarConsideration(dynasty, world, tradeManager);
         runCrossDynastyTrade(dynasty, world, tradeManager);
         runIntegrationAttempts(dynasty, world, tradeManager);
@@ -57,6 +61,136 @@ public class DynastyAiService {
             if (colony.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT) < desired) {
                 colony.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, desired);
             }
+        }
+    }
+
+    private void ensureSpyStaff(Dynasty dynasty) {
+        if (!dynasty.hasUpgrade(GameUnlocks.ROLE_SPY)) {
+            return;
+        }
+        Colony capital = dynasty.getCapital();
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony.getAge() < 7 || colony.getPrincesses().isEmpty()) {
+                continue;
+            }
+            int princesses = colony.getPrincesses().size();
+            int diplomats = colony.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT);
+            int breeders = colony.getAssignedRoleCount(GameConstants.ROLE_BREEDER);
+            int reserved = diplomats + breeders;
+            int room = Math.max(0, princesses - reserved);
+            if (room <= 0) {
+                continue;
+            }
+            int desired = colony == capital ? Math.min(2, room) : Math.min(1, room);
+            if (colony.getAssignedRoleCount(GameConstants.ROLE_SPY) < desired) {
+                colony.setAssignedRoleCount(GameConstants.ROLE_SPY, desired);
+            }
+        }
+    }
+
+    private void runSpyMissions(Dynasty dynasty, World world) {
+        DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        if (intel == null || diplo == null || !intel.hasSpyRole()) {
+            return;
+        }
+
+        int maxAbroad = intel.maxSpiesAbroadWhileKeepingCiParity();
+        int deployed = intel.countDeployedSpies();
+        if (deployed > maxAbroad) {
+            recallExcessSpies(dynasty, intel, diplo, world, deployed - maxAbroad);
+            deployed = intel.countDeployedSpies();
+        }
+
+        List<Dynasty> disliked = new ArrayList<>();
+        for (Dynasty other : world.getDynastys()) {
+            if (other == null || other == dynasty || !other.isActiveForDiplomacy()) {
+                continue;
+            }
+            int rep = diplo.getEffectiveDiplomaticReputation(other, world);
+            if (rep < GameConstants.REPUTATION_NEUTRAL.getMinScore()) {
+                disliked.add(other);
+            }
+        }
+        disliked.sort(Comparator.comparingInt(other -> diplo.getEffectiveDiplomaticReputation(other, world)));
+
+        for (Dynasty other : disliked) {
+            if (deployed >= maxAbroad) {
+                break;
+            }
+            int current = intel.countSpiesToward(other);
+            int roomToTarget = Math.max(0, intel.getMaxSpiesPerTarget() - current);
+            int roomAbroad = maxAbroad - deployed;
+            int available = intel.countDynastyWideAvailableSpies();
+            int toAdd = Math.min(roomToTarget, Math.min(roomAbroad, available));
+            if (toAdd <= 0) {
+                continue;
+            }
+            int targetTotal = current + toAdd;
+            intel.assignSpiesToward(other, targetTotal, world);
+            deployed = intel.countDeployedSpies();
+            if (toAdd > 0) {
+                logDynastyEvent(dynasty, LanguageStrings.format(
+                        LanguageStrings.LOG_AI_SPY_DYNASTY_FMT, toAdd, other.getName()));
+            }
+        }
+    }
+
+    private void recallExcessSpies(
+            Dynasty dynasty,
+            DynastyIntelligenceService intel,
+            DynastyDiplomacyService diplo,
+            World world,
+            int excess) {
+        if (excess <= 0 || world == null || dynasty == null) {
+            return;
+        }
+        List<Dynasty> targets = new ArrayList<>();
+        for (Dynasty other : world.getDynastys()) {
+            if (other == null || other == dynasty) {
+                continue;
+            }
+            if (intel.countSpiesToward(other) > 0) {
+                targets.add(other);
+            }
+        }
+        targets.sort(Comparator
+                .comparingInt((Dynasty other) -> diplo.getEffectiveDiplomaticReputation(other, world))
+                .reversed());
+        int remaining = excess;
+        for (Dynasty other : targets) {
+            if (remaining <= 0) {
+                break;
+            }
+            int current = intel.countSpiesToward(other);
+            if (current <= 0) {
+                continue;
+            }
+            int reduce = Math.min(current, remaining);
+            intel.assignSpiesToward(other, current - reduce, world);
+            remaining -= reduce;
+        }
+    }
+
+    private void ensureBreederStaff(Dynasty dynasty) {
+        if (!dynasty.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            return;
+        }
+        int minBreeders = GameNumbers.AI_MIN_BREEDERS_FOR_FLIGHT;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony.getAge() < 7) {
+                continue;
+            }
+            int princesses = colony.getPrincesses().size();
+            if (princesses <= 0) {
+                continue;
+            }
+            int breeders = colony.getAssignedRoleCount(GameConstants.ROLE_BREEDER);
+            if (breeders >= minBreeders) {
+                continue;
+            }
+            int desired = Math.min(princesses, Math.max(minBreeders, princesses / 2));
+            colony.setAssignedRoleCount(GameConstants.ROLE_BREEDER, desired);
         }
     }
 
@@ -146,7 +280,12 @@ public class DynastyAiService {
             return;
         }
         DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
-        if (diplo == null || hasColonizableExpansionSpace(dynasty, world)) {
+        if (diplo == null) {
+            return;
+        }
+        boolean hasSpace = hasColonizableExpansionSpace(dynasty, world);
+        AiPersonality personality = dynasty.getAiPersonality();
+        if (hasSpace && personality != AiPersonality.MILITARIST) {
             return;
         }
 
@@ -174,6 +313,7 @@ public class DynastyAiService {
                     dynasty.getMilitaryPower(),
                     other.getMilitaryPower(),
                     diplo.getEffectiveDiplomaticReputation(other, world));
+            chance *= warChanceMultiplier(personality);
             if (chance > bestChance) {
                 bestChance = chance;
                 target = other;
@@ -185,6 +325,16 @@ public class DynastyAiService {
 
         diplo.declareWar(target, world, tradeManager);
         logDynastyEvent(dynasty, LanguageStrings.format(LanguageStrings.LOG_AI_DECLARE_WAR_FMT, target.getName()));
+    }
+
+    private static double warChanceMultiplier(AiPersonality personality) {
+        if (personality == AiPersonality.MILITARIST) {
+            return GameNumbers.AI_MILITARIST_WAR_CHANCE_MULT;
+        }
+        if (personality == AiPersonality.PACIFIST) {
+            return GameNumbers.AI_PACIFIST_WAR_CHANCE_MULT;
+        }
+        return 1.0;
     }
 
     private boolean hasColonizableExpansionSpace(Dynasty dynasty, World world) {
@@ -276,7 +426,7 @@ public class DynastyAiService {
 
     private void runAbilities(Dynasty dynasty, World world) {
         int colonyCount = dynasty.getColonies().size();
-        boolean expanding = colonyCount < GameNumbers.AI_EXPANSION_COLONY_TARGET;
+        boolean expanding = colonyCount < dynasty.getAiExpansionColonyTarget();
 
         if (dynasty.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT) && expanding) {
             int massCost = dynasty.getMassNuptialFlightCost();
@@ -307,7 +457,8 @@ public class DynastyAiService {
         if (expanding
                 && capital.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)
                 && dynasty.getForcedFlightCooldownDays() <= 0
-                && capital.getResearchPoints() >= capital.getNuptialFlightCost() * 2L) {
+                && capital.getResearchPoints() >= capital.getNuptialFlightCost() * 2L
+                && ColonyLabourService.meetsNuptialRequirements(capital)) {
             int costBefore = capital.getResearchPoints();
             capital.forceNuptialFlight(world, capitalHex);
             if (capital.getResearchPoints() < costBefore) {

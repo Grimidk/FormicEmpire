@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
+import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -70,6 +71,8 @@ class DynastyAiServiceTest {
 
     @Test
     void formsPactWhenCordial() {
+        npc.setAiPersonality(AiPersonality.PACIFIST);
+        neighbor.setAiPersonality(AiPersonality.PACIFIST);
         npc.setDiplomaticReputation(neighbor.getId(), 100);
         neighbor.setDiplomaticReputation(npc.getId(), 100);
         Colony colony = new Colony(10, "Capital", false);
@@ -88,6 +91,8 @@ class DynastyAiServiceTest {
     @Test
     void sendsDiplomatsToImproveNeighborReputation() {
         npc.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        npc.setAiPersonality(AiPersonality.MILITARIST);
+        neighbor.setAiPersonality(AiPersonality.MILITARIST);
         npc.setDiplomaticReputation(neighbor.getId(), 50);
         neighbor.setDiplomaticReputation(npc.getId(), 50);
 
@@ -104,9 +109,11 @@ class DynastyAiServiceTest {
         neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
         neighbor.addColony(neighborColony);
 
+        int before = npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world);
         aiService.runDailyAi(npc, world, tradeManager);
 
-        assertTrue(npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world) > 50);
+        int after = npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world);
+        assertTrue(after > before);
         assertFalse(npc.getDiplomacyService().hasNonAggressionPact(neighbor));
     }
 

@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
@@ -647,8 +648,23 @@ public class DynastyDiplomacyService {
                 + getBorderFrictionAdjustment(other, world)
                 + getWarmongerAdjustment(other, world)
                 + getMilitaryReputationAdjustment(other)
-                + getDiplomatReputationAdjustment(other);
+                + getDiplomatReputationAdjustment(other)
+                + getAiPersonalityReputationAdjustment(other);
         return GameNumbers.clampDiplomaticReputation(score);
+    }
+
+    public int getAiPersonalityReputationAdjustment(Dynasty other) {
+        if (other == null || other == dynasty) {
+            return 0;
+        }
+        AiPersonality personality = other.getAiPersonality();
+        if (personality == AiPersonality.MILITARIST) {
+            return GameNumbers.AI_MILITARIST_REPUTATION_DELTA;
+        }
+        if (personality == AiPersonality.PACIFIST) {
+            return GameNumbers.AI_PACIFIST_REPUTATION_DELTA;
+        }
+        return 0;
     }
 
     public int getDiplomatReputationAdjustment(Dynasty other) {

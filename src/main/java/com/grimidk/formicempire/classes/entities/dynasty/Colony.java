@@ -15,6 +15,7 @@ import java.awt.Rectangle;
 
 import com.grimidk.formicempire.classes.entities.services.colony.*;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
@@ -84,6 +85,7 @@ public class Colony {
     private final Map<Integer, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
     private final Map<Integer, Integer> incomingColonyDiplomatSupport = new HashMap<>();
     private final Map<Integer, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
+    private final Map<Integer, Integer> outgoingDynastySpyMissions = new HashMap<>();
     private int integrationDiplomatsDeployed;
     private int nativeSpeciesId;
     private Boolean affordableResearchCached;
@@ -398,6 +400,7 @@ public class Colony {
                 parseIntKeyMap(savedColony.outgoingColonyDiplomatMissions),
                 parseIntKeyMap(savedColony.incomingColonyDiplomatSupport),
                 parseIntKeyMap(savedColony.outgoingDynastyDiplomatMissions));
+        copySpyMissionMaps(parseIntKeyMap(savedColony.outgoingDynastySpyMissions));
         
         this.hatchRateWorker = savedColony.hatchRateWorker;
         this.hatchRateSoldier = savedColony.hatchRateSoldier;
@@ -573,6 +576,10 @@ public class Colony {
             DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
             if (diplo != null) {
                 diplo.reconcileDiplomatDeploymentsAfterCasualty(this, formerRole);
+            }
+            DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+            if (intel != null && (formerRole == null || formerRole == GameConstants.ROLE_SPY)) {
+                intel.reconcileSpyDeploymentsAfterCasualty(this);
             }
         }
     }
@@ -929,6 +936,25 @@ public class Colony {
         return outgoingDynastyDiplomatMissions;
     }
 
+    public int getDeployedSpyCount() {
+        int total = 0;
+        for (int count : outgoingDynastySpyMissions.values()) {
+            total += count;
+        }
+        return total;
+    }
+
+    public Map<Integer, Integer> getOutgoingDynastySpyMissions() {
+        return outgoingDynastySpyMissions;
+    }
+
+    public void copySpyMissionMaps(Map<Integer, Integer> outgoingDynasty) {
+        outgoingDynastySpyMissions.clear();
+        if (outgoingDynasty != null) {
+            outgoingDynastySpyMissions.putAll(outgoingDynasty);
+        }
+    }
+
     public void copyDiplomatMissionMaps(
             Map<Integer, Integer> outgoingColony,
             Map<Integer, Integer> incomingColony,
@@ -1179,12 +1205,19 @@ public class Colony {
     }
 
     private void reconcileDiplomatDeploymentsIfNeeded(AntRole role, int previous, int next, boolean activeEconomy) {
-        if (!activeEconomy || role != GameConstants.ROLE_DIPLOMAT || next >= previous || dynasty == null) {
+        if (!activeEconomy || dynasty == null || next >= previous) {
             return;
         }
-        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
-        if (diplo != null) {
-            diplo.reconcileDiplomatDeployments(this, next);
+        if (role == GameConstants.ROLE_DIPLOMAT) {
+            DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+            if (diplo != null) {
+                diplo.reconcileDiplomatDeployments(this, next);
+            }
+        } else if (role == GameConstants.ROLE_SPY) {
+            DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+            if (intel != null) {
+                intel.reconcileSpyDeployments(this, next);
+            }
         }
     }
 

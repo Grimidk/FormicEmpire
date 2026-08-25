@@ -84,6 +84,7 @@ public class Trade {
             if (tunnel != null && tunnel.isComplete()) {
                 speedFactor *= 1.5f;
             }
+            speedFactor *= originColony.getStatsService().getLocsenseSpeedMultiplier(originColony);
         }
 
         this.totalHours = Math.max(1, Math.round(baseHours / speedFactor));
@@ -283,10 +284,8 @@ public class Trade {
         }
 
         double dangerFactor = method.getDangerFactor();
-        double mitigationPercent = 100.0;
-        if (dangerFactor > 0) {
-            mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
-        }
+        double mitigationPercent = originColony.getStatsService()
+                .getConvoySecurityMitigationPercent(originColony, totalSec, dangerFactor);
         
         double securityFactor = mitigationPercent / 100.0;
         

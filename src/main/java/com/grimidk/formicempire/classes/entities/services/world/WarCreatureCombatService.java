@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.entities.services.shared.WarCombatSkillS
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 public final class WarCreatureCombatService {
@@ -255,7 +256,8 @@ public final class WarCreatureCombatService {
             return;
         }
         int targetCount = Math.max(1, skill.getTargetCount());
-        ensureFocusTargets(actor, opposingSide, targetCount);
+        actor.getFocusTargets().clear();
+        ensureFocusTargets(actor, opposingSide, actingSide.getDynasty(), skill, targetCount);
         List<WarBattleParticipant> targets = new ArrayList<>(actor.getFocusTargets());
         for (WarBattleParticipant target : targets) {
             if (!target.isAlive()) {
@@ -298,6 +300,9 @@ public final class WarCreatureCombatService {
         }
         float damageMult = CritterSkillService.resolveDamageMult(skill, atkAnt.getSubtypeProfile());
         WarBattleSideState actingSide = attackerIsAttackerSide ? state.getAttacker() : state.getDefender();
+        if (jumpingBoostsMelee(actingSide.getDynasty(), skill)) {
+            damageMult *= GameNumbers.ASSIMILATED_JUMPING_MELEE_DAMAGE_MULT;
+        }
         float raw = damageMult * attackStat * laneDamageMultiplier(actingSide, attacker.getBattleLine());
         float dealt = GameNumbers.damageAfterDefense(raw, defenseStat);
         if (dealt <= 0f) {
@@ -407,11 +412,12 @@ public final class WarCreatureCombatService {
         }
     }
 
-    private static void ensureFocusTargets(WarBattleParticipant actor, WarBattleSideState enemy, int desired) {
+    private static void ensureFocusTargets(WarBattleParticipant actor, WarBattleSideState enemy, Dynasty actingDynasty,
+            Skill skill, int desired) {
         List<WarBattleParticipant> focus = actor.getFocusTargets();
         focus.removeIf(t -> t == null || !t.isAlive());
         while (focus.size() < desired) {
-            WarBattleParticipant next = pickTarget(actor, enemy, focus);
+            WarBattleParticipant next = pickTarget(actor, enemy, actingDynasty, skill, focus);
             if (next == null) {
                 break;
             }
@@ -423,8 +429,8 @@ public final class WarCreatureCombatService {
     }
 
     private static WarBattleParticipant pickTarget(WarBattleParticipant actor, WarBattleSideState enemy,
-            List<WarBattleParticipant> exclude) {
-        List<WarBattleParticipant> pool = eligibleTargets(actor.getBattleLine(), enemy);
+            Dynasty actingDynasty, Skill skill, List<WarBattleParticipant> exclude) {
+        List<WarBattleParticipant> pool = eligibleTargets(actor.getBattleLine(), enemy, actingDynasty, skill);
         pool.removeIf(exclude::contains);
         if (pool.isEmpty()) {
             return null;
@@ -467,10 +473,19 @@ public final class WarCreatureCombatService {
         return pool.get(GameRandom.nextInt(pool.size()));
     }
 
-    private static List<WarBattleParticipant> eligibleTargets(BattleLine attackerLine, WarBattleSideState enemy) {
+    static List<WarBattleParticipant> eligibleTargetsForSkill(BattleLine attackerLine, WarBattleSideState enemy,
+            Dynasty actingDynasty, Skill skill) {
+        return eligibleTargets(attackerLine, enemy, actingDynasty, skill);
+    }
+
+    private static List<WarBattleParticipant> eligibleTargets(BattleLine attackerLine, WarBattleSideState enemy,
+            Dynasty actingDynasty, Skill skill) {
         List<WarBattleParticipant> pool = new ArrayList<>();
         if (attackerLine == GameConstants.BATTLE_LINE_INFANTRY) {
             addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_INFANTRY));
+            if (jumpingBoostsMelee(actingDynasty, skill)) {
+                addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_ARTILLERY));
+            }
         } else if (attackerLine == GameConstants.BATTLE_LINE_ARTILLERY) {
             addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_INFANTRY));
             addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_ARTILLERY));
@@ -480,6 +495,20 @@ public final class WarCreatureCombatService {
             addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_AIR_SUPPORT));
         }
         return pool;
+    }
+
+    private static boolean hasJumpingAbility(Dynasty dynasty) {
+        return dynasty != null && (dynasty.hasUpgrade(GameUnlocks.ABILITY_JUMPING)
+                || dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_JUMPING));
+    }
+
+    private static boolean jumpingBoostsMelee(Dynasty dynasty, Skill skill) {
+        return hasJumpingAbility(dynasty) && isInfantryMeleeSkill(skill);
+    }
+
+    private static boolean isInfantryMeleeSkill(Skill skill) {
+        return skill != null && skill.isAttack()
+                && skill.getBattleLine() == GameConstants.BATTLE_LINE_INFANTRY;
     }
 
     private static void addLiving(List<WarBattleParticipant> pool, List<WarBattleParticipant> source) {

@@ -120,6 +120,8 @@ public final class GameUnlocks {
         static { upgrades.add(ROLE_BREEDER); }
         public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "ROLE_DIPLOMAT_UPGRADE", "ROLE_DIPLOMAT_FLAVOR", "ROLE_DIPLOMAT_DESC", TYPE_PRINCESS, 1500, loadIcon("icons/upgrades/RoleDiplomat.png"), 3);
         static { upgrades.add(ROLE_DIPLOMAT); }
+        public static final Upgrade ROLE_SPY = new Upgrade(44, "ROLE_SPY_UPGRADE", "ROLE_SPY_FLAVOR", "ROLE_SPY_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleSpy.png"), 0);
+        static { upgrades.add(ROLE_SPY); }
         public static final Upgrade ROLE_MILITIA = new Upgrade(32, "ROLE_MILITIA_UPGRADE", "ROLE_MILITIA_FLAVOR", "ROLE_MILITIA_DESC", TYPE_WORKER, 0, loadIcon("icons/upgrades/RoleMilitia.png"), 0);
         static { upgrades.add(ROLE_MILITIA); }
         public static final Upgrade ROLE_CATCHER = new Upgrade(33, "ROLE_CATCHER_UPGRADE", "ROLE_CATCHER_FLAVOR", "ROLE_CATCHER_DESC", ROLE_HUNTER, 500, loadIcon("icons/upgrades/RoleCatcher.png"), 1);
@@ -184,6 +186,10 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_AUTO_DIPLOMACY); }
         public static final Upgrade ABILITY_AUTO_LOGISTICS = new Upgrade(525, "ABILITY_AUTO_LOGISTICS", "ABILITY_AUTO_LOGISTICS_FLAVOR", "ABILITY_AUTO_LOGISTICS_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoDiplomacy.png"), 0);
         static { upgrades.add(ABILITY_AUTO_LOGISTICS); }
+        public static final Upgrade ABILITY_JUMPING = new Upgrade(526, "ABILITY_JUMPING", "ABILITY_JUMPING_FLAVOR", "ABILITY_JUMPING_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0);
+        static { upgrades.add(ABILITY_JUMPING); }
+        public static final Upgrade ABILITY_SWARMING = new Upgrade(527, "ABILITY_SWARMING", "ABILITY_SWARMING_FLAVOR", "ABILITY_SWARMING_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AssimilatedSwarming.png"), 0);
+        static { upgrades.add(ABILITY_SWARMING); }
 
         public static final Upgrade ABILITY_SUBTYPE_HATCH = new Upgrade(524, "ABILITY_SUBTYPE_HATCH", "ABILITY_SUBTYPE_HATCH_FLAVOR", "ABILITY_SUBTYPE_HATCH_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AbilitySubtypeHatch.png"), 0);
         static { upgrades.add(ABILITY_SUBTYPE_HATCH); }
@@ -249,9 +255,6 @@ public final class GameUnlocks {
         // TODO asset: icons/upgrades/StatThirst2.png
         public static final Upgrade STAT_THIRST_2 = new Upgrade(111, "STAT_THIRST_2", "STAT_THIRST_2_FLAVOR", "STAT_THIRST_2_DESC", STAT_THIRST_1, 5000, ICON_TODO, 3);
         static { upgrades.add(STAT_THIRST_2); }
-        // TODO asset: icons/upgrades/StatThirst3.png
-        public static final Upgrade STAT_THIRST_3 = new Upgrade(112, "STAT_THIRST_3", "STAT_THIRST_3_FLAVOR", "STAT_THIRST_3_DESC", STAT_THIRST_2, 15000, ICON_TODO, 4);
-        static { upgrades.add(STAT_THIRST_3); }
         // TODO asset: icons/upgrades/StatLogistics1.png
         public static final Upgrade STAT_LOGISTICS_1 = new Upgrade(113, "STAT_LOGISTICS_1", "STAT_LOGISTICS_1_FLAVOR", "STAT_LOGISTICS_1_DESC", ROLE_SCOUT, 600, ICON_TODO, 1);
         static { upgrades.add(STAT_LOGISTICS_1); }
@@ -367,20 +370,17 @@ public final class GameUnlocks {
         static { upgrades.add(ASSIMILATED_RAFTING); }
         public static final Upgrade ASSIMILATED_FIREVENOM = new Upgrade(1009, "ASSIMILATED_FIREVENOM", "ASSIMILATED_FIREVENOM_FLAVOR", "ASSIMILATED_FIREVENOM_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFirevenom.png"), 0);
         static { upgrades.add(ASSIMILATED_FIREVENOM); }
-        // TODO mechanic: jump attacks — not implemented
         public static final Upgrade ASSIMILATED_JUMPING = new Upgrade(1010, "ASSIMILATED_JUMPING", "ASSIMILATED_JUMPING_FLAVOR", "ASSIMILATED_JUMPING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0);
         static { upgrades.add(ASSIMILATED_JUMPING); }
         public static final Upgrade ASSIMILATED_STINGING = new Upgrade(1012, "ASSIMILATED_STINGING", "ASSIMILATED_STINGING_FLAVOR", "ASSIMILATED_STINGING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedStinging.png"), 0);
         static { upgrades.add(ASSIMILATED_STINGING); }
-        // TODO mechanic: army-ant raiding swarms — not implemented
         public static final Upgrade ASSIMILATED_SWARMING = new Upgrade(1013, "ASSIMILATED_SWARMING", "ASSIMILATED_SWARMING_FLAVOR", "ASSIMILATED_SWARMING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedSwarming.png"), 0);
         static { upgrades.add(ASSIMILATED_SWARMING); }
-        // TODO mechanic: ghost-ant stealth / hostile nesting — not implemented
+        // Ghost stealth unlocks Spies (intelligence / counter-intelligence)
         public static final Upgrade ASSIMILATED_STEALTH = new Upgrade(1014, "ASSIMILATED_STEALTH", "ASSIMILATED_STEALTH_FLAVOR", "ASSIMILATED_STEALTH_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedStealth.png"), 0);
         static { upgrades.add(ASSIMILATED_STEALTH); }
         public static final Upgrade ASSIMILATED_FASTBITE = new Upgrade(1015, "ASSIMILATED_FASTBITE", "ASSIMILATED_FASTBITE_FLAVOR", "ASSIMILATED_FASTBITE_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFastbite.png"), 0);
         static { upgrades.add(ASSIMILATED_FASTBITE); }
-        // TODO mechanic: desert heat foraging tolerance — not implemented
         public static final Upgrade ASSIMILATED_HEATRESIST = new Upgrade(1016, "ASSIMILATED_HEATRESIST", "ASSIMILATED_HEATRESIST_FLAVOR", "ASSIMILATED_HEATRESIST_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedHeatresist.png"), 0);
         static { upgrades.add(ASSIMILATED_HEATRESIST); }
         public static final Upgrade ASSIMILATED_DEADLYVENOM = new Upgrade(1017, "ASSIMILATED_DEADLYVENOM", "ASSIMILATED_DEADLYVENOM_FLAVOR", "ASSIMILATED_DEADLYVENOM_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedDeadlyvenom.png"), 0);
@@ -392,7 +392,6 @@ public final class GameUnlocks {
         // TODO mechanic: carton hive building — not implemented
         public static final Upgrade ASSIMILATED_HIVEBUILD = new Upgrade(1020, "ASSIMILATED_HIVEBUILD", "ASSIMILATED_HIVEBUILD_FLAVOR", "ASSIMILATED_HIVEBUILD_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedHivebuild.png"), 0);
         static { upgrades.add(ASSIMILATED_HIVEBUILD); }
-        // TODO mechanic: desert route navigation — not implemented
         public static final Upgrade ASSIMILATED_LOCSENSE = new Upgrade(1021, "ASSIMILATED_LOCSENSE", "ASSIMILATED_LOCSENSE_FLAVOR", "ASSIMILATED_LOCSENSE_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedLocsense.png"), 0);
         static { upgrades.add(ASSIMILATED_LOCSENSE); }
         public static final Upgrade ASSIMILATED_ACIDSPIT = new Upgrade(1022, "ASSIMILATED_ACIDSPIT", "ASSIMILATED_ACIDSPIT_FLAVOR", "ASSIMILATED_ACIDSPIT_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedAcidspit.png"), 0);
@@ -716,20 +715,16 @@ public final class GameUnlocks {
         static { assimilations.add(ASSIMILATION_RAFTING); }
         public static final Assimilation ASSIMILATION_FIREVENOM = new Assimilation(10, "ASSIMILATION_FIREVENOM", "ASSIMILATION_FIREVENOM_DESC", ASSIMILATED_FIREVENOM, ASSIMILATION_COST, loadIcon("icons/assimilations/Fire.png"));
         static { assimilations.add(ASSIMILATION_FIREVENOM); }
-        // TODO mechanic: reward ASSIMILATED_JUMPING — not implemented
         public static final Assimilation ASSIMILATION_JUMPING = new Assimilation(11, "ASSIMILATION_JUMPING", "ASSIMILATION_JUMPING_DESC", ASSIMILATED_JUMPING, ASSIMILATION_COST, loadIcon("icons/assimilations/Jet.png"));
         static { assimilations.add(ASSIMILATION_JUMPING); }
         public static final Assimilation ASSIMILATION_STINGING = new Assimilation(13, "ASSIMILATION_STINGING", "ASSIMILATION_STINGING_DESC", ASSIMILATED_STINGING, ASSIMILATION_COST, loadIcon("icons/assimilations/Bullet.png"));
         static { assimilations.add(ASSIMILATION_STINGING); }
-        // TODO mechanic: reward ASSIMILATED_SWARMING — not implemented
         public static final Assimilation ASSIMILATION_SWARMING = new Assimilation(14, "ASSIMILATION_SWARMING", "ASSIMILATION_SWARMING_DESC", ASSIMILATED_SWARMING, ASSIMILATION_COST, loadIcon("icons/assimilations/Army.png"));
         static { assimilations.add(ASSIMILATION_SWARMING); }
-        // TODO mechanic: reward ASSIMILATED_STEALTH — not implemented
         public static final Assimilation ASSIMILATION_STEALTH = new Assimilation(15, "ASSIMILATION_STEALTH", "ASSIMILATION_STEALTH_DESC", ASSIMILATED_STEALTH, ASSIMILATION_COST, loadIcon("icons/assimilations/Ghost.png"));
         static { assimilations.add(ASSIMILATION_STEALTH); }
         public static final Assimilation ASSIMILATION_FASTBITE = new Assimilation(16, "ASSIMILATION_FASTBITE", "ASSIMILATION_FASTBITE_DESC", ASSIMILATED_FASTBITE, ASSIMILATION_COST, loadIcon("icons/assimilations/Dracula.png"));
         static { assimilations.add(ASSIMILATION_FASTBITE); }
-        // TODO mechanic: reward ASSIMILATED_HEATRESIST — not implemented
         public static final Assimilation ASSIMILATION_HEATRESIST = new Assimilation(17, "ASSIMILATION_HEATRESIST", "ASSIMILATION_HEATRESIST_DESC", ASSIMILATED_HEATRESIST, ASSIMILATION_COST, loadIcon("icons/assimilations/Silver.png"));
         static { assimilations.add(ASSIMILATION_HEATRESIST); }
         public static final Assimilation ASSIMILATION_DEADLYVENOM = new Assimilation(18, "ASSIMILATION_DEADLYVENOM", "ASSIMILATION_DEADLYVENOM_DESC", ASSIMILATED_DEADLYVENOM, ASSIMILATION_COST, loadIcon("icons/assimilations/Maricopa.png"));
@@ -741,7 +736,6 @@ public final class GameUnlocks {
         // TODO mechanic: reward ASSIMILATED_HIVEBUILD — not implemented
         public static final Assimilation ASSIMILATION_HIVEBUILD = new Assimilation(21, "ASSIMILATION_HIVEBUILD", "ASSIMILATION_HIVEBUILD_DESC", ASSIMILATED_HIVEBUILD, ASSIMILATION_COST, loadIcon("icons/assimilations/ShiningBlack.png"));
         static { assimilations.add(ASSIMILATION_HIVEBUILD); }
-        // TODO mechanic: reward ASSIMILATED_LOCSENSE — not implemented
         public static final Assimilation ASSIMILATION_LOCSENSE = new Assimilation(22, "ASSIMILATION_LOCSENSE", "ASSIMILATION_LOCSENSE_DESC", ASSIMILATED_LOCSENSE, ASSIMILATION_COST, loadIcon("icons/assimilations/Desert.png"));
         static { assimilations.add(ASSIMILATION_LOCSENSE); }
         public static final Assimilation ASSIMILATION_ACIDSPIT = new Assimilation(23, "ASSIMILATION_ACIDSPIT", "ASSIMILATION_ACIDSPIT_DESC", ASSIMILATED_ACIDSPIT, ASSIMILATION_COST, loadIcon("icons/assimilations/Green.png"));
@@ -777,6 +771,9 @@ public final class GameUnlocks {
                 }
                 if (upgrade == ROLE_DEFENDER) {
                         return ASSIMILATION_DOORHEAD;
+                }
+                if (upgrade == ROLE_SPY) {
+                        return ASSIMILATION_STEALTH;
                 }
                 return null;
         }

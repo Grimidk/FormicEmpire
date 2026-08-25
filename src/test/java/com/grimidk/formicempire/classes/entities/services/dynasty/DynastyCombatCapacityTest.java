@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,6 +79,27 @@ class DynastyCombatCapacityTest {
         b.setWarAssignedRoleCount(GameConstants.ROLE_COMMANDER, 1);
 
         assertEquals(GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER, dynasty.getCombatCapacity());
+    }
+
+    @Test
+    void swarmingAbilityBoostsCombatCapacityByFiftyPercent() {
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        Colony colony = new Colony(1, "Prime", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+
+        assertEquals(GameNumbers.COMBAT_CAPACITY_BASE, dynasty.getCombatCapacity());
+
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_SWARMING);
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ABILITY_SWARMING));
+        assertEquals(Math.round(GameNumbers.COMBAT_CAPACITY_BASE
+                * GameNumbers.ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT), dynasty.getCombatCapacity());
+
+        colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+        colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+        colony.setWarAssignedRoleCount(GameConstants.ROLE_COMMANDER, 1);
+        assertEquals(Math.round(GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER
+                * GameNumbers.ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT), dynasty.getCombatCapacity());
     }
 
     @Test

@@ -30,6 +30,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourSer
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegrationService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
@@ -1826,6 +1827,18 @@ public class World {
 
         TradeManager tradeManager = engine != null ? engine.getTradeManager() : null;
         DynastyRebellionService.runMonthlyChecks(this, tradeManager);
+
+        if (this.dynastys != null) {
+            for (Dynasty dynasty : this.dynastys) {
+                if (dynasty == null || dynasty.isDefeated()) {
+                    continue;
+                }
+                DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+                if (intel != null) {
+                    intel.runMonthlyCounterIntelligence(this);
+                }
+            }
+        }
 
         this.setSeason(monthSeason);
 

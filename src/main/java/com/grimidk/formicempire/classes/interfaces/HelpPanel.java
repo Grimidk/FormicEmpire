@@ -917,6 +917,8 @@ public class HelpPanel extends JPanel {
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_REPUTATION, createReputationSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_INTELLIGENCE, createIntelligenceSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_RANKS, createRanksSection()));
 
         JScrollPane scrollPane = new JScrollPane(panel);
@@ -1093,6 +1095,21 @@ public class HelpPanel extends JPanel {
             list.add(item);
         }
         return list;
+    }
+
+    private JPanel createIntelligenceSection() {
+        JPanel panel = new JPanel(new BorderLayout(8, 0));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(8, 8, 8, 8));
+        JLabel iconLabel = new JLabel(GameConstants.ICON_STAT_INTELLIGENCE);
+        iconLabel.setVerticalAlignment(SwingConstants.TOP);
+        panel.add(iconLabel, BorderLayout.WEST);
+        JLabel body = new JLabel("<html><body style='width:280px'>"
+                + LanguageStrings.get(LanguageStrings.HELP_INTELLIGENCE_BODY) + "</body></html>");
+        body.setFont(AssetStyles.FONT_NORMAL);
+        body.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(body, BorderLayout.CENTER);
+        return panel;
     }
 
     private JPanel createSeasonListPanel(String title, List<Season> constants) {
