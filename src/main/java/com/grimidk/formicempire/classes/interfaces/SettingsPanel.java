@@ -51,6 +51,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox confirmQuitCheck;
     private JCheckBox escapeKeyGameActionsCheck;
     private JCheckBox showTooltipsCheck;
+    private JCheckBox disablePopupsCheck;
     private JCheckBox fuzzParasiteAntsCheck;
     private JCheckBox overworldAutoRecenterCheck;
 
@@ -77,7 +78,7 @@ public class SettingsPanel extends JPanel {
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
+    private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, disablePopupsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
     private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, easyConqueringLabel, instantIntegrationLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
@@ -324,9 +325,20 @@ public class SettingsPanel extends JPanel {
         showTooltipsCheck = new JCheckBox();
         styleCheckBox(showTooltipsCheck);
         c.gridx = 1; panel.add(showTooltipsCheck, c);
+
+        // Disable popups
+        c.gridy = 7; c.gridx = 0;
+        disablePopupsLabel = new JLabel();
+        disablePopupsLabel.setFont(AssetStyles.FONT_NORMAL);
+        disablePopupsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(disablePopupsLabel, c);
+
+        disablePopupsCheck = new JCheckBox();
+        styleCheckBox(disablePopupsCheck);
+        c.gridx = 1; panel.add(disablePopupsCheck, c);
         
         // Overworld auto-recenter
-        c.gridy = 7; c.gridx = 0;
+        c.gridy = 8; c.gridx = 0;
         overworldAutoRecenterLabel = new JLabel();
         overworldAutoRecenterLabel.setFont(AssetStyles.FONT_NORMAL);
         overworldAutoRecenterLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -337,7 +349,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(overworldAutoRecenterCheck, c);
 
         // Fuzz parasite ants
-        c.gridy = 8; c.gridx = 0;
+        c.gridy = 9; c.gridx = 0;
         fuzzParasiteAntsLabel = new JLabel();
         fuzzParasiteAntsLabel.setFont(AssetStyles.FONT_NORMAL);
         fuzzParasiteAntsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -347,7 +359,7 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(fuzzParasiteAntsCheck);
         c.gridx = 1; panel.add(fuzzParasiteAntsCheck, c);
 
-        c.gridy = 9;
+        c.gridy = 10;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -656,6 +668,7 @@ public class SettingsPanel extends JPanel {
         confirmQuitCheck.setSelected(true);
         escapeKeyGameActionsCheck.setSelected(true);
         showTooltipsCheck.setSelected(true);
+        disablePopupsCheck.setSelected(false);
         overworldAutoRecenterCheck.setSelected(true);
         fuzzParasiteAntsCheck.setSelected(true);
     }
@@ -943,6 +956,7 @@ public class SettingsPanel extends JPanel {
         confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
         escapeKeyGameActionsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ESCAPE_KEY_GAME_ACTIONS));
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
+        disablePopupsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DISABLE_POPUPS));
         overworldAutoRecenterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER));
         fuzzParasiteAntsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS));
 
@@ -1026,6 +1040,7 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(confirmQuitLabel, confirmQuitCheck, LanguageStrings.SETTINGS_CONFIRM_QUIT_TT);
         setSettingTooltip(escapeKeyGameActionsLabel, escapeKeyGameActionsCheck, LanguageStrings.SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT);
         setSettingTooltip(tooltipsLabel, showTooltipsCheck, LanguageStrings.SETTINGS_SHOW_TOOLTIPS_TT);
+        setSettingTooltip(disablePopupsLabel, disablePopupsCheck, LanguageStrings.SETTINGS_DISABLE_POPUPS_TT);
         setSettingTooltip(overworldAutoRecenterLabel, overworldAutoRecenterCheck, LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER_TT);
         setSettingTooltip(fuzzParasiteAntsLabel, fuzzParasiteAntsCheck, LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS_TT);
         setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
@@ -1079,6 +1094,7 @@ public class SettingsPanel extends JPanel {
         confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
         escapeKeyGameActionsCheck.setSelected(engine.isEscapeKeyGameActions());
         showTooltipsCheck.setSelected(engine.isShowTooltips());
+        disablePopupsCheck.setSelected(engine.isDisablePopups());
         overworldAutoRecenterCheck.setSelected(engine.isOverworldAutoRecenter());
         fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
 
@@ -1249,6 +1265,7 @@ public class SettingsPanel extends JPanel {
         engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
         engine.setEscapeKeyGameActions(escapeKeyGameActionsCheck.isSelected());
         engine.setShowTooltips(showTooltipsCheck.isSelected());
+        engine.setDisablePopups(disablePopupsCheck.isSelected());
         engine.setOverworldAutoRecenter(overworldAutoRecenterCheck.isSelected());
         engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
 

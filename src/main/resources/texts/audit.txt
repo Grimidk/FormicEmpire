@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 86% (345/400 checked)
+Completion: 85% (345/406 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -32,6 +32,7 @@ General:
 [X] Confirm on quit (active session)
 [X] Escape key closes dialogs / opens game menu
 [X] Show tooltips
+[ ] Disable popups (not recommended — may miss crucial info; unlocks still apply silently)
 [X] Overworld auto-recenter on idle
 [X] Fuzz parasite ant numbers
 [X] Reset tab to defaults
@@ -50,6 +51,11 @@ Audio:
 [X] Popup SFX on UiOptionPane dialogs (master × SFX volume; one SFX at a time)
 [X] Spinner up/down SFX on spinner step buttons
 [X] Battle finished SFX when a player-involved war battle resolves
+[ ] Building start SFX when the player colony begins construction
+[ ] Building finished SFX when a player colony building completes
+[ ] Close window SFX on ZeroDialog close (Close button, ESC, tab-toggle close)
+[ ] Research purchased SFX when buying an upgrade in the Research tree
+[ ] Assimilation finished SFX when a player dynasty completes assimilation
 [X] Reset tab to defaults
 
 Roles (default hatch roles for new ants):

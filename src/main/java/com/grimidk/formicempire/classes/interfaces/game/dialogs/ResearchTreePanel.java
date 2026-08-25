@@ -9,9 +9,11 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import javax.swing.BorderFactory;
@@ -565,6 +567,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 engine.applySandboxTaintToActiveWorld();
             }
             colony.unlockUpgrade(upgrade);
+            SfxService.play(SoundEffects.RESEARCH);
             closeDetail();
             if (onTreeChanged != null) {
                 onTreeChanged.run();

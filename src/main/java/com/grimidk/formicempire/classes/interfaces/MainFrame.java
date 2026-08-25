@@ -740,6 +740,13 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     
     @Override
     public void onUpgradeTriggered(Upgrade unlockedUpgrade, String title, String message) {
+        if (engine.isDisablePopups()) {
+            if (gamePanel != null) {
+                gamePanel.refreshAllGUIData();
+            }
+            return;
+        }
+
         boolean wasPaused = engine.isPaused();
         if (!wasPaused) {
             engine.pauseEngine();

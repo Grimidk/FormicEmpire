@@ -59,6 +59,7 @@ public class Engine extends Thread {
     private boolean confirmOnQuit = true;
     private boolean escapeKeyGameActions = true;
     private boolean showTooltips = true;
+    private boolean disablePopups = false;
     
     private boolean fuzzParasiteAnts = true;
     private boolean showAuditMenu = false;
@@ -523,6 +524,14 @@ public class Engine extends Thread {
 
     public void setShowTooltips(boolean showTooltips) {
         this.showTooltips = showTooltips;
+    }
+
+    public boolean isDisablePopups() {
+        return disablePopups;
+    }
+
+    public void setDisablePopups(boolean disablePopups) {
+        this.disablePopups = disablePopups;
     }
 
     public boolean isFuzzParasiteAnts() {

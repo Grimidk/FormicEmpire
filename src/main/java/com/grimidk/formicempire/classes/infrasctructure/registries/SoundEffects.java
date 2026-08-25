@@ -13,6 +13,11 @@ public final class SoundEffects {
     public static final SoundEffect SPIN_UP = effect("spinUp", "Spin Up");
     public static final SoundEffect SPIN_DOWN = effect("spinDown", "Spin Down");
     public static final SoundEffect BATTLE = effect("battle", "Battle");
+    public static final SoundEffect BUILDING = effect("building", "Building Start");
+    public static final SoundEffect BUILDING_END = effect("buildingEnd", "Building Finished");
+    public static final SoundEffect CLOSE_WINDOW = effect("closeWindow", "Close Window");
+    public static final SoundEffect RESEARCH = effect("research", "Research Finished");
+    public static final SoundEffect ASSIMILATION = effect("assimilation", "Assimilation Finished");
 
     private SoundEffects() {}
 

@@ -1889,6 +1889,7 @@ public class SaveManager {
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
             writeJsonLine(w, "escapeKeyGameActions", engine.isEscapeKeyGameActions(), false);
             writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
+            writeJsonLine(w, "disablePopups", engine.isDisablePopups(), false);
             writeJsonLine(w, "fuzzParasiteAnts", engine.isFuzzParasiteAnts(), false);
             writeJsonLine(w, "showAuditMenu", engine.isShowAuditMenu(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
@@ -2001,6 +2002,7 @@ public class SaveManager {
             engine.setEscapeKeyGameActions(Boolean.parseBoolean(m.getOrDefault("escapeKeyGameActions",
                     String.valueOf(engine.isEscapeKeyGameActions()))));
             engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
+            engine.setDisablePopups(Boolean.parseBoolean(m.getOrDefault("disablePopups", String.valueOf(engine.isDisablePopups()))));
             engine.setFuzzParasiteAnts(Boolean.parseBoolean(m.getOrDefault("fuzzParasiteAnts",
                     m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasiteAnts())))));
             engine.setShowAuditMenu(Boolean.parseBoolean(m.getOrDefault("showAuditMenu",

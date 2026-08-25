@@ -1496,6 +1496,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_CONFIRM_QUIT = "SETTINGS_CONFIRM_QUIT";
     public static final String SETTINGS_ESCAPE_KEY_GAME_ACTIONS = "SETTINGS_ESCAPE_KEY_GAME_ACTIONS";
     public static final String SETTINGS_SHOW_TOOLTIPS = "SETTINGS_SHOW_TOOLTIPS";
+    public static final String SETTINGS_DISABLE_POPUPS = "SETTINGS_DISABLE_POPUPS";
     
     public static final String SETTINGS_FUZZ_PARASITE_ANTS = "SETTINGS_FUZZ_PARASITE_ANTS";
     public static final String SETTINGS_SHOW_AUDIT_MENU = "SETTINGS_SHOW_AUDIT_MENU";
@@ -1521,6 +1522,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_CONFIRM_QUIT_TT = "SETTINGS_CONFIRM_QUIT_TT";
     public static final String SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT = "SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT";
     public static final String SETTINGS_SHOW_TOOLTIPS_TT = "SETTINGS_SHOW_TOOLTIPS_TT";
+    public static final String SETTINGS_DISABLE_POPUPS_TT = "SETTINGS_DISABLE_POPUPS_TT";
     public static final String SETTINGS_OVERWORLD_AUTO_RECENTER_TT = "SETTINGS_OVERWORLD_AUTO_RECENTER_TT";
     public static final String SETTINGS_FUZZ_PARASITE_ANTS_TT = "SETTINGS_FUZZ_PARASITE_ANTS_TT";
     public static final String SETTINGS_SHOW_AUDIT_MENU_TT = "SETTINGS_SHOW_AUDIT_MENU_TT";

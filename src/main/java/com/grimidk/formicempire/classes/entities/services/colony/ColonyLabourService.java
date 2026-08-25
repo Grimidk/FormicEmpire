@@ -23,12 +23,14 @@ import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEven
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
@@ -873,6 +875,9 @@ public class ColonyLabourService {
                     
                     dynasty.setCurrentAssimilation(null);
                     dynasty.setAssimilationProgress(0);
+                    if (colony.isPlayer()) {
+                        SfxService.play(SoundEffects.ASSIMILATION);
+                    }
                 }
             } else {
                 int queenGain = researcherCount * speed;
@@ -895,6 +900,9 @@ public class ColonyLabourService {
         if (colony.getBuildingProgressHours() >= requiredHours) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
             colony.logEvent(ColonyLogPrefixes.SUCCESS + " " + colony.getCurrentBuildingProject().getName());
+            if (colony.isPlayer()) {
+                SfxService.play(SoundEffects.BUILDING_END);
+            }
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }

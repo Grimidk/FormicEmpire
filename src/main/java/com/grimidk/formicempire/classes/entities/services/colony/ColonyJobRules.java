@@ -10,11 +10,13 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
@@ -389,6 +391,9 @@ public final class ColonyJobRules {
                                 assimilation.getName(), assimilation.getReward().getFlavorName()));
                 dynasty.setCurrentAssimilation(null);
                 dynasty.setAssimilationProgress(0);
+                if (colony.isPlayer()) {
+                    SfxService.play(SoundEffects.ASSIMILATION);
+                }
             }
         } else {
             int queenGain = researcherCount * speed;
@@ -413,6 +418,9 @@ public final class ColonyJobRules {
                 / efficiency;
         if (colony.getBuildingProgressHours() >= required) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
+            if (colony.isPlayer()) {
+                SfxService.play(SoundEffects.BUILDING_END);
+            }
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }

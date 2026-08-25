@@ -2,7 +2,9 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
@@ -56,6 +58,7 @@ public abstract class ZeroDialog extends JDialog {
     }
 
     public void requestClose() {
+        SfxService.play(SoundEffects.CLOSE_WINDOW);
         if (hideOnClose) {
             setVisible(false);
         } else {

@@ -31,6 +31,7 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
@@ -41,6 +42,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -1051,9 +1053,15 @@ public class Colony {
             resourceService.consumeResource(this, GameConstants.RESOURCE_PLANT, building.getPlantCost());
             setCurrentBuildingProject(building);
             this.buildingProgressHours = 0.0;
+            if (isPlayer()) {
+                SfxService.play(SoundEffects.BUILDING);
+            }
             return true;
         }
         unlockBuilding(building);
+        if (isPlayer()) {
+            SfxService.play(SoundEffects.BUILDING_END);
+        }
         if (eng != null) {
             eng.applySandboxTaintToActiveWorld();
         }
