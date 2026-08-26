@@ -2542,6 +2542,7 @@ public final class LanguageStrings {
     public static final String HELP_TAB_UI = "HELP_TAB_UI";
     public static final String HELP_UI_INTRO = "HELP_UI_INTRO";
     public static final String HELP_UI_BAR_TITLE = "HELP_UI_BAR_TITLE";
+    public static final String HELP_UI_MUSIC_TITLE = "HELP_UI_MUSIC_TITLE";
     public static final String HELP_UI_SPEEDS_TITLE = "HELP_UI_SPEEDS_TITLE";
     public static final String HELP_UI_SPEED_PAUSED = "HELP_UI_SPEED_PAUSED";
     public static final String HELP_UI_SPEED_MS = "HELP_UI_SPEED_MS";

@@ -1066,6 +1066,13 @@ public final class GameConstants {
     public static final ImageIcon ICON_SOCIAL_INSTAGRAM = loadIcon("icons/social/Instagram.png");
     public static final ImageIcon ICON_SOCIAL_FEEDBACK = loadIcon("icons/social/Feedback.png");
     public static final ImageIcon ICON_SOCIAL_SETTINGS = loadIcon("icons/social/Settings.png");
+    public static final ImageIcon ICON_MUSIC_PREV = loadIcon("icons/music/Prev.png");
+    public static final ImageIcon ICON_MUSIC_PLAY = loadIcon("icons/music/Play.png");
+    public static final ImageIcon ICON_MUSIC_PAUSE = loadIcon("icons/music/Pause.png");
+    public static final ImageIcon ICON_MUSIC_NEXT = loadIcon("icons/music/Next.png");
+    public static final ImageIcon ICON_MUSIC_SHUFFLE = loadIcon("icons/music/Shuffle.png");
+    public static final ImageIcon ICON_MUSIC_MUTE = loadIcon("icons/music/Mute.png");
+    public static final ImageIcon ICON_MUSIC_UNMUTE = loadIcon("icons/music/Unmute.png");
 
     // --- Diplomatic Reputation ---
     public static final DiplomaticReputation REPUTATION_AGGRESSIVE = new DiplomaticReputation(

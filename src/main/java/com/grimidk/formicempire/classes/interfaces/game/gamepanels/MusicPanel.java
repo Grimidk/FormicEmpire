@@ -4,9 +4,11 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.audio.MusicService;
 import com.grimidk.formicempire.classes.infrasctructure.audio.MusicTrack;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,6 +18,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 public class MusicPanel extends ZeroGamePanel {
+    private static final int ICON_DISPLAY_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
+    private static final Dimension ICON_SLOT = new Dimension(ICON_DISPLAY_SIZE, ICON_DISPLAY_SIZE);
+
     private final Engine engine;
     private final MusicService.Listener listener = this::refreshFromService;
 
@@ -48,11 +53,11 @@ public class MusicPanel extends ZeroGamePanel {
         trackLabel.setFont(AssetStyles.FONT_NORMAL.deriveFont(11f));
         trackLabel.setForeground(AssetStyles.FONT_COLOR);
 
-        prevButton = createControlButton("⏮");
-        playPauseButton = createControlButton("▶");
-        nextButton = createControlButton("⏭");
-        shuffleButton = createControlButton("⇄");
-        muteButton = createControlButton("♪");
+        prevButton = createControlButton(GameConstants.ICON_MUSIC_PREV);
+        playPauseButton = createControlButton(GameConstants.ICON_MUSIC_PLAY);
+        nextButton = createControlButton(GameConstants.ICON_MUSIC_NEXT);
+        shuffleButton = createControlButton(GameConstants.ICON_MUSIC_SHUFFLE);
+        muteButton = createControlButton(GameConstants.ICON_MUSIC_UNMUTE);
 
         prevButton.addActionListener(e -> {
             MusicService music = engine.getMusicService();
@@ -112,6 +117,7 @@ public class MusicPanel extends ZeroGamePanel {
         super.refreshTheme();
         trackLabel.setForeground(AssetStyles.FONT_COLOR);
         styleControls();
+        refreshFromService();
     }
 
     public void disposeListeners() {
@@ -121,24 +127,30 @@ public class MusicPanel extends ZeroGamePanel {
         }
     }
 
-    private JButton createControlButton(String label) {
-        JButton button = new JButton(label);
+    private JButton createControlButton(ImageIcon icon) {
+        JButton button = new JButton();
         button.setFocusable(false);
-        AssetStyles.styleCompactButton(button);
-        Dimension size = AssetStyles.minControlHitSize();
-        button.setPreferredSize(size);
-        button.setMinimumSize(size);
-        button.setMaximumSize(size);
-        button.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        styleIconControl(button, icon);
         return button;
     }
 
     private void styleControls() {
-        AssetStyles.styleCompactButton(prevButton);
-        AssetStyles.styleCompactButton(playPauseButton);
-        AssetStyles.styleCompactButton(nextButton);
-        AssetStyles.styleCompactButton(shuffleButton);
-        AssetStyles.styleCompactButton(muteButton);
+        styleIconControl(prevButton, GameConstants.ICON_MUSIC_PREV);
+        styleIconControl(nextButton, GameConstants.ICON_MUSIC_NEXT);
+        styleIconControl(shuffleButton, GameConstants.ICON_MUSIC_SHUFFLE);
+        styleIconControl(playPauseButton, GameConstants.ICON_MUSIC_PLAY);
+        styleIconControl(muteButton, GameConstants.ICON_MUSIC_UNMUTE);
+    }
+
+    private static void styleIconControl(JButton button, ImageIcon icon) {
+        AssetStyles.styleIconButton(button);
+        button.setIcon(icon);
+        button.setText("");
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setVerticalAlignment(SwingConstants.CENTER);
+        button.setPreferredSize(ICON_SLOT);
+        button.setMinimumSize(ICON_SLOT);
+        button.setMaximumSize(ICON_SLOT);
     }
 
     private void refreshFromService() {
@@ -158,25 +170,26 @@ public class MusicPanel extends ZeroGamePanel {
         }
 
         boolean playing = music != null && music.isPlaying();
-        playPauseButton.setText(playing ? "❚❚" : "▶");
+        playPauseButton.setIcon(playing ? GameConstants.ICON_MUSIC_PAUSE : GameConstants.ICON_MUSIC_PLAY);
+        playPauseButton.setText("");
         playPauseButton.setToolTipText(LanguageStrings.get(
                 playing ? LanguageStrings.MUSIC_PAUSE_TT : LanguageStrings.MUSIC_PLAY_TT));
         prevButton.setToolTipText(LanguageStrings.get(LanguageStrings.MUSIC_PREV_TT));
         nextButton.setToolTipText(LanguageStrings.get(LanguageStrings.MUSIC_NEXT_TT));
 
         boolean shuffle = engine.isMusicShuffle();
-        shuffleButton.setForeground(shuffle ? AssetStyles.FONT_COLOR_BRIGHT : AssetStyles.FONT_COLOR);
         shuffleButton.setToolTipText(LanguageStrings.get(LanguageStrings.MUSIC_SHUFFLE_TT));
+        shuffleButton.setEnabled(hasTracks);
 
         boolean muted = engine.isMusicMuted();
-        muteButton.setText(muted ? "X" : "♪");
+        muteButton.setIcon(muted ? GameConstants.ICON_MUSIC_MUTE : GameConstants.ICON_MUSIC_UNMUTE);
+        muteButton.setText("");
         muteButton.setToolTipText(LanguageStrings.get(
                 muted ? LanguageStrings.MUSIC_UNMUTE_TT : LanguageStrings.MUSIC_MUTE_TT));
 
         prevButton.setEnabled(hasTracks);
         playPauseButton.setEnabled(hasTracks);
         nextButton.setEnabled(hasTracks);
-        shuffleButton.setEnabled(hasTracks);
         muteButton.setEnabled(true);
     }
 

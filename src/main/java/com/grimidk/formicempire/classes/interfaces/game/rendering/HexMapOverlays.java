@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.util.HashSet;
 import java.util.List;
@@ -12,8 +13,11 @@ import java.util.Set;
 
 import javax.swing.ImageIcon;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
@@ -42,7 +46,7 @@ public final class HexMapOverlays {
             return;
         }
         double layoutSize = mesh.layoutSize();
-        int dotRadius = Math.max(3, (int) Math.round(layoutSize * 0.2));
+        int markerSize = Math.max(10, (int) Math.round(layoutSize * 0.45));
         BasicStroke stroke = new BasicStroke(TRADE_LINE_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
         g2d.setStroke(stroke);
         int minuteOfHour = Math.max(0, Math.min(59, world.getMinute()));
@@ -93,19 +97,31 @@ public final class HexMapOverlays {
             double toX = returning ? originFace.centerX : destFace.centerX;
             double toY = returning ? originFace.centerY : destFace.centerY;
             double progress = tradeLegProgress(trade, minuteOfHour);
-            double dotX = fromX + (toX - fromX) * progress;
-            double dotY = fromY + (toY - fromY) * progress;
-            Color dotColor = crossDynasty
-                    ? closerDynastyColor(
-                            originFace,
-                            destFace,
-                            originDynasty,
-                            destDynasty,
-                            mesh.mapCenterX(),
-                            mesh.mapCenterY(),
-                            AssetStyles.FONT_COLOR)
-                    : dynastyColor(originDynasty != null ? originDynasty : destDynasty, AssetStyles.FONT_COLOR);
-            paintTradeProgressDot(g2d, dotX, dotY, dotRadius, dotColor);
+            double markerX = fromX + (toX - fromX) * progress;
+            double markerY = fromY + (toY - fromY) * progress;
+            ImageIcon markerIcon = originSpeciesAssimilationIcon(origin);
+            if (markerIcon != null) {
+                paintTradeProgressMarker(
+                        g2d,
+                        markerIcon,
+                        markerX,
+                        markerY,
+                        markerSize,
+                        tradeMarkerFacingRadians(fromX, fromY, toX, toY));
+            } else {
+                int dotRadius = Math.max(3, markerSize / 2);
+                Color dotColor = crossDynasty
+                        ? closerDynastyColor(
+                                originFace,
+                                destFace,
+                                originDynasty,
+                                destDynasty,
+                                mesh.mapCenterX(),
+                                mesh.mapCenterY(),
+                                AssetStyles.FONT_COLOR)
+                        : dynastyColor(originDynasty != null ? originDynasty : destDynasty, AssetStyles.FONT_COLOR);
+                paintTradeProgressDot(g2d, markerX, markerY, dotRadius, dotColor);
+            }
         }
     }
 
@@ -210,6 +226,51 @@ public final class HexMapOverlays {
         double fractionalHour = HexMapGeometry.clamp(minuteOfHour / 60.0, 0.0, 59.0 / 60.0);
         double hoursLeft = HexMapGeometry.clamp(remaining - fractionalHour, 0.0, total);
         return 1.0 - (hoursLeft / (double) total);
+    }
+
+    static double tradeMarkerFacingRadians(double fromX, double fromY, double toX, double toY) {
+        return Math.atan2(toY - fromY, toX - fromX) + Math.PI / 2.0;
+    }
+
+    private static ImageIcon originSpeciesAssimilationIcon(Hex origin) {
+        if (origin == null) {
+            return null;
+        }
+        Colony colony = origin.getColony();
+        if (colony == null) {
+            return null;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) {
+            return null;
+        }
+        AntSpecies species = dynasty.getSpecies();
+        if (species == null) {
+            return null;
+        }
+        Assimilation assimilation = species.getAssimilation();
+        return assimilation != null ? assimilation.getIcon() : null;
+    }
+
+    private static void paintTradeProgressMarker(
+            Graphics2D g2d,
+            ImageIcon icon,
+            double centerX,
+            double centerY,
+            int size,
+            double facingRadians) {
+        if (icon == null || size <= 0) {
+            return;
+        }
+        Image image = icon.getImage();
+        if (image == null) {
+            return;
+        }
+        AffineTransform previous = g2d.getTransform();
+        g2d.translate(centerX, centerY);
+        g2d.rotate(facingRadians);
+        g2d.drawImage(image, -size / 2, -size / 2, size, size, null);
+        g2d.setTransform(previous);
     }
 
     private static void paintTradeProgressDot(

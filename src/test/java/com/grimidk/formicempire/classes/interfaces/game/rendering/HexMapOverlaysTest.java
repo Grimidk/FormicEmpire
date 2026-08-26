@@ -63,6 +63,14 @@ class HexMapOverlaysTest {
     }
 
     @Test
+    void tradeMarkerFacingPointsAlongTravelDirection() {
+        assertEquals(Math.PI / 2.0, HexMapOverlays.tradeMarkerFacingRadians(0, 0, 1, 0), 1e-9);
+        assertEquals(Math.PI, HexMapOverlays.tradeMarkerFacingRadians(0, 0, 0, 1), 1e-9);
+        assertEquals(0.0, HexMapOverlays.tradeMarkerFacingRadians(0, 0, 0, -1), 1e-9);
+        assertEquals(3.0 * Math.PI / 2.0, HexMapOverlays.tradeMarkerFacingRadians(0, 0, -1, 0), 1e-9);
+    }
+
+    @Test
     void areNeighborsMatchesFlatTopAdjacency() {
         Hex a = new Hex();
         a.setQ(0);

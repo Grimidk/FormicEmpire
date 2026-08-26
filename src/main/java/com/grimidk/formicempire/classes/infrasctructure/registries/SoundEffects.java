@@ -18,6 +18,7 @@ public final class SoundEffects {
     public static final SoundEffect CLOSE_WINDOW = effect("closeWindow", "Close Window");
     public static final SoundEffect RESEARCH = effect("research", "Research Finished");
     public static final SoundEffect ASSIMILATION = effect("assimilation", "Assimilation Finished");
+    public static final SoundEffect MENU_CLICK = effect("menuClick", "Menu Click");
 
     private SoundEffects() {}
 

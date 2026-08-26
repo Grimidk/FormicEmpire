@@ -13,7 +13,7 @@ class SoundEffectsTest {
 
     @Test
     void registryIncludesAllEffectFiles() {
-        assertEquals(9, SoundEffects.getEffects().size());
+        assertEquals(10, SoundEffects.getEffects().size());
         assertFalse(SoundEffects.getPlayableEffects().isEmpty());
 
         SoundEffect popup = SoundEffects.getById("popup");
@@ -30,6 +30,8 @@ class SoundEffectsTest {
         assertTrue(SoundEffects.CLOSE_WINDOW.isResourcePresent());
         assertTrue(SoundEffects.RESEARCH.isResourcePresent());
         assertTrue(SoundEffects.ASSIMILATION.isResourcePresent());
+        assertTrue(SoundEffects.MENU_CLICK.isResourcePresent());
+        assertEquals("/audio/effects/menuClick.mp3", SoundEffects.MENU_CLICK.getResourcePath());
     }
 
     @Test

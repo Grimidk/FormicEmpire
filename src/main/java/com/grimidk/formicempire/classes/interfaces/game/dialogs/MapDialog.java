@@ -50,6 +50,8 @@ public class MapDialog extends ZeroDialog {
     private final JButton homeButton;
     private final JButton zoomOutButton;
     private final JButton zoomInButton;
+    private final JSlider zoomSlider;
+    private final JPanel zoomRail;
     private final JButton layersButton;
     private final JButton conquerButton;
     private final JButton closeButton;
@@ -61,6 +63,7 @@ public class MapDialog extends ZeroDialog {
     private boolean showTrades = true;
     private boolean showTunnels = true;
     private boolean showBattles = true;
+    private boolean syncingZoomUi;
 
     public MapDialog(JFrame owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
         super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.MAP_DIALOG_SIZE);
@@ -78,17 +81,43 @@ public class MapDialog extends ZeroDialog {
         AssetStyles.styleButton(homeButton);
         homeButton.addActionListener(e -> travelToHomeHex());
 
-        zoomOutButton = new JButton("\u2212");
-        zoomOutButton.setFocusable(false);
-        AssetStyles.styleButton(zoomOutButton);
-        zoomOutButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_OUT_TT));
-        zoomOutButton.addActionListener(e -> mapPanel.zoomBy(-1.0));
+        zoomInButton = createZoomStepButton("+", LanguageStrings.MAP_ZOOM_IN_TT, 1.0);
+        zoomOutButton = createZoomStepButton("\u2212", LanguageStrings.MAP_ZOOM_OUT_TT, -1.0);
 
-        zoomInButton = new JButton("+");
-        zoomInButton.setFocusable(false);
-        AssetStyles.styleButton(zoomInButton);
-        zoomInButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_IN_TT));
-        zoomInButton.addActionListener(e -> mapPanel.zoomBy(1.0));
+        zoomSlider = new JSlider(
+                JSlider.VERTICAL,
+                0,
+                GameNumbers.MAP_ZOOM_SLIDER_MAX,
+                zoomToSliderValue(GameNumbers.MAP_ZOOM_MIN));
+        zoomSlider.setFocusable(false);
+        zoomSlider.setPaintTicks(false);
+        zoomSlider.setPaintLabels(false);
+        AssetStyles.styleSlider(zoomSlider);
+        Dimension zoomTrack = new Dimension(
+                AssetStyles.MIN_CONTROL_HIT_SIZE,
+                GameNumbers.MAP_ZOOM_SLIDER_TRACK_HEIGHT);
+        zoomSlider.setPreferredSize(zoomTrack);
+        zoomSlider.setMinimumSize(zoomTrack);
+        zoomSlider.setMaximumSize(zoomTrack);
+        zoomSlider.addChangeListener(e -> {
+            if (syncingZoomUi || mapPanel == null) {
+                return;
+            }
+            mapPanel.setZoomLevel(sliderValueToZoom(zoomSlider.getValue()));
+        });
+
+        zoomRail = new JPanel();
+        zoomRail.setOpaque(false);
+        zoomRail.setLayout(new BoxLayout(zoomRail, BoxLayout.Y_AXIS));
+        zoomRail.setBorder(new EmptyBorder(8, 4, 8, 8));
+        zoomInButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        zoomSlider.setAlignmentX(Component.CENTER_ALIGNMENT);
+        zoomOutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        zoomRail.add(zoomInButton);
+        zoomRail.add(Box.createVerticalStrut(4));
+        zoomRail.add(zoomSlider);
+        zoomRail.add(Box.createVerticalStrut(4));
+        zoomRail.add(zoomOutButton);
 
         layersButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_LAYERS));
         layersButton.setFocusable(false);
@@ -110,18 +139,36 @@ public class MapDialog extends ZeroDialog {
         bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(homeButton);
-        bottomPanel.add(zoomOutButton);
-        bottomPanel.add(zoomInButton);
         bottomPanel.add(layersButton);
         bottomPanel.add(conquerButton);
         bottomPanel.add(closeButton);
 
         add(legendPanel, BorderLayout.WEST);
         add(mapPanel, BorderLayout.CENTER);
+        add(zoomRail, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
 
         registerCloseKey(KeyEvent.VK_M);
-        updateZoomButtons();
+        updateZoomControls();
+    }
+
+    private JButton createZoomStepButton(String label, String tooltipKey, double notches) {
+        JButton button = new JButton(label);
+        button.setFocusable(false);
+        AssetStyles.styleCompactButton(button);
+        Dimension size = AssetStyles.minControlHitSize();
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
+        button.setMargin(new Insets(0, 0, 0, 0));
+        applyZoomStepButtonColors(button);
+        button.setToolTipText(LanguageStrings.get(tooltipKey));
+        button.addActionListener(e -> mapPanel.zoomBy(notches));
+        return button;
+    }
+
+    private static void applyZoomStepButtonColors(JButton button) {
+        button.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
     }
 
     public World getWorld() {
@@ -302,12 +349,33 @@ public class MapDialog extends ZeroDialog {
         }
     }
 
-    private void updateZoomButtons() {
-        if (zoomInButton == null || zoomOutButton == null || mapPanel == null) {
+    private void updateZoomControls() {
+        if (zoomInButton == null || zoomOutButton == null || zoomSlider == null || mapPanel == null) {
             return;
         }
-        zoomOutButton.setEnabled(mapPanel.canZoomOut());
-        zoomInButton.setEnabled(mapPanel.canZoomIn());
+        zoomOutButton.setEnabled(true);
+        zoomInButton.setEnabled(true);
+        int sliderValue = zoomToSliderValue(mapPanel.getZoom());
+        if (zoomSlider.getValue() != sliderValue) {
+            syncingZoomUi = true;
+            zoomSlider.setValue(sliderValue);
+            syncingZoomUi = false;
+        }
+        zoomSlider.setEnabled(mapPanel.canZoomIn() || mapPanel.canZoomOut());
+    }
+
+    private static int zoomToSliderValue(double zoom) {
+        double min = GameNumbers.MAP_ZOOM_MIN;
+        double max = GameNumbers.MAP_ZOOM_MAX;
+        double clamped = Math.max(min, Math.min(max, zoom));
+        double t = (clamped - min) / (max - min);
+        return (int) Math.round(t * GameNumbers.MAP_ZOOM_SLIDER_MAX);
+    }
+
+    private static double sliderValueToZoom(int sliderValue) {
+        double t = sliderValue / (double) GameNumbers.MAP_ZOOM_SLIDER_MAX;
+        return GameNumbers.MAP_ZOOM_MIN
+                + (GameNumbers.MAP_ZOOM_MAX - GameNumbers.MAP_ZOOM_MIN) * t;
     }
 
     private void conquerActiveHex() {
@@ -377,7 +445,7 @@ public class MapDialog extends ZeroDialog {
         if (zoomInButton != null) {
             zoomInButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_IN_TT));
         }
-        updateZoomButtons();
+        updateZoomControls();
     }
 
     public void liveUpdate() {
@@ -388,8 +456,17 @@ public class MapDialog extends ZeroDialog {
     public void refreshTheme() {
         super.refreshTheme();
         AssetStyles.styleButton(homeButton);
-        AssetStyles.styleButton(zoomOutButton);
-        AssetStyles.styleButton(zoomInButton);
+        AssetStyles.styleCompactButton(zoomOutButton);
+        AssetStyles.styleCompactButton(zoomInButton);
+        applyZoomStepButtonColors(zoomOutButton);
+        applyZoomStepButtonColors(zoomInButton);
+        AssetStyles.styleSlider(zoomSlider);
+        Dimension zoomTrack = new Dimension(
+                AssetStyles.MIN_CONTROL_HIT_SIZE,
+                GameNumbers.MAP_ZOOM_SLIDER_TRACK_HEIGHT);
+        zoomSlider.setPreferredSize(zoomTrack);
+        zoomSlider.setMinimumSize(zoomTrack);
+        zoomSlider.setMaximumSize(zoomTrack);
         AssetStyles.styleButton(layersButton);
         AssetStyles.styleButton(conquerButton);
         AssetStyles.styleButton(closeButton);
@@ -1036,10 +1113,14 @@ public class MapDialog extends ZeroDialog {
                 public void componentResized(ComponentEvent e) {
                     refreshHexSize();
                     clampCamera();
-                    updateZoomButtons();
+                    updateZoomControls();
                     repaint();
                 }
             });
+        }
+
+        double getZoom() {
+            return zoom;
         }
 
         boolean canZoomIn() {
@@ -1054,6 +1135,10 @@ public class MapDialog extends ZeroDialog {
             applyZoom(notches, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
         }
 
+        void setZoomLevel(double targetZoom) {
+            applyZoomAbsolute(targetZoom, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
+        }
+
         void centerOn(Hex hex) {
             if (hex == null) {
                 return;
@@ -1062,7 +1147,7 @@ public class MapDialog extends ZeroDialog {
             panX = -HexMapGeometry.flatTopCenterX(hex.getQ(), hex.getR(), hexSize);
             panY = -HexMapGeometry.flatTopCenterY(hex.getQ(), hex.getR(), hexSize);
             clampCamera();
-            updateZoomButtons();
+            updateZoomControls();
             repaint();
         }
 
@@ -1070,18 +1155,32 @@ public class MapDialog extends ZeroDialog {
             if (focus == null || world == null || Math.abs(notches) < 1e-9) {
                 return;
             }
+            double oldZoom = zoom;
+            double factor = Math.pow(GameNumbers.MAP_ZOOM_STEP, notches);
+            double next = HexMapGeometry.nextZoom(
+                    oldZoom,
+                    factor,
+                    GameNumbers.MAP_ZOOM_MIN,
+                    GameNumbers.MAP_ZOOM_MAX);
+            applyZoomAbsolute(next, focus);
+        }
+
+        private void applyZoomAbsolute(double targetZoom, Point focus) {
+            if (focus == null || world == null) {
+                return;
+            }
             double fit = fittedHexSize();
             if (!(fit > 0)) {
                 return;
             }
             double oldZoom = zoom;
-            double factor = Math.pow(GameNumbers.MAP_ZOOM_STEP, notches);
             zoom = HexMapGeometry.nextZoom(
-                    oldZoom,
-                    factor,
+                    targetZoom,
+                    1.0,
                     GameNumbers.MAP_ZOOM_MIN,
                     GameNumbers.MAP_ZOOM_MAX);
             if (Math.abs(zoom - oldZoom) < 1e-9) {
+                updateZoomControls();
                 return;
             }
             double oldSize = fit * oldZoom;
@@ -1092,7 +1191,7 @@ public class MapDialog extends ZeroDialog {
             panY = HexMapGeometry.panAfterZoom(panY, focus.y - centerY, oldSize, newSize);
             hexSize = newSize;
             clampCamera();
-            updateZoomButtons();
+            updateZoomControls();
             repaint();
         }
 

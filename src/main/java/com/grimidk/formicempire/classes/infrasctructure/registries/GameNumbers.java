@@ -42,6 +42,8 @@ public final class GameNumbers {
     public static final double MAP_ZOOM_MIN = 1.0;
     public static final double MAP_ZOOM_MAX = 4.0;
     public static final double MAP_ZOOM_STEP = 1.15;
+    public static final int MAP_ZOOM_SLIDER_MAX = 100;
+    public static final int MAP_ZOOM_SLIDER_TRACK_HEIGHT = 100;
     public static final double MAP_HEX_FIT_MIN = 10.0;
     public static final double MAP_HEX_FIT_MAX = 55.0;
 

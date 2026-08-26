@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 84% (343/408 checked)
+Completion: 86% (351/409 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -16,10 +16,10 @@ Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic change
 [X] Credits — credits text dialog
 [X] Main menu version text (bottom left, black)
 [X] Main menu License (bottom right) — opens full license dialog
-[ ] Main menu side rail — Discord icon opens Discord invite in browser
-[ ] Main menu side rail — Instagram icon opens https://www.instagram.com/grim.idk/
-[ ] Main menu side rail — Feedback icon opens Google Form in browser
-[ ] Main menu side rail — Settings icon opens settings panel
+[X] Main menu side rail — Discord icon opens Discord invite in browser
+[X] Main menu side rail — Instagram icon opens https://www.instagram.com/grim.idk/
+[X] Main menu side rail — Feedback icon opens Google Form in browser
+[X] Main menu side rail — Settings icon opens settings panel
 [X] Mechanics Audit — this file (only when enabled in Settings > Sandbox)
 [X] Quit — exit app (respects confirm-on-quit when a game session is active)
 
@@ -41,7 +41,7 @@ General:
 
 Video:
 [X] Window size preset (clamped to usable display; list filtered to sizes that fit)
-[ ] Full screen toggle (macOS: native Space fullscreen; retries when launched without a focused window / Mission Control desktop; other OS: borderless maximized)
+[X] Full screen toggle (macOS: native Space fullscreen; retries when launched without a focused window / Mission Control desktop; other OS: borderless maximized)
 [X] Daylight color overlay
 [X] Weather color overlay
 [X] Dark mode
@@ -58,6 +58,7 @@ Audio:
 [ ] Close window SFX on ZeroDialog close (Close button, ESC, tab-toggle close)
 [ ] Research purchased SFX when buying an upgrade in the Research tree
 [ ] Assimilation finished SFX when a player dynasty completes assimilation
+[ ] Menu click SFX on styled buttons, section tabs, menu items, and tabbed panes
 [X] Reset tab to defaults
 
 Roles (default hatch roles for new ants):
@@ -77,7 +78,7 @@ Sandbox:
 [X] ★ Assimilate all (unlocks Assimilation tab; disables achievements on saves that use it)
 [X] ★ Easy conquering (disables achievements on saves that use it)
 [X] ★ Instant integration (disables achievements on saves that use it)
-[ ] In-game Save & Apply with new ★ options — Yes confirms (taints save); No clears ★ checkboxes then applies remaining settings
+[X] In-game Save & Apply with new ★ options — Yes confirms (taints save); No clears ★ checkboxes then applies remaining settings
 [X] Reset tab to defaults
 
 [X] Save & Apply persists to settings.json and applies live
@@ -116,7 +117,7 @@ Side panels (live updates while playing):
 [X] Ant population panel
 [X] Alerts panel (icons + short labels; mite outbreaks, shortages, etc.)
 [X] Minimap panel above music (land hex biome colors; edges match hex color except dynasty-vs-dynasty frontiers; ocean hexes hidden; click/release opens map reliably)
-[X] Music panel below alerts (track name; prev / play-pause / next; shuffle; mute; shows No music when empty)
+[X] Music panel below alerts (track name; icon buttons: prev / play-pause / next / shuffle / mute)
 [X] Menu music starts after intro (never during intro); session music starts when a game loads; volumes use Settings > Audio
 
 ================================================================================
@@ -125,7 +126,7 @@ Side panels (live updates while playing):
 [X] Space — pause / resume
 [X] + / = / - — increase / decrease speed
 [X] Z — toggle Overworld / Underworld view
-[ ] Forager, hunter, and miner ants show resource icon(s) in open jaws only when returning with cargo (outbound empty; eggs/brood not shown)
+[X] Forager, hunter, and miner ants show resource icon(s) in open jaws only when returning with cargo (outbound empty; eggs/brood not shown)
 [X] ESC — game menu (Colony & Dynasty submenus) or close top dialog
 [X] Q — Workers role dialog (toggle)
 [X] W — Soldiers role dialog (toggle)
@@ -142,7 +143,7 @@ Side panels (live updates while playing):
 [X] S — Dynasty Trade / Logistics tab (always available; toggle)
 [X] D — Dynasty Diplomacy tab (always available; toggle)
 [X] F — Dynasty Wars tab (always available; toggle)
-[ ] M — World map (Layers: dynasty borders, biome/rank icons, trades, tunnels, active battles; wheel or +/− zoom toward cursor; drag pans when zoomed; hex press/release focus)
+[X] M — World map (Layers: dynasty borders, biome/rank icons, trades, tunnels, active battles; wheel or vertical zoom slider with +/−; drag pans when zoomed; hex press/release focus)
 [X] X — Statistics (toggle)
 [X] Repeat same hotkey closes the bound dialog/tab
 
@@ -151,7 +152,7 @@ Side panels (live updates while playing):
 ================================================================================
 [X] Back to game
 [X] Toggle Overworld / Underworld (Z)
-[ ] World map (M)
+[X] World map (M)
 [X] Statistics (X)
 
 Colony submenu (items appear when unlocked):
@@ -447,9 +448,9 @@ Per foreign dynasty Actions menu:
 [X] Active wars header expand / collapse
 [X] Click war in sidebar — focus war target
 [X] Dynasty badges: color, species icon, stance, defeated marker
-[ ] Mouse wheel zoom on map (toward cursor; +/− buttons; drag to pan when zoomed)
+[ ] Mouse wheel zoom on map (toward cursor; vertical slider +/−; drag to pan when zoomed)
 [X] Legend / overlay toggles if present
-[ ] Layers: trades (neighbor hex center-to-center line + contrasting progress dot; advances each minute within the hourly leg)
+[ ] Layers: trades (neighbor hex center-to-center line + origin species assimilation icon as progress marker, rotated toward current target when going/returning; advances each minute within the hourly leg)
 [X] Layers: tunnels (short dual rails in the same dynasty border color; incomplete dashed)
 [X] Layers: active battles (MilitaryPower icon on every shared border between dynasties at war)
 [X] Easy conquering: Conquer button — with ★ Easy conquering on, click a foreign colony or empty land hex (map stays open), then Conquer
@@ -494,7 +495,7 @@ Help encyclopedia (main menu Help):
 [X] Synergies list (Help > Synergies — Super Venom and future combos)
 [X] Combat (Help > Combat — creature battles, skills, battle lines, capacity/reserves, war phases)
 [X] World / biomes / hexes
-[X] UI controls (Help > UI Controls tab — speed bar and icons)
+[ ] UI controls (Help > UI Controls tab — speed bar, music player icons, and speed icons)
 
 ================================================================================
 22. AUTOMATIC TRIGGERS (play until fired — popup unlocks)

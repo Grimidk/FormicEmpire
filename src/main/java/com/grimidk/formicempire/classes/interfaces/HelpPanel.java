@@ -1370,6 +1370,8 @@ public class HelpPanel extends JPanel {
 
         panel.add(createUiControlBarSection());
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(createMusicControlsSection());
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(createGameSpeedIconsSection());
 
         JScrollPane scrollPane = new JScrollPane(panel);
@@ -1393,6 +1395,30 @@ public class HelpPanel extends JPanel {
         section.add(buildUiControlCell(GameConstants.ICON_SPEED_PAUSE, LanguageStrings.UI_CONTROL_PAUSE_TT));
         section.add(buildUiControlCell(GameConstants.ICON_SPEED_PLAY, LanguageStrings.UI_CONTROL_PLAY_TT));
         section.add(buildUiMenuControlCell());
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(section, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel createMusicControlsSection() {
+        JPanel section = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_MUSIC_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_PREV, LanguageStrings.MUSIC_PREV_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_PLAY, LanguageStrings.MUSIC_PLAY_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_PAUSE, LanguageStrings.MUSIC_PAUSE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_NEXT, LanguageStrings.MUSIC_NEXT_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_SHUFFLE, LanguageStrings.MUSIC_SHUFFLE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_MUTE, LanguageStrings.MUSIC_MUTE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_UNMUTE, LanguageStrings.MUSIC_UNMUTE_TT));
 
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
