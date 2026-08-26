@@ -8,7 +8,7 @@ To Fix (By decreasing priority):
 		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave/Web, Composter) — separate from sprites/buildings/rooms/ Silkweave L3 room/icons Hivebuild mound room/icons + overworld mound art (HiveMound2/4) PassiveWeb room sprite + icons/buildings/PassiveWeb.png (placeholder room exists)
 		change icons for music player to be like the other (add them to help)
 		music: main menu song, more songs in general
-		improve social buttons with icons and maybe feedback button
+		sounds: menu clicks for tabs and buttons
 	Mid:
 		(none right now)
 	Low:
@@ -30,8 +30,8 @@ Needed for launch (v1.0) (Launch Version):
 			Birds (Crow, Finch, Chicken)
 			Mammals (Rats, Possum, Anteater)
 			Zombie ant colonies (Cordiceps)
+		uncolonizable terrain with boss enemies (non ant assimilation reward, unique bosses)
 		implement pending roles ( carrier and therefore troop reinforcement) more roles (paratroopers to skip a stage)
-		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)
 		more biomes (beach, cliffs, wetlands, mangrove, (coastal vs inland) prairie, burnt forest (resin source, no water, cant start), ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain, lock species to certain biome, need an ant that only eats protein and biome rarity make world bigger to fit bigger continent 
 	Everything else :
 		fog of war, range of 1 at the start, cant interact with dynasties outside the fog, scouts (or explorer princess role with exploring range) have a small chance to venture to adjacent hexes to explore, cant colonize into fog, cheat to remove fog, action to exchange intel for trade (and rep)
@@ -60,6 +60,7 @@ Needed for launch (v1.0) (Launch Version):
 		steam upload and demo version and make sure saves are not overwritten by updates
 			TODO code (optional for listing; needed for Steam-native features): Steamworks init + App ID; cloud saves; achievements/stats API; demo build flavor (separate App ID/depot)
 			TODO ops: partner page, depots/builds, caps/trailers, wishlist, pricing
+		wishlist button
 		versioning to go back to previous stable patches
 		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
 

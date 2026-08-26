@@ -517,6 +517,11 @@ public final class LanguageStrings {
     public static final String ROADMAP_UNAVAILABLE = "ROADMAP_UNAVAILABLE";
     public static final String UI_CREDITS = "UI_CREDITS";
     public static final String UI_DISCORD = "UI_DISCORD";
+    public static final String UI_INSTAGRAM = "UI_INSTAGRAM";
+    public static final String UI_FEEDBACK = "UI_FEEDBACK";
+    public static final String UI_SOCIAL_COMING_SOON = "UI_SOCIAL_COMING_SOON";
+    public static final String UI_SOCIAL_COMING_SOON_FMT = "UI_SOCIAL_COMING_SOON_FMT";
+    public static final String UI_FEEDBACK_TT = "UI_FEEDBACK_TT";
     public static final String CREDITS_TITLE = "CREDITS_TITLE";
     public static final String CREDITS_UNAVAILABLE = "CREDITS_UNAVAILABLE";
     public static final String UI_LICENSE = "UI_LICENSE";

@@ -1062,6 +1062,10 @@ public final class GameConstants {
     public static final ImageIcon ICON_SPEED_DOWN = loadIcon("icons/speed/SpeedDown.png");
     public static final ImageIcon ICON_SPEED_PLAY = loadIcon("icons/speed/Play.png");
     public static final ImageIcon ICON_SPEED_PAUSE = loadIcon("icons/speed/Pause.png");
+    public static final ImageIcon ICON_SOCIAL_DISCORD = loadIcon("icons/social/Discord.png");
+    public static final ImageIcon ICON_SOCIAL_INSTAGRAM = loadIcon("icons/social/Instagram.png");
+    public static final ImageIcon ICON_SOCIAL_FEEDBACK = loadIcon("icons/social/Feedback.png");
+    public static final ImageIcon ICON_SOCIAL_SETTINGS = loadIcon("icons/social/Settings.png");
 
     // --- Diplomatic Reputation ---
     public static final DiplomaticReputation REPUTATION_AGGRESSIVE = new DiplomaticReputation(

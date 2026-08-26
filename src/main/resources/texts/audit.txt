@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 85% (345/406 checked)
+Completion: 84% (343/408 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -16,9 +16,11 @@ Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic change
 [X] Credits — credits text dialog
 [X] Main menu version text (bottom left, black)
 [X] Main menu License (bottom right) — opens full license dialog
-[X] Discord — opens Discord invite in browser
+[ ] Main menu side rail — Discord icon opens Discord invite in browser
+[ ] Main menu side rail — Instagram icon opens https://www.instagram.com/grim.idk/
+[ ] Main menu side rail — Feedback icon opens Google Form in browser
+[ ] Main menu side rail — Settings icon opens settings panel
 [X] Mechanics Audit — this file (only when enabled in Settings > Sandbox)
-[X] Settings — full settings panel (see section 2)
 [X] Quit — exit app (respects confirm-on-quit when a game session is active)
 
 ================================================================================
