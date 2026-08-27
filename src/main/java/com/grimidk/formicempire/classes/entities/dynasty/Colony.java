@@ -93,6 +93,8 @@ public class Colony {
     private Boolean affordableResearchCached;
     private Building affordableBuildingCached;
     private boolean affordableBuildingCacheValid;
+    private Integer cachedTotalConsumption;
+    private int cachedTotalConsumptionKey = Integer.MIN_VALUE;
     private final Set<Building> buildings;
 
     // --- Resource Data ---
@@ -1437,6 +1439,17 @@ public class Colony {
 
     public void invalidateActiveRoleCountCache() {
         activeRoleCountCache = null;
+        invalidateTotalConsumptionCache();
+    }
+
+    private int totalConsumptionCacheKey() {
+        return getAntTotal()
+                + 31 * getParasiteAnts()
+                + 961 * (listSize(getEggs()) + listSize(getLarvae()) + listSize(getPupae()));
+    }
+
+    public void invalidateTotalConsumptionCache() {
+        cachedTotalConsumption = null;
     }
 
     public void markRoleAssignmentDirty() {
@@ -1664,7 +1677,16 @@ public class Colony {
     public ColonyResourceService getResourceService() { return this.resourceService; }
     public ColonyStarterService getStarterService() { return this.starterService; }
 
-    public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
+    public int getTotalConsumption() {
+        int key = totalConsumptionCacheKey();
+        if (cachedTotalConsumption != null && cachedTotalConsumptionKey == key) {
+            return cachedTotalConsumption;
+        }
+        int value = statsService.getTotalConsumption(this);
+        cachedTotalConsumption = value;
+        cachedTotalConsumptionKey = key;
+        return value;
+    }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
     public int getPlantsCapacity() { return statsService.getPlantsCapacity(this); }
     public int getMushroomsCapacity() { return statsService.getMushroomsCapacity(this); }
@@ -1707,9 +1729,24 @@ public class Colony {
     }
 
     public void runRoleAssignmentIfNeeded(Engine engine) {
-        if (needsRoleAssignment()) {
+        if (roleAssignmentDirty) {
             runRoleAssignment(engine);
+            clearRoleAssignmentDirty();
         }
+    }
+
+    public void runRoleAssignmentForPopulationDrift(Engine engine) {
+        if (roleBearingPopulationKey() != lastRoleAssignmentPopKey) {
+            runRoleAssignment(engine);
+            clearRoleAssignmentDirty();
+        }
+    }
+
+    private Engine resolveEngine() {
+        if (dynasty == null || dynasty.getOwningWorld() == null) {
+            return null;
+        }
+        return dynasty.getOwningWorld().getEngine();
     }
     public void runHatching(){ populationService.runHatching(this); }
     public void rankUp() { populationService.rankUp(this); }
@@ -1964,7 +2001,7 @@ public class Colony {
     public void runMinutelyJobs() {
         if (this.runsFullSimulation()) {
             this.runConverting();
-            physicsService.tickAntSpriteAnimMinutes(this);
+            physicsService.tickAntSpriteAnimMinutes(this, lastPhysicsDimension, lastPhysicsViewport);
         }
     }
 
@@ -1980,6 +2017,7 @@ public class Colony {
                 this.automationService.runAutomation(this, biome, season);
             }
             this.runRoleAssignmentIfNeeded(engine);
+            this.runRoleAssignmentForPopulationDrift(engine);
             this.runLaying();
             this.runResearch();
             this.runRanching();
@@ -1991,7 +2029,6 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this, biome, season);
             }
-            this.runRoleAssignmentIfNeeded(engine);
             this.labourService.runTunnelConstruction(this);
             ColonyJobRules.runHourlyLite(this, biome);
         }
@@ -2026,6 +2063,7 @@ public class Colony {
         tickLoyaltyModifierDays();
 
         if (this.runsFullSimulation()) {
+            this.runRoleAssignmentForPopulationDrift(resolveEngine());
             this.rankUp();
             this.runEating(currentTemp); 
             this.runHatching();
@@ -2038,7 +2076,14 @@ public class Colony {
             this.runContamination(); 
             this.runPolicing(); 
         } else {
-            ColonyJobRules.runDailyLite(this, currentTemp, biome, currentHex);
+            World world = dynasty != null ? dynasty.getOwningWorld() : null;
+            int worldDay = world != null ? world.getDay() : 0;
+            if (!this.isPlayer() && world != null
+                    && !GameNumbers.runsNpcDailyWorkToday(worldDay, this.getId())) {
+                ColonyJobRules.runDailyLiteEssential(this, currentTemp);
+            } else {
+                ColonyJobRules.runDailyLite(this, currentTemp, biome, currentHex);
+            }
         }
 
         this.age++;

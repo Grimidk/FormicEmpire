@@ -98,6 +98,10 @@ public class GamePanel extends ZeroGamePanel {
     private KeyEventDispatcher plusSpeedKeyDispatcher;
     private int lastPeaceOfferPromptWarId = -1;
 
+    private volatile boolean hourGuiUpdatePending;
+    private int lastMiniMapRefreshHourKey = Integer.MIN_VALUE;
+    private int lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
+
     private static final int OVERWORLD_SPRING_DURATION_MS = 240;
     private static final int OVERWORLD_IDLE_RECENTER_MS = 1000;
     private static final int OVERWORLD_IDLE_RECENTER_POLL_MS = 200;
@@ -1450,7 +1454,16 @@ public class GamePanel extends ZeroGamePanel {
                 v >= GameNumbers.MAX_PENDING_MINUTE_GUI_STEPS
                         ? GameNumbers.MAX_PENDING_MINUTE_GUI_STEPS
                         : v + 1);
-        hourTickListener = () -> SwingUtilities.invokeLater(this::updateHourGUI);
+        hourTickListener = () -> {
+            if (hourGuiUpdatePending) {
+                return;
+            }
+            hourGuiUpdatePending = true;
+            SwingUtilities.invokeLater(() -> {
+                hourGuiUpdatePending = false;
+                updateHourGUI();
+            });
+        };
         dayTickListener = () -> SwingUtilities.invokeLater(this::updateDayGUI);
         monthTickListener = () -> SwingUtilities.invokeLater(this::updateMonthGUI);
 
@@ -1487,6 +1500,9 @@ public class GamePanel extends ZeroGamePanel {
         hourTickListener = null;
         dayTickListener = null;
         monthTickListener = null;
+        hourGuiUpdatePending = false;
+        lastMiniMapRefreshHourKey = Integer.MIN_VALUE;
+        lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
 
         if (sessionVisualTimer != null) {
             sessionVisualTimer.stop();
@@ -1657,10 +1673,18 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
         if (world == null) return;
 
+        int hourKey = world.getDay() * 24 + world.getHour();
+
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
-        if (miniMapPanel != null) {
+
+        boolean miniMapDue = miniMapPanel != null
+                && ((mapDialog != null && mapDialog.isShowing())
+                || hourKey - lastMiniMapRefreshHourKey >= GameNumbers.GUI_HOUR_MINIMAP_REFRESH_INTERVAL
+                || lastMiniMapRefreshHourKey == Integer.MIN_VALUE);
+        if (miniMapDue) {
             miniMapPanel.refreshMap();
+            lastMiniMapRefreshHourKey = hourKey;
         }
         if (mapDialog != null && mapDialog.isShowing()) {
             mapDialog.liveUpdate();
@@ -1669,6 +1693,9 @@ public class GamePanel extends ZeroGamePanel {
         if (colony != null && colony.belongsToPlayerDynasty()) {
             updateGameAreaSize();
         }
+
+        boolean controlPanelDue = hourKey - lastControlPanelRefreshHourKey >= GameNumbers.GUI_HOUR_CONTROL_PANEL_REFRESH_INTERVAL
+                || lastControlPanelRefreshHourKey == Integer.MIN_VALUE;
 
         if (colony != null && colony.belongsToPlayerDynasty()) {
             if (upgradeDialog != null && upgradeDialog.isShowing()) {
@@ -1689,7 +1716,7 @@ public class GamePanel extends ZeroGamePanel {
             if (convoyDialog != null && convoyDialog.isShowing()) {
                 convoyDialog.liveUpdate();
             }
-            if (controlPanel != null) {
+            if (controlPanel != null && controlPanelDue) {
                 Engine eng = frame.getEngine();
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)
                         || (eng != null && eng.isInfiniteResearch()));
@@ -1703,9 +1730,9 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateTradeMenu(true);
                 controlPanel.updateWarsMenu(true);
                 controlPanel.updateAuditMenu(frame.getEngine().isShowAuditMenu());
+                lastControlPanelRefreshHourKey = hourKey;
             }
-        } else {
-             if (controlPanel != null) {
+        } else if (controlPanel != null && controlPanelDue) {
                 controlPanel.updateResearchMenu(false);
                 controlPanel.updateBuildMenu(false);
                 controlPanel.updateAssimilationMenu(false);
@@ -1715,7 +1742,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateTradeMenu(false);
                 controlPanel.updateWarsMenu(false);
                 controlPanel.updateAuditMenu(frame.getEngine().isShowAuditMenu());
-            }
+                lastControlPanelRefreshHourKey = hourKey;
         }
 
         flushPlayerWarAlerts(world);

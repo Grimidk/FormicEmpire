@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
@@ -119,8 +120,22 @@ public class ColonySourceService {
             nest.getX(), nest.getY(), source.getCenterX(), source.getCenterY(), radius);
     }
 
+    public double computeGatherEfficiency(Colony colony, ResourceSource source, float fullEfficiencyRadius) {
+        NeoPoint nest = spatialService.getColonyEntrance(colony);
+        return GatheringMath.gatheringEfficiency(
+                nest.getX(),
+                nest.getY(),
+                source.getCenterX(),
+                source.getCenterY(),
+                fullEfficiencyRadius);
+    }
+
     public float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
         return GatheringMath.computeFullEfficiencyRadius(colony, workers);
+    }
+
+    public float computeFullEfficiencyRadiusForAntType(Colony colony, AntType type) {
+        return GatheringMath.computeFullEfficiencyRadiusForAntType(colony, type);
     }
 
     public boolean isActiveSource(ResourceSource source) {
@@ -259,6 +274,30 @@ public class ColonySourceService {
                     ? GameNumbers.GATHER_COLONY_SPEED_RADIUS_MULT
                     : 1f;
             return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE * (avg / refTravel) * colonyMult;
+        }
+
+        public static float computeFullEfficiencyRadiusForAntType(Colony colony, AntType type) {
+            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.TYPE_WORKER.getSpeedMult();
+            if (refTravel <= 1e-6f || type == null) {
+                return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
+            }
+            float travel = effectiveTravelUnitsForType(colony, type);
+            float colonyMult = colony.hasUpgrade(GameUnlocks.STAT_ACID)
+                    ? GameNumbers.GATHER_COLONY_SPEED_RADIUS_MULT
+                    : 1f;
+            return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE * (travel / refTravel) * colonyMult;
+        }
+
+        private static float effectiveTravelUnitsForType(Colony colony, AntType type) {
+            float u = GameNumbers.BASE_SPRITE_SPEED * type.getSpeedMult();
+            if (colony.isCreatineDietActive()) {
+                u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
+            }
+            u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
+            if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+                u *= 2f;
+            }
+            return u;
         }
 
         private static float effectiveTravelUnits(Colony colony, Ant ant) {

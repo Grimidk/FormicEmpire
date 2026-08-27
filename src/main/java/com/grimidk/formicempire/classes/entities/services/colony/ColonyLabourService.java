@@ -56,61 +56,68 @@ public class ColonyLabourService {
         return workingAntsScratch;
     }
     
-    private int processGathering(Colony colony, List<ResourceSource> sources, int powerAvailable, ResourceType type, List<Ant> workers) {
-        if (sources == null || sources.isEmpty() || workers.isEmpty()) return 0;
-        
+    private int processGathering(
+            Colony colony,
+            List<ResourceSource> sources,
+            int powerAvailable,
+            ResourceType type,
+            float efficiencyRadius,
+            List<Ant> resinWorkers,
+            int resinForagerCount) {
+        if (sources == null || sources.isEmpty() || powerAvailable <= 0) {
+            return 0;
+        }
+
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
         ColonyResourceService resources = colony.getResourceService();
-        
+
         int totalGathered = 0;
-        int workerIndex = 0;
 
         for (ResourceSource source : sources) {
-            if (powerAvailable <= 0) break;
-        
+            if (powerAvailable <= 0) {
+                break;
+            }
+
             double current = 0;
             double max = 0;
-            
+
             if (type == GameConstants.RESOURCE_PLANT) {
-                current = colony.getPlantsPrecise(); max = stats.getPlantsCapacity(colony);
+                current = colony.getPlantsPrecise();
+                max = stats.getPlantsCapacity(colony);
             } else if (type == GameConstants.RESOURCE_WATER) {
-                current = colony.getWaterPrecise(); max = stats.getWaterCapacity(colony);
+                current = colony.getWaterPrecise();
+                max = stats.getWaterCapacity(colony);
             } else if (type == GameConstants.RESOURCE_MEAT) {
-                current = colony.getProteinPrecise(); max = stats.getProteinCapacity(colony);
+                current = colony.getProteinPrecise();
+                max = stats.getProteinCapacity(colony);
             } else if (type == GameConstants.RESOURCE_ROCK) {
-                current = colony.getMineralsPrecise(); max = stats.getMineralsCapacity(colony);
+                current = colony.getMineralsPrecise();
+                max = stats.getMineralsCapacity(colony);
             }
-            
+
             double space = max - current;
-            if (space <= 0) break; 
+            if (space <= 0) {
+                break;
+            }
 
             int gatherAmount = Math.min(powerAvailable, (int) Math.ceil(space));
-            double efficiency = locations.computeGatherEfficiency(colony, source, workers);
+            double efficiency = locations.computeGatherEfficiency(colony, source, efficiencyRadius);
             int cappedRequest = (int) Math.floor(gatherAmount * efficiency);
             if (cappedRequest <= 0) {
                 continue;
             }
             int actualGathered = locations.gatherFromSource(colony, source, cappedRequest);
-            
+
             if (actualGathered > 0) {
                 resources.addResource(colony, type, actualGathered);
-                
+
                 if (type == GameConstants.RESOURCE_PLANT
-                        && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                    for (int i = 0; i < actualGathered; ) {
-                        if (workerIndex >= workers.size()) {
-                            workerIndex = 0;
-                        }
-                        Ant worker = workers.get(workerIndex);
-                        if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
-                            resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
-                        }
-                        i += AntSubtypeService.forageCarrySlots(worker);
-                        workerIndex++;
-                    }
+                        && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
+                        && resinForagerCount > 0) {
+                    applyResinForageBonus(colony, resources, actualGathered, resinForagerCount, resinWorkers);
                 }
-                
+
                 powerAvailable -= actualGathered;
                 totalGathered += actualGathered;
             }
@@ -118,74 +125,173 @@ public class ColonyLabourService {
         return totalGathered;
     }
 
+    private void applyResinForageBonus(
+            Colony colony,
+            ColonyResourceService resources,
+            int actualGathered,
+            int foragerCount,
+            List<Ant> workers) {
+        if (foragerCount > GameNumbers.COLLECTING_AGGREGATE_RESIN_WORKER_THRESHOLD) {
+            float avgSlots = 1f;
+            if (workers != null && !workers.isEmpty()) {
+                float slotSum = 0f;
+                for (Ant worker : workers) {
+                    slotSum += AntSubtypeService.forageCarrySlots(worker);
+                }
+                avgSlots = Math.max(1f, slotSum / workers.size());
+            }
+            int tripCount = Math.max(1, (int) Math.ceil(actualGathered / avgSlots));
+            for (int i = 0; i < tripCount; i++) {
+                if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
+                    resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
+                }
+            }
+            return;
+        }
+
+        if (workers == null || workers.isEmpty()) {
+            return;
+        }
+
+        int workerIndex = 0;
+        for (int i = 0; i < actualGathered; ) {
+            if (workerIndex >= workers.size()) {
+                workerIndex = 0;
+            }
+            Ant worker = workers.get(workerIndex);
+            if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
+                resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
+            }
+            i += AntSubtypeService.forageCarrySlots(worker);
+            workerIndex++;
+        }
+    }
+
     public void runCollecting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
         ColonyResourceService resources = colony.getResourceService();
-        
+
         // --- Foragers ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
-            List<Ant> foragers = getWorkingAnts(colony, GameConstants.ROLE_FORAGER);
-            if (!foragers.isEmpty()) {
-                int totalPower = AntSubtypeService.sumCollectingPower(colony, foragers);
-                List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
-                List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
-                List<ResourceSource> fungiSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)
-                        ? locations.getSourcesByType(GameConstants.RESOURCE_FUNGI) : List.of();
-                List<ResourceSource> resinSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3)
-                        ? locations.getSourcesByType(GameConstants.RESOURCE_RESIN) : List.of();
+            int foragerCount = colony.getActiveRoleCount(GameConstants.ROLE_FORAGER);
+            if (foragerCount > 0) {
+                boolean aggregateForagers = foragerCount >= GameNumbers.COLLECTING_AGGREGATE_RESIN_WORKER_THRESHOLD;
+                List<Ant> foragers = aggregateForagers
+                        ? null
+                        : getWorkingAnts(colony, GameConstants.ROLE_FORAGER);
+                if (aggregateForagers || (foragers != null && !foragers.isEmpty())) {
+                    int totalPower = aggregateForagers
+                            ? AntSubtypeService.sumCollectingPowerFromRoleCount(colony, foragerCount)
+                            : AntSubtypeService.sumCollectingPower(colony, foragers);
+                    float foragerRadius = locations.computeFullEfficiencyRadiusForAntType(
+                            colony, GameConstants.TYPE_WORKER);
+                    List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
+                    List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
+                    List<ResourceSource> fungiSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)
+                            ? locations.getSourcesByType(GameConstants.RESOURCE_FUNGI) : List.of();
+                    List<ResourceSource> resinSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3)
+                            ? locations.getSourcesByType(GameConstants.RESOURCE_RESIN) : List.of();
 
-                boolean canCollectPlants = !plantSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_PLANT);
-                boolean canCollectWater = !waterSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_WATER);
-                boolean canCollectFungi = !fungiSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI);
-                boolean canCollectResin = !resinSources.isEmpty() && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
-                        && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN);
+                    boolean canCollectPlants = !plantSources.isEmpty()
+                            && resources.hasCapacity(colony, GameConstants.RESOURCE_PLANT);
+                    boolean canCollectWater = !waterSources.isEmpty()
+                            && resources.hasCapacity(colony, GameConstants.RESOURCE_WATER);
+                    boolean canCollectFungi = !fungiSources.isEmpty()
+                            && resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI);
+                    boolean canCollectResin = !resinSources.isEmpty()
+                            && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
+                            && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN);
 
-                int activeTypes = (canCollectPlants ? 1 : 0) + (canCollectWater ? 1 : 0)
-                        + (canCollectFungi ? 1 : 0) + (canCollectResin ? 1 : 0);
-                if (activeTypes > 0) {
-                    int share = totalPower / activeTypes;
-                    int remainder = totalPower;
-                    if (canCollectPlants) {
-                        int gathered = processGathering(colony, plantSources, share, GameConstants.RESOURCE_PLANT, foragers);
-                        remainder = remainder - share + (share - gathered);
-                    }
-                    if (canCollectWater) {
-                        int power = activeTypes == 1 ? remainder : share;
-                        int gathered = processGathering(colony, waterSources, power, GameConstants.RESOURCE_WATER, foragers);
-                        remainder = remainder - power + (power - gathered);
-                    }
-                    if (canCollectFungi) {
-                        int power = (canCollectPlants || canCollectWater) ? share : remainder;
-                        processGathering(colony, fungiSources, power, GameConstants.RESOURCE_FUNGI, foragers);
-                    }
-                    if (canCollectResin) {
-                        int power = activeTypes == 1 ? totalPower : share;
-                        processGathering(colony, resinSources, power, GameConstants.RESOURCE_RESIN, foragers);
+                    int activeTypes = (canCollectPlants ? 1 : 0) + (canCollectWater ? 1 : 0)
+                            + (canCollectFungi ? 1 : 0) + (canCollectResin ? 1 : 0);
+                    if (activeTypes > 0) {
+                        int share = totalPower / activeTypes;
+                        int remainder = totalPower;
+                        if (canCollectPlants) {
+                            int gathered = processGathering(
+                                    colony,
+                                    plantSources,
+                                    share,
+                                    GameConstants.RESOURCE_PLANT,
+                                    foragerRadius,
+                                    foragers,
+                                    foragerCount);
+                            remainder = remainder - share + (share - gathered);
+                        }
+                        if (canCollectWater) {
+                            int power = activeTypes == 1 ? remainder : share;
+                            int gathered = processGathering(
+                                    colony,
+                                    waterSources,
+                                    power,
+                                    GameConstants.RESOURCE_WATER,
+                                    foragerRadius,
+                                    null,
+                                    0);
+                            remainder = remainder - power + (power - gathered);
+                        }
+                        if (canCollectFungi) {
+                            int power = (canCollectPlants || canCollectWater) ? share : remainder;
+                            processGathering(
+                                    colony,
+                                    fungiSources,
+                                    power,
+                                    GameConstants.RESOURCE_FUNGI,
+                                    foragerRadius,
+                                    null,
+                                    0);
+                        }
+                        if (canCollectResin) {
+                            int power = activeTypes == 1 ? totalPower : share;
+                            processGathering(
+                                    colony,
+                                    resinSources,
+                                    power,
+                                    GameConstants.RESOURCE_RESIN,
+                                    foragerRadius,
+                                    null,
+                                    0);
+                        }
                     }
                 }
             }
         }
-        
+
+        float soldierGatherRadius = locations.computeFullEfficiencyRadiusForAntType(
+                colony, GameConstants.TYPE_SOLDIER);
+
         // --- Hunters ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            List<Ant> hunters = getWorkingAnts(colony, GameConstants.ROLE_HUNTER);
-            if (!hunters.isEmpty()) {
-                int totalPower = (int) (hunters.size() * stats.getCollectingRate(colony));
+            int hunterCount = colony.getActiveRoleCount(GameConstants.ROLE_HUNTER);
+            if (hunterCount > 0) {
+                int totalPower = (int) (hunterCount * stats.getCollectingRate(colony));
                 List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_MEAT);
-                processGathering(colony, sources, totalPower, GameConstants.RESOURCE_MEAT, hunters);
+                processGathering(
+                        colony,
+                        sources,
+                        totalPower,
+                        GameConstants.RESOURCE_MEAT,
+                        soldierGatherRadius,
+                        null,
+                        0);
             }
         }
 
         // --- Miners ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
-            List<Ant> miners = getWorkingAnts(colony, GameConstants.ROLE_MINER);
-            if (!miners.isEmpty()) {
-                if (GameRandom.nextDouble() < GameNumbers.MINING_GATHER_SUCCESS_CHANCE) {
-                    int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
-                    List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);
-                    processGathering(colony, sources, totalPower, GameConstants.RESOURCE_ROCK, miners);
-                }
+            int minerCount = colony.getActiveRoleCount(GameConstants.ROLE_MINER);
+            if (minerCount > 0 && GameRandom.nextDouble() < GameNumbers.MINING_GATHER_SUCCESS_CHANCE) {
+                int totalPower = (int) (minerCount * stats.getCollectingRate(colony));
+                List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);
+                processGathering(
+                        colony,
+                        sources,
+                        totalPower,
+                        GameConstants.RESOURCE_ROCK,
+                        soldierGatherRadius,
+                        null,
+                        0);
             }
         }
 

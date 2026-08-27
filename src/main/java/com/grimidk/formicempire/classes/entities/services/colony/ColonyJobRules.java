@@ -41,26 +41,34 @@ public final class ColonyJobRules {
         applyHourlyRanching(colony);
     }
 
-    public static void runDailyLite(Colony colony, Temperature currentTemp) {
-        runDailyLite(colony, currentTemp, null, null);
-    }
-
-    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome) {
-        runDailyLite(colony, currentTemp, biome, null);
-    }
-
-    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
+    public static void runDailyLiteEssential(Colony colony, Temperature currentTemp) {
         colony.rankUp();
         applyDailyNursing(colony);
         applyDailyEating(colony);
         colony.getPopulationService().runHatching(colony);
         colony.getPopulationService().runAging(colony);
+    }
+
+    public static void runDailyLiteExtended(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
         applyDailyComposting(colony);
         applyDailyGraveKeeping(colony);
         applyDailyPolicing(colony);
         colony.getBugHandlingService().runDaily(colony, biome);
         colony.runScoutting(biome, currentHex);
         colony.getPopulationService().runContamination(colony);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
+        runDailyLiteEssential(colony, currentTemp);
+        runDailyLiteExtended(colony, currentTemp, biome, currentHex);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp) {
+        runDailyLite(colony, currentTemp, null, null);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome) {
+        runDailyLite(colony, currentTemp, biome, null);
     }
 
     public static void runMonthlyLite(Colony colony, Biome biome, Season season) {

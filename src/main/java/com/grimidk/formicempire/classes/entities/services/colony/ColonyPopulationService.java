@@ -210,6 +210,69 @@ public class ColonyPopulationService {
     }
     
     public void runEating(Colony colony, Temperature currentTemp) {
+        if (shouldUseAggregateEating(colony)) {
+            runEatingAggregate(colony, currentTemp);
+            return;
+        }
+        runEatingDetailed(colony, currentTemp);
+    }
+
+    static boolean shouldUseAggregateEating(Colony colony) {
+        return colony != null && colony.getAntTotal() > GameNumbers.EATING_AGGREGATE_ANT_THRESHOLD;
+    }
+
+    private void runEatingAggregate(Colony colony, Temperature currentTemp) {
+        ColonyStatsService stats = colony.getStatsService();
+        ColonyResourceService resources = colony.getResourceService();
+
+        int adultCount = countAdultAnts(colony);
+        int resistanceChance = stats.getThirstResistance(colony, currentTemp);
+        int waterNeeded = probabilisticRound(adultCount * (100.0 - resistanceChance) / 100.0);
+
+        double consumedWater = resources.consumeResource(colony, GameConstants.RESOURCE_WATER, waterNeeded);
+        double waterDeficit = waterNeeded - consumedWater;
+
+        if (waterDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+            double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, waterDeficit);
+            waterDeficit -= syrupConsumed;
+        }
+
+        int foodNeeded = colony.getTotalConsumption();
+        int parasiteCount = colony.getParasiteAnts();
+        if (parasiteCount > 0) {
+            foodNeeded += parasiteCount;
+        }
+
+        double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodNeeded);
+        double foodDeficit = foodNeeded - consumedFood;
+
+        if (foodDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+            double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
+            foodDeficit -= syrupConsumed;
+        }
+
+        List<Ant> doomedThirsty = List.of();
+        if (waterDeficit > 0) {
+            doomedThirsty = ColonyResourceDeathSelection.selectVictims(
+                    buildAdultCandidates(colony),
+                    (int) waterDeficit,
+                    null);
+        }
+
+        List<Ant> doomedHungry = List.of();
+        if (foodDeficit > 0) {
+            int approxAntsToKill = (int) (foodDeficit / Math.max(1, stats.getBaseConsumption(colony)));
+            doomedHungry = ColonyResourceDeathSelection.selectVictims(
+                    buildEaterCandidates(colony),
+                    approxAntsToKill,
+                    new HashSet<>(doomedThirsty));
+        }
+
+        processDeaths(colony, doomedThirsty, DeathCause.DEHYDRATION);
+        processDeaths(colony, doomedHungry, DeathCause.STARVATION);
+    }
+
+    private void runEatingDetailed(Colony colony, Temperature currentTemp) {
         ColonyStatsService stats = colony.getStatsService();
         ColonyResourceService resources = colony.getResourceService();
         
@@ -281,6 +344,58 @@ public class ColonyPopulationService {
 
         processDeaths(colony, doomedThirsty, DeathCause.DEHYDRATION);
         processDeaths(colony, doomedHungry, DeathCause.STARVATION);
+    }
+
+    private static int countAdultAnts(Colony colony) {
+        return listSize(colony.getWorkers())
+                + listSize(colony.getSoldiers())
+                + listSize(colony.getMajors())
+                + listSize(colony.getDrones())
+                + listSize(colony.getPrincesses())
+                + listSize(colony.getQueens());
+    }
+
+    private static List<Ant> buildAdultCandidates(Colony colony) {
+        List<Ant> candidates = new ArrayList<>();
+        appendLivingAnts(candidates, colony.getWorkers());
+        appendLivingAnts(candidates, colony.getSoldiers());
+        appendLivingAnts(candidates, colony.getMajors());
+        appendLivingAnts(candidates, colony.getDrones());
+        appendLivingAnts(candidates, colony.getPrincesses());
+        appendLivingAnts(candidates, colony.getQueens());
+        return candidates;
+    }
+
+    private static List<Ant> buildEaterCandidates(Colony colony) {
+        List<Ant> candidates = new ArrayList<>();
+        appendLivingAnts(candidates, colony.getWorkers());
+        appendLivingAnts(candidates, colony.getSoldiers());
+        appendLivingAnts(candidates, colony.getMajors());
+        appendLivingAnts(candidates, colony.getDrones());
+        appendLivingAnts(candidates, colony.getPrincesses());
+        appendLivingAnts(candidates, colony.getQueens());
+        appendLivingAnts(candidates, colony.getLarvae());
+        return candidates;
+    }
+
+    private static void appendLivingAnts(List<Ant> candidates, List<Ant> ants) {
+        if (ants == null || ants.isEmpty()) {
+            return;
+        }
+        for (Ant ant : ants) {
+            if (ant != null && ant.isAlive()) {
+                candidates.add(ant);
+            }
+        }
+    }
+
+    private static int listSize(List<Ant> ants) {
+        return ants != null ? ants.size() : 0;
+    }
+
+    private static int probabilisticRound(double value) {
+        int floor = (int) value;
+        return GameRandom.nextDouble() < (value - floor) ? floor + 1 : floor;
     }
 
     private void processDeaths(Colony colony, List<Ant> ants, String cause) {

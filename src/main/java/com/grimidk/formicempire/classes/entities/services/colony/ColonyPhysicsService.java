@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.entities.services.shared.ColonyAntAnimSampleLod;
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
@@ -18,6 +19,8 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -777,21 +780,42 @@ public class ColonyPhysicsService {
     }
 
     public void tickAntSpriteAnimMinutes(Colony colony) {
+        tickAntSpriteAnimMinutes(colony, null, null);
+    }
+
+    public void tickAntSpriteAnimMinutes(Colony colony, Dimension activeDimension, Rectangle viewportBounds) {
         if (colony == null) {
             return;
         }
+        boolean lodActive = ViewportPhysicsLod.isLodActive(viewportBounds);
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             AntType type = entry.getKey();
             if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA
                     || type == GameConstants.TYPE_PUPA || type == GameConstants.TYPE_DEAD) {
                 continue;
             }
+            ImageIcon spriteIcon = lodActive
+                    ? GameConstants.getAntSprite(type, colony.getSpecies())
+                    : null;
+            int spriteW = spriteIcon != null ? spriteIcon.getIconWidth() : 16;
+            int spriteH = spriteIcon != null ? spriteIcon.getIconHeight() : 16;
             List<Ant> ants = entry.getValue();
             synchronized (ants) {
                 for (Ant ant : ants) {
-                    if (ant.isAlive()) {
-                        ant.tickSpriteAnimMinute();
+                    if (!ant.isAlive()) {
+                        continue;
                     }
+                    if (lodActive) {
+                        if (activeDimension != null && ant.getDimension() != activeDimension) {
+                            continue;
+                        }
+                        if (!ant.hasOpenSpriteAnim()
+                                && !ViewportPhysicsLod.antIntersectsViewport(
+                                        viewportBounds, ant.getX(), ant.getY(), spriteW, spriteH)) {
+                            continue;
+                        }
+                    }
+                    ant.tickSpriteAnimMinute();
                 }
             }
         }
@@ -801,6 +825,8 @@ public class ColonyPhysicsService {
         if (colony == null || activeDimension == null || !ViewportPhysicsLod.isLodActive(viewportBounds)) {
             return;
         }
+        boolean sample = ColonyAntAnimSampleLod.isSampleActive(colony.getAntTotal());
+        Map<Long, List<Ant>> sampleBuckets = sample ? new HashMap<>() : null;
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             AntType type = entry.getKey();
             if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA
@@ -821,7 +847,24 @@ public class ColonyPhysicsService {
                             viewportBounds, ant.getX(), ant.getY(), spriteW, spriteH)) {
                         continue;
                     }
-                    ant.rollHourlySpriteAnim();
+                    if (sample) {
+                        long key = ColonyAntAnimSampleLod.hourlyAnimSampleKey(ant, type);
+                        sampleBuckets.computeIfAbsent(key, ignored -> new ArrayList<>()).add(ant);
+                    } else {
+                        ant.rollHourlySpriteAnim();
+                    }
+                }
+            }
+        }
+        if (sample && sampleBuckets != null) {
+            for (List<Ant> bucket : sampleBuckets.values()) {
+                if (bucket.isEmpty()) {
+                    continue;
+                }
+                Ant representative = bucket.get(0);
+                representative.rollHourlySpriteAnim();
+                for (int i = 1; i < bucket.size(); i++) {
+                    bucket.get(i).syncSpriteAnimFrom(representative);
                 }
             }
         }

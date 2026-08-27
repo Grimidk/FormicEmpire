@@ -479,6 +479,17 @@ public final class AntSubtypeService {
         return Math.max(1, Math.round(forageMult(ant)));
     }
 
+    public static int sumCollectingPowerFromRoleCount(Colony colony, int workerCount) {
+        if (colony == null || workerCount <= 0) {
+            return 0;
+        }
+        float baseRate = colony.getStatsService().getCollectingRate(colony);
+        if (baseRate <= 0f) {
+            return 0;
+        }
+        return Math.max(workerCount, Math.round(workerCount * baseRate));
+    }
+
     public static int sumCollectingPower(Colony colony, List<Ant> workers) {
         if (colony == null || workers == null || workers.isEmpty()) {
             return 0;

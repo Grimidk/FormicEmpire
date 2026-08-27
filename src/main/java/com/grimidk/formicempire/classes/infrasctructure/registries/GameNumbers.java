@@ -31,6 +31,15 @@ public final class GameNumbers {
     public static final int SPRITE_MERGE_POSITION_CELL_PX = SPRITE_MERGE_POSITION_TOLERANCE_PX * 2;
     public static final int SPRITE_MERGE_ZONE_THRESHOLD = 100;
     public static final double SPRITE_MERGE_ZONE_MIN_VISIBLE_FRACTION = 0.10;
+    public static final int COLLECTING_AGGREGATE_RESIN_WORKER_THRESHOLD = 100;
+    public static final int EATING_AGGREGATE_ANT_THRESHOLD = SPRITE_MERGE_ANT_THRESHOLD;
+    public static final int GUI_HOUR_MINIMAP_REFRESH_INTERVAL = 6;
+    public static final int GUI_HOUR_CONTROL_PANEL_REFRESH_INTERVAL = 6;
+    public static final int NPC_DAILY_STAGGER_DAYS = 7;
+
+    public static boolean runsNpcDailyWorkToday(int worldDay, int entityId) {
+        return Math.floorMod(worldDay, NPC_DAILY_STAGGER_DAYS) == Math.floorMod(entityId, NPC_DAILY_STAGGER_DAYS);
+    }
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;

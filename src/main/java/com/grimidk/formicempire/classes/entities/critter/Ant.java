@@ -289,6 +289,24 @@ public class Ant extends Critter {
         }
     }
 
+    public boolean hasOpenSpriteAnim() {
+        return jawOpenMinutesRemaining > 0
+                || wingOpenMinutesRemaining > 0
+                || antennaOpenMinutesRemaining > 0;
+    }
+
+    public void syncSpriteAnimFrom(Ant source) {
+        if (source == null) {
+            return;
+        }
+        jawFrame = source.jawFrame;
+        wingFrame = source.wingFrame;
+        antennaFrame = source.antennaFrame;
+        jawOpenMinutesRemaining = source.jawOpenMinutesRemaining;
+        wingOpenMinutesRemaining = source.wingOpenMinutesRemaining;
+        antennaOpenMinutesRemaining = source.antennaOpenMinutesRemaining;
+    }
+
     public void tickSpriteAnimMinute() {
         if (jawOpenMinutesRemaining > 0) {
             jawOpenMinutesRemaining--;

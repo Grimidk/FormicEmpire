@@ -1709,10 +1709,20 @@ public class World {
             }
         }
         
-        for (Hex h : this.hexes) {
-             if (GameRandom.nextInt(100) < 5) { 
-                 h.setLocalWeather(getRandomWeather(h.getBiome()));
-             }
+        for (Hex h : colonizedHexesForTicks()) {
+            maybeRandomizeHexWeather(h);
+            maybeRandomizeHexWeather(h.getNorth());
+            maybeRandomizeHexWeather(h.getNorthEast());
+            maybeRandomizeHexWeather(h.getSouthEast());
+            maybeRandomizeHexWeather(h.getSouth());
+            maybeRandomizeHexWeather(h.getSouthWest());
+            maybeRandomizeHexWeather(h.getNorthWest());
+        }
+    }
+
+    private void maybeRandomizeHexWeather(Hex hex) {
+        if (hex != null && GameRandom.nextInt(100) < 5) {
+            hex.setLocalWeather(getRandomWeather(hex.getBiome()));
         }
     }
 
@@ -1807,10 +1817,12 @@ public class World {
             long dynastyNanos = 0L;
             boolean timingDynasties = SimulationDiagnostics.isEnabled();
             for (Dynasty dynasty : this.dynastys) {
-                long dynastyStart = timingDynasties ? System.nanoTime() : 0L;
-                dynasty.runDailyJobs(this, engine != null ? engine.getTradeManager() : null);
-                if (timingDynasties) {
-                    dynastyNanos += System.nanoTime() - dynastyStart;
+                if (dynasty.isPlayer() || GameNumbers.runsNpcDailyWorkToday(this.day, dynasty.getId())) {
+                    long dynastyStart = timingDynasties ? System.nanoTime() : 0L;
+                    dynasty.runDailyJobs(this, engine != null ? engine.getTradeManager() : null);
+                    if (timingDynasties) {
+                        dynastyNanos += System.nanoTime() - dynastyStart;
+                    }
                 }
             }
             SimulationDiagnostics.record(Scope.DYNASTY_DAILY_TOTAL, dynastyNanos);
