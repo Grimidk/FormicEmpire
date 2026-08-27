@@ -4,8 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -39,10 +37,20 @@ public final class AntSpriteCompositor {
     private static final int DEFAULT_WING_FRAME = 1;
     private static final int DEFAULT_ANTENNA_FRAME = 1;
 
-    private static final Map<String, ImageIcon> COMPOSITE_CACHE = new ConcurrentHashMap<>();
-    private static final Map<String, BufferedImage> LAYER_CACHE = new ConcurrentHashMap<>();
+    private static final LruCache<String, ImageIcon> COMPOSITE_CACHE =
+            new LruCache<>(GameNumbers.SPRITE_COMPOSITE_CACHE_MAX_ENTRIES);
+    private static final LruCache<String, BufferedImage> LAYER_CACHE =
+            new LruCache<>(GameNumbers.SPRITE_LAYER_CACHE_MAX_ENTRIES);
 
     private AntSpriteCompositor() {
+    }
+
+    public static int compositeCacheSize() {
+        return COMPOSITE_CACHE.size();
+    }
+
+    public static int layerCacheSize() {
+        return LAYER_CACHE.size();
     }
 
     public static ImageIcon getSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
@@ -87,7 +95,7 @@ public final class AntSpriteCompositor {
         String cacheKey = species.getId() + "|" + type.getId() + "|" + safeProfile.getCode()
                 + "|L" + safeLeg + "|J" + safeJaw + "|W" + safeWing + "|A" + safeAntenna
                 + "|M" + (parasiticMites ? 1 : 0);
-        return COMPOSITE_CACHE.computeIfAbsent(cacheKey,
+        return COMPOSITE_CACHE.get(cacheKey,
                 k -> buildIcon(type, species, safeProfile, safeLeg, safeJaw, safeWing, safeAntenna, parasiticMites));
     }
 
@@ -114,7 +122,7 @@ public final class AntSpriteCompositor {
         if (composed == null) {
             return null;
         }
-        return new ImageIcon(composed);
+        return new ImageIcon(CompatibleImages.copyToCompatible(composed));
     }
 
     private static BufferedImage compose(
@@ -257,11 +265,11 @@ public final class AntSpriteCompositor {
     }
 
     private static BufferedImage loadLayer(String relativePath) {
-        return LAYER_CACHE.computeIfAbsent(SHARED_ROOT + relativePath, AntSpriteCompositor::readLayer);
+        return LAYER_CACHE.get(SHARED_ROOT + relativePath, AntSpriteCompositor::readLayer);
     }
 
     private static BufferedImage loadAbsoluteLayer(String classpathPath) {
-        return LAYER_CACHE.computeIfAbsent(classpathPath, AntSpriteCompositor::readLayer);
+        return LAYER_CACHE.get(classpathPath, AntSpriteCompositor::readLayer);
     }
 
     private static BufferedImage readLayer(String path) {

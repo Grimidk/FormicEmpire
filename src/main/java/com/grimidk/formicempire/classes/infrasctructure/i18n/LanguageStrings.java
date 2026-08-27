@@ -1505,6 +1505,9 @@ public final class LanguageStrings {
     
     public static final String SETTINGS_FUZZ_PARASITE_ANTS = "SETTINGS_FUZZ_PARASITE_ANTS";
     public static final String SETTINGS_SHOW_AUDIT_MENU = "SETTINGS_SHOW_AUDIT_MENU";
+    public static final String SETTINGS_SHOW_FPS_COUNTER = "SETTINGS_SHOW_FPS_COUNTER";
+    public static final String SETTINGS_FPS_OVERLAY = "SETTINGS_FPS_OVERLAY";
+    public static final String SETTINGS_FPS_OVERLAY_WAITING = "SETTINGS_FPS_OVERLAY_WAITING";
     public static final String SETTINGS_OVERWORLD_AUTO_RECENTER = "SETTINGS_OVERWORLD_AUTO_RECENTER";
     public static final String SETTINGS_DARK_MODE = "SETTINGS_DARK_MODE";
     public static final String SETTINGS_FRAME_RATE = "SETTINGS_FRAME_RATE";
@@ -1531,6 +1534,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_OVERWORLD_AUTO_RECENTER_TT = "SETTINGS_OVERWORLD_AUTO_RECENTER_TT";
     public static final String SETTINGS_FUZZ_PARASITE_ANTS_TT = "SETTINGS_FUZZ_PARASITE_ANTS_TT";
     public static final String SETTINGS_SHOW_AUDIT_MENU_TT = "SETTINGS_SHOW_AUDIT_MENU_TT";
+    public static final String SETTINGS_SHOW_FPS_COUNTER_TT = "SETTINGS_SHOW_FPS_COUNTER_TT";
     public static final String SETTINGS_FREE_ABILITIES_TT = "SETTINGS_FREE_ABILITIES_TT";
     public static final String SETTINGS_INFINITE_RESEARCH_TT = "SETTINGS_INFINITE_RESEARCH_TT";
     public static final String SETTINGS_INSTANT_BUILDINGS_TT = "SETTINGS_INSTANT_BUILDINGS_TT";

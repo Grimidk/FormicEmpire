@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 public class Ant extends Critter {
+    private final Colony homeColony;
     private AntType type;
     private AntRole role;
     private AntSubtypeProfile subtypeProfile;
@@ -39,7 +40,8 @@ public class Ant extends Critter {
     private int antennaOpenMinutesRemaining;
 
     public Ant(Colony colony, AntType type) {
-        super(GameConstants.TYPE_ANT); 
+        super(GameConstants.TYPE_ANT);
+        this.homeColony = colony;
         
         this.type = type;
         this.role = null;
@@ -75,7 +77,18 @@ public class Ant extends Critter {
     public void setAntType(AntType type) { this.type = type; }
 
     public AntRole getRole() { return role; }
-    public void setRole(AntRole role) { this.role = role; }
+    public void setRole(AntRole role) {
+        if (this.role != role) {
+            this.role = role;
+            if (homeColony != null) {
+                homeColony.invalidateActiveRoleCountCache();
+            }
+        }
+    }
+
+    public Colony getHomeColony() {
+        return homeColony;
+    }
 
     public AntSubtypeProfile getSubtypeProfile() { return subtypeProfile; }
     public void setSubtypeProfile(AntSubtypeProfile subtypeProfile) {
@@ -97,7 +110,14 @@ public class Ant extends Critter {
     public String getCauseOfDeath() { return causeOfDeath; }
 
     public boolean isOnTrade() { return isOnTrade; }
-    public void setOnTrade(boolean onTrade) { this.isOnTrade = onTrade; }
+    public void setOnTrade(boolean onTrade) {
+        if (this.isOnTrade != onTrade) {
+            this.isOnTrade = onTrade;
+            if (homeColony != null) {
+                homeColony.invalidateActiveRoleCountCache();
+            }
+        }
+    }
 
     public boolean isNuptial() { return isNuptial; }
     public void setNuptial(boolean isNuptial) {
@@ -170,12 +190,16 @@ public class Ant extends Critter {
     }
 
     public void goDie(Colony colony, String reason) {
-        this.type = GameConstants.TYPE_DEAD; 
+        this.type = GameConstants.TYPE_DEAD;
         this.causeOfDeath = reason;
-        
-        this.clearLoad();        
+
+        this.clearLoad();
         this.clearRoute();
         this.parasiticMiteInfected = false;
+        Colony owner = colony != null ? colony : homeColony;
+        if (owner != null) {
+            owner.invalidateActiveRoleCountCache();
+        }
         super.goDie();
     }
 

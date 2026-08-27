@@ -5,12 +5,16 @@ import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics.Counter;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics.Scope;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +44,11 @@ public class MenuChaoticPanel extends JPanel {
     private boolean active;
     private int frameIntervalMs = MenuChaoticCatalog.ANIMATION_FRAME_MS;
     private long lastTickNanos;
+    private BufferedImage cachedBackground;
+    private int cachedBackgroundW;
+    private int cachedBackgroundH;
+    private int cachedBackgroundScenarioKey = -1;
+    private Runnable framePaintListener;
 
     public MenuChaoticPanel() {
         setOpaque(true);
@@ -73,6 +82,10 @@ public class MenuChaoticPanel extends JPanel {
         }
     }
 
+    public void setFramePaintListener(Runnable framePaintListener) {
+        this.framePaintListener = framePaintListener;
+    }
+
     private void reshufflePlayOrder(Random random) {
         playOrder.clear();
         for (int i = 0; i < worlds.size(); i++) {
@@ -97,40 +110,117 @@ public class MenuChaoticPanel extends JPanel {
             animationTimer.stop();
             animationTimer = null;
         }
+        invalidateBackgroundCache();
+    }
+
+    private void invalidateBackgroundCache() {
+        cachedBackground = null;
+        cachedBackgroundScenarioKey = -1;
+    }
+
+    private int backgroundScenarioKey() {
+        if (playOrder.isEmpty() || playOrderIndex < 0 || playOrderIndex >= playOrder.size()) {
+            return -1;
+        }
+        return playOrder.get(playOrderIndex);
+    }
+
+    private void ensureBackgroundCache(int fieldW, int fieldH, MenuChaoticWorld world) {
+        if (world.getKind() == MenuChaoticKind.CONVOY) {
+            return;
+        }
+        int scenarioKey = backgroundScenarioKey();
+        if (cachedBackground != null && cachedBackgroundW == fieldW && cachedBackgroundH == fieldH
+                && cachedBackgroundScenarioKey == scenarioKey) {
+            return;
+        }
+        cachedBackground = new BufferedImage(fieldW, fieldH, BufferedImage.TYPE_INT_RGB);
+        Graphics2D bg = cachedBackground.createGraphics();
+        bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        bg.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+        switch (world.getKind()) {
+            case OVERWORLD -> drawFullBiomeField(bg, 0, 0, fieldW, fieldH, world.getPrimaryBiome());
+            case COLONY -> drawFullBiomeField(bg, 0, 0, fieldW, fieldH, world.getPrimaryBiome());
+            case BATTLE -> {
+                int contactLineX = Math.round(fieldW * world.getContactLineRatio());
+                drawBattlefieldBiomes(bg, 0, 0, fieldW, fieldH, contactLineX,
+                        world.getPrimaryBiome(), world.getSecondaryBiome());
+            }
+            default -> {
+            }
+        }
+        bg.dispose();
+        cachedBackgroundW = fieldW;
+        cachedBackgroundH = fieldH;
+        cachedBackgroundScenarioKey = scenarioKey;
+    }
+
+    private void blitBackground(Graphics2D g2d, int fieldW, int fieldH, MenuChaoticWorld world) {
+        if (world.getKind() == MenuChaoticKind.CONVOY) {
+            return;
+        }
+        ensureBackgroundCache(fieldW, fieldH, world);
+        if (cachedBackground != null) {
+            g2d.drawImage(cachedBackground, 0, 0, null);
+        }
     }
 
     private void tick() {
         if (!active || !isShowing() || worlds.isEmpty() || playOrder.isEmpty()) {
             return;
         }
-        long now = System.nanoTime();
-        float delta = (now - lastTickNanos) / 1_000_000_000f;
-        lastTickNanos = now;
-        if (delta <= 0f || delta > 0.25f) {
-            delta = frameIntervalMs / 1000f;
-        }
-        animationSeconds += delta;
-        if (animationSeconds > 10_000f) {
-            animationSeconds = 0f;
-        }
-        scenarioElapsedMs += Math.max(1, Math.round(delta * 1000f));
-        if (scenarioElapsedMs >= MenuChaoticCatalog.SCENARIO_DURATION_MS) {
-            scenarioElapsedMs = 0;
-            playOrderIndex++;
-            if (playOrderIndex >= playOrder.size()) {
-                playOrderIndex = 0;
-                reshufflePlayOrder(new Random(System.nanoTime()));
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.MENU_CHAOTIC_TICK)) {
+            long now = System.nanoTime();
+            float delta = (now - lastTickNanos) / 1_000_000_000f;
+            lastTickNanos = now;
+            if (delta <= 0f || delta > 0.25f) {
+                delta = frameIntervalMs / 1000f;
             }
-            prepareCurrentScenario(new Random(System.nanoTime()));
+            animationSeconds += delta;
+            if (animationSeconds > 10_000f) {
+                animationSeconds = 0f;
+            }
+            scenarioElapsedMs += Math.max(1, Math.round(delta * 1000f));
+            if (scenarioElapsedMs >= MenuChaoticCatalog.SCENARIO_DURATION_MS) {
+                scenarioElapsedMs = 0;
+                playOrderIndex++;
+                if (playOrderIndex >= playOrder.size()) {
+                    playOrderIndex = 0;
+                    reshufflePlayOrder(new Random(System.nanoTime()));
+                }
+                prepareCurrentScenario(new Random(System.nanoTime()));
+            }
+            advanceSimulation(delta);
+            repaint();
+            if (framePaintListener != null) {
+                framePaintListener.run();
+            }
         }
-        currentWorld().update(delta, getWidth(), getHeight());
-        repaint();
+    }
+
+    void advanceSimulationForDiagnostics(float deltaSeconds, int fieldW, int fieldH) {
+        if (!active || worlds.isEmpty() || playOrder.isEmpty()) {
+            return;
+        }
+        animationSeconds += deltaSeconds;
+        advanceSimulation(deltaSeconds, fieldW, fieldH);
+    }
+
+    private void advanceSimulation(float deltaSeconds) {
+        advanceSimulation(deltaSeconds, getWidth(), getHeight());
+    }
+
+    private void advanceSimulation(float deltaSeconds, int fieldW, int fieldH) {
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.MENU_CHAOTIC_UPDATE)) {
+            currentWorld().update(deltaSeconds, fieldW, fieldH);
+        }
     }
 
     private void prepareCurrentScenario(Random random) {
         if (playOrder.isEmpty() || playOrderIndex < 0 || playOrderIndex >= playOrder.size()) {
             return;
         }
+        invalidateBackgroundCache();
         MenuChaoticWorld world = currentWorld();
         if (world.getKind() == MenuChaoticKind.CONVOY) {
             world.randomizeConvoyTravelDirection(random);
@@ -149,12 +239,14 @@ public class MenuChaoticPanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (!active || worlds.isEmpty() || playOrder.isEmpty()) {
-            return;
-        }
-        MenuChaoticWorld world = currentWorld();
-        Graphics2D g2d = (Graphics2D) g.create();
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.MENU_CHAOTIC_PAINT)) {
+            super.paintComponent(g);
+            if (!active || worlds.isEmpty() || playOrder.isEmpty()) {
+                return;
+            }
+            MenuChaoticWorld world = currentWorld();
+            SimulationDiagnostics.addCounter(Counter.MENU_CHAOTIC_ANTS_PAINTED, world.getAnts().size());
+            Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 
@@ -175,6 +267,7 @@ public class MenuChaoticPanel extends JPanel {
         g2d.setColor(MENU_DIM);
         g2d.fillRect(0, 0, fieldW, fieldH);
         g2d.dispose();
+        }
     }
 
     private float quantizedAnimSeconds() {
@@ -182,7 +275,7 @@ public class MenuChaoticPanel extends JPanel {
     }
 
     private void paintOverworld(Graphics2D g2d, MenuChaoticWorld world, int fieldW, int fieldH) {
-        drawFullBiomeField(g2d, 0, 0, fieldW, fieldH, world.getPrimaryBiome());
+        blitBackground(g2d, fieldW, fieldH, world);
         for (MenuChaoticWorld.ShowcaseCritter critter : world.getCritters()) {
             drawCritter(g2d, critter, fieldW, fieldH);
         }
@@ -192,7 +285,7 @@ public class MenuChaoticPanel extends JPanel {
     }
 
     private void paintColony(Graphics2D g2d, MenuChaoticWorld world, int fieldW, int fieldH) {
-        drawFullBiomeField(g2d, 0, 0, fieldW, fieldH, world.getPrimaryBiome());
+        blitBackground(g2d, fieldW, fieldH, world);
         int entranceX = Math.round(MenuChaoticWorld.colonyEntranceXNorm() * fieldW);
         int entranceY = Math.round(MenuChaoticWorld.colonyEntranceYNorm() * fieldH);
         if (antHillImage != null) {
@@ -208,9 +301,8 @@ public class MenuChaoticPanel extends JPanel {
     }
 
     private void paintBattle(Graphics2D g2d, MenuChaoticWorld world, int fieldW, int fieldH) {
+        blitBackground(g2d, fieldW, fieldH, world);
         int contactLineX = Math.round(fieldW * world.getContactLineRatio());
-        drawBattlefieldBiomes(g2d, 0, 0, fieldW, fieldH, fieldW / 2,
-                world.getPrimaryBiome(), world.getSecondaryBiome());
         Rectangle field = new Rectangle(0, 0, fieldW, fieldH);
         drawBattleColumn(g2d, world.getAnts(), field, contactLineX, true);
         drawBattleColumn(g2d, world.getAnts(), field, contactLineX, false);

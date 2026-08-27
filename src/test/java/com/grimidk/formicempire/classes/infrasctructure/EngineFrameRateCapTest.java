@@ -15,6 +15,13 @@ class EngineFrameRateCapTest {
     }
 
     @Test
+    void sixtyHertzUsesSixteenMsVisualInterval() {
+        engine.setFrameRateCap(60);
+        assertEquals(60, engine.getFrameRateCap());
+        assertEquals(16, engine.getVisualFrameIntervalMs());
+    }
+
+    @Test
     void uncappedMeansOneMsVisualInterval() {
         engine.setFrameRateCap(0);
         assertEquals(0, engine.getFrameRateCap());

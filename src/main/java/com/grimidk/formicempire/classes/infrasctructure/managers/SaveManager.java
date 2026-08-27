@@ -1892,6 +1892,7 @@ public class SaveManager {
             writeJsonLine(w, "disablePopups", engine.isDisablePopups(), false);
             writeJsonLine(w, "fuzzParasiteAnts", engine.isFuzzParasiteAnts(), false);
             writeJsonLine(w, "showAuditMenu", engine.isShowAuditMenu(), false);
+            writeJsonLine(w, "showFpsCounter", engine.isShowFpsCounter(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
             writeJsonLine(w, "darkMode", engine.isDarkMode(), false);
             writeJsonLine(w, "frameRateCap", engine.getFrameRateCap(), false);
@@ -2007,6 +2008,8 @@ public class SaveManager {
                     m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasiteAnts())))));
             engine.setShowAuditMenu(Boolean.parseBoolean(m.getOrDefault("showAuditMenu",
                     String.valueOf(engine.isShowAuditMenu()))));
+            engine.setShowFpsCounter(Boolean.parseBoolean(m.getOrDefault("showFpsCounter",
+                    String.valueOf(engine.isShowFpsCounter()))));
             engine.setOverworldAutoRecenter(Boolean.parseBoolean(m.getOrDefault("overworldAutoRecenter",
                     String.valueOf(engine.isOverworldAutoRecenter()))));
             engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));

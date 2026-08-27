@@ -28,6 +28,9 @@ import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics.Counter;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics.Scope;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
@@ -72,6 +75,8 @@ public class World {
     private int temperature;
     private int humidity;
     private ArrayList<Hex> hexes;
+    private ArrayList<Hex> colonizedHexes;
+    private boolean colonizedHexesDirty = true;
     private List<Dynasty> dynastys;
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
@@ -97,6 +102,8 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
+        this.colonizedHexes = new ArrayList<>();
+        this.colonizedHexesDirty = true;
         this.dynastys = new ArrayList<>();
         this.timeOfDay = GameConstants.TIME_DAWN;
         this.moonPhase = GameConstants.PHASE_NEW_MOON;
@@ -262,8 +269,33 @@ public class World {
         return hexes;
     }
 
+    public void markColonizedHexIndexDirty() {
+        colonizedHexesDirty = true;
+    }
+
+    private void rebuildColonizedHexIndexIfNeeded() {
+        if (!colonizedHexesDirty) {
+            return;
+        }
+        colonizedHexes.clear();
+        if (hexes != null) {
+            for (Hex hex : hexes) {
+                if (hex != null && hex.getColony() != null) {
+                    colonizedHexes.add(hex);
+                }
+            }
+        }
+        colonizedHexesDirty = false;
+    }
+
+    private ArrayList<Hex> colonizedHexesForTicks() {
+        rebuildColonizedHexIndexIfNeeded();
+        return colonizedHexes;
+    }
+
     public void setHexes(ArrayList<Hex> hexes) {
         this.hexes = hexes;
+        markColonizedHexIndexDirty();
     }
 
     public Hex getHexOfColony(Colony colony) {
@@ -590,6 +622,7 @@ public class World {
                     WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
         }
 
+        markColonizedHexIndexDirty();
         bindDynastyTradeServices();
         System.out.println("[World] Landmasses: " + this.continentCount + " continent(s), "
                 + this.islandCount + " island(s).");
@@ -1574,6 +1607,7 @@ public class World {
         DynastySynergyService.refreshAll(this.dynastys);
 
         reapplyRoleAssignmentsAfterLoad();
+        markColonizedHexIndexDirty();
         bindDynastyTradeServices();
         ColonyMilitaryService.refreshAllMilitaryPower(this.dynastys);
         if (savefile.getWars() != null) {
@@ -1683,134 +1717,182 @@ public class World {
     }
 
     public void runMinute() {
-        this.minute++;
-        
-        for (Hex hex : this.hexes) {
-            if (hex.getColony() != null) {
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.WORLD_MINUTE)) {
+            this.minute++;
+
+            int hexCount = colonizedHexesForTicks().size();
+            SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_MINUTE, hexCount);
+
+            long colonyNanos = 0L;
+            int colonies = 0;
+            boolean timingColonies = SimulationDiagnostics.isEnabled();
+            for (Hex hex : colonizedHexesForTicks()) {
+                colonies++;
+                long colonyStart = timingColonies ? System.nanoTime() : 0L;
                 hex.getColony().runMinutelyJobs();
+                if (timingColonies) {
+                    colonyNanos += System.nanoTime() - colonyStart;
+                }
             }
-        }
-        
-        if (this.minute > 59) {
-            this.minute = 0;
-            this.runHour();
+            SimulationDiagnostics.addCounter(Counter.COLONIES_MINUTE, colonies);
+            SimulationDiagnostics.record(Scope.COLONY_MINUTELY_TOTAL, colonyNanos);
+
+            if (this.minute > 59) {
+                this.minute = 0;
+                this.runHour();
+            }
         }
     }
 
     public void runHour() {
-        this.hour++;
-        
-        for (Hex hex : this.hexes) {
-            if (hex.getColony() != null) {
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.WORLD_HOUR)) {
+            this.hour++;
+
+            int hexCount = colonizedHexesForTicks().size();
+            SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_HOUR, hexCount);
+
+            long colonyNanos = 0L;
+            int colonies = 0;
+            boolean timingColonies = SimulationDiagnostics.isEnabled();
+            for (Hex hex : colonizedHexesForTicks()) {
+                colonies++;
+                long colonyStart = timingColonies ? System.nanoTime() : 0L;
                 hex.getColony().runHourlyJobs(hex.getBiome(), this.engine);
+                if (timingColonies) {
+                    colonyNanos += System.nanoTime() - colonyStart;
+                }
             }
-        }
+            SimulationDiagnostics.addCounter(Counter.COLONIES_HOUR, colonies);
+            SimulationDiagnostics.record(Scope.COLONY_HOURLY_TOTAL, colonyNanos);
 
-        boolean isEclipse = (this.timeOfDay == GameConstants.TIME_SOLAR_ECLIPSE || 
-                             this.timeOfDay == GameConstants.TIME_LUNAR_ECLIPSE);
+            boolean isEclipse = (this.timeOfDay == GameConstants.TIME_SOLAR_ECLIPSE ||
+                                 this.timeOfDay == GameConstants.TIME_LUNAR_ECLIPSE);
 
-        if (!isEclipse) {
-            if (this.hour >= 0 && this.hour < 5) {
-                this.setTimeOfDay(GameConstants.TIME_NIGHT);
-            } else if (this.hour >= 5 && this.hour < 7) {
-                this.setTimeOfDay(GameConstants.TIME_DAWN);
-            } else if (this.hour >= 7 && this.hour < 18) {
-                this.setTimeOfDay(GameConstants.TIME_DAY);
-            } else if (this.hour >= 18 && this.hour < 20) {
-                this.setTimeOfDay(GameConstants.TIME_DUSK);
-            } else if (this.hour >= 20 && this.hour <= 23) {
-                this.setTimeOfDay(GameConstants.TIME_NIGHT);
+            if (!isEclipse) {
+                if (this.hour >= 0 && this.hour < 5) {
+                    this.setTimeOfDay(GameConstants.TIME_NIGHT);
+                } else if (this.hour >= 5 && this.hour < 7) {
+                    this.setTimeOfDay(GameConstants.TIME_DAWN);
+                } else if (this.hour >= 7 && this.hour < 18) {
+                    this.setTimeOfDay(GameConstants.TIME_DAY);
+                } else if (this.hour >= 18 && this.hour < 20) {
+                    this.setTimeOfDay(GameConstants.TIME_DUSK);
+                } else if (this.hour >= 20 && this.hour <= 23) {
+                    this.setTimeOfDay(GameConstants.TIME_NIGHT);
+                }
             }
-        }
-        
-        updateEnvironmentalConditions();
 
-        if (engine != null) {
-            engine.notifyHourListeners();
-        }
+            updateEnvironmentalConditions();
 
-        warService.tickWarProgressHourly();
+            if (engine != null) {
+                engine.notifyHourListeners();
+            }
 
-        if (this.hour > 23) {
-            this.hour = 0;
-            this.runDay();
+            warService.tickWarProgressHourly();
+
+            if (this.hour > 23) {
+                this.hour = 0;
+                this.runDay();
+            }
         }
     }
 
     public void runDay() {
-        this.day++;
-        
-        for (Dynasty dynasty : this.dynastys) {
-            dynasty.runDailyJobs(this, engine != null ? engine.getTradeManager() : null);
-        }
-        
-        for (Hex hex : this.hexes) {
-            if (hex.getColony() != null) {
-                Colony colony = hex.getColony();
-                colony.runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
-                tryQueenRecoveryNuptial(this, colony, hex);
-            }
-        }
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.WORLD_DAY)) {
+            this.day++;
 
-        for (Dynasty dynasty : this.dynastys) {
-            ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
-        }
+            int dynastyCount = this.dynastys != null ? this.dynastys.size() : 0;
+            SimulationDiagnostics.addCounter(Counter.DYNASTIES_DAY, dynastyCount);
 
-        warService.tickWarProgressDaily();
-        DynastyIntegrationService.tickIntegrationsDaily(this, engine != null ? engine.getTradeManager() : null);
-        
-        // --- Process Dynasty/Colony Deaths ---
-        DYNASTY_DEATH_SERVICE.processDynastyDeaths(this);
-
-        randomizeWeather();
-
-        if (GameRandom.nextInt(1000) == 0) {
-            if (GameRandom.nextBoolean()) {
-                this.setTimeOfDay(GameConstants.TIME_SOLAR_ECLIPSE);
-            } else {
-                this.setTimeOfDay(GameConstants.TIME_LUNAR_ECLIPSE);
-            }
-            
-            for (Hex hex : this.hexes) {
-                Colony colony = hex.getColony();
-                if (colonyHasActiveDynasty(colony)) {
-                    colony.getLabourService().runNuptial(colony, this, hex);
-                    colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
-                        + LanguageStrings.get(LanguageStrings.EVENT_ECLIPSE_NUPTIAL));
+            long dynastyNanos = 0L;
+            boolean timingDynasties = SimulationDiagnostics.isEnabled();
+            for (Dynasty dynasty : this.dynastys) {
+                long dynastyStart = timingDynasties ? System.nanoTime() : 0L;
+                dynasty.runDailyJobs(this, engine != null ? engine.getTradeManager() : null);
+                if (timingDynasties) {
+                    dynastyNanos += System.nanoTime() - dynastyStart;
                 }
             }
-            
-        } else {
-            this.setTimeOfDay(GameConstants.TIME_NIGHT);
-        }
+            SimulationDiagnostics.record(Scope.DYNASTY_DAILY_TOTAL, dynastyNanos);
 
-        if (this.day >= 1 && this.day < 2) {
-            this.moonPhase = GameConstants.PHASE_NEW_MOON;
-        } else if (this.day >= 2 && this.day < 8) {
-            this.moonPhase = GameConstants.PHASE_WAXING_CRESCENT;
-        } else if (this.day >= 8 && this.day < 9) {
-            this.moonPhase = GameConstants.PHASE_FIRST_QUARTER;
-        } else if (this.day >= 9 && this.day < 15) {
-            this.moonPhase = GameConstants.PHASE_WAXING_GIBBOUS;
-        } else if (this.day >= 15 && this.day < 16) {
-            this.moonPhase = GameConstants.PHASE_FULL_MOON;
-        } else if (this.day >= 16 && this.day < 22) {
-            this.moonPhase = GameConstants.PHASE_WANING_GIBBOUS;
-        } else if (this.day >= 22 && this.day < 23) {
-            this.moonPhase = GameConstants.PHASE_LAST_QUARTER;
-        } else if (this.day >= 23 && this.day < 30) {
-            this.moonPhase = GameConstants.PHASE_WANING_CRESCENT;
-        } else {
-            this.moonPhase = GameConstants.PHASE_NEW_MOON;
-        }
+            int hexCount = colonizedHexesForTicks().size();
+            SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_DAY, hexCount);
 
-        if (engine != null) {
-            engine.notifyDayListeners();
-        }
+            long colonyNanos = 0L;
+            int colonies = 0;
+            boolean timingColonies = SimulationDiagnostics.isEnabled();
+            for (Hex hex : colonizedHexesForTicks()) {
+                colonies++;
+                Colony colony = hex.getColony();
+                long colonyStart = timingColonies ? System.nanoTime() : 0L;
+                colony.runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
+                tryQueenRecoveryNuptial(this, colony, hex);
+                if (timingColonies) {
+                    colonyNanos += System.nanoTime() - colonyStart;
+                }
+            }
+            SimulationDiagnostics.addCounter(Counter.COLONIES_DAY, colonies);
+            SimulationDiagnostics.record(Scope.COLONY_DAILY_TOTAL, colonyNanos);
 
-        if (this.day > 30) {
-            this.day = 1;
-            this.runMonth();
+            for (Dynasty dynasty : this.dynastys) {
+                ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
+            }
+
+            warService.tickWarProgressDaily();
+            DynastyIntegrationService.tickIntegrationsDaily(this, engine != null ? engine.getTradeManager() : null);
+
+            DYNASTY_DEATH_SERVICE.processDynastyDeaths(this);
+
+            randomizeWeather();
+
+            if (GameRandom.nextInt(1000) == 0) {
+                if (GameRandom.nextBoolean()) {
+                    this.setTimeOfDay(GameConstants.TIME_SOLAR_ECLIPSE);
+                } else {
+                    this.setTimeOfDay(GameConstants.TIME_LUNAR_ECLIPSE);
+                }
+
+                for (Hex hex : this.hexes) {
+                    Colony colony = hex.getColony();
+                    if (colonyHasActiveDynasty(colony)) {
+                        colony.getLabourService().runNuptial(colony, this, hex);
+                        colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
+                            + LanguageStrings.get(LanguageStrings.EVENT_ECLIPSE_NUPTIAL));
+                    }
+                }
+
+            } else {
+                this.setTimeOfDay(GameConstants.TIME_NIGHT);
+            }
+
+            if (this.day >= 1 && this.day < 2) {
+                this.moonPhase = GameConstants.PHASE_NEW_MOON;
+            } else if (this.day >= 2 && this.day < 8) {
+                this.moonPhase = GameConstants.PHASE_WAXING_CRESCENT;
+            } else if (this.day >= 8 && this.day < 9) {
+                this.moonPhase = GameConstants.PHASE_FIRST_QUARTER;
+            } else if (this.day >= 9 && this.day < 15) {
+                this.moonPhase = GameConstants.PHASE_WAXING_GIBBOUS;
+            } else if (this.day >= 15 && this.day < 16) {
+                this.moonPhase = GameConstants.PHASE_FULL_MOON;
+            } else if (this.day >= 16 && this.day < 22) {
+                this.moonPhase = GameConstants.PHASE_WANING_GIBBOUS;
+            } else if (this.day >= 22 && this.day < 23) {
+                this.moonPhase = GameConstants.PHASE_LAST_QUARTER;
+            } else if (this.day >= 23 && this.day < 30) {
+                this.moonPhase = GameConstants.PHASE_WANING_CRESCENT;
+            } else {
+                this.moonPhase = GameConstants.PHASE_NEW_MOON;
+            }
+
+            if (engine != null) {
+                engine.notifyDayListeners();
+            }
+
+            if (this.day > 30) {
+                this.day = 1;
+                this.runMonth();
+            }
         }
     }
 
@@ -1818,7 +1900,7 @@ public class World {
         this.month++;
         Season monthSeason = GameConstants.seasonForMonth(this.month);
 
-        for (Hex hex : this.hexes) {
+        for (Hex hex : colonizedHexesForTicks()) {
             Colony colony = hex.getColony();
             if (colonyHasActiveDynasty(colony)) {
                 colony.runMonthlyJobs(monthSeason, hex.getBiome());

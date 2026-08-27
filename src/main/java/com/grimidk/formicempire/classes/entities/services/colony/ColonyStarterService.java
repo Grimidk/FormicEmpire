@@ -149,7 +149,11 @@ public class ColonyStarterService {
         if (colony.getDeadAnts() != null) colony.getDeadAnts().clear();
         if (colony.getCritters() != null) colony.getCritters().clear();
 
+        World world = colony.getDynasty() != null ? colony.getDynasty().getOwningWorld() : null;
         hex.setColony(null);
+        if (world != null) {
+            world.markColonizedHexIndexDirty();
+        }
     }
 
     public static boolean isReclaimableDeadColony(Colony colony) {
@@ -187,6 +191,7 @@ public class ColonyStarterService {
         colony.setRank(GameConstants.RANK_COLONY);
         initializeNewColony(colony);
         hex.setColony(colony);
+        world.markColonizedHexIndexDirty();
         if (world.getHistoryService() != null) {
             world.getHistoryService().record(
                     WorldHistoryEventType.COLONY_FOUNDED,

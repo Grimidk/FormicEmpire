@@ -17,6 +17,8 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics.Scope;
 
 public class Engine extends Thread {
     private World world;
@@ -63,9 +65,10 @@ public class Engine extends Thread {
     
     private boolean fuzzParasiteAnts = true;
     private boolean showAuditMenu = false;
+    private boolean showFpsCounter = false;
     private boolean overworldAutoRecenter = true;
     private boolean darkMode = false;
-    private int frameRateCap = 0;
+    private int frameRateCap = 60;
     private boolean freeAbilities = false;
     private boolean infiniteResearch = false;
     private boolean instantBuildings = false;
@@ -250,13 +253,31 @@ public class Engine extends Thread {
         if (r != null) minuteTickListeners.remove(r);
     }
     public void notifyMinuteListeners() {
-        for (Runnable r : minuteTickListeners) {
-            try {
-                r.run();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.ENGINE_MINUTE_NOTIFY)) {
+            for (Runnable r : minuteTickListeners) {
+                try {
+                    r.run();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
+    }
+
+    public int getMinuteTickListenerCount() {
+        return minuteTickListeners.size();
+    }
+
+    public int getHourTickListenerCount() {
+        return hourTickListeners.size();
+    }
+
+    public int getDayTickListenerCount() {
+        return dayTickListeners.size();
+    }
+
+    public int getMonthTickListenerCount() {
+        return monthTickListeners.size();
     }
 
     // --- Hour Listeners ---
@@ -548,6 +569,14 @@ public class Engine extends Thread {
 
     public void setShowAuditMenu(boolean showAuditMenu) {
         this.showAuditMenu = showAuditMenu;
+    }
+
+    public boolean isShowFpsCounter() {
+        return showFpsCounter;
+    }
+
+    public void setShowFpsCounter(boolean showFpsCounter) {
+        this.showFpsCounter = showFpsCounter;
     }
 
     public boolean isFreeAbilities() {

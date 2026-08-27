@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 86% (351/409 checked)
+Completion: 85% (350/410 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -45,7 +45,7 @@ Video:
 [X] Daylight color overlay
 [X] Weather color overlay
 [X] Dark mode
-[X] Frame rate cap (Uncapped / 30 Hz / 60 Hz / 120 Hz)
+[ ] Frame rate cap (default 60 Hz; Uncapped / 30 / 60 / 120)
 [X] Reset tab to defaults
 
 Audio:
@@ -72,6 +72,7 @@ Roles (default hatch roles for new ants):
 Sandbox:
 [X] Allow turbo speed mode
 [X] Show mechanics audit (main-menu and in-game ESC menu button for this file)
+[ ] Show FPS counter (top-right overlay on menu and in-game)
 [X] ★ Free abilities (disables achievements on saves that use it)
 [X] ★ Infinite research (unlocks Research tab; ignores dynasty tier, parent, and trigger gates including Parasitic Mite Alert; disables achievements on saves that use it)
 [X] ★ Instant buildings (unlocks Construction tab; ignores dynasty tier; disables achievements on saves that use it)

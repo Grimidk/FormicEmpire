@@ -11,7 +11,7 @@ public final class MenuChaoticCatalog {
 
     public static final int MAX_ANTS = 500;
     public static final int SCENARIO_DURATION_MS = 20_000;
-    public static final int ANIMATION_FRAME_MS = 20;
+    public static final int ANIMATION_FRAME_MS = 16;
     public static final float OVERWORLD_SPEED_SCALE = 1.4f;
     public static final float COLONY_SPEED_SCALE = 1.4f;
     public static final float BATTLE_LINE_DRIFT_PER_SEC = 0.01f;

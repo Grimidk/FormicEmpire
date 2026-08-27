@@ -1026,7 +1026,13 @@ public class MapDialog extends ZeroDialog {
         private double panX;
         private double panY;
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
-        private final Map<Point, Hex> hexLookup = new HashMap<>();
+        private final Map<Long, Hex> hexLookup = new HashMap<>();
+        private HexGridMesh cachedMesh;
+        private World cachedMeshWorld;
+        private double cachedMeshHexSize = Double.NaN;
+        private int cachedCenterX;
+        private int cachedCenterY;
+        private int cachedHexCount;
         private Point pressPoint;
         private Point lastDragPoint;
         private boolean dragging;
@@ -1197,8 +1203,50 @@ public class MapDialog extends ZeroDialog {
 
         void onThemeChanged() {
             biomeColorCache.clear();
+            invalidateMeshCache();
             setBackground(AssetStyles.BACKGROUND_COLOR);
             repaint();
+        }
+
+        private static long hexKey(int q, int r) {
+            return (((long) q) << 32) | (r & 0xffffffffL);
+        }
+
+        private void invalidateMeshCache() {
+            cachedMesh = null;
+            cachedMeshWorld = null;
+            cachedMeshHexSize = Double.NaN;
+            cachedHexCount = -1;
+        }
+
+        private HexGridMesh ensureMeshCache(Point centerOffset, List<Hex> hexes) {
+            int cx = centerOffset.x;
+            int cy = centerOffset.y;
+            int hexCount = hexes != null ? hexes.size() : 0;
+            if (cachedMesh != null && cachedMeshWorld == world && cachedMeshHexSize == hexSize
+                    && cachedCenterX == cx && cachedCenterY == cy && cachedHexCount == hexCount) {
+                return cachedMesh;
+            }
+            hexLookup.clear();
+            if (hexes != null) {
+                for (Hex hex : hexes) {
+                    if (hex != null) {
+                        hexLookup.put(hexKey(hex.getQ(), hex.getR()), hex);
+                    }
+                }
+            }
+            cachedMesh = HexGridMesh.build(
+                    hexes,
+                    cx,
+                    cy,
+                    hexSize,
+                    (q, r) -> hexLookup.get(hexKey(q, r)));
+            cachedMeshWorld = world;
+            cachedMeshHexSize = hexSize;
+            cachedCenterX = cx;
+            cachedCenterY = cy;
+            cachedHexCount = hexCount;
+            return cachedMesh;
         }
 
         private double fittedHexSize() {
@@ -1362,11 +1410,6 @@ public class MapDialog extends ZeroDialog {
 
             calculateHexSize();
 
-            hexLookup.clear();
-            for (Hex h : world.getHexes()) {
-                hexLookup.put(new Point(h.getQ(), h.getR()), h);
-            }
-
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -1375,12 +1418,7 @@ public class MapDialog extends ZeroDialog {
             Hex activeHex = world.getActiveHex();
             List<Hex> hexes = world.getHexes();
 
-            HexGridMesh mesh = HexGridMesh.build(
-                    hexes,
-                    centerOffset.x,
-                    centerOffset.y,
-                    hexSize,
-                    (q, r) -> hexLookup.get(new Point(q, r)));
+            HexGridMesh mesh = ensureMeshCache(centerOffset, hexes);
 
             mesh.paintFills(g2d, face -> resolveFillColor(face.hex));
             mesh.paintDividers(
@@ -1388,7 +1426,6 @@ public class MapDialog extends ZeroDialog {
                     showBorders,
                     face -> resolveFillColor(face.hex),
                     AssetStyles.BORDER_COLOR);
-
             if (showBiomeIcons || showColonyRanks) {
                 for (HexGridMesh.Face face : mesh.faces()) {
                     drawHexIcons(g2d, face);

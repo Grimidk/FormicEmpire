@@ -58,6 +58,7 @@ public class SettingsPanel extends JPanel {
     // --- Sandbox Tab ---
     private JCheckBox turboCheck;
     private JCheckBox showAuditMenuCheck;
+    private JCheckBox showFpsCounterCheck;
     private JCheckBox freeAbilitiesCheck;
     private JCheckBox infiniteResearchCheck;
     private JCheckBox instantBuildingsCheck;
@@ -79,7 +80,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, disablePopupsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
-    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, easyConqueringLabel, instantIntegrationLabel;
+    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, easyConqueringLabel, instantIntegrationLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -416,6 +417,18 @@ public class SettingsPanel extends JPanel {
 
         c.gridy = 3;
         c.gridx = 0;
+        showFpsCounterLabel = new JLabel();
+        showFpsCounterLabel.setFont(AssetStyles.FONT_NORMAL);
+        showFpsCounterLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(showFpsCounterLabel, c);
+
+        showFpsCounterCheck = new JCheckBox();
+        styleCheckBox(showFpsCounterCheck);
+        c.gridx = 1;
+        panel.add(showFpsCounterCheck, c);
+
+        c.gridy = 4;
+        c.gridx = 0;
         freeAbilitiesLabel = new JLabel();
         freeAbilitiesLabel.setFont(AssetStyles.FONT_NORMAL);
         freeAbilitiesLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -426,7 +439,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(freeAbilitiesCheck, c);
 
-        c.gridy = 4;
+        c.gridy = 5;
         c.gridx = 0;
         infiniteResearchLabel = new JLabel();
         infiniteResearchLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -438,7 +451,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(infiniteResearchCheck, c);
 
-        c.gridy = 5;
+        c.gridy = 6;
         c.gridx = 0;
         instantBuildingsLabel = new JLabel();
         instantBuildingsLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -450,7 +463,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(instantBuildingsCheck, c);
 
-        c.gridy = 6;
+        c.gridy = 7;
         c.gridx = 0;
         assimilateAllLabel = new JLabel();
         assimilateAllLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -462,7 +475,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(assimilateAllCheck, c);
 
-        c.gridy = 7;
+        c.gridy = 8;
         c.gridx = 0;
         easyConqueringLabel = new JLabel();
         easyConqueringLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -474,7 +487,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(easyConqueringCheck, c);
 
-        c.gridy = 8;
+        c.gridy = 9;
         c.gridx = 0;
         instantIntegrationLabel = new JLabel();
         instantIntegrationLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -486,7 +499,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(instantIntegrationCheck, c);
 
-        c.gridy = 9;
+        c.gridy = 10;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -676,6 +689,7 @@ public class SettingsPanel extends JPanel {
     private void resetSandboxTabToDefaults() {
         turboCheck.setSelected(false);
         showAuditMenuCheck.setSelected(false);
+        showFpsCounterCheck.setSelected(false);
         freeAbilitiesCheck.setSelected(false);
         infiniteResearchCheck.setSelected(false);
         instantBuildingsCheck.setSelected(false);
@@ -693,7 +707,7 @@ public class SettingsPanel extends JPanel {
         daylightColorOverlayCheck.setSelected(true);
         weatherColorOverlayCheck.setSelected(true);
         darkModeCheck.setSelected(false);
-        selectFrameRateByValue(0);
+        selectFrameRateByValue(60);
     }
 
     private void resetAudioTabToDefaults() {
@@ -963,6 +977,7 @@ public class SettingsPanel extends JPanel {
         sandboxNoteLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_NOTE));
         turboLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
         showAuditMenuLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_AUDIT_MENU));
+        showFpsCounterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_FPS_COUNTER));
         String starPrefix = LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_STAR_PREFIX);
         freeAbilitiesLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_FREE_ABILITIES));
         infiniteResearchLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INFINITE_RESEARCH));
@@ -1045,6 +1060,7 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(fuzzParasiteAntsLabel, fuzzParasiteAntsCheck, LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS_TT);
         setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
         setSettingTooltip(showAuditMenuLabel, showAuditMenuCheck, LanguageStrings.SETTINGS_SHOW_AUDIT_MENU_TT);
+        setSettingTooltip(showFpsCounterLabel, showFpsCounterCheck, LanguageStrings.SETTINGS_SHOW_FPS_COUNTER_TT);
         setSettingTooltip(freeAbilitiesLabel, freeAbilitiesCheck, LanguageStrings.SETTINGS_FREE_ABILITIES_TT);
         setSettingTooltip(infiniteResearchLabel, infiniteResearchCheck, LanguageStrings.SETTINGS_INFINITE_RESEARCH_TT);
         setSettingTooltip(instantBuildingsLabel, instantBuildingsCheck, LanguageStrings.SETTINGS_INSTANT_BUILDINGS_TT);
@@ -1100,6 +1116,7 @@ public class SettingsPanel extends JPanel {
 
         turboCheck.setSelected(engine.isAllowTurboMode());
         showAuditMenuCheck.setSelected(engine.isShowAuditMenu());
+        showFpsCounterCheck.setSelected(engine.isShowFpsCounter());
         freeAbilitiesCheck.setSelected(engine.isFreeAbilities());
         infiniteResearchCheck.setSelected(engine.isInfiniteResearch());
         instantBuildingsCheck.setSelected(engine.isInstantBuildings());
@@ -1271,6 +1288,7 @@ public class SettingsPanel extends JPanel {
 
         engine.setAllowTurboMode(turboCheck.isSelected());
         engine.setShowAuditMenu(showAuditMenuCheck.isSelected());
+        engine.setShowFpsCounter(showFpsCounterCheck.isSelected());
         engine.setFreeAbilities(freeAbilitiesCheck.isSelected());
         engine.setInfiniteResearch(infiniteResearchCheck.isSelected());
         engine.setInstantBuildings(instantBuildingsCheck.isSelected());

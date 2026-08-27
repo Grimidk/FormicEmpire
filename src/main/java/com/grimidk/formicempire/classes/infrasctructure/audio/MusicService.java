@@ -277,15 +277,46 @@ public final class MusicService {
             }
         }
         currentTrack = track;
-        stopPlaybackThread(true);
-        stopRequested.set(false);
-        skipRequested.set(false);
         playing = true;
         userPaused = false;
-        playbackThread = new Thread(() -> runPlayback(track), "music-player");
-        playbackThread.setDaemon(true);
-        playbackThread.start();
+        startPlaybackThread(track);
         notifyListeners();
+    }
+
+    private void startPlaybackThread(MusicTrack track) {
+        Thread previous;
+        boolean onPlaybackThread;
+        synchronized (playbackLock) {
+            onPlaybackThread = playbackThread == Thread.currentThread();
+            previous = onPlaybackThread ? null : playbackThread;
+            stopRequested.set(true);
+            skipRequested.set(true);
+            playbackLock.notifyAll();
+            if (activeLine != null) {
+                try {
+                    activeLine.stop();
+                    activeLine.flush();
+                } catch (Exception ignore) {
+                }
+            }
+            Thread next = new Thread(() -> {
+                if (previous != null) {
+                    try {
+                        previous.join(1500);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+                closeActiveLine();
+                stopRequested.set(false);
+                skipRequested.set(false);
+                runPlayback(track);
+            }, "music-player");
+            next.setDaemon(true);
+            playbackThread = next;
+            next.start();
+        }
     }
 
     private void runPlayback(MusicTrack track) {
@@ -413,9 +444,10 @@ public final class MusicService {
     }
 
     private void stopPlaybackThread(boolean join) {
-        stopRequested.set(true);
-        skipRequested.set(true);
+        Thread thread;
         synchronized (playbackLock) {
+            stopRequested.set(true);
+            skipRequested.set(true);
             playbackLock.notifyAll();
             if (activeLine != null) {
                 try {
@@ -424,19 +456,25 @@ public final class MusicService {
                 } catch (Exception ignore) {
                 }
             }
+            thread = playbackThread;
+            if (join) {
+                playbackThread = null;
+            }
         }
-        Thread thread = playbackThread;
         if (join && thread != null && thread != Thread.currentThread()) {
             try {
                 thread.join(1500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            closeActiveLine();
+            stopRequested.set(false);
+            skipRequested.set(false);
+        } else if (join) {
+            closeActiveLine();
+            stopRequested.set(false);
+            skipRequested.set(false);
         }
-        closeActiveLine();
-        playbackThread = null;
-        stopRequested.set(false);
-        skipRequested.set(false);
     }
 
     private void closeActiveLine() {

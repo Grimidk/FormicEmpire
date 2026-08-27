@@ -83,7 +83,8 @@ public class GamePanel extends ZeroGamePanel {
     private Runnable monthTickListener;
 
     private final AtomicInteger pendingMinuteGuiSteps = new AtomicInteger(0);
-    private Timer minuteDrainTimer;
+    private Timer sessionVisualTimer;
+    private Runnable visualFrameListener;
 
     private boolean overworldPanDragging;
     private Point overworldPanLastScreen;
@@ -184,8 +185,8 @@ public class GamePanel extends ZeroGamePanel {
     public void applyVisualFrameRateSetting() {
         Engine engine = frame.getEngine();
         int intervalMs = engine != null ? engine.getVisualFrameIntervalMs() : 1;
-        if (minuteDrainTimer != null) {
-            minuteDrainTimer.setDelay(intervalMs);
+        if (sessionVisualTimer != null) {
+            sessionVisualTimer.setDelay(intervalMs);
         }
         if (overworldSpringTimer != null) {
             overworldSpringTimer.setDelay(intervalMs);
@@ -196,6 +197,10 @@ public class GamePanel extends ZeroGamePanel {
         if (warBattleDialog != null && warBattleDialog.isShowing()) {
             warBattleDialog.applyVisualFrameRate();
         }
+    }
+
+    public void setFramePaintListener(Runnable framePaintListener) {
+        this.visualFrameListener = framePaintListener;
     }
 
     public void refreshAuditMenuOption() {
@@ -1454,14 +1459,15 @@ public class GamePanel extends ZeroGamePanel {
         engine.addDayTickListener(dayTickListener);
         engine.addMonthTickListener(monthTickListener);
 
-        if (minuteDrainTimer == null) {
+        if (sessionVisualTimer == null) {
             int intervalMs = engine.getVisualFrameIntervalMs();
-            minuteDrainTimer = new Timer(intervalMs, e -> drainPendingMinuteGuiSteps());
-            minuteDrainTimer.setRepeats(true);
+            sessionVisualTimer = new Timer(intervalMs, e -> onSessionVisualTick());
+            sessionVisualTimer.setRepeats(true);
+            sessionVisualTimer.setCoalesce(true);
         } else {
-            minuteDrainTimer.setDelay(engine.getVisualFrameIntervalMs());
+            sessionVisualTimer.setDelay(engine.getVisualFrameIntervalMs());
         }
-        minuteDrainTimer.start();
+        sessionVisualTimer.start();
         setupOverworldScrollbarPanTracking();
         startOverworldIdleRecenter();
 
@@ -1482,15 +1488,35 @@ public class GamePanel extends ZeroGamePanel {
         dayTickListener = null;
         monthTickListener = null;
 
-        if (minuteDrainTimer != null) {
-            minuteDrainTimer.stop();
+        if (sessionVisualTimer != null) {
+            sessionVisualTimer.stop();
         }
         stopOverworldIdleRecenter();
         removeOverworldScrollbarPanTracking();
         pendingMinuteGuiSteps.set(0);
     }
 
+    private void onSessionVisualTick() {
+        if (!engineStarted) {
+            return;
+        }
+        Engine engine = frame.getEngine();
+        if (engine != null && !engine.isPaused()) {
+            drainPendingMinuteGuiSteps(false);
+        }
+        if (gameAreaPanel != null) {
+            gameAreaPanel.repaint();
+        }
+        if (visualFrameListener != null) {
+            visualFrameListener.run();
+        }
+    }
+
     private void drainPendingMinuteGuiSteps() {
+        drainPendingMinuteGuiSteps(true);
+    }
+
+    private void drainPendingMinuteGuiSteps(boolean repaintAfter) {
         if (!engineStarted) {
             return;
         }
@@ -1507,7 +1533,7 @@ public class GamePanel extends ZeroGamePanel {
         if (leftover > 0) {
             pendingMinuteGuiSteps.addAndGet(leftover);
         }
-        performMinuteGuiUpdate(runNow);
+        performMinuteGuiUpdate(runNow, repaintAfter);
     }
 
     public void updateStatusIndicator(boolean paused) {
@@ -1574,10 +1600,14 @@ public class GamePanel extends ZeroGamePanel {
 
     private void updateMinuteGUI() {
         pendingMinuteGuiSteps.set(0);
-        performMinuteGuiUpdate(1);
+        performMinuteGuiUpdate(1, true);
     }
 
     private void performMinuteGuiUpdate(int physicsSteps) {
+        performMinuteGuiUpdate(physicsSteps, true);
+    }
+
+    private void performMinuteGuiUpdate(int physicsSteps, boolean repaintAfter) {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
         Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
@@ -1613,7 +1643,9 @@ public class GamePanel extends ZeroGamePanel {
 
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);
-        gameAreaPanel.repaint();
+        if (repaintAfter && gameAreaPanel != null) {
+            gameAreaPanel.repaint();
+        }
         if (mapDialog != null && mapDialog.isShowing()) {
             mapDialog.liveUpdate();
         }

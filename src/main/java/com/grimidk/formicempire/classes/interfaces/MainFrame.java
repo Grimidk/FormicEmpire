@@ -7,7 +7,9 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.FrameRateTracker;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.FpsOverlayPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiCursors;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.interfaces.menu.MenuChaoticPanel;
@@ -56,6 +58,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private boolean macFullscreenEnsurePending;
     private int macFullscreenRetryCount;
     private Timer macFullscreenVerifyTimer;
+    private final FrameRateTracker frameRateTracker = new FrameRateTracker();
+    private FpsOverlayPanel fpsOverlayPanel;
 
     private static final int MAC_FULLSCREEN_MAX_RETRIES = 6;
     private static final int MAC_FULLSCREEN_VERIFY_MS = 1600;
@@ -193,15 +197,25 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         cards.add(gamePanel, CARD_GAME);
 
         menuChaoticPanel = new MenuChaoticPanel();
+        fpsOverlayPanel = new FpsOverlayPanel(frameRateTracker);
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.add(menuChaoticPanel, JLayeredPane.DEFAULT_LAYER);
         layeredPane.add(cards, JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(fpsOverlayPanel, JLayeredPane.DRAG_LAYER);
+        Runnable visualFrameListener = () -> {
+            if (engine.isShowFpsCounter()) {
+                fpsOverlayPanel.onFramePainted();
+            }
+        };
+        menuChaoticPanel.setFramePaintListener(visualFrameListener);
+        gamePanel.setFramePaintListener(visualFrameListener);
         Runnable syncLayerBounds = () -> {
             Dimension size = layeredPane.getSize();
             int w = Math.max(0, size.width);
             int h = Math.max(0, size.height);
             menuChaoticPanel.setBounds(0, 0, w, h);
             cards.setBounds(0, 0, w, h);
+            fpsOverlayPanel.setBounds(0, 0, w, h);
         };
         layeredPane.addComponentListener(new ComponentAdapter() {
             @Override
@@ -354,6 +368,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     public void applyRuntimeSettings() {
         ToolTipManager.sharedInstance().setEnabled(engine.isShowTooltips());
         initPanel.refreshMenuOptions();
+        if (fpsOverlayPanel != null) {
+            fpsOverlayPanel.applyEnabled(engine.isShowFpsCounter());
+        }
         if (gamePanel != null) {
             gamePanel.refreshAuditMenuOption();
             gamePanel.applyVisualFrameRateSetting();

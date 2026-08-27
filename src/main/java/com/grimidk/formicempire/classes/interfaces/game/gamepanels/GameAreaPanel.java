@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
 // import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
@@ -29,6 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +61,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Rectangle lodViewportRect;
 
     private static final int OVERWORLD_PAN_OUTSET = 1400;
+    private static final float SPRITE_ROTATION_EPSILON_DEG = 0.5f;
 
     private int overworldLayoutOffsetX;
     private int overworldLayoutOffsetY;
@@ -77,6 +80,13 @@ public class GameAreaPanel extends ZeroGamePanel {
 
     private int overworldDeadBodySpritesRemaining;
     private int lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
+    private List<AntSpecies> cachedAssimilatedDroneSpecies = List.of();
+    private int cachedAssimilatedDroneSignature = Integer.MIN_VALUE;
+    private BufferedImage cachedBackgroundLayer;
+    private int cachedBackgroundW;
+    private int cachedBackgroundH;
+    private int cachedBackgroundBiomeId = -1;
+    private Dimension cachedBackgroundDimension;
 
     public GameAreaPanel() {
         super(null);
@@ -176,6 +186,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     public void setColony(Colony colony) {
         this.colony = colony;
         this.lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
+        this.cachedAssimilatedDroneSignature = Integer.MIN_VALUE;
     }
 
     public void setEngine(Engine engine) {
@@ -221,6 +232,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         this.overworldLayoutOffsetX = 0;
         this.overworldLayoutOffsetY = 0;
         this.backgroundImage = resolveBackgroundImage();
+        invalidateBackgroundLayerCache();
         repaint();
     }
 
@@ -276,6 +288,12 @@ public class GameAreaPanel extends ZeroGamePanel {
     
     private void updateBackground() {
         this.backgroundImage = resolveBackgroundImage();
+        invalidateBackgroundLayerCache();
+    }
+
+    private void invalidateBackgroundLayerCache() {
+        cachedBackgroundLayer = null;
+        cachedBackgroundBiomeId = -1;
     }
     
     public void refreshSize(int viewportWidth, int viewportHeight) {
@@ -333,22 +351,49 @@ public class GameAreaPanel extends ZeroGamePanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-
-        if (backgroundImage != null) {
-            int tileWidth = backgroundImage.getWidth(this);
-            int tileHeight = backgroundImage.getHeight(this);
-            if (tileWidth > 0 && tileHeight > 0) { 
-                int panelWidth = getWidth();
-                int panelHeight = getHeight();
-                for (int x = 0; x < panelWidth; x += tileWidth) {
-                    for (int y = 0; y < panelHeight; y += tileHeight) {
-                        g.drawImage(backgroundImage, x, y, this);
-                    }
-                }
-            }
+        int panelW = getWidth();
+        int panelH = getHeight();
+        if (panelW <= 0 || panelH <= 0) {
+            return;
         }
-        
+        Graphics2D g2d = (Graphics2D) g.create();
+        try {
+            renderGameScene(g2d);
+        } finally {
+            g2d.dispose();
+        }
+    }
+
+    private void renderGameScene(Graphics2D g2d) {
+        Shape previousClip = g2d.getClip();
+        Rectangle renderClip = resolveRenderClip(g2d);
+        if (renderClip != null) {
+            g2d.clip(renderClip);
+        }
+        try {
+            renderGameSceneContents(g2d);
+        } finally {
+            g2d.setClip(previousClip);
+        }
+    }
+
+    private Rectangle resolveRenderClip(Graphics2D g2d) {
+        Rectangle clip = g2d.getClipBounds();
+        if (currentDimension != WorldSpaces.OVERWORLD || paintViewportRect == null) {
+            return clip;
+        }
+        int margin = 128;
+        Rectangle viewportClip = new Rectangle(paintViewportRect);
+        viewportClip.grow(margin, margin);
+        if (clip == null) {
+            return viewportClip;
+        }
+        return clip.intersection(viewportClip);
+    }
+
+    private void renderGameSceneContents(Graphics2D g2d) {
+        paintBackgroundLayer(g2d);
+
         int contentPadX = 0;
         int contentPadY = 0;
         if (colony != null && currentDimension == WorldSpaces.OVERWORLD && paintViewportRect != null) {
@@ -365,7 +410,6 @@ public class GameAreaPanel extends ZeroGamePanel {
                 drawUnderworldStructure(g2d);
                 drawAnts(g2d);
                 drawBugs(g2d);
-                // drawUnderworldRoomDecorationsOverlay(g2d); // disabled — see roadmap: in-room sprites rework
             } else {
                 g2d.translate(contentPadX, contentPadY);
                 overworldDeadBodySpritesRemaining = GameNumbers.MAX_PEN_NON_ANT_SPRITES;
@@ -391,6 +435,79 @@ public class GameAreaPanel extends ZeroGamePanel {
 
         if (currentDimension == WorldSpaces.OVERWORLD && engine != null && engine.getWorld() != null) {
             drawEnvironmentalOverlays(g2d);
+        }
+    }
+
+    private void paintBackgroundLayer(Graphics2D g2d) {
+        if (backgroundImage == null) {
+            return;
+        }
+        if (shouldTileBackgroundDirectly(g2d)) {
+            tileBackgroundWithinClip(g2d);
+            return;
+        }
+        int panelW = getWidth();
+        int panelH = getHeight();
+        if (cachedBackgroundLayer != null && cachedBackgroundW == panelW && cachedBackgroundH == panelH
+                && cachedBackgroundBiomeId == currentBiomeId
+                && cachedBackgroundDimension == currentDimension) {
+            g2d.drawImage(cachedBackgroundLayer, 0, 0, null);
+            return;
+        }
+        int tileWidth = backgroundImage.getWidth(this);
+        int tileHeight = backgroundImage.getHeight(this);
+        if (tileWidth <= 0 || tileHeight <= 0) {
+            return;
+        }
+        BufferedImage layer = new BufferedImage(panelW, panelH, BufferedImage.TYPE_INT_RGB);
+        Graphics2D layerGraphics = layer.createGraphics();
+        try {
+            for (int x = 0; x < panelW; x += tileWidth) {
+                for (int y = 0; y < panelH; y += tileHeight) {
+                    layerGraphics.drawImage(backgroundImage, x, y, this);
+                }
+            }
+        } finally {
+            layerGraphics.dispose();
+        }
+        cachedBackgroundLayer = layer;
+        cachedBackgroundW = panelW;
+        cachedBackgroundH = panelH;
+        cachedBackgroundBiomeId = currentBiomeId;
+        cachedBackgroundDimension = currentDimension;
+        g2d.drawImage(cachedBackgroundLayer, 0, 0, null);
+    }
+
+    private boolean shouldTileBackgroundDirectly(Graphics2D g2d) {
+        if (currentDimension != WorldSpaces.OVERWORLD || paintViewportRect == null) {
+            return false;
+        }
+        int panelW = getWidth();
+        int panelH = getHeight();
+        if (panelW <= paintViewportRect.width + 256 && panelH <= paintViewportRect.height + 256) {
+            return false;
+        }
+        return g2d.getClipBounds() != null;
+    }
+
+    private void tileBackgroundWithinClip(Graphics2D g2d) {
+        Rectangle clip = g2d.getClipBounds();
+        if (clip == null) {
+            return;
+        }
+        int tileWidth = backgroundImage.getWidth(this);
+        int tileHeight = backgroundImage.getHeight(this);
+        if (tileWidth <= 0 || tileHeight <= 0) {
+            return;
+        }
+        int startX = Math.floorDiv(clip.x, tileWidth) * tileWidth;
+        int startY = Math.floorDiv(clip.y, tileHeight) * tileHeight;
+        int endX = clip.x + clip.width;
+        int endY = clip.y + clip.height;
+        for (int x = startX; x < endX; x += tileWidth) {
+            for (int y = startY; y < endY; y += tileHeight) {
+                g2d.drawImage(backgroundImage, x, y, this);
+            }
         }
     }
 
@@ -793,8 +910,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     private void drawAnts(Graphics2D g2d) {
         if (colony == null) return;
 
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        applyFastSpriteHints(g2d);
 
         for (AntType type : GameConstants.getAntTypes()) {
             if (type == GameConstants.TYPE_DEAD) continue; 
@@ -808,17 +924,9 @@ public class GameAreaPanel extends ZeroGamePanel {
             int typeW = typeSpriteIcon != null ? typeSpriteIcon.getIconWidth() : 16;
             int typeH = typeSpriteIcon != null ? typeSpriteIcon.getIconHeight() : 16;
 
-            List<AntSpecies> assimilatedSpecies = new ArrayList<>();
-            if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null
-                    && colony.getDynasty().hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
-                for (AntSpecies s : GameConstants.getSpecies()) {
-                    if (s == colony.getSpecies()) continue;
-                    if (s.getAssimilation() != null && colony.getDynasty().isAssimilationCompleted(s.getAssimilation())
-                            && GameConstants.hasAssimilatedDroneSprite(s)) {
-                        assimilatedSpecies.add(s);
-                    }
-                }
-            }
+            List<AntSpecies> assimilatedSpecies = type == GameConstants.TYPE_DRONE
+                    ? assimilatedDroneSpeciesForPaint()
+                    : List.of();
 
             for (Ant ant : ants) {
                 if (ant.getDimension() != currentDimension) continue;
@@ -855,20 +963,61 @@ public class GameAreaPanel extends ZeroGamePanel {
                         }
                     }
                 }
-                
-                AffineTransform oldTransform = g2d.getTransform();
-                double centerX = ant.getX() + (w / 2.0);
-                double centerY = ant.getY() + (h / 2.0);
-                g2d.translate(centerX, centerY);       
-                g2d.rotate(Math.toRadians(ant.getR()));
-                g2d.drawImage(currentSprite, -w / 2, -h / 2, this);
-                if (showCarry) {
-                    RouteViewVisuals.paintJawCarryIcons(g2d, RouteViewVisuals.gathererCarryIcons(ant), w, h, this);
-                }
 
-                g2d.setTransform(oldTransform);
+                drawSpriteOriented(g2d, currentSprite, ant.getX(), ant.getY(), w, h, ant.getR(), showCarry
+                        ? () -> RouteViewVisuals.paintJawCarryIcons(
+                        g2d, RouteViewVisuals.gathererCarryIcons(ant), w, h, this)
+                        : null);
             }
         }
+    }
+
+    private List<AntSpecies> assimilatedDroneSpeciesForPaint() {
+        if (colony == null) {
+            cachedAssimilatedDroneSignature = Integer.MIN_VALUE;
+            cachedAssimilatedDroneSpecies = List.of();
+            return cachedAssimilatedDroneSpecies;
+        }
+        int signature = assimilatedDronePaintSignature(colony);
+        if (signature == cachedAssimilatedDroneSignature) {
+            return cachedAssimilatedDroneSpecies;
+        }
+        cachedAssimilatedDroneSignature = signature;
+        if (signature == 0) {
+            cachedAssimilatedDroneSpecies = List.of();
+            return cachedAssimilatedDroneSpecies;
+        }
+        List<AntSpecies> species = new ArrayList<>();
+        Dynasty dynasty = colony.getDynasty();
+        for (AntSpecies s : GameConstants.getSpecies()) {
+            if (s == colony.getSpecies()) {
+                continue;
+            }
+            if (s.getAssimilation() != null && dynasty.isAssimilationCompleted(s.getAssimilation())
+                    && GameConstants.hasAssimilatedDroneSprite(s)) {
+                species.add(s);
+            }
+        }
+        cachedAssimilatedDroneSpecies = List.copyOf(species);
+        return cachedAssimilatedDroneSpecies;
+    }
+
+    private static int assimilatedDronePaintSignature(Colony colony) {
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
+            return 0;
+        }
+        int signature = colony.getId();
+        for (AntSpecies s : GameConstants.getSpecies()) {
+            if (s == colony.getSpecies() || s.getAssimilation() == null) {
+                continue;
+            }
+            if (dynasty.isAssimilationCompleted(s.getAssimilation())
+                    && GameConstants.hasAssimilatedDroneSprite(s)) {
+                signature = 31 * signature + s.getId();
+            }
+        }
+        return signature;
     }
 
     private void drawBugs(Graphics2D g2d) {
@@ -876,8 +1025,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             return;
         }
 
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        applyFastSpriteHints(g2d);
 
         boolean overworld = currentDimension == WorldSpaces.OVERWORLD;
         int aphidSprites = 0;
@@ -929,14 +1077,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 }
             }
 
-            AffineTransform oldTransform = g2d.getTransform();
-
-            double centerX = bug.getX() + (w / 2.0);
-            double centerY = bug.getY() + (h / 2.0);
-            g2d.translate(centerX, centerY);
-            g2d.rotate(Math.toRadians(bug.getR()));
-            g2d.drawImage(sprite, -w / 2, -h / 2, this);
-            g2d.setTransform(oldTransform);
+            drawSpriteOriented(g2d, sprite, bug.getX(), bug.getY(), w, h, bug.getR(), null);
 
             if (type == GameConstants.TYPE_APHID) {
                 aphidSprites++;
@@ -946,6 +1087,49 @@ public class GameAreaPanel extends ZeroGamePanel {
                 dermestidSprites++;
             }
         }
+    }
+
+    private static void applyFastSpriteHints(Graphics2D g2d) {
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+    }
+
+    private void drawSpriteOriented(
+            Graphics2D g2d,
+            Image sprite,
+            int x,
+            int y,
+            int w,
+            int h,
+            int rotationDegrees,
+            Runnable overlayInLocalSpace) {
+        float normalized = normalizeDegrees(rotationDegrees);
+        boolean needsRotate = Math.abs(normalized) >= SPRITE_ROTATION_EPSILON_DEG;
+        if (!needsRotate && overlayInLocalSpace == null) {
+            g2d.drawImage(sprite, Math.round(x), Math.round(y), this);
+            return;
+        }
+        AffineTransform oldTransform = g2d.getTransform();
+        g2d.translate(x + (w / 2.0), y + (h / 2.0));
+        if (needsRotate) {
+            g2d.rotate(Math.toRadians(normalized));
+        }
+        g2d.drawImage(sprite, -w / 2, -h / 2, this);
+        if (overlayInLocalSpace != null) {
+            overlayInLocalSpace.run();
+        }
+        g2d.setTransform(oldTransform);
+    }
+
+    private static float normalizeDegrees(float degrees) {
+        float r = degrees % 360f;
+        if (r > 180f) {
+            r -= 360f;
+        } else if (r < -180f) {
+            r += 360f;
+        }
+        return r;
     }
 
     private boolean isBugInTypePen(Critter bug, Species type, int w, int h) {

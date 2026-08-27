@@ -4,8 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -17,10 +15,20 @@ public final class CritterSpriteCompositor {
     private static final String ROOT = "sprites/critters/";
     private static final int DEFAULT_LEG_FRAME = 1;
 
-    private static final Map<String, ImageIcon> COMPOSITE_CACHE = new ConcurrentHashMap<>();
-    private static final Map<String, BufferedImage> LAYER_CACHE = new ConcurrentHashMap<>();
+    private static final LruCache<String, ImageIcon> COMPOSITE_CACHE =
+            new LruCache<>(GameNumbers.SPRITE_COMPOSITE_CACHE_MAX_ENTRIES);
+    private static final LruCache<String, BufferedImage> LAYER_CACHE =
+            new LruCache<>(GameNumbers.SPRITE_LAYER_CACHE_MAX_ENTRIES);
 
     private CritterSpriteCompositor() {
+    }
+
+    public static int compositeCacheSize() {
+        return COMPOSITE_CACHE.size();
+    }
+
+    public static int layerCacheSize() {
+        return LAYER_CACHE.size();
     }
 
     public static ImageIcon getSprite(String folder, String bodyFile, boolean animated) {
@@ -50,7 +58,7 @@ public final class CritterSpriteCompositor {
                 ? clampFrame(legFrame, 1, GameNumbers.ANT_LEG_FRAME_COUNT)
                 : DEFAULT_LEG_FRAME;
         String cacheKey = folder + "|L" + safeLeg;
-        return COMPOSITE_CACHE.computeIfAbsent(cacheKey, k -> buildIcon(folder, bodyFile, animated, safeLeg));
+        return COMPOSITE_CACHE.get(cacheKey, k -> buildIcon(folder, bodyFile, animated, safeLeg));
     }
 
     public static boolean hasLegWalkCycle(Species species) {
@@ -62,7 +70,7 @@ public final class CritterSpriteCompositor {
         if (composed == null) {
             return null;
         }
-        return new ImageIcon(composed);
+        return new ImageIcon(CompatibleImages.copyToCompatible(composed));
     }
 
     private static BufferedImage compose(String folder, String bodyFile, boolean animated, int legFrame) {
@@ -95,7 +103,7 @@ public final class CritterSpriteCompositor {
     }
 
     private static BufferedImage loadLayer(String relativePath) {
-        return LAYER_CACHE.computeIfAbsent(relativePath, CritterSpriteCompositor::readLayer);
+        return LAYER_CACHE.get(relativePath, CritterSpriteCompositor::readLayer);
     }
 
     private static BufferedImage readLayer(String relativePath) {

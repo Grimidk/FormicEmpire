@@ -514,6 +514,9 @@ public class Colony {
             }
             list.add(newAnt);
         }
+        if (count > 0) {
+            invalidateActiveRoleCountCache();
+        }
     }
     
     private void randomizeAllAntPositions() {
@@ -1959,7 +1962,6 @@ public class Colony {
 
     // --- Job Schedulers ---
     public void runMinutelyJobs() {
-        invalidateActiveRoleCountCache();
         if (this.runsFullSimulation()) {
             this.runConverting();
             physicsService.tickAntSpriteAnimMinutes(this);
@@ -1978,7 +1980,6 @@ public class Colony {
                 this.automationService.runAutomation(this, biome, season);
             }
             this.runRoleAssignmentIfNeeded(engine);
-            invalidateActiveRoleCountCache();
             this.runLaying();
             this.runResearch();
             this.runRanching();
@@ -1991,7 +1992,6 @@ public class Colony {
                 this.automationService.runAutomation(this, biome, season);
             }
             this.runRoleAssignmentIfNeeded(engine);
-            invalidateActiveRoleCountCache();
             this.labourService.runTunnelConstruction(this);
             ColonyJobRules.runHourlyLite(this, biome);
         }

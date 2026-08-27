@@ -429,7 +429,10 @@ public class ColonyLabourService {
                 }
                 
                 neighbor.setColony(satellite);
-                
+                if (world != null) {
+                    world.markColonizedHexIndexDirty();
+                }
+
                 satellitesSpawned++;
                 if (world != null && dynasty != null) {
                     world.getHistoryService().record(WorldHistoryEventType.COLONY_FOUNDED,
