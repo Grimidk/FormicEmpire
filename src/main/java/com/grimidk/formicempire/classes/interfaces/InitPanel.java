@@ -11,6 +11,8 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +21,7 @@ public class InitPanel extends JPanel {
     
     private final MenuHeaderPanel menuHeader = new MenuHeaderPanel();
     private final JPanel menuColumn = new JPanel(new GridBagLayout());
+    private final JPanel westBalance = new JPanel();
     private final MenuSideRailPanel sideRail;
     private final VersionLicenseFooter footer =
             new VersionLicenseFooter(AssetStyles.COLOR_ABSOLUTE_BLACK);
@@ -36,10 +39,19 @@ public class InitPanel extends JPanel {
         setLayout(new BorderLayout());
 
         menuColumn.setOpaque(false);
+        westBalance.setOpaque(false);
         sideRail = new MenuSideRailPanel(frame);
+        add(westBalance, BorderLayout.WEST);
         add(menuColumn, BorderLayout.CENTER);
         add(sideRail, BorderLayout.EAST);
         add(footer, BorderLayout.SOUTH);
+        syncSideRailBalance();
+        sideRail.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                syncSideRailBalance();
+            }
+        });
         
         initComponents();
         
@@ -84,6 +96,14 @@ public class InitPanel extends JPanel {
         boolean showAudit = frame.getEngine().isShowAuditMenu();
         audit.setVisible(showAudit);
         layoutMenuButtons();
+    }
+
+    private void syncSideRailBalance() {
+        int railWidth = sideRail.getPreferredSize().width;
+        Dimension balanceSize = new Dimension(railWidth, 0);
+        westBalance.setPreferredSize(balanceSize);
+        westBalance.setMinimumSize(balanceSize);
+        westBalance.setMaximumSize(new Dimension(railWidth, Integer.MAX_VALUE));
     }
 
     private void layoutMenuButtons() {

@@ -23,6 +23,7 @@ import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreload
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.ColonySpriteMergeLod;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
@@ -408,15 +409,17 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (colony != null) {
             if (currentDimension == WorldSpaces.UNDERWORLD) {
                 drawUnderworldStructure(g2d);
-                drawAnts(g2d);
-                drawBugs(g2d);
+                ColonySpriteMergeLod.ZoneMergeContext spriteMergeZoneContext = buildSpriteMergeZoneContext();
+                drawAnts(g2d, spriteMergeZoneContext);
+                drawBugs(g2d, spriteMergeZoneContext);
             } else {
                 g2d.translate(contentPadX, contentPadY);
                 overworldDeadBodySpritesRemaining = GameNumbers.MAX_PEN_NON_ANT_SPRITES;
                 drawOverworldStructure(g2d);
                 drawResourceSources(g2d);
-                drawAnts(g2d);
-                drawBugs(g2d);
+                ColonySpriteMergeLod.ZoneMergeContext spriteMergeZoneContext = buildSpriteMergeZoneContext();
+                drawAnts(g2d, spriteMergeZoneContext);
+                drawBugs(g2d, spriteMergeZoneContext);
                 g2d.translate(-contentPadX, -contentPadY);
             }
 
@@ -907,13 +910,44 @@ public class GameAreaPanel extends ZeroGamePanel {
         g2d.drawImage(tunnelSpriteImg, tunnelX, tunnelY, this);
     }
 
-    private void drawAnts(Graphics2D g2d) {
+    private ColonySpriteMergeLod.ZoneMergeContext buildSpriteMergeZoneContext() {
+        if (colony == null) {
+            return ColonySpriteMergeLod.buildZoneMergeContext(
+                    null,
+                    currentDimension,
+                    currentSpriteMergeZoneLayout());
+        }
+        return ColonySpriteMergeLod.buildZoneMergeContext(
+                colony,
+                currentDimension,
+                currentSpriteMergeZoneLayout());
+    }
+
+    private ColonySpriteMergeLod.MergeZoneLayout currentSpriteMergeZoneLayout() {
+        return new ColonySpriteMergeLod.MergeZoneLayout(
+                entranceBounds,
+                room1Bounds,
+                room2Bounds,
+                room3Bounds,
+                room4Bounds,
+                rancherYardBounds,
+                graverYardBounds,
+                insectPenBounds,
+                breederRoomBounds,
+                transitRoomBounds);
+    }
+
+    private void drawAnts(Graphics2D g2d, ColonySpriteMergeLod.ZoneMergeContext zoneMergeContext) {
         if (colony == null) return;
 
         applyFastSpriteHints(g2d);
 
+        int colonyAntTotal = colony.getAntTotal();
+        boolean colonyMergeActive = ColonySpriteMergeLod.isMergeActive(colonyAntTotal);
+        int maxGroupSize = ColonySpriteMergeLod.maxGroupSize(colonyAntTotal);
+
         for (AntType type : GameConstants.getAntTypes()) {
-            if (type == GameConstants.TYPE_DEAD) continue; 
+            if (type == GameConstants.TYPE_DEAD) continue;
 
             List<Ant> ants = colony.getAntsByType(type);
             if (ants.isEmpty()) {
@@ -928,48 +962,99 @@ public class GameAreaPanel extends ZeroGamePanel {
                     ? assimilatedDroneSpeciesForPaint()
                     : List.of();
 
-            for (Ant ant : ants) {
-                if (ant.getDimension() != currentDimension) continue;
-                if (ant.getDimension() == WorldSpaces.TUNNEL_WORLD) continue;
+            Map<ColonySpriteMergeLod.AntMergeBucket, List<Ant>> buckets = new HashMap<>();
+            List<Ant> individuals = new ArrayList<>();
 
-                if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), typeW, typeH)) {
+            for (Ant ant : ants) {
+                if (!isAntVisibleForPaint(ant, typeW, typeH)) {
                     continue;
                 }
-
-                boolean showCarry = RouteViewVisuals.showsGathererCarry(ant);
-                ImageIcon antSpriteIcon = GameConstants.getAntSprite(
-                        type,
-                        colony.getSpecies(),
-                        ant.getSubtypeProfile(),
-                        ant.getLegFrame(),
-                        RouteViewVisuals.jawFrameForCarry(ant.getJawFrame(), showCarry),
-                        ant.getWingFrame(),
-                        ant.getAntennaFrame(),
-                        ant.isParasiticMiteInfected());
-                if (antSpriteIcon == null) continue;
-                Image sprite = antSpriteIcon.getImage();
-                int w = antSpriteIcon.getIconWidth();
-                int h = antSpriteIcon.getIconHeight();
-                
-                Image currentSprite = sprite;
-                if (!assimilatedSpecies.isEmpty()) {
-                    int seed = System.identityHashCode(ant);
-                    if (Math.abs(seed) % 10 < 3) {
-                        int index = (Math.abs(seed) / 10) % assimilatedSpecies.size();
-                        AntSpecies as = assimilatedSpecies.get(index);
-                        ImageIcon asIcon = GameConstants.getAssimilatedDroneSprite(as);
-                        if (asIcon != null) {
-                            currentSprite = asIcon.getImage();
-                        }
-                    }
+                boolean mergeAnt = colonyMergeActive
+                        || (zoneMergeContext != null && zoneMergeContext.shouldMergeAnt(ant));
+                if (mergeAnt) {
+                    buckets.computeIfAbsent(ColonySpriteMergeLod.antBucket(ant, type), k -> new ArrayList<>()).add(ant);
+                } else {
+                    individuals.add(ant);
                 }
+            }
 
-                drawSpriteOriented(g2d, currentSprite, ant.getX(), ant.getY(), w, h, ant.getR(), showCarry
-                        ? () -> RouteViewVisuals.paintJawCarryIcons(
-                        g2d, RouteViewVisuals.gathererCarryIcons(ant), w, h, this)
-                        : null);
+            for (Ant ant : individuals) {
+                paintAntSprite(g2d, ant, type, assimilatedSpecies);
+            }
+
+            ColonySpriteMergeLod.forEachAntGroup(buckets, group -> {
+                if (zoneMergeContext == null || group.isEmpty()) {
+                    return maxGroupSize;
+                }
+                return zoneMergeContext.effectiveMaxGroupSizeForAnt(group.get(0), maxGroupSize);
+            }, (bucket, group) -> {
+                Ant representative = group.get(0);
+                paintAntSpriteAt(
+                        g2d,
+                        representative,
+                        type,
+                        ColonySpriteMergeLod.mergeCentroidX(group),
+                        ColonySpriteMergeLod.mergeCentroidY(group),
+                        assimilatedSpecies);
+            });
+        }
+    }
+
+    private boolean isAntVisibleForPaint(Ant ant, int typeW, int typeH) {
+        if (ant.getDimension() != currentDimension) {
+            return false;
+        }
+        if (ant.getDimension() == WorldSpaces.TUNNEL_WORLD) {
+            return false;
+        }
+        return ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), typeW, typeH);
+    }
+
+    private void paintAntSprite(Graphics2D g2d, Ant ant, AntType type, List<AntSpecies> assimilatedSpecies) {
+        paintAntSpriteAt(g2d, ant, type, ant.getX(), ant.getY(), assimilatedSpecies);
+    }
+
+    private void paintAntSpriteAt(
+            Graphics2D g2d,
+            Ant ant,
+            AntType type,
+            int drawX,
+            int drawY,
+            List<AntSpecies> assimilatedSpecies) {
+        boolean showCarry = RouteViewVisuals.showsGathererCarry(ant);
+        ImageIcon antSpriteIcon = GameConstants.getAntSprite(
+                type,
+                colony.getSpecies(),
+                ant.getSubtypeProfile(),
+                ant.getLegFrame(),
+                RouteViewVisuals.jawFrameForCarry(ant.getJawFrame(), showCarry),
+                ant.getWingFrame(),
+                ant.getAntennaFrame(),
+                ant.isParasiticMiteInfected());
+        if (antSpriteIcon == null) {
+            return;
+        }
+        Image sprite = antSpriteIcon.getImage();
+        int w = antSpriteIcon.getIconWidth();
+        int h = antSpriteIcon.getIconHeight();
+
+        Image currentSprite = sprite;
+        if (!assimilatedSpecies.isEmpty()) {
+            int seed = System.identityHashCode(ant);
+            if (Math.abs(seed) % 10 < 3) {
+                int index = (Math.abs(seed) / 10) % assimilatedSpecies.size();
+                AntSpecies as = assimilatedSpecies.get(index);
+                ImageIcon asIcon = GameConstants.getAssimilatedDroneSprite(as);
+                if (asIcon != null) {
+                    currentSprite = asIcon.getImage();
+                }
             }
         }
+
+        drawSpriteOriented(g2d, currentSprite, drawX, drawY, w, h, ant.getR(), showCarry
+                ? () -> RouteViewVisuals.paintJawCarryIcons(
+                g2d, RouteViewVisuals.gathererCarryIcons(ant), w, h, this)
+                : null);
     }
 
     private List<AntSpecies> assimilatedDroneSpeciesForPaint() {
@@ -1020,7 +1105,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         return signature;
     }
 
-    private void drawBugs(Graphics2D g2d) {
+    private void drawBugs(Graphics2D g2d, ColonySpriteMergeLod.ZoneMergeContext zoneMergeContext) {
         if (colony == null) {
             return;
         }
@@ -1028,10 +1113,13 @@ public class GameAreaPanel extends ZeroGamePanel {
         applyFastSpriteHints(g2d);
 
         boolean overworld = currentDimension == WorldSpaces.OVERWORLD;
-        int aphidSprites = 0;
-        int symbioticMiteSprites = 0;
-        int dermestidSprites = 0;
+        int[] aphidSprites = {0};
+        int[] symbioticMiteSprites = {0};
+        int[] dermestidSprites = {0};
         final int typeSpriteCap = GameNumbers.MAX_PEN_NON_ANT_SPRITES;
+        boolean colonyMergeActive = ColonySpriteMergeLod.isMergeActive(colony.getAntTotal());
+        int maxGroupSize = ColonySpriteMergeLod.maxGroupSize(colony.getAntTotal());
+        Map<ColonySpriteMergeLod.CritterMergeBucket, List<Critter>> buckets = new HashMap<>();
 
         for (Critter bug : colony.getCritters()) {
             if (bug.getDimension() != currentDimension) {
@@ -1043,7 +1131,6 @@ public class GameAreaPanel extends ZeroGamePanel {
                 continue;
             }
 
-            Image sprite = spriteIcon.getImage();
             int w = spriteIcon.getIconWidth();
             int h = spriteIcon.getIconHeight();
 
@@ -1056,37 +1143,103 @@ public class GameAreaPanel extends ZeroGamePanel {
                 if (!isBugInTypePen(bug, type, w, h)) {
                     continue;
                 }
-                if (type == GameConstants.TYPE_APHID && aphidSprites >= typeSpriteCap) {
+                if (type == GameConstants.TYPE_APHID && aphidSprites[0] >= typeSpriteCap) {
                     continue;
                 }
-                if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites >= typeSpriteCap) {
+                if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites[0] >= typeSpriteCap) {
                     continue;
                 }
-                if (type == GameConstants.TYPE_DERMESTID && dermestidSprites >= typeSpriteCap) {
+                if (type == GameConstants.TYPE_DERMESTID && dermestidSprites[0] >= typeSpriteCap) {
                     continue;
                 }
             } else {
-                if (type == GameConstants.TYPE_APHID && aphidSprites >= typeSpriteCap) {
+                if (type == GameConstants.TYPE_APHID && aphidSprites[0] >= typeSpriteCap) {
                     continue;
                 }
-                if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites >= typeSpriteCap) {
+                if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites[0] >= typeSpriteCap) {
                     continue;
                 }
-                if (type == GameConstants.TYPE_DERMESTID && dermestidSprites >= typeSpriteCap) {
+                if (type == GameConstants.TYPE_DERMESTID && dermestidSprites[0] >= typeSpriteCap) {
                     continue;
                 }
             }
 
-            drawSpriteOriented(g2d, sprite, bug.getX(), bug.getY(), w, h, bug.getR(), null);
+            boolean mergeBug = colonyMergeActive
+                    || (zoneMergeContext != null && zoneMergeContext.shouldMergeCritter(bug, w, h));
+            if (mergeBug) {
+                buckets.computeIfAbsent(ColonySpriteMergeLod.critterBucket(bug), k -> new ArrayList<>()).add(bug);
+                continue;
+            }
+
+            paintCritterSprite(g2d, bug, spriteIcon, w, h);
 
             if (type == GameConstants.TYPE_APHID) {
-                aphidSprites++;
+                aphidSprites[0]++;
             } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
-                symbioticMiteSprites++;
+                symbioticMiteSprites[0]++;
             } else if (type == GameConstants.TYPE_DERMESTID) {
-                dermestidSprites++;
+                dermestidSprites[0]++;
             }
         }
+
+        ColonySpriteMergeLod.forEachCritterGroup(buckets, group -> {
+            if (zoneMergeContext == null || group.isEmpty()) {
+                return maxGroupSize;
+            }
+            Critter representative = group.get(0);
+            ImageIcon groupSprite = GameConstants.getCritterSprite(representative.getSpecies(), representative.getLegFrame());
+            int groupW = groupSprite != null ? groupSprite.getIconWidth() : 16;
+            int groupH = groupSprite != null ? groupSprite.getIconHeight() : 16;
+            return zoneMergeContext.effectiveMaxGroupSizeForCritter(representative, groupW, groupH, maxGroupSize);
+        }, (bucket, group) -> {
+            Critter representative = group.get(0);
+            ImageIcon spriteIcon = GameConstants.getCritterSprite(representative.getSpecies(), representative.getLegFrame());
+            if (spriteIcon == null) {
+                return;
+            }
+            Species type = representative.getSpecies();
+            if (type == GameConstants.TYPE_APHID && aphidSprites[0] >= typeSpriteCap) {
+                return;
+            }
+            if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites[0] >= typeSpriteCap) {
+                return;
+            }
+            if (type == GameConstants.TYPE_DERMESTID && dermestidSprites[0] >= typeSpriteCap) {
+                return;
+            }
+
+            paintCritterSpriteAt(
+                    g2d,
+                    spriteIcon.getImage(),
+                    ColonySpriteMergeLod.mergeCentroidX(group),
+                    ColonySpriteMergeLod.mergeCentroidY(group),
+                    spriteIcon.getIconWidth(),
+                    spriteIcon.getIconHeight(),
+                    representative.getR());
+
+            if (type == GameConstants.TYPE_APHID) {
+                aphidSprites[0]++;
+            } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+                symbioticMiteSprites[0]++;
+            } else if (type == GameConstants.TYPE_DERMESTID) {
+                dermestidSprites[0]++;
+            }
+        });
+    }
+
+    private void paintCritterSprite(Graphics2D g2d, Critter bug, ImageIcon spriteIcon, int w, int h) {
+        paintCritterSpriteAt(g2d, spriteIcon.getImage(), bug.getX(), bug.getY(), w, h, bug.getR());
+    }
+
+    private void paintCritterSpriteAt(
+            Graphics2D g2d,
+            Image sprite,
+            int drawX,
+            int drawY,
+            int w,
+            int h,
+            int rotationDegrees) {
+        drawSpriteOriented(g2d, sprite, drawX, drawY, w, h, rotationDegrees, null);
     }
 
     private static void applyFastSpriteHints(Graphics2D g2d) {

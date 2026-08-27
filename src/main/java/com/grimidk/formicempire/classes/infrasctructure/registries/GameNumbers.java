@@ -23,6 +23,14 @@ public final class GameNumbers {
     public static final int MAX_PENDING_MINUTE_GUI_STEPS = 2;
     public static final int SPRITE_COMPOSITE_CACHE_MAX_ENTRIES = 2048;
     public static final int SPRITE_LAYER_CACHE_MAX_ENTRIES = 768;
+    public static final int SPRITE_MERGE_ANT_THRESHOLD = 1000;
+    public static final int SPRITE_MERGE_ANT_LARGE_THRESHOLD = 10000;
+    public static final int SPRITE_MERGE_GROUP_SIZE = 25;
+    public static final int SPRITE_MERGE_LARGE_GROUP_SIZE = 250;
+    public static final int SPRITE_MERGE_POSITION_TOLERANCE_PX = 10;
+    public static final int SPRITE_MERGE_POSITION_CELL_PX = SPRITE_MERGE_POSITION_TOLERANCE_PX * 2;
+    public static final int SPRITE_MERGE_ZONE_THRESHOLD = 100;
+    public static final double SPRITE_MERGE_ZONE_MIN_VISIBLE_FRACTION = 0.10;
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
