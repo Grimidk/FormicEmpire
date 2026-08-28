@@ -6,6 +6,7 @@ public final class WarBattleState {
     private final boolean hexAssault;
     private final int contestedColonyId;
     private int tickIndex;
+    private int worldDay;
 
     WarBattleState(WarBattleSideState attacker, WarBattleSideState defender, boolean hexAssault,
             int contestedColonyId) {
@@ -14,6 +15,15 @@ public final class WarBattleState {
         this.hexAssault = hexAssault;
         this.contestedColonyId = contestedColonyId;
         this.tickIndex = 0;
+        this.worldDay = 0;
+    }
+
+    int getWorldDay() {
+        return worldDay;
+    }
+
+    void setWorldDay(int worldDay) {
+        this.worldDay = worldDay;
     }
 
     public WarBattleSideState getAttacker() {

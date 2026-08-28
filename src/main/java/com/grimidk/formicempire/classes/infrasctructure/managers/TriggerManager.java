@@ -333,6 +333,9 @@ public class TriggerManager {
             if (!npc.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
                 npc.unlockUpgrade(GameUnlocks.ROLE_CRANE);
             }
+            if (!npc.hasUpgrade(GameUnlocks.ROLE_CARRIER)) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_CARRIER);
+            }
         }
     }
 
@@ -459,11 +462,15 @@ public class TriggerManager {
         }
         boolean needBrute = !playerColony.hasUpgrade(GameUnlocks.ROLE_BRUTE);
         boolean needCrane = !playerColony.hasUpgrade(GameUnlocks.ROLE_CRANE);
-        if (!needBrute && !needCrane) {
+        boolean needCarrier = !playerColony.hasUpgrade(GameUnlocks.ROLE_CARRIER);
+        if (!needBrute && !needCrane && !needCarrier) {
             return;
         }
         if (needCrane) {
             playerColony.unlockUpgrade(GameUnlocks.ROLE_CRANE);
+        }
+        if (needCarrier) {
+            playerColony.unlockUpgrade(GameUnlocks.ROLE_CARRIER);
         }
         if (needBrute) {
             fireLocalizedTrigger(GameUnlocks.ROLE_BRUTE,

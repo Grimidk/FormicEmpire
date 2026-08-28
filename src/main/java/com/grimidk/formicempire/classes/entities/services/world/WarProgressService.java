@@ -389,9 +389,9 @@ public final class WarProgressService {
     private static void resolveActiveClashHour(World world, War war, Dynasty stageAttacker, Dynasty stageDefender) {
         if (!WarCreatureCombatService.hasLivingCombatants(war)) {
             WarCreatureCombatService.clear(war);
-            WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender);
+            WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender, world.getDay());
         }
-        WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war);
+        WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war, world.getDay());
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
         if (outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS) {
@@ -436,16 +436,16 @@ public final class WarProgressService {
         war.setStageAttackerDynastyId(activeWinner.getId());
         war.setStagePhase(GameConstants.WAR_STAGE_RESERVE_ASSAULT);
         WarCreatureCombatService.clear(war);
-        WarCreatureCombatService.startHexBattle(war, activeWinner, reserveTarget);
+        WarCreatureCombatService.startHexBattle(war, activeWinner, reserveTarget, world.getDay());
     }
 
     private static void resolveReserveAssaultHour(World world, WarService warService, War war,
             Dynasty aggressor, Dynasty defender, Dynasty stageAttacker, Dynasty stageDefender, Colony contested) {
         if (!WarCreatureCombatService.hasLivingCombatants(war)) {
             WarCreatureCombatService.clear(war);
-            WarCreatureCombatService.startHexBattle(war, stageAttacker, contested);
+            WarCreatureCombatService.startHexBattle(war, stageAttacker, contested, world.getDay());
         }
-        WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war);
+        WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war, world.getDay());
         ColonyMilitaryService.refreshColonyMilitaryPower(contested);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
@@ -620,7 +620,7 @@ public final class WarProgressService {
         war.setStageStartActiveAggressor(ColonyMilitaryService.powerForWarStanding(aggressor));
         war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(defender));
         WarCreatureCombatService.clear(war);
-        WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender);
+        WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender, world.getDay());
     }
 
     private static void beginDirectReserveAssault(World world, War war, Dynasty stageAttacker,
@@ -638,7 +638,7 @@ public final class WarProgressService {
         war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(
                 world.findDynastyById(war.getDefenderDynastyId())));
         WarCreatureCombatService.clear(war);
-        WarCreatureCombatService.startHexBattle(war, stageAttacker, contested);
+        WarCreatureCombatService.startHexBattle(war, stageAttacker, contested, world.getDay());
     }
 
     private static void reassignContestedColony(World world, War war, Dynasty aggressor, Dynasty defender) {

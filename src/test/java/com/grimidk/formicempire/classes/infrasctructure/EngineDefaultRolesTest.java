@@ -91,12 +91,12 @@ class EngineDefaultRolesTest {
     }
 
     @Test
-    void sanitizeRejectsUnobtainableRole() {
+    void sanitizeRejectsWarEconomyRole() {
         int safe = Engine.sanitizeDefaultRoleId(
-                GameConstants.TYPE_MAJOR,
-                GameConstants.ROLE_CARRIER.getId(),
-                GameConstants.ROLE_CRANE.getId());
-        assertEquals(GameConstants.ROLE_CRANE.getId(), safe);
+                GameConstants.TYPE_SOLDIER,
+                GameConstants.ROLE_WARRIOR.getId(),
+                GameConstants.ROLE_MILITIA.getId());
+        assertEquals(GameConstants.ROLE_MILITIA.getId(), safe);
     }
 
     @Test

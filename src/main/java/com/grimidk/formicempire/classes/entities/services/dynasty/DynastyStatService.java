@@ -5,6 +5,8 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -138,5 +140,76 @@ public class DynastyStatService {
             }
         }
         return false;
+    }
+
+    public int getActiveMilitaryPower(Dynasty dynasty) {
+        return dynasty != null ? dynasty.getActiveMilitaryPower() : 0;
+    }
+
+    public int getReserveMilitaryPower(Dynasty dynasty) {
+        return dynasty != null ? dynasty.getReserveMilitaryPower() : 0;
+    }
+
+    public int getTotalAssignedCarriers(Dynasty dynasty) {
+        if (dynasty == null || dynasty.getColonies() == null) {
+            return 0;
+        }
+        boolean atWar = dynasty.isAtWar();
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == null) {
+                continue;
+            }
+            total += atWar
+                    ? colony.getWarAssignedRoleCount(GameConstants.ROLE_CARRIER)
+                    : colony.getAssignedRoleCount(GameConstants.ROLE_CARRIER);
+        }
+        return total;
+    }
+
+    public int getAssignedCarriers(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        boolean atWar = dynasty != null && dynasty.isAtWar();
+        return atWar
+                ? colony.getWarAssignedRoleCount(GameConstants.ROLE_CARRIER)
+                : colony.getAssignedRoleCount(GameConstants.ROLE_CARRIER);
+    }
+
+    public int getWarFrontCount(Dynasty dynasty, World world) {
+        if (dynasty == null || world == null || !dynasty.isAtWar()) {
+            return 1;
+        }
+        int count = 0;
+        for (War war : world.getWarService().getActiveWars()) {
+            if (war.involves(dynasty.getId())) {
+                count++;
+            }
+        }
+        return Math.max(1, count);
+    }
+
+    public int getCarrierSharePerFront(Dynasty dynasty, World world) {
+        return fairShare(getTotalAssignedCarriers(dynasty), getWarFrontCount(dynasty, world));
+    }
+
+    public float getDailyReinforcementRate(Dynasty dynasty, World world) {
+        return GameNumbers.warDailyReinforcementRate(getCarrierSharePerFront(dynasty, world));
+    }
+
+    public int getDailyReinforcementAllowancePerLine(Dynasty dynasty, World world) {
+        return GameNumbers.warDailyReinforcementAllowancePerLine(
+                getCombatCapacity(dynasty),
+                getCarrierSharePerFront(dynasty, world));
+    }
+
+    private static int fairShare(int totalQuota, int frontCount) {
+        int fronts = Math.max(1, frontCount);
+        if (totalQuota <= 0) {
+            return 0;
+        }
+        return (totalQuota + fronts - 1) / fronts;
     }
 }

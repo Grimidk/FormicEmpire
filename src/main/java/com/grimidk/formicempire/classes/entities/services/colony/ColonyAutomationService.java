@@ -43,7 +43,7 @@ public class ColonyAutomationService {
             GameConstants.ROLE_WARRIOR, GameConstants.ROLE_DEFENDER, GameConstants.ROLE_BOMBER
     };
     private static final AntRole[] PEACE_EXTRA_MAJOR_ROLES = {
-            GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE
+            GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE, GameConstants.ROLE_CARRIER
     };
     private static final AntRole[] PEACE_EXTRA_PRINCESS_ROLES = {
             GameConstants.ROLE_CAPTAIN, GameConstants.ROLE_AIR_SUPPORT, GameConstants.ROLE_AIR_BOMBER
@@ -55,7 +55,8 @@ public class ColonyAutomationService {
             GameConstants.ROLE_WARRIOR, GameConstants.ROLE_DEFENDER, GameConstants.ROLE_BOMBER
     };
     private static final AntRole[] WAR_MILITARY_MAJOR_ROLES = {
-            GameConstants.ROLE_BRUTE, GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE
+            GameConstants.ROLE_BRUTE, GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE,
+            GameConstants.ROLE_CARRIER
     };
     private static final AntRole[] WAR_MILITARY_PRINCESS_ROLES = {
             GameConstants.ROLE_CAPTAIN, GameConstants.ROLE_AIR_SUPPORT, GameConstants.ROLE_AIR_BOMBER

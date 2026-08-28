@@ -112,6 +112,7 @@ public final class GameUnlocks {
         public static final Upgrade ROLE_BRUTE = new Upgrade(25, "ROLE_BRUTE_UPGRADE", "ROLE_BRUTE_FLAVOR", "ROLE_BRUTE_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleBrute.png"), 0);
         static { upgrades.add(ROLE_BRUTE); }
         public static final Upgrade ROLE_CARRIER = new Upgrade(26, "ROLE_CARRIER_UPGRADE", "ROLE_CARRIER_FLAVOR", "ROLE_CARRIER_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleCarrier.png"), 0);
+        static { upgrades.add(ROLE_CARRIER); }
         public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "ROLE_ARTILLERY_UPGRADE", "ROLE_ARTILLERY_FLAVOR", "ROLE_ARTILLERY_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleArtillery.png"), 0);
         static { upgrades.add(ROLE_ARTILLERY); }
         public static final Upgrade ROLE_SIEGE = new Upgrade(28, "ROLE_SIEGE_UPGRADE", "ROLE_SIEGE_FLAVOR", "ROLE_SIEGE_DESC", TYPE_MAJOR, 200000, loadIcon("icons/upgrades/RoleSiege.png"), 4);

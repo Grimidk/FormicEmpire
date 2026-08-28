@@ -897,7 +897,7 @@ public final class GameConstants {
     static { antRoles.add(ROLE_HUNTER); }
     public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE,loadIcon("icons/roles/Brute.png"), true);
     static { antRoles.add(ROLE_BRUTE); }
-    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"));
+    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"), Set.of(), Set.of(), true, true);
     static { antRoles.add(ROLE_CARRIER); }
     public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY,loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of(), true);
     static { antRoles.add(ROLE_ARTILLERY); }
@@ -1141,8 +1141,7 @@ public final class GameConstants {
         2, LanguageStrings.GI_MODIFIER_GENETIC_EXCHANGE, 10.0, DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey());
     static { geneticIntegrityModifiers.add(GI_MODIFIER_GENETIC_EXCHANGE); }
 
-    private static final Set<AntRole> UNOBTAINABLE_ROLES = Set.of(
-            ROLE_CARRIER);
+    private static final Set<AntRole> UNOBTAINABLE_ROLES = Set.of();
 
     private static final AntRole[] ACTIVE_MILITARY_ROLES = antRoles.stream()
             .filter(AntRole::isActiveMilitary)

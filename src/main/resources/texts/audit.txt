@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 85% (350/410 checked)
+Completion: 85% (350/413 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -231,7 +231,8 @@ Soldier roles:
 [ ] Bomber (unlocked by Exploding Ant / Selfdestruct assimilation; war-economy active military)
 
 Major roles:
-[ ] Brute + Construction Crane (both unlock automatically with Major type; one combined popup)
+[ ] Brute + Construction Crane + Troop-Carrier (all unlock automatically with Major type; one combined popup)
+[ ] Troop-Carrier (hex defense only; stays in reserve; raises daily reserve-to-active rate; split across war fronts)
 [ ] Siege (RP purchase; Tier 4; hex-assault only)
 
 Princess roles:
@@ -366,7 +367,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [X] Dynasty-wide automation toggles (when unlocked):
     [X] Default auto-build
     [X] Default automation
-    [X] Peace automation assigns unlocked combat/support roles (Potter, Militia, Warrior, Defender, Bomber, Artillery, Siege, Captain, Air Support, Air Bomber, Commander) at ≥5% of that ant type
+    [X] Peace automation assigns unlocked combat/support roles (Potter, Militia, Warrior, Defender, Bomber, Artillery, Siege, Carrier, Captain, Air Support, Air Bomber, Commander) at ≥5% of that ant type
     [X] War automation keeps essential farm/forage/nurse (plus outbreak police/catchers / minimal layers) and sends the rest to unlocked active military roles
     [X] Default Auto-Tunnels
     [ ] Default Auto-Logistics (when Auto-Logistics unlocked)
@@ -511,7 +512,7 @@ Daily:
 [ ] Miner unlock from 10 Tier 3 buildings across dynasty (requires Soldier type; scouts then spot minerals)
 [ ] Hunter + Warrior + Militia role unlocks (one popup with Soldier type)
 [ ] Breeder + Spread unlock together (one popup with Princess type)
-[ ] Brute + Construction Crane (both unlock automatically with Major type; one combined popup)
+[ ] Brute + Construction Crane + Troop-Carrier (all unlock automatically with Major type; one combined popup)
 [X] Queendom rank unlocks Air Support princess role
 [X] Commander role unlock (3 wars participated + multi-queen colony)
 [X] Commander assignment: max 1 per colony; requires spare queen off combat; raises dynasty combat capacity 1k→2.5k once
@@ -572,6 +573,8 @@ Combat:
 [X] Redeploy: ants heal regen% of max HP; Boost Regen doubles next redeploy heal (Potter / Honeypot)
 [X] Shielding: doorhead Defenders absorb queen losses in hex defense until dead
 [X] Defender and Siege are active military but only fight in hex defense (not border clash)
+[ ] Troop-Carrier: hex defense only, stays in reserve, never fights; dynasty share on each front raises daily reserve-to-active rate (10% base up to 25%)
+[ ] Daily reserve promotions capped per battle line per world day (10–25% of combat capacity)
 [X] Battle lines: Infantry (Militia, Warrior, Defender, Brute, Siege, Bomber, Captain); Artillery (Artillery, Potter, Commander); Air Support (Air Support, Air Bomber) with flyby + reload dwell
 [X] Honeypot unlocks Potter (honeypot workers only); Doorhead unlocks Defender (doorhead soldiers only)
 [X] Battle view stat multipliers vs standing multipliers

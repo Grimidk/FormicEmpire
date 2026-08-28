@@ -227,6 +227,30 @@ public final class GameNumbers {
     public static final float WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT = 1.2f;
     public static final float WAR_AI_HEX_BAIT_MIN_COUNTER_ODDS = 0.9f;
     public static final float WAR_BATTLE_ARMY_DEFEAT_RATIO = 0.9f;
+    public static final float WAR_REINFORCEMENT_RATE_BASE = 0.10f;
+    public static final float WAR_REINFORCEMENT_RATE_MAX = 0.25f;
+    public static final int WAR_REINFORCEMENT_CARRIER_BONUS_MAX_PP = 15;
+    public static final int WAR_REINFORCEMENT_CARRIER_FULL_BONUS_COUNT = 1 << 14;
+
+    public static int warCarrierReinforcementBonusPercent(int carrierCount) {
+        if (carrierCount <= 0) {
+            return 0;
+        }
+        int floorLog2 = 31 - Integer.numberOfLeadingZeros(carrierCount);
+        return Math.min(WAR_REINFORCEMENT_CARRIER_BONUS_MAX_PP, floorLog2 + 1);
+    }
+
+    public static float warDailyReinforcementRate(int carrierCount) {
+        float bonus = warCarrierReinforcementBonusPercent(carrierCount) / 100f;
+        return Math.min(WAR_REINFORCEMENT_RATE_MAX, WAR_REINFORCEMENT_RATE_BASE + bonus);
+    }
+
+    public static int warDailyReinforcementAllowancePerLine(int combatCapacity, int carrierCount) {
+        if (combatCapacity <= 0) {
+            return 0;
+        }
+        return (int) Math.floor(combatCapacity * warDailyReinforcementRate(carrierCount));
+    }
 
     public static final int COMBAT_CAPACITY_BASE = 1000;
     public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;  

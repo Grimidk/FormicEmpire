@@ -599,6 +599,10 @@ public class HelpPanel extends JPanel {
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_BATTLE_LINES, buildCombatBattleLinesSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_HEX_DEFENSE, buildCombatHexDefenseSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_REINFORCEMENT, buildCombatReinforcementSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_PHASES, buildCombatWarPhasesSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_STANDING, buildCombatWarStandingSection()));
@@ -656,6 +660,32 @@ public class HelpPanel extends JPanel {
                     formatWarPhaseHelpBody(phase)));
             panel.add(Box.createRigidArea(new Dimension(0, 5)));
         }
+        return panel;
+    }
+
+    private JPanel buildCombatHexDefenseSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_HEX_DEFENSE_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 8, 0));
+        intro.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(intro);
+        for (AntRole role : GameConstants.getHexDefenseOnlyRoles()) {
+            panel.add(buildCombatConstantEntry(panel, role.getName(), role.getIcon(),
+                    LanguageStrings.get(roleDescriptionKey(role))));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatReinforcementSection() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        JLabel body = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_REINFORCEMENT_BODY)));
+        styleTutorialLabel(body);
+        panel.add(body, BorderLayout.CENTER);
         return panel;
     }
 

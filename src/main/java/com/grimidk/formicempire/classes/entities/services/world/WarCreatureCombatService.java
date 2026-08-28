@@ -46,6 +46,11 @@ public final class WarCreatureCombatService {
     }
 
     public static WarBattleState startBorderBattle(War war, Dynasty stageAttacker, Dynasty stageDefender) {
+        return startBorderBattle(war, stageAttacker, stageDefender, 0);
+    }
+
+    public static WarBattleState startBorderBattle(War war, Dynasty stageAttacker, Dynasty stageDefender,
+            int worldDay) {
         if (war == null || stageAttacker == null || stageDefender == null) {
             return null;
         }
@@ -54,12 +59,17 @@ public final class WarCreatureCombatService {
         WarBattleSideState atk = buildBorderSide(stageAttacker, false, attackerFronts);
         WarBattleSideState def = buildBorderSide(stageDefender, false, defenderFronts);
         WarBattleState state = new WarBattleState(atk, def, false, war.getContestedColonyId());
+        state.setWorldDay(worldDay);
         WAR_BATTLES.put(war.getId(), state);
         syncDeployedCounts(war, state);
         return state;
     }
 
     public static WarBattleState startHexBattle(War war, Dynasty stageAttacker, Colony contested) {
+        return startHexBattle(war, stageAttacker, contested, 0);
+    }
+
+    public static WarBattleState startHexBattle(War war, Dynasty stageAttacker, Colony contested, int worldDay) {
         if (war == null || stageAttacker == null || contested == null || contested.getDynasty() == null) {
             return null;
         }
@@ -69,12 +79,17 @@ public final class WarCreatureCombatService {
         WarBattleSideState def = buildHexDefenderSide(contested, defenderFronts);
         WarCombatSkillService.armShieldingForEligibleDefenders(contested);
         WarBattleState state = new WarBattleState(atk, def, true, contested.getId());
+        state.setWorldDay(worldDay);
         WAR_BATTLES.put(war.getId(), state);
         syncDeployedCounts(war, state);
         return state;
     }
 
     public static TickOutcome tick(War war) {
+        return tick(war, 0);
+    }
+
+    public static TickOutcome tick(War war, int worldDay) {
         if (war == null) {
             return TickOutcome.CONTINUE;
         }
@@ -82,6 +97,7 @@ public final class WarCreatureCombatService {
         if (state == null) {
             return TickOutcome.CONTINUE;
         }
+        state.setWorldDay(worldDay);
         state.advanceTick();
         int tick = state.getTickIndex();
 
@@ -96,8 +112,8 @@ public final class WarCreatureCombatService {
             resolveLinePhase(state, false, GameConstants.BATTLE_LINE_AIR_SUPPORT);
         }
 
-        promoteReserves(state.getAttacker());
-        promoteReserves(state.getDefender());
+        promoteReserves(state.getAttacker(), worldDay);
+        promoteReserves(state.getDefender(), worldDay);
         syncDeployedCounts(war, state);
         updateStageCasualtyProgress(war, state);
 
@@ -364,7 +380,7 @@ public final class WarCreatureCombatService {
         side.incrementDead();
         clearFocusOn(state, victim);
         detachAntFromOtherBattles(ant, state);
-        promoteReserves(side);
+        promoteReserves(side, state.getWorldDay());
     }
 
     private static void detachAntFromOtherBattles(Ant ant, WarBattleState except) {
@@ -519,20 +535,48 @@ public final class WarCreatureCombatService {
         }
     }
 
-    private static void promoteReserves(WarBattleSideState side) {
+    private static void promoteReserves(WarBattleSideState side, int worldDay) {
         if (side == null || side.getDynasty() == null) {
             return;
         }
-        int capacity = Math.max(1, side.getDynasty().getCombatCapacity());
+        side.resetReinforcementDayIfNeeded(worldDay);
+        Dynasty dynasty = side.getDynasty();
+        int capacity = Math.max(1, dynasty.getCombatCapacity());
+        int frontCount = Math.max(1, countBattlesInvolving(dynasty));
+        int carrierShare = fairShare(totalWarQuota(dynasty, GameConstants.ROLE_CARRIER), frontCount);
+        int allowancePerLine = GameNumbers.warDailyReinforcementAllowancePerLine(capacity, carrierShare);
         for (BattleLine line : GameConstants.getBattleLines()) {
             List<WarBattleParticipant> active = side.getActive(line);
             List<WarBattleParticipant> reserve = side.getReserve(line);
             active.removeIf(p -> !p.isAlive());
             reserve.removeIf(p -> !p.isAlive());
-            while (active.size() < capacity && !reserve.isEmpty()) {
-                active.add(reserve.remove(0));
+            while (active.size() < capacity
+                    && side.getReinforcementPromotionsUsed(line) < allowancePerLine) {
+                WarBattleParticipant next = pollNextReinforcement(reserve);
+                if (next == null) {
+                    break;
+                }
+                active.add(next);
+                side.recordReinforcementPromotion(line);
             }
         }
+    }
+
+    private static WarBattleParticipant pollNextReinforcement(List<WarBattleParticipant> reserve) {
+        for (int i = 0; i < reserve.size(); i++) {
+            WarBattleParticipant candidate = reserve.get(i);
+            if (isCarrierParticipant(candidate)) {
+                continue;
+            }
+            return reserve.remove(i);
+        }
+        return null;
+    }
+
+    private static boolean isCarrierParticipant(WarBattleParticipant participant) {
+        return participant != null
+                && participant.getAnt() != null
+                && participant.getAnt().getRole() == GameConstants.ROLE_CARRIER;
     }
 
     private static WarBattleSideState buildBorderSide(Dynasty dynasty, boolean hexPriority, int frontCount) {
@@ -575,6 +619,7 @@ public final class WarCreatureCombatService {
         claimRoleQuota(contested, GameConstants.ROLE_DEFENDER, pool, seen, defenderShare);
         int siegeShare = fairShare(contested.getWarAssignedRoleCount(GameConstants.ROLE_SIEGE), fronts);
         claimRoleQuota(contested, GameConstants.ROLE_SIEGE, pool, seen, siegeShare);
+        claimDynastyRoleQuota(dynasty, GameConstants.ROLE_CARRIER, pool, seen, fronts);
         for (AntRole role : GameConstants.getBorderBattleRoles()) {
             if (role == GameConstants.ROLE_DEFENDER) {
                 continue;
@@ -656,9 +701,13 @@ public final class WarCreatureCombatService {
             if (side != null) {
                 trimSideToFairShares(side, dynasty, frontCount);
                 side.setStartingArmySize(side.livingArmySize() + side.getDeadCount());
-                promoteReserves(side);
+                promoteReserves(side, battleWorldDay(state));
             }
         }
+    }
+
+    private static int battleWorldDay(WarBattleState state) {
+        return state != null ? state.getWorldDay() : 0;
     }
 
     private static void trimSideToFairShares(WarBattleSideState side, Dynasty dynasty, int frontCount) {
