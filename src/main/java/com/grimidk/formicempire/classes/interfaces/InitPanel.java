@@ -27,7 +27,6 @@ public class InitPanel extends JPanel {
             new VersionLicenseFooter(AssetStyles.COLOR_ABSOLUTE_BLACK);
     
     private JButton play;
-    private JButton help;
     private JButton audit;
     private JButton roadmap;
     private JButton credits;
@@ -75,7 +74,6 @@ public class InitPanel extends JPanel {
     
     private void initComponents() {
         play = createMenuButton(LanguageStrings.UI_PLAY, e -> frame.showCard(MainFrame.CARD_SAVE));
-        help = createMenuButton(LanguageStrings.UI_HELP, e -> frame.showCard(MainFrame.CARD_HELP));
         audit = createMenuButton(LanguageStrings.UI_AUDIT, e -> HelpPanel.showAuditDialog(this));
         roadmap = createMenuButton(LanguageStrings.UI_ROADMAP, e -> HelpPanel.showRoadmapDialog(this));
         credits = createMenuButton(LanguageStrings.UI_CREDITS, e -> HelpPanel.showCreditsDialog(this));
@@ -119,8 +117,8 @@ public class InitPanel extends JPanel {
         menuColumn.add(menuHeader, c);
 
         JButton[] buttons = audit.isVisible()
-                ? new JButton[] { play, help, audit, roadmap, credits, quit }
-                : new JButton[] { play, help, roadmap, credits, quit };
+                ? new JButton[] { play, audit, roadmap, credits, quit }
+                : new JButton[] { play, roadmap, credits, quit };
 
         for (int i = 0; i < buttons.length; i++) {
             c.gridy = i + 1;
@@ -133,7 +131,6 @@ public class InitPanel extends JPanel {
     
     public void refreshTranslations() {
         play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
-        help.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
         audit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         roadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
         credits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 85% (350/413 checked)
+Completion: 85% (349/412 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -11,13 +11,13 @@ Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic change
 ================================================================================
 [X] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning, then short translated license summary pointing to full License on main menu; click or timer to advance) auto-advances to main menu
 [X] Play — opens save slot screen
-[X] Help — encyclopedia (all tabs; see section 18)
 [X] Roadmap — development roadmap text dialog
 [X] Credits — credits text dialog
 [X] Main menu version text (bottom left, black)
 [X] Main menu License (bottom right) — opens full license dialog
 [X] Main menu side rail — Discord icon opens Discord invite in browser
 [X] Main menu side rail — Instagram icon opens https://www.instagram.com/grim.idk/
+[ ] Main menu side rail — Help icon opens help encyclopedia above Feedback (see section 18)
 [X] Main menu side rail — Feedback icon opens Google Form in browser
 [X] Main menu side rail — Settings icon opens settings panel
 [X] Mechanics Audit — this file (only when enabled in Settings > Sandbox)
@@ -484,7 +484,7 @@ Tabs (live refresh while open; dynasty-mode toggle where applicable):
 In-game tutorial dialog (on new game + ESC > Tutorial):
 [X] Multi-page walkthrough — Back, Next, Skip, Finish
 
-Help encyclopedia (main menu Help):
+Help encyclopedia (main menu side rail Help icon):
 [ ] Tutorials — Welcome, Getting Started, Dynasty (spies note), Hotkeys
 [X] Ant Species (assimilation name, icon, description; representative castes / subtypes)
 [X] Ant types

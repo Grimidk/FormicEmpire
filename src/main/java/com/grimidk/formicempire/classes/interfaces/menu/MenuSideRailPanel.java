@@ -31,6 +31,7 @@ public class MenuSideRailPanel extends JPanel {
     private final MainFrame frame;
     private final JButton discordButton;
     private final JButton instagramButton;
+    private final JButton helpButton;
     private final JButton feedbackButton;
     private final JButton settingsButton;
 
@@ -57,12 +58,16 @@ public class MenuSideRailPanel extends JPanel {
         bottomRail.setOpaque(false);
         bottomRail.setLayout(new BoxLayout(bottomRail, BoxLayout.Y_AXIS));
 
+        helpButton = createRailButton(GameConstants.ICON_SOCIAL_HELP,
+                e -> frame.showCard(MainFrame.CARD_HELP));
         feedbackButton = createRailButton(GameConstants.ICON_SOCIAL_FEEDBACK, e -> openUrl(
                 FEEDBACK_FORM_URL, LanguageStrings.UI_FEEDBACK));
         settingsButton = createRailButton(
                 GameConstants.ICON_SOCIAL_SETTINGS,
                 e -> frame.showSettingsMenu(MainFrame.CARD_INIT));
 
+        bottomRail.add(helpButton);
+        bottomRail.add(Box.createVerticalStrut(8));
         bottomRail.add(feedbackButton);
         bottomRail.add(Box.createVerticalStrut(8));
         bottomRail.add(settingsButton);
@@ -75,6 +80,7 @@ public class MenuSideRailPanel extends JPanel {
     public void refreshTranslations() {
         discordButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_DISCORD));
         instagramButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_INSTAGRAM));
+        helpButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_HELP_TT));
         feedbackButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_FEEDBACK_TT));
         settingsButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
     }
@@ -82,6 +88,7 @@ public class MenuSideRailPanel extends JPanel {
     public void refreshTheme() {
         styleRailButton(discordButton, GameConstants.ICON_SOCIAL_DISCORD);
         styleRailButton(instagramButton, GameConstants.ICON_SOCIAL_INSTAGRAM);
+        styleRailButton(helpButton, GameConstants.ICON_SOCIAL_HELP);
         styleRailButton(feedbackButton, GameConstants.ICON_SOCIAL_FEEDBACK);
         styleRailButton(settingsButton, GameConstants.ICON_SOCIAL_SETTINGS);
     }

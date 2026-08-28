@@ -1064,6 +1064,7 @@ public final class GameConstants {
     public static final ImageIcon ICON_SPEED_PAUSE = loadIcon("icons/speed/Pause.png");
     public static final ImageIcon ICON_SOCIAL_DISCORD = loadIcon("icons/social/Discord.png");
     public static final ImageIcon ICON_SOCIAL_INSTAGRAM = loadIcon("icons/social/Instagram.png");
+    public static final ImageIcon ICON_SOCIAL_HELP = loadIcon("icons/social/Help.png");
     public static final ImageIcon ICON_SOCIAL_FEEDBACK = loadIcon("icons/social/Feedback.png");
     public static final ImageIcon ICON_SOCIAL_SETTINGS = loadIcon("icons/social/Settings.png");
     public static final ImageIcon ICON_MUSIC_PREV = loadIcon("icons/music/Prev.png");

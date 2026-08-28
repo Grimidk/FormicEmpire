@@ -7,7 +7,6 @@ To Fix (By decreasing priority):
 		TODO: icons for stats (Skeleton, Acid, Longevity, Research/Growth/Thirst 1–2/Laying/Scouting/Farming/Contamination/Graving/Policing 1–3, Logistics 1, Passive 1, Symbiotic Mite 1, Dermestid 1, Hex Sustain, Worker Speed 2, Health/Attack/Defense 1–2, Attack Speed 1)
 		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave/Web, Composter) — separate from sprites/buildings/rooms/ Silkweave L3 room/icons Hivebuild mound room/icons + overworld mound art (HiveMound2/4) PassiveWeb room sprite + icons/buildings/PassiveWeb.png (placeholder room exists)
 		music: main menu song, more songs in general
-		change help and feedback icons
 	Mid:
 		(none right now)
 	Low:
@@ -21,19 +20,21 @@ To Fix (By decreasing priority):
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		swarm vs creature battles
+		swarm vs creature battles (system)
+		launch creatures (single battle or swarm; needs battle system):
+			Bugs: Cuban/reg cockroach, Bombardier beetle, Ant lion
+			Arachnids: Spider, Tarantula
+		uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
+		more biomes (beach, cliffs, wetlands, mangrove, coastal vs inland prairie, burnt forest [resin source, no water, cant start], ice field [cant start], continent variation, rivers on borders, unpassable terrain, lock species to biome, protein-only ant, bigger world)
+	Everything else :
 		more enemies (single battle or swarm battles):
-			Bugs (Bombardier beetle, ant lions, soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, cuban and regfcockroach, goliath beetle, cricket moles, locust swarms, scalopendra)
-			Arachnids (catapult ants, tarantulas, vinegaroons, horsehoecrabs)
+			Bugs (soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, goliath beetle, cricket moles, locust swarms, scalopendra)
+			Arachnids (catapult ants, vinegaroons, horsehoecrabs)
 			Anphibians (Salamander, frog, toad)
 			Reptiles (Gecko, Snake, Tortiose)
 			Birds (Crow, Finch, Chicken)
 			Mammals (Rats, Possum, Anteater)
 			Zombie ant colonies (Cordiceps)
-		uncolonizable terrain with boss enemies (non ant assimilation reward, unique bosses)
-		more roles (paratroopers to skip a stage)
-		more biomes (beach, cliffs, wetlands, mangrove, (coastal vs inland) prairie, burnt forest (resin source, no water, cant start), ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain, lock species to certain biome, need an ant that only eats protein and biome rarity make world bigger to fit bigger continent 
-	Everything else :
 		fog of war, range of 1 at the start, cant interact with dynasties outside the fog, scouts (or explorer princess role with exploring range) have a small chance to venture to adjacent hexes to explore, cant colonize into fog, cheat to remove fog, action to exchange intel for trade (and rep)
 		rework popups and dialogs to not be different windows
 		bridges (needs rafting)
@@ -66,6 +67,11 @@ Needed for launch (v1.0) (Launch Version):
 
 Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package) with addiontal codegen tools for saves and repositories etc
+	air battles rework (prerequisite for paratroopers):
+		air vs air fighters on the air battle line
+		anti-air artillery (and/or dedicated anti-air roles/skills)
+		deeper air battle resolution (not just passive air support)
+		paratroopers — attacker skips border clash → hex siege (paid drop, landing debuff; not instant capture)
 	editable stat panel 
 	world editing (size, islands, dynasty amounts and size) and further dynasty editing like color species and starting upgrades, starting biome and species assimilation
 	console and commands for debugging (to include in core)

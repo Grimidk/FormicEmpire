@@ -508,6 +508,7 @@ public final class LanguageStrings {
     public static final String UI_CREATE = "UI_CREATE";
     public static final String UI_LOAD = "UI_LOAD";
     public static final String UI_HELP = "UI_HELP";
+    public static final String UI_HELP_TT = "UI_HELP_TT";
     public static final String UI_ROADMAP = "UI_ROADMAP";
     public static final String UI_QUIT = "UI_QUIT";
     public static final String INTRO_WARNING = "INTRO_WARNING";
