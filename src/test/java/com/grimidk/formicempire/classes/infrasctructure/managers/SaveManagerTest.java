@@ -2,10 +2,14 @@ package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
@@ -330,5 +334,56 @@ public class SaveManagerTest {
         Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
         Colony restored = new Colony(loaded);
         assertEquals(50f, restored.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3));
+    }
+
+    @Test
+    void playerSaveSummaryUsesActiveOrCapitalNotLastSatellite() throws Exception {
+        World world = new World();
+        Engine engine = new Engine();
+        world.setEngine(engine);
+
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.getStarterService().initializeDynasty(dynasty);
+
+        Colony capital = new Colony(1, "Capital", true);
+        capital.setCapital(true);
+        dynasty.setCapital(capital);
+        dynasty.addColony(capital);
+        capital.setDynasty(dynasty);
+        capital.setActive(true);
+        for (int i = 0; i < 50; i++) {
+            capital.getWorkers().add(new Ant(capital, GameConstants.TYPE_WORKER));
+        }
+
+        Colony satellite = new Colony(2, "Satellite", true);
+        dynasty.addColony(satellite);
+        satellite.setDynasty(dynasty);
+        satellite.setActive(false);
+        satellite.getQueens().add(new Ant(satellite, GameConstants.TYPE_QUEEN));
+
+        Hex capitalHex = new Hex();
+        capitalHex.setQ(0);
+        capitalHex.setR(0);
+        capitalHex.setColony(capital);
+        Hex satelliteHex = new Hex();
+        satelliteHex.setQ(1);
+        satelliteHex.setR(0);
+        satelliteHex.setColony(satellite);
+
+        world.registerDynasty(dynasty);
+        world.getHexes().add(capitalHex);
+        world.getHexes().add(satelliteHex);
+
+        Savefile save = new Savefile(1, "test");
+        SaveManager saveManager = new SaveManager();
+        Method populate = SaveManager.class.getDeclaredMethod(
+                "populateSavefileFromGame", Savefile.class, World.class, Engine.class);
+        populate.setAccessible(true);
+        populate.invoke(saveManager, save, world, engine);
+
+        assertEquals(capital.getId(), save.getColonyId());
+        assertEquals(capital.getName(), save.getColonyName());
+        assertTrue(save.getTotalAnts() > satellite.getAntTotal());
+        assertTrue(save.getWorkers() > 0);
     }
 }

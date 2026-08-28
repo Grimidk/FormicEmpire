@@ -184,7 +184,7 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_AUTO_TUNNELS); }
         public static final Upgrade ABILITY_AUTO_DIPLOMACY = new Upgrade(523, "ABILITY_AUTO_DIPLOMACY", "ABILITY_AUTO_DIPLOMACY_FLAVOR", "ABILITY_AUTO_DIPLOMACY_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoDiplomacy.png"), 0);
         static { upgrades.add(ABILITY_AUTO_DIPLOMACY); }
-        public static final Upgrade ABILITY_AUTO_LOGISTICS = new Upgrade(525, "ABILITY_AUTO_LOGISTICS", "ABILITY_AUTO_LOGISTICS_FLAVOR", "ABILITY_AUTO_LOGISTICS_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoDiplomacy.png"), 0);
+        public static final Upgrade ABILITY_AUTO_LOGISTICS = new Upgrade(525, "ABILITY_AUTO_LOGISTICS", "ABILITY_AUTO_LOGISTICS_FLAVOR", "ABILITY_AUTO_LOGISTICS_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoLogistics.png"), 0);
         static { upgrades.add(ABILITY_AUTO_LOGISTICS); }
         public static final Upgrade ABILITY_JUMPING = new Upgrade(526, "ABILITY_JUMPING", "ABILITY_JUMPING_FLAVOR", "ABILITY_JUMPING_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0);
         static { upgrades.add(ABILITY_JUMPING); }

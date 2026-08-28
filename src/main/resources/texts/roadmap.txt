@@ -15,6 +15,7 @@ To Fix (By decreasing priority):
 		(none right now)
 	Important not Urgent:
 		Font - self explanatory
+		redo upgrade tree node shape
 
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):

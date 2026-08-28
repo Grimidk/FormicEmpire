@@ -123,10 +123,23 @@ public class AbilitiesDialog extends ZeroDialog {
                     createCostLabel(GameConstants.ICON_RESEARCH, massCost),
                     e -> {
                         if (getOwner() instanceof MainFrame main) {
-                            if (main.getEngine() != null && main.getEngine().getWorld() != null) {
-                                colony.getDynasty().runMassNuptialFlight(main.getEngine().getWorld());
-                                refreshDialog();
+                            Engine engine = main.getEngine();
+                            if (engine == null || engine.getWorld() == null || colony.getDynasty() == null) {
+                                return;
                             }
+                            World world = engine.getWorld();
+                            boolean resumeAfter = !engine.isPaused();
+                            if (resumeAfter) {
+                                engine.pauseEngine();
+                            }
+                            try {
+                                colony.getDynasty().runMassNuptialFlight(world);
+                            } finally {
+                                if (resumeAfter) {
+                                    engine.resumeEngine();
+                                }
+                            }
+                            refreshDialog();
                         }
                     });
             triggerSyncs.add(() -> syncMassFlight(row, massCost));

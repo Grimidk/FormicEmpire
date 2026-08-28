@@ -356,6 +356,8 @@ public class SaveManager {
         List<Savefile.SavedHex> hexList = new ArrayList<>();
         List<Savefile.SavedColony> colonyList = new ArrayList<>();
         List<Savefile.SavedDynasty> dynastyList = new ArrayList<>();
+        Colony playerSummaryColony = null;
+        Colony playerCapitalColony = null;
 
         // Save Dynastys
         if (w.getDynastys() != null) {
@@ -649,27 +651,40 @@ public class SaveManager {
                     colonyList.add(sc);
                     
                     if (c.isPlayer()) {
-                        save.setColonyId(c.getId());
-                        save.setColonyName(c.getName());
-                        save.setTotalAnts(c.getAntTotal());
-                        save.setWorkers(c.getWorkers().size());
-                        save.setQueens(c.getQueens().size());
-                        save.setDeadAnts(c.getDeadAnts().size());
-                        
-                        save.setMushrooms(c.getMushrooms());
-                        save.setPlants(c.getPlants());
-                        save.setProtein(c.getProtein());
-                        save.setWater(c.getWater());
-                        save.setSyrups(c.getSyrups());
-                        save.setResins(c.getResins());
-                        save.setMinerals(c.getMinerals());
+                        if (c.isActive()) {
+                            playerSummaryColony = c;
+                        } else if (c.isCapital()) {
+                            playerCapitalColony = c;
+                        }
                     }
                 }
             }
         }
+
+        Colony summaryColony = playerSummaryColony != null ? playerSummaryColony : playerCapitalColony;
+        if (summaryColony != null) {
+            applyPlayerColonySummary(save, summaryColony);
+        }
         
         save.setWorldHexes(hexList);
         save.setColonies(colonyList);
+    }
+
+    private static void applyPlayerColonySummary(Savefile save, Colony c) {
+        save.setColonyId(c.getId());
+        save.setColonyName(c.getName());
+        save.setTotalAnts(c.getAntTotal());
+        save.setWorkers(c.getWorkers().size());
+        save.setQueens(c.getQueens().size());
+        save.setDeadAnts(c.getDeadAnts().size());
+
+        save.setMushrooms(c.getMushrooms());
+        save.setPlants(c.getPlants());
+        save.setProtein(c.getProtein());
+        save.setWater(c.getWater());
+        save.setSyrups(c.getSyrups());
+        save.setResins(c.getResins());
+        save.setMinerals(c.getMinerals());
     }
 
     private void writeSaveToWriter(Savefile s, BufferedWriter w) throws IOException {
