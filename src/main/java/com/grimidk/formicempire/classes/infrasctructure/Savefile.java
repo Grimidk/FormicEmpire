@@ -200,6 +200,114 @@ public class Savefile implements Serializable {
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();
         public List<SavedResourceSource> savedResourceSources = new ArrayList<>();
+        public int nextHuntTargetId = 1;
+        public List<SavedHuntTarget> knownHuntTargets = new ArrayList<>();
+        public List<SavedHuntExpedition> activeHuntExpeditions = new ArrayList<>();
+        public SavedHuntExpedition activeHuntExpedition;
+        public int nextInvasionAlertId = 1;
+        public List<SavedInvasionAlert> invasionAlerts = new ArrayList<>();
+        public List<SavedInvasionDefense> activeInvasionDefenses = new ArrayList<>();
+    }
+
+    public static class SavedInvasionDefense implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int alertId;
+        public float bugHealth;
+        public int tickIndex;
+        public int focusTargetIndex;
+        public List<SavedHuntPartyMember> party = new ArrayList<>();
+
+        public SavedInvasionDefense(int alertId, float bugHealth, int tickIndex, int focusTargetIndex) {
+            this.alertId = alertId;
+            this.bugHealth = bugHealth;
+            this.tickIndex = tickIndex;
+            this.focusTargetIndex = focusTargetIndex;
+        }
+    }
+
+    public static class SavedInvasionAlert implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int id;
+        public int speciesId;
+        public String scope;
+        public int targetColonyId;
+        public int deadlineAbsoluteHour;
+        public boolean defenseDispatched;
+
+        public SavedInvasionAlert(int id, int speciesId, String scope, int targetColonyId,
+                int deadlineAbsoluteHour, boolean defenseDispatched) {
+            this.id = id;
+            this.speciesId = speciesId;
+            this.scope = scope;
+            this.targetColonyId = targetColonyId;
+            this.deadlineAbsoluteHour = deadlineAbsoluteHour;
+            this.defenseDispatched = defenseDispatched;
+        }
+    }
+
+    public static class SavedHuntPartyMember implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int typeId;
+        public int subtypeCode;
+        public int roleId;
+        public int slotIndex;
+        public int health;
+        public float battleHealth;
+        public float battleMaxHealth;
+
+        public SavedHuntPartyMember(int typeId, int subtypeCode, int roleId, int slotIndex, int health,
+                float battleHealth, float battleMaxHealth) {
+            this.typeId = typeId;
+            this.subtypeCode = subtypeCode;
+            this.roleId = roleId;
+            this.slotIndex = slotIndex;
+            this.health = health;
+            this.battleHealth = battleHealth;
+            this.battleMaxHealth = battleMaxHealth;
+        }
+    }
+
+    public static class SavedHuntExpedition implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int targetId;
+        public String phase;
+        public float travelHoursRemaining;
+        public float travelHoursTotal;
+        public float bugHealth;
+        public int tickIndex;
+        public int focusTargetIndex;
+        public List<SavedHuntPartyMember> party = new ArrayList<>();
+
+        public SavedHuntExpedition(int targetId, String phase, float travelHoursRemaining, float travelHoursTotal,
+                float bugHealth, int tickIndex, int focusTargetIndex) {
+            this.targetId = targetId;
+            this.phase = phase;
+            this.travelHoursRemaining = travelHoursRemaining;
+            this.travelHoursTotal = travelHoursTotal;
+            this.bugHealth = bugHealth;
+            this.tickIndex = tickIndex;
+            this.focusTargetIndex = focusTargetIndex;
+        }
+    }
+
+    public static class SavedHuntTarget implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int id;
+        public int speciesId;
+        public int overworldX;
+        public int overworldY;
+        public int discoveredWorldDay;
+        public int escapeWorldDay;
+
+        public SavedHuntTarget(int id, int speciesId, int overworldX, int overworldY, int discoveredWorldDay,
+                int escapeWorldDay) {
+            this.id = id;
+            this.speciesId = speciesId;
+            this.overworldX = overworldX;
+            this.overworldY = overworldY;
+            this.discoveredWorldDay = discoveredWorldDay;
+            this.escapeWorldDay = escapeWorldDay;
+        }
     }
 
     public static class SavedResourceSource implements Serializable {

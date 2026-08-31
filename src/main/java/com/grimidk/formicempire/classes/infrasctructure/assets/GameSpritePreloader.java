@@ -47,8 +47,11 @@ public final class GameSpritePreloader {
         Set<Image> images = new LinkedHashSet<>();
         for (Species bugType : GameConstants.getCritterSpecies()) {
             if (bugType.hasComposedSprite()) {
-                for (int leg = 1; leg <= GameNumbers.ANT_LEG_FRAME_COUNT; leg++) {
-                    collectIcon(images, GameConstants.getCritterSprite(bugType, leg));
+                for (int leg = 1; leg <= bugType.getLegFrameCount(); leg++) {
+                    int maxAntenna = Math.max(1, bugType.getAntennaFrameCount());
+                    for (int antenna = 1; antenna <= maxAntenna; antenna++) {
+                        collectIcon(images, GameConstants.getCritterSprite(bugType, leg, antenna));
+                    }
                 }
             } else {
                 collectIcon(images, bugType.getSprite());

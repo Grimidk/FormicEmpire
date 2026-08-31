@@ -42,7 +42,7 @@ public final class ColonySpriteMergeLod {
             int cellY) {
     }
 
-    public record CritterMergeBucket(int speciesId, int legFrame, int cellX, int cellY) {
+    public record CritterMergeBucket(int speciesId, int legFrame, int antennaFrame, int cellX, int cellY) {
     }
 
     public record MergeZoneLayout(
@@ -173,6 +173,7 @@ public final class ColonySpriteMergeLod {
         return new CritterMergeBucket(
                 critter.getSpecies().getId(),
                 critter.getLegFrame(),
+                critter.getAntennaFrame(),
                 spatialCell(critter.getX()),
                 spatialCell(critter.getY()));
     }

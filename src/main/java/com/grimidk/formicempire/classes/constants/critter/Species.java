@@ -21,42 +21,53 @@ public class Species extends Constant {
     private final String spriteFolder;
     private final String bodySpriteFile;
     private final boolean legWalkCycle;
-    private final boolean pet;
+    private final int legFrameCount;
+    private final int antennaFrameCount;
+    private final BugRole bugRole;
     private final List<Skill> baseSkills;
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
             ImageIcon icon, ImageIcon sprite) {
         this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
-                baseDefense, baseSpeed, icon, sprite, null, null, false, false, List.of());
+                baseDefense, baseSpeed, icon, sprite, null, null, false, null, List.of());
     }
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
-            ImageIcon icon, ImageIcon sprite, boolean pet) {
+            ImageIcon icon, ImageIcon sprite, BugRole bugRole) {
         this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
-                baseDefense, baseSpeed, icon, sprite, null, null, false, pet, List.of());
+                baseDefense, baseSpeed, icon, sprite, null, null, false, bugRole, List.of());
     }
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
-            ImageIcon icon, ImageIcon sprite, boolean pet, List<Skill> baseSkills) {
+            ImageIcon icon, ImageIcon sprite, BugRole bugRole, List<Skill> baseSkills) {
         this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
-                baseDefense, baseSpeed, icon, sprite, null, null, false, pet, baseSkills);
+                baseDefense, baseSpeed, icon, sprite, null, null, false, bugRole, baseSkills);
     }
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
             ImageIcon icon, ImageIcon sprite, String spriteFolder, String bodySpriteFile, boolean legWalkCycle,
-            boolean pet) {
+            BugRole bugRole) {
         this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
-                baseDefense, baseSpeed, icon, sprite, spriteFolder, bodySpriteFile, legWalkCycle, pet, List.of());
+                baseDefense, baseSpeed, icon, sprite, spriteFolder, bodySpriteFile, legWalkCycle, bugRole, List.of());
     }
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
             ImageIcon icon, ImageIcon sprite, String spriteFolder, String bodySpriteFile, boolean legWalkCycle,
-            boolean pet, List<Skill> baseSkills) {
+            BugRole bugRole, List<Skill> baseSkills) {
+        this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
+                baseDefense, baseSpeed, icon, sprite, spriteFolder, bodySpriteFile, legWalkCycle, bugRole, baseSkills,
+                legWalkCycle ? GameNumbers.ANT_LEG_FRAME_COUNT : 1, 0);
+    }
+
+    public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
+            float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
+            ImageIcon icon, ImageIcon sprite, String spriteFolder, String bodySpriteFile, boolean legWalkCycle,
+            BugRole bugRole, List<Skill> baseSkills, int legFrameCount, int antennaFrameCount) {
         super(id, name, icon);
         this.critterClass = critterClass;
         this.scientificNameKey = scientificNameKey;
@@ -70,7 +81,9 @@ public class Species extends Constant {
         this.spriteFolder = spriteFolder;
         this.bodySpriteFile = bodySpriteFile;
         this.legWalkCycle = legWalkCycle;
-        this.pet = pet;
+        this.legFrameCount = Math.max(1, legFrameCount);
+        this.antennaFrameCount = Math.max(0, antennaFrameCount);
+        this.bugRole = bugRole;
         this.baseSkills = baseSkills == null || baseSkills.isEmpty() ? List.of() : List.copyOf(baseSkills);
     }
 
@@ -78,8 +91,16 @@ public class Species extends Constant {
         return critterClass;
     }
 
+    public BugRole getBugRole() {
+        return bugRole;
+    }
+
+    public boolean hasBugRole(BugRole role) {
+        return role != null && role == bugRole;
+    }
+
     public boolean isPet() {
-        return pet;
+        return hasBugRole(BugRole.PET);
     }
 
     public String getScientificName() {
@@ -129,6 +150,18 @@ public class Species extends Constant {
 
     public boolean hasLegWalkCycle() {
         return legWalkCycle;
+    }
+
+    public int getLegFrameCount() {
+        return legFrameCount;
+    }
+
+    public int getAntennaFrameCount() {
+        return antennaFrameCount;
+    }
+
+    public boolean hasAntennaCycle() {
+        return antennaFrameCount > 1;
     }
 
     public List<Skill> getBaseSkills() {

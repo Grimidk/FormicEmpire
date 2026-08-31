@@ -44,7 +44,7 @@ class CritterSpriteCompositorTest {
     void parasiticAntUsesParasiticAntAssets() {
         ImageIcon icon = CritterSpriteCompositor.getSprite(GameConstants.TYPE_PARASITE_ANT, 1);
         assertNotNull(icon);
-        assertEquals("parasiticAnt", GameConstants.TYPE_PARASITE_ANT.getSpriteFolder());
+        assertEquals("otherAnts", GameConstants.TYPE_PARASITE_ANT.getSpriteFolder());
         assertEquals("ParasiticAnt.png", GameConstants.TYPE_PARASITE_ANT.getBodySpriteFile());
     }
 }

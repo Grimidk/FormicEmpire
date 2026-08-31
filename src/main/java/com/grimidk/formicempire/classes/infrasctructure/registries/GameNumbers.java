@@ -17,6 +17,7 @@ public final class GameNumbers {
     public static final int ANT_CARRY_JAW_OFFSET_Y = -17;
     public static final int ANT_CARRY_DUAL_OFFSET_X = 5;
     public static final int ANT_LEG_FRAME_COUNT = 4;
+    public static final int CRITTER_ENEMY_LEG_FRAME_COUNT = 4;
     public static final int ANT_LEG_FRAME_FLYING = 0;
     public static final float BASE_SPRITE_SPEED = 2.5f;
     public static final int MAX_PHYSICS_STEPS_PER_GUI_DRAIN = 2;
@@ -88,6 +89,10 @@ public final class GameNumbers {
     public static final int PET_BREED_DIVISOR = 10;
     public static final int PET_COUNT_SAVE_ABS_MAX = 10_000;
     public static final int MAX_PEN_NON_ANT_SPRITES = 500;
+    public static final float PET_PEN_CRITTER_SPEED_MULT = 0.35f;
+    public static final int PET_PEN_WANDER_RADIUS_PX = 28;
+    public static final double PET_PEN_WANDER_CHANCE = 0.02;
+    public static final float CRITTER_LEG_FRAME_DISTANCE_PX = 3.5f;
     public static final float CATCH_BASE_CHANCE_PER_CATCHER = 0.12f;
 
     // --- Convoy ---
@@ -253,7 +258,28 @@ public final class GameNumbers {
     }
 
     public static final int COMBAT_CAPACITY_BASE = 1000;
-    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;  
+    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;
+
+    public static final float HUNT_SCOUT_DISCOVERY_MULT = 0.06f;
+    public static final int HUNT_BUG_ESCAPE_DAYS = 21;
+    public static final int HUNT_TRAVEL_PX_PER_SPEED_HOUR = 120;
+    public static final int HUNT_COCKROACH_HP = 20000;
+    public static final float HUNT_COCKROACH_ATTACK = 500f;
+    public static final float HUNT_COCKROACH_DEFENSE = 10f;
+    public static final int HUNT_COCKROACH_ATTACK_SPEED = 3;
+    public static final int HUNT_COCKROACH_REWARD_PROTEIN = 250;
+    public static final int HUNT_COCKROACH_REWARD_RP = 120;
+    public static final int HUNT_COCKROACH_REWARD_MUSHROOMS = 80;
+    public static final int HUNT_MAX_PARTY_FROM_CAPACITY_DIVISOR = 50;
+    public static final float INVASION_RANDOM_CHANCE_PER_HOUR = 0.003f;
+    public static final int INVASION_RESPONSE_HOURS = 72;
+    public static final int INVASION_ANT_LION_HP = 12000;
+    public static final float INVASION_ANT_LION_ATTACK = 600f;
+    public static final float INVASION_ANT_LION_DEFENSE = 12f;
+    public static final int INVASION_ANT_LION_ATTACK_SPEED = 4;
+    public static final float INVASION_RAID_RESOURCE_STEAL_PCT = 0.05f;
+    public static final float INVASION_RAID_UNASSIGNED_KILL_PCT = 0.12f;
+    public static final int EXHAUSTION_UNASSIGNED_WARN_PCT = 10;
     public static final int COMMANDER_MAX_PER_COLONY = 1;
     public static final int TRIGGER_COMMANDER_MIN_WARS = 3;
     public static final int TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY = 2;

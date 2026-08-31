@@ -759,6 +759,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     public void onUpgradeTriggered(Upgrade unlockedUpgrade, String title, String message) {
         if (engine.isDisablePopups()) {
             if (gamePanel != null) {
+                gamePanel.forceControlPanelMenuRefresh();
                 gamePanel.refreshAllGUIData();
             }
             return;
@@ -782,6 +783,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
 
         if (gamePanel != null) {
+            gamePanel.forceControlPanelMenuRefresh();
             gamePanel.refreshAllGUIData();
         }
     }

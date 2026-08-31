@@ -10,6 +10,8 @@ import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ZeroDialog extends JDialog {
 
@@ -45,6 +47,7 @@ public abstract class ZeroDialog extends JDialog {
 
         EdgeTriggeredKeyBindings.bind(
                 getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+                getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT),
                 getRootPane().getActionMap(),
                 KeyEvent.VK_ESCAPE,
                 "escapeClose",
@@ -95,11 +98,16 @@ public abstract class ZeroDialog extends JDialog {
         if (consumeEscape()) {
             return;
         }
-        if (getOwner() instanceof MainFrame frame && frame.getGamePanel() != null
+        if (shouldDelegateEscapeToGamePanel()
+                && getOwner() instanceof MainFrame frame && frame.getGamePanel() != null
                 && frame.getGamePanel().handleEscapeKey()) {
             return;
         }
         requestClose();
+    }
+
+    protected boolean shouldDelegateEscapeToGamePanel() {
+        return true;
     }
 
     protected boolean consumeEscape() {
@@ -116,11 +124,37 @@ public abstract class ZeroDialog extends JDialog {
     }
 
     protected void addToSouthPanel(JComponent component) {
-        southPanel.add(component, 0); 
+        southPanel.add(component, 0);
+        if (component instanceof AbstractButton button) {
+            AssetStyles.styleButton(button);
+        }
+    }
+
+    protected void normalizeSouthPanelButtons() {
+        int maxWidth = 0;
+        int maxHeight = AssetStyles.MIN_CONTROL_HIT_SIZE;
+        List<AbstractButton> buttons = new ArrayList<>();
+        for (Component component : southPanel.getComponents()) {
+            if (component instanceof AbstractButton button) {
+                buttons.add(button);
+                Dimension preferred = button.getPreferredSize();
+                maxWidth = Math.max(maxWidth, preferred.width);
+                maxHeight = Math.max(maxHeight, preferred.height);
+            }
+        }
+        if (buttons.isEmpty()) {
+            return;
+        }
+        Dimension size = new Dimension(maxWidth, maxHeight);
+        for (AbstractButton button : buttons) {
+            button.setPreferredSize(size);
+            button.setMinimumSize(size);
+        }
     }
 
     public void showDialog() {
         refreshDialog();
+        normalizeSouthPanelButtons();
 
         disableFocusTraversal(this);
 

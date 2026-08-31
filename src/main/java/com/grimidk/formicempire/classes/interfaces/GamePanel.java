@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -66,6 +67,9 @@ public class GamePanel extends ZeroGamePanel {
     private RoleManagementDialog roleDialog;    
     private UpgradeDialog upgradeDialog; 
     private AbilitiesDialog abilitiesDialog;
+    private CritterManagementDialog critterManagementDialog;
+    private HuntBattleDialog huntBattleDialog;
+    private InvasionBattleDialog invasionBattleDialog;
     private MapDialog mapDialog;
     private StatsDialog statsDialog; 
     private DynastyManagementDialog dynastyDialog;
@@ -506,6 +510,9 @@ public class GamePanel extends ZeroGamePanel {
         if (roleDialog != null && roleDialog.isShowing()) roleDialog.refreshTheme();
         if (upgradeDialog != null && upgradeDialog.isShowing()) upgradeDialog.refreshTheme();
         if (abilitiesDialog != null && abilitiesDialog.isShowing()) abilitiesDialog.refreshTheme();
+        if (critterManagementDialog != null && critterManagementDialog.isShowing()) critterManagementDialog.refreshTheme();
+        if (huntBattleDialog != null && huntBattleDialog.isShowing()) huntBattleDialog.refreshTheme();
+        if (invasionBattleDialog != null && invasionBattleDialog.isShowing()) invasionBattleDialog.refreshTheme();
         if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTheme();
         if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTheme();
         if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTheme();
@@ -523,6 +530,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showAssimilationDialogCallback = this::showAssimilationDialog;
         Runnable showSynergyDialogCallback = this::showSynergyDialog;
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
+        Runnable showHuntsDialogCallback = this::showHuntsDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
         Runnable showDynastyDialogCallback = this::showDynastyDialog;
@@ -570,6 +578,7 @@ public class GamePanel extends ZeroGamePanel {
             showSynergyDialogCallback,
             showRoleManagementDialogCallback,
             showAbilitiesDialogCallback,
+            showHuntsDialogCallback,
             showStatsDialogCallback,
             toggleViewCallback,
             showMapDialogCallback,
@@ -579,7 +588,11 @@ public class GamePanel extends ZeroGamePanel {
             showWarDialogCallback,
             showSettingsDialogCallback,
             showHelpDialogCallback,
-            () -> dynastyDialog != null && dynastyDialog.isShowing());
+            () -> dynastyDialog != null && dynastyDialog.isShowing(),
+            () -> {
+                Colony colony = getColonyFromEngine(frame.getEngine());
+                return colony != null && colony.belongsToPlayerDynasty();
+            });
     }
 
     private void initGameControlKeyBindings() {
@@ -829,6 +842,60 @@ public class GamePanel extends ZeroGamePanel {
         }
         abilitiesDialog = new AbilitiesDialog(frame, colony);
         abilitiesDialog.showDialog();
+    }
+
+    private void showHuntsDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || !colony.belongsToPlayerDynasty()) {
+            return;
+        }
+        if (critterManagementDialog != null && critterManagementDialog.isShowing()) {
+            critterManagementDialog.dispose();
+            return;
+        }
+        if (critterManagementDialog != null) {
+            critterManagementDialog.dispose();
+        }
+        critterManagementDialog = new CritterManagementDialog(
+                frame, colony, engine, this::showHuntBattleDialog, this::showInvasionBattleDialog);
+        critterManagementDialog.showDialog();
+    }
+
+    private void showInvasionBattleDialog(Colony colony, int alertId) {
+        Engine engine = frame.getEngine();
+        if (colony == null || engine == null || alertId <= 0) {
+            return;
+        }
+        if (invasionBattleDialog != null && invasionBattleDialog.isShowing()
+                && invasionBattleDialog.getAlertId() == alertId) {
+            invasionBattleDialog.liveUpdate();
+            invasionBattleDialog.toFront();
+            return;
+        }
+        if (invasionBattleDialog != null) {
+            invasionBattleDialog.dispose();
+        }
+        invasionBattleDialog = new InvasionBattleDialog(frame, colony, engine, alertId);
+        invasionBattleDialog.showDialog();
+    }
+
+    private void showHuntBattleDialog(Colony colony, int targetId) {
+        Engine engine = frame.getEngine();
+        if (colony == null || engine == null || targetId <= 0) {
+            return;
+        }
+        if (huntBattleDialog != null && huntBattleDialog.isShowing()
+                && huntBattleDialog.getTargetId() == targetId) {
+            huntBattleDialog.liveUpdate();
+            huntBattleDialog.toFront();
+            return;
+        }
+        if (huntBattleDialog != null) {
+            huntBattleDialog.dispose();
+        }
+        huntBattleDialog = new HuntBattleDialog(frame, colony, engine, targetId);
+        huntBattleDialog.showDialog();
     }
 
     private void showMapDialog() {
@@ -1202,6 +1269,21 @@ public class GamePanel extends ZeroGamePanel {
             helpDialog = null;
             closed = true;
         }
+        if (huntBattleDialog != null && huntBattleDialog.isShowing()) {
+            huntBattleDialog.requestClose();
+            huntBattleDialog = null;
+            closed = true;
+        }
+        if (invasionBattleDialog != null && invasionBattleDialog.isShowing()) {
+            invasionBattleDialog.requestClose();
+            invasionBattleDialog = null;
+            closed = true;
+        }
+        if (critterManagementDialog != null && critterManagementDialog.isShowing()) {
+            critterManagementDialog.requestClose();
+            critterManagementDialog = null;
+            closed = true;
+        }
         return closed;
     }
 
@@ -1210,6 +1292,9 @@ public class GamePanel extends ZeroGamePanel {
         if (roleDialog != null) { roleDialog.dispose(); roleDialog = null; }
         if (upgradeDialog != null) { upgradeDialog.dispose(); upgradeDialog = null; }
         if (abilitiesDialog != null) { abilitiesDialog.dispose(); abilitiesDialog = null; }
+        if (critterManagementDialog != null) { critterManagementDialog.dispose(); critterManagementDialog = null; }
+        if (huntBattleDialog != null) { huntBattleDialog.dispose(); huntBattleDialog = null; }
+        if (invasionBattleDialog != null) { invasionBattleDialog.dispose(); invasionBattleDialog = null; }
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
         if (dynastyDialog != null) { dynastyDialog.dispose(); dynastyDialog = null; }
@@ -1247,6 +1332,7 @@ public class GamePanel extends ZeroGamePanel {
         if (miniMapPanel != null) miniMapPanel.reset();
 
         Engine eng = frame.getEngine();
+        HuntCreatureCombatService.clearAll();
         if (eng != null) {
             eng.pauseEngine();
             eng.setWorld(null);
@@ -1411,6 +1497,7 @@ public class GamePanel extends ZeroGamePanel {
                         installPlusSpeedKeyDispatcher();
                     }
                     engine.pauseEngine();
+                    forceControlPanelMenuRefresh();
                     refreshAllGUIData();
                     updateGameAreaSize();
                     centerOverworldScroll();
@@ -1589,6 +1676,10 @@ public class GamePanel extends ZeroGamePanel {
         updateMonthGUI();
     }
 
+    public void forceControlPanelMenuRefresh() {
+        lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
+    }
+
     private void updateStaticWorldInfo() {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
@@ -1704,6 +1795,15 @@ public class GamePanel extends ZeroGamePanel {
             if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
                 abilitiesDialog.liveUpdate();
             }
+            if (critterManagementDialog != null && critterManagementDialog.isShowing()) {
+                critterManagementDialog.liveUpdate();
+            }
+            if (huntBattleDialog != null && huntBattleDialog.isShowing()) {
+                huntBattleDialog.liveUpdate();
+            }
+            if (invasionBattleDialog != null && invasionBattleDialog.isShowing()) {
+                invasionBattleDialog.liveUpdate();
+            }
             if (statsDialog != null && statsDialog.isShowing()) {
                 statsDialog.liveUpdate();
             }
@@ -1726,6 +1826,7 @@ public class GamePanel extends ZeroGamePanel {
                         || (eng != null && eng.isAssimilateAll()));
                 controlPanel.updateSynergyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_ABILITY));
+                controlPanel.updateHuntsMenu(colony.belongsToPlayerDynasty());
                 controlPanel.updateDynastyMenu(true);
                 controlPanel.updateTradeMenu(true);
                 controlPanel.updateWarsMenu(true);
@@ -1738,6 +1839,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateAssimilationMenu(false);
                 controlPanel.updateSynergyMenu(false);
                 controlPanel.updateAbilitiesMenu(false);
+                controlPanel.updateHuntsMenu(false);
                 controlPanel.updateDynastyMenu(false);
                 controlPanel.updateTradeMenu(false);
                 controlPanel.updateWarsMenu(false);

@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -85,6 +86,31 @@ public final class RouteViewVisuals {
             index += GameNumbers.ANT_LEG_FRAME_COUNT;
         }
         return index + 1;
+    }
+
+    public static int resolveCritterLegFrame(Species species, boolean moving, float wobblePhase,
+            float animationSeconds, float motionRate) {
+        if (species == null || !species.hasLegWalkCycle()) {
+            return 1;
+        }
+        if (!moving) {
+            return 1;
+        }
+        int legFrameCount = species.getLegFrameCount();
+        double phase = wobblePhase + animationSeconds * LEG_WALK_CYCLE_SPEED * Math.max(0.01f, motionRate);
+        int index = (int) Math.floor(phase) % legFrameCount;
+        if (index < 0) {
+            index += legFrameCount;
+        }
+        return index + 1;
+    }
+
+    public static int resolveCritterAntennaFrame(Species species, float wobblePhase, float animationSeconds,
+            float motionRate) {
+        if (species == null || !species.hasAntennaCycle()) {
+            return 1;
+        }
+        return resolveAntennaFrame(null, wobblePhase, animationSeconds, motionRate);
     }
 
     public static int resolveWingFrame(AntType type, boolean preferOpenWings, float wobblePhase, float animationSeconds,

@@ -119,6 +119,10 @@ public class AlertManager {
                 return iconOf(GameConstants.ICON_STAT_LOYALTY);
             case "WAR":
                 return iconOf(GameConstants.ICON_STAT_MILITARY_POWER);
+            case "HUNT":
+            case "HUNT_OK":
+            case "HUNT_FAIL":
+                return iconOf(GameConstants.ROLE_SCOUT.getIcon());
             case "TRADE":
                 return iconOf(GameConstants.ICON_TRADE);
             case "NUPTIAL":
@@ -233,6 +237,18 @@ public class AlertManager {
             addAlert("AUTO", stripPrefix(msg, ColonyLogPrefixes.AUTOMATION), durationDefault);
         } else if (msg.startsWith(ColonyLogPrefixes.PROMOTION)) {
             addAlert("PROMO", stripPrefix(msg, ColonyLogPrefixes.PROMOTION), durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.INVASION_SUCCESS)) {
+            addAlert("INVASION_OK", stripPrefix(msg, ColonyLogPrefixes.INVASION_SUCCESS), durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.INVASION_FAILURE)) {
+            addAlert("INVASION_FAIL", stripPrefix(msg, ColonyLogPrefixes.INVASION_FAILURE), durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.INVASION)) {
+            addAlert("INVASION", stripPrefix(msg, ColonyLogPrefixes.INVASION), durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.HUNT_SUCCESS)) {
+            addAlert("HUNT_OK", stripPrefix(msg, ColonyLogPrefixes.HUNT_SUCCESS), durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.HUNT_FAILURE)) {
+            addAlert("HUNT_FAIL", stripPrefix(msg, ColonyLogPrefixes.HUNT_FAILURE), durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.HUNT)) {
+            addAlert("HUNT", stripPrefix(msg, ColonyLogPrefixes.HUNT), durationDefault);
         } else if (msg.startsWith(ColonyLogPrefixes.INFO)) {
             addAlert("INFO", stripPrefix(msg, ColonyLogPrefixes.INFO), durationDefault);
         } else {
@@ -262,6 +278,12 @@ public class AlertManager {
                 return LanguageStrings.ALERT_DETAIL_REBEL;
             case "WAR":
                 return LanguageStrings.ALERT_DETAIL_WAR;
+            case "HUNT":
+                return LanguageStrings.ALERT_DETAIL_HUNT;
+            case "HUNT_OK":
+                return LanguageStrings.ALERT_DETAIL_HUNT_SUCCESS;
+            case "HUNT_FAIL":
+                return LanguageStrings.ALERT_DETAIL_HUNT_FAILURE;
             case "TRADE":
                 return LanguageStrings.ALERT_DETAIL_TRADE;
             case "DYN":

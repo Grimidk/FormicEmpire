@@ -1126,7 +1126,8 @@ public class GameAreaPanel extends ZeroGamePanel {
                 continue;
             }
 
-            ImageIcon spriteIcon = GameConstants.getCritterSprite(bug.getSpecies(), bug.getLegFrame());
+            ImageIcon spriteIcon = GameConstants.getCritterSprite(
+                    bug.getSpecies(), bug.getLegFrame(), bug.getAntennaFrame());
             if (spriteIcon == null) {
                 continue;
             }
@@ -1187,13 +1188,15 @@ public class GameAreaPanel extends ZeroGamePanel {
                 return maxGroupSize;
             }
             Critter representative = group.get(0);
-            ImageIcon groupSprite = GameConstants.getCritterSprite(representative.getSpecies(), representative.getLegFrame());
+            ImageIcon groupSprite = GameConstants.getCritterSprite(
+                    representative.getSpecies(), representative.getLegFrame(), representative.getAntennaFrame());
             int groupW = groupSprite != null ? groupSprite.getIconWidth() : 16;
             int groupH = groupSprite != null ? groupSprite.getIconHeight() : 16;
             return zoneMergeContext.effectiveMaxGroupSizeForCritter(representative, groupW, groupH, maxGroupSize);
         }, (bucket, group) -> {
             Critter representative = group.get(0);
-            ImageIcon spriteIcon = GameConstants.getCritterSprite(representative.getSpecies(), representative.getLegFrame());
+            ImageIcon spriteIcon = GameConstants.getCritterSprite(
+                    representative.getSpecies(), representative.getLegFrame(), representative.getAntennaFrame());
             if (spriteIcon == null) {
                 return;
             }

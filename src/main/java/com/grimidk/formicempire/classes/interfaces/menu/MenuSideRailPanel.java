@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
@@ -78,11 +79,7 @@ public class MenuSideRailPanel extends JPanel {
     }
 
     public void refreshTranslations() {
-        discordButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_DISCORD));
-        instagramButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_INSTAGRAM));
-        helpButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_HELP_TT));
-        feedbackButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_FEEDBACK_TT));
-        settingsButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
+        applyTooltips();
     }
 
     public void refreshTheme() {
@@ -91,6 +88,20 @@ public class MenuSideRailPanel extends JPanel {
         styleRailButton(helpButton, GameConstants.ICON_SOCIAL_HELP);
         styleRailButton(feedbackButton, GameConstants.ICON_SOCIAL_FEEDBACK);
         styleRailButton(settingsButton, GameConstants.ICON_SOCIAL_SETTINGS);
+        applyTooltips();
+    }
+
+    private void applyTooltips() {
+        discordButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_DISCORD_TT));
+        instagramButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_INSTAGRAM_TT));
+        helpButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_HELP_TT));
+        feedbackButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_FEEDBACK_TT));
+        settingsButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_SETTINGS_TT));
+        ToolTipManager.sharedInstance().registerComponent(discordButton);
+        ToolTipManager.sharedInstance().registerComponent(instagramButton);
+        ToolTipManager.sharedInstance().registerComponent(helpButton);
+        ToolTipManager.sharedInstance().registerComponent(feedbackButton);
+        ToolTipManager.sharedInstance().registerComponent(settingsButton);
     }
 
     private static JButton createRailButton(ImageIcon icon, ActionListener action) {

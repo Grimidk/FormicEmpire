@@ -165,6 +165,7 @@ public class TriggerManager {
         checkBruteRoleUnlock();
         checkCommanderRoleUnlock();
         checkScoutRoleUnlock();
+        checkHuntsAbilityUnlock();
         checkMinerRoleUnlock();
         checkDynastyTriggers();
         checkTunnelRoleUnlock();
@@ -502,10 +503,24 @@ public class TriggerManager {
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
         
         if (plantHarvestProgress(playerColony) >= GameNumbers.TRIGGER_SCOUT_PLANT_COLLECTED) {
+            playerColony.unlockUpgrade(GameUnlocks.ABILITY_HUNTS);
             fireLocalizedTrigger(GameUnlocks.ROLE_SCOUT,
                 LanguageStrings.TRIGGER_SCOUT_ROLE_TITLE,
                 LanguageStrings.TRIGGER_SCOUT_ROLE_MSG);
         }
+    }
+
+    private void checkHuntsAbilityUnlock() {
+        if (!playerColony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
+            return;
+        }
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_HUNTS)) {
+            return;
+        }
+        playerColony.unlockUpgrade(GameUnlocks.ABILITY_HUNTS);
+        fireLocalizedTrigger(GameUnlocks.ABILITY_HUNTS,
+                LanguageStrings.TRIGGER_HUNTS_ABILITY_TITLE,
+                LanguageStrings.TRIGGER_HUNTS_ABILITY_MSG);
     }
 
     private void checkMinerRoleUnlock() {

@@ -7,10 +7,12 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyUnassignedAntService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
@@ -343,7 +345,7 @@ public class RoleManagementDialog extends ZeroDialog {
             assignedLabel.setForeground(AssetStyles.FONT_COLOR);
             assignedLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             
-            unassignedLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PREFIX, totalAnts));
+            unassignedLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PCT_FMT, 100));
             unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
             unassignedLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -829,9 +831,10 @@ public class RoleManagementDialog extends ZeroDialog {
                 }
                 
                 int unassigned = totalAnts - totalAssigned;
+                int unassignedPct = ColonyUnassignedAntService.computeUnassignedPercent(totalAnts, totalAssigned);
                 
                 assignedLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_ASSIGNED_PREFIX, totalAssigned));
-                unassignedLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PREFIX, unassigned));
+                unassignedLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PCT_FMT, unassignedPct));
                 refreshAvailableSubtypesSummary();
 
                 if (totalAssigned > totalAnts) {
@@ -839,6 +842,11 @@ public class RoleManagementDialog extends ZeroDialog {
                     assignedLabel.setToolTipText(LanguageStrings.get(LanguageStrings.ROLE_ERROR_OVER_ASSIGNED));
                     unassignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
                     unassignedLabel.setToolTipText(LanguageStrings.get(LanguageStrings.ROLE_ERROR_OVER_ASSIGNED));
+                } else if (unassignedPct < GameNumbers.EXHAUSTION_UNASSIGNED_WARN_PCT) {
+                    assignedLabel.setForeground(AssetStyles.FONT_COLOR);
+                    assignedLabel.setToolTipText(null);
+                    unassignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
+                    unassignedLabel.setToolTipText(LanguageStrings.get(LanguageStrings.ROLE_UNASSIGNED_LOW_TT));
                 } else {
                     assignedLabel.setForeground(AssetStyles.FONT_COLOR);
                     assignedLabel.setToolTipText(null);

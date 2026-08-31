@@ -48,6 +48,9 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
+import com.grimidk.formicempire.classes.entities.hunt.HuntExpedition;
+import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
+import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 
@@ -138,6 +141,13 @@ public class Colony {
     private Tunnel currentTunnelProject = null;
     private double buildingProgressHours = 0.0;
     private final List<String> eventLog = new ArrayList<>();
+    private final List<com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget> knownHuntTargets = new ArrayList<>();
+    private final List<com.grimidk.formicempire.classes.entities.hunt.HuntExpedition> activeHuntExpeditions = new ArrayList<>();
+    private int nextHuntTargetId = 1;
+    private final List<InvasionAlert> invasionAlerts = new ArrayList<>();
+    private int nextInvasionAlertId = 1;
+    private final List<com.grimidk.formicempire.classes.entities.invasion.InvasionDefense> activeInvasionDefenses =
+            new ArrayList<>();
 
     // --- Room Bounds ---
     private Rectangle entranceBounds;
@@ -466,6 +476,8 @@ public class Colony {
                 this, savedColony.aphids, savedColony.symbioticMites, savedColony.dermestids);
         getBugHandlingService().setParasiticMiteCount(this, savedColony.parasiticMites);
 
+        loadHuntStateFromSave(savedColony);
+
         this.totalDeaths = savedColony.totalDeaths;
         
         if (savedColony.savedResourceSources != null && this.locationService != null) {
@@ -607,6 +619,113 @@ public class Colony {
                 trade.cancelDueToEscortLoss(tradeManager);
             }
         }
+    }
+
+    public List<KnownHuntTarget> getKnownHuntTargets() {
+        return knownHuntTargets;
+    }
+
+    public List<HuntExpedition> getActiveHuntExpeditions() {
+        return java.util.Collections.unmodifiableList(activeHuntExpeditions);
+    }
+
+    public HuntExpedition getHuntExpeditionForTarget(int targetId) {
+        for (HuntExpedition expedition : activeHuntExpeditions) {
+            if (expedition.getTargetId() == targetId) {
+                return expedition;
+            }
+        }
+        return null;
+    }
+
+    public void addHuntExpedition(HuntExpedition expedition) {
+        if (expedition != null) {
+            activeHuntExpeditions.add(expedition);
+        }
+    }
+
+    public void removeHuntExpedition(int targetId) {
+        activeHuntExpeditions.removeIf(expedition -> expedition.getTargetId() == targetId);
+    }
+
+    public int nextHuntTargetId() {
+        return nextHuntTargetId++;
+    }
+
+    public int getNextHuntTargetIdSeed() {
+        return nextHuntTargetId;
+    }
+
+    public void setNextHuntTargetIdSeed(int nextHuntTargetId) {
+        this.nextHuntTargetId = Math.max(1, nextHuntTargetId);
+    }
+
+    private void loadHuntStateFromSave(Savefile.SavedColony savedColony) {
+        knownHuntTargets.clear();
+        activeHuntExpeditions.clear();
+        HuntCreatureCombatService.clear(this);
+        setNextHuntTargetIdSeed(savedColony.nextHuntTargetId);
+        if (savedColony.knownHuntTargets != null) {
+            for (Savefile.SavedHuntTarget savedTarget : savedColony.knownHuntTargets) {
+                if (savedTarget == null) {
+                    continue;
+                }
+                knownHuntTargets.add(new KnownHuntTarget(
+                        savedTarget.id,
+                        savedTarget.speciesId,
+                        savedTarget.overworldX,
+                        savedTarget.overworldY,
+                        savedTarget.discoveredWorldDay,
+                        savedTarget.escapeWorldDay));
+            }
+        }
+        ColonyHuntService.restoreExpeditionsFromSave(this, savedColony);
+        activeInvasionDefenses.clear();
+        ColonyInvasionService.restoreAlertsFromSave(this, savedColony.invasionAlerts, savedColony.nextInvasionAlertId);
+        ColonyInvasionService.restoreDefensesFromSave(this, savedColony);
+    }
+
+    public List<com.grimidk.formicempire.classes.entities.invasion.InvasionDefense> getActiveInvasionDefenses() {
+        return java.util.Collections.unmodifiableList(activeInvasionDefenses);
+    }
+
+    public com.grimidk.formicempire.classes.entities.invasion.InvasionDefense getInvasionDefenseForAlert(int alertId) {
+        for (com.grimidk.formicempire.classes.entities.invasion.InvasionDefense defense : activeInvasionDefenses) {
+            if (defense.getAlertId() == alertId) {
+                return defense;
+            }
+        }
+        return null;
+    }
+
+    public void addInvasionDefense(com.grimidk.formicempire.classes.entities.invasion.InvasionDefense defense) {
+        if (defense != null) {
+            activeInvasionDefenses.add(defense);
+        }
+    }
+
+    public void removeInvasionDefense(int alertId) {
+        activeInvasionDefenses.removeIf(defense -> defense.getAlertId() == alertId);
+    }
+
+    public void clearInvasionDefenses() {
+        activeInvasionDefenses.clear();
+    }
+
+    public List<InvasionAlert> getInvasionAlerts() {
+        return invasionAlerts;
+    }
+
+    public int nextInvasionAlertId() {
+        return nextInvasionAlertId++;
+    }
+
+    public int getNextInvasionAlertIdSeed() {
+        return nextInvasionAlertId;
+    }
+
+    public void setNextInvasionAlertIdSeed(int nextInvasionAlertId) {
+        this.nextInvasionAlertId = Math.max(1, nextInvasionAlertId);
     }
 
     // --- Getters/Setters ---
@@ -2024,6 +2143,11 @@ public class Colony {
             this.runBuilding();
             this.labourService.runTunnelConstruction(this);
             this.runCollecting();
+            ColonyHuntService.tickExpeditions(this);
+            World invasionWorld = dynasty != null ? dynasty.getOwningWorld() : null;
+            if (invasionWorld != null) {
+                ColonyInvasionService.tickInvasions(this, invasionWorld.getDay(), invasionWorld.getHour());
+            }
             physicsService.rollAntSpriteAnimHourly(this, lastPhysicsDimension, lastPhysicsViewport);
         } else {
             if (this.automationEnabled) {
@@ -2073,7 +2197,11 @@ public class Colony {
             this.runGraveKeeping();
             this.runHerding(biome); 
             this.runScoutting(biome, currentHex);
-            this.runContamination(); 
+            World huntWorld = dynasty != null ? dynasty.getOwningWorld() : null;
+            int worldDay = huntWorld != null ? huntWorld.getDay() : 0;
+            ColonyHuntService.runScoutBugDiscovery(this, biome, currentHex, worldDay);
+            ColonyHuntService.tickEscapedTargets(this, worldDay);
+            this.runContamination();
             this.runPolicing(); 
         } else {
             World world = dynasty != null ? dynasty.getOwningWorld() : null;

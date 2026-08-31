@@ -239,4 +239,36 @@ class TriggerManagerTest {
         assertTrue(capital.hasUpgrade(GameUnlocks.ABILITY_TRADE));
         assertTrue(capital.hasUpgrade(GameUnlocks.ROLE_COURIER));
     }
+
+    @Test
+    void existingScoutUnlockGrantsHuntsAbilityWithPopup() throws Exception {
+        Engine engine = new Engine();
+        World world = new World();
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        Colony colony = new Colony(1, "Capital", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+        colony.unlockUpgrade(GameUnlocks.ROLE_SCOUT);
+
+        TriggerManager manager = new TriggerManager(world, colony, engine);
+        AtomicReference<Upgrade> unlocked = new AtomicReference<>();
+        manager.addListener(new TriggerManager.TriggerListener() {
+            @Override
+            public void onUpgradeTriggered(Upgrade upgrade, String title, String message) {
+                unlocked.set(upgrade);
+            }
+
+            @Override
+            public void onColonyDeath() {
+            }
+        });
+
+        Method check = TriggerManager.class.getDeclaredMethod("checkHuntsAbilityUnlock");
+        check.setAccessible(true);
+        check.invoke(manager);
+        SwingUtilities.invokeAndWait(() -> { });
+
+        assertTrue(colony.hasUpgrade(GameUnlocks.ABILITY_HUNTS));
+        assertEquals(GameUnlocks.ABILITY_HUNTS, unlocked.get());
+    }
 }

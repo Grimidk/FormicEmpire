@@ -191,6 +191,8 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_JUMPING); }
         public static final Upgrade ABILITY_SWARMING = new Upgrade(527, "ABILITY_SWARMING", "ABILITY_SWARMING_FLAVOR", "ABILITY_SWARMING_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AssimilatedSwarming.png"), 0);
         static { upgrades.add(ABILITY_SWARMING); }
+        public static final Upgrade ABILITY_HUNTS = new Upgrade(530, "ABILITY_HUNTS", "ABILITY_HUNTS_FLAVOR", "ABILITY_HUNTS_DESC", ROLE_SCOUT, 0, loadIcon("icons/upgrades/RoleScout.png"), 0);
+        static { upgrades.add(ABILITY_HUNTS); }
 
         public static final Upgrade ABILITY_SUBTYPE_HATCH = new Upgrade(524, "ABILITY_SUBTYPE_HATCH", "ABILITY_SUBTYPE_HATCH_FLAVOR", "ABILITY_SUBTYPE_HATCH_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AbilitySubtypeHatch.png"), 0);
         static { upgrades.add(ABILITY_SUBTYPE_HATCH); }

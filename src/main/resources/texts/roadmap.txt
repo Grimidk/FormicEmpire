@@ -4,8 +4,6 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		TODO: icons for stats (Skeleton, Acid, Longevity, Research/Growth/Thirst 1–2/Laying/Scouting/Farming/Contamination/Graving/Policing 1–3, Logistics 1, Passive 1, Symbiotic Mite 1, Dermestid 1, Hex Sustain, Worker Speed 2, Health/Attack/Defense 1–2, Attack Speed 1)
-		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave/Web, Composter) — separate from sprites/buildings/rooms/ Silkweave L3 room/icons Hivebuild mound room/icons + overworld mound art (HiveMound2/4) PassiveWeb room sprite + icons/buildings/PassiveWeb.png (placeholder room exists)
 		music: main menu song, more songs in general
 	Mid:
 		(none right now)
@@ -17,12 +15,51 @@ To Fix (By decreasing priority):
 		Font - self explanatory
 		redo upgrade tree node shape
 
+Art TODO (assets to draw — PascalCase filenames; under src/main/resources):
+	Launch critters (hunt / invasion battles — wired in code, missing art):
+		UI icons (icons/critters/): AntLion.png, BombardierBeetle.png, Spider.png, Tarantula.png
+		Composed battle sprites (body + leg frames; antenna frames if animated — match cockroach pattern):
+			sprites/critters/insect/cockroach/ — finish legs
+			sprites/critters/insect/antLion/ — AntLion.png, Leg1–Leg4 (+ Antenna1, Antenna2 if used)
+			sprites/critters/insect/bombardierBeetle/ — BombardierBeetle.png, Leg1–Leg4 (+ antenna if used)
+			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (+ antenna if used)
+			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (+ antenna if used)
+		Skill icons (icons/skills/): CockroachBite.png, CockroachSpin.png (+ future ant-lion / bombardier attack skills when designed)
+	Stat upgrade icons (icons/upgrades/ — currently Unknown.png placeholder):
+		StatSkeleton.png, StatAcid.png, StatLongevity.png
+		StatResearch1.png, StatResearch2.png, StatResearch3.png
+		StatGrowth1.png, StatGrowth2.png, StatGrowth3.png
+		StatThirst1.png, StatThirst2.png
+		StatLogistics1.png, StatPassive1.png
+		StatLaying1.png, StatLaying2.png, StatLaying3.png
+		StatScouting1.png, StatScouting2.png, StatScouting3.png
+		StatFarming1.png, StatFarming2.png, StatFarming3.png
+		StatContamination1.png, StatContamination2.png, StatContamination3.png
+		StatSymbioticMite1.png, StatDermestid1.png
+		StatGraving1.png, StatGraving2.png, StatGraving3.png
+		StatPolicing1.png, StatPolicing2.png, StatPolicing3.png
+		StatHexSustain.png, StatWorkerSpeed2.png
+		StatHealth1.png, StatHealth2.png, StatAttack1.png, StatAttack2.png, StatDefense1.png, StatDefense2.png, StatAttackSpeed1.png
+	Building menu icons (icons/buildings/ — separate from sprites/buildings/rooms/):
+		Storage chains L0–L5: RoyalChamber, EggChamber, MushroomChamber, PlantChamber, WaterReservoir, MeatChamber, SyrupReservoir, RockWarehouse, ResinReservoir (0–5 each)
+		Passive rooms: PassiveLab.png, PassiveWater.png, PassiveAphid.png, PassiveNurse.png, PassiveFarm.png, PassiveGrave.png, PassiveWeb.png, Composter.png
+		Silkweave L3 storage icons (8): EggChamber3Silk, MushroomChamber3Silk, PlantChamber3Silk, WaterReservoir3Silk, MeatChamber3Silk, SyrupReservoir3Silk, RockWarehouse3Silk, ResinReservoir3Silk
+		Hivebuild mounds: HiveMound2.png, HiveMound4.png
+	Silkweave L3 room sprites (sprites/buildings/rooms/ — icons above also needed):
+		EggL3Silk.png, MushroomL3Silk.png, PlantL3Silk.png, WaterL3Silk.png, MeatL3Silk.png, SyrupL3Silk.png, RockL3Silk.png, ResinL3Silk.png
+	Hivebuild mound room + overworld art:
+		sprites/buildings/rooms/HiveMound2.png, HiveMound4.png
+		overworld mound sprites (path TBD — e.g. sprites/buildings/HiveMound2.png, HiveMound4.png)
+	Room sprites L4–L5 (sprites/buildings/rooms/ — L0–L3 exist; needed when in-room overlays ship):
+		Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin — L4 and L5 for each
+		Passive web for outside with water and protein
+		
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 		swarm vs creature battles (system)
 		launch creatures (single battle or swarm; needs battle system):
-			Bugs: Cuban/reg cockroach, Bombardier beetle, Ant lion
+			Bugs: giant/reg cockroach, Bombardier beetle, Ant lion
 			Arachnids: Spider, Tarantula
 		uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
 		more biomes (beach, cliffs, wetlands, mangrove, coastal vs inland prairie, burnt forest [resin source, no water, cant start], ice field [cant start], continent variation, rivers on borders, unpassable terrain, lock species to biome, protein-only ant, bigger world)

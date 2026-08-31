@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
@@ -35,6 +36,7 @@ import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildingTreePane
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchTreePanel;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.HelpAnimatedSpriteLabel;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -323,10 +325,7 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
             entry.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            ImageIcon sprite = GameConstants.getRepresentativeAntSprite(s);
-            JLabel spriteLabel = new JLabel(sprite != null ? sprite : s.getIcon());
-            spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(spriteLabel, BorderLayout.WEST);
+            entry.add(HelpAnimatedSpriteLabel.forRepresentativeAnt(s), BorderLayout.WEST);
 
             JPanel info = new JPanel();
             info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
@@ -449,6 +448,7 @@ public class HelpPanel extends JPanel {
         row.add("P", LanguageStrings.get("HOTKEY_P"));
         row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"), GameUnlocks.ABILITY_RESEARCH.getIcon());
         row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"), GameUnlocks.ABILITY_ABILITY.getIcon());
+        row.add("H", LanguageStrings.get(LanguageStrings.HOTKEY_H), GameConstants.ROLE_SCOUT.getIcon());
         row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"), GameUnlocks.ABILITY_DYNASTY.getIcon());
         row.add("M", LanguageStrings.get("HOTKEY_M"));
         row.add("X", LanguageStrings.get("HOTKEY_X"));
@@ -481,9 +481,8 @@ public class HelpPanel extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-            JLabel icon = new JLabel(type.getIcon());
-            icon.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(icon, BorderLayout.WEST);
+            entry.add(HelpAnimatedSpriteLabel.forAnt(type, GameConstants.SPECIES_OMNI, AntSubtypeProfile.standard()),
+                    BorderLayout.WEST);
 
             String desc = "";
             if (type == GameConstants.TYPE_EGG) desc = LanguageStrings.get("HELP_TYPE_EGG_DESC");
@@ -842,27 +841,9 @@ public class HelpPanel extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-            ImageIcon sprite = type.getSprite();
-            JLabel spriteLabel = new JLabel(sprite != null ? sprite : type.getIcon());
-            spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(spriteLabel, BorderLayout.WEST);
+            entry.add(HelpAnimatedSpriteLabel.forCritter(type), BorderLayout.WEST);
 
-            String desc;
-            if (type == GameConstants.TYPE_ANT) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_DESC);
-            } else if (type == GameConstants.TYPE_APHID) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_APHID_DESC);
-            } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_SYMBIOTIC_MITE_DESC);
-            } else if (type == GameConstants.TYPE_DERMESTID) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_DERMESTID_DESC);
-            } else if (type == GameConstants.TYPE_PARASITE_ANT) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_ANT_DESC);
-            } else if (type == GameConstants.TYPE_PARASITIC_MITE) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITIC_MITE_DESC);
-            } else {
-                desc = "";
-            }
+            String desc = bugDescription(type);
 
             String info = helpHtml("width:350px;font-size:11pt;",
                     "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>" + type.getScientificName()
@@ -880,6 +861,43 @@ public class HelpPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private static String bugDescription(Species type) {
+        if (type == GameConstants.TYPE_ANT) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_DESC);
+        }
+        if (type == GameConstants.TYPE_APHID) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_APHID_DESC);
+        }
+        if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_SYMBIOTIC_MITE_DESC);
+        }
+        if (type == GameConstants.TYPE_DERMESTID) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_DERMESTID_DESC);
+        }
+        if (type == GameConstants.TYPE_PARASITE_ANT) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_ANT_DESC);
+        }
+        if (type == GameConstants.TYPE_PARASITIC_MITE) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITIC_MITE_DESC);
+        }
+        if (type == GameConstants.TYPE_COCKROACH) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_COCKROACH_DESC);
+        }
+        if (type == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_BOMBARDIER_BEETLE_DESC);
+        }
+        if (type == GameConstants.TYPE_ANT_LION) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_LION_DESC);
+        }
+        if (type == GameConstants.TYPE_SPIDER) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_SPIDER_DESC);
+        }
+        if (type == GameConstants.TYPE_TARANTULA) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_TARANTULA_DESC);
+        }
+        return "";
     }
 
     private static String roleDescriptionKey(AntRole role) {
@@ -1816,6 +1834,7 @@ public class HelpPanel extends JPanel {
             {LanguageStrings.get("HOTKEY_UPGRADES_LABEL"), "Y-O"},
             {LanguageStrings.get("HOTKEY_P_LABEL"), "P"},
             {LanguageStrings.get("HOTKEY_ABILITIES_LABEL"), "C"},
+            {LanguageStrings.get("HOTKEY_H_LABEL"), "H"},
             {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "A / S / D / F"},
             {LanguageStrings.get("HOTKEY_M_LABEL"), "M"},
             {LanguageStrings.get("HOTKEY_X_LABEL"), "X"}

@@ -1,11 +1,16 @@
 package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.hunt.HuntExpedition;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyHuntService;
+import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -156,6 +161,136 @@ public class SaveManagerTest {
         Colony colony = new Colony(loaded);
         dynasty.addColony(colony);
         assertEquals(7, colony.getSymbioticMites());
+    }
+
+    @Test
+    void colonyKnownHuntTargetsRoundTripThroughJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "HuntColony";
+        sc.nextHuntTargetId = 4;
+        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                2,
+                GameConstants.TYPE_COCKROACH.getId(),
+                120,
+                80,
+                15,
+                0));
+        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                3,
+                GameConstants.TYPE_COCKROACH.getId(),
+                140,
+                90,
+                18,
+                22));
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        assertTrue(json.contains("\"nextHuntTargetId\": 4"));
+        assertTrue(json.contains("\"knownHuntTargets\":"));
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(4, loaded.nextHuntTargetId);
+        assertEquals(2, loaded.knownHuntTargets.size());
+        assertEquals(120, loaded.knownHuntTargets.get(0).overworldX);
+        assertEquals(22, loaded.knownHuntTargets.get(1).escapeWorldDay);
+
+        Colony colony = new Colony(loaded);
+        assertEquals(4, colony.getNextHuntTargetIdSeed());
+        assertEquals(2, colony.getKnownHuntTargets().size());
+        assertEquals(GameConstants.TYPE_COCKROACH, colony.getKnownHuntTargets().get(0).getSpecies());
+        assertEquals(140, colony.getKnownHuntTargets().get(1).getOverworldX());
+    }
+
+    @Test
+    void colonyActiveHuntExpeditionRoundTripThroughJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "HuntExpeditionColony";
+        sc.nextHuntTargetId = 3;
+        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                2,
+                GameConstants.TYPE_COCKROACH.getId(),
+                120,
+                80,
+                15,
+                0));
+        Savefile.SavedHuntExpedition expedition = new Savefile.SavedHuntExpedition(
+                2,
+                "FIGHTING",
+                0f,
+                6f,
+                420f,
+                9,
+                1);
+        expedition.party.add(new Savefile.SavedHuntPartyMember(
+                GameConstants.TYPE_SOLDIER.getId(),
+                AntSubtypeProfile.STANDARD_CODE,
+                GameConstants.ROLE_HUNTER.getId(),
+                0,
+                100,
+                75f,
+                100f));
+        sc.activeHuntExpeditions.add(expedition);
+        sc.activeHuntExpedition = expedition;
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        assertTrue(json.contains("\"activeHuntExpeditions\":"));
+        assertTrue(json.contains("\"activeHuntExpedition\":"));
+        assertTrue(json.contains("\"phase\":\"FIGHTING\""));
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(1, loaded.activeHuntExpeditions.size());
+        assertEquals(2, loaded.activeHuntExpeditions.get(0).targetId);
+        assertEquals("FIGHTING", loaded.activeHuntExpeditions.get(0).phase);
+        assertEquals(420f, loaded.activeHuntExpeditions.get(0).bugHealth, 0.01f);
+        assertEquals(1, loaded.activeHuntExpeditions.get(0).party.size());
+        assertNotNull(loaded.activeHuntExpedition);
+        assertEquals(2, loaded.activeHuntExpedition.targetId);
+
+        Colony colony = new Colony(1, "HuntExpeditionColony", true);
+        colony.setNextHuntTargetIdSeed(loaded.nextHuntTargetId);
+        colony.getKnownHuntTargets().addAll(
+                loaded.knownHuntTargets.stream()
+                        .map(target -> new com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget(
+                                target.id,
+                                target.speciesId,
+                                target.overworldX,
+                                target.overworldY,
+                                target.discoveredWorldDay,
+                                target.escapeWorldDay))
+                        .toList());
+        Ant soldier = AntSubtypeService.createAnt(colony, GameConstants.TYPE_SOLDIER, AntSubtypeProfile.standard());
+        soldier.setRole(GameConstants.ROLE_HUNTER);
+        colony.getSoldiers().add(soldier);
+        ColonyHuntService.restoreExpeditionsFromSave(colony, loaded);
+        assertEquals(1, colony.getActiveHuntExpeditions().size());
+        assertEquals(HuntExpedition.Phase.FIGHTING, colony.getHuntExpeditionForTarget(2).getPhase());
+        assertEquals(1, colony.getHuntExpeditionForTarget(2).getParty().size());
+        assertNotNull(HuntCreatureCombatService.getState(colony, 2));
+        assertEquals(420f, HuntCreatureCombatService.getState(colony, 2).getBugHealth(), 0.01f);
+        assertEquals(1, HuntCreatureCombatService.getState(colony, 2).livingHunters().size());
     }
 
     @Test

@@ -40,6 +40,8 @@ public class Critter {
     private Point targetPosition;
     private Room currentRoom;
     private int legFrame = 1;
+    private int antennaFrame = 1;
+    private float legAnimDistanceAcc;
 
     public Critter(Species species) {
         this.species = species;
@@ -239,8 +241,16 @@ public class Critter {
         return legFrame;
     }
 
+    public int getAntennaFrame() {
+        return antennaFrame;
+    }
+
     protected void setLegFrame(int legFrame) {
         this.legFrame = legFrame;
+    }
+
+    protected void setAntennaFrame(int antennaFrame) {
+        this.antennaFrame = antennaFrame;
     }
 
     public void setPosition(Point p) {
@@ -252,6 +262,9 @@ public class Critter {
         this.moveStatus = GameConstants.MOVE_STATIC;
         if (usesLegWalkCycle()) {
             this.legFrame = 1;
+            if (usesAntennaCycle()) {
+                this.antennaFrame = 1;
+            }
         }
     }
 
@@ -269,10 +282,16 @@ public class Critter {
         if (targetPosition == null || this.moveStatus == GameConstants.MOVE_STATIC) {
             if (usesLegWalkCycle()) {
                 this.legFrame = 1;
+                if (usesAntennaCycle()) {
+                    this.antennaFrame = 1;
+                }
             }
+            legAnimDistanceAcc = 0f;
             return;
         }
 
+        double prevX = this.preciseX;
+        double prevY = this.preciseY;
         double dx = targetPosition.x - this.preciseX;
         double dy = targetPosition.y - this.preciseY;
         double distance = Math.sqrt(dx * dx + dy * dy);
@@ -296,12 +315,30 @@ public class Critter {
             this.y = (int) this.preciseY;
         }
         if (usesLegWalkCycle()) {
-            this.legFrame = this.legFrame >= GameNumbers.ANT_LEG_FRAME_COUNT ? 1 : this.legFrame + 1;
+            double moved = Math.hypot(this.preciseX - prevX, this.preciseY - prevY);
+            if (moved > 0.01) {
+                legAnimDistanceAcc += (float) moved;
+                int legFrameCount = species.getLegFrameCount();
+                while (legAnimDistanceAcc >= GameNumbers.CRITTER_LEG_FRAME_DISTANCE_PX && legFrameCount > 0) {
+                    legAnimDistanceAcc -= GameNumbers.CRITTER_LEG_FRAME_DISTANCE_PX;
+                    this.legFrame = this.legFrame >= legFrameCount ? 1 : this.legFrame + 1;
+                }
+            } else {
+                this.legFrame = 1;
+                legAnimDistanceAcc = 0f;
+            }
+            if (usesAntennaCycle()) {
+                this.antennaFrame = this.antennaFrame >= species.getAntennaFrameCount() ? 1 : this.antennaFrame + 1;
+            }
         }
     }
 
     private boolean usesLegWalkCycle() {
         return species != null && species.hasLegWalkCycle();
+    }
+
+    private boolean usesAntennaCycle() {
+        return species != null && species.hasAntennaCycle();
     }
 
     private void calculateRotation() {

@@ -500,6 +500,7 @@ public class Dynasty {
                     this.unlockedUpgrades.add(u);
                 }
             }
+            migrateLegacyHuntsUnlock(savedDynasty);
         }
 
         if (savedDynasty.unlockedSkillIds != null && !savedDynasty.unlockedSkillIds.isEmpty()) {
@@ -1122,6 +1123,21 @@ public class Dynasty {
         DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(modifierKey);
         if (modifier != null && modifier.getReputationDelta() != 0) {
             adjustDiplomaticReputation(otherDynastyId, -modifier.getReputationDelta());
+        }
+    }
+
+    private void migrateLegacyHuntsUnlock(Savefile.SavedDynasty savedDynasty) {
+        boolean savedId528 = savedDynasty.unlockedUpgradeIds != null
+                && savedDynasty.unlockedUpgradeIds.contains(528);
+        if (savedId528
+                && unlockedUpgrades.contains(GameUnlocks.ROLE_SCOUT)
+                && !unlockedUpgrades.contains(GameUnlocks.ASSIMILATED_RAFTING)) {
+            unlockedUpgrades.remove(GameUnlocks.ABILITY_RAFTING_2);
+            unlockedUpgrades.add(GameUnlocks.ABILITY_HUNTS);
+        }
+        if (unlockedUpgrades.contains(GameUnlocks.ROLE_SCOUT)
+                && !unlockedUpgrades.contains(GameUnlocks.ABILITY_HUNTS)) {
+            unlockedUpgrades.add(GameUnlocks.ABILITY_HUNTS);
         }
     }
 

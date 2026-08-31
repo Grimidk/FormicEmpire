@@ -196,6 +196,10 @@ public final class MenuChaoticWorld {
                 assignShowcaseCargo(ant, random);
             }
         }
+        layoutWanderingCritters(random);
+    }
+
+    private void layoutWanderingCritters(Random random) {
         for (ShowcaseCritter critter : critters) {
             critter.xNorm = 0.1f + random.nextFloat() * 0.8f;
             critter.yNorm = 0.1f + random.nextFloat() * 0.8f;
@@ -213,6 +217,7 @@ public final class MenuChaoticWorld {
             assignWanderVelocity(ant, random);
             ant.wanderTimer = random.nextFloat() * 0.4f;
         }
+        layoutWanderingCritters(random);
     }
 
     private void layoutBattle(Random random) {
@@ -258,18 +263,7 @@ public final class MenuChaoticWorld {
             tickWander(ant, deltaSeconds);
             moveAntWrapped(ant, deltaSeconds, speedScale);
         }
-        for (ShowcaseCritter critter : critters) {
-            critter.xNorm += critter.vx * deltaSeconds * speedScale;
-            critter.yNorm += critter.vy * deltaSeconds * speedScale;
-            if (critter.xNorm < 0f || critter.xNorm > 1f) {
-                critter.vx *= -1f;
-                critter.xNorm = Math.max(0.02f, Math.min(0.98f, critter.xNorm));
-            }
-            if (critter.yNorm < 0f || critter.yNorm > 1f) {
-                critter.vy *= -1f;
-                critter.yNorm = Math.max(0.02f, Math.min(0.98f, critter.yNorm));
-            }
-        }
+        tickWanderingCritters(deltaSeconds, speedScale);
     }
 
     private void updateColony(float deltaSeconds) {
@@ -309,6 +303,22 @@ public final class MenuChaoticWorld {
                         assignWanderVelocity(ant, random);
                     }
                 }
+            }
+        }
+        tickWanderingCritters(deltaSeconds, speedScale);
+    }
+
+    private void tickWanderingCritters(float deltaSeconds, float speedScale) {
+        for (ShowcaseCritter critter : critters) {
+            critter.xNorm += critter.vx * deltaSeconds * speedScale;
+            critter.yNorm += critter.vy * deltaSeconds * speedScale;
+            if (critter.xNorm < 0f || critter.xNorm > 1f) {
+                critter.vx *= -1f;
+                critter.xNorm = Math.max(0.02f, Math.min(0.98f, critter.xNorm));
+            }
+            if (critter.yNorm < 0f || critter.yNorm > 1f) {
+                critter.vy *= -1f;
+                critter.yNorm = Math.max(0.02f, Math.min(0.98f, critter.yNorm));
             }
         }
     }

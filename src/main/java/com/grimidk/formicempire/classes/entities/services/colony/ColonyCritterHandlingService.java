@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
@@ -29,7 +30,7 @@ public class ColonyCritterHandlingService {
     public static List<Species> getPetTypes() {
         List<Species> pets = new ArrayList<>();
         for (Species type : GameConstants.getCritterSpecies()) {
-            if (type != null && type.isPet()) {
+            if (type != null && type.hasBugRole(BugRole.PET)) {
                 pets.add(type);
             }
         }
@@ -37,7 +38,7 @@ public class ColonyCritterHandlingService {
     }
 
     public static boolean isPetBug(Species type) {
-        return type != null && type.isPet();
+        return type != null && type.hasBugRole(BugRole.PET);
     }
 
     public boolean canCatchPetBug(Colony colony, Species type) {

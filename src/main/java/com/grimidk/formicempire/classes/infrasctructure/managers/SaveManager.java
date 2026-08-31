@@ -19,6 +19,10 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
+import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyHuntService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyInvasionService;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
@@ -648,6 +652,23 @@ public class SaveManager {
                              ));
                         }
                     }
+                    sc.nextHuntTargetId = c.getNextHuntTargetIdSeed();
+                    for (KnownHuntTarget target : c.getKnownHuntTargets()) {
+                        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                                target.getId(),
+                                target.getSpeciesId(),
+                                target.getOverworldX(),
+                                target.getOverworldY(),
+                                target.getDiscoveredWorldDay(),
+                                target.getEscapeWorldDay()));
+                    }
+                    sc.activeHuntExpeditions = ColonyHuntService.toSavedExpeditions(c);
+                    sc.activeHuntExpedition = sc.activeHuntExpeditions.size() == 1
+                            ? sc.activeHuntExpeditions.get(0)
+                            : null;
+                    sc.nextInvasionAlertId = c.getNextInvasionAlertIdSeed();
+                    sc.invasionAlerts = ColonyInvasionService.toSavedAlerts(c);
+                    sc.activeInvasionDefenses = ColonyInvasionService.toSavedDefenses(c);
                     colonyList.add(sc);
                     
                     if (c.isPlayer()) {
@@ -896,6 +917,13 @@ public class SaveManager {
         w.write("      \"outgoingDynastySpyMissions\": " + serializeMapToJson(sc.outgoingDynastySpyMissions) + ","); w.newLine();
         w.write("      \"localDeathStatistics\": " + serializeMapToJson(sc.localDeathStatistics) + ","); w.newLine();
         w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
+        w.write("      \"nextHuntTargetId\": " + sc.nextHuntTargetId + ","); w.newLine();
+        w.write("      \"knownHuntTargets\": " + serializeHuntTargetsToJson(sc.knownHuntTargets) + ","); w.newLine();
+        w.write("      \"activeHuntExpeditions\": " + serializeHuntExpeditionsToJson(sc.activeHuntExpeditions) + ","); w.newLine();
+        w.write("      \"activeHuntExpedition\": " + serializeHuntExpeditionToJson(sc.activeHuntExpedition) + ","); w.newLine();
+        w.write("      \"nextInvasionAlertId\": " + sc.nextInvasionAlertId + ","); w.newLine();
+        w.write("      \"invasionAlerts\": " + serializeInvasionAlertsToJson(sc.invasionAlerts) + ","); w.newLine();
+        w.write("      \"activeInvasionDefenses\": " + serializeInvasionDefensesToJson(sc.activeInvasionDefenses) + ","); w.newLine();
         w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); 
         
         w.write("    }");
@@ -1233,6 +1261,19 @@ public class SaveManager {
         sc.outgoingDynastySpyMissions = deserializeJsonToMap(map.get("outgoingDynastySpyMissions"));
         sc.localDeathStatistics = deserializeJsonToMap(map.get("localDeathStatistics"));
         sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
+        sc.nextHuntTargetId = Integer.parseInt(map.getOrDefault("nextHuntTargetId", "1"));
+        sc.knownHuntTargets = deserializeJsonToHuntTargets(map.get("knownHuntTargets"));
+        sc.activeHuntExpeditions = deserializeJsonToHuntExpeditions(map.get("activeHuntExpeditions"));
+        if (sc.activeHuntExpeditions.isEmpty()) {
+            Savefile.SavedHuntExpedition legacy = deserializeJsonToHuntExpedition(map.get("activeHuntExpedition"));
+            if (legacy != null) {
+                sc.activeHuntExpeditions.add(legacy);
+            }
+        }
+        sc.activeHuntExpedition = sc.activeHuntExpeditions.size() == 1 ? sc.activeHuntExpeditions.get(0) : null;
+        sc.nextInvasionAlertId = Integer.parseInt(map.getOrDefault("nextInvasionAlertId", "1"));
+        sc.invasionAlerts = deserializeJsonToInvasionAlerts(map.get("invasionAlerts"));
+        sc.activeInvasionDefenses = deserializeJsonToInvasionDefenses(map.get("activeInvasionDefenses"));
         sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));
         
         return sc;
@@ -1416,6 +1457,251 @@ public class SaveManager {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    private String serializeHuntTargetsToJson(List<Savefile.SavedHuntTarget> targets) {
+        if (targets == null || targets.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < targets.size(); i++) {
+            Savefile.SavedHuntTarget target = targets.get(i);
+            sb.append("{");
+            sb.append("\"id\":").append(target.id).append(",");
+            sb.append("\"speciesId\":").append(target.speciesId).append(",");
+            sb.append("\"x\":").append(target.overworldX).append(",");
+            sb.append("\"y\":").append(target.overworldY).append(",");
+            sb.append("\"discoveredDay\":").append(target.discoveredWorldDay).append(",");
+            sb.append("\"escapeDay\":").append(target.escapeWorldDay);
+            sb.append("}");
+            if (i < targets.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeInvasionAlertsToJson(List<Savefile.SavedInvasionAlert> alerts) {
+        if (alerts == null || alerts.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < alerts.size(); i++) {
+            Savefile.SavedInvasionAlert alert = alerts.get(i);
+            sb.append("{");
+            sb.append("\"id\":").append(alert.id).append(",");
+            sb.append("\"speciesId\":").append(alert.speciesId).append(",");
+            sb.append("\"scope\":\"").append(escapeJsonString(alert.scope)).append("\",");
+            sb.append("\"targetColonyId\":").append(alert.targetColonyId).append(",");
+            sb.append("\"deadlineAbsoluteHour\":").append(alert.deadlineAbsoluteHour).append(",");
+            sb.append("\"defenseDispatched\":").append(alert.defenseDispatched);
+            sb.append("}");
+            if (i < alerts.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeHuntExpeditionsToJson(List<Savefile.SavedHuntExpedition> expeditions) {
+        if (expeditions == null || expeditions.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < expeditions.size(); i++) {
+            sb.append(serializeHuntExpeditionToJson(expeditions.get(i)));
+            if (i < expeditions.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private List<Savefile.SavedHuntExpedition> deserializeJsonToHuntExpeditions(String json) {
+        List<Savefile.SavedHuntExpedition> list = new ArrayList<>();
+        if (json == null || json.isBlank() || json.trim().equals("[]") || json.trim().equals("null")) {
+            return list;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
+            return list;
+        }
+        String inner = trimmed.substring(1, trimmed.length() - 1).trim();
+        if (inner.isEmpty()) {
+            return list;
+        }
+        List<String> objects = splitTopLevelJsonObjects(inner);
+        for (String objectJson : objects) {
+            Savefile.SavedHuntExpedition expedition = deserializeJsonToHuntExpedition(objectJson);
+            if (expedition != null) {
+                list.add(expedition);
+            }
+        }
+        return list;
+    }
+
+    private List<String> splitTopLevelJsonObjects(String inner) {
+        List<String> objects = new ArrayList<>();
+        int depth = 0;
+        int start = -1;
+        for (int i = 0; i < inner.length(); i++) {
+            char c = inner.charAt(i);
+            if (c == '{') {
+                if (depth == 0) {
+                    start = i;
+                }
+                depth++;
+            } else if (c == '}') {
+                depth--;
+                if (depth == 0 && start >= 0) {
+                    objects.add(inner.substring(start, i + 1));
+                    start = -1;
+                }
+            }
+        }
+        return objects;
+    }
+
+    private String serializeHuntExpeditionToJson(Savefile.SavedHuntExpedition expedition) {
+        if (expedition == null) {
+            return "null";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("\"targetId\":").append(expedition.targetId).append(",");
+        sb.append("\"phase\":\"").append(escapeJsonString(expedition.phase)).append("\",");
+        sb.append("\"travelHoursRemaining\":").append(expedition.travelHoursRemaining).append(",");
+        sb.append("\"travelHoursTotal\":").append(expedition.travelHoursTotal).append(",");
+        sb.append("\"bugHealth\":").append(expedition.bugHealth).append(",");
+        sb.append("\"tickIndex\":").append(expedition.tickIndex).append(",");
+        sb.append("\"focusTargetIndex\":").append(expedition.focusTargetIndex).append(",");
+        sb.append("\"party\":").append(serializeHuntPartyToJson(expedition.party));
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private String serializeHuntPartyToJson(List<Savefile.SavedHuntPartyMember> party) {
+        if (party == null || party.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < party.size(); i++) {
+            Savefile.SavedHuntPartyMember member = party.get(i);
+            sb.append("{");
+            sb.append("\"typeId\":").append(member.typeId).append(",");
+            sb.append("\"subtypeCode\":").append(member.subtypeCode).append(",");
+            sb.append("\"roleId\":").append(member.roleId).append(",");
+            sb.append("\"slotIndex\":").append(member.slotIndex).append(",");
+            sb.append("\"health\":").append(member.health).append(",");
+            sb.append("\"battleHealth\":").append(member.battleHealth).append(",");
+            sb.append("\"battleMaxHealth\":").append(member.battleMaxHealth);
+            sb.append("}");
+            if (i < party.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeInvasionDefensesToJson(List<Savefile.SavedInvasionDefense> defenses) {
+        if (defenses == null || defenses.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < defenses.size(); i++) {
+            Savefile.SavedInvasionDefense defense = defenses.get(i);
+            sb.append("{");
+            sb.append("\"alertId\":").append(defense.alertId).append(",");
+            sb.append("\"bugHealth\":").append(defense.bugHealth).append(",");
+            sb.append("\"tickIndex\":").append(defense.tickIndex).append(",");
+            sb.append("\"focusTargetIndex\":").append(defense.focusTargetIndex).append(",");
+            sb.append("\"party\":").append(serializeHuntPartyToJson(defense.party));
+            sb.append("}");
+            if (i < defenses.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private List<Savefile.SavedInvasionDefense> deserializeJsonToInvasionDefenses(String json) {
+        List<Savefile.SavedInvasionDefense> list = new ArrayList<>();
+        if (json == null || json.isBlank() || json.trim().equals("[]") || json.trim().equals("null")) {
+            return list;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
+            return list;
+        }
+        String inner = trimmed.substring(1, trimmed.length() - 1).trim();
+        if (inner.isEmpty()) {
+            return list;
+        }
+        for (String objectJson : splitTopLevelJsonObjects(inner)) {
+            Savefile.SavedInvasionDefense defense = deserializeJsonToInvasionDefense(objectJson);
+            if (defense != null) {
+                list.add(defense);
+            }
+        }
+        return list;
+    }
+
+    private Savefile.SavedInvasionDefense deserializeJsonToInvasionDefense(String json) {
+        if (json == null || json.equals("null") || json.isBlank()) {
+            return null;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+            return null;
+        }
+        int alertId = 0;
+        float bugHealth = 0f;
+        int tickIndex = 0;
+        int focusTargetIndex = 0;
+        List<Savefile.SavedHuntPartyMember> party = new ArrayList<>();
+        try {
+            String inner = trimmed.substring(1, trimmed.length() - 1);
+            int partyStart = inner.indexOf("\"party\":");
+            String header = partyStart >= 0 ? inner.substring(0, partyStart) : inner;
+            String partyJson = partyStart >= 0
+                    ? extractJsonArray(inner.substring(partyStart + "\"party\":".length()))
+                    : "[]";
+            String[] headerFields = header.split(",");
+            for (String field : headerFields) {
+                String[] kv = field.split(":", 2);
+                if (kv.length != 2) {
+                    continue;
+                }
+                String key = kv[0].replace("\"", "").trim();
+                String value = kv[1].replace("\"", "").trim();
+                switch (key) {
+                    case "alertId" -> alertId = Integer.parseInt(value);
+                    case "bugHealth" -> bugHealth = Float.parseFloat(value);
+                    case "tickIndex" -> tickIndex = Integer.parseInt(value);
+                    case "focusTargetIndex" -> focusTargetIndex = Integer.parseInt(value);
+                    default -> {
+                    }
+                }
+            }
+            party = deserializeJsonToHuntParty(partyJson.trim());
+            Savefile.SavedInvasionDefense defense = new Savefile.SavedInvasionDefense(
+                    alertId, bugHealth, tickIndex, focusTargetIndex);
+            defense.party = party;
+            return defense;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
     
     private String serializeHexesToJson(List<Savefile.SavedHex> hexes) {
@@ -1662,6 +1948,269 @@ public class SaveManager {
         }
         
         return list;
+    }
+
+    private List<Savefile.SavedHuntTarget> deserializeJsonToHuntTargets(String json) {
+        List<Savefile.SavedHuntTarget> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) {
+            return list;
+        }
+
+        String[] objects = inner.split("\\},");
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) {
+                objStr += "}";
+            }
+
+            int id = 0;
+            int speciesId = 0;
+            int x = 0;
+            int y = 0;
+            int discoveredDay = 0;
+            int escapeDay = 0;
+
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+
+                        if (k.equals("id")) {
+                            id = Integer.parseInt(v);
+                        } else if (k.equals("speciesId")) {
+                            speciesId = Integer.parseInt(v);
+                        } else if (k.equals("x")) {
+                            x = Integer.parseInt(v);
+                        } else if (k.equals("y")) {
+                            y = Integer.parseInt(v);
+                        } else if (k.equals("discoveredDay")) {
+                            discoveredDay = Integer.parseInt(v);
+                        } else if (k.equals("escapeDay")) {
+                            escapeDay = Integer.parseInt(v);
+                        }
+                    }
+                }
+                list.add(new Savefile.SavedHuntTarget(id, speciesId, x, y, discoveredDay, escapeDay));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }
+
+    private List<Savefile.SavedInvasionAlert> deserializeJsonToInvasionAlerts(String json) {
+        List<Savefile.SavedInvasionAlert> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) {
+            return list;
+        }
+
+        String[] objects = inner.split("\\},");
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) {
+                objStr += "}";
+            }
+
+            int id = 0;
+            int speciesId = 0;
+            String scope = InvasionAlert.Scope.COLONY.name();
+            int targetColonyId = 0;
+            int deadlineAbsoluteHour = 0;
+            boolean defenseDispatched = false;
+
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+
+                        if (k.equals("id")) {
+                            id = Integer.parseInt(v);
+                        } else if (k.equals("speciesId")) {
+                            speciesId = Integer.parseInt(v);
+                        } else if (k.equals("scope")) {
+                            scope = v;
+                        } else if (k.equals("targetColonyId")) {
+                            targetColonyId = Integer.parseInt(v);
+                        } else if (k.equals("deadlineAbsoluteHour")) {
+                            deadlineAbsoluteHour = Integer.parseInt(v);
+                        } else if (k.equals("defenseDispatched")) {
+                            defenseDispatched = Boolean.parseBoolean(v);
+                        }
+                    }
+                }
+                list.add(new Savefile.SavedInvasionAlert(
+                        id, speciesId, scope, targetColonyId, deadlineAbsoluteHour, defenseDispatched));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }
+
+    private Savefile.SavedHuntExpedition deserializeJsonToHuntExpedition(String json) {
+        if (json == null || json.equals("null") || json.isBlank()) {
+            return null;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+            return null;
+        }
+
+        int targetId = 0;
+        String phase = "TRAVELING";
+        float travelHoursRemaining = 0f;
+        float travelHoursTotal = 1f;
+        float bugHealth = 0f;
+        int tickIndex = 0;
+        int focusTargetIndex = 0;
+        List<Savefile.SavedHuntPartyMember> party = new ArrayList<>();
+
+        try {
+            String inner = trimmed.substring(1, trimmed.length() - 1);
+            int partyStart = inner.indexOf("\"party\":");
+            String header = partyStart >= 0 ? inner.substring(0, partyStart) : inner;
+            String partyJson = partyStart >= 0 ? extractJsonArray(inner.substring(partyStart + "\"party\":".length())) : "[]";
+
+            String[] headerFields = header.split(",");
+            for (String field : headerFields) {
+                String[] kv = field.split(":", 2);
+                if (kv.length != 2) {
+                    continue;
+                }
+                String key = kv[0].replace("\"", "").trim();
+                String value = kv[1].replace("\"", "").trim();
+                switch (key) {
+                    case "targetId" -> targetId = Integer.parseInt(value);
+                    case "phase" -> phase = value;
+                    case "travelHoursRemaining" -> travelHoursRemaining = Float.parseFloat(value);
+                    case "travelHoursTotal" -> travelHoursTotal = Float.parseFloat(value);
+                    case "bugHealth" -> bugHealth = Float.parseFloat(value);
+                    case "tickIndex" -> tickIndex = Integer.parseInt(value);
+                    case "focusTargetIndex" -> focusTargetIndex = Integer.parseInt(value);
+                    default -> {
+                    }
+                }
+            }
+
+            party = deserializeJsonToHuntParty(partyJson.trim());
+            Savefile.SavedHuntExpedition expedition = new Savefile.SavedHuntExpedition(
+                    targetId,
+                    phase,
+                    travelHoursRemaining,
+                    travelHoursTotal,
+                    bugHealth,
+                    tickIndex,
+                    focusTargetIndex);
+            expedition.party = party;
+            return expedition;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<Savefile.SavedHuntPartyMember> deserializeJsonToHuntParty(String json) {
+        List<Savefile.SavedHuntPartyMember> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) {
+            return list;
+        }
+
+        String[] objects = inner.split("\\},");
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) {
+                objStr += "}";
+            }
+
+            int typeId = 0;
+            int subtypeCode = 0;
+            int roleId = 0;
+            int slotIndex = 0;
+            int health = 0;
+            float battleHealth = -1f;
+            float battleMaxHealth = -1f;
+
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+                        switch (k) {
+                            case "typeId" -> typeId = Integer.parseInt(v);
+                            case "subtypeCode" -> subtypeCode = Integer.parseInt(v);
+                            case "roleId" -> roleId = Integer.parseInt(v);
+                            case "slotIndex" -> slotIndex = Integer.parseInt(v);
+                            case "health" -> health = Integer.parseInt(v);
+                            case "battleHealth" -> battleHealth = Float.parseFloat(v);
+                            case "battleMaxHealth" -> battleMaxHealth = Float.parseFloat(v);
+                            default -> {
+                            }
+                        }
+                    }
+                }
+                list.add(new Savefile.SavedHuntPartyMember(
+                        typeId, subtypeCode, roleId, slotIndex, health, battleHealth, battleMaxHealth));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }
+
+    private String extractJsonArray(String jsonTail) {
+        if (jsonTail == null) {
+            return "[]";
+        }
+        String trimmed = jsonTail.trim();
+        int start = trimmed.indexOf('[');
+        if (start < 0) {
+            return "[]";
+        }
+        int depth = 0;
+        boolean inQuote = false;
+        for (int i = start; i < trimmed.length(); i++) {
+            char c = trimmed.charAt(i);
+            if (c == '"' && (i == 0 || trimmed.charAt(i - 1) != '\\')) {
+                inQuote = !inQuote;
+            }
+            if (!inQuote) {
+                if (c == '[') {
+                    depth++;
+                } else if (c == ']') {
+                    depth--;
+                    if (depth == 0) {
+                        return trimmed.substring(start, i + 1);
+                    }
+                }
+            }
+        }
+        return "[]";
     }
     
     private List<Savefile.SavedHex> deserializeJsonToHexes(String json) {

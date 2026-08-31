@@ -28,6 +28,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showSynergyDialogCallback;
     private final RoleManagementCallback showRoleManagementDialogCallback;
     private final Runnable showAbilitiesDialogCallback;
+    private final Runnable showHuntsDialogCallback;
     private final Runnable showStatsDialogCallback; 
     private final Runnable toggleViewCallback;
     private final Runnable showMapDialogCallback;
@@ -38,6 +39,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showSettingsDialogCallback;
     private final Runnable showHelpDialogCallback;
     private final BooleanSupplier dynastyDialogOpenCheck;
+    private final BooleanSupplier huntsUnlockedCheck;
 
     // --- UI Components ---
     private final JButton speedUpButton = new JButton();
@@ -60,6 +62,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageAssimilation;
     private JMenuItem manageSynergy;
     private JMenuItem manageAbilities;
+    private JMenuItem manageHunts;
     private JMenuItem manageDynasty;
     private JMenuItem manageTrade;
     private JMenuItem manageDiplomacy;
@@ -83,6 +86,7 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showSynergyDialogCallback,
                         RoleManagementCallback showRoleManagementDialogCallback,
                         Runnable showAbilitiesDialogCallback,
+                        Runnable showHuntsDialogCallback,
                         Runnable showStatsDialogCallback,
                         Runnable toggleViewCallback,
                         Runnable showMapDialogCallback,
@@ -92,7 +96,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showWarDialogCallback,
                         Runnable showSettingsDialogCallback,
                         Runnable showHelpDialogCallback,
-                        BooleanSupplier dynastyDialogOpenCheck) {
+                        BooleanSupplier dynastyDialogOpenCheck,
+                        BooleanSupplier huntsUnlockedCheck) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
         this.frame = frame;
@@ -104,6 +109,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showSynergyDialogCallback = showSynergyDialogCallback;
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
         this.showAbilitiesDialogCallback = showAbilitiesDialogCallback;
+        this.showHuntsDialogCallback = showHuntsDialogCallback;
         this.showStatsDialogCallback = showStatsDialogCallback;
         this.toggleViewCallback = toggleViewCallback;
         this.showMapDialogCallback = showMapDialogCallback;
@@ -114,6 +120,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showSettingsDialogCallback = showSettingsDialogCallback;
         this.showHelpDialogCallback = showHelpDialogCallback;
         this.dynastyDialogOpenCheck = dynastyDialogOpenCheck;
+        this.huntsUnlockedCheck = huntsUnlockedCheck;
 
         initComponents();
         initLayout();        
@@ -154,6 +161,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageAssimilation = new JMenuItem();
         manageSynergy = new JMenuItem();
         manageAbilities = new JMenuItem();
+        manageHunts = new JMenuItem();
         manageDynasty = new JMenuItem();
         manageTrade = new JMenuItem();
         manageDiplomacy = new JMenuItem();
@@ -201,6 +209,8 @@ public class ControlPanel extends ZeroGamePanel {
         manageSynergy.setIcon(GameUnlocks.ABILITY_SYNERGY.getIcon());
         manageAbilities.setText(LanguageStrings.get(LanguageStrings.MENU_ABILITIES));
         manageAbilities.setIcon(GameUnlocks.ABILITY_ABILITY.getIcon());
+        manageHunts.setText(LanguageStrings.get(LanguageStrings.MENU_CRITTER_MANAGEMENT));
+        manageHunts.setIcon(GameConstants.ROLE_SCOUT.getIcon());
         manageDynasty.setText(LanguageStrings.get(LanguageStrings.MENU_DYNASTY));
         manageDynasty.setIcon(GameUnlocks.ABILITY_DYNASTY.getIcon());
         manageTrade.setText(LanguageStrings.get(LanguageStrings.MENU_TRADE));
@@ -336,6 +346,9 @@ public class ControlPanel extends ZeroGamePanel {
         manageAbilities.addActionListener(e -> showAbilitiesDialogCallback.run());
         manageAbilities.setVisible(false);
 
+        manageHunts.addActionListener(e -> showHuntsDialogCallback.run());
+        manageHunts.setVisible(false);
+
         manageDynasty.addActionListener(e -> showDynastyDialogCallback.run());
         manageDynasty.setVisible(false);
 
@@ -374,6 +387,7 @@ public class ControlPanel extends ZeroGamePanel {
         colonyMenu.add(manageAssimilation);
         colonyMenu.add(manageSynergy);
         colonyMenu.add(manageAbilities);
+        colonyMenu.add(manageHunts);
         gameMenu.add(colonyMenu);
 
         dynastyMenu = createSubmenu(LanguageStrings.MENU_GROUP_DYNASTY);
@@ -448,6 +462,11 @@ public class ControlPanel extends ZeroGamePanel {
         EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_C, "openAbilities", () -> {
             if (manageAbilities.isVisible()) {
                 showAbilitiesDialogCallback.run();
+            }
+        });
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_H, "openHunts", () -> {
+            if (huntsUnlockedCheck != null && huntsUnlockedCheck.getAsBoolean()) {
+                showHuntsDialogCallback.run();
             }
         });
         EdgeTriggeredKeyBindings.bind(inputMap, actionMap, KeyEvent.VK_A, "openDynasty", () -> {
@@ -559,6 +578,13 @@ public class ControlPanel extends ZeroGamePanel {
     public void updateAbilitiesMenu(boolean visible) {
         if (manageAbilities != null) {
             manageAbilities.setVisible(visible);
+        }
+        refreshSubmenuVisibility(colonyMenu);
+    }
+
+    public void updateHuntsMenu(boolean visible) {
+        if (manageHunts != null) {
+            manageHunts.setVisible(visible);
         }
         refreshSubmenuVisibility(colonyMenu);
     }

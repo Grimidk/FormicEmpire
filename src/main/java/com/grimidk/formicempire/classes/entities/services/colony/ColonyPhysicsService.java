@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.entities.services.shared.ColonyAntAnimSampleLod;
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
@@ -135,6 +136,9 @@ public class ColonyPhysicsService {
                 }
 
                 float bugMove = GameNumbers.BASE_SPRITE_SPEED;
+                if (isPenPetCritter(bug, activeDimension)) {
+                    bugMove *= GameNumbers.PET_PEN_CRITTER_SPEED_MULT;
+                }
                 if (colony.isCreatineDietActive()) {
                     bugMove *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
                 }
@@ -142,7 +146,7 @@ public class ColonyPhysicsService {
                     if (!ViewportPhysicsLod.shouldRunOffViewportBugMove(physicsStepIndex, bugHash)) {
                         continue;
                     }
-                    bugMove = ViewportPhysicsLod.compensatedMoveSpeed(GameNumbers.BASE_SPRITE_SPEED);
+                    bugMove = ViewportPhysicsLod.compensatedMoveSpeed(bugMove);
                 }
                 bug.updatePosition(bugMove);
             }
@@ -352,7 +356,7 @@ public class ColonyPhysicsService {
                 if (yard == null) {
                     yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
                 }
-                wanderInBoundaries(colony, bug, yard, 0.05);
+                wanderInBoundaries(colony, bug, yard, GameNumbers.PET_PEN_WANDER_CHANCE, true);
             } else {
                 bug.setPosition(new Point(-1000, -1000));
             }
@@ -363,7 +367,7 @@ public class ColonyPhysicsService {
             if (pen == null) {
                 pen = getRoomBounds(colony, WorldSpaces.INSECT_PEN);
             }
-            wanderInBoundaries(colony, bug, pen, 0.05);
+            wanderInBoundaries(colony, bug, pen, GameNumbers.PET_PEN_WANDER_CHANCE, true);
         } else if (bug.getDimension() == WorldSpaces.OVERWORLD
                 && bug.getSpecies() == GameConstants.TYPE_DERMESTID
                 && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID)) {
@@ -371,7 +375,7 @@ public class ColonyPhysicsService {
             if (yard == null) {
                 yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
             }
-            wanderInBoundaries(colony, bug, yard, 0.05);
+            wanderInBoundaries(colony, bug, yard, GameNumbers.PET_PEN_WANDER_CHANCE, true);
         }
         else if (bug.getSpecies() == GameConstants.TYPE_PARASITE_ANT) {
             if (bug.getDimension() != WorldSpaces.UNDERWORLD) {
@@ -653,17 +657,39 @@ public class ColonyPhysicsService {
         return new Rectangle(x, y, room.getWidth(), room.getHeight());
     }
 
+    private static boolean isPenPetCritter(Critter bug, Dimension activeDimension) {
+        if (bug == null || activeDimension != WorldSpaces.OVERWORLD) {
+            return false;
+        }
+        Species species = bug.getSpecies();
+        return species == GameConstants.TYPE_APHID
+                || species == GameConstants.TYPE_SYMBIOTIC_MITE
+                || species == GameConstants.TYPE_DERMESTID;
+    }
+
     private void wanderInBoundaries(Colony colony, Critter entity, Rectangle bounds, double chance) {
+        wanderInBoundaries(colony, entity, bounds, chance, false);
+    }
+
+    private void wanderInBoundaries(Colony colony, Critter entity, Rectangle bounds, double chance,
+            boolean shortHops) {
         if (bounds == null) {
             return;
         }
         Rectangle walk = getBugWalkBounds(colony, bounds, entity);
         if (isPointInWalkBounds(walk, entity.getX(), entity.getY())) {
             if (GameRandom.nextDouble() < chance) {
-                entity.moveTo(getRandomPointInWalkBounds(walk));
+                Point target = shortHops
+                        ? getRandomPointNearInWalkBounds(walk, entity.getX(), entity.getY(),
+                                GameNumbers.PET_PEN_WANDER_RADIUS_PX)
+                        : getRandomPointInWalkBounds(walk);
+                entity.moveTo(target);
             }
         } else {
-            entity.moveTo(getRandomPointInWalkBounds(walk));
+            entity.moveTo(shortHops
+                    ? getRandomPointNearInWalkBounds(walk, entity.getX(), entity.getY(),
+                            GameNumbers.PET_PEN_WANDER_RADIUS_PX)
+                    : getRandomPointInWalkBounds(walk));
         }
     }
 
@@ -696,6 +722,18 @@ public class ColonyPhysicsService {
         }
         int x = walk.x + (walk.width <= 1 ? 0 : GameRandom.nextInt(walk.width));
         int y = walk.y + (walk.height <= 1 ? 0 : GameRandom.nextInt(walk.height));
+        return new Point(x, y);
+    }
+
+    private Point getRandomPointNearInWalkBounds(Rectangle walk, int originX, int originY, int radiusPx) {
+        if (walk == null || walk.width <= 0 || walk.height <= 0) {
+            return new Point(originX, originY);
+        }
+        int radius = Math.max(4, radiusPx);
+        int dx = GameRandom.nextInt(radius * 2 + 1) - radius;
+        int dy = GameRandom.nextInt(radius * 2 + 1) - radius;
+        int x = Math.max(walk.x, Math.min(walk.x + walk.width - 1, originX + dx));
+        int y = Math.max(walk.y, Math.min(walk.y + walk.height - 1, originY + dy));
         return new Point(x, y);
     }
 

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 85% (349/412 checked)
+Completion: 82% (348/426 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -17,7 +17,7 @@ Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic change
 [X] Main menu License (bottom right) — opens full license dialog
 [X] Main menu side rail — Discord icon opens Discord invite in browser
 [X] Main menu side rail — Instagram icon opens https://www.instagram.com/grim.idk/
-[ ] Main menu side rail — Help icon opens help encyclopedia above Feedback (see section 18)
+[X] Main menu side rail — Help icon opens help encyclopedia above Feedback (see section 18)
 [X] Main menu side rail — Feedback icon opens Google Form in browser
 [X] Main menu side rail — Settings icon opens settings panel
 [X] Mechanics Audit — this file (only when enabled in Settings > Sandbox)
@@ -356,6 +356,22 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [X] Active buff state prevents re-trigger
 
 ================================================================================
+14b. CRITTER MANAGEMENT (H) — CritterManagementDialog (Hunts / Invasions / Pets / Parasites tabs)
+================================================================================
+[ ] Hunts tab (requires Scout unlock): scouts discover cockroaches; known bugs capped at source capacity
+[ ] Hunts tab: setup party from unassigned soldiers/majors/princesses up to combat limit; preview travel/win/rewards
+[ ] Invasions tab: defend with unassigned ants (no party cap); battle starts immediately (no travel)
+[ ] Invasion battle view: invader center, defenders orbit; hourly combat ticks
+[ ] Invasion timeout steals resources and kills unassigned ants if undefended
+[ ] Pets tab shows aphids/mites/dermestids with counts capacity roles and biome natives
+[ ] Parasites tab shows parasitic mites and parasite ants with counters and outbreak info
+[ ] Role management shows unassigned %; red below 10% reserve
+[ ] Hunt battle view: cockroach center, hunters orbit; hourly combat ticks
+[ ] Victory grants protein, mushrooms, and RP; defeat removes target and kills party
+[ ] Hunt/invasion alerts in log and alert panel
+[ ] Hunts blocked while dynasty is at war
+
+================================================================================
 15. DYNASTY — OVERVIEW (A)
 ================================================================================
 [X] Colony list with sort options
@@ -508,7 +524,8 @@ Monthly:
 
 Daily:
 [X] Graver role unlock
-[X] Scout unlock from plant harvest (any plant source)
+[ ] Scout unlock from plant harvest (unlocks Scout role and Hunts menu with H)
+[ ] Hunts ability popup for saves that already had Scouts before Hunts shipped
 [ ] Miner unlock from 10 Tier 3 buildings across dynasty (requires Soldier type; scouts then spot minerals)
 [ ] Hunter + Warrior + Militia role unlocks (one popup with Soldier type)
 [ ] Breeder + Spread unlock together (one popup with Princess type)

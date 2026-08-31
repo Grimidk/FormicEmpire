@@ -295,6 +295,9 @@ public class MenuChaoticPanel extends JPanel {
                 g2d.drawImage(antHillImage, entranceX - hillW / 2, entranceY - hillH / 2, this);
             }
         }
+        for (MenuChaoticWorld.ShowcaseCritter critter : world.getCritters()) {
+            drawCritter(g2d, critter, fieldW, fieldH);
+        }
         for (MenuChaoticWorld.ShowcaseAnt ant : world.getAnts()) {
             drawWanderingAnt(g2d, ant, fieldW, fieldH);
         }
@@ -340,10 +343,11 @@ public class MenuChaoticPanel extends JPanel {
         }
         float anim = quantizedAnimSeconds();
         boolean moving = Math.abs(critter.vx) > 0.001f || Math.abs(critter.vy) > 0.001f;
-        int legFrame = critter.species.hasLegWalkCycle()
-                ? RouteViewVisuals.resolveLegFrame(null, false, moving, critter.wobblePhase, anim, critter.motionRate)
-                : 1;
-        ImageIcon icon = GameConstants.getCritterSprite(critter.species, legFrame);
+        int legFrame = RouteViewVisuals.resolveCritterLegFrame(
+                critter.species, moving, critter.wobblePhase, anim, critter.motionRate);
+        int antennaFrame = RouteViewVisuals.resolveCritterAntennaFrame(
+                critter.species, critter.wobblePhase, anim, critter.motionRate);
+        ImageIcon icon = GameConstants.getCritterSprite(critter.species, legFrame, antennaFrame);
         if (icon == null) {
             return;
         }

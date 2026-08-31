@@ -142,8 +142,8 @@ public final class MenuChaoticCatalog {
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_WORKER, GameConstants.SPECIES_TRAPJAW, 2111),
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_PRINCESS, GameConstants.SPECIES_JET, 1111)),
                 500,
-                List.of(),
-                0,
+                List.of(new MenuChaoticCritterEntry(GameConstants.TYPE_COCKROACH)),
+                10,
                 0x4A11_000CL));
 
         scenarios.add(new MenuChaoticDefinition(
