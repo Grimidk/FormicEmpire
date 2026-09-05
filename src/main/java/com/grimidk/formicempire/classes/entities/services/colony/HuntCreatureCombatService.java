@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
 import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
@@ -361,43 +362,43 @@ public final class HuntCreatureCombatService {
     }
 
     public static float resolveBugMaxHealth(Species species) {
-        if (species == GameConstants.TYPE_COCKROACH) {
-            return GameNumbers.HUNT_COCKROACH_HP;
+        if (species != null && species.hasBugRole(BugRole.INVASION)) {
+            return GameNumbers.invasionEnemyMaxHealth(species);
         }
-        if (species == GameConstants.TYPE_ANT_LION) {
-            return GameNumbers.INVASION_ANT_LION_HP;
+        if (species != null && species.hasBugRole(BugRole.HUNT)) {
+            return GameNumbers.huntEnemyMaxHealth(species);
         }
         return GameNumbers.MILITARY_BASELINE_HEALTH;
     }
 
     public static float resolveBugAttack(Species species) {
-        if (species == GameConstants.TYPE_COCKROACH) {
-            return GameNumbers.HUNT_COCKROACH_ATTACK;
+        if (species != null && species.hasBugRole(BugRole.INVASION)) {
+            return GameNumbers.invasionEnemyAttack(species);
         }
-        if (species == GameConstants.TYPE_ANT_LION) {
-            return GameNumbers.INVASION_ANT_LION_ATTACK;
+        if (species != null && species.hasBugRole(BugRole.HUNT)) {
+            return GameNumbers.huntEnemyAttack(species);
         }
         return GameNumbers.MILITARY_BASELINE_ATTACK;
     }
 
     public static float resolveBugDefense(Species species) {
-        if (species == GameConstants.TYPE_COCKROACH) {
-            return GameNumbers.HUNT_COCKROACH_DEFENSE;
+        if (species != null && species.hasBugRole(BugRole.INVASION)) {
+            return GameNumbers.invasionEnemyDefense(species);
         }
-        if (species == GameConstants.TYPE_ANT_LION) {
-            return GameNumbers.INVASION_ANT_LION_DEFENSE;
+        if (species != null && species.hasBugRole(BugRole.HUNT)) {
+            return GameNumbers.huntEnemyDefense(species);
         }
         return GameNumbers.MILITARY_BASELINE_DEFENSE;
     }
 
     public static int resolveBugAttackSpeed(Species species) {
-        if (species == GameConstants.TYPE_COCKROACH) {
-            return GameNumbers.HUNT_COCKROACH_ATTACK_SPEED;
+        if (species != null && species.hasBugRole(BugRole.INVASION)) {
+            return GameNumbers.invasionEnemyAttackSpeed(species);
         }
-        if (species == GameConstants.TYPE_ANT_LION) {
-            return GameNumbers.INVASION_ANT_LION_ATTACK_SPEED;
+        if (species != null && species.hasBugRole(BugRole.HUNT)) {
+            return GameNumbers.huntEnemyAttackSpeed(species);
         }
-        return 1;
+        return GameNumbers.MILITARY_BASELINE_ATTACK_SPEED;
     }
 }
 

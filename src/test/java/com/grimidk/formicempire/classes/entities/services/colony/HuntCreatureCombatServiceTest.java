@@ -65,6 +65,18 @@ class HuntCreatureCombatServiceTest {
     }
 
     @Test
+    void spiderUsesConfiguredHuntStats() {
+        assertEquals(GameNumbers.HUNT_SPIDER_HP,
+                HuntCreatureCombatService.resolveBugMaxHealth(GameConstants.TYPE_SPIDER), 0.0001f);
+        assertEquals(GameNumbers.HUNT_SPIDER_ATTACK,
+                HuntCreatureCombatService.resolveBugAttack(GameConstants.TYPE_SPIDER), 0.0001f);
+        assertEquals(GameNumbers.HUNT_SPIDER_DEFENSE,
+                HuntCreatureCombatService.resolveBugDefense(GameConstants.TYPE_SPIDER), 0.0001f);
+        assertEquals(GameNumbers.HUNT_SPIDER_ATTACK_SPEED,
+                HuntCreatureCombatService.resolveBugAttackSpeed(GameConstants.TYPE_SPIDER));
+    }
+
+    @Test
     void huntersCanDefeatCockroachWithLargeParty() {
         List<Ant> party = new ArrayList<>();
         for (int i = 0; i < 40; i++) {

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class AlertPanel extends ZeroGamePanel {
 
@@ -25,6 +26,7 @@ public class AlertPanel extends ZeroGamePanel {
     private List<Alert> lastAlerts = new ArrayList<>();
     private String hoveredAlertKey;
     private boolean rebuilding;
+    private Consumer<String> alertClickListener;
 
     public AlertPanel() {
         super(new BorderLayout());
@@ -61,6 +63,19 @@ public class AlertPanel extends ZeroGamePanel {
 
     public String getHoveredAlertKey() {
         return hoveredAlertKey;
+    }
+
+    public void setAlertClickListener(Consumer<String> alertClickListener) {
+        this.alertClickListener = alertClickListener;
+    }
+
+    private static boolean opensCritterManagement(String alertKey) {
+        return "HUNT".equals(alertKey)
+                || "HUNT_OK".equals(alertKey)
+                || "HUNT_FAIL".equals(alertKey)
+                || "INVASION".equals(alertKey)
+                || "INVASION_OK".equals(alertKey)
+                || "INVASION_FAIL".equals(alertKey);
     }
 
     private static String truncateForRow(String text) {
@@ -177,7 +192,19 @@ public class AlertPanel extends ZeroGamePanel {
                     msgLabel.setToolTipText(tip);
                 }
 
+                if (opensCritterManagement(alert.key)) {
+                    AssetStyles.markClickable(itemPanel);
+                    AssetStyles.markClickable(msgLabel);
+                }
+
                 itemPanel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (alertClickListener != null && opensCritterManagement(alert.key)) {
+                            alertClickListener.accept(alert.key);
+                        }
+                    }
+
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         setAlertHovered(alert, true);

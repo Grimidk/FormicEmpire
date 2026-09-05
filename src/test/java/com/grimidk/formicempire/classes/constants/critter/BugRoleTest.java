@@ -35,10 +35,13 @@ class BugRoleTest {
     }
 
     @Test
-    void activeHuntSpeciesAreCockroachOnlyForNow() {
-        assertEquals(1, GameConstants.getActiveHuntSpeciesForBiome(GameConstants.BIOME_URBAN).size());
-        assertEquals(GameConstants.TYPE_COCKROACH,
-                GameConstants.getActiveHuntSpeciesForBiome(GameConstants.BIOME_URBAN).get(0));
+    void activeHuntSpeciesMatchBiomeHuntList() {
+        assertEquals(GameConstants.getHuntSpeciesForBiome(GameConstants.BIOME_URBAN),
+                GameConstants.getActiveHuntSpeciesForBiome(GameConstants.BIOME_URBAN));
+        assertEquals(4, GameConstants.getActiveHuntSpeciesForBiome(GameConstants.BIOME_URBAN).size());
+        assertTrue(GameConstants.getActiveHuntSpeciesForBiome(GameConstants.BIOME_URBAN)
+                .stream()
+                .allMatch(s -> s.hasBugRole(BugRole.HUNT)));
         assertTrue(GameConstants.getActiveHuntSpeciesForBiome(GameConstants.BIOME_DESERT).isEmpty());
     }
 

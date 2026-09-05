@@ -791,6 +791,9 @@ public final class LanguageStrings {
     public static final String ALERT_DETAIL_HUNT = "ALERT_DETAIL_HUNT";
     public static final String ALERT_DETAIL_HUNT_SUCCESS = "ALERT_DETAIL_HUNT_SUCCESS";
     public static final String ALERT_DETAIL_HUNT_FAILURE = "ALERT_DETAIL_HUNT_FAILURE";
+    public static final String ALERT_DETAIL_INVASION = "ALERT_DETAIL_INVASION";
+    public static final String ALERT_DETAIL_INVASION_SUCCESS = "ALERT_DETAIL_INVASION_SUCCESS";
+    public static final String ALERT_DETAIL_INVASION_FAILURE = "ALERT_DETAIL_INVASION_FAILURE";
     public static final String DIALOG_CRITTER_MANAGEMENT_TITLE = "DIALOG_CRITTER_MANAGEMENT_TITLE";
     public static final String MENU_CRITTER_MANAGEMENT = "MENU_CRITTER_MANAGEMENT";
     public static final String CRITTER_TAB_HUNTS = "CRITTER_TAB_HUNTS";

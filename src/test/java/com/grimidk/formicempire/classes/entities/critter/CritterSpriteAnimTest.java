@@ -25,7 +25,7 @@ class CritterSpriteAnimTest {
     @Test
     void legWalkAdvancesOneFramePerMovementUpdate() {
         Critter critter = new Critter(GameConstants.TYPE_APHID);
-        critter.setSpeed(10f);
+        critter.setSpeed(GameNumbers.CRITTER_LEG_FRAME_DISTANCE_PX);
         critter.setPosition(new Point(0, 0));
         critter.moveTo(new Point(1000, 0));
 
@@ -42,7 +42,7 @@ class CritterSpriteAnimTest {
     @Test
     void idleCritterResetsToLegFrameOne() {
         Critter critter = new Critter(GameConstants.TYPE_DERMESTID);
-        critter.setSpeed(10f);
+        critter.setSpeed(GameNumbers.CRITTER_LEG_FRAME_DISTANCE_PX);
         critter.setPosition(new Point(0, 0));
         critter.moveTo(new Point(1000, 0));
         critter.updatePosition(1f);

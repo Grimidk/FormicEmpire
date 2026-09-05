@@ -72,4 +72,12 @@ public final class CritterManagementDialog extends ZeroDialog {
         }
         refreshAllTabs();
     }
+
+    public void selectTab(int tabIndex) {
+        if (tabIndex < 0 || tabIndex >= tabbedPane.getTabCount()) {
+            return;
+        }
+        tabbedPane.setSelectedIndex(tabIndex);
+        refreshAllTabs();
+    }
 }

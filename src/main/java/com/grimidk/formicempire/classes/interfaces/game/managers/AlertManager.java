@@ -123,6 +123,10 @@ public class AlertManager {
             case "HUNT_OK":
             case "HUNT_FAIL":
                 return iconOf(GameConstants.ROLE_SCOUT.getIcon());
+            case "INVASION":
+            case "INVASION_OK":
+            case "INVASION_FAIL":
+                return iconOf(GameConstants.TYPE_ANT_LION.getIcon());
             case "TRADE":
                 return iconOf(GameConstants.ICON_TRADE);
             case "NUPTIAL":
@@ -284,6 +288,12 @@ public class AlertManager {
                 return LanguageStrings.ALERT_DETAIL_HUNT_SUCCESS;
             case "HUNT_FAIL":
                 return LanguageStrings.ALERT_DETAIL_HUNT_FAILURE;
+            case "INVASION":
+                return LanguageStrings.ALERT_DETAIL_INVASION;
+            case "INVASION_OK":
+                return LanguageStrings.ALERT_DETAIL_INVASION_SUCCESS;
+            case "INVASION_FAIL":
+                return LanguageStrings.ALERT_DETAIL_INVASION_FAILURE;
             case "TRADE":
                 return LanguageStrings.ALERT_DETAIL_TRADE;
             case "DYN":

@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 
@@ -270,6 +272,27 @@ public final class GameNumbers {
     public static final int HUNT_COCKROACH_REWARD_PROTEIN = 250;
     public static final int HUNT_COCKROACH_REWARD_RP = 120;
     public static final int HUNT_COCKROACH_REWARD_MUSHROOMS = 80;
+    public static final int HUNT_BOMBARDIER_BEETLE_HP = 22000;
+    public static final float HUNT_BOMBARDIER_BEETLE_ATTACK = 580f;
+    public static final float HUNT_BOMBARDIER_BEETLE_DEFENSE = 14f;
+    public static final int HUNT_BOMBARDIER_BEETLE_ATTACK_SPEED = 3;
+    public static final int HUNT_BOMBARDIER_BEETLE_REWARD_PROTEIN = 220;
+    public static final int HUNT_BOMBARDIER_BEETLE_REWARD_RP = 150;
+    public static final int HUNT_BOMBARDIER_BEETLE_REWARD_MUSHROOMS = 50;
+    public static final int HUNT_SPIDER_HP = 16000;
+    public static final float HUNT_SPIDER_ATTACK = 520f;
+    public static final float HUNT_SPIDER_DEFENSE = 8f;
+    public static final int HUNT_SPIDER_ATTACK_SPEED = 4;
+    public static final int HUNT_SPIDER_REWARD_PROTEIN = 200;
+    public static final int HUNT_SPIDER_REWARD_RP = 110;
+    public static final int HUNT_SPIDER_REWARD_MUSHROOMS = 90;
+    public static final int HUNT_TARANTULA_HP = 26000;
+    public static final float HUNT_TARANTULA_ATTACK = 540f;
+    public static final float HUNT_TARANTULA_DEFENSE = 16f;
+    public static final int HUNT_TARANTULA_ATTACK_SPEED = 3;
+    public static final int HUNT_TARANTULA_REWARD_PROTEIN = 320;
+    public static final int HUNT_TARANTULA_REWARD_RP = 130;
+    public static final int HUNT_TARANTULA_REWARD_MUSHROOMS = 100;
     public static final int HUNT_MAX_PARTY_FROM_CAPACITY_DIVISOR = 50;
     public static final float INVASION_RANDOM_CHANCE_PER_HOUR = 0.003f;
     public static final int INVASION_RESPONSE_HOURS = 72;
@@ -524,5 +547,158 @@ public final class GameNumbers {
             return INTEGRATION_MONTHS_PER_COLONY_SLOW;
         }
         return INTEGRATION_MONTHS_PER_COLONY_SLOW / Math.sqrt(diplomatsPerColony);
+    }
+
+    public static final class HuntRewards {
+        public static final HuntRewards NONE = new HuntRewards(0, 0, 0);
+
+        public final int protein;
+        public final int mushrooms;
+        public final int research;
+
+        public HuntRewards(int protein, int mushrooms, int research) {
+            this.protein = Math.max(0, protein);
+            this.mushrooms = Math.max(0, mushrooms);
+            this.research = Math.max(0, research);
+        }
+
+        public boolean hasAny() {
+            return protein > 0 || mushrooms > 0 || research > 0;
+        }
+    }
+
+    public static HuntRewards huntRewardsFor(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return HuntRewards.NONE;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return new HuntRewards(
+                    HUNT_COCKROACH_REWARD_PROTEIN,
+                    HUNT_COCKROACH_REWARD_MUSHROOMS,
+                    HUNT_COCKROACH_REWARD_RP);
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+            return new HuntRewards(
+                    HUNT_BOMBARDIER_BEETLE_REWARD_PROTEIN,
+                    HUNT_BOMBARDIER_BEETLE_REWARD_MUSHROOMS,
+                    HUNT_BOMBARDIER_BEETLE_REWARD_RP);
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return new HuntRewards(
+                    HUNT_SPIDER_REWARD_PROTEIN,
+                    HUNT_SPIDER_REWARD_MUSHROOMS,
+                    HUNT_SPIDER_REWARD_RP);
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return new HuntRewards(
+                    HUNT_TARANTULA_REWARD_PROTEIN,
+                    HUNT_TARANTULA_REWARD_MUSHROOMS,
+                    HUNT_TARANTULA_REWARD_RP);
+        }
+        return HuntRewards.NONE;
+    }
+
+    public static float huntEnemyMaxHealth(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_HEALTH;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_HP;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+            return HUNT_BOMBARDIER_BEETLE_HP;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_HP;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_HP;
+        }
+        return MILITARY_BASELINE_HEALTH;
+    }
+
+    public static float huntEnemyAttack(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_ATTACK;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_ATTACK;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+            return HUNT_BOMBARDIER_BEETLE_ATTACK;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_ATTACK;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_ATTACK;
+        }
+        return MILITARY_BASELINE_ATTACK;
+    }
+
+    public static float huntEnemyDefense(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+            return HUNT_BOMBARDIER_BEETLE_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_DEFENSE;
+        }
+        return MILITARY_BASELINE_DEFENSE;
+    }
+
+    public static int huntEnemyAttackSpeed(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+            return HUNT_BOMBARDIER_BEETLE_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_ATTACK_SPEED;
+        }
+        return MILITARY_BASELINE_ATTACK_SPEED;
+    }
+
+    public static float invasionEnemyMaxHealth(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_HP;
+        }
+        return MILITARY_BASELINE_HEALTH;
+    }
+
+    public static float invasionEnemyAttack(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_ATTACK;
+        }
+        return MILITARY_BASELINE_ATTACK;
+    }
+
+    public static float invasionEnemyDefense(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_DEFENSE;
+        }
+        return MILITARY_BASELINE_DEFENSE;
+    }
+
+    public static int invasionEnemyAttackSpeed(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_ATTACK_SPEED;
+        }
+        return MILITARY_BASELINE_ATTACK_SPEED;
     }
 }

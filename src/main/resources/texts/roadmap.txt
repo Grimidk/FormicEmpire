@@ -4,7 +4,8 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		music: main menu song, more songs in general
+		rebalance assimilations so they all unclock something big
+		clean uprade dependencies from redundants
 	Mid:
 		(none right now)
 	Low:
@@ -12,14 +13,12 @@ To Fix (By decreasing priority):
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
-		Font - self explanatory
 		redo upgrade tree node shape
 
-Art TODO (assets to draw — PascalCase filenames; under src/main/resources):
+To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion battles — wired in code, missing art):
 		UI icons (icons/critters/): AntLion.png, BombardierBeetle.png, Spider.png, Tarantula.png
 		Composed battle sprites (body + leg frames; antenna frames if animated — match cockroach pattern):
-			sprites/critters/insect/cockroach/ — finish legs
 			sprites/critters/insect/antLion/ — AntLion.png, Leg1–Leg4 (+ Antenna1, Antenna2 if used)
 			sprites/critters/insect/bombardierBeetle/ — BombardierBeetle.png, Leg1–Leg4 (+ antenna if used)
 			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (+ antenna if used)
@@ -53,7 +52,16 @@ Art TODO (assets to draw — PascalCase filenames; under src/main/resources):
 	Room sprites L4–L5 (sprites/buildings/rooms/ — L0–L3 exist; needed when in-room overlays ship):
 		Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin — L4 and L5 for each
 		Passive web for outside with water and protein
-		
+
+To Compose (.mp3 in resources/audio)
+	Songs:
+		Main menu
+	Sounds: 
+		(none right now)
+
+Other assets:
+	Game Font
+
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:

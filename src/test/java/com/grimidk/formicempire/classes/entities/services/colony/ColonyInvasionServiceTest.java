@@ -76,13 +76,29 @@ class ColonyInvasionServiceTest {
                 colony.getId(),
                 InvasionAlert.toAbsoluteHour(1, 0));
         colony.getInvasionAlerts().add(alert);
-        colony.setMushrooms(1000);
-        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        int mushroomsBefore = 1000;
+        int proteinBefore = 800;
+        int rpBefore = 200;
+        colony.setMushrooms(mushroomsBefore);
+        colony.setProtein(proteinBefore);
+        colony.addResearchPoints(rpBefore);
+        for (int i = 0; i < 10; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
         colony.runRoleAssignment(null);
+        int workersBefore = colony.getWorkers().size();
 
         ColonyInvasionService.tickInvasions(colony, 1, 0);
+
         assertTrue(colony.getInvasionAlerts().isEmpty());
-        assertTrue(colony.getMushrooms() < 1000);
+        float stealFactor = 1f - GameNumbers.INVASION_RAID_RESOURCE_STEAL_PCT;
+        assertEquals(mushroomsBefore * stealFactor, colony.getMushroomsPrecise(), 0.51);
+        assertEquals(proteinBefore * stealFactor, colony.getProteinPrecise(), 0.51);
+        assertEquals(rpBefore - Math.max(1, (int) (rpBefore * GameNumbers.INVASION_RAID_RESOURCE_STEAL_PCT)),
+                colony.getResearchPoints());
+        int expectedKills = Math.max(1,
+                Math.round(workersBefore * GameNumbers.INVASION_RAID_UNASSIGNED_KILL_PCT));
+        assertEquals(workersBefore - expectedKills, colony.getWorkers().size());
     }
 
     @Test

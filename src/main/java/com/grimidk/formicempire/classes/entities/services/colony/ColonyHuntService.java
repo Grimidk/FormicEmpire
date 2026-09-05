@@ -113,15 +113,10 @@ public final class ColonyHuntService {
         }
         float travelHours = computeTravelHours(colony, target, party);
         float winChance = estimateWinChance(species, party);
-        int protein = 0;
-        int mushrooms = 0;
-        int research = 0;
-        if (species.hasBugRole(BugRole.HUNT) && species == GameConstants.TYPE_COCKROACH) {
-            protein = GameNumbers.HUNT_COCKROACH_REWARD_PROTEIN;
-            mushrooms = GameNumbers.HUNT_COCKROACH_REWARD_MUSHROOMS;
-            research = GameNumbers.HUNT_COCKROACH_REWARD_RP;
-        }
-        return new HuntDispatchPreview(party.size(), travelHours, winChance, protein, mushrooms, research);
+        GameNumbers.HuntRewards rewards = GameNumbers.huntRewardsFor(species);
+        return new HuntDispatchPreview(
+                party.size(), travelHours, winChance,
+                rewards.protein, rewards.mushrooms, rewards.research);
     }
 
     public static float estimateWinChance(Species species, List<Ant> party) {
@@ -379,7 +374,7 @@ public final class ColonyHuntService {
         if (candidates.isEmpty()) {
             return null;
         }
-        return candidates.get(0);
+        return candidates.get(GameRandom.nextInt(candidates.size()));
     }
 
     private static void beginCombat(Colony colony, HuntExpedition expedition) {
@@ -427,10 +422,15 @@ public final class ColonyHuntService {
         if (colony == null) {
             return;
         }
-        if (species != null && species.hasBugRole(BugRole.HUNT) && species == GameConstants.TYPE_COCKROACH) {
-            colony.setProtein(colony.getProtein() + GameNumbers.HUNT_COCKROACH_REWARD_PROTEIN);
-            colony.setMushrooms(colony.getMushrooms() + GameNumbers.HUNT_COCKROACH_REWARD_MUSHROOMS);
-            colony.addResearchPoints(GameNumbers.HUNT_COCKROACH_REWARD_RP);
+        GameNumbers.HuntRewards rewards = GameNumbers.huntRewardsFor(species);
+        if (rewards.protein > 0) {
+            colony.setProtein(colony.getProtein() + rewards.protein);
+        }
+        if (rewards.mushrooms > 0) {
+            colony.setMushrooms(colony.getMushrooms() + rewards.mushrooms);
+        }
+        if (rewards.research > 0) {
+            colony.addResearchPoints(rewards.research);
         }
     }
 

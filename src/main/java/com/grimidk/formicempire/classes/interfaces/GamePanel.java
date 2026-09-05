@@ -135,6 +135,7 @@ public class GamePanel extends ZeroGamePanel {
         colonyPanel.setEngine(frame.getEngine());
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
+        alertPanel.setAlertClickListener(this::handleAlertClick);
         miniMapPanel = new MiniMapPanel(frame.getEngine(), this::openMapDialogFromMiniMap);
         musicPanel = new MusicPanel(frame.getEngine());
         gameAreaPanel = new GameAreaPanel();
@@ -845,13 +846,23 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void showHuntsDialog() {
+        if (critterManagementDialog != null && critterManagementDialog.isShowing()) {
+            critterManagementDialog.dispose();
+            return;
+        }
+        showCritterManagementDialog(CritterManagementDialog.TAB_HUNTS);
+    }
+
+    private void showCritterManagementDialog(int tab) {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.belongsToPlayerDynasty()) {
             return;
         }
         if (critterManagementDialog != null && critterManagementDialog.isShowing()) {
-            critterManagementDialog.dispose();
+            critterManagementDialog.selectTab(tab);
+            critterManagementDialog.toFront();
+            critterManagementDialog.liveUpdate();
             return;
         }
         if (critterManagementDialog != null) {
@@ -860,6 +871,17 @@ public class GamePanel extends ZeroGamePanel {
         critterManagementDialog = new CritterManagementDialog(
                 frame, colony, engine, this::showHuntBattleDialog, this::showInvasionBattleDialog);
         critterManagementDialog.showDialog();
+        critterManagementDialog.selectTab(tab);
+    }
+
+    private void handleAlertClick(String alertKey) {
+        if ("INVASION".equals(alertKey) || "INVASION_OK".equals(alertKey) || "INVASION_FAIL".equals(alertKey)) {
+            showCritterManagementDialog(CritterManagementDialog.TAB_INVASIONS);
+            return;
+        }
+        if ("HUNT".equals(alertKey) || "HUNT_OK".equals(alertKey) || "HUNT_FAIL".equals(alertKey)) {
+            showCritterManagementDialog(CritterManagementDialog.TAB_HUNTS);
+        }
     }
 
     private void showInvasionBattleDialog(Colony colony, int alertId) {

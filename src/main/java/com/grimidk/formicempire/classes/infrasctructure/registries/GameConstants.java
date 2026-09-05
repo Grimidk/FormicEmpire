@@ -2242,10 +2242,7 @@ public final class GameConstants {
     }
 
     public static List<Species> getActiveHuntSpeciesForBiome(Biome biome) {
-        if (!isHuntBiome(biome)) {
-            return List.of();
-        }
-        return List.of(TYPE_COCKROACH);
+        return getHuntSpeciesForBiome(biome);
     }
 
     public static List<CritterClass> getCritterClasses() { return Collections.unmodifiableList(critterClasses); }
