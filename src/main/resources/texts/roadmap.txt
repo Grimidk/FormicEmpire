@@ -4,7 +4,6 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		rebalance assimilations so they all unclock something big
 		clean uprade dependencies from redundants
 	Mid:
 		(none right now)
@@ -16,13 +15,14 @@ To Fix (By decreasing priority):
 		redo upgrade tree node shape
 
 To Draw (PascalCase filenames; under src/main/resources):
-	Launch critters (hunt / invasion battles — wired in code, missing art):
-		UI icons (icons/critters/): AntLion.png, BombardierBeetle.png, Spider.png, Tarantula.png
+	Launch critters (hunt / invasion):
+		UI icons (icons/critters/): AntLion.png, BombardierBeetle.png, Spider.png, Tarantula.png, Commonfly.png
 		Composed battle sprites (body + leg frames; antenna frames if animated — match cockroach pattern):
-			sprites/critters/insect/antLion/ — AntLion.png, Leg1–Leg4 (+ Antenna1, Antenna2 if used)
-			sprites/critters/insect/bombardierBeetle/ — BombardierBeetle.png, Leg1–Leg4 (+ antenna if used)
-			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (+ antenna if used)
-			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (+ antenna if used)
+			sprites/critters/insect/antLion/ — AntLion.png, Leg1–Leg4 (Jaw1, Jaw2)
+			sprites/critters/insect/bombardierBeetle/ — BombardierBeetle.png, Leg1–Leg4 (+ antenn1 and 2)
+			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (Jaw1, Jaw2)
+			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (Jaw1, Jaw2)
+			sprites/critters/insect/commonFly/ — Commonfly.png, Leg1–Leg4 (+ Wing1, Wing2)
 		Skill icons (icons/skills/): CockroachBite.png, CockroachSpin.png (+ future ant-lion / bombardier attack skills when designed)
 	Stat upgrade icons (icons/upgrades/ — currently Unknown.png placeholder):
 		StatSkeleton.png, StatAcid.png, StatLongevity.png
@@ -52,6 +52,15 @@ To Draw (PascalCase filenames; under src/main/resources):
 	Room sprites L4–L5 (sprites/buildings/rooms/ — L0–L3 exist; needed when in-room overlays ship):
 		Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin — L4 and L5 for each
 		Passive web for outside with water and protein
+	Ant Subtypes & Skills (Leafcutter & Silver):
+		UI icons:
+			icons/subtypes/ — Leafcutter.png, Silver.png
+			icons/skills/ — ShearingBite.png
+		Composed ant subtype sprite layers (under sprites/ants/ for Worker, Soldier, Major, Princess, Queen):
+			sprites/ants/head/<Type>/HeadLeafcutter.png
+			sprites/ants/jaws/<Type>/JawLeafcutter1.png, JawLeafcutter2.png
+			sprites/ants/antennae/<Type>/AntennaLeafcutter1.png, AntennaLeafcutter2.png
+			sprites/ants/torso/<Type>/TorsoSilver.png
 
 To Compose (.mp3 in resources/audio)
 	Songs:
@@ -83,6 +92,8 @@ Needed for launch (v1.0) (Launch Version):
 		fog of war, range of 1 at the start, cant interact with dynasties outside the fog, scouts (or explorer princess role with exploring range) have a small chance to venture to adjacent hexes to explore, cant colonize into fog, cheat to remove fog, action to exchange intel for trade (and rep)
 		rework popups and dialogs to not be different windows
 		bridges (needs rafting)
+		zoom in overworld view with sprite switching
+		deload overworld in map view for better idle waiting
 		rethink hatching to other types taking more time so its balanced to not just spam a type
 		reserve ants to ant exauhstion and punishing 100% worker capacity
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events)) disasters penalie overworked colonies

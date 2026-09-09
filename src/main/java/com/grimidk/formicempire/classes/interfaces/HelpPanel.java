@@ -528,9 +528,12 @@ public class HelpPanel extends JPanel {
         panel.add(intro);
 
         for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
-            String sectionKey = slot == AntSubtypeSlot.HEAD
-                    ? LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION
-                    : LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
+            String sectionKey = switch (slot) {
+                case HEAD -> LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION;
+                case TORSO -> LanguageStrings.HATCH_SUBTYPE_TORSO_SECTION;
+                case ABDOMEN -> LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
+                default -> LanguageStrings.HATCH_DESC;
+            };
             JLabel sectionLabel = new JLabel(LanguageStrings.get(sectionKey));
             sectionLabel.setFont(AssetStyles.FONT_BOLD);
             sectionLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);

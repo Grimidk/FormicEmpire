@@ -267,6 +267,7 @@ public class HatchRateDialog extends ZeroDialog {
     private static String sectionLabelKey(AntSubtypeSlot slot) {
         return switch (slot) {
             case HEAD -> LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION;
+            case TORSO -> LanguageStrings.HATCH_SUBTYPE_TORSO_SECTION;
             case ABDOMEN -> LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
             default -> LanguageStrings.HATCH_DESC;
         };

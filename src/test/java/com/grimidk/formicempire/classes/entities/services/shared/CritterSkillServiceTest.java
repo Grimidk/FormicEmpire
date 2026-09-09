@@ -43,6 +43,15 @@ class CritterSkillServiceTest {
     }
 
     @Test
+    void leafcutterReplacesBasicBiteWithShearingBiteOnAnt() {
+        List<Skill> skills = CritterSkillService.resolveAvailableSkills(
+                GameConstants.TYPE_ANT, AntSubtypeProfile.of(5, 1, 1, 1));
+        assertEquals(1, skills.size());
+        assertEquals(GameConstants.SKILL_SHEARING_BITE, skills.get(0));
+        assertFalse(skills.contains(GameConstants.SKILL_BASIC_BITE));
+    }
+
+    @Test
     void trapjawAssimilationKeepsBasicBiteOnDynastyAndRequiresSubtype() {
         Dynasty dynasty = new Dynasty(1, "Trapjaw", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);

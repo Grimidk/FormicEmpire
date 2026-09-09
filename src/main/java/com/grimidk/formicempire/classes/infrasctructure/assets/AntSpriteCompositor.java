@@ -141,6 +141,7 @@ public final class AntSpriteCompositor {
 
         boolean drone = type == GameConstants.TYPE_DRONE;
         String headVariant = headVariantName(profile, drone);
+        String torsoVariant = torsoVariantName(profile, drone);
         String abdomenVariant = abdomenVariantName(profile, drone);
         String jawVariant = headVariant;
         String antennaVariant = headVariant;
@@ -155,11 +156,27 @@ public final class AntSpriteCompositor {
             legs = loadLayer("legs/" + typeName + "/Leg" + legFrame + ".png");
         }
         BufferedImage abdomen = loadLayer("abdomen/" + typeName + "/Abdomen" + abdomenVariant + ".png");
-        BufferedImage torso = loadLayer("torso/" + typeName + "/TorsoNone.png");
+        if (abdomen == null) {
+            abdomen = loadLayer("abdomen/" + typeName + "/AbdomenNone.png");
+        }
+        BufferedImage torso = loadLayer("torso/" + typeName + "/Torso" + torsoVariant + ".png");
+        if (torso == null) {
+            torso = loadLayer("torso/" + typeName + "/TorsoNone.png");
+        }
         BufferedImage head = loadLayer("head/" + typeName + "/Head" + headVariant + ".png");
+        if (head == null) {
+            head = loadLayer("head/" + typeName + "/HeadNone.png");
+        }
         BufferedImage jaws = loadLayer("jaws/" + typeName + "/Jaw" + jawVariant + jawFrame + ".png");
+        if (jaws == null) {
+            jaws = loadLayer("jaws/" + typeName + "/JawNone" + jawFrame + ".png");
+        }
         BufferedImage antennae = loadLayer(
                 "antennae/" + typeName + "/Antenna" + antennaVariant + antennaFrame + ".png");
+        if (antennae == null) {
+            antennae = loadLayer(
+                    "antennae/" + typeName + "/AntennaNone" + antennaFrame + ".png");
+        }
 
         BufferedImage wings = null;
         if (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS) {
@@ -323,6 +340,14 @@ public final class AntSpriteCompositor {
             return "None";
         }
         AntSubtype subtype = profile.getSubtype(AntSubtypeSlot.HEAD);
+        return subtypeVariantPascal(subtype, "None");
+    }
+
+    private static String torsoVariantName(AntSubtypeProfile profile, boolean drone) {
+        if (drone) {
+            return "None";
+        }
+        AntSubtype subtype = profile.getSubtype(AntSubtypeSlot.TORSO);
         return subtypeVariantPascal(subtype, "None");
     }
 

@@ -338,4 +338,42 @@ class AntSubtypeServiceTest {
         assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, digit));
         assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, digit));
     }
+
+    @Test
+    void leafcutterMandiblesProfileMultipliers() {
+        AntSubtypeProfile profile = AntSubtypeProfile.of(5, 1, 1, 1);
+        assertEquals(1.25f, AntSubtypeService.combinedAttackMult(profile), 0.0001f);
+        Colony colony = new Colony(23, "C", true);
+        Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
+        worker.setSubtypeProfile(profile);
+        assertEquals(2f, AntSubtypeService.forageMult(worker), 0.0001f);
+        assertEquals(2, AntSubtypeService.forageCarrySlots(worker));
+    }
+
+    @Test
+    void silverCuticleTorsoProfileMultipliers() {
+        AntSubtypeProfile profile = AntSubtypeProfile.of(1, 2, 1, 1);
+        assertEquals(15f, AntSubtypeService.combinedDefenseBonus(profile), 0.0001f);
+        assertEquals(1.4f, AntSubtypeService.combinedSpeedMult(profile), 0.0001f);
+    }
+
+    @Test
+    void automatedLeafcutterAndSilverRates() {
+        Dynasty dynasty = new Dynasty(24, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_WORKER);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_FARMING);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST);
+        Colony colony = new Colony(24, "C", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+        colony.setMushrooms(1000);
+        colony.setWater(100);
+
+        AntSubtypeService.applyAutomatedSubtypeRates(colony);
+
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 5));
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.TORSO, 2));
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.TORSO, 2));
+    }
 }

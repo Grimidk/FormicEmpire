@@ -133,6 +133,8 @@ public final class AntSubtypeService {
         boolean doorhead = colony.hasUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD);
         boolean bullet = colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
         boolean farsight = colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARSIGHT);
+        boolean leafcutter = colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING);
+        boolean silver = colony.hasUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST);
 
         if (honeypot) {
             setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f);
@@ -148,6 +150,16 @@ public final class AntSubtypeService {
             setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 50f);
             if (!trapjaw && colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
                 setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 3, 50f);
+            }
+        }
+        if (leafcutter && !doorhead) {
+            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD,
+                    GameConstants.SUBTYPE_HEAD_LEAFCUTTER.getDigit(), 50f);
+        }
+        if (silver) {
+            for (AntType type : getSubtypeRateTypes()) {
+                setAutomatedSlotRate(rates, type, AntSubtypeSlot.TORSO,
+                        GameConstants.SUBTYPE_TORSO_SILVER.getDigit(), 50f);
             }
         }
         if (farsight && !trapjaw) {
@@ -279,7 +291,7 @@ public final class AntSubtypeService {
 
     public static AntSubtypeProfile rollProfile(Colony colony, AntType type) {
         int head = rollSlotDigit(colony, type, AntSubtypeSlot.HEAD);
-        int torso = AntSubtype.DIGIT_NONE;
+        int torso = rollSlotDigit(colony, type, AntSubtypeSlot.TORSO);
         int abdomen = rollSlotDigit(colony, type, AntSubtypeSlot.ABDOMEN);
         int other = AntSubtype.DIGIT_NONE;
         return AntSubtypeProfile.of(head, torso, abdomen, other);

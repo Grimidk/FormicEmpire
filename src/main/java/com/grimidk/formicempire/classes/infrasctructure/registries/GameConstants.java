@@ -660,6 +660,9 @@ public final class GameConstants {
     public static final Skill SKILL_POWERFUL_BITE = new Skill(2, LanguageStrings.SKILL_POWERFUL_BITE, 1f, 2f, 1, true,
             loadIcon("icons/skills/PowerfulBite.png"));
     static { skills.add(SKILL_POWERFUL_BITE); }
+    public static final Skill SKILL_SHEARING_BITE = new Skill(16, LanguageStrings.SKILL_SHEARING_BITE, 1f, 1.5f, 1, true,
+            loadIcon("icons/skills/ShearingBite.png"));
+    static { skills.add(SKILL_SHEARING_BITE); }
     public static final Skill SKILL_STINGING = new Skill(3, LanguageStrings.SKILL_STINGING, 0.8f, 2.5f, 1, true,
             loadIcon("icons/skills/Stinging.png"));
     static { skills.add(SKILL_STINGING); }
@@ -929,10 +932,20 @@ public final class GameConstants {
             1f, false, 1f, 1f, 1f,
             1f, 0.15f, LanguageStrings.SUBTYPE_HEAD_FARSIGHT_DESC, null, null, loadIcon("icons/subtypes/farsight.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_FARSIGHT); }
+    public static final AntSubtype SUBTYPE_HEAD_LEAFCUTTER = new AntSubtype(10, LanguageStrings.SUBTYPE_HEAD_LEAFCUTTER, AntSubtypeSlot.HEAD,
+            5, GameUnlocks.ASSIMILATED_FARMING, "leafcutter/", "leafcutter",
+            1.25f, true, 1f, 1f, 2f,
+            SKILL_SHEARING_BITE, SKILL_BASIC_BITE, loadIcon("icons/subtypes/leafcutter.png"));
+    static { antSubtypes.add(SUBTYPE_HEAD_LEAFCUTTER); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
             AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
+    public static final AntSubtype SUBTYPE_TORSO_SILVER = new AntSubtype(11, LanguageStrings.SUBTYPE_TORSO_SILVER, AntSubtypeSlot.TORSO,
+            2, GameUnlocks.ASSIMILATED_HEATRESIST, "silver/", "silver",
+            1f, false, 15f, 1.4f, 1f,
+            loadIcon("icons/subtypes/silver.png"));
+    static { antSubtypes.add(SUBTYPE_TORSO_SILVER); }
 
     public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
             AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
@@ -953,6 +966,7 @@ public final class GameConstants {
 
     static {
         SKILL_POWERFUL_BITE.setRequiredSubtype(SUBTYPE_HEAD_TRAPJAW);
+        SKILL_SHEARING_BITE.setRequiredSubtype(SUBTYPE_HEAD_LEAFCUTTER);
         SKILL_STINGING.setRequiredSubtype(SUBTYPE_ABDOMEN_STINGER);
         SKILL_SHIELDING.setRequiredSubtype(SUBTYPE_HEAD_DOORHEAD);
         SKILL_BOOST_REGEN.setRequiredSubtype(SUBTYPE_ABDOMEN_HONEYPOT);
@@ -1716,6 +1730,7 @@ public final class GameConstants {
     static {
         SKILL_BASIC_BITE.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_POWERFUL_BITE.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_SHEARING_BITE.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_STINGING.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_SHIELDING.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_BOOST_REGEN.setBattleLine(BATTLE_LINE_ARTILLERY);
@@ -1727,6 +1742,8 @@ public final class GameConstants {
         SKILL_INFANTRY_LEADER.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_CLOSE_ANT_SUPPORT.setBattleLine(BATTLE_LINE_AIR_SUPPORT);
         SKILL_AIR_BOMBING.setBattleLine(BATTLE_LINE_AIR_SUPPORT);
+        SKILL_COCKROACH_BITE.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_COCKROACH_SPIN.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_SELFDESTRUCT.setSacrificesSelf(true);
         SKILL_ACIDIC_SELFDESTRUCT.setSacrificesSelf(true);
         SKILL_AIR_BOMBING.setSacrificesSelf(true);
@@ -1832,7 +1849,7 @@ public final class GameConstants {
     }
 
     public static List<AntSubtypeSlot> getConfigurableSubtypeSlots() {
-        return List.of(AntSubtypeSlot.HEAD, AntSubtypeSlot.ABDOMEN);
+        return List.of(AntSubtypeSlot.HEAD, AntSubtypeSlot.TORSO, AntSubtypeSlot.ABDOMEN);
     }
 
     public static AntSubtype getAntSubtypeBySlotAndDigit(AntSubtypeSlot slot, int digit) {

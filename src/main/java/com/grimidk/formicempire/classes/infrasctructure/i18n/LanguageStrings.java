@@ -709,6 +709,7 @@ public final class LanguageStrings {
     public static final String HATCH_WARNING_TOTAL = "HATCH_WARNING_TOTAL";
     public static final String HATCH_TOTAL_OK = "HATCH_TOTAL_OK";
     public static final String HATCH_SUBTYPE_HEAD_SECTION = "HATCH_SUBTYPE_HEAD_SECTION";
+    public static final String HATCH_SUBTYPE_TORSO_SECTION = "HATCH_SUBTYPE_TORSO_SECTION";
     public static final String HATCH_SUBTYPE_ABDOMEN_SECTION = "HATCH_SUBTYPE_ABDOMEN_SECTION";
     public static final String HATCH_SUBTYPE_ROW_TOTAL = "HATCH_SUBTYPE_ROW_TOTAL";
     public static final String SUBTYPE_FOOD_COST_PER_TRAIT = "SUBTYPE_FOOD_COST_PER_TRAIT";
@@ -719,11 +720,17 @@ public final class LanguageStrings {
     public static final String SUBTYPE_HEAD_DOORHEAD = "SUBTYPE_HEAD_DOORHEAD";
     public static final String SUBTYPE_HEAD_FARSIGHT = "SUBTYPE_HEAD_FARSIGHT";
     public static final String SUBTYPE_HEAD_FARSIGHT_DESC = "SUBTYPE_HEAD_FARSIGHT_DESC";
+    public static final String SUBTYPE_HEAD_LEAFCUTTER = "SUBTYPE_HEAD_LEAFCUTTER";
+    public static final String SUBTYPE_HEAD_LEAFCUTTER_DESC = "SUBTYPE_HEAD_LEAFCUTTER_DESC";
+    public static final String SUBTYPE_TORSO_SILVER = "SUBTYPE_TORSO_SILVER";
+    public static final String SUBTYPE_TORSO_SILVER_DESC = "SUBTYPE_TORSO_SILVER_DESC";
     public static final String SUBTYPE_ABDOMEN_STINGER = "SUBTYPE_ABDOMEN_STINGER";
     public static final String SUBTYPE_ABDOMEN_HONEYPOT = "SUBTYPE_ABDOMEN_HONEYPOT";
 
     public static final String SKILL_BASIC_BITE = "SKILL_BASIC_BITE";
     public static final String SKILL_POWERFUL_BITE = "SKILL_POWERFUL_BITE";
+    public static final String SKILL_SHEARING_BITE = "SKILL_SHEARING_BITE";
+    public static final String SKILL_SHEARING_BITE_DESC = "SKILL_SHEARING_BITE_DESC";
     public static final String SKILL_STINGING = "SKILL_STINGING";
     public static final String SKILL_SHIELDING = "SKILL_SHIELDING";
     public static final String SKILL_BOOST_REGEN = "SKILL_BOOST_REGEN";
