@@ -33,6 +33,7 @@ class DynastyDiplomacyServiceTest {
     void setUp() {
         player = new Dynasty(1, "Player Dynasty", true, GameConstants.SPECIES_OMNI);
         neighbor = new Dynasty(2, "Wild Dynasty", false, GameConstants.SPECIES_OMNI);
+        neighbor.setAiPersonality(null);
         seedDiplomaticPopulation(player);
         seedDiplomaticPopulation(neighbor);
     }
@@ -945,6 +946,7 @@ class DynastyDiplomacyServiceTest {
             victims.add(victim);
         }
         Dynasty bystander = new Dynasty(200, "Bystander", false, GameConstants.SPECIES_OMNI);
+        bystander.setAiPersonality(null);
         seedDiplomaticPopulation(bystander);
         world.getDynastys().add(bystander);
 

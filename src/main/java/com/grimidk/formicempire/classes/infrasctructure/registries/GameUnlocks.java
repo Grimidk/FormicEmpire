@@ -161,7 +161,7 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_BILATERAL_TRADE); }
         public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "ABILITY_MANAGEMENT", "ABILITY_MANAGEMENT_FLAVOR", "ABILITY_MANAGEMENT_DESC", ABILITY_DYNASTY, 0, loadIcon("icons/upgrades/AbilityManagement.png"), 0);
         static { upgrades.add(ABILITY_MANAGEMENT); }
-        public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "ABILITY_MASS_FLIGHT", "ABILITY_MASS_FLIGHT_FLAVOR", "ABILITY_MASS_FLIGHT_DESC", ABILITY_FORCED_FLIGHT, 0, loadIcon("icons/upgrades/AbilityMassFlight.png"), 1);
+        public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "ABILITY_MASS_FLIGHT", "ABILITY_MASS_FLIGHT_FLAVOR", "ABILITY_MASS_FLIGHT_DESC", ABILITY_FORCED_FLIGHT, 0, loadIcon("icons/upgrades/AbilityMassFlight.png"), 2);
         static { upgrades.add(ABILITY_MASS_FLIGHT); }
         public static final Upgrade ABILITY_CLONING = new Upgrade(514, "ABILITY_CLONING", "ABILITY_CLONING_FLAVOR", "ABILITY_CLONING_DESC", ABILITY_RESEARCH, 0, loadIcon("icons/upgrades/AbilityCloning.png"), 0);
         static { upgrades.add(ABILITY_CLONING); }
@@ -187,10 +187,6 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_AUTO_DIPLOMACY); }
         public static final Upgrade ABILITY_AUTO_LOGISTICS = new Upgrade(525, "ABILITY_AUTO_LOGISTICS", "ABILITY_AUTO_LOGISTICS_FLAVOR", "ABILITY_AUTO_LOGISTICS_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoLogistics.png"), 0);
         static { upgrades.add(ABILITY_AUTO_LOGISTICS); }
-        public static final Upgrade ABILITY_JUMPING = new Upgrade(526, "ABILITY_JUMPING", "ABILITY_JUMPING_FLAVOR", "ABILITY_JUMPING_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0);
-        static { upgrades.add(ABILITY_JUMPING); }
-        public static final Upgrade ABILITY_SWARMING = new Upgrade(527, "ABILITY_SWARMING", "ABILITY_SWARMING_FLAVOR", "ABILITY_SWARMING_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AssimilatedSwarming.png"), 0);
-        static { upgrades.add(ABILITY_SWARMING); }
         public static final Upgrade ABILITY_HUNTS = new Upgrade(530, "ABILITY_HUNTS", "ABILITY_HUNTS_FLAVOR", "ABILITY_HUNTS_DESC", ROLE_SCOUT, 0, loadIcon("icons/upgrades/RoleScout.png"), 0);
         static { upgrades.add(ABILITY_HUNTS); }
 
@@ -213,13 +209,13 @@ public final class GameUnlocks {
         // -- Advanced Roles --
         public static final Upgrade ROLE_COURIER = new Upgrade(18, "ROLE_COURIER_UPGRADE", "ROLE_COURIER_FLAVOR", "ROLE_COURIER_DESC", ABILITY_TRADE, 0, loadIcon("icons/upgrades/RoleCourier.png"), 0);
         static { upgrades.add(ROLE_COURIER); }
-        public static final Upgrade ROLE_BORER = new Upgrade(29, "ROLE_BORER_UPGRADE", "ROLE_BORER_FLAVOR", "ROLE_BORER_DESC", ABILITY_TUNNELS, 0, loadIcon("icons/upgrades/RoleBorer.png"), 3);
+        public static final Upgrade ROLE_BORER = new Upgrade(29, "ROLE_BORER_UPGRADE", "ROLE_BORER_FLAVOR", "ROLE_BORER_DESC", ABILITY_TUNNELS, 0, loadIcon("icons/upgrades/RoleBorer.png"), 4);
         static { upgrades.add(ROLE_BORER); }
         public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "ROLE_TRANSPORT_UPGRADE", "ROLE_TRANSPORT_FLAVOR", "ROLE_TRANSPORT_DESC", ROLE_COURIER, 100000, loadIcon("icons/upgrades/RoleTransport.png"), 4);
         static { upgrades.add(ROLE_TRANSPORT); }
         public static final Upgrade ROLE_ESCORT = new Upgrade(37, "ROLE_ESCORT_UPGRADE", "ROLE_ESCORT_FLAVOR", "ROLE_ESCORT_DESC", ROLE_COURIER, 80000, loadIcon("icons/upgrades/RoleEscort.png"), 3);
         static { upgrades.add(ROLE_ESCORT); }
-        public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "ROLE_ENGINEER_UPGRADE", "ROLE_ENGINEER_FLAVOR", "ROLE_ENGINEER_DESC", ROLE_BORER, 50000, loadIcon("icons/upgrades/RoleEngineer.png"), 3);
+        public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "ROLE_ENGINEER_UPGRADE", "ROLE_ENGINEER_FLAVOR", "ROLE_ENGINEER_DESC", ROLE_BORER, 50000, loadIcon("icons/upgrades/RoleEngineer.png"), 4);
         static { upgrades.add(ROLE_ENGINEER); }
         public static final Upgrade ROLE_SKYTRANS = new Upgrade(39, "ROLE_SKYTRANS_UPGRADE", "ROLE_SKYTRANS_FLAVOR", "ROLE_SKYTRANS_DESC", ROLE_COURIER, 150000, loadIcon("icons/upgrades/RoleSkytrans.png"), 4);
         static { upgrades.add(ROLE_SKYTRANS); }
@@ -244,7 +240,7 @@ public final class GameUnlocks {
         public static final Upgrade STAT_RESEARCH_3 = new Upgrade(106, "STAT_RESEARCH_3", "STAT_RESEARCH_3_FLAVOR", "STAT_RESEARCH_3_DESC", STAT_RESEARCH_2, 7500, ICON_TODO, 3);
         static { upgrades.add(STAT_RESEARCH_3); }
         // TODO asset: icons/upgrades/StatGrowth1.png
-        public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "STAT_GROWTH_1", "STAT_GROWTH_1_FLAVOR", "STAT_GROWTH_1_DESC", TYPE_EGG, 3500, ICON_TODO, 2);
+        public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "STAT_GROWTH_1", "STAT_GROWTH_1_FLAVOR", "STAT_GROWTH_1_DESC", STAT_LONGEVITY, 3500, ICON_TODO, 2);
         static { upgrades.add(STAT_GROWTH_1); }
         // TODO asset: icons/upgrades/StatGrowth2.png
         public static final Upgrade STAT_GROWTH_2 = new Upgrade(108, "STAT_GROWTH_2", "STAT_GROWTH_2_FLAVOR", "STAT_GROWTH_2_DESC", STAT_GROWTH_1, 9000, ICON_TODO, 3);
@@ -376,10 +372,14 @@ public final class GameUnlocks {
         static { upgrades.add(ASSIMILATED_FIREVENOM); }
         public static final Upgrade ASSIMILATED_JUMPING = new Upgrade(1010, "ASSIMILATED_JUMPING", "ASSIMILATED_JUMPING_FLAVOR", "ASSIMILATED_JUMPING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0);
         static { upgrades.add(ASSIMILATED_JUMPING); }
+        public static final Upgrade ABILITY_JUMPING = new Upgrade(526, "ABILITY_JUMPING", "ABILITY_JUMPING_FLAVOR", "ABILITY_JUMPING_DESC", ASSIMILATED_JUMPING, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0);
+        static { upgrades.add(ABILITY_JUMPING); }
         public static final Upgrade ASSIMILATED_STINGING = new Upgrade(1012, "ASSIMILATED_STINGING", "ASSIMILATED_STINGING_FLAVOR", "ASSIMILATED_STINGING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedStinging.png"), 0);
         static { upgrades.add(ASSIMILATED_STINGING); }
         public static final Upgrade ASSIMILATED_SWARMING = new Upgrade(1013, "ASSIMILATED_SWARMING", "ASSIMILATED_SWARMING_FLAVOR", "ASSIMILATED_SWARMING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedSwarming.png"), 0);
         static { upgrades.add(ASSIMILATED_SWARMING); }
+        public static final Upgrade ABILITY_SWARMING = new Upgrade(527, "ABILITY_SWARMING", "ABILITY_SWARMING_FLAVOR", "ABILITY_SWARMING_DESC", ASSIMILATED_SWARMING, 0, loadIcon("icons/upgrades/AssimilatedSwarming.png"), 0);
+        static { upgrades.add(ABILITY_SWARMING); }
         // Ghost stealth unlocks Spies (intelligence / counter-intelligence)
         public static final Upgrade ASSIMILATED_STEALTH = new Upgrade(1014, "ASSIMILATED_STEALTH", "ASSIMILATED_STEALTH_FLAVOR", "ASSIMILATED_STEALTH_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedStealth.png"), 0);
         static { upgrades.add(ASSIMILATED_STEALTH); }

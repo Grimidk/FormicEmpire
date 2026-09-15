@@ -158,6 +158,7 @@ public class AssetStyles {
     public static final Dimension ROLE_DIALOG_SIZE = new Dimension(1320, 820);
     public static final Dimension DYNASTY_DIALOG_SIZE = new Dimension(1400, 860);
     public static final Dimension MAP_DIALOG_SIZE = new Dimension(1280, 820);
+    public static final Dimension HATCH_DIALOG_SIZE = new Dimension(1600, 800);
 
     public static final int BORDER_THICKNESS_EXTERNAL = 2;
     public static final int BORDER_THICKNESS_INTERNAL = 1;

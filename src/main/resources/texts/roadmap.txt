@@ -4,9 +4,9 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		clean uprade dependencies from redundants
+		clean uprade tree
 	Mid:
-		(none right now)
+		improve dialogs buttons with icons like close, layers, conquer, go home
 	Low:
 		(none right now)
 	Can't reproduce:
@@ -22,7 +22,7 @@ To Draw (PascalCase filenames; under src/main/resources):
 			sprites/critters/insect/bombardierBeetle/ — BombardierBeetle.png, Leg1–Leg4 (+ antenn1 and 2)
 			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (Jaw1, Jaw2)
-			sprites/critters/insect/commonFly/ — Commonfly.png, Leg1–Leg4 (+ Wing1, Wing2)
+			sprites/critters/insect/commonFly/ — CommonFly.png, Leg1–Leg4 (+ Wing1, Wing2)
 		Skill icons (icons/skills/): CockroachBite.png, CockroachSpin.png (+ future ant-lion / bombardier attack skills when designed)
 	Stat upgrade icons (icons/upgrades/ — currently Unknown.png placeholder):
 		StatSkeleton.png, StatAcid.png, StatLongevity.png

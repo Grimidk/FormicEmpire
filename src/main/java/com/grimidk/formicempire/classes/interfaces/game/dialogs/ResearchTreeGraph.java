@@ -884,7 +884,6 @@ public final class ResearchTreeGraph {
         placeRelative(posByUpgrade, occupied, GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_HEALTH_1, 0, -1);
         placeRelative(posByUpgrade, occupied, GameUnlocks.STAT_ATTACK_2, GameUnlocks.STAT_ATTACK_1, -1, 0);
         placeRelative(posByUpgrade, occupied, GameUnlocks.STAT_ATTACK_SPEED_1, GameUnlocks.STAT_ATTACK_1, 0, 1);
-        nudge(posByUpgrade, occupied, GameUnlocks.STAT_DEFENSE_1, -1, 0);
         placeRelative(posByUpgrade, occupied, GameUnlocks.STAT_DEFENSE_2, GameUnlocks.STAT_DEFENSE_1, 0, 1);
 
         nudge(posByUpgrade, occupied, GameUnlocks.ROLE_LAYER, -1, 0);
