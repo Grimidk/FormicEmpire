@@ -19,7 +19,7 @@ class BugRoleTest {
         assertTrue(GameConstants.TYPE_PARASITE_ANT.hasBugRole(BugRole.PARASITE));
         assertTrue(GameConstants.TYPE_PARASITIC_MITE.hasBugRole(BugRole.PARASITE));
         assertTrue(GameConstants.TYPE_COCKROACH.hasBugRole(BugRole.HUNT));
-        assertTrue(GameConstants.TYPE_BOMBARDIER_BEETLE.hasBugRole(BugRole.HUNT));
+        assertTrue(GameConstants.TYPE_BOMBARDIER.hasBugRole(BugRole.HUNT));
         assertTrue(GameConstants.TYPE_ANT_LION.hasBugRole(BugRole.INVASION));
         assertFalse(GameConstants.TYPE_ANT_LION.hasBugRole(BugRole.HUNT));
         assertTrue(GameConstants.TYPE_SPIDER.hasBugRole(BugRole.HUNT));

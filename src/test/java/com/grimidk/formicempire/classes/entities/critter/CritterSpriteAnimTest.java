@@ -15,7 +15,7 @@ class CritterSpriteAnimTest {
     void enemyCrittersUseFourLegFrames() {
         assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_COCKROACH.getLegFrameCount());
         assertEquals(2, GameConstants.TYPE_COCKROACH.getAntennaFrameCount());
-        assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_BOMBARDIER_BEETLE.getLegFrameCount());
+        assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_BOMBARDIER.getLegFrameCount());
         assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_ANT_LION.getLegFrameCount());
         assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_SPIDER.getLegFrameCount());
         assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_TARANTULA.getLegFrameCount());

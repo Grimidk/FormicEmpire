@@ -12,7 +12,7 @@ To Fix (By decreasing priority):
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
-		redo upgrade tree node shape
+		(none right now)
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):
