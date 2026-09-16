@@ -1792,6 +1792,7 @@ public final class LanguageStrings {
     public static final String CRITTER_CLASS_FUNGI = "CRITTER_CLASS_FUNGI";
     public static final String CRITTER_CLASS_PLANT = "CRITTER_CLASS_PLANT";
     public static final String CRITTER_CLASS_XENO = "CRITTER_CLASS_XENO";
+    public static final String CRITTER_CLASS_MYRIAPOD = "CRITTER_CLASS_MYRIAPOD";
 
     public static final String BUG_ANT = "BUG_ANT";
     public static final String BUG_APHID = "BUG_APHID";
@@ -1807,8 +1808,8 @@ public final class LanguageStrings {
     public static final String BUG_PARASITIC_MITE_SCIENTIFIC = "BUG_PARASITIC_MITE_SCIENTIFIC";
     public static final String BUG_COCKROACH = "BUG_COCKROACH";
     public static final String BUG_COCKROACH_SCIENTIFIC = "BUG_COCKROACH_SCIENTIFIC";
-    public static final String BUG_BOMBARDIER_BEETLE = "BUG_BOMBARDIER_BEETLE";
-    public static final String BUG_BOMBARDIER_BEETLE_SCIENTIFIC = "BUG_BOMBARDIER_BEETLE_SCIENTIFIC";
+    public static final String BUG_BOMBARDIER = "BUG_BOMBARDIER";
+    public static final String BUG_BOMBARDIER_SCIENTIFIC = "BUG_BOMBARDIER_SCIENTIFIC";
     public static final String BUG_ANT_LION = "BUG_ANT_LION";
     public static final String BUG_ANT_LION_SCIENTIFIC = "BUG_ANT_LION_SCIENTIFIC";
     public static final String BUG_SPIDER = "BUG_SPIDER";
@@ -2771,7 +2772,7 @@ public final class LanguageStrings {
     public static final String HELP_BUG_PARASITE_ANT_DESC = "HELP_BUG_PARASITE_ANT_DESC";
     public static final String HELP_BUG_PARASITIC_MITE_DESC = "HELP_BUG_PARASITIC_MITE_DESC";
     public static final String HELP_BUG_COCKROACH_DESC = "HELP_BUG_COCKROACH_DESC";
-    public static final String HELP_BUG_BOMBARDIER_BEETLE_DESC = "HELP_BUG_BOMBARDIER_BEETLE_DESC";
+    public static final String HELP_BUG_BOMBARDIER_DESC = "HELP_BUG_BOMBARDIER_DESC";
     public static final String HELP_BUG_ANT_LION_DESC = "HELP_BUG_ANT_LION_DESC";
     public static final String HELP_BUG_SPIDER_DESC = "HELP_BUG_SPIDER_DESC";
     public static final String HELP_BUG_TARANTULA_DESC = "HELP_BUG_TARANTULA_DESC";

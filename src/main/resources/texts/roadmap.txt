@@ -6,7 +6,7 @@ To Fix (By decreasing priority):
 	High:
 		(none right now)
 	Mid:
-		improve critter naming specially inside insects since there are so many (diptera, coleoptera, orthoptera, hemiptera)
+		(none right now)
 	Low:
 		(none right now)
 	Can't reproduce:
@@ -16,10 +16,10 @@ To Fix (By decreasing priority):
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):
-		UI icons (icons/critters/): AntLion.png, BombardierBeetle.png, Spider.png, Tarantula.png, Commonfly.png
+		UI icons (icons/critters/): AntLion.png, Bombardier.png, Spider.png, Tarantula.png, Commonfly.png
 		Composed battle sprites (body + leg frames; antenna frames if animated — match cockroach pattern):
 			sprites/critters/insect/antLion/ — AntLion.png, Leg1–Leg4 (Jaw1, Jaw2)
-			sprites/critters/insect/bombardierBeetle/ — BombardierBeetle.png, Leg1–Leg4 (+ antenn1 and 2)
+			sprites/critters/insect/coleoptera/bombardier/ — Bombardier.png, Leg1–Leg4 (+ antenn1 and 2)
 			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/insect/commonFly/ — CommonFly.png, Leg1–Leg4 (+ Wing1, Wing2)
@@ -76,7 +76,7 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 		swarm vs creature battles (system)
 		launch creatures (single battle or swarm; needs battle system):
-			Bugs: giant/reg cockroach, Bombardier beetle, Ant lion
+			Bugs: giant/reg cockroach, Bombardier, Ant lion
 			Arachnids: Spider, Tarantula
 		uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
 		more biomes (beach, cliffs, wetlands, mangrove, coastal vs inland prairie, burnt forest [resin source, no water, cant start], ice field [cant start], continent variation, rivers on borders, unpassable terrain, lock species to biome, protein-only ant, bigger world)
@@ -99,7 +99,7 @@ Needed for launch (v1.0) (Launch Version):
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events)) disasters penalie overworked colonies
 		more stats (kills, historic productions, graphs?)
 		intra dynasty ai auto logisitcs with non esential resources 
-		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
+		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 		revamp story and lore and maybe intro screen
 		more hive rooms, specially more twisty (research room after royal chamber, barrack room before royal chamber)
 		rework completely in-room sprites (overlay disabled in GameAreaPanel for now, can turn off in settings)

@@ -652,6 +652,9 @@ public final class GameConstants {
     public static final CritterClass CRITTER_CLASS_XENO = new CritterClass(8, LanguageStrings.CRITTER_CLASS_XENO,
         loadIcon("icons/critterclasses/Xeno.png"));
     static { critterClasses.add(CRITTER_CLASS_XENO); }
+    public static final CritterClass CRITTER_CLASS_MYRIAPOD = new CritterClass(9, LanguageStrings.CRITTER_CLASS_MYRIAPOD,
+        loadIcon("icons/critterclasses/Myriapod.png"));
+    static { critterClasses.add(CRITTER_CLASS_MYRIAPOD); }
 
     // --- Skills ---
     public static final Skill SKILL_BASIC_BITE = new Skill(1, LanguageStrings.SKILL_BASIC_BITE, 1f, 1f, 1, true,
@@ -733,6 +736,9 @@ public final class GameConstants {
         if (critterClass == CRITTER_CLASS_XENO) {
             return "xeno";
         }
+        if (critterClass == CRITTER_CLASS_MYRIAPOD) {
+            return "myriapod";
+        }
         return "";
     }
 
@@ -749,8 +755,8 @@ public final class GameConstants {
     static { critterSpecies.add(TYPE_ANT); }
     public static final Species TYPE_APHID = new Species(2, LanguageStrings.BUG_APHID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 0, 0.5f,
         loadIcon("icons/critters/Aphid.png"),
-        CritterSpriteCompositor.getSprite(critterSpriteFolder(CRITTER_CLASS_INSECT, "aphid"), "Aphid.png", true),
-        critterSpriteFolder(CRITTER_CLASS_INSECT, "aphid"), "Aphid.png", true, BugRole.PET);
+        CritterSpriteCompositor.getSprite(critterSpriteFolder(CRITTER_CLASS_INSECT, "hemiptera/aphid"), "Aphid.png", true),
+        critterSpriteFolder(CRITTER_CLASS_INSECT, "hemiptera/aphid"), "Aphid.png", true, BugRole.PET);
     static { critterSpecies.add(TYPE_APHID); }
     public static final Species TYPE_PARASITE_ANT = new Species(3, LanguageStrings.BUG_PARASITE_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
         loadIcon("icons/critters/ParasiticAnt.png"),
@@ -764,8 +770,8 @@ public final class GameConstants {
     static { critterSpecies.add(TYPE_SYMBIOTIC_MITE); }
     public static final Species TYPE_DERMESTID = new Species(5, LanguageStrings.BUG_DERMESTID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 0, 0.35f,
         loadIcon("icons/critters/Dermestid.png"),
-        CritterSpriteCompositor.getSprite(critterSpriteFolder(CRITTER_CLASS_INSECT, "dermestid"), "Dermestid.png", true),
-        critterSpriteFolder(CRITTER_CLASS_INSECT, "dermestid"), "Dermestid.png", true, BugRole.PET);
+        CritterSpriteCompositor.getSprite(critterSpriteFolder(CRITTER_CLASS_INSECT, "coleoptera/dermestid"), "Dermestid.png", true),
+        critterSpriteFolder(CRITTER_CLASS_INSECT, "coleoptera/dermestid"), "Dermestid.png", true, BugRole.PET);
     static { critterSpecies.add(TYPE_DERMESTID); }
     public static final Species TYPE_PARASITIC_MITE = new Species(6, LanguageStrings.BUG_PARASITIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
         loadIcon("icons/critters/ParasiticMite.png"),
@@ -776,24 +782,24 @@ public final class GameConstants {
             LanguageStrings.BUG_COCKROACH_SCIENTIFIC, 1, 0, 1, 1, 0, 1f,
             loadIcon("icons/critters/Cockroach.png"),
             CritterSpriteCompositor.getSprite(
-                    critterSpriteFolder(CRITTER_CLASS_INSECT, "cockroach"), "Cockroach.png", true,
+                    critterSpriteFolder(CRITTER_CLASS_INSECT, "blattodea/cockroach"), "Cockroach.png", true,
                     1, GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, 1, 2),
-            critterSpriteFolder(CRITTER_CLASS_INSECT, "cockroach"), "Cockroach.png", true, BugRole.HUNT,
+            critterSpriteFolder(CRITTER_CLASS_INSECT, "blattodea/cockroach"), "Cockroach.png", true, BugRole.HUNT,
             List.of(SKILL_COCKROACH_BITE, SKILL_COCKROACH_SPIN),
             GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, 2);
     static { critterSpecies.add(TYPE_COCKROACH); }
-    public static final Species TYPE_BOMBARDIER_BEETLE = new Species(8, LanguageStrings.BUG_BOMBARDIER_BEETLE,
-            CRITTER_CLASS_INSECT, LanguageStrings.BUG_BOMBARDIER_BEETLE_SCIENTIFIC, 1, 0, 1, 1, 0, 0.8f,
-            loadIcon("icons/critters/BombardierBeetle.png"),
-            loadIcon("icons/critters/BombardierBeetle.png"),
-            critterSpriteFolder(CRITTER_CLASS_INSECT, "bombardierBeetle"), "BombardierBeetle.png", true, BugRole.HUNT, List.of(),
+    public static final Species TYPE_BOMBARDIER = new Species(8, LanguageStrings.BUG_BOMBARDIER,
+            CRITTER_CLASS_INSECT, LanguageStrings.BUG_BOMBARDIER_SCIENTIFIC, 1, 0, 1, 1, 0, 0.8f,
+            loadIcon("icons/critters/Bombardier.png"),
+            loadIcon("icons/critters/Bombardier.png"),
+            critterSpriteFolder(CRITTER_CLASS_INSECT, "coleoptera/bombardier"), "Bombardier.png", true, BugRole.HUNT, List.of(),
             GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, 0);
-    static { critterSpecies.add(TYPE_BOMBARDIER_BEETLE); }
+    static { critterSpecies.add(TYPE_BOMBARDIER); }
     public static final Species TYPE_ANT_LION = new Species(9, LanguageStrings.BUG_ANT_LION, CRITTER_CLASS_INSECT,
             LanguageStrings.BUG_ANT_LION_SCIENTIFIC, 1, 0, 1, 1, 0, 0.9f,
             loadIcon("icons/critters/AntLion.png"),
             loadIcon("icons/critters/AntLion.png"),
-            critterSpriteFolder(CRITTER_CLASS_INSECT, "antLion"), "AntLion.png", true, BugRole.INVASION, List.of(),
+            critterSpriteFolder(CRITTER_CLASS_INSECT, "neuroptera/antLion"), "AntLion.png", true, BugRole.INVASION, List.of(),
             GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, 0);
     static { critterSpecies.add(TYPE_ANT_LION); }
     public static final Species TYPE_SPIDER = new Species(10, LanguageStrings.BUG_SPIDER, CRITTER_CLASS_ARACHNID,

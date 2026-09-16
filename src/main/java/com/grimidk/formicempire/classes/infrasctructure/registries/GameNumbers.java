@@ -577,7 +577,7 @@ public final class GameNumbers {
                     HUNT_COCKROACH_REWARD_MUSHROOMS,
                     HUNT_COCKROACH_REWARD_RP);
         }
-        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+        if (species == GameConstants.TYPE_BOMBARDIER) {
             return new HuntRewards(
                     HUNT_BOMBARDIER_BEETLE_REWARD_PROTEIN,
                     HUNT_BOMBARDIER_BEETLE_REWARD_MUSHROOMS,
@@ -605,7 +605,7 @@ public final class GameNumbers {
         if (species == GameConstants.TYPE_COCKROACH) {
             return HUNT_COCKROACH_HP;
         }
-        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+        if (species == GameConstants.TYPE_BOMBARDIER) {
             return HUNT_BOMBARDIER_BEETLE_HP;
         }
         if (species == GameConstants.TYPE_SPIDER) {
@@ -624,7 +624,7 @@ public final class GameNumbers {
         if (species == GameConstants.TYPE_COCKROACH) {
             return HUNT_COCKROACH_ATTACK;
         }
-        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+        if (species == GameConstants.TYPE_BOMBARDIER) {
             return HUNT_BOMBARDIER_BEETLE_ATTACK;
         }
         if (species == GameConstants.TYPE_SPIDER) {
@@ -643,7 +643,7 @@ public final class GameNumbers {
         if (species == GameConstants.TYPE_COCKROACH) {
             return HUNT_COCKROACH_DEFENSE;
         }
-        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+        if (species == GameConstants.TYPE_BOMBARDIER) {
             return HUNT_BOMBARDIER_BEETLE_DEFENSE;
         }
         if (species == GameConstants.TYPE_SPIDER) {
@@ -662,7 +662,7 @@ public final class GameNumbers {
         if (species == GameConstants.TYPE_COCKROACH) {
             return HUNT_COCKROACH_ATTACK_SPEED;
         }
-        if (species == GameConstants.TYPE_BOMBARDIER_BEETLE) {
+        if (species == GameConstants.TYPE_BOMBARDIER) {
             return HUNT_BOMBARDIER_BEETLE_ATTACK_SPEED;
         }
         if (species == GameConstants.TYPE_SPIDER) {

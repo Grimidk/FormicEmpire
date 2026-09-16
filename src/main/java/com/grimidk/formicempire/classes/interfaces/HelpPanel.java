@@ -888,8 +888,8 @@ public class HelpPanel extends JPanel {
         if (type == GameConstants.TYPE_COCKROACH) {
             return LanguageStrings.get(LanguageStrings.HELP_BUG_COCKROACH_DESC);
         }
-        if (type == GameConstants.TYPE_BOMBARDIER_BEETLE) {
-            return LanguageStrings.get(LanguageStrings.HELP_BUG_BOMBARDIER_BEETLE_DESC);
+        if (type == GameConstants.TYPE_BOMBARDIER) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_BOMBARDIER_DESC);
         }
         if (type == GameConstants.TYPE_ANT_LION) {
             return LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_LION_DESC);
