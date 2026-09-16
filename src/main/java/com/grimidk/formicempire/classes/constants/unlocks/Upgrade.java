@@ -17,6 +17,8 @@ public class Upgrade extends Constant {
     private final int tierIndex;
     private int gridX;
     private int gridY;
+    private final int defaultGridX;
+    private final int defaultGridY;
 
     public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon, int tierIndex, int gridX, int gridY) {
         super(id, nameKey, icon);
@@ -27,6 +29,8 @@ public class Upgrade extends Constant {
         this.tierIndex = Math.max(0, tierIndex);
         this.gridX = gridX;
         this.gridY = gridY;
+        this.defaultGridX = gridX;
+        this.defaultGridY = gridY;
     }
 
     public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon, int gridX, int gridY) {
@@ -95,5 +99,13 @@ public class Upgrade extends Constant {
 
     public void setGridY(int gridY) {
         this.gridY = gridY;
+    }
+
+    public int getDefaultGridX() {
+        return defaultGridX;
+    }
+
+    public int getDefaultGridY() {
+        return defaultGridY;
     }
 }

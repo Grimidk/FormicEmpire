@@ -73,6 +73,7 @@ public class Engine extends Thread {
     private boolean infiniteResearch = false;
     private boolean instantBuildings = false;
     private boolean assimilateAll = false;
+    private boolean mapEditorEnabled = false;
     private boolean easyConquering = false;
     private boolean instantIntegration = false;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
@@ -617,6 +618,14 @@ public class Engine extends Thread {
 
     public void setEasyConquering(boolean easyConquering) {
         this.easyConquering = easyConquering;
+    }
+
+    public boolean isMapEditorEnabled() {
+        return mapEditorEnabled;
+    }
+
+    public void setMapEditorEnabled(boolean mapEditorEnabled) {
+        this.mapEditorEnabled = mapEditorEnabled;
     }
 
     public boolean isInstantIntegration() {

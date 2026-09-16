@@ -114,6 +114,11 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         northPanel.add(researchPointsLabel);
         northPanel.add(Box.createRigidArea(new Dimension(15, 0)));
         northPanel.add(tierLabel);
+        
+        if (engine != null && engine.isMapEditorEnabled()) {
+            // Map editor enabled
+        }
+        
         northPanel.setVisible(!encyclopediaMode);
         add(northPanel, BorderLayout.NORTH);
 
@@ -604,12 +609,26 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 public void mouseReleased(MouseEvent e) {
                     if (pressedNode != null && dragged) {
                         try {
-                            java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter("manual_positions.txt"));
+                            java.io.File dest = new java.io.File(com.grimidk.formicempire.classes.infrasctructure.util.GamePaths.resolveSavesDirectory(), "upgrade_positions.json");
+                            java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(dest));
+                            pw.println("{");
+                            boolean first = true;
                             for (ResearchTreeGraph.Node n : graph.getNodes()) {
-                                pw.println(n.getUpgrade().getNameKey() + "," + n.getUpgrade().getGridX() + "," + n.getUpgrade().getGridY());
+                                if (!first) pw.println(",");
+                                pw.print("  \"" + n.getUpgrade().getNameKey() + "\": { ");
+                                pw.print("\"defaultX\": " + n.getUpgrade().getDefaultGridX() + ", ");
+                                pw.print("\"defaultY\": " + n.getUpgrade().getDefaultGridY() + ", ");
+                                pw.print("\"setX\": " + n.getUpgrade().getGridX() + ", ");
+                                pw.print("\"setY\": " + n.getUpgrade().getGridY());
+                                pw.print(" }");
+                                first = false;
                             }
+                            pw.println("\n}");
                             pw.close();
-                            System.out.println("Saved manual positions to manual_positions.txt");
+                            System.out.println("Saved manual positions to " + dest.getAbsolutePath());
+                            if (engine != null) {
+                                engine.getSaveManager().saveSettings(engine);
+                            }
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -636,18 +655,29 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                         return;
                     }
                     dragged = true;
-                    boolean ALLOW_DRAG_AND_DROP = false;
-                    if (pressedNode != null && ALLOW_DRAG_AND_DROP) {
+                    boolean allowDragAndDrop = engine != null && engine.isMapEditorEnabled();
+                    if (pressedNode != null && allowDragAndDrop) {
                         double rawX = (e.getX() - centerX) / (double) UNIT_SIZE;
                         double rawY = (e.getY() - centerY) / (double) UNIT_SIZE;
                         int gx = (int) Math.round(rawX / ResearchTreeGraph.GRID_STEP);
                         int gy = (int) Math.round(rawY / ResearchTreeGraph.GRID_STEP);
-                        pressedNode.getUpgrade().setGridX(gx);
-                        pressedNode.getUpgrade().setGridY(gy);
-                        pressedNode.setPosX(gx * ResearchTreeGraph.GRID_STEP);
-                        pressedNode.setPosY(gy * ResearchTreeGraph.GRID_STEP);
-                        rebuildLayout();
-                        repaint();
+                        
+                        boolean collision = false;
+                        for (ResearchTreeGraph.Node n : graph.getNodes()) {
+                            if (n != pressedNode && n.getUpgrade().getGridX() == gx && n.getUpgrade().getGridY() == gy) {
+                                collision = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!collision) {
+                            pressedNode.getUpgrade().setGridX(gx);
+                            pressedNode.getUpgrade().setGridY(gy);
+                            pressedNode.setPosX(gx * ResearchTreeGraph.GRID_STEP);
+                            pressedNode.setPosY(gy * ResearchTreeGraph.GRID_STEP);
+                            rebuildLayout();
+                            repaint();
+                        }
                     } else {
                         JViewport viewport = scrollPane.getViewport();
                         Dimension viewSize = getPreferredSize();

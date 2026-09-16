@@ -2486,3 +2486,6 @@ LOG_INVASION_DEFENDED_FMT,Defense party of %s ants repelled the %s.,Partida de d
 LOG_INVASION_DEFENSE_LOST_FMT,Defense party of %s ants was wiped out by the %s.,La partida de defensa de %s hormigas fue aniquilada por el %s.,Grupo de defesa de %s formigas foi eliminado pelo %s.,Groupe de défense de %s fourmis anéanti par le %s.,,,
 ROLE_UNASSIGNED_PCT_FMT,Unassigned: %s%%,Sin asignar: %s%%,Sem atribuir: %s%%,Non assignées : %s%%,,,
 ROLE_UNASSIGNED_LOW_TT,Low unassigned reserve — critter parties and exhaustion risk.,Reserva sin asignar baja — partidas de criaturas y riesgo de agotamiento.,Reserva sem atribuir baixa — grupos de criaturas e risco de exaustão.,Faible réserve non assignée — groupes de créatures et risque d'épuisement.,,,
+SETTINGS_MAP_EDITOR_ENABLED,Upgrade Tree Editing,Edición del Árbol de Mejoras,Edición del Árbol de Mejoras,Édition de l'Arbre d'Améliorations
+SETTINGS_MAP_EDITOR_ENABLED_TT,Enable dragging nodes in the Research Tree.,Habilita arrastrar nodos en el Árbol de Investigación.,Permite arrastar nós na Árvore de Pesquisa.,Permet de glisser les nœuds dans l'Arbre de Recherche.
+SETTINGS_MAP_EDITOR_NOTE,(Not recommended for non-dev purposes),(No recomendado para fines que no sean de desarrollo),(Não recomendado para fins não relacionados a desenvolvimento),(Non recommandé pour des usages autres que le développement)

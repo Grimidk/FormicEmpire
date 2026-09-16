@@ -6,7 +6,6 @@ To Fix (By decreasing priority):
 	High:
 		(none right now)
 	Mid:
-		improve dialogs buttons with icons like close, layers, conquer, go home
 		improve critter naming specially inside insects since there are so many (diptera, coleoptera, orthoptera, hemiptera)
 	Low:
 		(none right now)
@@ -142,7 +141,6 @@ Post launch (v1.1) (Improvements Update):
 	link to IRL documentation for ant facts  and bug facts
 	achievements (to include in core)
 	map loading and manual editing with debug
-	clean up research tree editing
 	click and react minigame
 	expectator mode
 	discord integration

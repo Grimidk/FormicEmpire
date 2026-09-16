@@ -2464,6 +2464,7 @@ public class SaveManager {
             writeJsonLine(w, "infiniteResearch", engine.isInfiniteResearch(), false);
             writeJsonLine(w, "instantBuildings", engine.isInstantBuildings(), false);
             writeJsonLine(w, "assimilateAll", engine.isAssimilateAll(), false);
+            writeJsonLine(w, "mapEditorEnabled", engine.isMapEditorEnabled(), false);
             writeJsonLine(w, "easyConquering", engine.isEasyConquering(), false);
             writeJsonLine(w, "instantIntegration", engine.isInstantIntegration(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
@@ -2476,7 +2477,22 @@ public class SaveManager {
             writeJsonLine(w, "mapLayerColonyRanks", engine.isMapLayerColonyRanks(), false);
             writeJsonLine(w, "mapLayerTrades", engine.isMapLayerTrades(), false);
             writeJsonLine(w, "mapLayerTunnels", engine.isMapLayerTunnels(), false);
-            writeJsonLine(w, "mapLayerBattles", engine.isMapLayerBattles(), true);
+            writeJsonLine(w, "mapLayerBattles", engine.isMapLayerBattles(), false);
+            
+            // Serialize Upgrade Coordinates
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            boolean first = true;
+            for (com.grimidk.formicempire.classes.constants.unlocks.Upgrade u : com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks.getUpgrades()) {
+                if (u.getGridX() != u.getDefaultGridX() || u.getGridY() != u.getDefaultGridY()) {
+                    if (!first) sb.append(",");
+                    sb.append("\"").append(u.getId()).append("\":\"").append(u.getGridX()).append(",").append(u.getGridY()).append("\"");
+                    first = false;
+                }
+            }
+            sb.append("}");
+            writeJsonLine(w, "upgradePositions", sb.toString(), true);
+
             w.write("}");
             w.newLine();
             w.flush();
@@ -2582,6 +2598,7 @@ public class SaveManager {
             engine.setInfiniteResearch(Boolean.parseBoolean(m.getOrDefault("infiniteResearch", "false")));
             engine.setInstantBuildings(Boolean.parseBoolean(m.getOrDefault("instantBuildings", "false")));
             engine.setAssimilateAll(Boolean.parseBoolean(m.getOrDefault("assimilateAll", "false")));
+            engine.setMapEditorEnabled(Boolean.parseBoolean(m.getOrDefault("mapEditorEnabled", "false")));
             engine.setEasyConquering(Boolean.parseBoolean(m.getOrDefault("easyConquering", "false")));
             engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(

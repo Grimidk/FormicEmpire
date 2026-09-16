@@ -63,6 +63,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox infiniteResearchCheck;
     private JCheckBox instantBuildingsCheck;
     private JCheckBox assimilateAllCheck;
+    private JCheckBox mapEditorEnabledCheck;
     private JCheckBox easyConqueringCheck;
     private JCheckBox instantIntegrationCheck;
     
@@ -80,7 +81,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, disablePopupsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
-    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, easyConqueringLabel, instantIntegrationLabel;
+    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -477,6 +478,36 @@ public class SettingsPanel extends JPanel {
 
         c.gridy = 8;
         c.gridx = 0;
+        mapEditorEnabledLabel = new JLabel();
+        mapEditorEnabledLabel.setFont(AssetStyles.FONT_NORMAL);
+        mapEditorEnabledLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(mapEditorEnabledLabel, c);
+
+        mapEditorEnabledCheck = new JCheckBox();
+        styleCheckBox(mapEditorEnabledCheck);
+        
+        JButton resetMapButton = new JButton("Reset Setup");
+        AssetStyles.styleCompactButton(resetMapButton);
+        resetMapButton.addActionListener(e -> {
+            for (com.grimidk.formicempire.classes.constants.unlocks.Upgrade u : com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks.getUpgrades()) {
+                u.setGridX(u.getDefaultGridX());
+                u.setGridY(u.getDefaultGridY());
+            }
+            if (frame.getGamePanel() != null) {
+                frame.getGamePanel().refreshAllGUIData();
+            }
+        });
+
+        JPanel editorPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 0));
+        editorPanel.setOpaque(false);
+        editorPanel.add(mapEditorEnabledCheck);
+        editorPanel.add(resetMapButton);
+        
+        c.gridx = 1;
+        panel.add(editorPanel, c);
+
+        c.gridy = 9;
+        c.gridx = 0;
         easyConqueringLabel = new JLabel();
         easyConqueringLabel.setFont(AssetStyles.FONT_NORMAL);
         easyConqueringLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -487,7 +518,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(easyConqueringCheck, c);
 
-        c.gridy = 9;
+        c.gridy = 10;
         c.gridx = 0;
         instantIntegrationLabel = new JLabel();
         instantIntegrationLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -499,7 +530,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(instantIntegrationCheck, c);
 
-        c.gridy = 10;
+        c.gridy = 11;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -694,6 +725,7 @@ public class SettingsPanel extends JPanel {
         infiniteResearchCheck.setSelected(false);
         instantBuildingsCheck.setSelected(false);
         assimilateAllCheck.setSelected(false);
+        mapEditorEnabledCheck.setSelected(false);
         easyConqueringCheck.setSelected(false);
         instantIntegrationCheck.setSelected(false);
     }
@@ -983,6 +1015,7 @@ public class SettingsPanel extends JPanel {
         infiniteResearchLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INFINITE_RESEARCH));
         instantBuildingsLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_BUILDINGS));
         assimilateAllLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_ASSIMILATE_ALL));
+        mapEditorEnabledLabel.setText(LanguageStrings.get("SETTINGS_MAP_EDITOR_ENABLED") + " " + LanguageStrings.get("SETTINGS_MAP_EDITOR_NOTE"));
         easyConqueringLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_EASY_CONQUERING));
         instantIntegrationLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_INTEGRATION));
         
@@ -1065,6 +1098,7 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(infiniteResearchLabel, infiniteResearchCheck, LanguageStrings.SETTINGS_INFINITE_RESEARCH_TT);
         setSettingTooltip(instantBuildingsLabel, instantBuildingsCheck, LanguageStrings.SETTINGS_INSTANT_BUILDINGS_TT);
         setSettingTooltip(assimilateAllLabel, assimilateAllCheck, LanguageStrings.SETTINGS_ASSIMILATE_ALL_TT);
+        setSettingTooltip(mapEditorEnabledLabel, mapEditorEnabledCheck, "SETTINGS_MAP_EDITOR_ENABLED_TT");
         setSettingTooltip(easyConqueringLabel, easyConqueringCheck, LanguageStrings.SETTINGS_EASY_CONQUERING_TT);
         setSettingTooltip(instantIntegrationLabel, instantIntegrationCheck, LanguageStrings.SETTINGS_INSTANT_INTEGRATION_TT);
         setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
@@ -1121,6 +1155,7 @@ public class SettingsPanel extends JPanel {
         infiniteResearchCheck.setSelected(engine.isInfiniteResearch());
         instantBuildingsCheck.setSelected(engine.isInstantBuildings());
         assimilateAllCheck.setSelected(engine.isAssimilateAll());
+        mapEditorEnabledCheck.setSelected(engine.isMapEditorEnabled());
         easyConqueringCheck.setSelected(engine.isEasyConquering());
         instantIntegrationCheck.setSelected(engine.isInstantIntegration());
         
@@ -1239,7 +1274,8 @@ public class SettingsPanel extends JPanel {
             assimilateAllCheck.setSelected(false);
         }
         if (easyConqueringCheck.isSelected() && !engine.isEasyConquering()) {
-            easyConqueringCheck.setSelected(false);
+            mapEditorEnabledCheck.setSelected(false);
+        easyConqueringCheck.setSelected(false);
         }
         if (instantIntegrationCheck.isSelected() && !engine.isInstantIntegration()) {
             instantIntegrationCheck.setSelected(false);
@@ -1293,6 +1329,7 @@ public class SettingsPanel extends JPanel {
         engine.setInfiniteResearch(infiniteResearchCheck.isSelected());
         engine.setInstantBuildings(instantBuildingsCheck.isSelected());
         engine.setAssimilateAll(assimilateAllCheck.isSelected());
+        engine.setMapEditorEnabled(mapEditorEnabledCheck.isSelected());
         engine.setEasyConquering(easyConqueringCheck.isSelected());
         engine.setInstantIntegration(instantIntegrationCheck.isSelected());
         engine.applySandboxTaintToActiveWorld();
