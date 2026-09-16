@@ -15,23 +15,27 @@ public class Upgrade extends Constant {
     private final Upgrade requirement;
     private final int cost;
     private final int tierIndex;
+    private int gridX;
+    private int gridY;
 
-    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon, int tierIndex) {
+    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon, int tierIndex, int gridX, int gridY) {
         super(id, nameKey, icon);
         this.flavorNameKey = flavorNameKey;
         this.descriptionKey = descriptionKey;
         this.requirement = requirement;
         this.cost = cost;
         this.tierIndex = Math.max(0, tierIndex);
+        this.gridX = gridX;
+        this.gridY = gridY;
     }
 
-    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon) {
-        this(id, nameKey, flavorNameKey, descriptionKey, requirement, cost, icon, 0);
+    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon, int gridX, int gridY) {
+        this(id, nameKey, flavorNameKey, descriptionKey, requirement, cost, icon, 0, gridX, gridY);
     }
 
     // (no icon)
-    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost) {
-        this(id, nameKey, flavorNameKey, descriptionKey, requirement, cost, null, 0);
+    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, int gridX, int gridY) {
+        this(id, nameKey, flavorNameKey, descriptionKey, requirement, cost, null, 0, gridX, gridY);
     }
 
     public String getFlavorName() {
@@ -75,5 +79,21 @@ public class Upgrade extends Constant {
 
     public ImageIcon getTierIcon() {
         return getTier().getIcon();
+    }
+
+    public int getGridX() {
+        return gridX;
+    }
+
+    public int getGridY() {
+        return gridY;
+    }
+
+    public void setGridX(int gridX) {
+        this.gridX = gridX;
+    }
+
+    public void setGridY(int gridY) {
+        this.gridY = gridY;
     }
 }

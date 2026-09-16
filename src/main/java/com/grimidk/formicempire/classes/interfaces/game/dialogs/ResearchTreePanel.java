@@ -602,7 +602,18 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    if (pressedNode != null && !dragged) {
+                    if (pressedNode != null && dragged) {
+                        try {
+                            java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter("manual_positions.txt"));
+                            for (ResearchTreeGraph.Node n : graph.getNodes()) {
+                                pw.println(n.getUpgrade().getNameKey() + "," + n.getUpgrade().getGridX() + "," + n.getUpgrade().getGridY());
+                            }
+                            pw.close();
+                            System.out.println("Saved manual positions to manual_positions.txt");
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    } else if (pressedNode != null && !dragged) {
                         openDetail(pressedNode);
                     } else if (!dragged && nodeAt(e.getPoint()) == null) {
                         closeDetail();
@@ -615,7 +626,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             addMouseMotionListener(new MouseAdapter() {
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    if (pressScreen == null || viewOrigin == null || pressedNode != null) {
+                    if (pressScreen == null || viewOrigin == null) {
                         return;
                     }
                     Point now = e.getLocationOnScreen();
@@ -625,12 +636,26 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                         return;
                     }
                     dragged = true;
-                    JViewport viewport = scrollPane.getViewport();
-                    Dimension viewSize = getPreferredSize();
-                    Dimension extent = viewport.getExtentSize();
-                    int x = Math.max(0, Math.min(viewOrigin.x - dx, Math.max(0, viewSize.width - extent.width)));
-                    int y = Math.max(0, Math.min(viewOrigin.y - dy, Math.max(0, viewSize.height - extent.height)));
-                    viewport.setViewPosition(new Point(x, y));
+                    boolean ALLOW_DRAG_AND_DROP = false;
+                    if (pressedNode != null && ALLOW_DRAG_AND_DROP) {
+                        double rawX = (e.getX() - centerX) / (double) UNIT_SIZE;
+                        double rawY = (e.getY() - centerY) / (double) UNIT_SIZE;
+                        int gx = (int) Math.round(rawX / ResearchTreeGraph.GRID_STEP);
+                        int gy = (int) Math.round(rawY / ResearchTreeGraph.GRID_STEP);
+                        pressedNode.getUpgrade().setGridX(gx);
+                        pressedNode.getUpgrade().setGridY(gy);
+                        pressedNode.setPosX(gx * ResearchTreeGraph.GRID_STEP);
+                        pressedNode.setPosY(gy * ResearchTreeGraph.GRID_STEP);
+                        rebuildLayout();
+                        repaint();
+                    } else {
+                        JViewport viewport = scrollPane.getViewport();
+                        Dimension viewSize = getPreferredSize();
+                        Dimension extent = viewport.getExtentSize();
+                        int x = Math.max(0, Math.min(viewOrigin.x - dx, Math.max(0, viewSize.width - extent.width)));
+                        int y = Math.max(0, Math.min(viewOrigin.y - dy, Math.max(0, viewSize.height - extent.height)));
+                        viewport.setViewPosition(new Point(x, y));
+                    }
                 }
             });
         }
