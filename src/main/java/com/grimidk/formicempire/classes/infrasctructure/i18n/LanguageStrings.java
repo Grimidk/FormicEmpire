@@ -891,12 +891,12 @@ public final class LanguageStrings {
     public static final String ABILITY_HUNTS = "ABILITY_HUNTS";
     public static final String ABILITY_HUNTS_FLAVOR = "ABILITY_HUNTS_FLAVOR";
     public static final String ABILITY_HUNTS_DESC = "ABILITY_HUNTS_DESC";
-    public static final String ABILITY_RAFTING_2 = "ABILITY_RAFTING_2";
-    public static final String ABILITY_RAFTING_2_FLAVOR = "ABILITY_RAFTING_2_FLAVOR";
-    public static final String ABILITY_RAFTING_2_DESC = "ABILITY_RAFTING_2_DESC";
-    public static final String ABILITY_RAFTING_3 = "ABILITY_RAFTING_3";
-    public static final String ABILITY_RAFTING_3_FLAVOR = "ABILITY_RAFTING_3_FLAVOR";
-    public static final String ABILITY_RAFTING_3_DESC = "ABILITY_RAFTING_3_DESC";
+    public static final String STAT_RAFTING_2 = "STAT_RAFTING_2";
+    public static final String STAT_RAFTING_2_FLAVOR = "STAT_RAFTING_2_FLAVOR";
+    public static final String STAT_RAFTING_2_DESC = "STAT_RAFTING_2_DESC";
+    public static final String STAT_RAFTING_3 = "STAT_RAFTING_3";
+    public static final String STAT_RAFTING_3_FLAVOR = "STAT_RAFTING_3_FLAVOR";
+    public static final String STAT_RAFTING_3_DESC = "STAT_RAFTING_3_DESC";
 
     public static final String DIALOG_STATS_TITLE = "DIALOG_STATS_TITLE";
     public static final String STATS_DYNASTY_MODE = "STATS_DYNASTY_MODE";
@@ -2380,12 +2380,12 @@ public final class LanguageStrings {
     public static final String ABILITY_CATCH_SYMBIOTIC_MITE_DESC = "ABILITY_CATCH_SYMBIOTIC_MITE_DESC";
     public static final String ABILITY_CATCH_DERMESTID_FLAVOR = "ABILITY_CATCH_DERMESTID_FLAVOR";
     public static final String ABILITY_CATCH_DERMESTID_DESC = "ABILITY_CATCH_DERMESTID_DESC";
-    public static final String ABILITY_DIPLOMAT_PRESSURE_2 = "ABILITY_DIPLOMAT_PRESSURE_2";
-    public static final String ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR = "ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR";
-    public static final String ABILITY_DIPLOMAT_PRESSURE_2_DESC = "ABILITY_DIPLOMAT_PRESSURE_2_DESC";
-    public static final String ABILITY_DIPLOMAT_PRESSURE_3 = "ABILITY_DIPLOMAT_PRESSURE_3";
-    public static final String ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR = "ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR";
-    public static final String ABILITY_DIPLOMAT_PRESSURE_3_DESC = "ABILITY_DIPLOMAT_PRESSURE_3_DESC";
+    public static final String STAT_DIPLOMAT_PRESSURE_2 = "STAT_DIPLOMAT_PRESSURE_2";
+    public static final String STAT_DIPLOMAT_PRESSURE_2_FLAVOR = "STAT_DIPLOMAT_PRESSURE_2_FLAVOR";
+    public static final String STAT_DIPLOMAT_PRESSURE_2_DESC = "STAT_DIPLOMAT_PRESSURE_2_DESC";
+    public static final String STAT_DIPLOMAT_PRESSURE_3 = "STAT_DIPLOMAT_PRESSURE_3";
+    public static final String STAT_DIPLOMAT_PRESSURE_3_FLAVOR = "STAT_DIPLOMAT_PRESSURE_3_FLAVOR";
+    public static final String STAT_DIPLOMAT_PRESSURE_3_DESC = "STAT_DIPLOMAT_PRESSURE_3_DESC";
     public static final String ABILITY_ABILITY_FLAVOR = "ABILITY_ABILITY_FLAVOR";
     public static final String ABILITY_ABILITY_DESC = "ABILITY_ABILITY_DESC";
 

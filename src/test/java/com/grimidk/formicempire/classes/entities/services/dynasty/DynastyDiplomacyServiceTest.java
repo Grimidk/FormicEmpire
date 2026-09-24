@@ -381,9 +381,9 @@ class DynastyDiplomacyServiceTest {
     @Test
     void diplomatPressureUpgradesIncreaseStabilityGain() {
         assertEquals(1, player.getDiplomacyService().getDiplomatStabilityGainPerAnt());
-        player.unlockUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2);
+        player.unlockUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_2);
         assertEquals(3, player.getDiplomacyService().getDiplomatStabilityGainPerAnt());
-        player.unlockUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3);
+        player.unlockUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_3);
         assertEquals(5, player.getDiplomacyService().getDiplomatStabilityGainPerAnt());
     }
 

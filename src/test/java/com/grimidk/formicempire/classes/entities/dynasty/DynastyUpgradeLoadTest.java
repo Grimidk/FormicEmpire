@@ -37,7 +37,7 @@ class DynastyUpgradeLoadTest {
         Dynasty dynasty = new Dynasty(saved);
 
         assertTrue(dynasty.hasUpgrade(GameUnlocks.ABILITY_HUNTS));
-        assertFalse(dynasty.hasUpgrade(GameUnlocks.ABILITY_RAFTING_2));
+        assertFalse(dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_2));
     }
 
     @Test
@@ -67,7 +67,7 @@ class DynastyUpgradeLoadTest {
 
         Dynasty dynasty = new Dynasty(saved);
 
-        assertTrue(dynasty.hasUpgrade(GameUnlocks.ABILITY_RAFTING_2));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_2));
         assertFalse(dynasty.hasUpgrade(GameUnlocks.ABILITY_HUNTS));
     }
 }

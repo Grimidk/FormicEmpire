@@ -5,7 +5,7 @@
     <artifactId>FormicEmpire</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>FormicEmpire</name>
-    <description>A game about ants.</description>
+    <description>An open source strategy and simulation game about ants.</description>
     <inceptionYear>2026</inceptionYear>
     <organization>
         <name>GrimIDK</name>

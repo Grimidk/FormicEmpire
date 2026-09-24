@@ -33,6 +33,7 @@ class DynastyIntegrationServiceTest {
         tradeManager = new TradeManager();
         overlord = new Dynasty(1, "Overlord", true, GameConstants.SPECIES_OMNI);
         target = new Dynasty(2, "Target", false, GameConstants.SPECIES_LEAFCUTTER);
+        target.setAiPersonality(null);
         world.getDynastys().add(overlord);
         world.getDynastys().add(target);
 

@@ -29,10 +29,10 @@ public class DynastyIntelligenceService {
     }
 
     public int getSpyPowerPerAnt() {
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_3)) {
             return GameNumbers.SPY_POWER_PRESSURE_3;
         }
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_2)) {
             return GameNumbers.SPY_POWER_PRESSURE_2;
         }
         return GameNumbers.SPY_POWER_BASE;

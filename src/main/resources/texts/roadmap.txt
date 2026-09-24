@@ -8,7 +8,8 @@ To Fix (By decreasing priority):
 	Mid:
 		(none right now)
 	Low:
-		(none right now)
+		versioning used in compile so the app and pom has the proper info
+		look into proper meta data for the app
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
@@ -16,29 +17,30 @@ To Fix (By decreasing priority):
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):
-		UI icons (icons/critters/): AntLion.png, Bombardier.png, Spider.png, Tarantula.png, Commonfly.png
 		Composed battle sprites (body + leg frames; antenna frames if animated — match cockroach pattern):
-			sprites/critters/insect/antLion/ — AntLion.png, Leg1–Leg4 (Jaw1, Jaw2)
+			sprites/critters/insect/neuroptera/antLion/ — AntLion.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/insect/coleoptera/bombardier/ — Bombardier.png, Leg1–Leg4 (+ antenn1 and 2)
 			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (Jaw1, Jaw2)
-			sprites/critters/insect/commonFly/ — CommonFly.png, Leg1–Leg4 (+ Wing1, Wing2)
+			sprites/critters/insect/diptera/commonFly/ — CommonFly.png, Leg1–Leg4 (+ Wing1, Wing2)
 		Skill icons (icons/skills/): CockroachBite.png, CockroachSpin.png (+ future ant-lion / bombardier attack skills when designed)
 	Stat upgrade icons (icons/upgrades/ — currently Unknown.png placeholder):
-		StatSkeleton.png, StatAcid.png, StatLongevity.png
-		StatResearch1.png, StatResearch2.png, StatResearch3.png
 		StatGrowth1.png, StatGrowth2.png, StatGrowth3.png
 		StatThirst1.png, StatThirst2.png
 		StatLogistics1.png, StatPassive1.png
-		StatLaying1.png, StatLaying2.png, StatLaying3.png
-		StatScouting1.png, StatScouting2.png, StatScouting3.png
-		StatFarming1.png, StatFarming2.png, StatFarming3.png
 		StatContamination1.png, StatContamination2.png, StatContamination3.png
 		StatSymbioticMite1.png, StatDermestid1.png
-		StatGraving1.png, StatGraving2.png, StatGraving3.png
-		StatPolicing1.png, StatPolicing2.png, StatPolicing3.png
 		StatHexSustain.png, StatWorkerSpeed2.png
 		StatHealth1.png, StatHealth2.png, StatAttack1.png, StatAttack2.png, StatDefense1.png, StatDefense2.png, StatAttackSpeed1.png
+	Ability & upgrade icons (icons/upgrades/ — currently copying existing icons):
+		AbilityBuild.png (RoleBuilder)
+		AbilitySpread2.png (AbilitySpread)
+		AbilityMassFlight.png (AbilityForcedFlight)
+		AbilityAbility.png (TypeQueen)
+		AbilityHunts.png (RoleScout)
+		StatRafting2.png, StatRafting3.png (AssimilatedRafting)
+		AbilityJumping.png (AssimilatedJumping)
+		AbilitySwarming.png (AssimilatedSwarming)
 	Building menu icons (icons/buildings/ — separate from sprites/buildings/rooms/):
 		Storage chains L0–L5: RoyalChamber, EggChamber, MushroomChamber, PlantChamber, WaterReservoir, MeatChamber, SyrupReservoir, RockWarehouse, ResinReservoir (0–5 each)
 		Passive rooms: PassiveLab.png, PassiveWater.png, PassiveAphid.png, PassiveNurse.png, PassiveFarm.png, PassiveGrave.png, PassiveWeb.png, Composter.png
@@ -74,15 +76,15 @@ Other assets:
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		swarm vs creature battles (system)
 		launch creatures (single battle or swarm; needs battle system):
-			Bugs: giant/reg cockroach, Bombardier, Ant lion
+			Bugs: reg cockroach, Bombardier, Ant lion, CommonFly
 			Arachnids: Spider, Tarantula
 		uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
-		more biomes (beach, cliffs, wetlands, mangrove, coastal vs inland prairie, burnt forest [resin source, no water, cant start], ice field [cant start], continent variation, rivers on borders, unpassable terrain, lock species to biome, protein-only ant, bigger world)
+		more biomes (coastal vs inland prairies)(beach, cliffs, wetlands, mangrove, prairie, burnt forest [resin source, no water, cant start], ice field [cant start], continent variation, rivers on borders, unpassable terrain, lock species to biome, protein-only ant, bigger world)(maybe a systems that generates water first then see how far is a biome from water body)
 	Everything else :
+		swarm vs swarm system
 		more enemies (single battle or swarm battles):
-			Bugs (soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, goliath beetle, cricket moles, locust swarms, scalopendra)
+			Bugs (soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, goliath beetle, cricket moles, locust swarms, scalopendra, giant cockroach)
 			Arachnids (catapult ants, vinegaroons, horsehoecrabs)
 			Anphibians (Salamander, frog, toad)
 			Reptiles (Gecko, Snake, Tortiose)
@@ -90,7 +92,7 @@ Needed for launch (v1.0) (Launch Version):
 			Mammals (Rats, Possum, Anteater)
 			Zombie ant colonies (Cordiceps)
 		fog of war, range of 1 at the start, cant interact with dynasties outside the fog, scouts (or explorer princess role with exploring range) have a small chance to venture to adjacent hexes to explore, cant colonize into fog, cheat to remove fog, action to exchange intel for trade (and rep)
-		rework popups and dialogs to not be different windows
+		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		bridges (needs rafting)
 		zoom in overworld view with sprite switching
 		deload overworld in map view for better idle waiting
@@ -117,7 +119,7 @@ Needed for launch (v1.0) (Launch Version):
 		steam upload and demo version and make sure saves are not overwritten by updates
 			TODO code (optional for listing; needed for Steam-native features): Steamworks init + App ID; cloud saves; achievements/stats API; demo build flavor (separate App ID/depot)
 			TODO ops: partner page, depots/builds, caps/trailers, wishlist, pricing
-		wishlist button
+			wishlist button
 		versioning to go back to previous stable patches
 		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
 

@@ -35,10 +35,10 @@ public final class HexWaterCrossing {
         if (dynasty == null) {
             return 0;
         }
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_RAFTING_3)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_3)) {
             return GameNumbers.RAFTING_WATER_CROSS_RANGE_3;
         }
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_RAFTING_2)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_2)) {
             return GameNumbers.RAFTING_WATER_CROSS_RANGE_2;
         }
         if (dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_RAFTING)) {

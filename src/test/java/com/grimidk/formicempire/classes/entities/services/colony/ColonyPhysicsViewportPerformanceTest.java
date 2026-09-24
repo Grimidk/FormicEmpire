@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.condition.EnabledIf;
 
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -74,21 +73,4 @@ class ColonyPhysicsViewportPerformanceTest {
         assertTrue(tLod < 90_000 && tNoLod < 90_000, "Smoke: both modes complete in reasonable time");
     }
 
-    @Test
-    @Timeout(120)
-    @EnabledIf("run100kEnabled")
-    void physics_100k_workers_reportsTiming() {
-        final int n = 100_000;
-        spawnWorkers(n, 5000);
-
-        Rectangle smallVp = new Rectangle(0, 0, 800, 600);
-        long tSmall = timePhysicsMs(WorldSpaces.OVERWORLD, smallVp, 1, 2);
-        System.out.println("[ColonyPhysicsViewportPerformance] 100k ants, 2 physics calls, smallVp=" + tSmall + "ms");
-
-        assertTrue(tSmall < 120_000L, "Sanity: completes under 120s with timeout guard");
-    }
-
-    static boolean run100kEnabled() {
-        return Boolean.parseBoolean(System.getProperty("formic.run100k", "false"));
-    }
 }

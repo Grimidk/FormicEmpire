@@ -60,10 +60,10 @@ class DynastyIntelligenceServiceTest {
         assertEquals(GameNumbers.SPY_POWER_BASE, intel.getSpyPowerPerAnt());
 
         dynasty.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
-        dynasty.unlockUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_2);
         assertEquals(GameNumbers.SPY_POWER_PRESSURE_2, intel.getSpyPowerPerAnt());
 
-        dynasty.unlockUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_3);
         assertEquals(GameNumbers.SPY_POWER_PRESSURE_3, intel.getSpyPowerPerAnt());
     }
 }

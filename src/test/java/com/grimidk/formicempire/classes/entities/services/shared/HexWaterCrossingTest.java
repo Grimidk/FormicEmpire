@@ -67,10 +67,10 @@ class HexWaterCrossingTest {
 
         assertEquals(GameNumbers.RAFTING_WATER_CROSS_RANGE_1, HexWaterCrossing.waterCrossRange(dynasty));
 
-        dynasty.unlockUpgrade(GameUnlocks.ABILITY_RAFTING_2);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_RAFTING_2);
         assertEquals(GameNumbers.RAFTING_WATER_CROSS_RANGE_2, HexWaterCrossing.waterCrossRange(dynasty));
 
-        dynasty.unlockUpgrade(GameUnlocks.ABILITY_RAFTING_3);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_RAFTING_3);
         assertEquals(GameNumbers.RAFTING_WATER_CROSS_RANGE_3, HexWaterCrossing.waterCrossRange(dynasty));
     }
 

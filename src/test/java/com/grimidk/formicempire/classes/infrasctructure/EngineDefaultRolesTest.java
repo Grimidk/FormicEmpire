@@ -95,8 +95,8 @@ class EngineDefaultRolesTest {
         int safe = Engine.sanitizeDefaultRoleId(
                 GameConstants.TYPE_SOLDIER,
                 GameConstants.ROLE_WARRIOR.getId(),
-                GameConstants.ROLE_MILITIA.getId());
-        assertEquals(GameConstants.ROLE_MILITIA.getId(), safe);
+                GameConstants.ROLE_MINER.getId());
+        assertEquals(GameConstants.ROLE_MINER.getId(), safe);
     }
 
     @Test
@@ -131,6 +131,7 @@ class EngineDefaultRolesTest {
                 List.of(
                         GameConstants.ROLE_BREEDER,
                         GameConstants.ROLE_DIPLOMAT,
+                        GameConstants.ROLE_SPY,
                         GameConstants.ROLE_ASSISTANT,
                         GameConstants.ROLE_SKYTRANS),
                 GameConstants.eligibleDefaultHatchRoles(GameConstants.TYPE_PRINCESS));

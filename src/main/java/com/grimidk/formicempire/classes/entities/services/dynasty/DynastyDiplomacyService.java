@@ -1215,10 +1215,10 @@ public class DynastyDiplomacyService {
     }
 
     public int getDiplomatStabilityGainPerAnt() {
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_3)) {
             return GameNumbers.DIPLOMAT_STABILITY_GAIN_PRESSURE_3;
         }
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_2)) {
             return GameNumbers.DIPLOMAT_STABILITY_GAIN_PRESSURE_2;
         }
         return GameNumbers.DIPLOMAT_STABILITY_GAIN_BASE;
