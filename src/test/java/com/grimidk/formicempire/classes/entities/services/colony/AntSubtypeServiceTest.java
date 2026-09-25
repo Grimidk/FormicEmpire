@@ -351,14 +351,7 @@ class AntSubtypeServiceTest {
     }
 
     @Test
-    void silverCuticleTorsoProfileMultipliers() {
-        AntSubtypeProfile profile = AntSubtypeProfile.of(1, 2, 1, 1);
-        assertEquals(15f, AntSubtypeService.combinedDefenseBonus(profile), 0.0001f);
-        assertEquals(1.4f, AntSubtypeService.combinedSpeedMult(profile), 0.0001f);
-    }
-
-    @Test
-    void automatedLeafcutterAndSilverRates() {
+    void automatedLeafcutterRates() {
         Dynasty dynasty = new Dynasty(24, "D", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.TYPE_WORKER);
         dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
@@ -373,7 +366,5 @@ class AntSubtypeServiceTest {
         AntSubtypeService.applyAutomatedSubtypeRates(colony);
 
         assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 5));
-        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.TORSO, 2));
-        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.TORSO, 2));
     }
 }

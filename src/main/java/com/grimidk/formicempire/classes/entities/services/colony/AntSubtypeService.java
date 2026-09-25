@@ -134,7 +134,6 @@ public final class AntSubtypeService {
         boolean bullet = colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
         boolean farsight = colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARSIGHT);
         boolean leafcutter = colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING);
-        boolean silver = colony.hasUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST);
 
         if (honeypot) {
             setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f);
@@ -155,12 +154,6 @@ public final class AntSubtypeService {
         if (leafcutter && !doorhead) {
             setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD,
                     GameConstants.SUBTYPE_HEAD_LEAFCUTTER.getDigit(), 50f);
-        }
-        if (silver) {
-            for (AntType type : getSubtypeRateTypes()) {
-                setAutomatedSlotRate(rates, type, AntSubtypeSlot.TORSO,
-                        GameConstants.SUBTYPE_TORSO_SILVER.getDigit(), 50f);
-            }
         }
         if (farsight && !trapjaw) {
             if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
@@ -345,6 +338,7 @@ public final class AntSubtypeService {
         ant.setDefense(GameNumbers.clampDefensePercent(
                 type.getDefenseMult() + colony.getBaseDefense() + combinedDefenseBonus(profile)));
         ant.setSpeed(colony.getBaseSpeed() * type.getSpeedMult() * combinedSpeedMult(profile));
+        ant.setEvasionChance(colony.getBaseEvasionChance());
     }
 
     public static float combinedAttackMult(AntSubtypeProfile profile) {

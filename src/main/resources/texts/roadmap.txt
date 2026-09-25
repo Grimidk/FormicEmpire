@@ -8,8 +8,7 @@ To Fix (By decreasing priority):
 	Mid:
 		(none right now)
 	Low:
-		versioning used in compile so the app and pom has the proper info
-		look into proper meta data for the app
+		(none right now)
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
@@ -24,23 +23,6 @@ To Draw (PascalCase filenames; under src/main/resources):
 			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/insect/diptera/commonFly/ — CommonFly.png, Leg1–Leg4 (+ Wing1, Wing2)
 		Skill icons (icons/skills/): CockroachBite.png, CockroachSpin.png (+ future ant-lion / bombardier attack skills when designed)
-	Stat upgrade icons (icons/upgrades/ — currently Unknown.png placeholder):
-		StatGrowth1.png, StatGrowth2.png, StatGrowth3.png
-		StatThirst1.png, StatThirst2.png
-		StatLogistics1.png, StatPassive1.png
-		StatContamination1.png, StatContamination2.png, StatContamination3.png
-		StatSymbioticMite1.png, StatDermestid1.png
-		StatHexSustain.png, StatWorkerSpeed2.png
-		StatHealth1.png, StatHealth2.png, StatAttack1.png, StatAttack2.png, StatDefense1.png, StatDefense2.png, StatAttackSpeed1.png
-	Ability & upgrade icons (icons/upgrades/ — currently copying existing icons):
-		AbilityBuild.png (RoleBuilder)
-		AbilitySpread2.png (AbilitySpread)
-		AbilityMassFlight.png (AbilityForcedFlight)
-		AbilityAbility.png (TypeQueen)
-		AbilityHunts.png (RoleScout)
-		StatRafting2.png, StatRafting3.png (AssimilatedRafting)
-		AbilityJumping.png (AssimilatedJumping)
-		AbilitySwarming.png (AssimilatedSwarming)
 	Building menu icons (icons/buildings/ — separate from sprites/buildings/rooms/):
 		Storage chains L0–L5: RoyalChamber, EggChamber, MushroomChamber, PlantChamber, WaterReservoir, MeatChamber, SyrupReservoir, RockWarehouse, ResinReservoir (0–5 each)
 		Passive rooms: PassiveLab.png, PassiveWater.png, PassiveAphid.png, PassiveNurse.png, PassiveFarm.png, PassiveGrave.png, PassiveWeb.png, Composter.png
@@ -54,15 +36,11 @@ To Draw (PascalCase filenames; under src/main/resources):
 	Room sprites L4–L5 (sprites/buildings/rooms/ — L0–L3 exist; needed when in-room overlays ship):
 		Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin — L4 and L5 for each
 		Passive web for outside with water and protein
-	Ant Subtypes & Skills (Leafcutter & Silver):
-		UI icons:
-			icons/subtypes/ — Leafcutter.png, Silver.png
-			icons/skills/ — ShearingBite.png
+	Ant Subtypes & Skills (Leafcutter):
 		Composed ant subtype sprite layers (under sprites/ants/ for Worker, Soldier, Major, Princess, Queen):
 			sprites/ants/head/<Type>/HeadLeafcutter.png
 			sprites/ants/jaws/<Type>/JawLeafcutter1.png, JawLeafcutter2.png
 			sprites/ants/antennae/<Type>/AntennaLeafcutter1.png, AntennaLeafcutter2.png
-			sprites/ants/torso/<Type>/TorsoSilver.png
 
 To Compose (.mp3 in resources/audio)
 	Songs:

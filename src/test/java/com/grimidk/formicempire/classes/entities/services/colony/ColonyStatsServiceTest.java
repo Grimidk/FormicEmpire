@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,7 @@ public class ColonyStatsServiceTest {
 
     @Test
     public void heatresistAssimilationGivesThirstThreeResistance() {
+        assertEquals(0, statsService.getBaseEvasionChance(colony));
         for (int i = 0; i < 10; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         }
@@ -56,6 +58,18 @@ public class ColonyStatsServiceTest {
 
         assertEquals(2, statsService.getWaterConsumption(colony));
         assertEquals(80, statsService.getThirstResistance(colony, null));
+        assertEquals(0, statsService.getBaseDefense(colony));
+        assertEquals(15, statsService.getBaseEvasionChance(colony));
+        assertEquals(1.4f, statsService.getHeatresistSpeedMultiplier(colony), 0.0001f);
+
+        Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
+        assertEquals(15f, worker.getEvasionChance(), 0.0001f);
+
+        assertEquals(0.85f, GameNumbers.applyEvasionToHitChance(1.0f, 15f), 0.0001f);
+        assertEquals(0.05f, GameNumbers.applyEvasionToHitChance(0.10f, 15f), 0.0001f);
+        assertEquals(0.05f, GameNumbers.applyEvasionToHitChance(0.50f, 60f), 0.0001f);
+        assertEquals(0.02f, GameNumbers.applyEvasionToHitChance(0.02f, 15f), 0.0001f);
+        assertEquals(0.80f, GameNumbers.applyEvasionToHitChance(0.80f, 0f), 0.0001f);
     }
 
     @Test

@@ -66,6 +66,7 @@ public class Ant extends Critter {
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult() + colony.getBaseDefense()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
+        this.setEvasionChance(colony.getBaseEvasionChance());
         
         this.setDimension(WorldSpaces.OVERWORLD);
         if (AntSubtypeService.isEligibleType(type)) {
@@ -221,6 +222,7 @@ public class Ant extends Critter {
             this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newType.getAttackSpeedMult()));
             this.setDefense(GameNumbers.clampDefensePercent(newType.getDefenseMult() + colony.getBaseDefense()));
             this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
+            this.setEvasionChance(colony.getBaseEvasionChance());
         }
     }
 
@@ -242,6 +244,7 @@ public class Ant extends Critter {
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult() + colony.getBaseDefense()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
+        this.setEvasionChance(colony.getBaseEvasionChance());
     }
 
     public int getJawFrame() {

@@ -1557,6 +1557,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             Tunnel tunnel = origin.getDynasty().getTunnelBetween(world.getHexOfColony(origin), world.getHexOfColony(target));
             if (tunnel != null && tunnel.isComplete()) speedFactor *= 1.5f;
             speedFactor *= origin.getStatsService().getLocsenseSpeedMultiplier(origin);
+            speedFactor *= origin.getStatsService().getHeatresistSpeedMultiplier(origin);
 
             int hours = Math.max(1, Math.round(168f / speedFactor));
             

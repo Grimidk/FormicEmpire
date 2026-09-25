@@ -1132,7 +1132,7 @@ public class Dynasty {
         if (savedId528
                 && unlockedUpgrades.contains(GameUnlocks.ROLE_SCOUT)
                 && !unlockedUpgrades.contains(GameUnlocks.ASSIMILATED_RAFTING)) {
-            unlockedUpgrades.remove(GameUnlocks.STAT_RAFTING_2);
+            unlockedUpgrades.remove(GameUnlocks.STAT_RAFTING_1);
             unlockedUpgrades.add(GameUnlocks.ABILITY_HUNTS);
         }
         if (unlockedUpgrades.contains(GameUnlocks.ROLE_SCOUT)

@@ -190,6 +190,12 @@ public final class GameNumbers {
     public static final float ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT = 1.5f;
     public static final float ASSIMILATED_LOCSENSE_SPEED_MULT = 1.5f;
     public static final double ASSIMILATED_LOCSENSE_CONVOY_SECURITY_FLAT = 20.0;
+    public static final float BASE_EVASION_PERCENT = 0f;
+    public static final float EVASION_PERCENT_MIN = 0f;
+    public static final float EVASION_PERCENT_MAX = 100f;
+    public static final int ASSIMILATED_HEATRESIST_EVASION_BONUS = 15;
+    public static final float BATTLE_HIT_CHANCE_MIN = 0.05f;
+    public static final float ASSIMILATED_HEATRESIST_SPEED_MULT = 1.4f;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
 
@@ -525,6 +531,27 @@ public final class GameNumbers {
 
     public static int clampDefensePercent(int defensePercent) {
         return Math.round(clampDefensePercent((float) defensePercent));
+    }
+
+    public static float clampEvasionPercent(float evasionPercent) {
+        if (Float.isNaN(evasionPercent) || Float.isInfinite(evasionPercent)) {
+            return EVASION_PERCENT_MIN;
+        }
+        return Math.max(EVASION_PERCENT_MIN, Math.min(EVASION_PERCENT_MAX, evasionPercent));
+    }
+
+    public static int clampEvasionPercent(int evasionPercent) {
+        return Math.round(clampEvasionPercent((float) evasionPercent));
+    }
+
+    public static float applyEvasionToHitChance(float hitChance, float evasionPercent) {
+        if (evasionPercent <= 0f) {
+            return hitChance;
+        }
+        float evasionRate = clampEvasionPercent(evasionPercent) / 100f;
+        float reduced = hitChance - evasionRate;
+        float floor = Math.min(hitChance, BATTLE_HIT_CHANCE_MIN);
+        return Math.min(1f, Math.max(floor, reduced));
     }
 
     public static float damageAfterDefense(float rawDamage, float defensePercent) {

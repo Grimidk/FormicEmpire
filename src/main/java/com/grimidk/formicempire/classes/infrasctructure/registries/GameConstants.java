@@ -335,6 +335,12 @@ public final class GameConstants {
     static { misc.add(ICON_ATTACK); }
     public static final ImageIcon ICON_DEFENSE = loadIcon("icons/misc/Defense.png");
     static { misc.add(ICON_DEFENSE); }
+    public static final ImageIcon ICON_HEALTH = loadIcon("icons/misc/Health.png");
+    static { misc.add(ICON_HEALTH); }
+    public static final ImageIcon ICON_GROWTH = loadIcon("icons/misc/Growth.png");
+    static { misc.add(ICON_GROWTH); }
+    public static final ImageIcon ICON_RAFT = loadIcon("icons/misc/Raft.png");
+    static { misc.add(ICON_RAFT); }
     public static final ImageIcon ICON_UNKNOWN = loadIcon("icons/misc/Unknown.png");
     static { misc.add(ICON_UNKNOWN); }
     public static final ImageIcon ICON_STAT_LOYALTY = loadIcon("icons/misc/Loyalty.png");
@@ -951,11 +957,6 @@ public final class GameConstants {
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
             AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
-    public static final AntSubtype SUBTYPE_TORSO_SILVER = new AntSubtype(11, LanguageStrings.SUBTYPE_TORSO_SILVER, AntSubtypeSlot.TORSO,
-            2, GameUnlocks.ASSIMILATED_HEATRESIST, "silver/", "silver",
-            1f, false, 15f, 1.4f, 1f,
-            loadIcon("icons/subtypes/silver.png"));
-    static { antSubtypes.add(SUBTYPE_TORSO_SILVER); }
 
     public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
             AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);

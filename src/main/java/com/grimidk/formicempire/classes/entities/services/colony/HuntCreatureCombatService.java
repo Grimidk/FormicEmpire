@@ -250,7 +250,7 @@ public final class HuntCreatureCombatService {
                 if (!target.isAlive()) {
                     continue;
                 }
-                if (!rollBugHit(skill)) {
+                if (!rollBugHit(skill, target)) {
                     continue;
                 }
                 float damageMult = skill.getDamageMult();
@@ -320,8 +320,12 @@ public final class HuntCreatureCombatService {
         return GameRandom.nextDouble() < chance;
     }
 
-    private static boolean rollBugHit(Skill skill) {
-        float chance = Math.min(1f, Math.max(0f, skill.getAccuracyMult()));
+    private static boolean rollBugHit(Skill skill, HuntBattleParticipant target) {
+        float baseChance = Math.min(1f, Math.max(0f, skill.getAccuracyMult()));
+        float targetEvasion = target != null && target.getAnt() != null
+                ? target.getAnt().getEvasionChance()
+                : 0f;
+        float chance = GameNumbers.applyEvasionToHitChance(baseChance, targetEvasion);
         return GameRandom.nextDouble() < chance;
     }
 

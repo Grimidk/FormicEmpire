@@ -24,6 +24,16 @@ class DynastyUpgradeLoadTest {
     }
 
     @Test
+    void upgradeIconPathsAreUnique() {
+        Set<javax.swing.ImageIcon> seenIcons = new HashSet<>();
+        for (var upgrade : GameUnlocks.getUpgrades()) {
+            var icon = upgrade.getIcon();
+            org.junit.jupiter.api.Assertions.assertNotNull(icon, "Upgrade missing icon: " + upgrade.getNameKey());
+            assertTrue(seenIcons.add(icon), "Duplicate icon path used by: " + upgrade.getNameKey());
+        }
+    }
+
+    @Test
     void loadMigratesCollision528HuntsUnlockForScout() {
         Savefile.SavedDynasty saved = new Savefile.SavedDynasty();
         saved.id = 1;
@@ -37,7 +47,7 @@ class DynastyUpgradeLoadTest {
         Dynasty dynasty = new Dynasty(saved);
 
         assertTrue(dynasty.hasUpgrade(GameUnlocks.ABILITY_HUNTS));
-        assertFalse(dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_2));
+        assertFalse(dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_1));
     }
 
     @Test
@@ -67,7 +77,7 @@ class DynastyUpgradeLoadTest {
 
         Dynasty dynasty = new Dynasty(saved);
 
-        assertTrue(dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_2));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.STAT_RAFTING_1));
         assertFalse(dynasty.hasUpgrade(GameUnlocks.ABILITY_HUNTS));
     }
 }

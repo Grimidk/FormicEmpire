@@ -36,11 +36,13 @@ public class ColonyPhysicsService {
 
     public void runPhysics(Colony colony, Dimension activeDimension, Rectangle viewportBounds, long physicsStepIndex) {
         float locsenseSpeedMultiplier = colony.getStatsService().getLocsenseSpeedMultiplier(colony);
+        float heatresistSpeedMultiplier = colony.getStatsService().getHeatresistSpeedMultiplier(colony);
         float creatineSpeedMultiplier = colony.isCreatineDietActive()
                 ? GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER
                 : 1f;
         float offViewportBaseSpeed = ViewportPhysicsLod.compensatedMoveSpeed(GameNumbers.BASE_SPRITE_SPEED)
-                * locsenseSpeedMultiplier;
+                * locsenseSpeedMultiplier
+                * heatresistSpeedMultiplier;
         // -- Ants --
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             AntType type = entry.getKey();
@@ -90,6 +92,7 @@ public class ColonyPhysicsService {
                     float moveSpeed = GameNumbers.BASE_SPRITE_SPEED;
                     moveSpeed *= creatineSpeedMultiplier;
                     moveSpeed *= locsenseSpeedMultiplier;
+                    moveSpeed *= heatresistSpeedMultiplier;
                     if (lodSameDim && !inView) {
                         if (!ViewportPhysicsLod.shouldRunOffViewportPosition(physicsStepIndex, ant)) {
                             continue;

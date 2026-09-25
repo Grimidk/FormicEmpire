@@ -39,11 +39,26 @@ java "$ROOT/tools/MusicTracksCodegen.java" \
     "$ROOT/src/main/resources/audio/music" \
     "$ROOT/src/main/java/com/grimidk/formicempire/classes/infrasctructure/registries/MusicTracks.java"
 
-echo "[Build] Building Formic Empire..."
-$MVN_EXEC clean package -DskipTests
+VERSION_FILE="$ROOT/src/main/resources/texts/version.txt"
+if [ -f "$VERSION_FILE" ]; then
+    APP_VERSION_DISPLAY="$(head -n 1 "$VERSION_FILE" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+else
+    APP_VERSION_DISPLAY="v0.6.9 (Beta)"
+fi
+
+APP_VERSION_NUMERIC="$(echo "$APP_VERSION_DISPLAY" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -n 1)"
+[ -z "$APP_VERSION_NUMERIC" ] && APP_VERSION_NUMERIC="0.6.9"
+
+APP_VERSION_QUAD="$(echo "$APP_VERSION_NUMERIC" | awk -F. '{printf "%d.%d.%d.%d\n", $1, $2, $3, $4}')"
+
+echo "[Build] Building Formic Empire ($APP_VERSION_DISPLAY)..."
+$MVN_EXEC clean package -DskipTests \
+    -Dapp.version.display="$APP_VERSION_DISPLAY" \
+    -Dapp.version.numeric="$APP_VERSION_NUMERIC" \
+    -Dapp.version.quad="$APP_VERSION_QUAD"
 
 OUTPUT_DIR="outputs"
-JAR_NAME="FormicEmpire-1.0-SNAPSHOT.jar"
+JAR_NAME="FormicEmpire.jar"
 JAR_ZIP="$OUTPUT_DIR/FormicEmpire.jar.zip"
 JAR_STAGING="$OUTPUT_DIR/.jar-staging"
 WIN_ZIP="$OUTPUT_DIR/FormicEmpire.windows.zip"
@@ -183,6 +198,12 @@ pack_macos_app() {
     mkdir -p "$JPACKAGE_INPUT"
     cp "$BUILD_JAR" "$JPACKAGE_INPUT/$JAR_NAME"
 
+    JPACKAGE_MAC_VERSION="$APP_VERSION_NUMERIC"
+    MAJOR_VER="$(echo "$APP_VERSION_NUMERIC" | cut -d. -f1)"
+    if [ "$MAJOR_VER" -le 0 ] 2>/dev/null; then
+        JPACKAGE_MAC_VERSION="1.0"
+    fi
+
     JPACKAGE_ARGS=(
         --input "$JPACKAGE_INPUT"
         --name FormicEmpire
@@ -191,9 +212,12 @@ pack_macos_app() {
         --type app-image
         --dest "$OUTPUT_DIR"
         --icon "$ICON_ICNS"
-        --app-version 1.0
-        --vendor GrimIDK
-        --description "A game about ants."
+        --app-version "$JPACKAGE_MAC_VERSION"
+        --vendor "GrimIDK"
+        --copyright "Copyright (C) 2026 GrimIDK"
+        --description "An open source strategy and simulation game about ants."
+        --mac-package-identifier "com.grimidk.formicempire"
+        --mac-package-name "FormicEmpire"
         --mac-app-category "games"
         --java-options "-Dapple.awt.application.name=FormicEmpire"
         --java-options "-Dawt.useSystemAAFontSettings=on"
@@ -213,6 +237,18 @@ pack_macos_app() {
 
     jpackage "${JPACKAGE_ARGS[@]}"
     rm -rf "$JPACKAGE_INPUT"
+
+    PLIST="$MAC_APP/Contents/Info.plist"
+    if [ -f "$PLIST" ] && command -v /usr/libexec/PlistBuddy >/dev/null 2>&1; then
+        /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $APP_VERSION_NUMERIC" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $APP_VERSION_NUMERIC" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string 'Formic Empire'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName 'Formic Empire'" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Add :CFBundleGetInfoString string 'Formic Empire $APP_VERSION_DISPLAY, Copyright (C) 2026 GrimIDK'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :CFBundleGetInfoString 'Formic Empire $APP_VERSION_DISPLAY, Copyright (C) 2026 GrimIDK'" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Delete :NSMicrophoneUsageDescription" "$PLIST" 2>/dev/null || true
+    fi
+
     HAS_APP=1
 }
 
@@ -260,9 +296,10 @@ pack_linux_app_native() {
         --dest "$OUTPUT_DIR" \
         --runtime-image "$LINUX_JRE" \
         --icon "$ICON_PNG" \
-        --app-version 1.0 \
-        --vendor GrimIDK \
-        --description "A game about ants." \
+        --app-version "$APP_VERSION_NUMERIC" \
+        --vendor "GrimIDK" \
+        --copyright "Copyright (C) 2026 GrimIDK" \
+        --description "An open source strategy and simulation game about ants." \
         --java-options "-Dawt.useSystemAAFontSettings=on" \
         --java-options "-Dswing.aatext=true"
 
@@ -317,6 +354,7 @@ pack_linux_app_docker() {
             JAR_NAME='$JAR_NAME'
             MAIN_CLASS='$MAIN_CLASS'
             ICON_PNG='$ICON_PNG'
+            APP_VERSION_NUMERIC='$APP_VERSION_NUMERIC'
             LINUX_JRE='$LINUX_JRE'
             LINUX_APP_DIR=\"\$OUTPUT_DIR/FormicEmpire\"
             LINUX_ZIP=\"\$OUTPUT_DIR/FormicEmpire.linux.zip\"
@@ -335,9 +373,10 @@ pack_linux_app_docker() {
                 --dest \"\$OUTPUT_DIR\" \\
                 --runtime-image \"\$LINUX_JRE\" \\
                 --icon \"\$ICON_PNG\" \\
-                --app-version 1.0 \\
-                --vendor GrimIDK \\
-                --description \"A game about ants.\" \\
+                --app-version \"\$APP_VERSION_NUMERIC\" \\
+                --vendor \"GrimIDK\" \\
+                --copyright \"Copyright (C) 2026 GrimIDK\" \\
+                --description \"An open source strategy and simulation game about ants.\" \\
                 --java-options \"-Dawt.useSystemAAFontSettings=on\" \\
                 --java-options \"-Dswing.aatext=true\"
 

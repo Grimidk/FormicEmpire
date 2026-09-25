@@ -27,6 +27,7 @@ public class Critter {
     private float attack;
     private float attackSpeed;
     private float defense;
+    private float evasionChance;
     private float speed;
 
     private MoveStatus moveStatus;
@@ -167,6 +168,18 @@ public class Critter {
 
     public void setDefense(float defense) {
         this.defense = GameNumbers.clampDefensePercent(defense);
+    }
+
+    public float getEvasionChance() {
+        return evasionChance;
+    }
+
+    public void setEvasionChance(int evasionChance) {
+        this.evasionChance = GameNumbers.clampEvasionPercent(evasionChance);
+    }
+
+    public void setEvasionChance(float evasionChance) {
+        this.evasionChance = GameNumbers.clampEvasionPercent(evasionChance);
     }
 
     public float getSpeed() {

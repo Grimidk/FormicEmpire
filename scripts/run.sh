@@ -50,4 +50,4 @@ case "$(uname -s)" in
         JAVA_OPTS+=(--add-exports java.desktop/com.apple.eawt=ALL-UNNAMED)
         ;;
 esac
-java "${JAVA_OPTS[@]}" -jar target/FormicEmpire-1.0-SNAPSHOT.jar
+java "${JAVA_OPTS[@]}" -jar target/FormicEmpire.jar

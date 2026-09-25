@@ -85,6 +85,7 @@ public class Trade {
                 speedFactor *= 1.5f;
             }
             speedFactor *= originColony.getStatsService().getLocsenseSpeedMultiplier(originColony);
+            speedFactor *= originColony.getStatsService().getHeatresistSpeedMultiplier(originColony);
         }
 
         this.totalHours = Math.max(1, Math.round(baseHours / speedFactor));

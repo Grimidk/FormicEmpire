@@ -210,6 +210,12 @@ public class ColonyStatsService {
         return hasLocsense(colony) ? GameNumbers.ASSIMILATED_LOCSENSE_SPEED_MULT : 1f;
     }
 
+    public float getHeatresistSpeedMultiplier(Colony colony) {
+        return colony != null && colony.hasUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST)
+                ? GameNumbers.ASSIMILATED_HEATRESIST_SPEED_MULT
+                : 1f;
+    }
+
     private static boolean hasLocsense(Colony colony) {
         return colony != null && colony.hasUpgrade(GameUnlocks.ASSIMILATED_LOCSENSE);
     }
@@ -450,6 +456,21 @@ public class ColonyStatsService {
             defense += GameNumbers.STAT_DEFENSE_FLAT_BONUS;
         }
         return defense;
+    }
+
+    public int getBaseEvasionChance(Colony colony) {
+        return resolveBaseEvasionChance(colony != null ? colony.getDynasty() : null);
+    }
+
+    public static int resolveBaseEvasionChance(Dynasty dynasty) {
+        if (dynasty == null) {
+            return (int) GameNumbers.BASE_EVASION_PERCENT;
+        }
+        int evasion = (int) GameNumbers.BASE_EVASION_PERCENT;
+        if (dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST)) {
+            evasion += GameNumbers.ASSIMILATED_HEATRESIST_EVASION_BONUS;
+        }
+        return Math.round(GameNumbers.clampEvasionPercent(evasion));
     }
     public int getBaseSpeed(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_ACID) ? 1 : 0; }
     public int getBaseSize(Colony colony){ return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }

@@ -279,7 +279,7 @@ public final class WarCreatureCombatService {
             if (!target.isAlive()) {
                 continue;
             }
-            if (!rollHit(skill, actor)) {
+            if (!rollHit(skill, actor, target)) {
                 continue;
             }
             applyDamage(state, actor, target, opposingSide, skill, actorIsAttacker);
@@ -297,10 +297,14 @@ public final class WarCreatureCombatService {
         }
     }
 
-    private static boolean rollHit(Skill skill, WarBattleParticipant actor) {
+    private static boolean rollHit(Skill skill, WarBattleParticipant actor, WarBattleParticipant target) {
         float skillAcc = CritterSkillService.resolveAccuracyMult(skill, actor.getAnt().getSubtypeProfile());
         float lineAcc = actor.getBattleLine().getBaseAccuracyPercent() / 100f;
-        float chance = Math.min(1f, Math.max(0f, skillAcc * lineAcc));
+        float baseChance = Math.min(1f, Math.max(0f, skillAcc * lineAcc));
+        float targetEvasion = target != null && target.getAnt() != null
+                ? target.getAnt().getEvasionChance()
+                : 0f;
+        float chance = GameNumbers.applyEvasionToHitChance(baseChance, targetEvasion);
         return GameRandom.nextDouble() < chance;
     }
 

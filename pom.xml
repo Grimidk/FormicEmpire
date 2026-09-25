@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.grimidk</groupId>
     <artifactId>FormicEmpire</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.6.9-SNAPSHOT</version>
     <name>FormicEmpire</name>
     <description>An open source strategy and simulation game about ants.</description>
     <inceptionYear>2026</inceptionYear>
@@ -34,9 +34,13 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <exec.mainClass>com.grimidk.formicempire.FormicEmpire</exec.mainClass>
+        <app.version.display>v0.6.9 (Beta)</app.version.display>
+        <app.version.numeric>0.6.9</app.version.numeric>
+        <app.version.quad>0.6.9.0</app.version.quad>
     </properties>
     
     <build>
+        <finalName>FormicEmpire</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -120,6 +124,14 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.grimidk.formicempire.FormicEmpire</mainClass>
+                                    <manifestEntries>
+                                        <Implementation-Title>${project.name}</Implementation-Title>
+                                        <Implementation-Version>${app.version.display}</Implementation-Version>
+                                        <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                                        <Specification-Title>${project.name}</Specification-Title>
+                                        <Specification-Version>${app.version.numeric}</Specification-Version>
+                                        <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+                                    </manifestEntries>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
@@ -141,7 +153,7 @@
                         <configuration>
                             <headerType>gui</headerType>
                             <chdir>.</chdir>
-                            <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
+                            <jar>${project.build.directory}/FormicEmpire.jar</jar>
                             <outfile>${project.build.directory}/FormicEmpire.exe</outfile>
                             <icon>${project.basedir}/src/main/resources/meta/icon.ico</icon>
                             <downloadUrl>http://java.com/download</downloadUrl>
@@ -159,14 +171,14 @@
                                 <requiresJdk>false</requiresJdk>
                             </jre>
                             <versionInfo>
-                                <fileVersion>1.0.0.0</fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <fileVersion>${app.version.quad}</fileVersion>
+                                <txtFileVersion>${app.version.display}</txtFileVersion>
                                 <fileDescription>${project.name}</fileDescription>
-                                <copyright>2026</copyright>
-                                <productVersion>1.0.0.0</productVersion>
-                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <copyright>Copyright (C) ${project.inceptionYear} ${project.organization.name}</copyright>
+                                <productVersion>${app.version.quad}</productVersion>
+                                <txtProductVersion>${app.version.display}</txtProductVersion>
                                 <productName>${project.name}</productName>
-                                <companyName>GrimIDK</companyName>
+                                <companyName>${project.organization.name}</companyName>
                                 <internalName>FormicEmpire</internalName>
                                 <originalFilename>FormicEmpire.exe</originalFilename>
                             </versionInfo>

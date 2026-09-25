@@ -716,6 +716,11 @@ public class HelpPanel extends JPanel {
                 LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE),
                 GameConstants.ICON_DEFENSE,
                 LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE_DESC)));
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(buildCombatConstantEntry(content,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_EVASION),
+                null,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_EVASION_DESC)));
         return buildCombatSection(LanguageStrings.HELP_COMBAT_UNIT_STATS, content);
     }
 

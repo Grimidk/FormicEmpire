@@ -294,6 +294,7 @@ public class ColonySourceService {
                 u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
             }
             u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
+            u *= colony.getStatsService().getHeatresistSpeedMultiplier(colony);
             if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                 u *= 2f;
             }
@@ -306,6 +307,7 @@ public class ColonySourceService {
                 u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
             }
             u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
+            u *= colony.getStatsService().getHeatresistSpeedMultiplier(colony);
             if (ant.getAntType() == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                 u *= 2f;
             }

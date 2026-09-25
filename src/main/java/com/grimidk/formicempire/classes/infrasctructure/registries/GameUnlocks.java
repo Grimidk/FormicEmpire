@@ -135,7 +135,6 @@ public final class GameUnlocks {
         // -- Abilities --
         public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "ABILITY_RESEARCH", "ABILITY_RESEARCH_FLAVOR", "ABILITY_RESEARCH_DESC", ROLE_RESEARCHER, 0, loadIcon("icons/upgrades/AbilityResearch.png"), 0, -4, -2);
                 static { upgrades.add(ABILITY_RESEARCH); }
-		// TODO asset: icons/upgrades/AbilityBuild.png
         public static final Upgrade ABILITY_BUILD = new Upgrade(202, "ABILITY_BUILD", "ABILITY_BUILD_FLAVOR", "ABILITY_BUILD_DESC", ROLE_BUILDER, 0, loadIcon("icons/upgrades/AbilityBuild.png"), 0, -1, 2);
                 static { upgrades.add(ABILITY_BUILD); }
         public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "ABILITY_SPREAD", "ABILITY_SPREAD_FLAVOR", "ABILITY_SPREAD_DESC", ROLE_BREEDER, 0, loadIcon("icons/upgrades/AbilitySpread.png"), 0, 1, -4);
@@ -152,7 +151,6 @@ public final class GameUnlocks {
                 static { upgrades.add(ABILITY_DYNASTY); }
         public static final Upgrade ABILITY_TRADE = new Upgrade(507, "ABILITY_TRADE", "ABILITY_TRADE_FLAVOR", "ABILITY_TRADE_DESC", ABILITY_DYNASTY, 0, loadIcon("icons/upgrades/AbilityTrade.png"), 0, 1, -7);
                 static { upgrades.add(ABILITY_TRADE); }
-		// TODO asset: icons/upgrades/AbilitySpread2.png
         public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "ABILITY_SPREAD_2", "ABILITY_SPREAD_2_FLAVOR", "ABILITY_SPREAD_2_DESC", ABILITY_SPREAD, 0, loadIcon("icons/upgrades/AbilitySpread2.png"), 0, 2, -5);
                 static { upgrades.add(ABILITY_SPREAD_2); }
         public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "ABILITY_AUTOMATION", "ABILITY_AUTOMATION_FLAVOR", "ABILITY_AUTOMATION_DESC", ABILITY_DYNASTY, 0, loadIcon("icons/upgrades/AbilityAutomation.png"), 0, 3, -7);
@@ -163,12 +161,10 @@ public final class GameUnlocks {
                 static { upgrades.add(ABILITY_BILATERAL_TRADE); }
         public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "ABILITY_MANAGEMENT", "ABILITY_MANAGEMENT_FLAVOR", "ABILITY_MANAGEMENT_DESC", ABILITY_DYNASTY, 0, loadIcon("icons/upgrades/AbilityManagement.png"), 0, 3, -6);
                 static { upgrades.add(ABILITY_MANAGEMENT); }
-		// TODO asset: icons/upgrades/AbilityMassFlight.png
         public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "ABILITY_MASS_FLIGHT", "ABILITY_MASS_FLIGHT_FLAVOR", "ABILITY_MASS_FLIGHT_DESC", ABILITY_FORCED_FLIGHT, 0, loadIcon("icons/upgrades/AbilityMassFlight.png"), 2, 3, -5);
                 static { upgrades.add(ABILITY_MASS_FLIGHT); }
         public static final Upgrade ABILITY_CLONING = new Upgrade(514, "ABILITY_CLONING", "ABILITY_CLONING_FLAVOR", "ABILITY_CLONING_DESC", ABILITY_RESEARCH, 0, loadIcon("icons/upgrades/AbilityCloning.png"), 0, -4, -1);
                 static { upgrades.add(ABILITY_CLONING); }
-		// TODO asset: icons/upgrades/AbilityAbility.png
         public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "ABILITY_ABILITY", "ABILITY_ABILITY_FLAVOR", "ABILITY_ABILITY_DESC", TYPE_QUEEN, 0, loadIcon("icons/upgrades/AbilityAbility.png"), 0, -2, -4);
                 static { upgrades.add(ABILITY_ABILITY); }
         public static final Upgrade ABILITY_PARASITIC_MITE_ALERT = new Upgrade(515, "ABILITY_PARASITIC_MITE_ALERT", "ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "ABILITY_PARASITIC_MITE_ALERT_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AbilityParasiticMiteAlert.png"), 0, -3, -4);
@@ -191,7 +187,6 @@ public final class GameUnlocks {
                 static { upgrades.add(ABILITY_AUTO_DIPLOMACY); }
         public static final Upgrade ABILITY_AUTO_LOGISTICS = new Upgrade(525, "ABILITY_AUTO_LOGISTICS", "ABILITY_AUTO_LOGISTICS_FLAVOR", "ABILITY_AUTO_LOGISTICS_DESC", ABILITY_AUTOMATION, 0, loadIcon("icons/upgrades/AbilityAutoLogistics.png"), 0, 4, -6);
                 static { upgrades.add(ABILITY_AUTO_LOGISTICS); }
-		// TODO asset: icons/upgrades/AbilityHunts.png
         public static final Upgrade ABILITY_HUNTS = new Upgrade(530, "ABILITY_HUNTS", "ABILITY_HUNTS_FLAVOR", "ABILITY_HUNTS_DESC", ROLE_SCOUT, 0, loadIcon("icons/upgrades/AbilityHunts.png"), 0, -1, 5);
                 static { upgrades.add(ABILITY_HUNTS); }
 
@@ -238,26 +233,19 @@ public final class GameUnlocks {
                 static { upgrades.add(STAT_RESEARCH_2); }
         public static final Upgrade STAT_RESEARCH_3 = new Upgrade(106, "STAT_RESEARCH_3", "STAT_RESEARCH_3_FLAVOR", "STAT_RESEARCH_3_DESC", STAT_RESEARCH_2, 7500, loadIcon("icons/upgrades/StatResearch3.png"), 3, -4, -5);
                 static { upgrades.add(STAT_RESEARCH_3); }
-                // TODO asset: icons/upgrades/StatGrowth1.png
-        public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "STAT_GROWTH_1", "STAT_GROWTH_1_FLAVOR", "STAT_GROWTH_1_DESC", STAT_LONGEVITY, 3500, ICON_TODO, 2, 4, 2);
+        public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "STAT_GROWTH_1", "STAT_GROWTH_1_FLAVOR", "STAT_GROWTH_1_DESC", STAT_LONGEVITY, 3500, loadIcon("icons/upgrades/StatGrowth1.png"), 2, 4, 2);
                 static { upgrades.add(STAT_GROWTH_1); }
-                // TODO asset: icons/upgrades/StatGrowth2.png
-        public static final Upgrade STAT_GROWTH_2 = new Upgrade(108, "STAT_GROWTH_2", "STAT_GROWTH_2_FLAVOR", "STAT_GROWTH_2_DESC", STAT_GROWTH_1, 9000, ICON_TODO, 3, 5, 3);
+        public static final Upgrade STAT_GROWTH_2 = new Upgrade(108, "STAT_GROWTH_2", "STAT_GROWTH_2_FLAVOR", "STAT_GROWTH_2_DESC", STAT_GROWTH_1, 9000, loadIcon("icons/upgrades/StatGrowth2.png"), 3, 5, 3);
                 static { upgrades.add(STAT_GROWTH_2); }
-                // TODO asset: icons/upgrades/StatGrowth3.png
-        public static final Upgrade STAT_GROWTH_3 = new Upgrade(109, "STAT_GROWTH_3", "STAT_GROWTH_3_FLAVOR", "STAT_GROWTH_3_DESC", STAT_GROWTH_2, 20000, ICON_TODO, 4, 6, 4);
+        public static final Upgrade STAT_GROWTH_3 = new Upgrade(109, "STAT_GROWTH_3", "STAT_GROWTH_3_FLAVOR", "STAT_GROWTH_3_DESC", STAT_GROWTH_2, 20000, loadIcon("icons/upgrades/StatGrowth3.png"), 4, 6, 4);
                 static { upgrades.add(STAT_GROWTH_3); }
-                // TODO asset: icons/upgrades/StatThirst1.png
-        public static final Upgrade STAT_THIRST_1 = new Upgrade(110, "STAT_THIRST_1", "STAT_THIRST_1_FLAVOR", "STAT_THIRST_1_DESC", STAT_LONGEVITY, 1500, ICON_TODO, 2, 5, 2);
+        public static final Upgrade STAT_THIRST_1 = new Upgrade(110, "STAT_THIRST_1", "STAT_THIRST_1_FLAVOR", "STAT_THIRST_1_DESC", STAT_LONGEVITY, 1500, loadIcon("icons/upgrades/StatThirst1.png"), 2, 5, 2);
                 static { upgrades.add(STAT_THIRST_1); }
-                // TODO asset: icons/upgrades/StatThirst2.png
-        public static final Upgrade STAT_THIRST_2 = new Upgrade(111, "STAT_THIRST_2", "STAT_THIRST_2_FLAVOR", "STAT_THIRST_2_DESC", STAT_THIRST_1, 5000, ICON_TODO, 3, 6, 3);
+        public static final Upgrade STAT_THIRST_2 = new Upgrade(111, "STAT_THIRST_2", "STAT_THIRST_2_FLAVOR", "STAT_THIRST_2_DESC", STAT_THIRST_1, 5000, loadIcon("icons/upgrades/StatThirst2.png"), 3, 6, 3);
                 static { upgrades.add(STAT_THIRST_2); }
-                // TODO asset: icons/upgrades/StatLogistics1.png
-        public static final Upgrade STAT_LOGISTICS_1 = new Upgrade(113, "STAT_LOGISTICS_1", "STAT_LOGISTICS_1_FLAVOR", "STAT_LOGISTICS_1_DESC", ROLE_SCOUT, 600, ICON_TODO, 1, -1, 4);
+        public static final Upgrade STAT_LOGISTICS_1 = new Upgrade(113, "STAT_LOGISTICS_1", "STAT_LOGISTICS_1_FLAVOR", "STAT_LOGISTICS_1_DESC", ROLE_SCOUT, 600, loadIcon("icons/upgrades/StatLogistics1.png"), 1, -1, 4);
                 static { upgrades.add(STAT_LOGISTICS_1); }
-                // TODO asset: icons/upgrades/StatPassive1.png
-        public static final Upgrade STAT_PASSIVE_1 = new Upgrade(114, "STAT_PASSIVE_1", "STAT_PASSIVE_1_FLAVOR", "STAT_PASSIVE_1_DESC", STAT_RESEARCH_3, 25000, ICON_TODO, 4, -4, -6);
+        public static final Upgrade STAT_PASSIVE_1 = new Upgrade(114, "STAT_PASSIVE_1", "STAT_PASSIVE_1_FLAVOR", "STAT_PASSIVE_1_DESC", STAT_RESEARCH_3, 25000, loadIcon("icons/upgrades/StatPassive1.png"), 4, -4, -6);
                 static { upgrades.add(STAT_PASSIVE_1); }
         public static final Upgrade STAT_LAYING_1 = new Upgrade(115, "STAT_LAYING_1", "STAT_LAYING_1_FLAVOR", "STAT_LAYING_1_DESC", ROLE_LAYER, 5000, loadIcon("icons/upgrades/StatLaying1.png"), 2, -4, 0);
                 static { upgrades.add(STAT_LAYING_1); }
@@ -277,20 +265,15 @@ public final class GameUnlocks {
                 static { upgrades.add(STAT_FARMING_2); }
         public static final Upgrade STAT_FARMING_3 = new Upgrade(123, "STAT_FARMING_3", "STAT_FARMING_3_FLAVOR", "STAT_FARMING_3_DESC", STAT_FARMING_2, 60000, loadIcon("icons/upgrades/StatFarming3.png"), 4, 5, 6);
                 static { upgrades.add(STAT_FARMING_3); }
-                // TODO asset: icons/upgrades/StatContamination1.png
-        public static final Upgrade STAT_CONTAMINATION_1 = new Upgrade(124, "STAT_CONTAMINATION_1", "STAT_CONTAMINATION_1_FLAVOR", "STAT_CONTAMINATION_1_DESC", ROLE_GRAVER, 2000, ICON_TODO, 2, 2, 5);
+        public static final Upgrade STAT_CONTAMINATION_1 = new Upgrade(124, "STAT_CONTAMINATION_1", "STAT_CONTAMINATION_1_FLAVOR", "STAT_CONTAMINATION_1_DESC", ROLE_GRAVER, 2000, loadIcon("icons/upgrades/StatContamination1.png"), 2, 2, 5);
                 static { upgrades.add(STAT_CONTAMINATION_1); }
-                // TODO asset: icons/upgrades/StatContamination2.png
-        public static final Upgrade STAT_CONTAMINATION_2 = new Upgrade(125, "STAT_CONTAMINATION_2", "STAT_CONTAMINATION_2_FLAVOR", "STAT_CONTAMINATION_2_DESC", STAT_CONTAMINATION_1, 8000, ICON_TODO, 3, 2, 6);
+        public static final Upgrade STAT_CONTAMINATION_2 = new Upgrade(125, "STAT_CONTAMINATION_2", "STAT_CONTAMINATION_2_FLAVOR", "STAT_CONTAMINATION_2_DESC", STAT_CONTAMINATION_1, 8000, loadIcon("icons/upgrades/StatContamination2.png"), 3, 2, 6);
                 static { upgrades.add(STAT_CONTAMINATION_2); }
-                // TODO asset: icons/upgrades/StatContamination3.png
-        public static final Upgrade STAT_CONTAMINATION_3 = new Upgrade(126, "STAT_CONTAMINATION_3", "STAT_CONTAMINATION_3_FLAVOR", "STAT_CONTAMINATION_3_DESC", STAT_CONTAMINATION_2, 25000, ICON_TODO, 4, 2, 7);
+        public static final Upgrade STAT_CONTAMINATION_3 = new Upgrade(126, "STAT_CONTAMINATION_3", "STAT_CONTAMINATION_3_FLAVOR", "STAT_CONTAMINATION_3_DESC", STAT_CONTAMINATION_2, 25000, loadIcon("icons/upgrades/StatContamination3.png"), 4, 2, 7);
                 static { upgrades.add(STAT_CONTAMINATION_3); }
-                // TODO asset: icons/upgrades/StatSymbioticMite1.png
-        public static final Upgrade STAT_SYMBIOTIC_MITE_1 = new Upgrade(135, "STAT_SYMBIOTIC_MITE_1", "STAT_SYMBIOTIC_MITE_1_FLAVOR", "STAT_SYMBIOTIC_MITE_1_DESC", ABILITY_CATCH_SYMBIOTIC_MITE, 2000, ICON_TODO, 2, -1, -5);
+        public static final Upgrade STAT_SYMBIOTIC_MITE_1 = new Upgrade(135, "STAT_SYMBIOTIC_MITE_1", "STAT_SYMBIOTIC_MITE_1_FLAVOR", "STAT_SYMBIOTIC_MITE_1_DESC", ABILITY_CATCH_SYMBIOTIC_MITE, 2000, loadIcon("icons/upgrades/StatSymbioticMite1.png"), 2, -1, -5);
                 static { upgrades.add(STAT_SYMBIOTIC_MITE_1); }
-                // TODO asset: icons/upgrades/StatDermestid1.png
-        public static final Upgrade STAT_DERMESTID_1 = new Upgrade(136, "STAT_DERMESTID_1", "STAT_DERMESTID_1_FLAVOR", "STAT_DERMESTID_1_DESC", ABILITY_CATCH_DERMESTID, 2000, ICON_TODO, 3, 1, 6);
+        public static final Upgrade STAT_DERMESTID_1 = new Upgrade(136, "STAT_DERMESTID_1", "STAT_DERMESTID_1_FLAVOR", "STAT_DERMESTID_1_DESC", ABILITY_CATCH_DERMESTID, 2000, loadIcon("icons/upgrades/StatDermestid1.png"), 3, 1, 6);
                 static { upgrades.add(STAT_DERMESTID_1); }
         public static final Upgrade STAT_GRAVING_1 = new Upgrade(127, "STAT_GRAVING_1", "STAT_GRAVING_1_FLAVOR", "STAT_GRAVING_1_DESC", ROLE_GRAVER, 1500, loadIcon("icons/upgrades/StatGraving1.png"), 2, 3, 5);
                 static { upgrades.add(STAT_GRAVING_1); }
@@ -304,32 +287,23 @@ public final class GameUnlocks {
                 static { upgrades.add(STAT_POLICING_2); }
         public static final Upgrade STAT_POLICING_3 = new Upgrade(132, "STAT_POLICING_3", "STAT_POLICING_3_FLAVOR", "STAT_POLICING_3_DESC", STAT_POLICING_2, 42000, loadIcon("icons/upgrades/StatPolicing3.png"), 4, -3, 6);
                 static { upgrades.add(STAT_POLICING_3); }
-                // TODO asset: icons/upgrades/StatHexSustain.png
-        public static final Upgrade STAT_HEX_SUSTAIN = new Upgrade(133, "STAT_HEX_SUSTAIN", "STAT_HEX_SUSTAIN_FLAVOR", "STAT_HEX_SUSTAIN_DESC", STAT_FARMING_3, 175000, ICON_TODO, 5, 6, 7);
+        public static final Upgrade STAT_HEX_SUSTAIN = new Upgrade(133, "STAT_HEX_SUSTAIN", "STAT_HEX_SUSTAIN_FLAVOR", "STAT_HEX_SUSTAIN_DESC", STAT_FARMING_3, 175000, loadIcon("icons/upgrades/StatHexSustain.png"), 5, 6, 7);
                 static { upgrades.add(STAT_HEX_SUSTAIN); }
-                // TODO asset: icons/upgrades/StatWorkerSpeed2.png
-        public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, ICON_TODO, 5, 0, 8);
+        public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, loadIcon("icons/upgrades/StatWorkerSpeed2.png"), 5, 0, 8);
                 static { upgrades.add(STAT_WORKER_SPEED_2); }
-                // TODO asset: icons/upgrades/StatHealth1.png
-        public static final Upgrade STAT_HEALTH_1 = new Upgrade(137, "STAT_HEALTH_1", "STAT_HEALTH_1_FLAVOR", "STAT_HEALTH_1_DESC", STAT_SKELETON, 12000, ICON_TODO, 3, 5, 1);
+        public static final Upgrade STAT_HEALTH_1 = new Upgrade(137, "STAT_HEALTH_1", "STAT_HEALTH_1_FLAVOR", "STAT_HEALTH_1_DESC", STAT_SKELETON, 12000, loadIcon("icons/upgrades/StatHealth1.png"), 3, 5, 1);
                 static { upgrades.add(STAT_HEALTH_1); }
-                // TODO asset: icons/upgrades/StatAttack1.png
-        public static final Upgrade STAT_ATTACK_1 = new Upgrade(138, "STAT_ATTACK_1", "STAT_ATTACK_1_FLAVOR", "STAT_ATTACK_1_DESC", STAT_ACID, 12000, ICON_TODO, 3, 5, -1);
+        public static final Upgrade STAT_ATTACK_1 = new Upgrade(138, "STAT_ATTACK_1", "STAT_ATTACK_1_FLAVOR", "STAT_ATTACK_1_DESC", STAT_ACID, 12000, loadIcon("icons/upgrades/StatAttack1.png"), 3, 5, -1);
                 static { upgrades.add(STAT_ATTACK_1); }
-                // TODO asset: icons/upgrades/StatDefense1.png
-        public static final Upgrade STAT_DEFENSE_1 = new Upgrade(139, "STAT_DEFENSE_1", "STAT_DEFENSE_1_FLAVOR", "STAT_DEFENSE_1_DESC", STAT_SKELETON, 10000, ICON_TODO, 3, 5, 0);
+        public static final Upgrade STAT_DEFENSE_1 = new Upgrade(139, "STAT_DEFENSE_1", "STAT_DEFENSE_1_FLAVOR", "STAT_DEFENSE_1_DESC", STAT_SKELETON, 10000, loadIcon("icons/upgrades/StatDefense1.png"), 3, 5, 0);
                 static { upgrades.add(STAT_DEFENSE_1); }
-                // TODO asset: icons/upgrades/StatHealth2.png
-        public static final Upgrade STAT_HEALTH_2 = new Upgrade(140, "STAT_HEALTH_2", "STAT_HEALTH_2_FLAVOR", "STAT_HEALTH_2_DESC", STAT_HEALTH_1, 500000, ICON_TODO, 6, 6, 2);
+        public static final Upgrade STAT_HEALTH_2 = new Upgrade(140, "STAT_HEALTH_2", "STAT_HEALTH_2_FLAVOR", "STAT_HEALTH_2_DESC", STAT_HEALTH_1, 500000, loadIcon("icons/upgrades/StatHealth2.png"), 6, 6, 2);
                 static { upgrades.add(STAT_HEALTH_2); }
-                // TODO asset: icons/upgrades/StatAttack2.png
-        public static final Upgrade STAT_ATTACK_2 = new Upgrade(141, "STAT_ATTACK_2", "STAT_ATTACK_2_FLAVOR", "STAT_ATTACK_2_DESC", STAT_ATTACK_1, 500000, ICON_TODO, 6, 6, -1);
+        public static final Upgrade STAT_ATTACK_2 = new Upgrade(141, "STAT_ATTACK_2", "STAT_ATTACK_2_FLAVOR", "STAT_ATTACK_2_DESC", STAT_ATTACK_1, 500000, loadIcon("icons/upgrades/StatAttack2.png"), 6, 6, -1);
                 static { upgrades.add(STAT_ATTACK_2); }
-                // TODO asset: icons/upgrades/StatDefense2.png
-        public static final Upgrade STAT_DEFENSE_2 = new Upgrade(142, "STAT_DEFENSE_2", "STAT_DEFENSE_2_FLAVOR", "STAT_DEFENSE_2_DESC", STAT_DEFENSE_1, 450000, ICON_TODO, 6, 6, 0);
+        public static final Upgrade STAT_DEFENSE_2 = new Upgrade(142, "STAT_DEFENSE_2", "STAT_DEFENSE_2_FLAVOR", "STAT_DEFENSE_2_DESC", STAT_DEFENSE_1, 450000, loadIcon("icons/upgrades/StatDefense2.png"), 6, 6, 0);
                 static { upgrades.add(STAT_DEFENSE_2); }
-                // TODO asset: icons/upgrades/StatAttackSpeed1.png
-        public static final Upgrade STAT_ATTACK_SPEED_1 = new Upgrade(143, "STAT_ATTACK_SPEED_1", "STAT_ATTACK_SPEED_1_FLAVOR", "STAT_ATTACK_SPEED_1_DESC", STAT_ATTACK_1, 550000, ICON_TODO, 6, 6, -2);
+        public static final Upgrade STAT_ATTACK_SPEED_1 = new Upgrade(143, "STAT_ATTACK_SPEED_1", "STAT_ATTACK_SPEED_1_FLAVOR", "STAT_ATTACK_SPEED_1_DESC", STAT_ATTACK_1, 550000, loadIcon("icons/upgrades/StatAttackSpeed1.png"), 6, 6, -2);
                 static { upgrades.add(STAT_ATTACK_SPEED_1); }
         // -- Assimilated --
         public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "ASSIMILATED_FARMING", "ASSIMILATED_FARMING_FLAVOR", "ASSIMILATED_FARMING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFarming.png"), 0, -7, 0);
@@ -348,24 +322,20 @@ public final class GameUnlocks {
                 static { upgrades.add(ASSIMILATED_SILKWEAVE); }
         public static final Upgrade ASSIMILATED_RAFTING = new Upgrade(1008, "ASSIMILATED_RAFTING", "ASSIMILATED_RAFTING_FLAVOR", "ASSIMILATED_RAFTING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedRafting.png"), 0, -6, -6);
                 static { upgrades.add(ASSIMILATED_RAFTING); }
-		// TODO asset: icons/upgrades/StatRafting2.png
-        public static final Upgrade STAT_RAFTING_2 = new Upgrade(528, "STAT_RAFTING_2", "STAT_RAFTING_2_FLAVOR", "STAT_RAFTING_2_DESC", ASSIMILATED_RAFTING, 2500, loadIcon("icons/upgrades/StatRafting2.png"), 4, -5, -7);
+        public static final Upgrade STAT_RAFTING_1 = new Upgrade(528, "STAT_RAFTING_1", "STAT_RAFTING_1_FLAVOR", "STAT_RAFTING_1_DESC", ASSIMILATED_RAFTING, 2500, loadIcon("icons/upgrades/StatRafting1.png"), 4, -5, -7);
+                static { upgrades.add(STAT_RAFTING_1); }
+        public static final Upgrade STAT_RAFTING_2 = new Upgrade(529, "STAT_RAFTING_2", "STAT_RAFTING_2_FLAVOR", "STAT_RAFTING_2_DESC", STAT_RAFTING_1, 10000, loadIcon("icons/upgrades/StatRafting2.png"), 5, -4, -8);
                 static { upgrades.add(STAT_RAFTING_2); }
-		// TODO asset: icons/upgrades/StatRafting3.png
-        public static final Upgrade STAT_RAFTING_3 = new Upgrade(529, "STAT_RAFTING_3", "STAT_RAFTING_3_FLAVOR", "STAT_RAFTING_3_DESC", STAT_RAFTING_2, 10000, loadIcon("icons/upgrades/StatRafting3.png"), 5, -4, -8);
-                static { upgrades.add(STAT_RAFTING_3); }
         public static final Upgrade ASSIMILATED_FIREVENOM = new Upgrade(1009, "ASSIMILATED_FIREVENOM", "ASSIMILATED_FIREVENOM_FLAVOR", "ASSIMILATED_FIREVENOM_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFirevenom.png"), 0, -9, -6);
                 static { upgrades.add(ASSIMILATED_FIREVENOM); }
         public static final Upgrade ASSIMILATED_JUMPING = new Upgrade(1010, "ASSIMILATED_JUMPING", "ASSIMILATED_JUMPING_FLAVOR", "ASSIMILATED_JUMPING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedJumping.png"), 0, -8, -6);
                 static { upgrades.add(ASSIMILATED_JUMPING); }
-		// TODO asset: icons/upgrades/AbilityJumping.png
         public static final Upgrade ABILITY_JUMPING = new Upgrade(526, "ABILITY_JUMPING", "ABILITY_JUMPING_FLAVOR", "ABILITY_JUMPING_DESC", ASSIMILATED_JUMPING, 0, loadIcon("icons/upgrades/AbilityJumping.png"), 0, -8, -7);
                 static { upgrades.add(ABILITY_JUMPING); }
         public static final Upgrade ASSIMILATED_STINGING = new Upgrade(1012, "ASSIMILATED_STINGING", "ASSIMILATED_STINGING_FLAVOR", "ASSIMILATED_STINGING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedStinging.png"), 0, -10, -6);
                 static { upgrades.add(ASSIMILATED_STINGING); }
         public static final Upgrade ASSIMILATED_SWARMING = new Upgrade(1013, "ASSIMILATED_SWARMING", "ASSIMILATED_SWARMING_FLAVOR", "ASSIMILATED_SWARMING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedSwarming.png"), 0, -12, -6);
                 static { upgrades.add(ASSIMILATED_SWARMING); }
-		// TODO asset: icons/upgrades/AbilitySwarming.png
         public static final Upgrade ABILITY_SWARMING = new Upgrade(527, "ABILITY_SWARMING", "ABILITY_SWARMING_FLAVOR", "ABILITY_SWARMING_DESC", ASSIMILATED_SWARMING, 0, loadIcon("icons/upgrades/AbilitySwarming.png"), 0, -13, -7);
                 static { upgrades.add(ABILITY_SWARMING); }
         public static final Upgrade ASSIMILATED_STEALTH = new Upgrade(1014, "ASSIMILATED_STEALTH", "ASSIMILATED_STEALTH_FLAVOR", "ASSIMILATED_STEALTH_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedStealth.png"), 0, -12, -5);

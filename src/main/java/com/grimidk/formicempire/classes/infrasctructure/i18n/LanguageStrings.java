@@ -722,8 +722,6 @@ public final class LanguageStrings {
     public static final String SUBTYPE_HEAD_FARSIGHT_DESC = "SUBTYPE_HEAD_FARSIGHT_DESC";
     public static final String SUBTYPE_HEAD_LEAFCUTTER = "SUBTYPE_HEAD_LEAFCUTTER";
     public static final String SUBTYPE_HEAD_LEAFCUTTER_DESC = "SUBTYPE_HEAD_LEAFCUTTER_DESC";
-    public static final String SUBTYPE_TORSO_SILVER = "SUBTYPE_TORSO_SILVER";
-    public static final String SUBTYPE_TORSO_SILVER_DESC = "SUBTYPE_TORSO_SILVER_DESC";
     public static final String SUBTYPE_ABDOMEN_STINGER = "SUBTYPE_ABDOMEN_STINGER";
     public static final String SUBTYPE_ABDOMEN_HONEYPOT = "SUBTYPE_ABDOMEN_HONEYPOT";
 
@@ -891,12 +889,12 @@ public final class LanguageStrings {
     public static final String ABILITY_HUNTS = "ABILITY_HUNTS";
     public static final String ABILITY_HUNTS_FLAVOR = "ABILITY_HUNTS_FLAVOR";
     public static final String ABILITY_HUNTS_DESC = "ABILITY_HUNTS_DESC";
+    public static final String STAT_RAFTING_1 = "STAT_RAFTING_1";
+    public static final String STAT_RAFTING_1_FLAVOR = "STAT_RAFTING_1_FLAVOR";
+    public static final String STAT_RAFTING_1_DESC = "STAT_RAFTING_1_DESC";
     public static final String STAT_RAFTING_2 = "STAT_RAFTING_2";
     public static final String STAT_RAFTING_2_FLAVOR = "STAT_RAFTING_2_FLAVOR";
     public static final String STAT_RAFTING_2_DESC = "STAT_RAFTING_2_DESC";
-    public static final String STAT_RAFTING_3 = "STAT_RAFTING_3";
-    public static final String STAT_RAFTING_3_FLAVOR = "STAT_RAFTING_3_FLAVOR";
-    public static final String STAT_RAFTING_3_DESC = "STAT_RAFTING_3_DESC";
 
     public static final String DIALOG_STATS_TITLE = "DIALOG_STATS_TITLE";
     public static final String STATS_DYNASTY_MODE = "STATS_DYNASTY_MODE";
@@ -1033,6 +1031,8 @@ public final class LanguageStrings {
     public static final String UNIT_STAT_HEALTH_DESC = "UNIT_STAT_HEALTH_DESC";
     public static final String UNIT_STAT_DEFENSE = "UNIT_STAT_DEFENSE";
     public static final String UNIT_STAT_DEFENSE_DESC = "UNIT_STAT_DEFENSE_DESC";
+    public static final String UNIT_STAT_EVASION = "UNIT_STAT_EVASION";
+    public static final String UNIT_STAT_EVASION_DESC = "UNIT_STAT_EVASION_DESC";
     public static final String UNIT_STAT_ATTACK = "UNIT_STAT_ATTACK";
     public static final String UNIT_STAT_ATTACK_DESC = "UNIT_STAT_ATTACK_DESC";
     public static final String UNIT_STAT_SPEED = "UNIT_STAT_SPEED";
