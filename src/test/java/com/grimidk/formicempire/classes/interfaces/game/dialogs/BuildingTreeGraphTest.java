@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildingTreeGraphTest {
@@ -273,5 +274,12 @@ class BuildingTreeGraphTest {
                 BuildingTreeGraph.stateFor(colony, GameUnlocks.ROYAL_CHAMBER_2));
         assertTrue(colony.startBuildingProject(GameUnlocks.ROYAL_CHAMBER_2));
         assertTrue(colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2));
+    }
+
+    @Test
+    void allBuildingsHaveNonNullIcons() {
+        for (Building building : GameUnlocks.getBuildings()) {
+            assertNotNull(building.getIcon(), building.getNameKey() + " icon should not be null");
+        }
     }
 }

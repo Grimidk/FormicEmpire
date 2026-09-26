@@ -28,7 +28,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_3_SILK)) {
             base += 60000;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return applyResourceMoundCapacity(colony, base, GameUnlocks.PLANT_MOUND_2, GameUnlocks.PLANT_MOUND_4);
     }
     public int getMushroomsCapacity(Colony colony) {
         int base = 0;
@@ -41,7 +41,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_3_SILK)) {
             base += 100000;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return applyResourceMoundCapacity(colony, base, GameUnlocks.MUSHROOM_MOUND_2, GameUnlocks.MUSHROOM_MOUND_4);
     }
     public int getProteinCapacity(Colony colony) {
         int base = 0;
@@ -54,7 +54,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_3_SILK)) {
             base += 40000;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return applyResourceMoundCapacity(colony, base, GameUnlocks.MEAT_MOUND_2, GameUnlocks.MEAT_MOUND_4);
     }
     public int getWaterCapacity(Colony colony) {
         int base = 0;
@@ -67,7 +67,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_3_SILK)) {
             base += 25000;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return applyResourceMoundCapacity(colony, base, GameUnlocks.WATER_MOUND_2, GameUnlocks.WATER_MOUND_4);
     }
     public int getSyrupsCapacity(Colony colony) {
         int base = 0;
@@ -80,7 +80,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_3_SILK)) {
             base += 10000;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return applyResourceMoundCapacity(colony, base, GameUnlocks.SYRUP_MOUND_2, GameUnlocks.SYRUP_MOUND_4);
     }
     public int getResinsCapacity(Colony colony) {
         int base = 0;
@@ -93,7 +93,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_3_SILK)) {
             base += 3000;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return applyResourceMoundCapacity(colony, base, GameUnlocks.RESIN_MOUND_2, GameUnlocks.RESIN_MOUND_4);
     }
     public int getMineralsCapacity(Colony colony) {
         int base = 0;
@@ -106,7 +106,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_3_SILK)) {
             base += 2500;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return applyResourceMoundCapacity(colony, base, GameUnlocks.ROCK_MOUND_2, GameUnlocks.ROCK_MOUND_4);
     }
     public int getEggsCapacity(Colony colony) {
         int base = 0;
@@ -119,7 +119,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_3_SILK)) {
             base += 500;
         }
-        return applyHivebuildCapacity(colony, base, true);
+        return base;
     }
     public int getQueensCapacity(Colony colony) {
         boolean canMultiQueen = colony.hasUpgrade(GameUnlocks.ASSIMILATED_MULTIQUEEN);
@@ -138,27 +138,46 @@ public class ColonyStatsService {
             return 0;
         }
         int count = 0;
-        if (colony.hasBuilding(GameUnlocks.HIVE_MOUND_2)) {
+        Building[] mounds = {
+            GameUnlocks.MUSHROOM_MOUND_2, GameUnlocks.MUSHROOM_MOUND_4,
+            GameUnlocks.PLANT_MOUND_2, GameUnlocks.PLANT_MOUND_4,
+            GameUnlocks.WATER_MOUND_2, GameUnlocks.WATER_MOUND_4,
+            GameUnlocks.MEAT_MOUND_2, GameUnlocks.MEAT_MOUND_4,
+            GameUnlocks.SYRUP_MOUND_2, GameUnlocks.SYRUP_MOUND_4,
+            GameUnlocks.ROCK_MOUND_2, GameUnlocks.ROCK_MOUND_4,
+            GameUnlocks.RESIN_MOUND_2, GameUnlocks.RESIN_MOUND_4
+        };
+        for (Building m : mounds) {
+            if (colony.hasBuilding(m)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static int countResourceMounds(Colony colony, Building mound2, Building mound4) {
+        if (colony == null) {
+            return 0;
+        }
+        int count = 0;
+        if (colony.hasBuilding(mound2)) {
             count++;
         }
-        if (colony.hasBuilding(GameUnlocks.HIVE_MOUND_4)) {
+        if (colony.hasBuilding(mound4)) {
             count++;
         }
         return count;
     }
 
-    private static int applyHivebuildCapacity(Colony colony, int base, boolean storage) {
+    private static int applyResourceMoundCapacity(Colony colony, int base, Building mound2, Building mound4) {
         if (base <= 0) {
             return 0;
         }
-        int mounds = countHiveMounds(colony);
+        int mounds = countResourceMounds(colony, mound2, mound4);
         if (mounds <= 0) {
             return base;
         }
-        double bonus = GameNumbers.HIVEBUILD_CAPACITY_BONUS_PER_MOUND * mounds;
-        if (storage) {
-            bonus += GameNumbers.HIVEBUILD_STORAGE_BONUS_PER_MOUND * mounds;
-        }
+        double bonus = (GameNumbers.HIVEBUILD_CAPACITY_BONUS_PER_MOUND + GameNumbers.HIVEBUILD_STORAGE_BONUS_PER_MOUND) * mounds;
         return (int) Math.round(base * (1.0 + bonus));
     }
 

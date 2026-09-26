@@ -1,11 +1,13 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
@@ -62,14 +64,17 @@ class ColonyAssimilationBuildingsTest {
         colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
         int plantsBefore = stats.getPlantsCapacity(colony);
         int queensBefore = stats.getQueensCapacity(colony);
+        int mushroomsBefore = stats.getMushroomsCapacity(colony);
 
-        colony.unlockBuilding(GameUnlocks.HIVE_MOUND_2);
+        colony.unlockBuilding(GameUnlocks.PLANT_MOUND_2);
         int plantsAfter = stats.getPlantsCapacity(colony);
         assertEquals(Math.round(plantsBefore * 1.35), plantsAfter);
         assertEquals(queensBefore, stats.getQueensCapacity(colony));
+        assertEquals(mushroomsBefore, stats.getMushroomsCapacity(colony));
 
-        colony.unlockBuilding(GameUnlocks.HIVE_MOUND_4);
+        colony.unlockBuilding(GameUnlocks.PLANT_MOUND_4);
         assertEquals(Math.round(plantsBefore * 1.70), stats.getPlantsCapacity(colony));
+        assertEquals(mushroomsBefore, stats.getMushroomsCapacity(colony));
     }
 
     @Test
@@ -107,5 +112,26 @@ class ColonyAssimilationBuildingsTest {
         colony.unlockBuilding(GameUnlocks.PASSIVE_WEB);
         double expected = (stats.getProteinCapacity(colony) * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
         assertEquals(expected, stats.getProteinProductionHourly(colony), 1e-6);
+    }
+
+    @Test
+    void mounds_haveValidIconsAndSprites() {
+        Building[] mounds = {
+            GameUnlocks.MUSHROOM_MOUND_2, GameUnlocks.MUSHROOM_MOUND_4,
+            GameUnlocks.PLANT_MOUND_2, GameUnlocks.PLANT_MOUND_4,
+            GameUnlocks.WATER_MOUND_2, GameUnlocks.WATER_MOUND_4,
+            GameUnlocks.MEAT_MOUND_2, GameUnlocks.MEAT_MOUND_4,
+            GameUnlocks.SYRUP_MOUND_2, GameUnlocks.SYRUP_MOUND_4,
+            GameUnlocks.ROCK_MOUND_2, GameUnlocks.ROCK_MOUND_4,
+            GameUnlocks.RESIN_MOUND_2, GameUnlocks.RESIN_MOUND_4
+        };
+        for (Building mound : mounds) {
+            assertNotNull(mound.getIcon());
+            assertEquals(16, mound.getIcon().getIconWidth());
+            assertEquals(16, mound.getIcon().getIconHeight());
+            assertNotNull(mound.getSprite());
+            assertEquals(48, mound.getSprite().getIconWidth());
+            assertEquals(48, mound.getSprite().getIconHeight());
+        }
     }
 }

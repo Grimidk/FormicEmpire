@@ -47,4 +47,22 @@ class RoomDecorationRendererTest {
                 rh - ColonySpatialLayout.PAD_TOP - ColonySpatialLayout.PAD_BOTTOM,
                 inLeft.height);
     }
+
+    @Test
+    void farmAndStorageRoomDecorations_renderWithoutError() {
+        Colony colony = new Colony(1, "Test", true);
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(300, 300, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g2 = img.createGraphics();
+        try {
+            RoomDecorationRenderer.drawFarmRoomDecorations(g2, colony, 0, 0, 256, 256, null);
+            RoomDecorationRenderer.drawStorageRoomDecorations(g2, colony, 0, 0, 256, 256, null);
+            colony.unlockBuilding(GameUnlocks.MEAT_CHAMBER_1);
+            colony.unlockBuilding(GameUnlocks.PASSIVE_FARM);
+            colony.unlockBuilding(GameUnlocks.WATER_RESERVOIR_1);
+            RoomDecorationRenderer.drawFarmRoomDecorations(g2, colony, 0, 0, 256, 256, null);
+            RoomDecorationRenderer.drawStorageRoomDecorations(g2, colony, 0, 0, 256, 256, null);
+        } finally {
+            g2.dispose();
+        }
+    }
 }

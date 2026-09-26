@@ -11,7 +11,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
-// import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -412,6 +412,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 ColonySpriteMergeLod.ZoneMergeContext spriteMergeZoneContext = buildSpriteMergeZoneContext();
                 drawAnts(g2d, spriteMergeZoneContext);
                 drawBugs(g2d, spriteMergeZoneContext);
+                drawUnderworldRoomDecorationsOverlay(g2d);
             } else {
                 g2d.translate(contentPadX, contentPadY);
                 overworldDeadBodySpritesRemaining = GameNumbers.MAX_PEN_NON_ANT_SPRITES;
@@ -643,6 +644,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             
             g2d.drawImage(basicYardImg, x, y, this);
             rancherYardBounds = new Rectangle(x, y, w, h);
+            RoomDecorationRenderer.drawRancherYardDecorations(g2d, colony, x, y, w, h, this);
                         
         } else {
             rancherYardBounds = null;
@@ -689,6 +691,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
 
             g2d.setTransform(old);
+            RoomDecorationRenderer.drawGraverYardDecorations(g2d, colony, x, y, w, h, this);
             
         } else {
             graverYardBounds = null;
@@ -765,10 +768,6 @@ public class GameAreaPanel extends ZeroGamePanel {
         return new UnderworldRoomLayout(hallX, hallY, hallW, hallH, leftRoomX, rightRoomX, roomW, roomH, hallY, roomY2);
     }
 
-    /*
-     * In-room building decoration overlay — disabled for now (see roadmap).
-     * Re-enable by uncommenting the draw call in paint and restoring RoomDecorationRenderer import.
-     *  
     private void drawUnderworldRoomDecorationsOverlay(Graphics2D g2d) {
         if (colony == null) {
             return;
@@ -779,24 +778,10 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
 
         RoomDecorationRenderer.drawStorageRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow1, L.roomW, L.roomH, this);
-
-        AffineTransform old = g2d.getTransform();
-        double rotateCenterX = L.rightRoomX + (L.roomW / 2.0);
-        double rotateCenterY = L.roomYRow1 + (L.roomH / 2.0);
-        g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
         RoomDecorationRenderer.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this);
-        g2d.setTransform(old);
-
         RoomDecorationRenderer.drawNurseryRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
-
-        AffineTransform old2 = g2d.getTransform();
-        double rotateCenter2X = L.rightRoomX + (L.roomW / 2.0);
-        double rotateCenter2Y = L.roomYRow2 + (L.roomH / 2.0);
-        g2d.rotate(Math.toRadians(180), rotateCenter2X, rotateCenter2Y);
         RoomDecorationRenderer.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this);
-        g2d.setTransform(old2);
     }
-    */
 
     private void drawUnderworldStructure(Graphics2D g2d) {
         if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null) {

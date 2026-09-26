@@ -12,35 +12,26 @@ To Fix (By decreasing priority):
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
-		(none right now)
+		can type be renamed to class and subtype to modificacion? 
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):
 		Composed battle sprites (body + leg frames; antenna frames if animated — match cockroach pattern):
-			sprites/critters/insect/neuroptera/antLion/ — AntLion.png, Leg1–Leg4 (Jaw1, Jaw2)
+			sprites/critters/insect/neuroptera/antLion/ — AntLion.png, Leg1–Leg4 (Jaw1, Jaw2) 
 			sprites/critters/insect/coleoptera/bombardier/ — Bombardier.png, Leg1–Leg4 (+ antenn1 and 2)
 			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/insect/diptera/commonFly/ — CommonFly.png, Leg1–Leg4 (+ Wing1, Wing2)
-		Skill icons (icons/skills/): CockroachBite.png, CockroachSpin.png (+ future ant-lion / bombardier attack skills when designed)
-	Building menu icons (icons/buildings/ — separate from sprites/buildings/rooms/):
-		Storage chains L0–L5: RoyalChamber, EggChamber, MushroomChamber, PlantChamber, WaterReservoir, MeatChamber, SyrupReservoir, RockWarehouse, ResinReservoir (0–5 each)
-		Passive rooms: PassiveLab.png, PassiveWater.png, PassiveAphid.png, PassiveNurse.png, PassiveFarm.png, PassiveGrave.png, PassiveWeb.png, Composter.png
-		Silkweave L3 storage icons (8): EggChamber3Silk, MushroomChamber3Silk, PlantChamber3Silk, WaterReservoir3Silk, MeatChamber3Silk, SyrupReservoir3Silk, RockWarehouse3Silk, ResinReservoir3Silk
-		Hivebuild mounds: HiveMound2.png, HiveMound4.png
-	Silkweave L3 room sprites (sprites/buildings/rooms/ — icons above also needed):
+		Skill icons (icons/skills/): (future ant-lion / bombardier attack skills when designed)
+	Silkweave L3 room sprites (sprites/buildings/rooms/):
 		EggL3Silk.png, MushroomL3Silk.png, PlantL3Silk.png, WaterL3Silk.png, MeatL3Silk.png, SyrupL3Silk.png, RockL3Silk.png, ResinL3Silk.png
 	Hivebuild mound room + overworld art:
-		sprites/buildings/rooms/HiveMound2.png, HiveMound4.png
-		overworld mound sprites (path TBD — e.g. sprites/buildings/HiveMound2.png, HiveMound4.png)
-	Room sprites L4–L5 (sprites/buildings/rooms/ — L0–L3 exist; needed when in-room overlays ship):
-		Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin — L4 and L5 for each
-		Passive web for outside with water and protein
-	Ant Subtypes & Skills (Leafcutter):
-		Composed ant subtype sprite layers (under sprites/ants/ for Worker, Soldier, Major, Princess, Queen):
-			sprites/ants/head/<Type>/HeadLeafcutter.png
-			sprites/ants/jaws/<Type>/JawLeafcutter1.png, JawLeafcutter2.png
-			sprites/ants/antennae/<Type>/AntennaLeafcutter1.png, AntennaLeafcutter2.png
+		sprites/buildings/rooms/ (14): MushroomMound2.png, MushroomMound4.png, PlantMound2.png, PlantMound4.png, WaterMound2.png, WaterMound4.png, MeatMound2.png, MeatMound4.png, SyrupMound2.png, SyrupMound4.png, RockMound2.png, RockMound4.png, ResinMound2.png, ResinMound4.png
+		overworld mound sprites (path TBD)
+	Room sprites (sprites/buildings/rooms/ — 48x48 blank placeholders):
+		L0–L5 and L3S for Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin
+		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter,
+		PassiveWeb and water logic too for randomly spawning water drops and protein parts (look into renaming passiveweb to passive protein)
 
 To Compose (.mp3 in resources/audio)
 	Songs:

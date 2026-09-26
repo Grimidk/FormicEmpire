@@ -122,8 +122,21 @@ public final class GameConstants {
     public static final ImageIcon ROOM_PASSIVE_FARM = loadIcon("sprites/buildings/rooms/PassiveFarm.png");
     public static final ImageIcon ROOM_PASSIVE_GRAVE = loadIcon("sprites/buildings/rooms/PassiveGrave.png");
     public static final ImageIcon ROOM_PASSIVE_COMPOSTER = loadIcon("sprites/buildings/rooms/PassiveComposter.png");
-    // TODO asset: sprites/buildings/rooms/PassiveWeb.png (placeholder)
     public static final ImageIcon ROOM_PASSIVE_WEB = loadIcon("sprites/buildings/rooms/PassiveWeb.png");
+    public static final ImageIcon ROOM_MUSHROOM_MOUND_2 = loadIcon("sprites/buildings/rooms/MushroomMound2.png");
+    public static final ImageIcon ROOM_MUSHROOM_MOUND_4 = loadIcon("sprites/buildings/rooms/MushroomMound4.png");
+    public static final ImageIcon ROOM_PLANT_MOUND_2 = loadIcon("sprites/buildings/rooms/PlantMound2.png");
+    public static final ImageIcon ROOM_PLANT_MOUND_4 = loadIcon("sprites/buildings/rooms/PlantMound4.png");
+    public static final ImageIcon ROOM_WATER_MOUND_2 = loadIcon("sprites/buildings/rooms/WaterMound2.png");
+    public static final ImageIcon ROOM_WATER_MOUND_4 = loadIcon("sprites/buildings/rooms/WaterMound4.png");
+    public static final ImageIcon ROOM_MEAT_MOUND_2 = loadIcon("sprites/buildings/rooms/MeatMound2.png");
+    public static final ImageIcon ROOM_MEAT_MOUND_4 = loadIcon("sprites/buildings/rooms/MeatMound4.png");
+    public static final ImageIcon ROOM_SYRUP_MOUND_2 = loadIcon("sprites/buildings/rooms/SyrupMound2.png");
+    public static final ImageIcon ROOM_SYRUP_MOUND_4 = loadIcon("sprites/buildings/rooms/SyrupMound4.png");
+    public static final ImageIcon ROOM_ROCK_MOUND_2 = loadIcon("sprites/buildings/rooms/RockMound2.png");
+    public static final ImageIcon ROOM_ROCK_MOUND_4 = loadIcon("sprites/buildings/rooms/RockMound4.png");
+    public static final ImageIcon ROOM_RESIN_MOUND_2 = loadIcon("sprites/buildings/rooms/ResinMound2.png");
+    public static final ImageIcon ROOM_RESIN_MOUND_4 = loadIcon("sprites/buildings/rooms/ResinMound4.png");
 
     // --- Convoy view tiles ---
     public static final ImageIcon CONVOY_TILE_SEA = loadIcon("backgrounds/convoy/SeaConvoyTile.png");
@@ -708,10 +721,10 @@ public final class GameConstants {
             loadIcon("icons/skills/AirBombing.png"));
     static { skills.add(SKILL_AIR_BOMBING); }
     public static final Skill SKILL_COCKROACH_BITE = new Skill(14, LanguageStrings.SKILL_COCKROACH_BITE, 0.85f, 1f, 10,
-            true, loadIcon("icons/skills/BasicBite.png"));
+            true, loadIcon("icons/skills/CockroachBite.png"));
     static { skills.add(SKILL_COCKROACH_BITE); }
     public static final Skill SKILL_COCKROACH_SPIN = new Skill(15, LanguageStrings.SKILL_COCKROACH_SPIN, 0.75f, 1.75f,
-            10, true, loadIcon("icons/skills/PowerfulBite.png"));
+            10, true, loadIcon("icons/skills/CockroachSpin.png"));
     static { skills.add(SKILL_COCKROACH_SPIN); }
 
     private static String critterClassSpriteFolder(CritterClass critterClass) {

@@ -34,7 +34,7 @@ public final class RoomDecorationRenderer {
 
     private static final int ICON_GAP = 4;
 
-    private static final int DECORATION_CONTENT_MARGIN_PX = 14;
+    private static final int DECORATION_CONTENT_MARGIN_PX = 8;
 
     private static Rectangle shrinkRect(Rectangle r, int margin) {
         int m = Math.max(0, margin);
@@ -154,42 +154,72 @@ public final class RoomDecorationRenderer {
         if (colony == null) {
             return;
         }
-        Building[][] chains = {
-                GameUnlocks.BUILDING_CHAIN_ROCK,
+        Building[][] topChains = {
                 GameUnlocks.BUILDING_CHAIN_WATER,
-                GameUnlocks.BUILDING_CHAIN_MEAT,
-                GameUnlocks.BUILDING_CHAIN_SYRUP,
+                GameUnlocks.BUILDING_CHAIN_SYRUP
+        };
+        Building[][] bottomChains = {
+                GameUnlocks.BUILDING_CHAIN_ROCK,
                 GameUnlocks.BUILDING_CHAIN_RESIN
         };
         List<ImageIcon> topRow = new ArrayList<>();
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER) && GameUnlocks.PASSIVE_WATER.getSprite() != null) {
-            topRow.add(GameUnlocks.PASSIVE_WATER.getSprite());
-        }
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_APHID) && GameUnlocks.PASSIVE_APHID.getSprite() != null) {
-            topRow.add(GameUnlocks.PASSIVE_APHID.getSprite());
-        }
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE) && GameUnlocks.PASSIVE_GRAVE.getSprite() != null) {
-            topRow.add(GameUnlocks.PASSIVE_GRAVE.getSprite());
-        }
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB) && GameUnlocks.PASSIVE_WEB.getSprite() != null) {
-            topRow.add(GameUnlocks.PASSIVE_WEB.getSprite());
+        for (Building[] ch : topChains) {
+            Building b = highestUnlocked(colony, ch);
+            if (b != null && b.getSprite() != null) {
+                topRow.add(b.getSprite());
+            }
         }
         List<ImageIcon> bottomRow = new ArrayList<>();
-        for (Building[] ch : chains) {
+        for (Building[] ch : bottomChains) {
             Building b = highestUnlocked(colony, ch);
             if (b != null && b.getSprite() != null) {
                 bottomRow.add(b.getSprite());
             }
-        }
-        boolean hasComposter = colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER) && GameUnlocks.BUILDING_COMPOSTER.getSprite() != null;
-        if (hasComposter) {
-            bottomRow.add(GameUnlocks.BUILDING_COMPOSTER.getSprite());
         }
         if (bottomRow.isEmpty() && topRow.isEmpty()) {
             return;
         }
         Rectangle in = shrinkRect(decorationInteriorRect(rx, ry, rw, rh), DECORATION_CONTENT_MARGIN_PX);
         drawTwoBandOverlay(g, in, topRow, bottomRow, obs);
+    }
+
+    public static void drawRancherYardDecorations(Graphics2D g, Colony colony, int rx, int ry, int rw, int rh, Component obs) {
+        if (colony == null || !colony.hasBuilding(GameUnlocks.PASSIVE_APHID) || GameUnlocks.PASSIVE_APHID.getSprite() == null) {
+            return;
+        }
+        int ix = rx + 64;
+        int iy = ry + 48;
+        int iw = rw - 64 - 16;
+        int ih = rh - 48 - 48;
+        Rectangle in = shrinkRect(new Rectangle(ix, iy, Math.max(1, iw), Math.max(1, ih)), DECORATION_CONTENT_MARGIN_PX);
+        List<ImageIcon> icons = List.of(GameUnlocks.PASSIVE_APHID.getSprite());
+        withInteriorClip(g, in, () -> {
+            drawCenteredIconRow(g, in, in.y, icons, obs);
+        });
+    }
+
+    public static void drawGraverYardDecorations(Graphics2D g, Colony colony, int rx, int ry, int rw, int rh, Component obs) {
+        if (colony == null) {
+            return;
+        }
+        List<ImageIcon> icons = new ArrayList<>();
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE) && GameUnlocks.PASSIVE_GRAVE.getSprite() != null) {
+            icons.add(GameUnlocks.PASSIVE_GRAVE.getSprite());
+        }
+        if (colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER) && GameUnlocks.BUILDING_COMPOSTER.getSprite() != null) {
+            icons.add(GameUnlocks.BUILDING_COMPOSTER.getSprite());
+        }
+        if (icons.isEmpty()) {
+            return;
+        }
+        int ix = rx + 16;
+        int iy = ry + 48;
+        int iw = rw - 16 - 64;
+        int ih = rh - 48 - 48;
+        Rectangle in = shrinkRect(new Rectangle(ix, iy, Math.max(1, iw), Math.max(1, ih)), DECORATION_CONTENT_MARGIN_PX);
+        withInteriorClip(g, in, () -> {
+            drawCenteredIconRow(g, in, in.y, icons, obs);
+        });
     }
 
     public static void drawFarmRoomDecorations(
@@ -199,6 +229,7 @@ public final class RoomDecorationRenderer {
         }
         Building mush = highestUnlocked(colony, GameUnlocks.BUILDING_CHAIN_MUSHROOM);
         Building plant = highestUnlocked(colony, GameUnlocks.BUILDING_CHAIN_PLANT);
+        Building meat = highestUnlocked(colony, GameUnlocks.BUILDING_CHAIN_MEAT);
         boolean hasPassiveFarm = colony.hasBuilding(GameUnlocks.PASSIVE_FARM) && GameUnlocks.PASSIVE_FARM.getSprite() != null;
         List<ImageIcon> topRow = new ArrayList<>();
         if (hasPassiveFarm) {
@@ -210,6 +241,9 @@ public final class RoomDecorationRenderer {
         }
         if (plant != null && plant.getSprite() != null) {
             bottomRow.add(plant.getSprite());
+        }
+        if (meat != null && meat.getSprite() != null) {
+            bottomRow.add(meat.getSprite());
         }
         if (topRow.isEmpty() && bottomRow.isEmpty()) {
             return;
