@@ -1,28 +1,28 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 
 public final class HuntBattleFallenBody {
-    private final AntType antType;
-    private final AntSubtypeProfile subtypeProfile;
+    private final AntClass antClass;
+    private final AntModProfile modProfile;
     private final int orbitSlot;
     private final float bodyRotationDegrees;
 
-    HuntBattleFallenBody(AntType antType, AntSubtypeProfile subtypeProfile, int orbitSlot,
+    HuntBattleFallenBody(AntClass antClass, AntModProfile modProfile, int orbitSlot,
             float bodyRotationDegrees) {
-        this.antType = antType;
-        this.subtypeProfile = subtypeProfile != null ? subtypeProfile : AntSubtypeProfile.standard();
+        this.antClass = antClass;
+        this.modProfile = modProfile != null ? modProfile : AntModProfile.standard();
         this.orbitSlot = orbitSlot;
         this.bodyRotationDegrees = bodyRotationDegrees;
     }
 
-    public AntType getAntType() {
-        return antType;
+    public AntClass getAntClass() {
+        return antClass;
     }
 
-    public AntSubtypeProfile getSubtypeProfile() {
-        return subtypeProfile;
+    public AntModProfile getModProfile() {
+        return modProfile;
     }
 
     public int getOrbitSlot() {

@@ -13,7 +13,7 @@ import java.util.Set;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
@@ -970,7 +970,7 @@ public class DynastyDiplomacyService {
             return false;
         }
 
-        Map<AntType, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
+        Map<AntClass, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
         if (transport.isEmpty()) {
             dynasty.removePendingTradeProposal(proposal);
             return false;

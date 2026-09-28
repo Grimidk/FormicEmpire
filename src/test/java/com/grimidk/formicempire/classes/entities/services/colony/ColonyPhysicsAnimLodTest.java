@@ -27,8 +27,8 @@ class ColonyPhysicsAnimLodTest {
     @Test
     void minuteTickSkipsOffViewportAntsWithoutOpenAnim() {
         Colony colony = new Colony(1, "C", true);
-        Ant inView = new Ant(colony, GameConstants.TYPE_WORKER);
-        Ant outOfView = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant inView = new Ant(colony, GameConstants.CLASS_WORKER);
+        Ant outOfView = new Ant(colony, GameConstants.CLASS_WORKER);
         inView.setDimension(WorldSpaces.OVERWORLD);
         outOfView.setDimension(WorldSpaces.OVERWORLD);
         inView.setPosition(new Point(50, 50));
@@ -53,7 +53,7 @@ class ColonyPhysicsAnimLodTest {
     @Test
     void minuteTickStillAdvancesOpenAnimOffViewport() {
         Colony colony = new Colony(1, "C", true);
-        Ant outOfView = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant outOfView = new Ant(colony, GameConstants.CLASS_WORKER);
         outOfView.setDimension(WorldSpaces.OVERWORLD);
         outOfView.setPosition(new Point(900, 900));
         colony.getWorkers().add(outOfView);
@@ -76,12 +76,12 @@ class ColonyPhysicsAnimLodTest {
     void hourlyRollSamplesBucketAnimAtHighPopulation() {
         Colony colony = new Colony(1, "C", true);
         for (int i = 0; i < GameNumbers.SPRITE_MERGE_ANT_THRESHOLD + 2; i++) {
-            Ant filler = new Ant(colony, GameConstants.TYPE_EGG);
+            Ant filler = new Ant(colony, GameConstants.CLASS_EGG);
             colony.getEggs().add(filler);
         }
 
-        Ant a = new Ant(colony, GameConstants.TYPE_WORKER);
-        Ant b = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant a = new Ant(colony, GameConstants.CLASS_WORKER);
+        Ant b = new Ant(colony, GameConstants.CLASS_WORKER);
         a.setDimension(WorldSpaces.OVERWORLD);
         b.setDimension(WorldSpaces.OVERWORLD);
         a.setPosition(new Point(40, 40));

@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -579,7 +579,7 @@ public class StatsDialog extends ZeroDialog {
         List<Ant> sampleWorker = new ArrayList<>();
         if (colony.getWorkers() != null) {
             for (Ant w : colony.getWorkers()) {
-                if (w.getAntType() == GameConstants.TYPE_WORKER) {
+                if (w.getAntClass() == GameConstants.CLASS_WORKER) {
                     sampleWorker.add(w);
                     break;
                 }
@@ -976,7 +976,7 @@ public class StatsDialog extends ZeroDialog {
         int netFood = prodMushrooms - consMushrooms;
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TOTAL_FOOD), "---", "---", "---", prodMushrooms, consMushrooms, AssetStyles.formatSignedNumber(netFood)});
         if (subtypeFoodOverhead > 0) {
-            model.addRow(new Object[]{GameConstants.ICON_STAT_FOOD_CONSUMPTION, LanguageStrings.get(LanguageStrings.STAT_SUBTYPE_FOOD_OVERHEAD),
+            model.addRow(new Object[]{GameConstants.ICON_STAT_FOOD_CONSUMPTION, LanguageStrings.get(LanguageStrings.STAT_MOD_FOOD_OVERHEAD),
                     "---", "---", "---", "---", subtypeFoodOverhead, AssetStyles.formatSignedNumber(subtypeFoodOverhead)});
         }
     }
@@ -1008,7 +1008,7 @@ public class StatsDialog extends ZeroDialog {
             coloniesToCount.add(colony);
         }
 
-        Map<AntType, Integer> typeTotals = new HashMap<>();
+        Map<AntClass, Integer> typeTotals = new HashMap<>();
         Map<AntRole, Integer> roleTotals = new HashMap<>();
         int totalJuvenile = 0;
         int totalAdult = 0;
@@ -1016,13 +1016,13 @@ public class StatsDialog extends ZeroDialog {
 
         for (Colony c : coloniesToCount) {
             grandTotal += c.getAntTotal();
-            for (AntType type : GameConstants.getAntTypes()) {
-                int count = c.getAntsByType(type).size();
+            for (AntClass type : GameConstants.getAntClasses()) {
+                int count = c.getAntsByClass(type).size();
                 if (count > 0) {
                     typeTotals.merge(type, count, Integer::sum);
-                    if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA) {
+                    if (type == GameConstants.CLASS_EGG || type == GameConstants.CLASS_LARVA || type == GameConstants.CLASS_PUPA) {
                         totalJuvenile += count;
-                    } else if (type != GameConstants.TYPE_DEAD) {
+                    } else if (type != GameConstants.CLASS_DEAD) {
                         totalAdult += count;
                     }
                 }
@@ -1035,15 +1035,15 @@ public class StatsDialog extends ZeroDialog {
             }
         }
 
-        for (AntType type : GameConstants.getAntTypes()) {
+        for (AntClass type : GameConstants.getAntClasses()) {
             Integer count = typeTotals.get(type);
             if (count == null || count == 0) continue;
 
             model.addRow(new Object[]{type.getIcon(), type.getName(), LanguageStrings.get(LanguageStrings.UI_TOTAL), count, "—"});
 
-            if (type != GameConstants.TYPE_EGG && type != GameConstants.TYPE_LARVA && type != GameConstants.TYPE_PUPA && type != GameConstants.TYPE_DEAD) {
+            if (type != GameConstants.CLASS_EGG && type != GameConstants.CLASS_LARVA && type != GameConstants.CLASS_PUPA && type != GameConstants.CLASS_DEAD) {
                 for (AntRole role : GameConstants.getAntRoles()) {
-                    if (role.getAntType() == type) {
+                    if (role.getAntClass() == type) {
                         Integer rCount = roleTotals.get(role);
                         if (rCount != null && rCount > 0) {
                             model.addRow(new Object[]{null, "", role.getName(), rCount, "—"});
@@ -1055,8 +1055,8 @@ public class StatsDialog extends ZeroDialog {
         
         String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
         model.addRow(new Object[]{null, sep, sep, sep, sep});
-        model.addRow(new Object[]{GameConstants.TYPE_WORKER.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult, "—"});
-        model.addRow(new Object[]{GameConstants.TYPE_EGG.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile, "—"});
+        model.addRow(new Object[]{GameConstants.CLASS_WORKER.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult, "—"});
+        model.addRow(new Object[]{GameConstants.CLASS_EGG.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile, "—"});
         model.addRow(new Object[]{GameConstants.ICON_STAT_POPULATION, LanguageStrings.get(LanguageStrings.UI_SUMMARY), dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), grandTotal, "—"});
 
         int militaryTotal = 0;

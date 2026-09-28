@@ -19,9 +19,9 @@ class DynastyStatServiceTest {
         Colony b = new Colony(2, "B", true);
         dynasty.addColony(a);
         dynasty.addColony(b);
-        a.getQueens().add(new Ant(a, GameConstants.TYPE_QUEEN));
-        a.getQueens().add(new Ant(a, GameConstants.TYPE_QUEEN));
-        b.getQueens().add(new Ant(b, GameConstants.TYPE_QUEEN));
+        a.getQueens().add(new Ant(a, GameConstants.CLASS_QUEEN));
+        a.getQueens().add(new Ant(a, GameConstants.CLASS_QUEEN));
+        b.getQueens().add(new Ant(b, GameConstants.CLASS_QUEEN));
 
         assertEquals(3, dynasty.getStatService().getTotalQueens(dynasty));
     }

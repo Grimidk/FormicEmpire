@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -23,7 +23,7 @@ public class TradeTest {
     private Hex originHex;
     private Hex destHex;
     private Map<ResourceType, Double> load;
-    private Map<AntType, Integer> transport;
+    private Map<AntClass, Integer> transport;
 
     @BeforeEach
     public void setup() {
@@ -38,10 +38,10 @@ public class TradeTest {
         load.put(GameConstants.RESOURCE_PLANT, 100.0);
         
         transport = new HashMap<>();
-        transport.put(GameConstants.TYPE_WORKER, 10);
+        transport.put(GameConstants.CLASS_WORKER, 10);
         
-        origin.addAnts(GameConstants.TYPE_WORKER, 100);
-        origin.addAnts(GameConstants.TYPE_SOLDIER, 100);
+        origin.addAnts(GameConstants.CLASS_WORKER, 100);
+        origin.addAnts(GameConstants.CLASS_SOLDIER, 100);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class TradeTest {
         destination.setPlants(destination.getPlantsCapacity());
 
         transport.clear();
-        transport.put(GameConstants.TYPE_SOLDIER, 50);
+        transport.put(GameConstants.CLASS_SOLDIER, 50);
 
         Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         assertTrue(trade.startTrip());
@@ -87,7 +87,7 @@ public class TradeTest {
         // Temporarily free space at origin so startTrip can consume cargo, then refill.
         origin.setPlants(origin.getPlantsCapacity() - 100);
         transport.clear();
-        transport.put(GameConstants.TYPE_SOLDIER, 50);
+        transport.put(GameConstants.CLASS_SOLDIER, 50);
 
         Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         assertTrue(trade.startTrip());
@@ -110,7 +110,7 @@ public class TradeTest {
         destination.setPlants(destination.getPlantsCapacity() - 40);
 
         transport.clear();
-        transport.put(GameConstants.TYPE_SOLDIER, 50);
+        transport.put(GameConstants.CLASS_SOLDIER, 50);
 
         Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         assertTrue(trade.startTrip());
@@ -173,7 +173,7 @@ public class TradeTest {
         origin.setPlants(200);
 
         transport.clear();
-        transport.put(GameConstants.TYPE_SOLDIER, 50);
+        transport.put(GameConstants.CLASS_SOLDIER, 50);
 
         Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         trade.startTrip();
@@ -211,8 +211,8 @@ public class TradeTest {
 
         Map<ResourceType, Double> newLoad = new HashMap<>();
         newLoad.put(GameConstants.RESOURCE_PLANT, 200.0);
-        Map<AntType, Integer> newTransport = new HashMap<>();
-        newTransport.put(GameConstants.TYPE_WORKER, 15);
+        Map<AntClass, Integer> newTransport = new HashMap<>();
+        newTransport.put(GameConstants.CLASS_WORKER, 15);
 
         trade.setPendingUpdate(newLoad, null, newTransport, true, false, GameConstants.METHOD_AIR);
         assertTrue(trade.hasPendingUpdate());
@@ -230,20 +230,20 @@ public class TradeTest {
 
         assertFalse(trade.hasPendingUpdate());
         assertEquals(200.0, trade.getLoad().get(GameConstants.RESOURCE_PLANT), "New load should be applied after return");
-        assertEquals(15, trade.getTransport().get(GameConstants.TYPE_WORKER), "New transport should be applied after return");
+        assertEquals(15, trade.getTransport().get(GameConstants.CLASS_WORKER), "New transport should be applied after return");
         assertEquals(GameConstants.METHOD_AIR, trade.getMethod());
     }
 
     @Test
     public void testAntAvailability() {
         origin.getWorkers().clear();
-        origin.addAnts(GameConstants.TYPE_WORKER, 10);
+        origin.addAnts(GameConstants.CLASS_WORKER, 10);
 
         for (int i = 0; i < 5; i++) {
             origin.getWorkers().get(i).setOnTrade(true);
         }
 
-        transport.put(GameConstants.TYPE_WORKER, 10);
+        transport.put(GameConstants.CLASS_WORKER, 10);
         Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         boolean started = trade.startTrip();
 
@@ -263,7 +263,7 @@ public class TradeTest {
     public void testStartTripFailsIfNoAntsFound() {
         origin.getWorkers().clear();
         
-        transport.put(GameConstants.TYPE_WORKER, 1);
+        transport.put(GameConstants.CLASS_WORKER, 1);
         Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
 
         boolean started = trade.startTrip();

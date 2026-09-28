@@ -8,12 +8,12 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpeciesPalette;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
@@ -53,15 +53,15 @@ public final class AntSpriteCompositor {
         return LAYER_CACHE.size();
     }
 
-    public static ImageIcon getSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
+    public static ImageIcon getSprite(AntClass type, AntSpecies species, AntModProfile profile) {
         return getSprite(type, species, profile, DEFAULT_LEG_FRAME, DEFAULT_JAW_FRAME, DEFAULT_WING_FRAME,
                 DEFAULT_ANTENNA_FRAME, false);
     }
 
     public static ImageIcon getSprite(
-            AntType type,
+            AntClass type,
             AntSpecies species,
-            AntSubtypeProfile profile,
+            AntModProfile profile,
             int legFrame,
             int jawFrame,
             int wingFrame) {
@@ -69,9 +69,9 @@ public final class AntSpriteCompositor {
     }
 
     public static ImageIcon getSprite(
-            AntType type,
+            AntClass type,
             AntSpecies species,
-            AntSubtypeProfile profile,
+            AntModProfile profile,
             int legFrame,
             int jawFrame,
             int wingFrame,
@@ -80,14 +80,14 @@ public final class AntSpriteCompositor {
         if (type == null || species == null || species.getPalette() == null) {
             return null;
         }
-        if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA
-                || type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_ZOMBIE) {
+        if (type == GameConstants.CLASS_EGG || type == GameConstants.CLASS_LARVA || type == GameConstants.CLASS_PUPA
+                || type == GameConstants.CLASS_DEAD || type == GameConstants.CLASS_ZOMBIE) {
             return null;
         }
 
-        AntSubtypeProfile safeProfile = profile != null ? profile : AntSubtypeProfile.standard();
+        AntModProfile safeProfile = profile != null ? profile : AntModProfile.standard();
         boolean flyingLegs = legFrame == GameNumbers.ANT_LEG_FRAME_FLYING
-                && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS);
+                && (type == GameConstants.CLASS_DRONE || type == GameConstants.CLASS_PRINCESS);
         int safeLeg = flyingLegs ? GameNumbers.ANT_LEG_FRAME_FLYING : clampFrame(legFrame, 1, 4);
         int safeJaw = clampFrame(jawFrame, 1, 2);
         int safeWing = clampFrame(wingFrame, 1, 2);
@@ -99,19 +99,19 @@ public final class AntSpriteCompositor {
                 k -> buildIcon(type, species, safeProfile, safeLeg, safeJaw, safeWing, safeAntenna, parasiticMites));
     }
 
-    public static boolean canCompose(AntType type) {
+    public static boolean canCompose(AntClass type) {
         return type != null
-                && type != GameConstants.TYPE_EGG
-                && type != GameConstants.TYPE_LARVA
-                && type != GameConstants.TYPE_PUPA
-                && type != GameConstants.TYPE_DEAD
-                && type != GameConstants.TYPE_ZOMBIE;
+                && type != GameConstants.CLASS_EGG
+                && type != GameConstants.CLASS_LARVA
+                && type != GameConstants.CLASS_PUPA
+                && type != GameConstants.CLASS_DEAD
+                && type != GameConstants.CLASS_ZOMBIE;
     }
 
     private static ImageIcon buildIcon(
-            AntType type,
+            AntClass type,
             AntSpecies species,
-            AntSubtypeProfile profile,
+            AntModProfile profile,
             int legFrame,
             int jawFrame,
             int wingFrame,
@@ -126,9 +126,9 @@ public final class AntSpriteCompositor {
     }
 
     private static BufferedImage compose(
-            AntType type,
+            AntClass type,
             AntSpecies species,
-            AntSubtypeProfile profile,
+            AntModProfile profile,
             int legFrame,
             int jawFrame,
             int wingFrame,
@@ -139,7 +139,7 @@ public final class AntSpriteCompositor {
             return null;
         }
 
-        boolean drone = type == GameConstants.TYPE_DRONE;
+        boolean drone = type == GameConstants.CLASS_DRONE;
         String headVariant = headVariantName(profile, drone);
         String torsoVariant = torsoVariantName(profile, drone);
         String abdomenVariant = abdomenVariantName(profile, drone);
@@ -179,7 +179,7 @@ public final class AntSpriteCompositor {
         }
 
         BufferedImage wings = null;
-        if (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS) {
+        if (type == GameConstants.CLASS_DRONE || type == GameConstants.CLASS_PRINCESS) {
             wings = loadLayer("wings/" + typeName + "/Wing" + wingFrame + ".png");
         }
 
@@ -313,57 +313,57 @@ public final class AntSpriteCompositor {
         }
     }
 
-    private static String typeFolderName(AntType type) {
-        if (type == GameConstants.TYPE_WORKER) {
+    private static String typeFolderName(AntClass type) {
+        if (type == GameConstants.CLASS_WORKER) {
             return "Worker";
         }
-        if (type == GameConstants.TYPE_SOLDIER) {
+        if (type == GameConstants.CLASS_SOLDIER) {
             return "Soldier";
         }
-        if (type == GameConstants.TYPE_MAJOR) {
+        if (type == GameConstants.CLASS_MAJOR) {
             return "Major";
         }
-        if (type == GameConstants.TYPE_DRONE) {
+        if (type == GameConstants.CLASS_DRONE) {
             return "Drone";
         }
-        if (type == GameConstants.TYPE_PRINCESS) {
+        if (type == GameConstants.CLASS_PRINCESS) {
             return "Princess";
         }
-        if (type == GameConstants.TYPE_QUEEN) {
+        if (type == GameConstants.CLASS_QUEEN) {
             return "Queen";
         }
         return null;
     }
 
-    private static String headVariantName(AntSubtypeProfile profile, boolean drone) {
+    private static String headVariantName(AntModProfile profile, boolean drone) {
         if (drone) {
             return "None";
         }
-        AntSubtype subtype = profile.getSubtype(AntSubtypeSlot.HEAD);
-        return subtypeVariantPascal(subtype, "None");
+        AntMod mod = profile.getMod(AntModSlot.HEAD);
+        return modVariantPascal(mod, "None");
     }
 
-    private static String torsoVariantName(AntSubtypeProfile profile, boolean drone) {
+    private static String torsoVariantName(AntModProfile profile, boolean drone) {
         if (drone) {
             return "None";
         }
-        AntSubtype subtype = profile.getSubtype(AntSubtypeSlot.TORSO);
-        return subtypeVariantPascal(subtype, "None");
+        AntMod mod = profile.getMod(AntModSlot.TORSO);
+        return modVariantPascal(mod, "None");
     }
 
-    private static String abdomenVariantName(AntSubtypeProfile profile, boolean drone) {
+    private static String abdomenVariantName(AntModProfile profile, boolean drone) {
         if (drone) {
             return "None";
         }
-        AntSubtype subtype = profile.getSubtype(AntSubtypeSlot.ABDOMEN);
-        return subtypeVariantPascal(subtype, "None");
+        AntMod mod = profile.getMod(AntModSlot.ABDOMEN);
+        return modVariantPascal(mod, "None");
     }
 
-    private static String subtypeVariantPascal(AntSubtype subtype, String fallback) {
-        if (subtype == null || subtype.isNone() || !subtype.hasSprite()) {
+    private static String modVariantPascal(AntMod mod, String fallback) {
+        if (mod == null || mod.isNone() || !mod.hasSprite()) {
             return fallback;
         }
-        String folder = subtype.getSpriteFolder();
+        String folder = mod.getSpriteFolder();
         if (folder == null || folder.isEmpty()) {
             return fallback;
         }

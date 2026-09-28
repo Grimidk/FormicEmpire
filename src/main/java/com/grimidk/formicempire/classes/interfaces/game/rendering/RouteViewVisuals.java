@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
@@ -55,16 +55,16 @@ public final class RouteViewVisuals {
         return movementFacingDegrees(travelingRight ? 1f : -1f, 0f);
     }
 
-    public static int resolveJawFrame(AntType type, boolean reserve, float wobblePhase, float animationSeconds,
+    public static int resolveJawFrame(AntClass type, boolean reserve, float wobblePhase, float animationSeconds,
             float motionRate) {
-        if (reserve || type == null || type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS) {
+        if (reserve || type == null || type == GameConstants.CLASS_DRONE || type == GameConstants.CLASS_PRINCESS) {
             return 1;
         }
         double attackPulse = Math.sin(wobblePhase + animationSeconds * ATTACK_JAW_SNAP_SPEED * motionRate);
         return attackPulse > 0.82 ? 2 : 1;
     }
 
-    public static int resolveAntennaFrame(AntType type, float wobblePhase, float animationSeconds, float motionRate) {
+    public static int resolveAntennaFrame(AntClass type, float wobblePhase, float animationSeconds, float motionRate) {
         if (type == null) {
             return 1;
         }
@@ -72,7 +72,7 @@ public final class RouteViewVisuals {
         return twitchPulse > 0.88 ? 2 : 1;
     }
 
-    public static int resolveLegFrame(AntType type, boolean flying, boolean moving, float wobblePhase,
+    public static int resolveLegFrame(AntClass type, boolean flying, boolean moving, float wobblePhase,
             float animationSeconds, float motionRate) {
         if (flying && isWinged(type)) {
             return GameNumbers.ANT_LEG_FRAME_FLYING;
@@ -113,9 +113,9 @@ public final class RouteViewVisuals {
         return resolveAntennaFrame(null, wobblePhase, animationSeconds, motionRate);
     }
 
-    public static int resolveWingFrame(AntType type, boolean preferOpenWings, float wobblePhase, float animationSeconds,
+    public static int resolveWingFrame(AntClass type, boolean preferOpenWings, float wobblePhase, float animationSeconds,
             float motionRate) {
-        if (type == null || (type != GameConstants.TYPE_DRONE && type != GameConstants.TYPE_PRINCESS)) {
+        if (type == null || (type != GameConstants.CLASS_DRONE && type != GameConstants.CLASS_PRINCESS)) {
             return 1;
         }
         if (preferOpenWings) {
@@ -129,11 +129,11 @@ public final class RouteViewVisuals {
         return wingPulse > 0.92 ? 2 : 1;
     }
 
-    public static boolean isWinged(AntType type) {
-        return type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS;
+    public static boolean isWinged(AntClass type) {
+        return type == GameConstants.CLASS_DRONE || type == GameConstants.CLASS_PRINCESS;
     }
 
-    public static boolean canHoldJawCargo(AntType type) {
+    public static boolean canHoldJawCargo(AntClass type) {
         return type != null && !isWinged(type);
     }
 

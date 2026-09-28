@@ -83,8 +83,8 @@ public final class HuntBattleState {
         }
         Ant ant = victim.getAnt();
         fallenBodies.add(new HuntBattleFallenBody(
-                ant.getAntType(),
-                ant.getSubtypeProfile(),
+                ant.getAntClass(),
+                ant.getModProfile(),
                 victim.getOrbitSlot(),
                 bodyRotationDegrees));
     }

@@ -137,7 +137,7 @@ public final class SimulationDiagnosticsSupport {
     private static void boostColony(Colony colony) {
         colony.setAge(7);
         for (int i = colony.getWorkers().size(); i < 40; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         colony.setMushrooms(5000);
         colony.setPlants(5000);

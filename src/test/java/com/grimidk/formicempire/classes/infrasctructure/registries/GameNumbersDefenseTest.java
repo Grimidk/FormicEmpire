@@ -73,41 +73,41 @@ class GameNumbersDefenseTest {
 
     @Test
     void juvenileAndDroneTypesAreNonCombat() {
-        assertEquals(0.01f, GameConstants.TYPE_EGG.getHealtMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_EGG.getAttackMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_EGG.getRegenMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_EGG.getAttackSpeedMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_EGG.getDefenseMult(), 0.0001f);
+        assertEquals(0.01f, GameConstants.CLASS_EGG.getHealtMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_EGG.getAttackMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_EGG.getRegenMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_EGG.getAttackSpeedMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_EGG.getDefenseMult(), 0.0001f);
 
-        assertEquals(0.01f, GameConstants.TYPE_LARVA.getHealtMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_LARVA.getAttackMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_LARVA.getRegenMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_LARVA.getAttackSpeedMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_LARVA.getDefenseMult(), 0.0001f);
+        assertEquals(0.01f, GameConstants.CLASS_LARVA.getHealtMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_LARVA.getAttackMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_LARVA.getRegenMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_LARVA.getAttackSpeedMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_LARVA.getDefenseMult(), 0.0001f);
 
-        assertEquals(0.01f, GameConstants.TYPE_PUPA.getHealtMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_PUPA.getAttackMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_PUPA.getRegenMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_PUPA.getAttackSpeedMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_PUPA.getDefenseMult(), 0.0001f);
+        assertEquals(0.01f, GameConstants.CLASS_PUPA.getHealtMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_PUPA.getAttackMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_PUPA.getRegenMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_PUPA.getAttackSpeedMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_PUPA.getDefenseMult(), 0.0001f);
 
-        assertEquals(0.01f, GameConstants.TYPE_DRONE.getHealtMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_DRONE.getAttackMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_DRONE.getRegenMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_DRONE.getAttackSpeedMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_DRONE.getDefenseMult(), 0.0001f);
+        assertEquals(0.01f, GameConstants.CLASS_DRONE.getHealtMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_DRONE.getAttackMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_DRONE.getRegenMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_DRONE.getAttackSpeedMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_DRONE.getDefenseMult(), 0.0001f);
     }
 
     @Test
     void combatTypesUseTenPercentRegenAndTypeDefense() {
-        assertEquals(1f, GameConstants.TYPE_WORKER.getRegenMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_WORKER.getDefenseMult(), 0.0001f);
-        assertEquals(1f, GameConstants.TYPE_SOLDIER.getRegenMult(), 0.0001f);
-        assertEquals(0f, GameConstants.TYPE_SOLDIER.getDefenseMult(), 0.0001f);
-        assertEquals(1f, GameConstants.TYPE_MAJOR.getRegenMult(), 0.0001f);
-        assertEquals(20f, GameConstants.TYPE_MAJOR.getDefenseMult(), 0.0001f);
-        assertEquals(1f, GameConstants.TYPE_QUEEN.getRegenMult(), 0.0001f);
-        assertEquals(20f, GameConstants.TYPE_QUEEN.getDefenseMult(), 0.0001f);
+        assertEquals(1f, GameConstants.CLASS_WORKER.getRegenMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_WORKER.getDefenseMult(), 0.0001f);
+        assertEquals(1f, GameConstants.CLASS_SOLDIER.getRegenMult(), 0.0001f);
+        assertEquals(0f, GameConstants.CLASS_SOLDIER.getDefenseMult(), 0.0001f);
+        assertEquals(1f, GameConstants.CLASS_MAJOR.getRegenMult(), 0.0001f);
+        assertEquals(20f, GameConstants.CLASS_MAJOR.getDefenseMult(), 0.0001f);
+        assertEquals(1f, GameConstants.CLASS_QUEEN.getRegenMult(), 0.0001f);
+        assertEquals(20f, GameConstants.CLASS_QUEEN.getDefenseMult(), 0.0001f);
         assertEquals(10, GameNumbers.ANT_REGEN_PERCENT_BASE);
     }
 }

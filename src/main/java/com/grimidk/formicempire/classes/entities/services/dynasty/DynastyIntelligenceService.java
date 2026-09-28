@@ -435,7 +435,7 @@ public class DynastyIntelligenceService {
         int toKill = Math.min(count, spies.size());
         for (int i = 0; i < toKill; i++) {
             Ant ant = spies.get(i);
-            var formerType = ant.getAntType();
+            var formerType = ant.getAntClass();
             var formerRole = ant.getRole();
             boolean onTrade = ant.isOnTrade();
             ant.goDie(colony, DeathCause.CONFLICT);

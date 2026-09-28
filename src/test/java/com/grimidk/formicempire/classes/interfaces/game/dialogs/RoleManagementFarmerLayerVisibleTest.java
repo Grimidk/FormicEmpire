@@ -36,7 +36,7 @@ class RoleManagementFarmerLayerVisibleTest {
             JPanel worker = (JPanel) tabs.getComponentAt(0);
             collectRoleLabels(worker, workerLabels);
             for (int i = 0; i < tabs.getTabCount(); i++) {
-                if (tabs.getTitleAt(i).equals(GameConstants.TYPE_QUEEN.getName())) {
+                if (tabs.getTitleAt(i).equals(GameConstants.CLASS_QUEEN.getName())) {
                     collectRoleLabels((JPanel) tabs.getComponentAt(i), queenLabels);
                 }
             }

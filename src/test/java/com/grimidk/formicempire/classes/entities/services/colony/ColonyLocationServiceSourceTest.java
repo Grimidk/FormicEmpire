@@ -50,7 +50,7 @@ class ColonyLocationServiceSourceTest {
         source.decreaseQuantity(ResourceType.SOURCE_QTY_SMALL);
         locationService.removeSource(colony, source);
 
-        Ant forager = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant forager = new Ant(colony, GameConstants.CLASS_WORKER);
         forager.setRole(GameConstants.ROLE_FORAGER);
         assertNull(locationService.findNearestRelevantSource(colony, forager));
     }

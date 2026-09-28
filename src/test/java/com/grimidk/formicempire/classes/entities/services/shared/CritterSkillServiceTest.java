@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.constants.critter.Skill;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -21,7 +21,7 @@ class CritterSkillServiceTest {
     @Test
     void antSpeciesBaseSkillIsBasicBite() {
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard());
+                GameConstants.TYPE_ANT, AntModProfile.standard());
         assertEquals(1, skills.size());
         assertEquals(GameConstants.SKILL_BASIC_BITE, skills.get(0));
     }
@@ -36,7 +36,7 @@ class CritterSkillServiceTest {
     @Test
     void trapjawReplacesBasicBiteWithPowerfulBiteOnAnt() {
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(2, 1, 1, 1));
+                GameConstants.TYPE_ANT, AntModProfile.of(2, 1, 1, 1));
         assertEquals(1, skills.size());
         assertEquals(GameConstants.SKILL_POWERFUL_BITE, skills.get(0));
         assertFalse(skills.contains(GameConstants.SKILL_BASIC_BITE));
@@ -45,7 +45,7 @@ class CritterSkillServiceTest {
     @Test
     void leafcutterReplacesBasicBiteWithShearingBiteOnAnt() {
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(5, 1, 1, 1));
+                GameConstants.TYPE_ANT, AntModProfile.of(5, 1, 1, 1));
         assertEquals(1, skills.size());
         assertEquals(GameConstants.SKILL_SHEARING_BITE, skills.get(0));
         assertFalse(skills.contains(GameConstants.SKILL_BASIC_BITE));
@@ -62,12 +62,12 @@ class CritterSkillServiceTest {
         colony.setDynasty(dynasty);
 
         List<Skill> withoutTrapjaw = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_WARRIOR);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_WARRIOR);
         assertTrue(withoutTrapjaw.contains(GameConstants.SKILL_BASIC_BITE));
         assertFalse(withoutTrapjaw.contains(GameConstants.SKILL_POWERFUL_BITE));
 
         List<Skill> withTrapjaw = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(2, 1, 1, 1), colony, GameConstants.ROLE_WARRIOR);
+                GameConstants.TYPE_ANT, AntModProfile.of(2, 1, 1, 1), colony, GameConstants.ROLE_WARRIOR);
         assertTrue(withTrapjaw.contains(GameConstants.SKILL_POWERFUL_BITE));
         assertFalse(withTrapjaw.contains(GameConstants.SKILL_BASIC_BITE));
     }
@@ -75,14 +75,14 @@ class CritterSkillServiceTest {
     @Test
     void stingerDoorheadHoneypotAddSkills() {
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(3, 1, 2, 1), null, GameConstants.ROLE_DEFENDER);
+                GameConstants.TYPE_ANT, AntModProfile.of(3, 1, 2, 1), null, GameConstants.ROLE_DEFENDER);
         assertTrue(skills.contains(GameConstants.SKILL_BASIC_BITE));
         assertTrue(skills.contains(GameConstants.SKILL_SHIELDING));
         assertTrue(skills.contains(GameConstants.SKILL_STINGING));
         assertEquals(3, skills.size());
 
         skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(1, 1, 3, 1), null, GameConstants.ROLE_POTTER);
+                GameConstants.TYPE_ANT, AntModProfile.of(1, 1, 3, 1), null, GameConstants.ROLE_POTTER);
         assertTrue(skills.contains(GameConstants.SKILL_BOOST_REGEN));
         assertFalse(skills.contains(GameConstants.SKILL_BASIC_BITE));
         assertEquals(1, skills.size());
@@ -91,11 +91,11 @@ class CritterSkillServiceTest {
     @Test
     void shieldingAndBoostRegenRequireMatchingRoles() {
         List<Skill> doorheadWithoutRole = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(3, 1, 1, 1));
+                GameConstants.TYPE_ANT, AntModProfile.of(3, 1, 1, 1));
         assertFalse(doorheadWithoutRole.contains(GameConstants.SKILL_SHIELDING));
 
         List<Skill> honeypotWithoutRole = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(1, 1, 3, 1));
+                GameConstants.TYPE_ANT, AntModProfile.of(1, 1, 3, 1));
         assertFalse(honeypotWithoutRole.contains(GameConstants.SKILL_BOOST_REGEN));
     }
 
@@ -110,22 +110,22 @@ class CritterSkillServiceTest {
         colony.setDynasty(dynasty);
 
         List<Skill> potterWithoutSubtype = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_POTTER);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_POTTER);
         assertFalse(potterWithoutSubtype.contains(GameConstants.SKILL_BOOST_REGEN));
 
         List<Skill> withHoneypot = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(1, 1, 3, 1), colony, GameConstants.ROLE_POTTER);
+                GameConstants.TYPE_ANT, AntModProfile.of(1, 1, 3, 1), colony, GameConstants.ROLE_POTTER);
         assertTrue(withHoneypot.contains(GameConstants.SKILL_BOOST_REGEN));
 
         List<Skill> warriorWithHoneypot = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(1, 1, 3, 1), colony, GameConstants.ROLE_WARRIOR);
+                GameConstants.TYPE_ANT, AntModProfile.of(1, 1, 3, 1), colony, GameConstants.ROLE_WARRIOR);
         assertFalse(warriorWithHoneypot.contains(GameConstants.SKILL_BOOST_REGEN));
     }
 
     @Test
     void trapjawWithStingerHasPowerfulBiteAndStinging() {
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.of(2, 1, 2, 1));
+                GameConstants.TYPE_ANT, AntModProfile.of(2, 1, 2, 1));
         assertTrue(skills.contains(GameConstants.SKILL_POWERFUL_BITE));
         assertTrue(skills.contains(GameConstants.SKILL_STINGING));
         assertFalse(skills.contains(GameConstants.SKILL_BASIC_BITE));
@@ -142,7 +142,7 @@ class CritterSkillServiceTest {
     @Test
     void acidSpittingRequiresAssimilationOnDynasty() {
         List<Skill> without = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), null);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), null);
         assertFalse(without.contains(GameConstants.SKILL_ACID_SPITTING));
 
         Dynasty dynasty = new Dynasty(1, "Green", true, GameConstants.SPECIES_GREEN);
@@ -151,7 +151,7 @@ class CritterSkillServiceTest {
         Colony colony = new Colony(1, "Nest", true);
         colony.setDynasty(dynasty);
         List<Skill> with = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_WARRIOR);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_WARRIOR);
         assertTrue(with.contains(GameConstants.SKILL_BASIC_BITE));
         assertTrue(with.contains(GameConstants.SKILL_ACID_SPITTING));
     }
@@ -182,17 +182,17 @@ class CritterSkillServiceTest {
         assertTrue(GameConstants.SKILL_ACIDIC_SELFDESTRUCT.sacrificesSelf());
         assertEquals(GameConstants.SKILL_SELFDESTRUCT, GameConstants.SKILL_ACIDIC_SELFDESTRUCT.getReplacesSkill());
         assertNull(GameConstants.SKILL_ACID_SPITTING.getRequiredRole());
-        assertNull(GameConstants.SKILL_ACID_SPITTING.getRequiredSubtype());
-        assertNull(GameConstants.SKILL_BASIC_BITE.getRequiredSubtype());
+        assertNull(GameConstants.SKILL_ACID_SPITTING.getRequiredMod());
+        assertNull(GameConstants.SKILL_BASIC_BITE.getRequiredMod());
         assertEquals(GameConstants.ROLE_ARTILLERY, GameConstants.SKILL_ACID_ARTILLERY.getRequiredRole());
         assertEquals(GameConstants.ROLE_BOMBER, GameConstants.SKILL_SELFDESTRUCT.getRequiredRole());
         assertEquals(GameConstants.ROLE_BOMBER, GameConstants.SKILL_ACIDIC_SELFDESTRUCT.getRequiredRole());
         assertEquals(GameConstants.ROLE_DEFENDER, GameConstants.SKILL_SHIELDING.getRequiredRole());
         assertEquals(GameConstants.ROLE_POTTER, GameConstants.SKILL_BOOST_REGEN.getRequiredRole());
-        assertEquals(GameConstants.SUBTYPE_HEAD_TRAPJAW, GameConstants.SKILL_POWERFUL_BITE.getRequiredSubtype());
-        assertEquals(GameConstants.SUBTYPE_ABDOMEN_STINGER, GameConstants.SKILL_STINGING.getRequiredSubtype());
-        assertEquals(GameConstants.SUBTYPE_HEAD_DOORHEAD, GameConstants.SKILL_SHIELDING.getRequiredSubtype());
-        assertEquals(GameConstants.SUBTYPE_ABDOMEN_HONEYPOT, GameConstants.SKILL_BOOST_REGEN.getRequiredSubtype());
+        assertEquals(GameConstants.MOD_HEAD_TRAPJAW, GameConstants.SKILL_POWERFUL_BITE.getRequiredMod());
+        assertEquals(GameConstants.MOD_ABDOMEN_STINGER, GameConstants.SKILL_STINGING.getRequiredMod());
+        assertEquals(GameConstants.MOD_HEAD_DOORHEAD, GameConstants.SKILL_SHIELDING.getRequiredMod());
+        assertEquals(GameConstants.MOD_ABDOMEN_HONEYPOT, GameConstants.SKILL_BOOST_REGEN.getRequiredMod());
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_BASIC_BITE.getBattleLine());
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_POWERFUL_BITE.getBattleLine());
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_STINGING.getBattleLine());
@@ -214,7 +214,7 @@ class CritterSkillServiceTest {
         colony.setDynasty(dynasty);
 
         List<Skill> without = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_BOMBER);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_BOMBER);
         assertFalse(without.contains(GameConstants.SKILL_SELFDESTRUCT));
 
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_SELFDESTRUCT);
@@ -223,11 +223,11 @@ class CritterSkillServiceTest {
         assertTrue(GameConstants.isObtainableRole(GameConstants.ROLE_BOMBER));
 
         List<Skill> withoutRole = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_WARRIOR);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_WARRIOR);
         assertFalse(withoutRole.contains(GameConstants.SKILL_SELFDESTRUCT));
 
         List<Skill> withBomber = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_BOMBER);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_BOMBER);
         assertTrue(withBomber.contains(GameConstants.SKILL_SELFDESTRUCT));
         assertTrue(withBomber.contains(GameConstants.SKILL_BASIC_BITE));
     }
@@ -242,15 +242,15 @@ class CritterSkillServiceTest {
         Colony colony = new Colony(1, "Nest", true);
         colony.setDynasty(dynasty);
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_BOMBER);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_BOMBER);
         assertTrue(skills.contains(GameConstants.SKILL_ACIDIC_SELFDESTRUCT));
         assertFalse(skills.contains(GameConstants.SKILL_SELFDESTRUCT));
     }
 
     @Test
     void farsightBoostsAccuracyOnAllSkillsCappedAtOne() {
-        AntSubtypeProfile farsight = AntSubtypeProfile.of(4, 1, 1, 1);
-        assertEquals(0.15f, GameConstants.SUBTYPE_HEAD_FARSIGHT.getAccuracyBonus(), 0.0001f);
+        AntModProfile farsight = AntModProfile.of(4, 1, 1, 1);
+        assertEquals(0.15f, GameConstants.MOD_HEAD_FARSIGHT.getAccuracyBonus(), 0.0001f);
         assertEquals(1f, CritterSkillService.resolveAccuracyMult(GameConstants.SKILL_BASIC_BITE, farsight), 0.0001f);
         assertEquals(1f, CritterSkillService.resolveAccuracyMult(GameConstants.SKILL_SELFDESTRUCT, farsight), 0.0001f);
         assertEquals(0.95f, CritterSkillService.resolveAccuracyMult(GameConstants.SKILL_STINGING, farsight), 0.0001f);
@@ -259,10 +259,10 @@ class CritterSkillServiceTest {
 
     @Test
     void subtypeAttackBoostAppliesOnlyToInfantrySkills() {
-        AntSubtypeProfile trapjaw = AntSubtypeProfile.of(2, 1, 1, 1);
-        assertEquals(1.5f, CritterSkillService.resolveSubtypeAttackMult(GameConstants.SKILL_BASIC_BITE, trapjaw), 0.0001f);
+        AntModProfile trapjaw = AntModProfile.of(2, 1, 1, 1);
+        assertEquals(1.5f, CritterSkillService.resolveModAttackMult(GameConstants.SKILL_BASIC_BITE, trapjaw), 0.0001f);
         assertEquals(3f, CritterSkillService.resolveDamageMult(GameConstants.SKILL_POWERFUL_BITE, trapjaw), 0.0001f);
-        assertEquals(1f, CritterSkillService.resolveSubtypeAttackMult(GameConstants.SKILL_ACID_ARTILLERY, trapjaw), 0.0001f);
+        assertEquals(1f, CritterSkillService.resolveModAttackMult(GameConstants.SKILL_ACID_ARTILLERY, trapjaw), 0.0001f);
         assertEquals(5f, CritterSkillService.resolveDamageMult(GameConstants.SKILL_ACID_ARTILLERY, trapjaw), 0.0001f);
     }
 
@@ -273,18 +273,18 @@ class CritterSkillServiceTest {
         colony.setDynasty(dynasty);
 
         List<Skill> withoutUnlock = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_ARTILLERY);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_ARTILLERY);
         assertFalse(withoutUnlock.contains(GameConstants.SKILL_ACID_ARTILLERY));
 
         dynasty.unlockUpgrade(GameUnlocks.ROLE_ARTILLERY);
         assertTrue(dynasty.hasSkill(GameConstants.SKILL_ACID_ARTILLERY));
 
         List<Skill> withoutRole = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, null);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, null);
         assertFalse(withoutRole.contains(GameConstants.SKILL_ACID_ARTILLERY));
 
         List<Skill> withRole = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), colony, GameConstants.ROLE_ARTILLERY);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), colony, GameConstants.ROLE_ARTILLERY);
         assertTrue(withRole.contains(GameConstants.SKILL_ACID_ARTILLERY));
         assertFalse(withRole.contains(GameConstants.SKILL_BASIC_BITE));
     }
@@ -292,7 +292,7 @@ class CritterSkillServiceTest {
     @Test
     void infantryRoleKeepsInfantrySkillsAndExcludesArtillery() {
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), null, GameConstants.ROLE_WARRIOR);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), null, GameConstants.ROLE_WARRIOR);
         assertTrue(skills.contains(GameConstants.SKILL_BASIC_BITE));
         assertFalse(skills.contains(GameConstants.SKILL_ACID_ARTILLERY));
     }
@@ -300,7 +300,7 @@ class CritterSkillServiceTest {
     @Test
     void nonBattleLineRoleExcludesBattleLineSkills() {
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(
-                GameConstants.TYPE_ANT, AntSubtypeProfile.standard(), null, GameConstants.ROLE_FORAGER);
+                GameConstants.TYPE_ANT, AntModProfile.standard(), null, GameConstants.ROLE_FORAGER);
         assertFalse(skills.contains(GameConstants.SKILL_BASIC_BITE));
         assertTrue(skills.isEmpty());
     }

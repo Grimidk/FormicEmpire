@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.constants.critter.BugRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -50,12 +50,12 @@ class ColonyInvasionServiceTest {
         colony.getInvasionAlerts().add(alert);
 
         for (int i = 0; i < 30; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         colony.runRoleAssignment(null);
 
-        Map<AntType, Integer> counts = new HashMap<>();
-        counts.put(GameConstants.TYPE_WORKER, 30);
+        Map<AntClass, Integer> counts = new HashMap<>();
+        counts.put(GameConstants.CLASS_WORKER, 30);
         assertTrue(ColonyInvasionService.dispatchDefense(colony, 1, counts, 0, 0));
         assertEquals(1, colony.getActiveInvasionDefenses().size());
         assertNotNull(HuntCreatureCombatService.getInvasionState(colony, 1));
@@ -83,7 +83,7 @@ class ColonyInvasionServiceTest {
         colony.setProtein(proteinBefore);
         colony.addResearchPoints(rpBefore);
         for (int i = 0; i < 10; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         colony.runRoleAssignment(null);
         int workersBefore = colony.getWorkers().size();
@@ -109,19 +109,19 @@ class ColonyInvasionServiceTest {
                 InvasionAlert.Scope.COLONY,
                 colony.getId(),
                 InvasionAlert.toAbsoluteHour(0, 0) + GameNumbers.INVASION_RESPONSE_HOURS);
-        Map<AntType, Integer> small = new HashMap<>();
-        small.put(GameConstants.TYPE_SOLDIER, 1);
-        colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        Map<AntClass, Integer> small = new HashMap<>();
+        small.put(GameConstants.CLASS_SOLDIER, 1);
+        colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         colony.runRoleAssignment(null);
         ColonyInvasionService.InvasionDispatchPreview smallPreview =
                 ColonyInvasionService.previewDefense(colony, alert, small, 0, 0);
 
         for (int i = 0; i < 40; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         colony.runRoleAssignment(null);
-        Map<AntType, Integer> large = new HashMap<>();
-        large.put(GameConstants.TYPE_SOLDIER, 40);
+        Map<AntClass, Integer> large = new HashMap<>();
+        large.put(GameConstants.CLASS_SOLDIER, 40);
         ColonyInvasionService.InvasionDispatchPreview largePreview =
                 ColonyInvasionService.previewDefense(colony, alert, large, 0, 0);
 

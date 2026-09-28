@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -140,16 +140,16 @@ public class ColonyPanel extends ZeroGamePanel {
         setupConstantLabel(mineralLabel, GameConstants.RESOURCE_ROCK);
         
         // Ants Setup
-        setupConstantLabel(queensLabel, GameConstants.TYPE_QUEEN);
-        setupConstantLabel(princessLabel, GameConstants.TYPE_PRINCESS);
-        setupConstantLabel(droneLabel, GameConstants.TYPE_DRONE);
-        setupConstantLabel(majorLabel, GameConstants.TYPE_MAJOR);
-        setupConstantLabel(soldiersLabel, GameConstants.TYPE_SOLDIER);
-        setupConstantLabel(workersLabel, GameConstants.TYPE_WORKER);
-        setupConstantLabel(pupaLabel, GameConstants.TYPE_PUPA);
-        setupConstantLabel(larvaLabel, GameConstants.TYPE_LARVA);
-        setupConstantLabel(eggsLabel, GameConstants.TYPE_EGG);
-        setupConstantLabel(deadAntsLabel, GameConstants.TYPE_DEAD);
+        setupConstantLabel(queensLabel, GameConstants.CLASS_QUEEN);
+        setupConstantLabel(princessLabel, GameConstants.CLASS_PRINCESS);
+        setupConstantLabel(droneLabel, GameConstants.CLASS_DRONE);
+        setupConstantLabel(majorLabel, GameConstants.CLASS_MAJOR);
+        setupConstantLabel(soldiersLabel, GameConstants.CLASS_SOLDIER);
+        setupConstantLabel(workersLabel, GameConstants.CLASS_WORKER);
+        setupConstantLabel(pupaLabel, GameConstants.CLASS_PUPA);
+        setupConstantLabel(larvaLabel, GameConstants.CLASS_LARVA);
+        setupConstantLabel(eggsLabel, GameConstants.CLASS_EGG);
+        setupConstantLabel(deadAntsLabel, GameConstants.CLASS_DEAD);
 
         // Special Icons & Tooltips
         setupStatLabel(totalAntLabel, GameConstants.ICON_STAT_POPULATION);
@@ -159,8 +159,8 @@ public class ColonyPanel extends ZeroGamePanel {
         setupConstantLabel(layingRateLabel, GameConstants.ROLE_LAYER);
         setupConstantLabel(nurseCoverageLabel, GameConstants.ROLE_NURSE);
         setupConstantLabel(graveKeepingLabel, GameConstants.ROLE_GRAVER);
-        setupConstantLabel(babyAntsLabel, GameConstants.TYPE_EGG);
-        setupConstantLabel(adultAntsLabel, GameConstants.TYPE_WORKER);
+        setupConstantLabel(babyAntsLabel, GameConstants.CLASS_EGG);
+        setupConstantLabel(adultAntsLabel, GameConstants.CLASS_WORKER);
         petInsectsLabel.setIcon(GameConstants.ICON_APHID);
         parasiticMiteCountLabel.setIcon(GameConstants.ICON_PARASITIC_MITE);
         parasiteAntCountLabel.setIcon(GameConstants.TYPE_PARASITE_ANT.getIcon());
@@ -195,16 +195,16 @@ public class ColonyPanel extends ZeroGamePanel {
         resinLabel.setToolTipText(GameConstants.RESOURCE_RESIN.getName());
         mineralLabel.setToolTipText(GameConstants.RESOURCE_ROCK.getName());
         
-        queensLabel.setToolTipText(GameConstants.TYPE_QUEEN.getName());
-        princessLabel.setToolTipText(GameConstants.TYPE_PRINCESS.getName());
-        droneLabel.setToolTipText(GameConstants.TYPE_DRONE.getName());
-        majorLabel.setToolTipText(GameConstants.TYPE_MAJOR.getName());
-        soldiersLabel.setToolTipText(GameConstants.TYPE_SOLDIER.getName());
-        workersLabel.setToolTipText(GameConstants.TYPE_WORKER.getName());
-        pupaLabel.setToolTipText(GameConstants.TYPE_PUPA.getName());
-        larvaLabel.setToolTipText(GameConstants.TYPE_LARVA.getName());
-        eggsLabel.setToolTipText(GameConstants.TYPE_EGG.getName());
-        deadAntsLabel.setToolTipText(GameConstants.TYPE_DEAD.getName());
+        queensLabel.setToolTipText(GameConstants.CLASS_QUEEN.getName());
+        princessLabel.setToolTipText(GameConstants.CLASS_PRINCESS.getName());
+        droneLabel.setToolTipText(GameConstants.CLASS_DRONE.getName());
+        majorLabel.setToolTipText(GameConstants.CLASS_MAJOR.getName());
+        soldiersLabel.setToolTipText(GameConstants.CLASS_SOLDIER.getName());
+        workersLabel.setToolTipText(GameConstants.CLASS_WORKER.getName());
+        pupaLabel.setToolTipText(GameConstants.CLASS_PUPA.getName());
+        larvaLabel.setToolTipText(GameConstants.CLASS_LARVA.getName());
+        eggsLabel.setToolTipText(GameConstants.CLASS_EGG.getName());
+        deadAntsLabel.setToolTipText(GameConstants.CLASS_DEAD.getName());
         
         petInsectsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PET_INSECTS));
         parasiticMiteCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITIC_MITES));
@@ -213,7 +213,7 @@ public class ColonyPanel extends ZeroGamePanel {
         researchPointsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
     }
 
-    private void setupConstantLabel(JLabel label, AntType type) {
+    private void setupConstantLabel(JLabel label, AntClass type) {
         label.setIcon(type.getIcon());
         label.setForeground(AssetStyles.FONT_COLOR);
     }

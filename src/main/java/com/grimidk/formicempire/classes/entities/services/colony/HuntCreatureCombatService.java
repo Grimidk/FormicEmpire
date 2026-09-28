@@ -223,7 +223,7 @@ public final class HuntCreatureCombatService {
                 if (!rollHit(skill, ant)) {
                     continue;
                 }
-                float damageMult = CritterSkillService.resolveDamageMult(skill, ant.getSubtypeProfile());
+                float damageMult = CritterSkillService.resolveDamageMult(skill, ant.getModProfile());
                 float raw = damageMult * ant.getAttack();
                 float dealt = GameNumbers.damageAfterDefense(raw, state.getBugDefense());
                 state.applyBugDamage(dealt);
@@ -315,7 +315,7 @@ public final class HuntCreatureCombatService {
     }
 
     private static boolean rollHit(Skill skill, Ant ant) {
-        float skillAcc = CritterSkillService.resolveAccuracyMult(skill, ant.getSubtypeProfile());
+        float skillAcc = CritterSkillService.resolveAccuracyMult(skill, ant.getModProfile());
         float chance = Math.min(1f, Math.max(0f, skillAcc));
         return GameRandom.nextDouble() < chance;
     }

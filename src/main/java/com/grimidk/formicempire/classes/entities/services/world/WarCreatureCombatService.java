@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -298,7 +298,7 @@ public final class WarCreatureCombatService {
     }
 
     private static boolean rollHit(Skill skill, WarBattleParticipant actor, WarBattleParticipant target) {
-        float skillAcc = CritterSkillService.resolveAccuracyMult(skill, actor.getAnt().getSubtypeProfile());
+        float skillAcc = CritterSkillService.resolveAccuracyMult(skill, actor.getAnt().getModProfile());
         float lineAcc = actor.getBattleLine().getBaseAccuracyPercent() / 100f;
         float baseChance = Math.min(1f, Math.max(0f, skillAcc * lineAcc));
         float targetEvasion = target != null && target.getAnt() != null
@@ -318,7 +318,7 @@ public final class WarCreatureCombatService {
             attackStat = WarCombatSkillService.effectiveHexDefenseAttack(atkAnt, attackerIsAttackerSide);
             defenseStat = WarCombatSkillService.effectiveHexDefenseDefense(defAnt, !attackerIsAttackerSide);
         }
-        float damageMult = CritterSkillService.resolveDamageMult(skill, atkAnt.getSubtypeProfile());
+        float damageMult = CritterSkillService.resolveDamageMult(skill, atkAnt.getModProfile());
         WarBattleSideState actingSide = attackerIsAttackerSide ? state.getAttacker() : state.getDefender();
         if (jumpingBoostsMelee(actingSide.getDynasty(), skill)) {
             damageMult *= GameNumbers.ASSIMILATED_JUMPING_MELEE_DAMAGE_MULT;
@@ -364,7 +364,7 @@ public final class WarCreatureCombatService {
             return;
         }
         Ant ant = victim.getAnt();
-        if (!ant.isAlive() && ant.getAntType() == GameConstants.TYPE_DEAD) {
+        if (!ant.isAlive() && ant.getAntClass() == GameConstants.CLASS_DEAD) {
             return;
         }
         ant.setHealth(0);
@@ -790,14 +790,14 @@ public final class WarCreatureCombatService {
 
     private static int claimRoleQuota(Colony colony, AntRole role, List<WarBattleParticipant> pool,
             Map<Ant, Boolean> seen, int maxToClaim) {
-        if (colony == null || role == null || role.getAntType() == null || maxToClaim <= 0) {
+        if (colony == null || role == null || role.getAntClass() == null || maxToClaim <= 0) {
             return 0;
         }
         int quota = Math.min(maxToClaim, colony.getWarAssignedRoleCount(role));
         if (quota <= 0) {
             return 0;
         }
-        List<Ant> candidates = antsOfType(colony, role.getAntType());
+        List<Ant> candidates = antsOfClass(colony, role.getAntClass());
         List<Ant> preferred = new ArrayList<>();
         List<Ant> fallback = new ArrayList<>();
         for (Ant ant : candidates) {
@@ -853,20 +853,20 @@ public final class WarCreatureCombatService {
         }
     }
 
-    private static List<Ant> antsOfType(Colony colony, AntType type) {
+    private static List<Ant> antsOfClass(Colony colony, AntClass type) {
         List<Ant> ants = new ArrayList<>();
         if (colony == null || type == null) {
             return ants;
         }
-        if (type == GameConstants.TYPE_WORKER) {
+        if (type == GameConstants.CLASS_WORKER) {
             addAll(ants, colony.getWorkers());
-        } else if (type == GameConstants.TYPE_SOLDIER) {
+        } else if (type == GameConstants.CLASS_SOLDIER) {
             addAll(ants, colony.getSoldiers());
-        } else if (type == GameConstants.TYPE_MAJOR) {
+        } else if (type == GameConstants.CLASS_MAJOR) {
             addAll(ants, colony.getMajors());
-        } else if (type == GameConstants.TYPE_PRINCESS) {
+        } else if (type == GameConstants.CLASS_PRINCESS) {
             addAll(ants, colony.getPrincesses());
-        } else if (type == GameConstants.TYPE_QUEEN) {
+        } else if (type == GameConstants.CLASS_QUEEN) {
             addAll(ants, colony.getQueens());
         }
         return ants;

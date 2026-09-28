@@ -90,12 +90,4 @@ public final class AntModProfile {
     public int hashCode() {
         return code;
     }
-
-    public AntSubtypeProfile toSubtypeProfile() {
-        return AntSubtypeProfile.fromCode(code);
-    }
-
-    public static AntModProfile fromSubtypeProfile(AntSubtypeProfile profile) {
-        return profile != null ? fromCode(profile.getCode()) : standard();
-    }
 }

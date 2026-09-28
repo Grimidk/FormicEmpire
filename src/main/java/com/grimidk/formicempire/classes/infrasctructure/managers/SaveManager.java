@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
@@ -28,7 +28,7 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -504,7 +504,7 @@ public class SaveManager {
                 for (Map.Entry<ResourceType, Double> e : t.getReturnLoad().entrySet()) {
                     st.returnLoad.put(e.getKey().getId(), e.getValue());
                 }
-                for (Map.Entry<AntType, Integer> e : t.getTransport().entrySet()) {
+                for (Map.Entry<AntClass, Integer> e : t.getTransport().entrySet()) {
                     st.transport.put(e.getKey().getId(), e.getValue());
                 }
 
@@ -525,7 +525,7 @@ public class SaveManager {
                         }
                     }
                     if (t.getPendingTransport() != null) {
-                        for (Map.Entry<AntType, Integer> e : t.getPendingTransport().entrySet()) {
+                        for (Map.Entry<AntClass, Integer> e : t.getPendingTransport().entrySet()) {
                             st.pendingTransport.put(e.getKey().getId(), e.getValue());
                         }
                     }
@@ -597,12 +597,12 @@ public class SaveManager {
                     sc.hatchRateMajor = c.getHatchRateMajor();
                     sc.hatchRateDrone = c.getHatchRateDrone();
                     sc.hatchRatePrincess = c.getHatchRatePrincess();
-                    sc.subtypeHatchRatesFlat = AntSubtypeService.flattenSubtypeRates(c.getSubtypeHatchRates());
-                    sc.workerSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getWorkers());
-                    sc.soldierSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getSoldiers());
-                    sc.majorSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getMajors());
-                    sc.princessSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getPrincesses());
-                    sc.queenSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getQueens());
+                    sc.modHatchRatesFlat = AntModService.flattenModRates(c.getModHatchRates());
+                    sc.workerMods = AntModService.aggregateModCounts(c.getWorkers());
+                    sc.soldierMods = AntModService.aggregateModCounts(c.getSoldiers());
+                    sc.majorMods = AntModService.aggregateModCounts(c.getMajors());
+                    sc.princessMods = AntModService.aggregateModCounts(c.getPrincesses());
+                    sc.queenMods = AntModService.aggregateModCounts(c.getQueens());
                     
                     // Stats
                     sc.aphids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_APHID);
@@ -624,8 +624,8 @@ public class SaveManager {
                     for (Map.Entry<AntRole, Integer> entry : c.getWarAssignedRoleCounts().entrySet()) {
                         sc.warAssignedRoleCounts.put(String.valueOf(entry.getKey().getId()), entry.getValue());
                     }
-                    sc.roleDisallowedSubtypesFlat = c.flattenPeaceRoleDisallowedSubtypes();
-                    sc.warRoleDisallowedSubtypesFlat = c.flattenWarRoleDisallowedSubtypes();
+                    sc.roleDisallowedModsFlat = c.flattenPeaceRoleDisallowedMods();
+                    sc.warRoleDisallowedModsFlat = c.flattenWarRoleDisallowedMods();
                     for (Map.Entry<Integer, Integer> entry : c.getOutgoingColonyDiplomatMissions().entrySet()) {
                         sc.outgoingColonyDiplomatMissions.put(String.valueOf(entry.getKey()), entry.getValue());
                     }
@@ -888,12 +888,12 @@ public class SaveManager {
         writeJsonLine(w, "hatchRateDrone", sc.hatchRateDrone, false);
         writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
         
-        w.write("      \"subtypeHatchRatesFlat\": " + serializeDoubleMapToJson(sc.subtypeHatchRatesFlat) + ","); w.newLine();
-        w.write("      \"workerSubtypes\": " + serializeMapToJson(sc.workerSubtypes) + ","); w.newLine();
-        w.write("      \"soldierSubtypes\": " + serializeMapToJson(sc.soldierSubtypes) + ","); w.newLine();
-        w.write("      \"majorSubtypes\": " + serializeMapToJson(sc.majorSubtypes) + ","); w.newLine();
-        w.write("      \"princessSubtypes\": " + serializeMapToJson(sc.princessSubtypes) + ","); w.newLine();
-        w.write("      \"queenSubtypes\": " + serializeMapToJson(sc.queenSubtypes) + ","); w.newLine();
+        w.write("      \"modHatchRatesFlat\": " + serializeDoubleMapToJson(sc.modHatchRatesFlat) + ","); w.newLine();
+        w.write("      \"workerMods\": " + serializeMapToJson(sc.workerMods) + ","); w.newLine();
+        w.write("      \"soldierMods\": " + serializeMapToJson(sc.soldierMods) + ","); w.newLine();
+        w.write("      \"majorMods\": " + serializeMapToJson(sc.majorMods) + ","); w.newLine();
+        w.write("      \"princessMods\": " + serializeMapToJson(sc.princessMods) + ","); w.newLine();
+        w.write("      \"queenMods\": " + serializeMapToJson(sc.queenMods) + ","); w.newLine();
         
         writeJsonLine(w, "aphids", sc.aphids, false);
         writeJsonLine(w, "symbioticMites", sc.symbioticMites, false);
@@ -909,8 +909,8 @@ public class SaveManager {
         // Serialized Lists within Colony
         w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
         w.write("      \"warAssignedRoleCounts\": " + serializeMapToJson(sc.warAssignedRoleCounts) + ","); w.newLine();
-        w.write("      \"roleDisallowedSubtypesFlat\": " + serializeMapToJson(sc.roleDisallowedSubtypesFlat) + ","); w.newLine();
-        w.write("      \"warRoleDisallowedSubtypesFlat\": " + serializeMapToJson(sc.warRoleDisallowedSubtypesFlat) + ","); w.newLine();
+        w.write("      \"roleDisallowedModsFlat\": " + serializeMapToJson(sc.roleDisallowedModsFlat) + ","); w.newLine();
+        w.write("      \"warRoleDisallowedModsFlat\": " + serializeMapToJson(sc.warRoleDisallowedModsFlat) + ","); w.newLine();
         w.write("      \"outgoingColonyDiplomatMissions\": " + serializeMapToJson(sc.outgoingColonyDiplomatMissions) + ","); w.newLine();
         w.write("      \"incomingColonyDiplomatSupport\": " + serializeMapToJson(sc.incomingColonyDiplomatSupport) + ","); w.newLine();
         w.write("      \"outgoingDynastyDiplomatMissions\": " + serializeMapToJson(sc.outgoingDynastyDiplomatMissions) + ","); w.newLine();
@@ -1225,12 +1225,12 @@ public class SaveManager {
         sc.hatchRateMajor = Float.parseFloat(map.getOrDefault("hatchRateMajor", "0.0"));
         sc.hatchRateDrone = Float.parseFloat(map.getOrDefault("hatchRateDrone", "0.0"));
         sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
-        sc.subtypeHatchRatesFlat = deserializeJsonToDoubleMap(map.get("subtypeHatchRatesFlat"));
-        sc.workerSubtypes = deserializeJsonToMap(map.get("workerSubtypes"));
-        sc.soldierSubtypes = deserializeJsonToMap(map.get("soldierSubtypes"));
-        sc.majorSubtypes = deserializeJsonToMap(map.get("majorSubtypes"));
-        sc.princessSubtypes = deserializeJsonToMap(map.get("princessSubtypes"));
-        sc.queenSubtypes = deserializeJsonToMap(map.get("queenSubtypes"));
+        sc.modHatchRatesFlat = deserializeJsonToDoubleMap(map.get("modHatchRatesFlat"));
+        sc.workerMods = deserializeJsonToMap(map.get("workerMods"));
+        sc.soldierMods = deserializeJsonToMap(map.get("soldierMods"));
+        sc.majorMods = deserializeJsonToMap(map.get("majorMods"));
+        sc.princessMods = deserializeJsonToMap(map.get("princessMods"));
+        sc.queenMods = deserializeJsonToMap(map.get("queenMods"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
         sc.symbioticMites = Integer.parseInt(map.getOrDefault("symbioticMites",
@@ -1253,8 +1253,8 @@ public class SaveManager {
         // Nested structures
         sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
         sc.warAssignedRoleCounts = deserializeJsonToMap(map.get("warAssignedRoleCounts"));
-        sc.roleDisallowedSubtypesFlat = deserializeJsonToMap(map.get("roleDisallowedSubtypesFlat"));
-        sc.warRoleDisallowedSubtypesFlat = deserializeJsonToMap(map.get("warRoleDisallowedSubtypesFlat"));
+        sc.roleDisallowedModsFlat = deserializeJsonToMap(map.get("roleDisallowedModsFlat"));
+        sc.warRoleDisallowedModsFlat = deserializeJsonToMap(map.get("warRoleDisallowedModsFlat"));
         sc.outgoingColonyDiplomatMissions = deserializeJsonToMap(map.get("outgoingColonyDiplomatMissions"));
         sc.incomingColonyDiplomatSupport = deserializeJsonToMap(map.get("incomingColonyDiplomatSupport"));
         sc.outgoingDynastyDiplomatMissions = deserializeJsonToMap(map.get("outgoingDynastyDiplomatMissions"));
@@ -1595,8 +1595,8 @@ public class SaveManager {
         for (int i = 0; i < party.size(); i++) {
             Savefile.SavedHuntPartyMember member = party.get(i);
             sb.append("{");
-            sb.append("\"typeId\":").append(member.typeId).append(",");
-            sb.append("\"subtypeCode\":").append(member.subtypeCode).append(",");
+            sb.append("\"classId\":").append(member.classId).append(",");
+            sb.append("\"modProfileCode\":").append(member.modProfileCode).append(",");
             sb.append("\"roleId\":").append(member.roleId).append(",");
             sb.append("\"slotIndex\":").append(member.slotIndex).append(",");
             sb.append("\"health\":").append(member.health).append(",");
@@ -2144,8 +2144,8 @@ public class SaveManager {
                 objStr += "}";
             }
 
-            int typeId = 0;
-            int subtypeCode = 0;
+            int classId = 0;
+            int modProfileCode = 0;
             int roleId = 0;
             int slotIndex = 0;
             int health = 0;
@@ -2161,8 +2161,8 @@ public class SaveManager {
                         String k = kv[0].replace("\"", "").trim();
                         String v = kv[1].replace("\"", "").trim();
                         switch (k) {
-                            case "typeId" -> typeId = Integer.parseInt(v);
-                            case "subtypeCode" -> subtypeCode = Integer.parseInt(v);
+                            case "classId" -> classId = Integer.parseInt(v);
+                            case "modProfileCode" -> modProfileCode = Integer.parseInt(v);
                             case "roleId" -> roleId = Integer.parseInt(v);
                             case "slotIndex" -> slotIndex = Integer.parseInt(v);
                             case "health" -> health = Integer.parseInt(v);
@@ -2174,7 +2174,7 @@ public class SaveManager {
                     }
                 }
                 list.add(new Savefile.SavedHuntPartyMember(
-                        typeId, subtypeCode, roleId, slotIndex, health, battleHealth, battleMaxHealth));
+                        classId, modProfileCode, roleId, slotIndex, health, battleHealth, battleMaxHealth));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -2602,25 +2602,25 @@ public class SaveManager {
             engine.setEasyConquering(Boolean.parseBoolean(m.getOrDefault("easyConquering", "false")));
             engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_WORKER,
+                    GameConstants.CLASS_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_WORKER).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_WORKER).getId()));
             engine.setDefaultRoleSoldier(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_SOLDIER,
+                    GameConstants.CLASS_SOLDIER,
                     Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_SOLDIER).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_SOLDIER).getId()));
             engine.setDefaultRoleMajor(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_MAJOR,
+                    GameConstants.CLASS_MAJOR,
                     Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_MAJOR).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_MAJOR).getId()));
             engine.setDefaultRolePrincess(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_PRINCESS,
+                    GameConstants.CLASS_PRINCESS,
                     Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_PRINCESS).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_PRINCESS).getId()));
             engine.setDefaultRoleQueen(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_QUEEN,
+                    GameConstants.CLASS_QUEEN,
                     Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_QUEEN).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_QUEEN).getId()));
             engine.setMapLayerBorders(Boolean.parseBoolean(m.getOrDefault("mapLayerBorders",
                     String.valueOf(engine.isMapLayerBorders()))));
             engine.setMapLayerBiomeIcons(Boolean.parseBoolean(m.getOrDefault("mapLayerBiomeIcons",

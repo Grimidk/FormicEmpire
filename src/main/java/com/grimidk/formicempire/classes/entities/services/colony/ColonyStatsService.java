@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
@@ -638,7 +638,7 @@ public class ColonyStatsService {
 
     public int getTotalConsumption(Colony colony){
         int totalConsumption = 0;
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             for (Ant ant : entry.getValue()) {
                 if (ant == null || !ant.isAlive()) {
                     continue;
@@ -649,15 +649,15 @@ public class ColonyStatsService {
         return totalConsumption;
     }
 
-    public int getSubtypeFoodOverhead(Colony colony) {
+    public int getModFoodOverhead(Colony colony) {
         if (colony == null) {
             return 0;
         }
         int base = getBaseConsumption(colony);
         int overhead = 0;
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            AntType type = entry.getKey();
-            if (type == null || !AntSubtypeService.isEligibleType(type)) {
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntClass type = entry.getKey();
+            if (type == null || !AntModService.isEligibleClass(type)) {
                 continue;
             }
             float baseline = base * type.getConsumptionMult();
@@ -669,5 +669,9 @@ public class ColonyStatsService {
             }
         }
         return overhead;
+    }
+
+    public int getSubtypeFoodOverhead(Colony colony) {
+        return getModFoodOverhead(colony);
     }
 }

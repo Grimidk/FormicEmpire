@@ -22,7 +22,7 @@ class AntSpriteAnimTest {
     @Test
     void legWalkAdvancesOneFramePerMovementUpdate() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         ant.setSpeed(10f);
         ant.setPosition(new Point(0, 0));
         ant.moveTo(new Point(1000, 0));
@@ -40,7 +40,7 @@ class AntSpriteAnimTest {
     @Test
     void legWalkAdvancesExtraFramesWhenMoveSpeedExceedsBase() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         ant.setSpeed(10f);
         ant.setPosition(new Point(0, 0));
         ant.moveTo(new Point(1000, 0));
@@ -53,7 +53,7 @@ class AntSpriteAnimTest {
     @Test
     void idleAntResetsToLegFrameOne() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         ant.setSpeed(10f);
         ant.setPosition(new Point(0, 0));
         ant.moveTo(new Point(1000, 0));
@@ -70,7 +70,7 @@ class AntSpriteAnimTest {
     @Test
     void nuptialDroneUsesFlyingLegFrame() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_DRONE);
+        Ant ant = new Ant(colony, GameConstants.CLASS_DRONE);
         ant.setNuptial(true);
         assertEquals(GameNumbers.ANT_LEG_FRAME_FLYING, ant.getLegFrame());
         ant.setSpeed(10f);
@@ -82,7 +82,7 @@ class AntSpriteAnimTest {
     @Test
     void hourlyRollSnapsJawWhenChanceSucceeds() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         GameRandom.enqueueTestDoubles(0.0, 1.0);
 
         ant.rollHourlySpriteAnim();
@@ -94,7 +94,7 @@ class AntSpriteAnimTest {
     @Test
     void hourlyRollTwitchesAntennaWhenChanceSucceeds() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         GameRandom.enqueueTestDoubles(1.0, 0.0);
 
         ant.rollHourlySpriteAnim();
@@ -106,7 +106,7 @@ class AntSpriteAnimTest {
     @Test
     void hourlyRollCanSnapJawAndTwitchAntennaIndependently() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_SOLDIER);
         GameRandom.enqueueTestDoubles(0.0, 0.0, 1.0);
 
         ant.rollHourlySpriteAnim();
@@ -118,7 +118,7 @@ class AntSpriteAnimTest {
     @Test
     void spriteAnimMinuteClosesJawAndAntennaAfterSnapDuration() {
         Colony colony = new Colony(1, "C", true);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         GameRandom.enqueueTestDoubles(0.0, 0.0);
 
         ant.rollHourlySpriteAnim();

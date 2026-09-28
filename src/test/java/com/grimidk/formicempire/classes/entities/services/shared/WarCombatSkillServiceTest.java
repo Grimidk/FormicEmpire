@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -25,8 +25,8 @@ class WarCombatSkillServiceTest {
         Colony colony = new Colony(1, "C", true);
         colony.setDynasty(dynasty);
 
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
-        AntSubtypeService.applySubtypeStats(ant, colony);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
+        AntModService.applyModStats(ant, colony);
         ant.setHealth(Math.round(ant.getMaxHealth() * 0.5f));
         float before = ant.getHealth();
 
@@ -45,10 +45,10 @@ class WarCombatSkillServiceTest {
         Colony colony = new Colony(2, "C", true);
         colony.setDynasty(dynasty);
 
-        Ant potter = new Ant(colony, GameConstants.TYPE_WORKER);
-        potter.setSubtypeProfile(AntSubtypeProfile.of(1, 1, 3, 1));
+        Ant potter = new Ant(colony, GameConstants.CLASS_WORKER);
+        potter.setModProfile(AntModProfile.of(1, 1, 3, 1));
         potter.setRole(GameConstants.ROLE_POTTER);
-        AntSubtypeService.applySubtypeStats(potter, colony);
+        AntModService.applyModStats(potter, colony);
         potter.setHealth(Math.round(potter.getMaxHealth() * 0.4f));
         float before = potter.getHealth();
         float baseHeal = GameNumbers.regenAmountFromPercent(potter.getMaxHealth(), potter.getRegen());
@@ -68,7 +68,7 @@ class WarCombatSkillServiceTest {
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
         assertTrue(dynasty.hasUpgrade(GameUnlocks.ROLE_POTTER));
         assertTrue(GameConstants.isObtainableRole(GameConstants.ROLE_POTTER));
-        assertTrue(GameConstants.ROLE_POTTER.requiresSubtypes());
+        assertTrue(GameConstants.ROLE_POTTER.requiresMods());
     }
 
     @Test
@@ -78,7 +78,7 @@ class WarCombatSkillServiceTest {
         assertTrue(dynasty.hasUpgrade(GameUnlocks.ROLE_DEFENDER));
         assertTrue(GameConstants.isObtainableRole(GameConstants.ROLE_DEFENDER));
         assertTrue(GameConstants.ROLE_DEFENDER.isHexDefenseOnly());
-        assertTrue(GameConstants.ROLE_DEFENDER.isSubtypeRequired(GameConstants.SUBTYPE_HEAD_DOORHEAD));
+        assertTrue(GameConstants.ROLE_DEFENDER.isModRequired(GameConstants.MOD_HEAD_DOORHEAD));
     }
 
     @Test
@@ -88,13 +88,13 @@ class WarCombatSkillServiceTest {
         Colony colony = new Colony(5, "C", true);
         colony.setDynasty(dynasty);
 
-        Ant queen = new Ant(colony, GameConstants.TYPE_QUEEN);
+        Ant queen = new Ant(colony, GameConstants.CLASS_QUEEN);
         colony.getQueens().add(queen);
 
-        Ant defender = new Ant(colony, GameConstants.TYPE_SOLDIER);
-        defender.setSubtypeProfile(AntSubtypeProfile.of(3, 1, 1, 1));
+        Ant defender = new Ant(colony, GameConstants.CLASS_SOLDIER);
+        defender.setModProfile(AntModProfile.of(3, 1, 1, 1));
         defender.setRole(GameConstants.ROLE_DEFENDER);
-        AntSubtypeService.applySubtypeStats(defender, colony);
+        AntModService.applyModStats(defender, colony);
         colony.getSoldiers().add(defender);
         assertTrue(WarCombatSkillService.useShielding(defender, colony));
 
@@ -129,15 +129,15 @@ class WarCombatSkillServiceTest {
         home.setDynasty(dynasty);
         dynasty.addColony(home);
         for (int i = 0; i < 30; i++) {
-            home.getSoldiers().add(new Ant(home, GameConstants.TYPE_SOLDIER));
+            home.getSoldiers().add(new Ant(home, GameConstants.CLASS_SOLDIER));
         }
         for (int i = 0; i < 10; i++) {
-            home.getMajors().add(new Ant(home, GameConstants.TYPE_MAJOR));
+            home.getMajors().add(new Ant(home, GameConstants.CLASS_MAJOR));
         }
 
         Dynasty enemy = new Dynasty(10, "Enemy", false, GameConstants.SPECIES_OMNI);
         Colony enemyColony = new Colony(10, "EC", false);
-        enemyColony.getWorkers().add(new Ant(enemyColony, GameConstants.TYPE_WORKER));
+        enemyColony.getWorkers().add(new Ant(enemyColony, GameConstants.CLASS_WORKER));
         enemy.addColony(enemyColony);
         dynasty.getDiplomacyService().applyWar(enemy);
         assertTrue(dynasty.isAtWar());
@@ -170,10 +170,10 @@ class WarCombatSkillServiceTest {
         Colony colony = new Colony(8, "C", true);
         colony.setDynasty(dynasty);
 
-        Ant defender = new Ant(colony, GameConstants.TYPE_SOLDIER);
-        defender.setSubtypeProfile(AntSubtypeProfile.of(3, 1, 1, 1));
+        Ant defender = new Ant(colony, GameConstants.CLASS_SOLDIER);
+        defender.setModProfile(AntModProfile.of(3, 1, 1, 1));
         defender.setRole(GameConstants.ROLE_DEFENDER);
-        AntSubtypeService.applySubtypeStats(defender, colony);
+        AntModService.applyModStats(defender, colony);
         defender.setDefense(50f);
 
         assertEquals(100f, WarCombatSkillService.effectiveHexDefenseDefense(defender, false), 0.0001f);
@@ -192,12 +192,12 @@ class WarCombatSkillServiceTest {
         colony.setDynasty(dynasty);
         dynasty.addColony(colony);
         for (int i = 0; i < 25; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
 
         Dynasty enemy = new Dynasty(7, "Enemy", false, GameConstants.SPECIES_OMNI);
         Colony enemyColony = new Colony(7, "EC", false);
-        enemyColony.getWorkers().add(new Ant(enemyColony, GameConstants.TYPE_WORKER));
+        enemyColony.getWorkers().add(new Ant(enemyColony, GameConstants.CLASS_WORKER));
         enemy.addColony(enemyColony);
         dynasty.getDiplomacyService().applyWar(enemy);
         assertTrue(dynasty.isAtWar());

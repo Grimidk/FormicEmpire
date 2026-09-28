@@ -7,11 +7,9 @@ import java.util.Queue;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
@@ -21,13 +19,13 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 public class Ant extends Critter {
     private final Colony homeColony;
-    private AntType type;
+    private AntClass antClass;
     private AntRole role;
-    private AntSubtypeProfile subtypeProfile;
+    private AntModProfile modProfile;
     private float tempRes;    
     private ResourceType carrying;
     private ResourceType carryingSec;
-    private AntType carryingAnt;   
+    private AntClass carryingAnt;
     private String causeOfDeath;
     private boolean isOnTrade;
     private boolean isNuptial;
@@ -41,13 +39,13 @@ public class Ant extends Critter {
     private int wingOpenMinutesRemaining;
     private int antennaOpenMinutesRemaining;
 
-    public Ant(Colony colony, AntType type) {
+    public Ant(Colony colony, AntClass antClass) {
         super(GameConstants.TYPE_ANT);
         this.homeColony = colony;
         
-        this.type = type;
+        this.antClass = antClass;
         this.role = null;
-        this.subtypeProfile = AntSubtypeProfile.standard();
+        this.modProfile = AntModProfile.standard();
         this.carrying = null;
         this.carryingSec = null;
         this.carryingAnt = null;
@@ -56,35 +54,28 @@ public class Ant extends Critter {
         this.isNuptial = false;
         
         this.setStatus(GameConstants.STATUS_ALIVE);
-        this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * type.getHealtMult()))); 
+        this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * antClass.getHealtMult())));
         this.setHealth(this.getMaxHealth());
         this.setAge(0);
         
         this.tempRes = colony.getBaseTempRes();
         
-        this.setRegen((int)(colony.getBaseRegen() * type.getRegenMult()));
-        this.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
-        this.setAttack((int)(colony.getBaseAttack() * type.getAttackMult()));
-        this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult() + colony.getBaseDefense()));        
-        this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
+        this.setRegen((int)(colony.getBaseRegen() * antClass.getRegenMult()));
+        this.setConsumption(colony.getBaseConsumption() * antClass.getConsumptionMult());
+        this.setAttack((int)(colony.getBaseAttack() * antClass.getAttackMult()));
+        this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * antClass.getAttackSpeedMult()));
+        this.setDefense(GameNumbers.clampDefensePercent(antClass.getDefenseMult() + colony.getBaseDefense()));
+        this.setSpeed(colony.getBaseSpeed() * antClass.getSpeedMult());
         this.setEvasionChance(colony.getBaseEvasionChance());
         
         this.setDimension(WorldSpaces.OVERWORLD);
-        if (AntSubtypeService.isEligibleType(type)) {
-            AntSubtypeService.applySubtypeStats(this, colony);
+        if (AntModService.isEligibleClass(antClass)) {
+            AntModService.applyModStats(this, colony);
         }
     }
     
-    public AntType getAntType() { return type; }
-    public void setAntType(AntType type) { this.type = type; }
-
-    public AntClass getAntClass() { return type; }
-    public void setAntClass(AntClass type) {
-        if (type instanceof AntType t) {
-            this.type = t;
-        }
-    }
+    public AntClass getAntClass() { return antClass; }
+    public void setAntClass(AntClass antClass) { this.antClass = antClass; }
 
     public AntRole getRole() { return role; }
     public void setRole(AntRole role) {
@@ -100,16 +91,9 @@ public class Ant extends Critter {
         return homeColony;
     }
 
-    public AntSubtypeProfile getSubtypeProfile() { return subtypeProfile; }
-    public void setSubtypeProfile(AntSubtypeProfile subtypeProfile) {
-        this.subtypeProfile = subtypeProfile != null ? subtypeProfile : AntSubtypeProfile.standard();
-    }
-
-    public AntModProfile getModProfile() {
-        return subtypeProfile != null ? subtypeProfile.toModProfile() : AntModProfile.standard();
-    }
+    public AntModProfile getModProfile() { return modProfile; }
     public void setModProfile(AntModProfile modProfile) {
-        this.subtypeProfile = modProfile != null ? modProfile.toSubtypeProfile() : AntSubtypeProfile.standard();
+        this.modProfile = modProfile != null ? modProfile : AntModProfile.standard();
     }
 
     public float getTempRes() { return tempRes; }
@@ -121,8 +105,8 @@ public class Ant extends Critter {
     public ResourceType getCarryingSec() { return carryingSec; }
     public void setCarryingSec(ResourceType carryingSec) { this.carryingSec = carryingSec; }
 
-    public AntType getCarryingAnt() { return carryingAnt; }
-    public void setCarryingAnt(AntType carryingAnt) { this.carryingAnt = carryingAnt; }
+    public AntClass getCarryingAnt() { return carryingAnt; }
+    public void setCarryingAnt(AntClass carryingAnt) { this.carryingAnt = carryingAnt; }
     
     public String getCauseOfDeath() { return causeOfDeath; }
 
@@ -139,7 +123,7 @@ public class Ant extends Critter {
     public boolean isNuptial() { return isNuptial; }
     public void setNuptial(boolean isNuptial) {
         this.isNuptial = isNuptial;
-        if (isNuptial && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS)) {
+        if (isNuptial && (antClass == GameConstants.CLASS_DRONE || antClass == GameConstants.CLASS_PRINCESS)) {
             setLegFrame(GameNumbers.ANT_LEG_FRAME_FLYING);
         } else if (!isMoving()) {
             setLegFrame(1);
@@ -207,7 +191,7 @@ public class Ant extends Critter {
     }
 
     public void goDie(Colony colony, String reason) {
-        this.type = GameConstants.TYPE_DEAD;
+        this.antClass = GameConstants.CLASS_DEAD;
         this.causeOfDeath = reason;
 
         this.clearLoad();
@@ -220,46 +204,46 @@ public class Ant extends Critter {
         super.goDie();
     }
 
-    public void transform(Colony colony, AntType newType) {
-        AntSubtypeProfile preserved = subtypeProfile;
-        this.type = newType;
-        if (AntSubtypeService.isEligibleType(newType)) {
-            this.subtypeProfile = preserved != null ? preserved : AntSubtypeProfile.standard();
+    public void transform(Colony colony, AntClass newClass) {
+        AntModProfile preserved = modProfile;
+        this.antClass = newClass;
+        if (AntModService.isEligibleClass(newClass)) {
+            this.modProfile = preserved != null ? preserved : AntModProfile.standard();
             this.setAge(0);
-            AntSubtypeService.applySubtypeStats(this, colony);
+            AntModService.applyModStats(this, colony);
         } else {
-            this.subtypeProfile = AntSubtypeProfile.standard();
-            this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * newType.getHealtMult())));
+            this.modProfile = AntModProfile.standard();
+            this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * newClass.getHealtMult())));
             this.setHealth(this.getMaxHealth());
             this.setAge(0);
-            this.setRegen((int)(colony.getBaseRegen() * newType.getRegenMult()));
-            this.setConsumption(colony.getBaseConsumption() * newType.getConsumptionMult());
-            this.setAttack((int)(colony.getBaseAttack() * newType.getAttackMult()));
-            this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newType.getAttackSpeedMult()));
-            this.setDefense(GameNumbers.clampDefensePercent(newType.getDefenseMult() + colony.getBaseDefense()));
-            this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
+            this.setRegen((int)(colony.getBaseRegen() * newClass.getRegenMult()));
+            this.setConsumption(colony.getBaseConsumption() * newClass.getConsumptionMult());
+            this.setAttack((int)(colony.getBaseAttack() * newClass.getAttackMult()));
+            this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newClass.getAttackSpeedMult()));
+            this.setDefense(GameNumbers.clampDefensePercent(newClass.getDefenseMult() + colony.getBaseDefense()));
+            this.setSpeed(colony.getBaseSpeed() * newClass.getSpeedMult());
             this.setEvasionChance(colony.getBaseEvasionChance());
         }
     }
 
     public void updateStatsFromColony(Colony colony) {
-        if (AntSubtypeService.isEligibleType(type)) {
-            AntSubtypeService.applySubtypeStats(this, colony);
+        if (AntModService.isEligibleClass(antClass)) {
+            AntModService.applyModStats(this, colony);
             return;
         }
-        this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * type.getHealtMult())));
+        this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * antClass.getHealtMult())));
         
         if (this.getHealth() > this.getMaxHealth()) {
             this.setHealth(this.getMaxHealth());
         }
         
         this.tempRes = colony.getBaseTempRes();
-        this.setRegen((int)(colony.getBaseRegen() * type.getRegenMult()));
-        this.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
-        this.setAttack((int)(colony.getBaseAttack() * type.getAttackMult()));
-        this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult() + colony.getBaseDefense()));        
-        this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
+        this.setRegen((int)(colony.getBaseRegen() * antClass.getRegenMult()));
+        this.setConsumption(colony.getBaseConsumption() * antClass.getConsumptionMult());
+        this.setAttack((int)(colony.getBaseAttack() * antClass.getAttackMult()));
+        this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * antClass.getAttackSpeedMult()));
+        this.setDefense(GameNumbers.clampDefensePercent(antClass.getDefenseMult() + colony.getBaseDefense()));
+        this.setSpeed(colony.getBaseSpeed() * antClass.getSpeedMult());
         this.setEvasionChance(colony.getBaseEvasionChance());
     }
 
@@ -278,7 +262,7 @@ public class Ant extends Critter {
     @Override
     public void updatePosition(float speedMultiplier) {
         boolean wingedFlyer = isNuptial()
-                && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS);
+                && (antClass == GameConstants.CLASS_DRONE || antClass == GameConstants.CLASS_PRINCESS);
         if (wingedFlyer) {
             setLegFrame(GameNumbers.ANT_LEG_FRAME_FLYING);
             super.updatePosition(speedMultiplier);
@@ -301,7 +285,7 @@ public class Ant extends Critter {
     @Override
     public void setPosition(Point p) {
         super.setPosition(p);
-        if (isNuptial() && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS)) {
+        if (isNuptial() && (antClass == GameConstants.CLASS_DRONE || antClass == GameConstants.CLASS_PRINCESS)) {
             setLegFrame(GameNumbers.ANT_LEG_FRAME_FLYING);
         } else {
             setLegFrame(1);
@@ -359,7 +343,7 @@ public class Ant extends Critter {
             antennaOpenMinutesRemaining = GameNumbers.ANT_SPRITE_SNAP_MINUTES;
         }
 
-        boolean winged = type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS;
+        boolean winged = antClass == GameConstants.CLASS_DRONE || antClass == GameConstants.CLASS_PRINCESS;
         if (!winged) {
             wingFrame = 1;
             wingOpenMinutesRemaining = 0;

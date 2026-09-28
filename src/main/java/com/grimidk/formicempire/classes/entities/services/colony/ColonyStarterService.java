@@ -70,7 +70,7 @@ public class ColonyStarterService {
                     colony.setHatchRateMajor(capitalColony.getHatchRateMajor());
                     colony.setHatchRateDrone(capitalColony.getHatchRateDrone());
                     colony.setHatchRatePrincess(capitalColony.getHatchRatePrincess());
-                    AntSubtypeService.copySubtypeRates(colony, capitalColony);
+                    AntModService.copyModRates(colony, capitalColony);
                 }
                 if (d.isDefaultAutomationEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
                     colony.setAutomationEnabled(true);
@@ -97,14 +97,14 @@ public class ColonyStarterService {
             System.out.println("[ColonyStarterService] Automation ENABLED for NPC colony.");
             AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : null;
             if (species != null) {
-                AntSubtypeService.applyNaturalSpeciesSubtypeRates(colony, species);
+                AntModService.applyNaturalSpeciesModRates(colony, species);
             }
         }
         
         clearColonyLists(colony);
 
         try {
-            Ant queen = new Ant(colony, GameConstants.TYPE_QUEEN);
+            Ant queen = new Ant(colony, GameConstants.CLASS_QUEEN);
             queen.setDimension(WorldSpaces.UNDERWORLD); 
             queen.setRole(GameConstants.ROLE_LAYER);
             colony.getQueens().add(queen);
@@ -118,7 +118,7 @@ public class ColonyStarterService {
         }
 
         if (!colony.isPlayer()) {
-            AntSubtypeService.assignNaturalSubtypesToPopulation(colony);
+            AntModService.assignNaturalModsToPopulation(colony);
         }
         
         System.out.println("[ColonyStarterService] Initialization complete for " + colony.getName() + " (ID: " + colony.getId() + "). Current Age: " + colony.getAge());
@@ -296,7 +296,7 @@ public class ColonyStarterService {
     }
 
     private void spawnOccupationQueen(Colony colony) {
-        Ant queen = new Ant(colony, GameConstants.TYPE_QUEEN);
+        Ant queen = new Ant(colony, GameConstants.CLASS_QUEEN);
         queen.setDimension(WorldSpaces.UNDERWORLD);
         queen.setRole(GameConstants.ROLE_LAYER);
         if (colony.getPhysicsService() != null) {
@@ -327,7 +327,7 @@ public class ColonyStarterService {
             colony.setHatchRateMajor(capital.getHatchRateMajor());
             colony.setHatchRateDrone(capital.getHatchRateDrone());
             colony.setHatchRatePrincess(capital.getHatchRatePrincess());
-            AntSubtypeService.copySubtypeRates(colony, capital);
+            AntModService.copyModRates(colony, capital);
         }
         if (colony.isAutomationEnabled()) {
             if (overlord.isDefaultAutomationEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
@@ -363,7 +363,7 @@ public class ColonyStarterService {
         target.setHatchRateMajor(capital.getHatchRateMajor());
         target.setHatchRateDrone(capital.getHatchRateDrone());
         target.setHatchRatePrincess(capital.getHatchRatePrincess());
-        AntSubtypeService.copySubtypeRates(target, capital);
+        AntModService.copyModRates(target, capital);
 
         Dynasty dynasty = target.getDynasty();
         if (dynasty != null) {
@@ -383,7 +383,7 @@ public class ColonyStarterService {
 
         int workerDeficit = MIN_SUSTAIN_WORKERS - target.getWorkers().size();
         for (int i = 0; i < workerDeficit; i++) {
-            target.getWorkers().add(new Ant(target, GameConstants.TYPE_WORKER));
+            target.getWorkers().add(new Ant(target, GameConstants.CLASS_WORKER));
         }
 
         ensurePeaceEconomyRoles(target);
@@ -409,7 +409,7 @@ public class ColonyStarterService {
     private void applyStarterWorkforce(Colony colony) {
         List<Ant> workers = colony.getWorkers();
         while (workers.size() < STARTING_WORKERS) {
-            workers.add(new Ant(colony, GameConstants.TYPE_WORKER));
+            workers.add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         int index = 0;

@@ -872,8 +872,8 @@ public class MapDialog extends ZeroDialog {
                 }
 
                 boolean defeated = d.isDefeated();
-                if (defeated && GameConstants.TYPE_DEAD.getIcon() != null) {
-                    badges.add(new JLabel(GameConstants.TYPE_DEAD.getIcon()));
+                if (defeated && GameConstants.CLASS_DEAD.getIcon() != null) {
+                    badges.add(new JLabel(GameConstants.CLASS_DEAD.getIcon()));
                 }
 
                 JLabel stanceIcon = null;
@@ -890,8 +890,8 @@ public class MapDialog extends ZeroDialog {
                 String nameStr = d.getName();
                 String clickTooltip = LanguageStrings.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName());
                 if (defeated) {
-                    nameStr += " (" + GameConstants.TYPE_DEAD.getName() + ")";
-                    clickTooltip = clickTooltip + " — " + GameConstants.TYPE_DEAD.getName();
+                    nameStr += " (" + GameConstants.CLASS_DEAD.getName() + ")";
+                    clickTooltip = clickTooltip + " — " + GameConstants.CLASS_DEAD.getName();
                 } else if (d.isPlayer()) {
                     nameStr += LanguageStrings.get(LanguageStrings.MAP_YOU_PLAYER);
                 }
@@ -954,7 +954,7 @@ public class MapDialog extends ZeroDialog {
             StringBuilder sb = new StringBuilder("<html>");
             sb.append("<b>").append(dynasty.getName()).append("</b>");
             if (dynasty.isDefeated()) {
-                sb.append(" (").append(GameConstants.TYPE_DEAD.getName()).append(")");
+                sb.append(" (").append(GameConstants.CLASS_DEAD.getName()).append(")");
             }
             if (dynasty.getSpecies() != null) {
                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(dynasty.getSpecies().getName());
@@ -1342,7 +1342,7 @@ public class MapDialog extends ZeroDialog {
                         if (dynasty != null) {
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY)).append(dynasty.getName());
                             if (dynasty.isDefeated()) {
-                                sb.append(" (").append(GameConstants.TYPE_DEAD.getName()).append(")");
+                                sb.append(" (").append(GameConstants.CLASS_DEAD.getName()).append(")");
                             }
                             if (dynasty.getRank() != null) {
                                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());

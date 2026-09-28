@@ -131,7 +131,7 @@ public class AlertManager {
                 return iconOf(GameConstants.ICON_TRADE);
             case "NUPTIAL":
             case "PROMO":
-                return iconOf(GameConstants.TYPE_QUEEN.getIcon());
+                return iconOf(GameConstants.CLASS_QUEEN.getIcon());
             case "WARN":
                 return iconOf(GameConstants.REPUTATION_WARY.getIcon());
             case "FAIL":

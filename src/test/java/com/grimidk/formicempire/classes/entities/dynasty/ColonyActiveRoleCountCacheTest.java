@@ -16,7 +16,7 @@ class ColonyActiveRoleCountCacheTest {
     void setUp() {
         colony = new Colony(1, "Cache Test", true);
         colony.setActive(true);
-        Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant worker = new Ant(colony, GameConstants.CLASS_WORKER);
         worker.setRole(GameConstants.ROLE_FORAGER);
         colony.getWorkers().add(worker);
     }

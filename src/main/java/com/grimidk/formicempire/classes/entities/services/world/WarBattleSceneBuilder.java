@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -100,16 +100,16 @@ public final class WarBattleSceneBuilder {
                 && (battle.getAttacker().livingArmySize() > 0 || battle.getDefender().livingArmySize() > 0);
     }
 
-    private record SideComposition(Map<BattleLine, Map<AntType, Integer>> activeByLine,
-            Map<BattleLine, Map<AntType, Integer>> reserveByLine, int livingArmy, int livingActive) {
+    private record SideComposition(Map<BattleLine, Map<AntClass, Integer>> activeByLine,
+            Map<BattleLine, Map<AntClass, Integer>> reserveByLine, int livingArmy, int livingActive) {
     }
 
     private static SideComposition compositionFromBattleSide(WarBattleSideState side) {
         if (side == null) {
             return emptyComposition();
         }
-        Map<BattleLine, Map<AntType, Integer>> active = emptyLineMaps();
-        Map<BattleLine, Map<AntType, Integer>> reserve = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> active = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> reserve = emptyLineMaps();
         for (BattleLine line : GameConstants.getBattleLines()) {
             tallyParticipants(active.get(line), side.getActive(line));
             tallyParticipants(reserve.get(line), side.getReserve(line));
@@ -117,20 +117,20 @@ public final class WarBattleSceneBuilder {
         return new SideComposition(active, reserve, side.livingArmySize(), side.livingActiveSize());
     }
 
-    private static void tallyParticipants(Map<AntType, Integer> counts, java.util.List<WarBattleParticipant> list) {
+    private static void tallyParticipants(Map<AntClass, Integer> counts, java.util.List<WarBattleParticipant> list) {
         if (counts == null || list == null) {
             return;
         }
         for (WarBattleParticipant p : list) {
-            if (p == null || !p.isAlive() || p.getAnt() == null || p.getAnt().getAntType() == null) {
+            if (p == null || !p.isAlive() || p.getAnt() == null || p.getAnt().getAntClass() == null) {
                 continue;
             }
-            counts.merge(p.getAnt().getAntType(), 1, Integer::sum);
+            counts.merge(p.getAnt().getAntClass(), 1, Integer::sum);
         }
     }
 
     private static SideComposition compositionFromRoleQuotasBorder(Dynasty dynasty) {
-        Map<BattleLine, Map<AntType, Integer>> pooled = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> pooled = emptyLineMaps();
         if (dynasty == null) {
             return emptyComposition();
         }
@@ -148,7 +148,7 @@ public final class WarBattleSceneBuilder {
     }
 
     private static SideComposition compositionFromRoleQuotasHexAssault(Dynasty dynasty) {
-        Map<BattleLine, Map<AntType, Integer>> pooled = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> pooled = emptyLineMaps();
         if (dynasty == null) {
             return emptyComposition();
         }
@@ -167,59 +167,59 @@ public final class WarBattleSceneBuilder {
     }
 
     private static SideComposition compositionFromPhysicalMilitary(Dynasty dynasty, int capacity) {
-        Map<BattleLine, Map<AntType, Integer>> pooled = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> pooled = emptyLineMaps();
         if (dynasty == null) {
             return emptyComposition();
         }
         for (Colony colony : dynasty.getColonies()) {
-            putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_SOLDIER,
-                    countLivingOfType(colony, GameConstants.TYPE_SOLDIER));
-            putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_MAJOR,
-                    countLivingOfType(colony, GameConstants.TYPE_MAJOR));
+            putClass(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.CLASS_SOLDIER,
+                    countLivingOfClass(colony, GameConstants.CLASS_SOLDIER));
+            putClass(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.CLASS_MAJOR,
+                    countLivingOfClass(colony, GameConstants.CLASS_MAJOR));
         }
         return seatByCapacity(pooled, capacity, false);
     }
 
     private static SideComposition compositionFromColonyPopulation(Colony contested, Dynasty dynasty) {
-        Map<BattleLine, Map<AntType, Integer>> pooled = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> pooled = emptyLineMaps();
         if (contested == null) {
             return emptyComposition();
         }
         int capacity = Math.max(1, dynasty != null ? dynasty.getCombatCapacity() : 1);
-        putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_WORKER, sizeOf(contested.getWorkers()));
-        putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_SOLDIER, sizeOf(contested.getSoldiers()));
-        putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_MAJOR, sizeOf(contested.getMajors()));
-        putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_PRINCESS, sizeOf(contested.getPrincesses()));
-        putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_QUEEN, sizeOf(contested.getQueens()));
+        putClass(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.CLASS_WORKER, sizeOf(contested.getWorkers()));
+        putClass(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.CLASS_SOLDIER, sizeOf(contested.getSoldiers()));
+        putClass(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.CLASS_MAJOR, sizeOf(contested.getMajors()));
+        putClass(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.CLASS_PRINCESS, sizeOf(contested.getPrincesses()));
+        putClass(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.CLASS_QUEEN, sizeOf(contested.getQueens()));
         for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
             int count = contested.getWarAssignedRoleCount(role);
-            if (count <= 0 || role.getAntType() == null) {
+            if (count <= 0 || role.getAntClass() == null) {
                 continue;
             }
             BattleLine line = GameConstants.getBattleLineForRole(role);
             if (line == null) {
                 line = GameConstants.BATTLE_LINE_INFANTRY;
             }
-            Map<AntType, Integer> infantry = pooled.get(GameConstants.BATTLE_LINE_INFANTRY);
-            int available = infantry.getOrDefault(role.getAntType(), 0);
+            Map<AntClass, Integer> infantry = pooled.get(GameConstants.BATTLE_LINE_INFANTRY);
+            int available = infantry.getOrDefault(role.getAntClass(), 0);
             int move = Math.min(count, available);
             if (move > 0) {
-                infantry.put(role.getAntType(), available - move);
-                putType(pooled, line, role.getAntType(), move);
+                infantry.put(role.getAntClass(), available - move);
+                putClass(pooled, line, role.getAntClass(), move);
             }
         }
         return seatByCapacity(pooled, capacity, true);
     }
 
-    private static void addRoleQuota(Map<BattleLine, Map<AntType, Integer>> pooled, Colony colony, AntRole role) {
-        if (colony == null || role == null || role.getAntType() == null) {
+    private static void addRoleQuota(Map<BattleLine, Map<AntClass, Integer>> pooled, Colony colony, AntRole role) {
+        if (colony == null || role == null || role.getAntClass() == null) {
             return;
         }
         int count = Math.max(colony.getWarAssignedRoleCount(role), countLivingWithRole(colony, role));
         if (count <= 0) {
             return;
         }
-        int available = countLivingOfType(colony, role.getAntType());
+        int available = countLivingOfClass(colony, role.getAntClass());
         if (available > 0) {
             count = Math.min(count, available);
         }
@@ -227,15 +227,15 @@ public final class WarBattleSceneBuilder {
         if (line == null) {
             line = GameConstants.BATTLE_LINE_INFANTRY;
         }
-        putType(pooled, line, role.getAntType(), count);
+        putClass(pooled, line, role.getAntClass(), count);
     }
 
     private static int countLivingWithRole(Colony colony, AntRole role) {
-        if (colony == null || role == null || role.getAntType() == null) {
+        if (colony == null || role == null || role.getAntClass() == null) {
             return 0;
         }
         int n = 0;
-        for (Ant ant : antsOfTypeList(colony, role.getAntType())) {
+        for (Ant ant : antsOfClassList(colony, role.getAntClass())) {
             if (ant != null && ant.isAlive() && ant.getRole() == role) {
                 n++;
             }
@@ -243,9 +243,9 @@ public final class WarBattleSceneBuilder {
         return n;
     }
 
-    private static int countLivingOfType(Colony colony, AntType type) {
+    private static int countLivingOfClass(Colony colony, AntClass antClass) {
         int n = 0;
-        for (Ant ant : antsOfTypeList(colony, type)) {
+        for (Ant ant : antsOfClassList(colony, antClass)) {
             if (ant != null && ant.isAlive()) {
                 n++;
             }
@@ -253,34 +253,34 @@ public final class WarBattleSceneBuilder {
         return n;
     }
 
-    private static List<Ant> antsOfTypeList(Colony colony, AntType type) {
-        if (colony == null || type == null) {
+    private static List<Ant> antsOfClassList(Colony colony, AntClass antClass) {
+        if (colony == null || antClass == null) {
             return List.of();
         }
-        List<Ant> list = colony.getAntsByType(type);
+        List<Ant> list = colony.getAntsByClass(antClass);
         return list != null ? list : List.of();
     }
 
-    private static SideComposition seatByCapacity(Map<BattleLine, Map<AntType, Integer>> pooled, int capacity,
+    private static SideComposition seatByCapacity(Map<BattleLine, Map<AntClass, Integer>> pooled, int capacity,
             boolean hexHomeAlwaysActive) {
-        Map<BattleLine, Map<AntType, Integer>> active = emptyLineMaps();
-        Map<BattleLine, Map<AntType, Integer>> reserve = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> active = emptyLineMaps();
+        Map<BattleLine, Map<AntClass, Integer>> reserve = emptyLineMaps();
         int livingArmy = 0;
         int livingActive = 0;
         for (BattleLine line : GameConstants.getBattleLines()) {
-            Map<AntType, Integer> linePool = pooled.getOrDefault(line, Map.of());
+            Map<AntClass, Integer> linePool = pooled.getOrDefault(line, Map.of());
             int seated = 0;
-            for (Map.Entry<AntType, Integer> e : linePool.entrySet()) {
-                AntType type = e.getKey();
+            for (Map.Entry<AntClass, Integer> e : linePool.entrySet()) {
+                AntClass antClass = e.getKey();
                 int count = e.getValue() != null ? e.getValue() : 0;
-                if (type == null || count <= 0) {
+                if (antClass == null || count <= 0) {
                     continue;
                 }
                 livingArmy += count;
-                boolean forceActive = type == GameConstants.TYPE_QUEEN
-                        || (hexHomeAlwaysActive && (type == GameConstants.TYPE_SOLDIER || type == GameConstants.TYPE_MAJOR));
+                boolean forceActive = antClass == GameConstants.CLASS_QUEEN
+                        || (hexHomeAlwaysActive && (antClass == GameConstants.CLASS_SOLDIER || antClass == GameConstants.CLASS_MAJOR));
                 if (forceActive) {
-                    putType(active, line, type, count);
+                    putClass(active, line, antClass, count);
                     livingActive += count;
                     continue;
                 }
@@ -288,27 +288,27 @@ public final class WarBattleSceneBuilder {
                 int toActive = Math.min(count, room);
                 int toReserve = count - toActive;
                 if (toActive > 0) {
-                    putType(active, line, type, toActive);
+                    putClass(active, line, antClass, toActive);
                     seated += toActive;
                     livingActive += toActive;
                 }
                 if (toReserve > 0) {
-                    putType(reserve, line, type, toReserve);
+                    putClass(reserve, line, antClass, toReserve);
                 }
             }
         }
         return new SideComposition(active, reserve, livingArmy, livingActive);
     }
 
-    private static void putType(Map<BattleLine, Map<AntType, Integer>> byLine, BattleLine line, AntType type, int count) {
-        if (byLine == null || line == null || type == null || count <= 0) {
+    private static void putClass(Map<BattleLine, Map<AntClass, Integer>> byLine, BattleLine line, AntClass antClass, int count) {
+        if (byLine == null || line == null || antClass == null || count <= 0) {
             return;
         }
-        byLine.computeIfAbsent(line, k -> new HashMap<>()).merge(type, count, Integer::sum);
+        byLine.computeIfAbsent(line, k -> new HashMap<>()).merge(antClass, count, Integer::sum);
     }
 
-    private static Map<BattleLine, Map<AntType, Integer>> emptyLineMaps() {
-        Map<BattleLine, Map<AntType, Integer>> maps = new HashMap<>();
+    private static Map<BattleLine, Map<AntClass, Integer>> emptyLineMaps() {
+        Map<BattleLine, Map<AntClass, Integer>> maps = new HashMap<>();
         for (BattleLine line : GameConstants.getBattleLines()) {
             maps.put(line, new HashMap<>());
         }

@@ -13,8 +13,8 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ import java.util.Set;
 public class ColonyPopulationService {
 
     // --- Role Management ---
-    private void assignRolesForType(Colony colony, List<Ant> ants, AntType type, Engine engine) {
-        AntRole defaultRole = Engine.resolveDefaultRoleForAntType(type, engine);
+    private void assignRolesForType(Colony colony, List<Ant> ants, AntClass type, Engine engine) {
+        AntRole defaultRole = Engine.resolveDefaultRoleForAntClass(type, engine);
         if (defaultRole == null) return;
         
         List<Ant> tradeAnts = new ArrayList<>();
@@ -48,7 +48,7 @@ public class ColonyPopulationService {
         
         for (Map.Entry<AntRole, Integer> entry : assignedRoleCounts.entrySet()) {
             AntRole role = entry.getKey();
-            if (role.getAntType() != type) continue;
+            if (role.getAntClass() != type) continue;
             if (role.equals(defaultRole)) continue; 
             
             int desiredCount = entry.getValue();
@@ -62,12 +62,12 @@ public class ColonyPopulationService {
             
             int neededCount = Math.max(0, desiredCount - currentlyOnTradeWithThisRole);
             int assignedCount = 0;
-            Set<Integer> allowedSubtypes = colony.getAllowedSpecialSubtypeIdsForRole(role);
+            Set<Integer> allowedMods = colony.getAllowedSpecialModIdsForRole(role);
             Iterator<Ant> antIterator = availableAnts.iterator();
             
             while (assignedCount < neededCount && antIterator.hasNext()) {
                 Ant antToAssign = antIterator.next();
-                if (!AntSubtypeService.isAntEligibleForRole(antToAssign, role, allowedSubtypes)) {
+                if (!AntModService.isAntEligibleForRole(antToAssign, role, allowedMods)) {
                     continue;
                 }
                 antToAssign.setRole(role); 
@@ -78,39 +78,39 @@ public class ColonyPopulationService {
     }
 
     public void runRoleAssignment(Colony colony, Engine engine) {
-        assignRolesForType(colony, colony.getWorkers(), GameConstants.TYPE_WORKER, engine);
-        assignRolesForType(colony, colony.getSoldiers(), GameConstants.TYPE_SOLDIER, engine);
-        assignRolesForType(colony, colony.getMajors(), GameConstants.TYPE_MAJOR, engine);
-        assignRolesForType(colony, colony.getPrincesses(), GameConstants.TYPE_PRINCESS, engine);
-        assignRolesForType(colony, colony.getQueens(), GameConstants.TYPE_QUEEN, engine);
+        assignRolesForType(colony, colony.getWorkers(), GameConstants.CLASS_WORKER, engine);
+        assignRolesForType(colony, colony.getSoldiers(), GameConstants.CLASS_SOLDIER, engine);
+        assignRolesForType(colony, colony.getMajors(), GameConstants.CLASS_MAJOR, engine);
+        assignRolesForType(colony, colony.getPrincesses(), GameConstants.CLASS_PRINCESS, engine);
+        assignRolesForType(colony, colony.getQueens(), GameConstants.CLASS_QUEEN, engine);
     }
 
     // --- Hatching & Lifecycle ---
-    private AntType determineHatchType(Colony colony) {
+    private AntClass determineHatchType(Colony colony) {
         double rand = GameRandom.nextDouble() * 100.0;
         double cumulative = 0.0;
         
         cumulative += colony.getHatchRateWorker();
-        if (rand < cumulative) return GameConstants.TYPE_WORKER;
+        if (rand < cumulative) return GameConstants.CLASS_WORKER;
         
         if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             cumulative += colony.getHatchRateSoldier();
-            if (rand < cumulative) return GameConstants.TYPE_SOLDIER;
+            if (rand < cumulative) return GameConstants.CLASS_SOLDIER;
         }
         if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
             cumulative += colony.getHatchRateMajor();
-            if (rand < cumulative) return GameConstants.TYPE_MAJOR;
+            if (rand < cumulative) return GameConstants.CLASS_MAJOR;
         }
         if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             cumulative += colony.getHatchRateDrone();
-            if (rand < cumulative) return GameConstants.TYPE_DRONE;
+            if (rand < cumulative) return GameConstants.CLASS_DRONE;
             cumulative += colony.getHatchRatePrincess();
-            if (rand < cumulative) return GameConstants.TYPE_PRINCESS;
+            if (rand < cumulative) return GameConstants.CLASS_PRINCESS;
         }
-        return GameConstants.TYPE_WORKER;
+        return GameConstants.CLASS_WORKER;
     }
 
-    private void evolveAnts(Colony colony, List<Ant> sourceList, List<Ant> destList, AntType newType) {
+    private void evolveAnts(Colony colony, List<Ant> sourceList, List<Ant> destList, AntClass newType) {
         List<Ant> antsToEvolve = new ArrayList<>();
         int growthTime = colony.getStatsService().getGrowthTime(colony);
         
@@ -136,13 +136,13 @@ public class ColonyPopulationService {
             }
         }
         for (Ant pupa : pupaeToHatch) {
-            AntType newType = determineHatchType(colony);
+            AntClass newType = determineHatchType(colony);
             pupa.transform(colony, newType);
-            if (AntSubtypeService.isEligibleType(newType)) {
-                pupa.setSubtypeProfile(AntSubtypeService.rollProfile(colony, newType));
-                AntSubtypeService.applySubtypeStats(pupa, colony);
+            if (AntModService.isEligibleClass(newType)) {
+                pupa.setModProfile(AntModService.rollProfile(colony, newType));
+                AntModService.applyModStats(pupa, colony);
             }
-            colony.getAntsByType(newType).add(pupa);
+            colony.getAntsByClass(newType).add(pupa);
         }
         colony.getPupae().removeAll(pupaeToHatch);
     }
@@ -160,12 +160,12 @@ public class ColonyPopulationService {
 
         float w = 100.0f - (s + m + p + d);
 
-        colony.setHatchRate(GameConstants.TYPE_WORKER, w);
-        colony.setHatchRate(GameConstants.TYPE_SOLDIER, s);
-        colony.setHatchRate(GameConstants.TYPE_MAJOR, m);
-        colony.setHatchRate(GameConstants.TYPE_PRINCESS, p);
-        colony.setHatchRate(GameConstants.TYPE_DRONE, d);
-        AntSubtypeService.applyAutomatedSubtypeRates(colony);
+        colony.setHatchRate(GameConstants.CLASS_WORKER, w);
+        colony.setHatchRate(GameConstants.CLASS_SOLDIER, s);
+        colony.setHatchRate(GameConstants.CLASS_MAJOR, m);
+        colony.setHatchRate(GameConstants.CLASS_PRINCESS, p);
+        colony.setHatchRate(GameConstants.CLASS_DRONE, d);
+        AntModService.applyAutomatedModRates(colony);
     }
 
     public void runHatching(Colony colony){
@@ -174,8 +174,8 @@ public class ColonyPopulationService {
         }
 
         hatchPupae(colony);
-        evolveAnts(colony, colony.getLarvae(), colony.getPupae(), GameConstants.TYPE_PUPA);
-        evolveAnts(colony, colony.getEggs(), colony.getLarvae(), GameConstants.TYPE_LARVA);
+        evolveAnts(colony, colony.getLarvae(), colony.getPupae(), GameConstants.CLASS_PUPA);
+        evolveAnts(colony, colony.getEggs(), colony.getLarvae(), GameConstants.CLASS_LARVA);
     }
 
     public void runAging(Colony colony){
@@ -190,14 +190,14 @@ public class ColonyPopulationService {
         int agedDeaths = 0;
         for (Ant ant : antsToKill) {
              if (ant.isAlive()) { 
-                AntType originalType = ant.getAntType();
+                AntClass originalType = ant.getAntClass();
                 AntRole formerRole = ant.getRole();
                 boolean wasOnTrade = ant.isOnTrade();
                 ant.goDie(colony, DeathCause.OLD_AGE);
                 colony.recordAntDeath(ant, DeathCause.OLD_AGE);
                 colony.handleAntCasualtyAftermath(ant, originalType, formerRole, wasOnTrade);
                 
-                List<Ant> antList = colony.getAntsByType(originalType);
+                List<Ant> antList = colony.getAntsByClass(originalType);
                 if (antList != null) antList.remove(ant);
                 agedDeaths++;
             }
@@ -276,16 +276,16 @@ public class ColonyPopulationService {
         ColonyStatsService stats = colony.getStatsService();
         ColonyResourceService resources = colony.getResourceService();
         
-        List<AntType> adultDrinkOrder = Arrays.asList(
-            GameConstants.TYPE_DRONE, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_WORKER, GameConstants.TYPE_QUEEN
+        List<AntClass> adultDrinkOrder = Arrays.asList(
+            GameConstants.CLASS_DRONE, GameConstants.CLASS_PRINCESS, GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_SOLDIER, GameConstants.CLASS_WORKER, GameConstants.CLASS_QUEEN
         );
         
         int resistanceChance = stats.getThirstResistance(colony, currentTemp);
         List<Ant> thirstyCandidates = new ArrayList<>();
         
-        for (AntType type : adultDrinkOrder) {
-            List<Ant> list = colony.getAntsByType(type);
+        for (AntClass type : adultDrinkOrder) {
+            List<Ant> list = colony.getAntsByClass(type);
             for (Ant ant : list) {
                 if (GameRandom.nextInt(100) >= resistanceChance) {
                     thirstyCandidates.add(ant);
@@ -305,19 +305,19 @@ public class ColonyPopulationService {
         List<Ant> doomedThirsty = ColonyResourceDeathSelection.selectVictims(
             thirstyCandidates, (int) waterDeficit, null);
 
-        List<AntType> eatTypes = Arrays.asList(
-            GameConstants.TYPE_DRONE, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_LARVA, GameConstants.TYPE_WORKER, GameConstants.TYPE_QUEEN
+        List<AntClass> eatTypes = Arrays.asList(
+            GameConstants.CLASS_DRONE, GameConstants.CLASS_PRINCESS, GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_SOLDIER, GameConstants.CLASS_LARVA, GameConstants.CLASS_WORKER, GameConstants.CLASS_QUEEN
         );
         
         List<Ant> hungryCandidates = new ArrayList<>();
         int foodNeeded = 0;
 
-        for (AntType type : eatTypes) {
-            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) {
+        for (AntClass type : eatTypes) {
+            if (type == GameConstants.CLASS_EGG || type == GameConstants.CLASS_PUPA) {
                 continue;
             }
-            List<Ant> list = colony.getAntsByType(type);
+            List<Ant> list = colony.getAntsByClass(type);
             for (Ant ant : list) {
                 int consumptionPerAnt = Math.max(1, (int) Math.ceil(ant.getConsumption()));
                 foodNeeded += consumptionPerAnt;
@@ -402,14 +402,14 @@ public class ColonyPopulationService {
         int count = 0;
         for (Ant ant : ants) {
             if (ant.isAlive()) {
-                AntType originalType = ant.getAntType();
+                AntClass originalType = ant.getAntClass();
                 AntRole formerRole = ant.getRole();
                 boolean wasOnTrade = ant.isOnTrade();
                 ant.goDie(colony, cause);
                 colony.recordAntDeath(ant, cause);
                 colony.handleAntCasualtyAftermath(ant, originalType, formerRole, wasOnTrade);
                 
-                List<Ant> antList = colony.getAntsByType(originalType);
+                List<Ant> antList = colony.getAntsByClass(originalType);
                 if (antList != null) antList.remove(ant);
                 count++;
             }
@@ -445,12 +445,12 @@ public class ColonyPopulationService {
         if (finalDeaths <= 0) return;
 
         List<Ant> victims = new ArrayList<>();
-        List<AntType> killableTypes = Arrays.asList(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR);
+        List<AntClass> killableTypes = Arrays.asList(GameConstants.CLASS_WORKER, GameConstants.CLASS_SOLDIER, GameConstants.CLASS_MAJOR);
         
         int killed = 0;
-        for (AntType type : killableTypes) {
+        for (AntClass type : killableTypes) {
             if (killed >= finalDeaths) break;
-            List<Ant> population = colony.getAntsByType(type);
+            List<Ant> population = colony.getAntsByClass(type);
             
             for (Ant ant : population) {
                 if (killed >= finalDeaths) break;

@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
@@ -749,7 +749,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             Map<ResourceType, Double> returnLoad = incoming.hasPendingUpdate() && incoming.getPendingLoad() != null
                     ? new HashMap<>(incoming.getPendingLoad())
                     : new HashMap<>(incoming.getLoad());
-            Map<AntType, Integer> transport = outgoing.hasPendingUpdate() && outgoing.getPendingTransport() != null
+            Map<AntClass, Integer> transport = outgoing.hasPendingUpdate() && outgoing.getPendingTransport() != null
                     ? new HashMap<>(outgoing.getPendingTransport())
                     : new HashMap<>(outgoing.getTransport());
             boolean recurrent = outgoing.hasPendingUpdate() ? outgoing.isPendingRecurrent() : outgoing.isRecurrent();
@@ -1116,7 +1116,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final boolean crossDynasty;
         private final Map<ResourceType, JSpinner> resourceSpinners = new HashMap<>();
         private final Map<ResourceType, JSpinner> returnResourceSpinners = new HashMap<>();
-        private final Map<AntType, JSpinner> antSpinners = new HashMap<>();
+        private final Map<AntClass, JSpinner> antSpinners = new HashMap<>();
         private final JComboBox<TradeMethod> methodCombo;
         private final JCheckBox recurrentCheck;
         private final JCheckBox bilateralCheck;
@@ -1258,18 +1258,18 @@ public class DynastyManagementDialog extends ZeroDialog {
             antGrid.setBorder(BorderFactory.createTitledBorder(LanguageStrings.get(LanguageStrings.TRADE_PERSONNEL)));
             antGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
             
-            Map<AntType, Integer> availableRoles = new HashMap<>();
-            availableRoles.put(GameConstants.TYPE_WORKER, origin.getAssignedRoleCount(GameConstants.ROLE_COURIER));
-            availableRoles.put(GameConstants.TYPE_MAJOR, origin.getAssignedRoleCount(GameConstants.ROLE_TRANSPORT));
-            availableRoles.put(GameConstants.TYPE_SOLDIER, origin.getAssignedRoleCount(GameConstants.ROLE_ESCORT));
-            availableRoles.put(GameConstants.TYPE_PRINCESS, origin.getAssignedRoleCount(GameConstants.ROLE_SKYTRANS));
+            Map<AntClass, Integer> availableRoles = new HashMap<>();
+            availableRoles.put(GameConstants.CLASS_WORKER, origin.getAssignedRoleCount(GameConstants.ROLE_COURIER));
+            availableRoles.put(GameConstants.CLASS_MAJOR, origin.getAssignedRoleCount(GameConstants.ROLE_TRANSPORT));
+            availableRoles.put(GameConstants.CLASS_SOLDIER, origin.getAssignedRoleCount(GameConstants.ROLE_ESCORT));
+            availableRoles.put(GameConstants.CLASS_PRINCESS, origin.getAssignedRoleCount(GameConstants.ROLE_SKYTRANS));
 
             if (engine.getTradeManager() != null) {
                 for (Trade t : engine.getTradeManager().getActiveTrades()) {
                     if (t == existingTrade || !t.isActive()) continue;
                     if (t.getOrigin().getColony() == origin) {
-                        Map<AntType, Integer> trans = t.hasPendingUpdate() ? t.getPendingTransport() : t.getTransport();
-                        for (Map.Entry<AntType, Integer> entry : trans.entrySet()) {
+                        Map<AntClass, Integer> trans = t.hasPendingUpdate() ? t.getPendingTransport() : t.getTransport();
+                        for (Map.Entry<AntClass, Integer> entry : trans.entrySet()) {
                             int current = availableRoles.getOrDefault(entry.getKey(), 0);
                             availableRoles.put(entry.getKey(), Math.max(0, current - entry.getValue()));
                         }
@@ -1277,15 +1277,15 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             }
 
-            List<AntType> tradeAnts = List.of(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS);
-            for (AntType at : tradeAnts) {
+            List<AntClass> tradeAnts = List.of(GameConstants.CLASS_WORKER, GameConstants.CLASS_SOLDIER, GameConstants.CLASS_MAJOR, GameConstants.CLASS_PRINCESS);
+            for (AntClass at : tradeAnts) {
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
                 p.setOpaque(false);
                 String labelName = at.getName();
-                if (at == GameConstants.TYPE_WORKER) labelName = LanguageStrings.get(LanguageStrings.TRADE_COURIERS);
-                else if (at == GameConstants.TYPE_MAJOR) labelName = LanguageStrings.get(LanguageStrings.TRADE_TRANSPORTS);
-                else if (at == GameConstants.TYPE_SOLDIER) labelName = LanguageStrings.get(LanguageStrings.TRADE_ESCORTS);
-                else if (at == GameConstants.TYPE_PRINCESS) labelName = LanguageStrings.get(LanguageStrings.TRADE_FLYERS);
+                if (at == GameConstants.CLASS_WORKER) labelName = LanguageStrings.get(LanguageStrings.TRADE_COURIERS);
+                else if (at == GameConstants.CLASS_MAJOR) labelName = LanguageStrings.get(LanguageStrings.TRADE_TRANSPORTS);
+                else if (at == GameConstants.CLASS_SOLDIER) labelName = LanguageStrings.get(LanguageStrings.TRADE_ESCORTS);
+                else if (at == GameConstants.CLASS_PRINCESS) labelName = LanguageStrings.get(LanguageStrings.TRADE_FLYERS);
                 
                 int available = availableRoles.getOrDefault(at, 0);
                 JLabel label = new JLabel(labelName + " (" + available + ")", at.getIcon(), JLabel.LEFT);
@@ -1472,10 +1472,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             boolean princessesOnly = true;
             boolean anyPrincesses = false;
-            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+            for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
                 int count = (Integer) entry.getValue().getValue();
                 if (count > 0) {
-                    if (entry.getKey() != GameConstants.TYPE_PRINCESS) { princessesOnly = false; }
+                    if (entry.getKey() != GameConstants.CLASS_PRINCESS) { princessesOnly = false; }
                     else { anyPrincesses = true; }
                 }
             }
@@ -1523,23 +1523,23 @@ public class DynastyManagementDialog extends ZeroDialog {
             float totalAntSpeed = 0;
             int totalAnts = 0;
             
-            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+            for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
                 int count = (Integer) entry.getValue().getValue();
                 if (count <= 0) continue;
 
-                AntType type = entry.getKey();
+                AntClass type = entry.getKey();
                 totalAnts += count;
                 totalAntSpeed += type.getSpeedMult() * count;
 
-                if (type == GameConstants.TYPE_WORKER) { 
+                if (type == GameConstants.CLASS_WORKER) {
                     totalCap += count * baseCap * 1.0;
                     totalSec += count * baseSec * 1.0;
-                } else if (type == GameConstants.TYPE_MAJOR) { 
+                } else if (type == GameConstants.CLASS_MAJOR) {
                     totalCap += count * baseCap * 5.0;
                     totalSec += count * baseSec * 2.5;
-                } else if (type == GameConstants.TYPE_SOLDIER) { 
+                } else if (type == GameConstants.CLASS_SOLDIER) {
                     totalSec += count * baseSec * 10.0;
-                } else if (type == GameConstants.TYPE_PRINCESS) {
+                } else if (type == GameConstants.CLASS_PRINCESS) {
                     totalCap += count * baseCap * 1.0;
                     totalSec += count * baseSec * 1.0;
                 }
@@ -1549,7 +1549,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             this.totalTransportCapacity = totalCap;
             
             float methodSpeed = method.getSpeedMult();
-            float workerSpeed = GameConstants.TYPE_WORKER.getSpeedMult();
+            float workerSpeed = GameConstants.CLASS_WORKER.getSpeedMult();
             float avgAntSpeed = (totalAnts > 0) ? (totalAntSpeed / totalAnts) : workerSpeed;
             float speedFactor = methodSpeed * (avgAntSpeed / workerSpeed);
             
@@ -1647,8 +1647,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             }
 
-            Map<AntType, Integer> transport = new HashMap<>();
-            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+            Map<AntClass, Integer> transport = new HashMap<>();
+            for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
                 int val = (Integer) entry.getValue().getValue();
                 if (val > 0) transport.put(entry.getKey(), val);
             }

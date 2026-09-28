@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -31,13 +31,13 @@ public final class ColonySpriteMergeLod {
     public static final int ZONE_COUNT = 10;
 
     public record AntMergeBucket(
-            int typeId,
+            int classId,
             int roleId,
-            int subtypeCode,
+            int modCode,
             boolean parasiticMite,
             int carryPrimaryId,
             int carrySecondaryId,
-            int carryAntTypeId,
+            int carryAntClassId,
             int cellX,
             int cellY) {
     }
@@ -151,20 +151,20 @@ public final class ColonySpriteMergeLod {
         return Math.floorDiv(coord, GameNumbers.SPRITE_MERGE_POSITION_CELL_PX);
     }
 
-    public static AntMergeBucket antBucket(Ant ant, AntType type) {
+    public static AntMergeBucket antBucket(Ant ant, AntClass type) {
         int roleId = ant.getRole() != null ? ant.getRole().getId() : 0;
-        int subtypeCode = ant.getSubtypeProfile().getCode();
+        int modCode = ant.getModProfile().getCode();
         int carryPrimaryId = ant.getCarrying() != null ? ant.getCarrying().getId() : 0;
         int carrySecondaryId = ant.getCarryingSec() != null ? ant.getCarryingSec().getId() : 0;
-        int carryAntTypeId = ant.getCarryingAnt() != null ? ant.getCarryingAnt().getId() : 0;
+        int carryAntClassId = ant.getCarryingAnt() != null ? ant.getCarryingAnt().getId() : 0;
         return new AntMergeBucket(
                 type.getId(),
                 roleId,
-                subtypeCode,
+                modCode,
                 ant.isParasiticMiteInfected(),
                 carryPrimaryId,
                 carrySecondaryId,
-                carryAntTypeId,
+                carryAntClassId,
                 spatialCell(ant.getX()),
                 spatialCell(ant.getY()));
     }
@@ -186,11 +186,11 @@ public final class ColonySpriteMergeLod {
         if (colony == null || layout == null || currentDimension == null) {
             return new ZoneMergeContext(layout, currentDimension, occupancy);
         }
-        for (AntType type : GameConstants.getAntTypes()) {
-            if (type == GameConstants.TYPE_DEAD) {
+        for (AntClass type : GameConstants.getAntClasses()) {
+            if (type == GameConstants.CLASS_DEAD) {
                 continue;
             }
-            for (Ant ant : colony.getAntsByType(type)) {
+            for (Ant ant : colony.getAntsByClass(type)) {
                 if (ant.getDimension() != currentDimension || ant.getDimension() == WorldSpaces.TUNNEL_WORLD) {
                     continue;
                 }

@@ -87,7 +87,7 @@ class WarJumpingCombatTest {
         defenderColony.getWarAssignedRoleCounts().clear();
         defenderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_ARTILLERY, 5);
         for (int i = 0; i < 5; i++) {
-            Ant major = new Ant(defenderColony, GameConstants.TYPE_MAJOR);
+            Ant major = new Ant(defenderColony, GameConstants.CLASS_MAJOR);
             major.setRole(GameConstants.ROLE_ARTILLERY);
             defenderColony.getMajors().add(major);
         }
@@ -137,13 +137,13 @@ class WarJumpingCombatTest {
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < Math.max(0, needed); i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         for (int i = 0; i < 40; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         if (colony.getQueens().isEmpty()) {
-            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+            colony.getQueens().add(new Ant(colony, GameConstants.CLASS_QUEEN));
         }
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 20);
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);

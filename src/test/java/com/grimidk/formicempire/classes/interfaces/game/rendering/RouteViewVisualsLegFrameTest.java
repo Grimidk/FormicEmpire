@@ -13,36 +13,36 @@ class RouteViewVisualsLegFrameTest {
     @Test
     void flyingWingedAntUsesFlyingLegFrame() {
         assertEquals(GameNumbers.ANT_LEG_FRAME_FLYING,
-                RouteViewVisuals.resolveLegFrame(GameConstants.TYPE_DRONE, true, true, 0f, 1.2f, 1f));
+                RouteViewVisuals.resolveLegFrame(GameConstants.CLASS_DRONE, true, true, 0f, 1.2f, 1f));
         assertEquals(GameNumbers.ANT_LEG_FRAME_FLYING,
-                RouteViewVisuals.resolveLegFrame(GameConstants.TYPE_PRINCESS, true, false, 0f, 0.5f, 1f));
+                RouteViewVisuals.resolveLegFrame(GameConstants.CLASS_PRINCESS, true, false, 0f, 0.5f, 1f));
     }
 
     @Test
     void groundedMovingAntCyclesWalkFrames() {
-        int a = RouteViewVisuals.resolveLegFrame(GameConstants.TYPE_WORKER, false, true, 0f, 0f, 1f);
-        int b = RouteViewVisuals.resolveLegFrame(GameConstants.TYPE_WORKER, false, true, 0f, 0.2f, 1f);
+        int a = RouteViewVisuals.resolveLegFrame(GameConstants.CLASS_WORKER, false, true, 0f, 0f, 1f);
+        int b = RouteViewVisuals.resolveLegFrame(GameConstants.CLASS_WORKER, false, true, 0f, 0.2f, 1f);
         assertEquals(1, a);
         assertTrue(b >= 1 && b <= GameNumbers.ANT_LEG_FRAME_COUNT);
     }
 
     @Test
     void idleAntStaysOnLegOne() {
-        assertEquals(1, RouteViewVisuals.resolveLegFrame(GameConstants.TYPE_SOLDIER, false, false, 1.5f, 9f, 1f));
+        assertEquals(1, RouteViewVisuals.resolveLegFrame(GameConstants.CLASS_SOLDIER, false, false, 1.5f, 9f, 1f));
     }
 
     @Test
     void antennaFrameOscillatesBetweenOneAndTwo() {
-        int closed = RouteViewVisuals.resolveAntennaFrame(GameConstants.TYPE_WORKER, 0f, 0f, 1f);
-        int twitch = RouteViewVisuals.resolveAntennaFrame(GameConstants.TYPE_WORKER, 1.7f, 2.4f, 1f);
+        int closed = RouteViewVisuals.resolveAntennaFrame(GameConstants.CLASS_WORKER, 0f, 0f, 1f);
+        int twitch = RouteViewVisuals.resolveAntennaFrame(GameConstants.CLASS_WORKER, 1.7f, 2.4f, 1f);
         assertEquals(1, closed);
         assertTrue(twitch == 1 || twitch == 2);
     }
 
     @Test
     void reserveAntsKeepJawClosedButStillTwitchAntennae() {
-        assertEquals(1, RouteViewVisuals.resolveJawFrame(GameConstants.TYPE_SOLDIER, true, 1.7f, 2.4f, 1f));
-        int antenna = RouteViewVisuals.resolveAntennaFrame(GameConstants.TYPE_SOLDIER, 1.7f, 2.4f, 1f);
+        assertEquals(1, RouteViewVisuals.resolveJawFrame(GameConstants.CLASS_SOLDIER, true, 1.7f, 2.4f, 1f));
+        int antenna = RouteViewVisuals.resolveAntennaFrame(GameConstants.CLASS_SOLDIER, 1.7f, 2.4f, 1f);
         assertTrue(antenna == 1 || antenna == 2);
     }
 }

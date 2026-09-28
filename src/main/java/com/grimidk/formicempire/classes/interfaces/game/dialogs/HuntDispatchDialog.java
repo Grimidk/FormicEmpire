@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyHuntService;
@@ -19,16 +19,16 @@ import java.util.Map;
 
 public final class HuntDispatchDialog extends ZeroDialog {
 
-    private static final List<AntType> HUNT_ANT_TYPES = List.of(
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_PRINCESS);
+    private static final List<AntClass> HUNT_ANT_TYPES = List.of(
+            GameConstants.CLASS_SOLDIER,
+            GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_PRINCESS);
 
     private final Colony colony;
     private final KnownHuntTarget target;
     private final Runnable onDispatched;
-    private final Map<AntType, JSpinner> antSpinners = new HashMap<>();
-    private final Map<AntType, Integer> availableByType = new HashMap<>();
+    private final Map<AntClass, JSpinner> antSpinners = new HashMap<>();
+    private final Map<AntClass, Integer> availableByType = new HashMap<>();
     private final int maxParty;
     private boolean updating;
 
@@ -44,7 +44,7 @@ public final class HuntDispatchDialog extends ZeroDialog {
         this.target = target;
         this.onDispatched = onDispatched;
         this.maxParty = ColonyHuntService.maxPartyCapacity(colony);
-        availableByType.putAll(ColonyHuntService.getAvailableHunterCountsByType(colony));
+        availableByType.putAll(ColonyHuntService.getAvailableHunterCountsByClass(colony));
 
         JPanel headerPanel = new JPanel(new GridLayout(1, 4, 16, 8));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 10, 20));
@@ -73,7 +73,7 @@ public final class HuntDispatchDialog extends ZeroDialog {
                 BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR),
                 LanguageStrings.get(LanguageStrings.HUNT_PERSONNEL)));
         antGrid.setBackground(AssetStyles.UI_BG_PRIMARY);
-        for (AntType type : HUNT_ANT_TYPES) {
+        for (AntClass type : HUNT_ANT_TYPES) {
             antGrid.add(buildAntRow(type));
         }
         mainPanel.add(antGrid);
@@ -92,11 +92,11 @@ public final class HuntDispatchDialog extends ZeroDialog {
         updatePreview();
     }
 
-    private JPanel buildAntRow(AntType type) {
+    private JPanel buildAntRow(AntClass type) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
         row.setBackground(AssetStyles.UI_BG_PRIMARY);
         int available = availableByType.getOrDefault(type, 0);
-        row.add(CritterPanelUtils.buildAntTypeAvailabilityLabel(type, available));
+        row.add(CritterPanelUtils.buildAntClassAvailabilityLabel(type, available));
 
         int initial = 0;
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, 0, available, 1));
@@ -123,7 +123,7 @@ public final class HuntDispatchDialog extends ZeroDialog {
         return row;
     }
 
-    private void setMaxForType(AntType type) {
+    private void setMaxForType(AntClass type) {
         JSpinner spinner = antSpinners.get(type);
         if (spinner == null) {
             return;
@@ -135,7 +135,7 @@ public final class HuntDispatchDialog extends ZeroDialog {
         updatePreview();
     }
 
-    private void enforcePartyLimit(AntType changedType) {
+    private void enforcePartyLimit(AntClass changedType) {
         int total = getTotalSelected();
         if (total <= maxParty) {
             return;
@@ -161,9 +161,9 @@ public final class HuntDispatchDialog extends ZeroDialog {
         return total;
     }
 
-    private Map<AntType, Integer> getSelectedCounts() {
-        Map<AntType, Integer> counts = new HashMap<>();
-        for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+    private Map<AntClass, Integer> getSelectedCounts() {
+        Map<AntClass, Integer> counts = new HashMap<>();
+        for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
             counts.put(entry.getKey(), (Integer) entry.getValue().getValue());
         }
         return counts;
@@ -192,7 +192,7 @@ public final class HuntDispatchDialog extends ZeroDialog {
     private void applyDefaultSelection() {
         updating = true;
         try {
-            for (AntType type : HUNT_ANT_TYPES) {
+            for (AntClass type : HUNT_ANT_TYPES) {
                 if (availableByType.getOrDefault(type, 0) > 0) {
                     JSpinner spinner = antSpinners.get(type);
                     if (spinner != null) {

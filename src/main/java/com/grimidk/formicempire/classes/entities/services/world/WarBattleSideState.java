@@ -160,7 +160,7 @@ public final class WarBattleSideState {
         if (ant == null) {
             return GameConstants.BATTLE_LINE_INFANTRY;
         }
-        if (ant.getAntType() == GameConstants.TYPE_QUEEN) {
+        if (ant.getAntClass() == GameConstants.CLASS_QUEEN) {
             return GameConstants.BATTLE_LINE_INFANTRY;
         }
         BattleLine line = GameConstants.getBattleLineForRole(ant.getRole());

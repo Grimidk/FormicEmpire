@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -47,7 +47,7 @@ public class DynastyLogisticsAutomationService {
                 Map<ResourceType, Double> load = DynastyTradeAutomation.computeOutboundLoad(origin, neighbor);
                 if (load.isEmpty()) continue;
 
-                Map<AntType, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
+                Map<AntClass, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
                 if (transport.isEmpty()) continue;
 
                 Hex targetHex = tradeService.getNeighborHex(world, origin, neighbor);

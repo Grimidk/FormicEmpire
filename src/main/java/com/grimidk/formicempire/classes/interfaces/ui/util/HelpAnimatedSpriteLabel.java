@@ -1,11 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces.ui.util;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
@@ -57,12 +56,12 @@ public final class HelpAnimatedSpriteLabel {
         return forAnt(showcase.type(), showcase.species(), showcase.profile());
     }
 
-    public static Component forAnt(AntType type, AntSpecies species, AntSubtypeProfile profile) {
+    public static Component forAnt(AntClass type, AntSpecies species, AntModProfile profile) {
         if (type == null) {
             return bordered(new JLabel());
         }
         AntSpecies resolvedSpecies = species != null ? species : GameConstants.SPECIES_OMNI;
-        AntSubtypeProfile resolvedProfile = profile != null ? profile : AntSubtypeProfile.standard();
+        AntModProfile resolvedProfile = profile != null ? profile : AntModProfile.standard();
         ImageIcon fallback = GameConstants.getAntSprite(type, resolvedSpecies, resolvedProfile);
         if (fallback == null) {
             fallback = type.getIcon();
@@ -87,62 +86,62 @@ public final class HelpAnimatedSpriteLabel {
         });
     }
 
-    private static boolean usesAnimatedAntSprite(AntType type) {
-        return type != GameConstants.TYPE_EGG
-                && type != GameConstants.TYPE_LARVA
-                && type != GameConstants.TYPE_PUPA
-                && type != GameConstants.TYPE_DEAD
-                && type != GameConstants.TYPE_ZOMBIE;
+    private static boolean usesAnimatedAntSprite(AntClass type) {
+        return type != GameConstants.CLASS_EGG
+                && type != GameConstants.CLASS_LARVA
+                && type != GameConstants.CLASS_PUPA
+                && type != GameConstants.CLASS_DEAD
+                && type != GameConstants.CLASS_ZOMBIE;
     }
 
     private static AntShowcase resolveAntShowcase(AntSpecies species) {
-        AntType type = GameConstants.TYPE_WORKER;
-        AntSubtypeProfile profile = AntSubtypeProfile.standard();
+        AntClass type = GameConstants.CLASS_WORKER;
+        AntModProfile profile = AntModProfile.standard();
 
         if (species != null && species.getBaseUpgrades().contains(GameUnlocks.TYPE_MAJOR)) {
-            type = GameConstants.TYPE_MAJOR;
+            type = GameConstants.CLASS_MAJOR;
         }
 
-        AntSubtype traitSubtype = findSpeciesTraitSubtype(species);
-        if (traitSubtype != null) {
-            profile = profileWithSubtype(traitSubtype);
-            if (traitSubtype.getAttackMult() > 1f) {
-                type = GameConstants.TYPE_SOLDIER;
+        AntMod traitMod = findSpeciesTraitMod(species);
+        if (traitMod != null) {
+            profile = profileWithMod(traitMod);
+            if (traitMod.getAttackMult() > 1f) {
+                type = GameConstants.CLASS_SOLDIER;
             } else {
-                type = GameConstants.TYPE_WORKER;
+                type = GameConstants.CLASS_WORKER;
             }
         }
 
         return new AntShowcase(type, species, profile);
     }
 
-    private static AntSubtype findSpeciesTraitSubtype(AntSpecies species) {
+    private static AntMod findSpeciesTraitMod(AntSpecies species) {
         if (species == null) {
             return null;
         }
-        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
-            if (subtype == null || subtype.isNone() || subtype.getRequiredUpgrade() == null) {
+        for (AntMod mod : GameConstants.getAntMods()) {
+            if (mod == null || mod.isNone() || mod.getRequiredUpgrade() == null) {
                 continue;
             }
-            if (species.getBaseUpgrades().contains(subtype.getRequiredUpgrade())) {
-                return subtype;
+            if (species.getBaseUpgrades().contains(mod.getRequiredUpgrade())) {
+                return mod;
             }
         }
         return null;
     }
 
-    private static AntSubtypeProfile profileWithSubtype(AntSubtype subtype) {
-        int head = AntSubtype.DIGIT_NONE;
-        int torso = AntSubtype.DIGIT_NONE;
-        int abdomen = AntSubtype.DIGIT_NONE;
-        int other = AntSubtype.DIGIT_NONE;
-        switch (subtype.getSlot()) {
-            case HEAD -> head = subtype.getDigit();
-            case TORSO -> torso = subtype.getDigit();
-            case ABDOMEN -> abdomen = subtype.getDigit();
-            case OTHER -> other = subtype.getDigit();
+    private static AntModProfile profileWithMod(AntMod mod) {
+        int head = AntMod.DIGIT_NONE;
+        int torso = AntMod.DIGIT_NONE;
+        int abdomen = AntMod.DIGIT_NONE;
+        int other = AntMod.DIGIT_NONE;
+        switch (mod.getSlot()) {
+            case HEAD -> head = mod.getDigit();
+            case TORSO -> torso = mod.getDigit();
+            case ABDOMEN -> abdomen = mod.getDigit();
+            case OTHER -> other = mod.getDigit();
         }
-        return AntSubtypeProfile.of(head, torso, abdomen, other);
+        return AntModProfile.of(head, torso, abdomen, other);
     }
 
     private static JLabel bordered(JLabel label) {
@@ -150,7 +149,7 @@ public final class HelpAnimatedSpriteLabel {
         return label;
     }
 
-    private record AntShowcase(AntType type, AntSpecies species, AntSubtypeProfile profile) {
+    private record AntShowcase(AntClass type, AntSpecies species, AntModProfile profile) {
     }
 
     private static final class AnimatedLabel extends JLabel {

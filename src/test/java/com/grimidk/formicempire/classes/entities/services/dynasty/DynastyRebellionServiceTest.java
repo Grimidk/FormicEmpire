@@ -328,7 +328,7 @@ class DynastyRebellionServiceTest {
                 findHex(world, seed),
                 Map.of(),
                 Map.of(),
-                Map.of(GameConstants.TYPE_WORKER, 1),
+                Map.of(GameConstants.CLASS_WORKER, 1),
                 false,
                 false,
                 GameConstants.METHOD_LAND);
@@ -351,7 +351,7 @@ class DynastyRebellionServiceTest {
                 findHex(world, joiner),
                 Map.of(),
                 Map.of(),
-                Map.of(GameConstants.TYPE_WORKER, 1),
+                Map.of(GameConstants.CLASS_WORKER, 1),
                 false,
                 false,
                 GameConstants.METHOD_LAND);
@@ -574,9 +574,9 @@ class DynastyRebellionServiceTest {
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
-        colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 5);
     }

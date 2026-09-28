@@ -13,7 +13,7 @@ class EngineDefaultRolesTest {
     @Test
     void sanitizeAcceptsRoleMatchingType() {
         int safe = Engine.sanitizeDefaultRoleId(
-                GameConstants.TYPE_WORKER,
+                GameConstants.CLASS_WORKER,
                 GameConstants.ROLE_NURSE.getId(),
                 GameConstants.ROLE_FORAGER.getId());
         assertEquals(GameConstants.ROLE_NURSE.getId(), safe);
@@ -22,7 +22,7 @@ class EngineDefaultRolesTest {
     @Test
     void sanitizeRejectsWrongTypeAndUsesFallback() {
         int safe = Engine.sanitizeDefaultRoleId(
-                GameConstants.TYPE_WORKER,
+                GameConstants.CLASS_WORKER,
                 GameConstants.ROLE_HUNTER.getId(),
                 GameConstants.ROLE_FORAGER.getId());
         assertEquals(GameConstants.ROLE_FORAGER.getId(), safe);
@@ -31,7 +31,7 @@ class EngineDefaultRolesTest {
     @Test
     void sanitizeRejectsUnknownId() {
         int safe = Engine.sanitizeDefaultRoleId(
-                GameConstants.TYPE_SOLDIER,
+                GameConstants.CLASS_SOLDIER,
                 -1,
                 GameConstants.ROLE_HUNTER.getId());
         assertEquals(GameConstants.ROLE_HUNTER.getId(), safe);
@@ -39,7 +39,7 @@ class EngineDefaultRolesTest {
 
     @Test
     void resolveUsesLegacyWhenEngineNull() {
-        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_WORKER, null);
+        AntRole r = Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_WORKER, null);
         assertEquals(GameConstants.ROLE_FORAGER, r);
     }
 
@@ -47,7 +47,7 @@ class EngineDefaultRolesTest {
     void resolveUsesEngineWhenValid() {
         Engine engine = new Engine();
         engine.setDefaultRoleWorker(GameConstants.ROLE_NURSE.getId());
-        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_WORKER, engine);
+        AntRole r = Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_WORKER, engine);
         assertEquals(GameConstants.ROLE_NURSE, r);
     }
 
@@ -55,7 +55,7 @@ class EngineDefaultRolesTest {
     void resolveFallsBackWhenEngineStoresInvalidRoleForType() {
         Engine engine = new Engine();
         engine.setDefaultRoleWorker(GameConstants.ROLE_HUNTER.getId());
-        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_WORKER, engine);
+        AntRole r = Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_WORKER, engine);
         assertEquals(GameConstants.ROLE_FORAGER, r);
     }
 
@@ -63,14 +63,14 @@ class EngineDefaultRolesTest {
     void resolveRejectsWarExclusiveDefaultRoleFromEngine() {
         Engine engine = new Engine();
         engine.setDefaultRoleSoldier(GameConstants.ROLE_WARRIOR.getId());
-        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_SOLDIER, engine);
+        AntRole r = Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_SOLDIER, engine);
         assertEquals(GameConstants.ROLE_HUNTER, r);
     }
 
     @Test
     void sanitizeRejectsWarExclusiveRole() {
         int safe = Engine.sanitizeDefaultRoleId(
-                GameConstants.TYPE_SOLDIER,
+                GameConstants.CLASS_SOLDIER,
                 GameConstants.ROLE_DEFENDER.getId(),
                 GameConstants.ROLE_HUNTER.getId());
         assertEquals(GameConstants.ROLE_HUNTER.getId(), safe);
@@ -78,7 +78,7 @@ class EngineDefaultRolesTest {
 
     @Test
     void legacyMajorDefaultIsPeacetimeRole() {
-        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_MAJOR, null);
+        AntRole r = Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_MAJOR, null);
         assertEquals(GameConstants.ROLE_CRANE, r);
     }
 
@@ -86,14 +86,14 @@ class EngineDefaultRolesTest {
     void defaultRoleIdForAntTypeMatchesResolve() {
         Engine engine = new Engine();
         engine.setDefaultRoleMajor(GameConstants.ROLE_CRANE.getId());
-        int id = Engine.defaultRoleIdForAntType(GameConstants.TYPE_MAJOR, engine);
+        int id = Engine.defaultRoleIdForAntClass(GameConstants.CLASS_MAJOR, engine);
         assertEquals(GameConstants.ROLE_CRANE.getId(), id);
     }
 
     @Test
     void sanitizeRejectsWarEconomyRole() {
         int safe = Engine.sanitizeDefaultRoleId(
-                GameConstants.TYPE_SOLDIER,
+                GameConstants.CLASS_SOLDIER,
                 GameConstants.ROLE_WARRIOR.getId(),
                 GameConstants.ROLE_MINER.getId());
         assertEquals(GameConstants.ROLE_MINER.getId(), safe);
@@ -112,7 +112,7 @@ class EngineDefaultRolesTest {
                         GameConstants.ROLE_GRAVER,
                         GameConstants.ROLE_COURIER,
                         GameConstants.ROLE_ENGINEER),
-                GameConstants.eligibleDefaultHatchRoles(GameConstants.TYPE_WORKER));
+                GameConstants.eligibleDefaultHatchRoles(GameConstants.CLASS_WORKER));
         assertEquals(
                 List.of(
                         GameConstants.ROLE_MINER,
@@ -120,13 +120,13 @@ class EngineDefaultRolesTest {
                         GameConstants.ROLE_HUNTER,
                         GameConstants.ROLE_CATCHER,
                         GameConstants.ROLE_ESCORT),
-                GameConstants.eligibleDefaultHatchRoles(GameConstants.TYPE_SOLDIER));
+                GameConstants.eligibleDefaultHatchRoles(GameConstants.CLASS_SOLDIER));
         assertEquals(
                 List.of(
                         GameConstants.ROLE_BORER,
                         GameConstants.ROLE_CRANE,
                         GameConstants.ROLE_TRANSPORT),
-                GameConstants.eligibleDefaultHatchRoles(GameConstants.TYPE_MAJOR));
+                GameConstants.eligibleDefaultHatchRoles(GameConstants.CLASS_MAJOR));
         assertEquals(
                 List.of(
                         GameConstants.ROLE_BREEDER,
@@ -134,12 +134,12 @@ class EngineDefaultRolesTest {
                         GameConstants.ROLE_SPY,
                         GameConstants.ROLE_ASSISTANT,
                         GameConstants.ROLE_SKYTRANS),
-                GameConstants.eligibleDefaultHatchRoles(GameConstants.TYPE_PRINCESS));
+                GameConstants.eligibleDefaultHatchRoles(GameConstants.CLASS_PRINCESS));
         assertEquals(
                 List.of(
                         GameConstants.ROLE_LAYER,
                         GameConstants.ROLE_RESEARCHER),
-                GameConstants.eligibleDefaultHatchRoles(GameConstants.TYPE_QUEEN));
+                GameConstants.eligibleDefaultHatchRoles(GameConstants.CLASS_QUEEN));
     }
 
     @Test
@@ -151,19 +151,19 @@ class EngineDefaultRolesTest {
         engine.setDefaultRolePrincess(GameConstants.ROLE_BREEDER.getId());
         engine.setDefaultRoleQueen(GameConstants.ROLE_LAYER.getId());
         assertEquals(GameConstants.ROLE_FORAGER,
-                Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_WORKER, engine));
+                Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_WORKER, engine));
         assertEquals(GameConstants.ROLE_HUNTER,
-                Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_SOLDIER, engine));
+                Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_SOLDIER, engine));
         assertEquals(GameConstants.ROLE_CRANE,
-                Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_MAJOR, engine));
+                Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_MAJOR, engine));
         assertEquals(GameConstants.ROLE_BREEDER,
-                Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_PRINCESS, engine));
+                Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_PRINCESS, engine));
         assertEquals(GameConstants.ROLE_LAYER,
-                Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_QUEEN, engine));
-        assertEquals(GameConstants.ROLE_FORAGER, Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_WORKER));
-        assertEquals(GameConstants.ROLE_HUNTER, Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_SOLDIER));
-        assertEquals(GameConstants.ROLE_CRANE, Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_MAJOR));
-        assertEquals(GameConstants.ROLE_BREEDER, Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_PRINCESS));
-        assertEquals(GameConstants.ROLE_LAYER, Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_QUEEN));
+                Engine.resolveDefaultRoleForAntClass(GameConstants.CLASS_QUEEN, engine));
+        assertEquals(GameConstants.ROLE_FORAGER, Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_WORKER));
+        assertEquals(GameConstants.ROLE_HUNTER, Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_SOLDIER));
+        assertEquals(GameConstants.ROLE_CRANE, Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_MAJOR));
+        assertEquals(GameConstants.ROLE_BREEDER, Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_PRINCESS));
+        assertEquals(GameConstants.ROLE_LAYER, Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_QUEEN));
     }
 }

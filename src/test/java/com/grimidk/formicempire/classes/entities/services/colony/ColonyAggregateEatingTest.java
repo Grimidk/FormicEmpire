@@ -22,7 +22,7 @@ class ColonyAggregateEatingTest {
 
         Colony large = new Colony(2, "Large", true);
         for (int i = 0; i < GameNumbers.EATING_AGGREGATE_ANT_THRESHOLD + 1; i++) {
-            large.getWorkers().add(new Ant(large, GameConstants.TYPE_WORKER));
+            large.getWorkers().add(new Ant(large, GameConstants.CLASS_WORKER));
         }
         assertTrue(ColonyPopulationService.shouldUseAggregateEating(large));
     }
@@ -31,14 +31,14 @@ class ColonyAggregateEatingTest {
     void totalConsumptionCacheAvoidsRescanUntilPopulationChanges() {
         Colony colony = new Colony(3, "Cache", true);
         for (int i = 0; i < 5; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         int first = colony.getTotalConsumption();
         int second = colony.getTotalConsumption();
         assertEquals(first, second);
 
-        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         int afterGrowth = colony.getTotalConsumption();
         assertTrue(afterGrowth >= first);
     }
@@ -49,7 +49,7 @@ class ColonyAggregateEatingTest {
         Colony colony = new Colony(4, "Collect", true);
         colony.setDynasty(dynasty);
         dynasty.unlockUpgrade(GameUnlocks.ROLE_FORAGER);
-        int fromRoleCount = AntSubtypeService.sumCollectingPowerFromRoleCount(colony, 50);
+        int fromRoleCount = AntModService.sumCollectingPowerFromRoleCount(colony, 50);
         assertEquals(50, fromRoleCount);
     }
 }

@@ -1,14 +1,14 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleSceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
@@ -350,19 +350,19 @@ public class WarBattleViewPanel extends JPanel {
         List<BattleAnt> ants = new ArrayList<>();
 
         appendLineAnts(ants, side.activeByLine(), dynasty, side.species(), random, false);
-        Map<BattleLine, Map<AntType, Integer>> reserveVisual =
+        Map<BattleLine, Map<AntClass, Integer>> reserveVisual =
                 allocateReserveVisual(side.reserveByLine(), WarBattleScene.MAX_VISUAL_RESERVE_ANTS_PER_SIDE);
         appendLineAnts(ants, reserveVisual, dynasty, side.species(), random, true);
         return ants;
     }
 
-    private static void appendLineAnts(List<BattleAnt> ants, Map<BattleLine, Map<AntType, Integer>> byLine,
+    private static void appendLineAnts(List<BattleAnt> ants, Map<BattleLine, Map<AntClass, Integer>> byLine,
             Dynasty dynasty, AntSpecies species, Random random, boolean reserve) {
         if (byLine == null || byLine.isEmpty()) {
             return;
         }
         for (BattleLine line : GameConstants.getBattleLines()) {
-            Map<AntType, Integer> typeCounts = byLine.get(line);
+            Map<AntClass, Integer> typeCounts = byLine.get(line);
             if (typeCounts == null || typeCounts.isEmpty()) {
                 continue;
             }
@@ -376,25 +376,25 @@ public class WarBattleViewPanel extends JPanel {
                 continue;
             }
             int indexInLine = 0;
-            for (Map.Entry<AntType, Integer> entry : typeCounts.entrySet()) {
-                AntType type = entry.getKey();
+            for (Map.Entry<AntClass, Integer> entry : typeCounts.entrySet()) {
+                AntClass type = entry.getKey();
                 int count = entry.getValue() != null ? entry.getValue() : 0;
-                if (type == null || type == GameConstants.TYPE_DEAD || count <= 0) {
+                if (type == null || type == GameConstants.CLASS_DEAD || count <= 0) {
                     continue;
                 }
                 if (line == GameConstants.BATTLE_LINE_AIR_SUPPORT) {
                     if (!RouteViewVisuals.isWinged(type)) {
                         continue;
                     }
-                } else if (type == GameConstants.TYPE_DRONE) {
+                } else if (type == GameConstants.CLASS_DRONE) {
                     continue;
                 }
                 for (int i = 0; i < count; i++) {
                     float laneY = lineTotal <= 1 ? 0.5f : indexInLine / (float) (lineTotal - 1);
                     laneY = Math.max(0f, Math.min(1f, laneY + (random.nextFloat() - 0.5f) * 0.02f));
-                    AntSubtypeProfile profile = dynasty != null
-                            ? AntSubtypeService.sampleProfileFromDynasty(dynasty, type)
-                            : AntSubtypeProfile.standard();
+                    AntModProfile profile = dynasty != null
+                            ? AntModService.sampleProfileFromDynasty(dynasty, type)
+                            : AntModProfile.standard();
                     ants.add(new BattleAnt(type, species, profile, line, laneY, random.nextFloat(),
                             random.nextFloat() * (float) (Math.PI * 2),
                             0.85f + random.nextFloat() * 0.3f,
@@ -406,13 +406,13 @@ public class WarBattleViewPanel extends JPanel {
         }
     }
 
-    private static Map<BattleLine, Map<AntType, Integer>> allocateReserveVisual(
-            Map<BattleLine, Map<AntType, Integer>> reserveByLine, int visualCap) {
+    private static Map<BattleLine, Map<AntClass, Integer>> allocateReserveVisual(
+            Map<BattleLine, Map<AntClass, Integer>> reserveByLine, int visualCap) {
         if (reserveByLine == null || reserveByLine.isEmpty() || visualCap <= 0) {
             return Map.of();
         }
         int total = 0;
-        for (Map<AntType, Integer> counts : reserveByLine.values()) {
+        for (Map<AntClass, Integer> counts : reserveByLine.values()) {
             if (counts == null) {
                 continue;
             }
@@ -429,12 +429,12 @@ public class WarBattleViewPanel extends JPanel {
             return reserveByLine;
         }
         float scale = visualCap / (float) total;
-        Map<BattleLine, Map<AntType, Integer>> scaled = new HashMap<>();
+        Map<BattleLine, Map<AntClass, Integer>> scaled = new HashMap<>();
         int assigned = 0;
-        for (Map.Entry<BattleLine, Map<AntType, Integer>> lineEntry : reserveByLine.entrySet()) {
-            Map<AntType, Integer> out = new HashMap<>();
+        for (Map.Entry<BattleLine, Map<AntClass, Integer>> lineEntry : reserveByLine.entrySet()) {
+            Map<AntClass, Integer> out = new HashMap<>();
             if (lineEntry.getValue() != null) {
-                for (Map.Entry<AntType, Integer> e : lineEntry.getValue().entrySet()) {
+                for (Map.Entry<AntClass, Integer> e : lineEntry.getValue().entrySet()) {
                     int count = e.getValue() != null ? e.getValue() : 0;
                     int visual = Math.max(0, Math.round(count * scale));
                     if (visual > 0 && e.getKey() != null) {
@@ -448,11 +448,11 @@ public class WarBattleViewPanel extends JPanel {
             }
         }
         if (assigned == 0) {
-            for (Map.Entry<BattleLine, Map<AntType, Integer>> lineEntry : reserveByLine.entrySet()) {
+            for (Map.Entry<BattleLine, Map<AntClass, Integer>> lineEntry : reserveByLine.entrySet()) {
                 if (lineEntry.getValue() == null) {
                     continue;
                 }
-                for (Map.Entry<AntType, Integer> e : lineEntry.getValue().entrySet()) {
+                for (Map.Entry<AntClass, Integer> e : lineEntry.getValue().entrySet()) {
                     if (e.getKey() != null && e.getValue() != null && e.getValue() > 0) {
                         scaled.put(lineEntry.getKey(), Map.of(e.getKey(), 1));
                         return scaled;
@@ -471,8 +471,8 @@ public class WarBattleViewPanel extends JPanel {
     }
 
     private String buildHeaderText(WarBattleScene scene) {
-        int attackerAnts = sumTypeCounts(scene.getAttacker().typeCounts());
-        int defenderAnts = sumTypeCounts(scene.getDefender().typeCounts());
+        int attackerAnts = sumClassCounts(scene.getAttacker().classCounts());
+        int defenderAnts = sumClassCounts(scene.getDefender().classCounts());
         String phase = formatPhase(scene.getPhase());
         String location = LanguageStrings.format(LanguageStrings.BATTLE_LOCATION_FMT, scene.getLocationName());
         String attackerPower = LanguageStrings.format(
@@ -500,12 +500,12 @@ public class WarBattleViewPanel extends JPanel {
                 + "  |  " + forces + "  |  " + attackerPower + " vs " + defenderPower + "  |  " + progress;
     }
 
-    private static int sumTypeCounts(Map<AntType, Integer> typeCounts) {
-        if (typeCounts == null || typeCounts.isEmpty()) {
+    private static int sumClassCounts(Map<AntClass, Integer> classCounts) {
+        if (classCounts == null || classCounts.isEmpty()) {
             return 0;
         }
         int sum = 0;
-        for (Integer count : typeCounts.values()) {
+        for (Integer count : classCounts.values()) {
             if (count != null) {
                 sum += count;
             }
@@ -546,9 +546,9 @@ public class WarBattleViewPanel extends JPanel {
     }
 
     private static final class BattleAnt {
-        private final AntType type;
+        private final AntClass type;
         private final AntSpecies species;
-        private final AntSubtypeProfile profile;
+        private final AntModProfile profile;
         private final BattleLine battleLine;
         private final float laneY;
         private final float laneJitter;
@@ -557,11 +557,11 @@ public class WarBattleViewPanel extends JPanel {
         private final float flyPhase;
         private final boolean reserve;
 
-        private BattleAnt(AntType type, AntSpecies species, AntSubtypeProfile profile, BattleLine battleLine,
+        private BattleAnt(AntClass type, AntSpecies species, AntModProfile profile, BattleLine battleLine,
                 float laneY, float laneJitter, float wobblePhase, float motionRate, float flyPhase, boolean reserve) {
             this.type = type;
             this.species = species;
-            this.profile = profile != null ? profile : AntSubtypeProfile.standard();
+            this.profile = profile != null ? profile : AntModProfile.standard();
             this.battleLine = battleLine != null ? battleLine : GameConstants.BATTLE_LINE_INFANTRY;
             this.laneY = laneY;
             this.laneJitter = laneJitter;

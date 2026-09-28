@@ -323,8 +323,8 @@ class WarServiceTest {
         player.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
 
         Colony capital = player.getCapital();
-        capital.getDrones().add(new Ant(capital, GameConstants.TYPE_DRONE));
-        Ant breeder = new Ant(capital, GameConstants.TYPE_PRINCESS);
+        capital.getDrones().add(new Ant(capital, GameConstants.CLASS_DRONE));
+        Ant breeder = new Ant(capital, GameConstants.CLASS_PRINCESS);
         breeder.setRole(GameConstants.ROLE_BREEDER);
         capital.getPrincesses().add(breeder);
 
@@ -390,10 +390,10 @@ class WarServiceTest {
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         for (int i = 0; i < 20; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 10);
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 10);

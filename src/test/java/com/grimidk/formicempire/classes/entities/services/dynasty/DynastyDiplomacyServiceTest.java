@@ -41,14 +41,14 @@ class DynastyDiplomacyServiceTest {
     private static void seedDiplomaticPopulation(Dynasty dynasty) {
         Colony colony = new Colony(dynasty.getId() * 100, "Capital", dynasty.isPlayer());
         colony.setCapital(true);
-        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         dynasty.addColony(colony);
     }
 
     private static void addSatelliteColonies(Dynasty dynasty, int count) {
         for (int i = 0; i < count; i++) {
             Colony satellite = new Colony(dynasty.getId() * 1000 + i, "Satellite " + i, dynasty.isPlayer());
-            satellite.getWorkers().add(new Ant(satellite, GameConstants.TYPE_WORKER));
+            satellite.getWorkers().add(new Ant(satellite, GameConstants.CLASS_WORKER));
             dynasty.addColony(satellite);
         }
     }
@@ -244,7 +244,7 @@ class DynastyDiplomacyServiceTest {
 
         for (int i = 0; i < GameNumbers.WAR_DECLARATION_MIN_POPULATION; i++) {
             smallColony.getWorkers().add(
-                    new com.grimidk.formicempire.classes.entities.critter.Ant(smallColony, GameConstants.TYPE_WORKER));
+                    new com.grimidk.formicempire.classes.entities.critter.Ant(smallColony, GameConstants.CLASS_WORKER));
         }
         assertTrue(DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(player));
     }
@@ -371,9 +371,9 @@ class DynastyDiplomacyServiceTest {
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
-        colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 5);
     }
@@ -864,7 +864,7 @@ class DynastyDiplomacyServiceTest {
         Colony capital = player.getCapital();
         capital.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
         capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 1);
-        Ant princess = new Ant(capital, GameConstants.TYPE_PRINCESS);
+        Ant princess = new Ant(capital, GameConstants.CLASS_PRINCESS);
         princess.setRole(GameConstants.ROLE_DIPLOMAT);
         capital.getPrincesses().add(princess);
         playerHex.setColony(capital);
@@ -895,7 +895,7 @@ class DynastyDiplomacyServiceTest {
         player.setDiplomaticReputation(neighbor.getId(), 70);
         neighbor.setDiplomaticReputation(player.getId(), 50);
         for (int i = 0; i < GameNumbers.GENETIC_EXCHANGE_DRONE_COST; i++) {
-            capital.getDrones().add(new Ant(capital, GameConstants.TYPE_DRONE));
+            capital.getDrones().add(new Ant(capital, GameConstants.CLASS_DRONE));
         }
 
         World world = emptyWorld();
@@ -917,10 +917,10 @@ class DynastyDiplomacyServiceTest {
         player.addColony(interior);
         player.setDiplomaticReputation(neighbor.getId(), 70);
         for (int i = 0; i < 10; i++) {
-            capital.getDrones().add(new Ant(capital, GameConstants.TYPE_DRONE));
+            capital.getDrones().add(new Ant(capital, GameConstants.CLASS_DRONE));
         }
         for (int i = 0; i < 15; i++) {
-            interior.getDrones().add(new Ant(interior, GameConstants.TYPE_DRONE));
+            interior.getDrones().add(new Ant(interior, GameConstants.CLASS_DRONE));
         }
 
         World world = emptyWorld();

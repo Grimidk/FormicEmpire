@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -44,7 +44,7 @@ public class ColonyLabourService {
         if (role == null) {
             return workingAntsScratch;
         }
-        List<Ant> group = colony.getAntsByType(role.getAntType());
+        List<Ant> group = colony.getAntsByClass(role.getAntClass());
         if (group == null || group.isEmpty()) {
             return workingAntsScratch;
         }
@@ -136,7 +136,7 @@ public class ColonyLabourService {
             if (workers != null && !workers.isEmpty()) {
                 float slotSum = 0f;
                 for (Ant worker : workers) {
-                    slotSum += AntSubtypeService.forageCarrySlots(worker);
+                    slotSum += AntModService.forageCarrySlots(worker);
                 }
                 avgSlots = Math.max(1f, slotSum / workers.size());
             }
@@ -162,7 +162,7 @@ public class ColonyLabourService {
             if (GameRandom.nextDouble() < GameNumbers.RESIN_FORAGE_BONUS_CHANCE) {
                 resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
             }
-            i += AntSubtypeService.forageCarrySlots(worker);
+            i += AntModService.forageCarrySlots(worker);
             workerIndex++;
         }
     }
@@ -182,10 +182,10 @@ public class ColonyLabourService {
                         : getWorkingAnts(colony, GameConstants.ROLE_FORAGER);
                 if (aggregateForagers || (foragers != null && !foragers.isEmpty())) {
                     int totalPower = aggregateForagers
-                            ? AntSubtypeService.sumCollectingPowerFromRoleCount(colony, foragerCount)
-                            : AntSubtypeService.sumCollectingPower(colony, foragers);
-                    float foragerRadius = locations.computeFullEfficiencyRadiusForAntType(
-                            colony, GameConstants.TYPE_WORKER);
+                            ? AntModService.sumCollectingPowerFromRoleCount(colony, foragerCount)
+                            : AntModService.sumCollectingPower(colony, foragers);
+                    float foragerRadius = locations.computeFullEfficiencyRadiusForAntClass(
+                            colony, GameConstants.CLASS_WORKER);
                     List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
                     List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
                     List<ResourceSource> fungiSources = colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)
@@ -258,8 +258,8 @@ public class ColonyLabourService {
             }
         }
 
-        float soldierGatherRadius = locations.computeFullEfficiencyRadiusForAntType(
-                colony, GameConstants.TYPE_SOLDIER);
+        float soldierGatherRadius = locations.computeFullEfficiencyRadiusForAntClass(
+                colony, GameConstants.CLASS_SOLDIER);
 
         // --- Hunters ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
@@ -379,7 +379,7 @@ public class ColonyLabourService {
         
         int toLay = Math.min(layerCount * (int) colony.getStatsService().getLayingRate(colony), spaceAvailable);
         for (int i = 0; i < toLay; i++) {
-            Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
+            Ant newEgg = new Ant(colony, GameConstants.CLASS_EGG);
             
             newEgg.setDimension(WorldSpaces.UNDERWORLD);            
             Rectangle nursery = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.NURSERY);
@@ -413,9 +413,9 @@ public class ColonyLabourService {
             nurse.clearLoad();
             if (babyAntTotal > 0 && GameRandom.nextDouble() < 0.30) {
                 double r = GameRandom.nextDouble();
-                if (r < 0.33) nurse.setCarryingAnt(GameConstants.TYPE_EGG);
-                else if (r < 0.66) nurse.setCarryingAnt(GameConstants.TYPE_LARVA);
-                else nurse.setCarryingAnt(GameConstants.TYPE_PUPA);
+                if (r < 0.33) nurse.setCarryingAnt(GameConstants.CLASS_EGG);
+                else if (r < 0.66) nurse.setCarryingAnt(GameConstants.CLASS_LARVA);
+                else nurse.setCarryingAnt(GameConstants.CLASS_PUPA);
             }
         }
 
@@ -425,12 +425,12 @@ public class ColonyLabourService {
         }
 
         int deficit = babyAntTotal - capacity;
-        List<AntType> killOrder = List.of(GameConstants.TYPE_EGG, GameConstants.TYPE_LARVA, GameConstants.TYPE_PUPA);
+        List<AntClass> killOrder = List.of(GameConstants.CLASS_EGG, GameConstants.CLASS_LARVA, GameConstants.CLASS_PUPA);
         int deathCount = 0;
 
-        for (AntType typeToKill : killOrder) {
+        for (AntClass classToKill : killOrder) {
             if (deficit <= 0) break;
-            List<Ant> list = colony.getAntsByType(typeToKill);
+            List<Ant> list = colony.getAntsByClass(classToKill);
             int toCullCount = Math.min(deficit, list.size());
             
             List<Ant> antsToCull = new ArrayList<>();
@@ -440,12 +440,12 @@ public class ColonyLabourService {
             
             for (Ant antToCull : antsToCull) {
                 if (antToCull.isAlive()) {
-                    AntType originalType = antToCull.getAntType();
+                    AntClass originalClass = antToCull.getAntClass();
                     AntRole formerRole = antToCull.getRole();
                     boolean wasOnTrade = antToCull.isOnTrade();
                     antToCull.goDie(colony, DeathCause.LACK_OF_CARE);
                     colony.recordAntDeath(antToCull, DeathCause.LACK_OF_CARE);
-                    colony.handleAntCasualtyAftermath(antToCull, originalType, formerRole, wasOnTrade);
+                    colony.handleAntCasualtyAftermath(antToCull, originalClass, formerRole, wasOnTrade);
                     
                     list.remove(antToCull);
                     deathCount++;
@@ -524,14 +524,14 @@ public class ColonyLabourService {
                     satellite.setHatchRateMajor(primaryColony.getHatchRateMajor());
                     satellite.setHatchRateDrone(primaryColony.getHatchRateDrone());
                     satellite.setHatchRatePrincess(primaryColony.getHatchRatePrincess());
-                    AntSubtypeService.copySubtypeRates(satellite, primaryColony);
+                    AntModService.copyModRates(satellite, primaryColony);
                 } else {
                     satellite.setHatchRateWorker(colony.getHatchRateWorker());
                     satellite.setHatchRateSoldier(colony.getHatchRateSoldier());
                     satellite.setHatchRateMajor(colony.getHatchRateMajor());
                     satellite.setHatchRateDrone(colony.getHatchRateDrone());
                     satellite.setHatchRatePrincess(colony.getHatchRatePrincess());
-                    AntSubtypeService.copySubtypeRates(satellite, colony);
+                    AntModService.copyModRates(satellite, colony);
                 }
                 
                 neighbor.setColony(satellite);
@@ -759,8 +759,8 @@ public class ColonyLabourService {
 
         for (int i = 0; i < queensToAdd; i++) {
             Ant breeder = breederPrincesses.get(i);
-            Ant newQueen = new Ant(colony, GameConstants.TYPE_QUEEN);
-            AntSubtypeService.inheritSubtype(breeder, newQueen, colony);
+            Ant newQueen = new Ant(colony, GameConstants.CLASS_QUEEN);
+            AntModService.inheritMod(breeder, newQueen, colony);
             newQueen.setDimension(WorldSpaces.UNDERWORLD);
 
             Rectangle royal = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER);
@@ -875,7 +875,7 @@ public class ColonyLabourService {
         capital.getDrones().remove(drone);
         capital.getPrincesses().remove(breeder);
 
-        Ant queen = new Ant(target, GameConstants.TYPE_QUEEN);
+        Ant queen = new Ant(target, GameConstants.CLASS_QUEEN);
         queen.setDimension(WorldSpaces.UNDERWORLD);
         queen.setRole(GameConstants.ROLE_LAYER);
         Rectangle royal = target.getPhysicsService().getRoomBounds(target, WorldSpaces.ROYAL_CHAMBER);
@@ -908,7 +908,7 @@ public class ColonyLabourService {
         for (Ant graver : gravers) {
             graver.clearLoad();
             if (hasBodies && GameRandom.nextDouble() < 0.5) {
-                graver.setCarryingAnt(GameConstants.TYPE_DEAD);
+                graver.setCarryingAnt(GameConstants.CLASS_DEAD);
             }
         }
         

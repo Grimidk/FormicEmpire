@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
@@ -22,7 +22,7 @@ final class ColonyResourceDeathSelection {
             return List.of();
         }
 
-        Map<AntType, List<Ant>> byType = new LinkedHashMap<>();
+        Map<AntClass, List<Ant>> byType = new LinkedHashMap<>();
         List<Ant> queens = new ArrayList<>();
 
         for (Ant ant : candidates) {
@@ -32,10 +32,10 @@ final class ColonyResourceDeathSelection {
             if (exclude != null && exclude.contains(ant)) {
                 continue;
             }
-            if (ant.getAntType() == GameConstants.TYPE_QUEEN) {
+            if (ant.getAntClass() == GameConstants.CLASS_QUEEN) {
                 queens.add(ant);
             } else {
-                byType.computeIfAbsent(ant.getAntType(), type -> new ArrayList<>()).add(ant);
+                byType.computeIfAbsent(ant.getAntClass(), type -> new ArrayList<>()).add(ant);
             }
         }
 
@@ -68,7 +68,7 @@ final class ColonyResourceDeathSelection {
         return victims;
     }
 
-    private static List<Ant> pickProportional(Map<AntType, List<Ant>> byType, int deathCount) {
+    private static List<Ant> pickProportional(Map<AntClass, List<Ant>> byType, int deathCount) {
         int total = 0;
         for (List<Ant> ants : byType.values()) {
             total += ants.size();
@@ -78,10 +78,10 @@ final class ColonyResourceDeathSelection {
         }
 
         deathCount = Math.min(deathCount, total);
-        Map<AntType, Integer> killsByType = allocateProportional(byType, deathCount);
+        Map<AntClass, Integer> killsByType = allocateProportional(byType, deathCount);
 
         List<Ant> victims = new ArrayList<>(deathCount);
-        for (Map.Entry<AntType, List<Ant>> entry : byType.entrySet()) {
+        for (Map.Entry<AntClass, List<Ant>> entry : byType.entrySet()) {
             int n = killsByType.getOrDefault(entry.getKey(), 0);
             if (n <= 0) {
                 continue;
@@ -95,19 +95,19 @@ final class ColonyResourceDeathSelection {
         return victims;
     }
 
-    private static Map<AntType, Integer> allocateProportional(Map<AntType, List<Ant>> byType, int deathCount) {
-        List<AntType> types = new ArrayList<>(byType.keySet());
+    private static Map<AntClass, Integer> allocateProportional(Map<AntClass, List<Ant>> byType, int deathCount) {
+        List<AntClass> types = new ArrayList<>(byType.keySet());
         int total = 0;
-        for (AntType type : types) {
+        for (AntClass type : types) {
             total += byType.get(type).size();
         }
 
-        Map<AntType, Integer> allocated = new HashMap<>();
+        Map<AntClass, Integer> allocated = new HashMap<>();
         double[] exact = new double[types.size()];
         int assigned = 0;
 
         for (int i = 0; i < types.size(); i++) {
-            AntType type = types.get(i);
+            AntClass type = types.get(i);
             int count = byType.get(type).size();
             exact[i] = deathCount * (double) count / total;
             int floor = (int) exact[i];
@@ -131,7 +131,7 @@ final class ColonyResourceDeathSelection {
                 return types.get(a).getId() - types.get(b).getId();
             });
             for (int i = 0; i < remainder && i < order.length; i++) {
-                AntType type = types.get(order[i]);
+                AntClass type = types.get(order[i]);
                 allocated.put(type, allocated.get(type) + 1);
             }
         }

@@ -43,8 +43,8 @@ class WarBattleSceneBuilderTest {
         assertNotNull(scene.getAttackerBiome());
         assertNotNull(scene.getDefenderBiome());
         assertTrue(scene.getFrontlineRatio() >= 0.05f && scene.getFrontlineRatio() <= 0.95f);
-        assertFalse(scene.getAttacker().typeCounts().isEmpty());
-        assertFalse(scene.getDefender().typeCounts().isEmpty());
+        assertFalse(scene.getAttacker().classCounts().isEmpty());
+        assertFalse(scene.getDefender().classCounts().isEmpty());
         assertTrue(scene.getAttacker().livingArmy() > 0);
         assertTrue(scene.getDefender().livingArmy() > 0);
     }
@@ -102,13 +102,13 @@ class WarBattleSceneBuilderTest {
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         for (int i = 0; i < 20; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         if (colony.getQueens().isEmpty()) {
-            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+            colony.getQueens().add(new Ant(colony, GameConstants.CLASS_QUEEN));
         }
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 10);
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 10);

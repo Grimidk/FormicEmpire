@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.BugRole;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -790,14 +790,14 @@ public class ColonyCritterHandlingService {
 
     private List<Ant> collectParasiticMiteCandidates(Colony colony) {
         List<Ant> candidates = new ArrayList<>();
-        for (AntType type : List.of(
-                GameConstants.TYPE_WORKER,
-                GameConstants.TYPE_SOLDIER,
-                GameConstants.TYPE_MAJOR,
-                GameConstants.TYPE_DRONE,
-                GameConstants.TYPE_PRINCESS,
-                GameConstants.TYPE_QUEEN)) {
-            List<Ant> ants = colony.getAntsByType(type);
+        for (AntClass type : List.of(
+                GameConstants.CLASS_WORKER,
+                GameConstants.CLASS_SOLDIER,
+                GameConstants.CLASS_MAJOR,
+                GameConstants.CLASS_DRONE,
+                GameConstants.CLASS_PRINCESS,
+                GameConstants.CLASS_QUEEN)) {
+            List<Ant> ants = colony.getAntsByClass(type);
             if (ants == null) {
                 continue;
             }

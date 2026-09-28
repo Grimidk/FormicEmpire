@@ -7,12 +7,11 @@ import java.awt.Image;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-
 import javax.swing.ImageIcon;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -67,14 +66,14 @@ public final class GameSpritePreloader {
         }
         AntSpecies colonySpecies = colony != null ? colony.getSpecies() : GameConstants.SPECIES_OMNI;
         if (colonySpecies != null) {
-            AntSubtypeProfile standardProfile = AntSubtypeProfile.standard();
-            for (AntType antType : GameConstants.getAntTypes()) {
-                collectIcon(images, GameConstants.getAntSprite(antType, colonySpecies));
-                if (AntSpriteCompositor.canCompose(antType)) {
+            AntModProfile standardProfile = AntModProfile.standard();
+            for (AntClass antClass : GameConstants.getAntClasses()) {
+                collectIcon(images, GameConstants.getAntSprite(antClass, colonySpecies));
+                if (AntSpriteCompositor.canCompose(antClass)) {
                     collectIcon(images, GameConstants.getAntSprite(
-                            antType, colonySpecies, standardProfile, 1, 2, 1, 1, false));
+                            antClass, colonySpecies, standardProfile, 1, 2, 1, 1, false));
                     collectIcon(images, GameConstants.getAntSprite(
-                            antType, colonySpecies, standardProfile, 1, 1, 1, 2, false));
+                            antClass, colonySpecies, standardProfile, 1, 1, 1, 2, false));
                 }
             }
         }

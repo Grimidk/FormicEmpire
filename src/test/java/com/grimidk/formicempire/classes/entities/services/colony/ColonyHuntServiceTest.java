@@ -10,7 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -57,15 +57,15 @@ class ColonyHuntServiceTest {
     void dispatchUsesSelectedAntCountsByType() {
         colony.getKnownHuntTargets().add(new KnownHuntTarget(
                 1, GameConstants.TYPE_COCKROACH.getId(), 100, 200, 0, 30));
-        Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
         colony.getSoldiers().add(soldier);
-        Ant major = new Ant(colony, GameConstants.TYPE_MAJOR);
+        Ant major = new Ant(colony, GameConstants.CLASS_MAJOR);
         colony.getMajors().add(major);
         colony.runRoleAssignment(null);
 
-        Map<AntType, Integer> counts = new HashMap<>();
-        counts.put(GameConstants.TYPE_SOLDIER, 1);
-        counts.put(GameConstants.TYPE_MAJOR, 1);
+        Map<AntClass, Integer> counts = new HashMap<>();
+        counts.put(GameConstants.CLASS_SOLDIER, 1);
+        counts.put(GameConstants.CLASS_MAJOR, 1);
         assertTrue(ColonyHuntService.dispatchHunt(colony, 1, counts));
         assertEquals(2, colony.getHuntExpeditionForTarget(1).getParty().size());
     }
@@ -77,15 +77,15 @@ class ColonyHuntServiceTest {
         colony.getKnownHuntTargets().add(new KnownHuntTarget(
                 2, GameConstants.TYPE_COCKROACH.getId(), 120, 220, 0, 30));
         for (int i = 0; i < 4; i++) {
-            Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+            Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
             colony.getSoldiers().add(soldier);
         }
         colony.runRoleAssignment(null);
 
-        Map<AntType, Integer> first = new HashMap<>();
-        first.put(GameConstants.TYPE_SOLDIER, 1);
-        Map<AntType, Integer> second = new HashMap<>();
-        second.put(GameConstants.TYPE_SOLDIER, 1);
+        Map<AntClass, Integer> first = new HashMap<>();
+        first.put(GameConstants.CLASS_SOLDIER, 1);
+        Map<AntClass, Integer> second = new HashMap<>();
+        second.put(GameConstants.CLASS_SOLDIER, 1);
 
         assertTrue(ColonyHuntService.dispatchHunt(colony, 1, first));
         assertTrue(ColonyHuntService.dispatchHunt(colony, 2, second));
@@ -98,18 +98,18 @@ class ColonyHuntServiceTest {
     void winChanceIncreasesWithLargerParty() {
         KnownHuntTarget target = new KnownHuntTarget(
                 1, GameConstants.TYPE_COCKROACH.getId(), 100, 200, 0, 30);
-        Map<AntType, Integer> small = new HashMap<>();
-        small.put(GameConstants.TYPE_SOLDIER, 1);
+        Map<AntClass, Integer> small = new HashMap<>();
+        small.put(GameConstants.CLASS_SOLDIER, 1);
         ColonyHuntService.HuntDispatchPreview smallPreview =
                 ColonyHuntService.previewDispatch(colony, target, small);
 
         for (int i = 0; i < 20; i++) {
-            Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+            Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
             colony.getSoldiers().add(soldier);
         }
         colony.runRoleAssignment(null);
-        Map<AntType, Integer> large = new HashMap<>();
-        large.put(GameConstants.TYPE_SOLDIER, 20);
+        Map<AntClass, Integer> large = new HashMap<>();
+        large.put(GameConstants.CLASS_SOLDIER, 20);
         ColonyHuntService.HuntDispatchPreview largePreview =
                 ColonyHuntService.previewDispatch(colony, target, large);
 

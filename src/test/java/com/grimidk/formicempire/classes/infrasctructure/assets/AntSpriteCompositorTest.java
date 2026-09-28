@@ -11,10 +11,10 @@ import javax.swing.ImageIcon;
 import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpeciesPalette;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
@@ -36,9 +36,9 @@ class AntSpriteCompositorTest {
     @Test
     void composeOmniWorkerUsesSpeciesHeadColor() {
         ImageIcon icon = AntSpriteCompositor.getSprite(
-                GameConstants.TYPE_WORKER,
+                GameConstants.CLASS_WORKER,
                 GameConstants.SPECIES_OMNI,
-                AntSubtypeProfile.standard());
+                AntModProfile.standard());
         assertNotNull(icon);
         assertTrue(icon.getIconWidth() > 0);
         assertTrue(icon.getIconHeight() > 0);
@@ -68,10 +68,10 @@ class AntSpriteCompositorTest {
 
     @Test
     void composeWorkerLegFramesOneThroughFour() {
-        AntSubtypeProfile profile = AntSubtypeProfile.standard();
+        AntModProfile profile = AntModProfile.standard();
         for (int leg = 1; leg <= 4; leg++) {
             ImageIcon icon = AntSpriteCompositor.getSprite(
-                    GameConstants.TYPE_WORKER,
+                    GameConstants.CLASS_WORKER,
                     GameConstants.SPECIES_OMNI,
                     profile,
                     leg,
@@ -86,16 +86,16 @@ class AntSpriteCompositorTest {
     @Test
     void composeDroneFlyingLegsUsesLegFlyingLayer() {
         ImageIcon flying = AntSpriteCompositor.getSprite(
-                GameConstants.TYPE_DRONE,
+                GameConstants.CLASS_DRONE,
                 GameConstants.SPECIES_OMNI,
-                AntSubtypeProfile.standard(),
+                AntModProfile.standard(),
                 GameNumbers.ANT_LEG_FRAME_FLYING,
                 1,
                 2);
         ImageIcon walking = AntSpriteCompositor.getSprite(
-                GameConstants.TYPE_DRONE,
+                GameConstants.CLASS_DRONE,
                 GameConstants.SPECIES_OMNI,
-                AntSubtypeProfile.standard(),
+                AntModProfile.standard(),
                 1,
                 1,
                 2);
@@ -106,25 +106,25 @@ class AntSpriteCompositorTest {
 
     @Test
     void composeTrapjawHeadUsesNamedJawLayer() {
-        AntSubtypeProfile profile = AntSubtypeProfile.of(
-                GameConstants.SUBTYPE_HEAD_TRAPJAW.getDigit(),
-                AntSubtype.DIGIT_NONE,
-                AntSubtype.DIGIT_NONE,
-                AntSubtype.DIGIT_NONE);
+        AntModProfile profile = AntModProfile.of(
+                GameConstants.MOD_HEAD_TRAPJAW.getDigit(),
+                AntMod.DIGIT_NONE,
+                AntMod.DIGIT_NONE,
+                AntMod.DIGIT_NONE);
         ImageIcon icon = GameConstants.getAntSprite(
-                GameConstants.TYPE_WORKER,
+                GameConstants.CLASS_WORKER,
                 GameConstants.SPECIES_FIRE,
                 profile);
         assertNotNull(icon);
-        assertEquals(GameConstants.SUBTYPE_HEAD_TRAPJAW, profile.getSubtype(AntSubtypeSlot.HEAD));
+        assertEquals(GameConstants.MOD_HEAD_TRAPJAW, profile.getMod(AntModSlot.HEAD));
     }
 
     @Test
     void composeWorkerAntennaFramesOneAndTwo() {
-        AntSubtypeProfile profile = AntSubtypeProfile.standard();
+        AntModProfile profile = AntModProfile.standard();
         for (int antenna = 1; antenna <= 2; antenna++) {
             ImageIcon icon = AntSpriteCompositor.getSprite(
-                    GameConstants.TYPE_WORKER,
+                    GameConstants.CLASS_WORKER,
                     GameConstants.SPECIES_OMNI,
                     profile,
                     1,
@@ -140,30 +140,30 @@ class AntSpriteCompositorTest {
 
     @Test
     void composeAllAntennaHeadVariantsForEveryType() {
-        AntSubtype[] heads = {
-                GameConstants.SUBTYPE_HEAD_NONE,
-                GameConstants.SUBTYPE_HEAD_TRAPJAW,
-                GameConstants.SUBTYPE_HEAD_DOORHEAD,
-                GameConstants.SUBTYPE_HEAD_FARSIGHT
+        AntMod[] heads = {
+                GameConstants.MOD_HEAD_NONE,
+                GameConstants.MOD_HEAD_TRAPJAW,
+                GameConstants.MOD_HEAD_DOORHEAD,
+                GameConstants.MOD_HEAD_FARSIGHT
         };
-        AntType[] types = {
-                GameConstants.TYPE_WORKER,
-                GameConstants.TYPE_SOLDIER,
-                GameConstants.TYPE_MAJOR,
-                GameConstants.TYPE_QUEEN,
-                GameConstants.TYPE_PRINCESS,
-                GameConstants.TYPE_DRONE
+        AntClass[] types = {
+                GameConstants.CLASS_WORKER,
+                GameConstants.CLASS_SOLDIER,
+                GameConstants.CLASS_MAJOR,
+                GameConstants.CLASS_QUEEN,
+                GameConstants.CLASS_PRINCESS,
+                GameConstants.CLASS_DRONE
         };
-        for (AntType type : types) {
-            for (AntSubtype head : heads) {
-                if (type == GameConstants.TYPE_DRONE && head != GameConstants.SUBTYPE_HEAD_NONE) {
+        for (AntClass type : types) {
+            for (AntMod head : heads) {
+                if (type == GameConstants.CLASS_DRONE && head != GameConstants.MOD_HEAD_NONE) {
                     continue;
                 }
-                AntSubtypeProfile profile = AntSubtypeProfile.of(
+                AntModProfile profile = AntModProfile.of(
                         head.getDigit(),
-                        AntSubtype.DIGIT_NONE,
-                        AntSubtype.DIGIT_NONE,
-                        AntSubtype.DIGIT_NONE);
+                        AntMod.DIGIT_NONE,
+                        AntMod.DIGIT_NONE,
+                        AntMod.DIGIT_NONE);
                 for (int antennaFrame = 1; antennaFrame <= 2; antennaFrame++) {
                     ImageIcon icon = AntSpriteCompositor.getSprite(
                             type,
@@ -184,13 +184,13 @@ class AntSpriteCompositorTest {
 
     @Test
     void composeTrapjawAntennaUsesHeadVariantLayer() {
-        AntSubtypeProfile profile = AntSubtypeProfile.of(
-                GameConstants.SUBTYPE_HEAD_TRAPJAW.getDigit(),
-                AntSubtype.DIGIT_NONE,
-                AntSubtype.DIGIT_NONE,
-                AntSubtype.DIGIT_NONE);
+        AntModProfile profile = AntModProfile.of(
+                GameConstants.MOD_HEAD_TRAPJAW.getDigit(),
+                AntMod.DIGIT_NONE,
+                AntMod.DIGIT_NONE,
+                AntMod.DIGIT_NONE);
         ImageIcon icon = AntSpriteCompositor.getSprite(
-                GameConstants.TYPE_WORKER,
+                GameConstants.CLASS_WORKER,
                 GameConstants.SPECIES_FIRE,
                 profile,
                 1,
@@ -204,18 +204,18 @@ class AntSpriteCompositorTest {
     @Test
     void composeWithParasiticMitesBakesOverlayIntoSprite() {
         ImageIcon clean = AntSpriteCompositor.getSprite(
-                GameConstants.TYPE_WORKER,
+                GameConstants.CLASS_WORKER,
                 GameConstants.SPECIES_OMNI,
-                AntSubtypeProfile.standard(),
+                AntModProfile.standard(),
                 1,
                 1,
                 1,
                 1,
                 false);
         ImageIcon infected = AntSpriteCompositor.getSprite(
-                GameConstants.TYPE_WORKER,
+                GameConstants.CLASS_WORKER,
                 GameConstants.SPECIES_OMNI,
-                AntSubtypeProfile.standard(),
+                AntModProfile.standard(),
                 1,
                 1,
                 1,

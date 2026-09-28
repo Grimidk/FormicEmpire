@@ -21,7 +21,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
@@ -1951,7 +1951,7 @@ public class Dynasty {
         if (upgrade == null) {
             return;
         }
-        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
+        for (AntMod subtype : GameConstants.getAntMods()) {
             if (upgrade.equals(subtype.getRequiredUpgrade()) && subtype.getGrantedSkill() != null) {
                 unlockSkill(subtype.getGrantedSkill());
             }

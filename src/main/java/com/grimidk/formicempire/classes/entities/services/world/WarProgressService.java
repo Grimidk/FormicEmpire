@@ -880,7 +880,7 @@ public final class WarProgressService {
             int pointBudget = Math.round(colonyLoss / mult);
             int roleWeight = GameConstants.getActiveMilitaryRoleWeight(GameConstants.ROLE_SIEGE);
             if (roleWeight <= 0) {
-                roleWeight = GameConstants.getMilitaryWeightForAntType(GameConstants.TYPE_MAJOR);
+                roleWeight = GameConstants.getMilitaryWeightForAntClass(GameConstants.CLASS_MAJOR);
             }
             int count = colony.getWarAssignedRoleCount(GameConstants.ROLE_SIEGE);
             int remove = Math.min(count, (pointBudget + roleWeight - 1) / Math.max(1, roleWeight));
@@ -955,7 +955,7 @@ public final class WarProgressService {
 
         int shieldWeight = GameConstants.getActiveMilitaryRoleWeight(GameConstants.ROLE_DEFENDER);
         if (shieldWeight <= 0) {
-            shieldWeight = GameConstants.getMilitaryWeightForAntType(GameConstants.TYPE_SOLDIER);
+            shieldWeight = GameConstants.getMilitaryWeightForAntClass(GameConstants.CLASS_SOLDIER);
         }
         int shieldsToSacrifice = Math.min(
                 WarCombatSkillService.countShieldingDefenders(colony),
@@ -968,11 +968,11 @@ public final class WarProgressService {
         }
         if (remaining > 0) {
             remaining -= reduceAntList(colony.getSoldiers(), remaining,
-                    GameConstants.TYPE_SOLDIER.getMilitaryWeight());
+                    GameConstants.CLASS_SOLDIER.getMilitaryWeight());
             remaining -= reduceAntList(colony.getMajors(), remaining,
-                    GameConstants.TYPE_MAJOR.getMilitaryWeight());
+                    GameConstants.CLASS_MAJOR.getMilitaryWeight());
             remaining -= reduceAntList(colony.getWorkers(), remaining,
-                    GameConstants.TYPE_WORKER.getMilitaryWeight());
+                    GameConstants.CLASS_WORKER.getMilitaryWeight());
         }
         if (remaining > 0) {
             eliminateColonyQueens(colony);

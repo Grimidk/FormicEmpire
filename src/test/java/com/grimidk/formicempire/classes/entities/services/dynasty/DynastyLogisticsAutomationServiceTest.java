@@ -60,7 +60,7 @@ class DynastyLogisticsAutomationServiceTest {
         colonyA.setAssignedRoleCount(GameConstants.ROLE_COURIER, 2);
 
         for (int i = 0; i < 5; i++) {
-            colonyA.getWorkers().add(new Ant(colonyA, GameConstants.TYPE_WORKER));
+            colonyA.getWorkers().add(new Ant(colonyA, GameConstants.CLASS_WORKER));
         }
 
         int mushCap = colonyA.getStatsService().getMushroomsCapacity(colonyA);

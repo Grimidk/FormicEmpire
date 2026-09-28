@@ -40,7 +40,7 @@ class ColonyAutomationServiceTest {
         dynasty.addColony(new Colony(2, "Secundus", false));
 
         for (int i = 0; i < 20; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         automationService.runAutomation(colony);
@@ -53,10 +53,10 @@ class ColonyAutomationServiceTest {
         dynasty.unlockUpgrade(GameUnlocks.ABILITY_TUNNELS);
         colony.unlockUpgrade(GameUnlocks.ROLE_BORER);
         for (int i = 0; i < 6; i++) {
-            colony.getMajors().add(new Ant(colony, GameConstants.TYPE_MAJOR));
+            colony.getMajors().add(new Ant(colony, GameConstants.CLASS_MAJOR));
         }
         for (int i = 0; i < 15; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         Hex hexA = new Hex();
@@ -77,7 +77,7 @@ class ColonyAutomationServiceTest {
         colony.setAutoTunnelsEnabled(false);
 
         for (int i = 0; i < 6; i++) {
-            colony.getMajors().add(new Ant(colony, GameConstants.TYPE_MAJOR));
+            colony.getMajors().add(new Ant(colony, GameConstants.CLASS_MAJOR));
         }
 
         automationService.runAutomation(colony);
@@ -159,8 +159,8 @@ class ColonyAutomationServiceTest {
         satellite.unlockUpgrade(GameUnlocks.ROLE_RESEARCHER);
 
         for (int i = 0; i < 10; i++) {
-            satellite.getPrincesses().add(new Ant(satellite, GameConstants.TYPE_PRINCESS));
-            satellite.getQueens().add(new Ant(satellite, GameConstants.TYPE_QUEEN));
+            satellite.getPrincesses().add(new Ant(satellite, GameConstants.CLASS_PRINCESS));
+            satellite.getQueens().add(new Ant(satellite, GameConstants.CLASS_QUEEN));
         }
 
         automationService.runAutomation(satellite);
@@ -187,10 +187,10 @@ class ColonyAutomationServiceTest {
         satellite.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
 
         for (int i = 0; i < 40; i++) {
-            satellite.getPrincesses().add(new Ant(satellite, GameConstants.TYPE_PRINCESS));
+            satellite.getPrincesses().add(new Ant(satellite, GameConstants.CLASS_PRINCESS));
         }
         for (int i = 0; i < 5; i++) {
-            satellite.getQueens().add(new Ant(satellite, GameConstants.TYPE_QUEEN));
+            satellite.getQueens().add(new Ant(satellite, GameConstants.CLASS_QUEEN));
         }
 
         automationService.runAutomation(satellite);
@@ -214,10 +214,10 @@ class ColonyAutomationServiceTest {
     void assignsPoliceToFightAndPreventParasiteAnts() {
         dynasty.unlockUpgrade(GameUnlocks.ROLE_POLICE);
         for (int i = 0; i < 50; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         for (int i = 0; i < 5_000; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         automationService.runAutomation(
@@ -235,7 +235,7 @@ class ColonyAutomationServiceTest {
         dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
         dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
         for (int i = 0; i < 30; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         colony.setParasiticMites(100);
 
@@ -259,13 +259,13 @@ class ColonyAutomationServiceTest {
         dynasty.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
 
         for (int i = 0; i < 100; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
-            colony.getMajors().add(new Ant(colony, GameConstants.TYPE_MAJOR));
-            colony.getPrincesses().add(new Ant(colony, GameConstants.TYPE_PRINCESS));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
+            colony.getMajors().add(new Ant(colony, GameConstants.CLASS_MAJOR));
+            colony.getPrincesses().add(new Ant(colony, GameConstants.CLASS_PRINCESS));
         }
         for (int i = 0; i < 5; i++) {
-            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+            colony.getQueens().add(new Ant(colony, GameConstants.CLASS_QUEEN));
         }
 
         automationService.runAutomation(colony);
@@ -298,19 +298,19 @@ class ColonyAutomationServiceTest {
         dynasty.unlockUpgrade(GameUnlocks.ROLE_LAYER);
 
         for (int i = 0; i < 40; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         for (int i = 0; i < 30; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         for (int i = 0; i < 12; i++) {
-            colony.getMajors().add(new Ant(colony, GameConstants.TYPE_MAJOR));
+            colony.getMajors().add(new Ant(colony, GameConstants.CLASS_MAJOR));
         }
         for (int i = 0; i < 10; i++) {
-            colony.getPrincesses().add(new Ant(colony, GameConstants.TYPE_PRINCESS));
+            colony.getPrincesses().add(new Ant(colony, GameConstants.CLASS_PRINCESS));
         }
         for (int i = 0; i < 3; i++) {
-            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+            colony.getQueens().add(new Ant(colony, GameConstants.CLASS_QUEEN));
         }
 
         assertTrue(dynasty.isAtWar());
@@ -339,10 +339,10 @@ class ColonyAutomationServiceTest {
         dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
         dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
         for (int i = 0; i < 40; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         for (int i = 0; i < 2_000; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         colony.setPlants(12_000);
 

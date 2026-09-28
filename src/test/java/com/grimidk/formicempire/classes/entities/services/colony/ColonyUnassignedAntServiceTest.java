@@ -27,7 +27,7 @@ class ColonyUnassignedAntServiceTest {
 
     @Test
     void defaultRoleAntsCountAsUnassigned() {
-        Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
         colony.getSoldiers().add(soldier);
         colony.runRoleAssignment(null);
         assertTrue(ColonyUnassignedAntService.isUnassigned(soldier, colony, null));
@@ -35,7 +35,7 @@ class ColonyUnassignedAntServiceTest {
 
     @Test
     void assignedRoleAntsAreNotUnassigned() {
-        Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
         colony.getSoldiers().add(soldier);
         colony.setAssignedRoleCount(GameConstants.ROLE_WARRIOR, 1);
         colony.runRoleAssignment(null);

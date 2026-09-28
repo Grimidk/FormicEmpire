@@ -77,10 +77,10 @@ class DynastyAiServiceTest {
         neighbor.setDiplomaticReputation(npc.getId(), 100);
         Colony colony = new Colony(10, "Capital", false);
         colony.setAge(10);
-        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         npc.addColony(colony);
         Colony neighborColony = new Colony(20, "Neighbor Capital", false);
-        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
+        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.CLASS_WORKER));
         neighbor.addColony(neighborColony);
 
         aiService.runDailyAi(npc, world, tradeManager);
@@ -98,15 +98,15 @@ class DynastyAiServiceTest {
 
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
-        Ant diplomat = new Ant(capital, GameConstants.TYPE_PRINCESS);
+        Ant diplomat = new Ant(capital, GameConstants.CLASS_PRINCESS);
         diplomat.setRole(GameConstants.ROLE_DIPLOMAT);
         capital.getPrincesses().add(diplomat);
         capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 1);
-        capital.getWorkers().add(new Ant(capital, GameConstants.TYPE_WORKER));
+        capital.getWorkers().add(new Ant(capital, GameConstants.CLASS_WORKER));
         npc.addColony(capital);
         npc.setCapital(capital);
         Colony neighborColony = new Colony(20, "Neighbor Capital", false);
-        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
+        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.CLASS_WORKER));
         neighbor.addColony(neighborColony);
 
         int before = npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world);
@@ -122,8 +122,8 @@ class DynastyAiServiceTest {
         npc.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
-        capital.getPrincesses().add(new Ant(capital, GameConstants.TYPE_PRINCESS));
-        capital.getPrincesses().add(new Ant(capital, GameConstants.TYPE_PRINCESS));
+        capital.getPrincesses().add(new Ant(capital, GameConstants.CLASS_PRINCESS));
+        capital.getPrincesses().add(new Ant(capital, GameConstants.CLASS_PRINCESS));
         npc.addColony(capital);
 
         aiService.runDailyAi(npc, world, tradeManager);

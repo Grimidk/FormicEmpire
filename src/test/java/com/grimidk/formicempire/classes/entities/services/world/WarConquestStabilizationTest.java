@@ -87,7 +87,7 @@ class WarConquestStabilizationTest {
 
         Colony captured = new Colony(11, "Captured", false);
         captured.setAge(10);
-        captured.getQueens().add(new Ant(captured, GameConstants.TYPE_QUEEN));
+        captured.getQueens().add(new Ant(captured, GameConstants.CLASS_QUEEN));
         ColonyStarterService.shared().matureColony(captured);
         captured.getWorkers().clear();
         captured.getSoldiers().clear();

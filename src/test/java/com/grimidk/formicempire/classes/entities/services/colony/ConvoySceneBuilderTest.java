@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -51,10 +51,10 @@ class ConvoySceneBuilderTest {
         dynasty.bindTradeManager(tradeManager);
 
         origin.setActive(true);
-        origin.addAnts(GameConstants.TYPE_WORKER, 3);
+        origin.addAnts(GameConstants.CLASS_WORKER, 3);
 
-        Map<AntType, Integer> transport = new HashMap<>();
-        transport.put(GameConstants.TYPE_WORKER, 2);
+        Map<AntClass, Integer> transport = new HashMap<>();
+        transport.put(GameConstants.CLASS_WORKER, 2);
         trade = new Trade(originHex, destHex, new HashMap<>(), null, transport, false, false, GameConstants.METHOD_LAND);
         tradeManager.addTrade(trade);
         trade.startTrip();
@@ -73,7 +73,7 @@ class ConvoySceneBuilderTest {
         assertEquals(GameConstants.BIOME_FOREST, scene.getLandBiome());
         assertEquals(ConvoyScene.BackgroundKind.LAND_BIOME, scene.getBackgroundKind());
         assertFalse(scene.isReturning());
-        assertFalse(scene.typeCounts().isEmpty());
+        assertFalse(scene.classCounts().isEmpty());
     }
 
     @Test
@@ -88,8 +88,8 @@ class ConvoySceneBuilderTest {
     @Test
     void usesDedicatedTilesForSeaAndTunnelMethods() {
         trade = new Trade(originHex, destHex, new HashMap<>(), null,
-                Map.of(GameConstants.TYPE_WORKER, 1), false, false, GameConstants.METHOD_SEA);
-        Ant ant = origin.getAntsByType(GameConstants.TYPE_WORKER).get(0);
+                Map.of(GameConstants.CLASS_WORKER, 1), false, false, GameConstants.METHOD_SEA);
+        Ant ant = origin.getAntsByClass(GameConstants.CLASS_WORKER).get(0);
         ant.setOnTrade(true);
         trade.getAntsOnTrip().add(ant);
         trade.setActive(true);
@@ -98,7 +98,7 @@ class ConvoySceneBuilderTest {
         assertEquals(ConvoyScene.BackgroundKind.SEA, seaScene.getBackgroundKind());
 
         trade = new Trade(originHex, destHex, new HashMap<>(), null,
-                Map.of(GameConstants.TYPE_WORKER, 1), false, false, GameConstants.METHOD_TUNNEL);
+                Map.of(GameConstants.CLASS_WORKER, 1), false, false, GameConstants.METHOD_TUNNEL);
         trade.getAntsOnTrip().clear();
         ant.setOnTrade(true);
         trade.getAntsOnTrip().add(ant);

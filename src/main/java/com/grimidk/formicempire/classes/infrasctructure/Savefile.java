@@ -176,12 +176,12 @@ public class Savefile implements Serializable {
         public int eggs, pupae, larvae, workers, soldiers, majors, drones, princesses, queens;        
         public int plants, mushrooms, protein, water, syrups, resins, minerals;        
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
-        public Map<String, Double> subtypeHatchRatesFlat = new HashMap<>();
-        public Map<String, Integer> workerSubtypes = new HashMap<>();
-        public Map<String, Integer> soldierSubtypes = new HashMap<>();
-        public Map<String, Integer> majorSubtypes = new HashMap<>();
-        public Map<String, Integer> princessSubtypes = new HashMap<>();
-        public Map<String, Integer> queenSubtypes = new HashMap<>();
+        public Map<String, Double> modHatchRatesFlat = new HashMap<>();
+        public Map<String, Integer> workerMods = new HashMap<>();
+        public Map<String, Integer> soldierMods = new HashMap<>();
+        public Map<String, Integer> majorMods = new HashMap<>();
+        public Map<String, Integer> princessMods = new HashMap<>();
+        public Map<String, Integer> queenMods = new HashMap<>();
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
         public int pheromoneStormMonthsRemaining;
         public int recentlyConqueredMonthsRemaining;
@@ -195,8 +195,8 @@ public class Savefile implements Serializable {
         public int militaryPower;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> warAssignedRoleCounts = new HashMap<>();
-        public Map<String, Integer> roleDisallowedSubtypesFlat = new HashMap<>();
-        public Map<String, Integer> warRoleDisallowedSubtypesFlat = new HashMap<>();
+        public Map<String, Integer> roleDisallowedModsFlat = new HashMap<>();
+        public Map<String, Integer> warRoleDisallowedModsFlat = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();
         public List<SavedResourceSource> savedResourceSources = new ArrayList<>();
@@ -247,18 +247,18 @@ public class Savefile implements Serializable {
 
     public static class SavedHuntPartyMember implements Serializable {
         private static final long serialVersionUID = 1L;
-        public int typeId;
-        public int subtypeCode;
+        public int classId;
+        public int modProfileCode;
         public int roleId;
         public int slotIndex;
         public int health;
         public float battleHealth;
         public float battleMaxHealth;
 
-        public SavedHuntPartyMember(int typeId, int subtypeCode, int roleId, int slotIndex, int health,
+        public SavedHuntPartyMember(int classId, int modProfileCode, int roleId, int slotIndex, int health,
                 float battleHealth, float battleMaxHealth) {
-            this.typeId = typeId;
-            this.subtypeCode = subtypeCode;
+            this.classId = classId;
+            this.modProfileCode = modProfileCode;
             this.roleId = roleId;
             this.slotIndex = slotIndex;
             this.health = health;

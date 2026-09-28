@@ -19,7 +19,7 @@ class RouteViewVisualsCarryTest {
     @Test
     void gathererShowsCarryOnlyWhenReturningWithResource() {
         Colony colony = new Colony(1, "C", true);
-        Ant forager = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant forager = new Ant(colony, GameConstants.CLASS_WORKER);
         forager.setRole(GameConstants.ROLE_FORAGER);
         assertFalse(RouteViewVisuals.showsGathererCarry(forager));
 
@@ -34,9 +34,9 @@ class RouteViewVisualsCarryTest {
     @Test
     void nurseBroodCarryDoesNotShowResourceIcon() {
         Colony colony = new Colony(1, "C", true);
-        Ant nurse = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant nurse = new Ant(colony, GameConstants.CLASS_WORKER);
         nurse.setRole(GameConstants.ROLE_NURSE);
-        nurse.setCarryingAnt(GameConstants.TYPE_EGG);
+        nurse.setCarryingAnt(GameConstants.CLASS_EGG);
         assertFalse(RouteViewVisuals.showsGathererCarry(nurse));
         assertEquals(0, RouteViewVisuals.gathererCarryIcons(nurse).length);
     }
@@ -44,7 +44,7 @@ class RouteViewVisualsCarryTest {
     @Test
     void secondaryResinAppearsBesidePrimaryPlant() {
         Colony colony = new Colony(1, "C", true);
-        Ant forager = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant forager = new Ant(colony, GameConstants.CLASS_WORKER);
         forager.setRole(GameConstants.ROLE_FORAGER);
         forager.setCarrying(GameConstants.RESOURCE_PLANT);
         forager.setCarryingSec(GameConstants.RESOURCE_RESIN);
@@ -57,12 +57,12 @@ class RouteViewVisualsCarryTest {
     @Test
     void hunterAndMinerUseSameCarryRule() {
         Colony colony = new Colony(1, "C", true);
-        Ant hunter = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        Ant hunter = new Ant(colony, GameConstants.CLASS_SOLDIER);
         hunter.setRole(GameConstants.ROLE_HUNTER);
         hunter.setCarrying(GameConstants.RESOURCE_MEAT);
         assertTrue(RouteViewVisuals.showsGathererCarry(hunter));
 
-        Ant miner = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        Ant miner = new Ant(colony, GameConstants.CLASS_SOLDIER);
         miner.setRole(GameConstants.ROLE_MINER);
         miner.setCarrying(GameConstants.RESOURCE_ROCK);
         assertTrue(RouteViewVisuals.showsGathererCarry(miner));
@@ -83,8 +83,8 @@ class RouteViewVisualsCarryTest {
 
     @Test
     void dronesDoNotHoldJawCargo() {
-        assertFalse(RouteViewVisuals.canHoldJawCargo(GameConstants.TYPE_DRONE));
-        assertFalse(RouteViewVisuals.canHoldJawCargo(GameConstants.TYPE_PRINCESS));
-        assertTrue(RouteViewVisuals.canHoldJawCargo(GameConstants.TYPE_WORKER));
+        assertFalse(RouteViewVisuals.canHoldJawCargo(GameConstants.CLASS_DRONE));
+        assertFalse(RouteViewVisuals.canHoldJawCargo(GameConstants.CLASS_PRINCESS));
+        assertTrue(RouteViewVisuals.canHoldJawCargo(GameConstants.CLASS_WORKER));
     }
 }

@@ -14,7 +14,7 @@ import java.awt.Rectangle;
 
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -56,26 +56,26 @@ class ColonySpriteMergeLodTest {
         Dynasty dynasty = new Dynasty(1, "d", true, GameConstants.SPECIES_OMNI);
         colony.setDynasty(dynasty);
 
-        Ant workerA = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant workerA = new Ant(colony, GameConstants.CLASS_WORKER);
         workerA.setPosition(new Point(100, 100));
         workerA.setRole(GameConstants.ROLE_FORAGER);
-        workerA.setSubtypeProfile(AntSubtypeProfile.standard());
+        workerA.setModProfile(AntModProfile.standard());
 
-        Ant workerB = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant workerB = new Ant(colony, GameConstants.CLASS_WORKER);
         workerB.setPosition(new Point(102, 101));
         workerB.setRole(GameConstants.ROLE_FORAGER);
-        workerB.setSubtypeProfile(AntSubtypeProfile.standard());
+        workerB.setModProfile(AntModProfile.standard());
 
-        Ant workerC = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant workerC = new Ant(colony, GameConstants.CLASS_WORKER);
         workerC.setPosition(new Point(102, 101));
         workerC.setRole(GameConstants.ROLE_NURSE);
-        workerC.setSubtypeProfile(AntSubtypeProfile.standard());
+        workerC.setModProfile(AntModProfile.standard());
 
         assertEquals(
-                ColonySpriteMergeLod.antBucket(workerA, GameConstants.TYPE_WORKER),
-                ColonySpriteMergeLod.antBucket(workerB, GameConstants.TYPE_WORKER));
-        assertFalse(ColonySpriteMergeLod.antBucket(workerA, GameConstants.TYPE_WORKER)
-                .equals(ColonySpriteMergeLod.antBucket(workerC, GameConstants.TYPE_WORKER)));
+                ColonySpriteMergeLod.antBucket(workerA, GameConstants.CLASS_WORKER),
+                ColonySpriteMergeLod.antBucket(workerB, GameConstants.CLASS_WORKER));
+        assertFalse(ColonySpriteMergeLod.antBucket(workerA, GameConstants.CLASS_WORKER)
+                .equals(ColonySpriteMergeLod.antBucket(workerC, GameConstants.CLASS_WORKER)));
     }
 
     @Test
@@ -86,12 +86,12 @@ class ColonySpriteMergeLodTest {
 
         List<Ant> ants = new ArrayList<>();
         for (int i = 0; i < 25; i++) {
-            Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+            Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
             ant.setPosition(new Point(100 + i, 100));
             ants.add(ant);
         }
 
-        ColonySpriteMergeLod.AntMergeBucket bucket = ColonySpriteMergeLod.antBucket(ants.get(0), GameConstants.TYPE_WORKER);
+        ColonySpriteMergeLod.AntMergeBucket bucket = ColonySpriteMergeLod.antBucket(ants.get(0), GameConstants.CLASS_WORKER);
         Map<ColonySpriteMergeLod.AntMergeBucket, List<Ant>> buckets = new HashMap<>();
         buckets.put(bucket, ants);
 
@@ -107,26 +107,26 @@ class ColonySpriteMergeLodTest {
         Dynasty dynasty = new Dynasty(1, "d", true, GameConstants.SPECIES_OMNI);
         colony.setDynasty(dynasty);
 
-        Ant carryingPlant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant carryingPlant = new Ant(colony, GameConstants.CLASS_WORKER);
         carryingPlant.setPosition(new Point(100, 100));
         carryingPlant.setRole(GameConstants.ROLE_FORAGER);
         carryingPlant.setCarrying(GameConstants.RESOURCE_PLANT);
 
-        Ant sameLoad = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant sameLoad = new Ant(colony, GameConstants.CLASS_WORKER);
         sameLoad.setPosition(new Point(101, 102));
         sameLoad.setRole(GameConstants.ROLE_FORAGER);
         sameLoad.setCarrying(GameConstants.RESOURCE_PLANT);
 
-        Ant carryingMeat = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant carryingMeat = new Ant(colony, GameConstants.CLASS_WORKER);
         carryingMeat.setPosition(new Point(100, 100));
         carryingMeat.setRole(GameConstants.ROLE_FORAGER);
         carryingMeat.setCarrying(GameConstants.RESOURCE_MEAT);
 
         assertEquals(
-                ColonySpriteMergeLod.antBucket(carryingPlant, GameConstants.TYPE_WORKER),
-                ColonySpriteMergeLod.antBucket(sameLoad, GameConstants.TYPE_WORKER));
-        assertFalse(ColonySpriteMergeLod.antBucket(carryingPlant, GameConstants.TYPE_WORKER)
-                .equals(ColonySpriteMergeLod.antBucket(carryingMeat, GameConstants.TYPE_WORKER)));
+                ColonySpriteMergeLod.antBucket(carryingPlant, GameConstants.CLASS_WORKER),
+                ColonySpriteMergeLod.antBucket(sameLoad, GameConstants.CLASS_WORKER));
+        assertFalse(ColonySpriteMergeLod.antBucket(carryingPlant, GameConstants.CLASS_WORKER)
+                .equals(ColonySpriteMergeLod.antBucket(carryingMeat, GameConstants.CLASS_WORKER)));
     }
 
     @Test
@@ -160,7 +160,7 @@ class ColonySpriteMergeLodTest {
                 null);
 
         for (int i = 0; i < GameNumbers.SPRITE_MERGE_ZONE_THRESHOLD + 1; i++) {
-            Ant ant = new Ant(colony, GameConstants.TYPE_LARVA);
+            Ant ant = new Ant(colony, GameConstants.CLASS_LARVA);
             ant.setDimension(WorldSpaces.UNDERWORLD);
             ant.setPosition(new Point(10 + (i % 20), 10 + (i / 20)));
             colony.getLarvae().add(ant);
@@ -182,9 +182,9 @@ class ColonySpriteMergeLodTest {
         Dynasty dynasty = new Dynasty(1, "d", true, GameConstants.SPECIES_OMNI);
         colony.setDynasty(dynasty);
 
-        Ant a = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant a = new Ant(colony, GameConstants.CLASS_WORKER);
         a.setPosition(new Point(100, 200));
-        Ant b = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant b = new Ant(colony, GameConstants.CLASS_WORKER);
         b.setPosition(new Point(104, 208));
 
         List<Critter> group = List.of(a, b);

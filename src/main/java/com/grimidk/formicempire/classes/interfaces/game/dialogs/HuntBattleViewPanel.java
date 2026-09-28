@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -189,9 +189,9 @@ public class HuntBattleViewPanel extends JPanel {
             int drawX = centerX + (int) Math.round(Math.cos(angle) * radius);
             int drawY = centerY + (int) Math.round(Math.sin(angle) * radius);
             ImageIcon icon = GameConstants.getAntSprite(
-                    GameConstants.TYPE_DEAD,
+                    GameConstants.CLASS_DEAD,
                     species,
-                    body.getSubtypeProfile(),
+                    body.getModProfile(),
                     1,
                     1,
                     1,
@@ -214,14 +214,14 @@ public class HuntBattleViewPanel extends JPanel {
             double angle = slotAngle(hunter.getOrbitSlot(), slotCount);
             int drawX = centerX + (int) Math.round(Math.cos(angle) * radius);
             int drawY = centerY + (int) Math.round(Math.sin(angle) * radius);
-            AntType type = ant.getAntType();
+            AntClass type = ant.getAntClass();
             AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : GameConstants.SPECIES_OMNI;
             int slot = hunter.getOrbitSlot();
             int legFrame = RouteViewVisuals.resolveLegFrame(type, false, true, slot * 0.7f, animationSeconds, 1f);
             int jawFrame = RouteViewVisuals.resolveJawFrame(type, false, slot * 0.7f, animationSeconds, 1f);
             int wingFrame = 1;
             int antennaFrame = RouteViewVisuals.resolveAntennaFrame(type, slot * 0.7f, animationSeconds, 1f);
-            ImageIcon icon = GameConstants.getAntSprite(type, species, ant.getSubtypeProfile(), legFrame, jawFrame,
+            ImageIcon icon = GameConstants.getAntSprite(type, species, ant.getModProfile(), legFrame, jawFrame,
                     wingFrame, antennaFrame, false);
             float faceDegrees = (float) Math.toDegrees(Math.atan2(centerY - drawY, centerX - drawX)) + 90f;
             drawScaledSprite(g2d, icon, drawX, drawY, ANT_SPRITE_SCALE, faceDegrees);

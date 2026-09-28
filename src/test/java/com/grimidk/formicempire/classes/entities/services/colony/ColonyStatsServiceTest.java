@@ -28,7 +28,7 @@ public class ColonyStatsServiceTest {
     @Test
     public void testWaterConsumptionBase() {
         for (int i = 0; i < 10; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         int expected = 8;
@@ -38,7 +38,7 @@ public class ColonyStatsServiceTest {
     @Test
     public void testWaterConsumptionWithUpgrade() {
         for (int i = 0; i < 10; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         dynasty.unlockUpgrade(GameUnlocks.STAT_THIRST_1);
@@ -51,7 +51,7 @@ public class ColonyStatsServiceTest {
     public void heatresistAssimilationGivesThirstThreeResistance() {
         assertEquals(0, statsService.getBaseEvasionChance(colony));
         for (int i = 0; i < 10; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HEATRESIST);
@@ -62,7 +62,7 @@ public class ColonyStatsServiceTest {
         assertEquals(15, statsService.getBaseEvasionChance(colony));
         assertEquals(1.4f, statsService.getHeatresistSpeedMultiplier(colony), 0.0001f);
 
-        Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant worker = new Ant(colony, GameConstants.CLASS_WORKER);
         assertEquals(15f, worker.getEvasionChance(), 0.0001f);
 
         assertEquals(0.85f, GameNumbers.applyEvasionToHitChance(1.0f, 15f), 0.0001f);
@@ -89,7 +89,7 @@ public class ColonyStatsServiceTest {
     @Test
     public void testTotalMushroomConsumption() {
         for (int i = 0; i < 10; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         
         dynasty.unlockUpgrade(GameUnlocks.STAT_LONGEVITY);

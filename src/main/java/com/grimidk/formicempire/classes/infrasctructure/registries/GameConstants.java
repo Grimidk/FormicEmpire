@@ -12,13 +12,13 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpeciesPalette;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntStatus;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.ant.MoveStatus;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.CityTitle;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
@@ -168,18 +168,18 @@ public final class GameConstants {
         return species.getSprite();
     }
 
-    public static ImageIcon getAntSprite(AntType type, AntSpecies species) {
-        return getAntSprite(type, species, AntSubtypeProfile.standard());
+    public static ImageIcon getAntSprite(AntClass type, AntSpecies species) {
+        return getAntSprite(type, species, AntModProfile.standard());
     }
 
-    public static ImageIcon getAntSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
+    public static ImageIcon getAntSprite(AntClass type, AntSpecies species, AntModProfile profile) {
         return getAntSprite(type, species, profile, 1, 1, 1, 1, false);
     }
 
     public static ImageIcon getAntSprite(
-            AntType type,
+            AntClass type,
             AntSpecies species,
-            AntSubtypeProfile profile,
+            AntModProfile profile,
             int legFrame,
             int jawFrame,
             int wingFrame) {
@@ -187,9 +187,9 @@ public final class GameConstants {
     }
 
     public static ImageIcon getAntSprite(
-            AntType type,
+            AntClass type,
             AntSpecies species,
-            AntSubtypeProfile profile,
+            AntModProfile profile,
             int legFrame,
             int jawFrame,
             int wingFrame,
@@ -198,7 +198,7 @@ public final class GameConstants {
         if (type == null) {
             return null;
         }
-        if (type == TYPE_EGG || type == TYPE_LARVA || type == TYPE_PUPA || type == TYPE_DEAD || type == TYPE_ZOMBIE) {
+        if (type == CLASS_EGG || type == CLASS_LARVA || type == CLASS_PUPA || type == CLASS_DEAD || type == CLASS_ZOMBIE) {
             return loadIcon("sprites/ants/" + type.getSpriteName());
         }
         AntSpecies resolveSpecies = species != null ? species : SPECIES_OMNI;
@@ -227,53 +227,53 @@ public final class GameConstants {
     }
 
     public static ImageIcon getRepresentativeAntSprite(AntSpecies species) {
-        AntType type = TYPE_WORKER;
-        AntSubtypeProfile profile = AntSubtypeProfile.standard();
+        AntClass type = CLASS_WORKER;
+        AntModProfile profile = AntModProfile.standard();
 
         if (species != null && species.getBaseUpgrades().contains(GameUnlocks.TYPE_MAJOR)) {
-            type = TYPE_MAJOR;
+            type = CLASS_MAJOR;
         }
 
-        AntSubtype traitSubtype = findSpeciesTraitSubtype(species);
-        if (traitSubtype != null) {
-            profile = profileWithSubtype(traitSubtype);
-            if (traitSubtype.getAttackMult() > 1f) {
-                type = TYPE_SOLDIER;
+        AntMod traitMod = findSpeciesTraitMod(species);
+        if (traitMod != null) {
+            profile = profileWithMod(traitMod);
+            if (traitMod.getAttackMult() > 1f) {
+                type = CLASS_SOLDIER;
             } else {
-                type = TYPE_WORKER;
+                type = CLASS_WORKER;
             }
         }
 
         return getAntSprite(type, species, profile);
     }
 
-    private static AntSubtype findSpeciesTraitSubtype(AntSpecies species) {
+    private static AntMod findSpeciesTraitMod(AntSpecies species) {
         if (species == null) {
             return null;
         }
-        for (AntSubtype subtype : antSubtypes) {
-            if (subtype == null || subtype.isNone() || subtype.getRequiredUpgrade() == null) {
+        for (AntMod mod : antMods) {
+            if (mod == null || mod.isNone() || mod.getRequiredUpgrade() == null) {
                 continue;
             }
-            if (species.getBaseUpgrades().contains(subtype.getRequiredUpgrade())) {
-                return subtype;
+            if (species.getBaseUpgrades().contains(mod.getRequiredUpgrade())) {
+                return mod;
             }
         }
         return null;
     }
 
-    private static AntSubtypeProfile profileWithSubtype(AntSubtype subtype) {
-        int head = AntSubtype.DIGIT_NONE;
-        int torso = AntSubtype.DIGIT_NONE;
-        int abdomen = AntSubtype.DIGIT_NONE;
-        int other = AntSubtype.DIGIT_NONE;
-        switch (subtype.getSlot()) {
-            case HEAD -> head = subtype.getDigit();
-            case TORSO -> torso = subtype.getDigit();
-            case ABDOMEN -> abdomen = subtype.getDigit();
-            case OTHER -> other = subtype.getDigit();
+    private static AntModProfile profileWithMod(AntMod mod) {
+        int head = AntMod.DIGIT_NONE;
+        int torso = AntMod.DIGIT_NONE;
+        int abdomen = AntMod.DIGIT_NONE;
+        int other = AntMod.DIGIT_NONE;
+        switch (mod.getSlot()) {
+            case HEAD -> head = mod.getDigit();
+            case TORSO -> torso = mod.getDigit();
+            case ABDOMEN -> abdomen = mod.getDigit();
+            case OTHER -> other = mod.getDigit();
         }
-        return AntSubtypeProfile.of(head, torso, abdomen, other);
+        return AntModProfile.of(head, torso, abdomen, other);
     }
 
     public static ImageIcon getAssimilatedDroneSprite(AntSpecies species) {
@@ -310,9 +310,7 @@ public final class GameConstants {
     private static final List<CritterClass> critterClasses = new ArrayList<>();
     private static final List<Skill> skills = new ArrayList<>();
     private static final List<Species> critterSpecies = new ArrayList<>();
-    private static final List<AntType> antTypes = new ArrayList<>();
     private static final List<AntClass> antClasses = new ArrayList<>();
-    private static final List<AntSubtype> antSubtypes = new ArrayList<>();
     private static final List<AntMod> antMods = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<Rank> colonyRanks = new ArrayList<>();
@@ -912,100 +910,43 @@ public final class GameConstants {
         return season == SEASON_AUTUMN || season == SEASON_WINTER;
     }
 
-    // --- Ant Types and Classes ---
-    public static final AntType TYPE_EGG = new AntType(1, LanguageStrings.TYPE_EGG, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
+    // --- Ant Classes ---
+    public static final AntClass CLASS_EGG = new AntClass(1, LanguageStrings.CLASS_EGG, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Egg.png"), "Egg.png");
-    static { antTypes.add(TYPE_EGG); antClasses.add(TYPE_EGG); }    
-    public static final AntType TYPE_LARVA = new AntType(2, LanguageStrings.TYPE_LARVA, 0.01f, 0f, 0f, 1f, 0f, 0f, 0.5f,
+    static { antClasses.add(CLASS_EGG); }
+    public static final AntClass CLASS_LARVA = new AntClass(2, LanguageStrings.CLASS_LARVA, 0.01f, 0f, 0f, 1f, 0f, 0f, 0.5f,
         loadIcon("icons/ants/Larva.png"), "Larva.png");
-    static { antTypes.add(TYPE_LARVA); antClasses.add(TYPE_LARVA); }
-    public static final AntType TYPE_PUPA = new AntType(3, LanguageStrings.TYPE_PUPA, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
+    static { antClasses.add(CLASS_LARVA); }
+    public static final AntClass CLASS_PUPA = new AntClass(3, LanguageStrings.CLASS_PUPA, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Pupa.png"), "Pupa.png");
-    static { antTypes.add(TYPE_PUPA); antClasses.add(TYPE_PUPA); }
-    public static final AntType TYPE_WORKER = new AntType(4, LanguageStrings.TYPE_WORKER, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 1,
+    static { antClasses.add(CLASS_PUPA); }
+    public static final AntClass CLASS_WORKER = new AntClass(4, LanguageStrings.CLASS_WORKER, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 1,
         loadIcon("icons/ants/omni/Worker.png"), "Worker.png");
-    static { antTypes.add(TYPE_WORKER); antClasses.add(TYPE_WORKER); }
-    public static final AntType TYPE_SOLDIER = new AntType(5, LanguageStrings.TYPE_SOLDIER, 3f, 3f, 1f, 2f, 2f, 0f, 3f, 5,
+    static { antClasses.add(CLASS_WORKER); }
+    public static final AntClass CLASS_SOLDIER = new AntClass(5, LanguageStrings.CLASS_SOLDIER, 3f, 3f, 1f, 2f, 2f, 0f, 3f, 5,
         loadIcon("icons/ants/omni/Soldier.png"), "Soldier.png");
-    static { antTypes.add(TYPE_SOLDIER); antClasses.add(TYPE_SOLDIER); }
-    public static final AntType TYPE_MAJOR = new AntType(6, LanguageStrings.TYPE_MAJOR, 10f, 15f, 1f, 5f, 2f, 20f, 2f, 15,
+    static { antClasses.add(CLASS_SOLDIER); }
+    public static final AntClass CLASS_MAJOR = new AntClass(6, LanguageStrings.CLASS_MAJOR, 10f, 15f, 1f, 5f, 2f, 20f, 2f, 15,
         loadIcon("icons/ants/omni/Major.png"), "Major.png");
-    static { antTypes.add(TYPE_MAJOR); antClasses.add(TYPE_MAJOR); }
-    public static final AntType TYPE_DRONE = new AntType(7, LanguageStrings.TYPE_DRONE, 0.01f, 0f, 0f, 1f, 0f, 0f, 1f, 
+    static { antClasses.add(CLASS_MAJOR); }
+    public static final AntClass CLASS_DRONE = new AntClass(7, LanguageStrings.CLASS_DRONE, 0.01f, 0f, 0f, 1f, 0f, 0f, 1f,
         loadIcon("icons/ants/omni/Drone.png"), "Drone.png");
-    static { antTypes.add(TYPE_DRONE); antClasses.add(TYPE_DRONE); }
-    public static final AntType TYPE_PRINCESS = new AntType(8, LanguageStrings.TYPE_PRINCESS, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 10,
+    static { antClasses.add(CLASS_DRONE); }
+    public static final AntClass CLASS_PRINCESS = new AntClass(8, LanguageStrings.CLASS_PRINCESS, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 10,
         loadIcon("icons/ants/omni/Princess.png"), "Princess.png");
-    static { antTypes.add(TYPE_PRINCESS); antClasses.add(TYPE_PRINCESS); }
-    public static final AntType TYPE_QUEEN = new AntType(9, LanguageStrings.TYPE_QUEEN, 50f, 2f, 1f, 10f, 1f, 20f, 1/4f, 50,
+    static { antClasses.add(CLASS_PRINCESS); }
+    public static final AntClass CLASS_QUEEN = new AntClass(9, LanguageStrings.CLASS_QUEEN, 50f, 2f, 1f, 10f, 1f, 20f, 1/4f, 50,
         loadIcon("icons/ants/omni/Queen.png"), "Queen.png");
-    static { antTypes.add(TYPE_QUEEN); antClasses.add(TYPE_QUEEN); }
-    public static final AntType TYPE_DEAD = new AntType(10, LanguageStrings.TYPE_DEAD, 0, 0, 0, 0, 0, 0, 0,
+    static { antClasses.add(CLASS_QUEEN); }
+    public static final AntClass CLASS_DEAD = new AntClass(10, LanguageStrings.CLASS_DEAD, 0, 0, 0, 0, 0, 0, 0,
         loadIcon("icons/ants/Dead.png"), "Dead.png");
-    static { antTypes.add(TYPE_DEAD); antClasses.add(TYPE_DEAD); }
-    public static final AntType TYPE_ZOMBIE = new AntType(11, LanguageStrings.TYPE_ZOMBIE,  1f, 1f, 1f, 1f, 1f, 0f, 1f, 
+    static { antClasses.add(CLASS_DEAD); }
+    public static final AntClass CLASS_ZOMBIE = new AntClass(11, LanguageStrings.CLASS_ZOMBIE,  1f, 1f, 1f, 1f, 1f, 0f, 1f,
         loadIcon("icons/ants/Zombie.png"), "Zombie.png");
-    static { antTypes.add(TYPE_ZOMBIE); antClasses.add(TYPE_ZOMBIE); }
+    static { antClasses.add(CLASS_ZOMBIE); }
 
-    public static final AntClass CLASS_EGG = TYPE_EGG;
-    public static final AntClass CLASS_LARVA = TYPE_LARVA;
-    public static final AntClass CLASS_PUPA = TYPE_PUPA;
-    public static final AntClass CLASS_WORKER = TYPE_WORKER;
-    public static final AntClass CLASS_SOLDIER = TYPE_SOLDIER;
-    public static final AntClass CLASS_MAJOR = TYPE_MAJOR;
-    public static final AntClass CLASS_DRONE = TYPE_DRONE;
-    public static final AntClass CLASS_PRINCESS = TYPE_PRINCESS;
-    public static final AntClass CLASS_QUEEN = TYPE_QUEEN;
-    public static final AntClass CLASS_DEAD = TYPE_DEAD;
-    public static final AntClass CLASS_ZOMBIE = TYPE_ZOMBIE;
-
-    // --- Ant Subtypes and Mods ---
+    // --- Ant Mods ---
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
-
-    public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
-    static { antSubtypes.add(SUBTYPE_HEAD_NONE); }
-    public static final AntSubtype SUBTYPE_HEAD_TRAPJAW = new AntSubtype(2, LanguageStrings.SUBTYPE_HEAD_TRAPJAW, AntSubtypeSlot.HEAD,
-            2, GameUnlocks.ASSIMILATED_TRAPJAW, "trapjaw/", "trapjaw",
-            1.5f, true, 1f, 1f, 1f,
-            SKILL_POWERFUL_BITE, SKILL_BASIC_BITE, loadIcon("icons/subtypes/trapjaw.png"));
-    static { antSubtypes.add(SUBTYPE_HEAD_TRAPJAW); }
-    public static final AntSubtype SUBTYPE_HEAD_DOORHEAD = new AntSubtype(3, LanguageStrings.SUBTYPE_HEAD_DOORHEAD, AntSubtypeSlot.HEAD,
-            3, GameUnlocks.ASSIMILATED_DOORHEAD, "turtle/", "doorhead",
-            1f, false, 20f, 1f, 1f,
-            SKILL_SHIELDING, null, loadIcon("icons/subtypes/doorhead.png"));
-    static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
-    public static final AntSubtype SUBTYPE_HEAD_FARSIGHT = new AntSubtype(9, LanguageStrings.SUBTYPE_HEAD_FARSIGHT, AntSubtypeSlot.HEAD,
-            4, GameUnlocks.ASSIMILATED_FARSIGHT, "bulldog/", "farsight",
-            1f, false, 1f, 1f, 1f,
-            1f, 0.15f, LanguageStrings.SUBTYPE_HEAD_FARSIGHT_DESC, null, null, loadIcon("icons/subtypes/farsight.png"));
-    static { antSubtypes.add(SUBTYPE_HEAD_FARSIGHT); }
-    public static final AntSubtype SUBTYPE_HEAD_LEAFCUTTER = new AntSubtype(10, LanguageStrings.SUBTYPE_HEAD_LEAFCUTTER, AntSubtypeSlot.HEAD,
-            5, GameUnlocks.ASSIMILATED_FARMING, "leafcutter/", "leafcutter",
-            1.25f, true, 1f, 1f, 2f,
-            SKILL_SHEARING_BITE, SKILL_BASIC_BITE, loadIcon("icons/subtypes/leafcutter.png"));
-    static { antSubtypes.add(SUBTYPE_HEAD_LEAFCUTTER); }
-
-    public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
-    static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
-
-    public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
-    static { antSubtypes.add(SUBTYPE_ABDOMEN_NONE); }
-    public static final AntSubtype SUBTYPE_ABDOMEN_STINGER = new AntSubtype(6, LanguageStrings.SUBTYPE_ABDOMEN_STINGER, AntSubtypeSlot.ABDOMEN,
-            2, GameUnlocks.ASSIMILATED_STINGING, "bullet/", "bullet",
-            1.5f, false, 1f, 1f, 1f,
-            SKILL_STINGING, null, loadIcon("icons/subtypes/bullet.png"));
-    static { antSubtypes.add(SUBTYPE_ABDOMEN_STINGER); }
-    public static final AntSubtype SUBTYPE_ABDOMEN_HONEYPOT = new AntSubtype(7, LanguageStrings.SUBTYPE_ABDOMEN_HONEYPOT, AntSubtypeSlot.ABDOMEN,
-            3, GameUnlocks.ASSIMILATED_HONEYPOT, "honeypot/", "honeypot",
-            1f, false, 1f, 0.75f, 4f,
-            1.15f, SKILL_BOOST_REGEN, null, loadIcon("icons/subtypes/honeypot.png"));
-    static { antSubtypes.add(SUBTYPE_ABDOMEN_HONEYPOT); }
-    public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,
-            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
-    static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
 
     public static final AntMod MOD_HEAD_NONE = new AntMod(1, LanguageStrings.SUBTYPE_NOTHING, AntModSlot.HEAD,
             AntMod.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
@@ -1053,103 +994,98 @@ public final class GameConstants {
     static { antMods.add(MOD_OTHER_NONE); }
 
     static {
-        SKILL_POWERFUL_BITE.setRequiredSubtype(SUBTYPE_HEAD_TRAPJAW);
         SKILL_POWERFUL_BITE.setRequiredMod(MOD_HEAD_TRAPJAW);
-        SKILL_SHEARING_BITE.setRequiredSubtype(SUBTYPE_HEAD_LEAFCUTTER);
         SKILL_SHEARING_BITE.setRequiredMod(MOD_HEAD_LEAFCUTTER);
-        SKILL_STINGING.setRequiredSubtype(SUBTYPE_ABDOMEN_STINGER);
         SKILL_STINGING.setRequiredMod(MOD_ABDOMEN_STINGER);
-        SKILL_SHIELDING.setRequiredSubtype(SUBTYPE_HEAD_DOORHEAD);
         SKILL_SHIELDING.setRequiredMod(MOD_HEAD_DOORHEAD);
-        SKILL_BOOST_REGEN.setRequiredSubtype(SUBTYPE_ABDOMEN_HONEYPOT);
         SKILL_BOOST_REGEN.setRequiredMod(MOD_ABDOMEN_HONEYPOT);
     }
 
     // --- Ant Roles ---
-    public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, LanguageStrings.ROLE_FORAGER, loadIcon("icons/roles/Forager.png"));
+    public static final AntRole ROLE_FORAGER = new AntRole(1, CLASS_WORKER, LanguageStrings.ROLE_FORAGER, loadIcon("icons/roles/Forager.png"));
     static { antRoles.add(ROLE_FORAGER); }
-    public static final AntRole ROLE_NURSE = new AntRole(2, TYPE_WORKER, LanguageStrings.ROLE_NURSE, loadIcon("icons/roles/Nurse.png"));
+    public static final AntRole ROLE_NURSE = new AntRole(2, CLASS_WORKER, LanguageStrings.ROLE_NURSE, loadIcon("icons/roles/Nurse.png"));
     static { antRoles.add(ROLE_NURSE); }
-    public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, LanguageStrings.ROLE_BUILDER, loadIcon("icons/roles/Builder.png"));
+    public static final AntRole ROLE_BUILDER = new AntRole(3, CLASS_WORKER, LanguageStrings.ROLE_BUILDER, loadIcon("icons/roles/Builder.png"));
     static { antRoles.add(ROLE_BUILDER); }
-    public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, LanguageStrings.ROLE_SCOUT, loadIcon("icons/roles/Scout.png"));
+    public static final AntRole ROLE_SCOUT = new AntRole(4, CLASS_WORKER, LanguageStrings.ROLE_SCOUT, loadIcon("icons/roles/Scout.png"));
     static { antRoles.add(ROLE_SCOUT); }
-    public static final AntRole ROLE_FARMER = new AntRole(5, TYPE_WORKER, LanguageStrings.ROLE_FARMER, loadIcon("icons/roles/Farmer.png"));
+    public static final AntRole ROLE_FARMER = new AntRole(5, CLASS_WORKER, LanguageStrings.ROLE_FARMER, loadIcon("icons/roles/Farmer.png"));
     static { antRoles.add(ROLE_FARMER); }
-    public static final AntRole ROLE_RANCHER = new AntRole(6, TYPE_WORKER, LanguageStrings.ROLE_RANCHER, loadIcon("icons/roles/Rancher.png"));
+    public static final AntRole ROLE_RANCHER = new AntRole(6, CLASS_WORKER, LanguageStrings.ROLE_RANCHER, loadIcon("icons/roles/Rancher.png"));
     static { antRoles.add(ROLE_RANCHER); }
-    public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, LanguageStrings.ROLE_GRAVER, loadIcon("icons/roles/Graver.png"));
+    public static final AntRole ROLE_GRAVER = new AntRole(7, CLASS_WORKER, LanguageStrings.ROLE_GRAVER, loadIcon("icons/roles/Graver.png"));
     static { antRoles.add(ROLE_GRAVER); }
-    public static final AntRole ROLE_MINER = new AntRole(8, TYPE_SOLDIER, LanguageStrings.ROLE_MINER, loadIcon("icons/roles/Miner.png"));
+    public static final AntRole ROLE_MINER = new AntRole(8, CLASS_SOLDIER, LanguageStrings.ROLE_MINER, loadIcon("icons/roles/Miner.png"));
     static { antRoles.add(ROLE_MINER); }
-    public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER, loadIcon("icons/roles/Courier.png"));
+    public static final AntRole ROLE_COURIER = new AntRole(9, CLASS_WORKER, LanguageStrings.ROLE_COURIER, loadIcon("icons/roles/Courier.png"));
     static { antRoles.add(ROLE_COURIER); }
-    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER, loadIcon("icons/roles/Potter.png"), Set.of(SUBTYPE_ABDOMEN_HONEYPOT), Set.of(SUBTYPE_ABDOMEN_HONEYPOT), true);
+    public static final AntRole ROLE_POTTER = new AntRole(10, CLASS_WORKER, LanguageStrings.ROLE_POTTER, loadIcon("icons/roles/Potter.png"), Set.of(MOD_ABDOMEN_HONEYPOT), Set.of(MOD_ABDOMEN_HONEYPOT), true);
     static { antRoles.add(ROLE_POTTER); }
     static { SKILL_BOOST_REGEN.setRequiredRole(ROLE_POTTER); }
-    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"), true);
+    public static final AntRole ROLE_WARRIOR = new AntRole(12, CLASS_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"), true);
     static { antRoles.add(ROLE_WARRIOR); }
-    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"), Set.of(SUBTYPE_HEAD_DOORHEAD), Set.of(SUBTYPE_HEAD_DOORHEAD), true, true);
+    public static final AntRole ROLE_DEFENDER = new AntRole(13, CLASS_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"), Set.of(MOD_HEAD_DOORHEAD), Set.of(MOD_HEAD_DOORHEAD), true, true);
     static { antRoles.add(ROLE_DEFENDER); }
     static { SKILL_SHIELDING.setRequiredRole(ROLE_DEFENDER); }
-    public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE, loadIcon("icons/roles/Police.png"));
+    public static final AntRole ROLE_POLICE = new AntRole(14, CLASS_SOLDIER, LanguageStrings.ROLE_POLICE, loadIcon("icons/roles/Police.png"));
     static { antRoles.add(ROLE_POLICE); }
-    public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, LanguageStrings.ROLE_BOMBER, loadIcon("icons/roles/Bomber.png"), true);
+    public static final AntRole ROLE_BOMBER = new AntRole(15, CLASS_SOLDIER, LanguageStrings.ROLE_BOMBER, loadIcon("icons/roles/Bomber.png"), true);
     static { antRoles.add(ROLE_BOMBER); }
     static { SKILL_SELFDESTRUCT.setRequiredRole(ROLE_BOMBER); }
     static { SKILL_ACIDIC_SELFDESTRUCT.setRequiredRole(ROLE_BOMBER); }
-    public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER, loadIcon("icons/roles/Hunter.png"));
+    public static final AntRole ROLE_HUNTER = new AntRole(16, CLASS_SOLDIER, LanguageStrings.ROLE_HUNTER, loadIcon("icons/roles/Hunter.png"));
     static { antRoles.add(ROLE_HUNTER); }
-    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE,loadIcon("icons/roles/Brute.png"), true);
+    public static final AntRole ROLE_BRUTE = new AntRole(17, CLASS_MAJOR, LanguageStrings.ROLE_BRUTE,loadIcon("icons/roles/Brute.png"), true);
     static { antRoles.add(ROLE_BRUTE); }
-    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"), Set.of(), Set.of(), true, true);
+    public static final AntRole ROLE_CARRIER = new AntRole(18, CLASS_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"), Set.of(), Set.of(), true, true);
     static { antRoles.add(ROLE_CARRIER); }
-    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY,loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of(), true);
+    public static final AntRole ROLE_ARTILLERY = new AntRole(19, CLASS_MAJOR, LanguageStrings.ROLE_ARTILLERY,loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of(), true);
     static { antRoles.add(ROLE_ARTILLERY); }
     static { SKILL_ACID_ARTILLERY.setRequiredRole(ROLE_ARTILLERY); }
-    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"), Set.of(), Set.of(), true, true);
+    public static final AntRole ROLE_SIEGE = new AntRole(20, CLASS_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"), Set.of(), Set.of(), true, true);
     static { antRoles.add(ROLE_SIEGE); }
-    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER, loadIcon("icons/roles/Borer.png"));
+    public static final AntRole ROLE_BORER = new AntRole(21, CLASS_MAJOR, LanguageStrings.ROLE_BORER, loadIcon("icons/roles/Borer.png"));
     static { antRoles.add(ROLE_BORER); }
-    public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, LanguageStrings.ROLE_DRONE, loadIcon("icons/roles/Drone.png"));
+    public static final AntRole ROLE_DRONE = new AntRole(22, CLASS_DRONE, LanguageStrings.ROLE_DRONE, loadIcon("icons/roles/Drone.png"));
     static { antRoles.add(ROLE_DRONE); }
-    public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, LanguageStrings.ROLE_BREEDER, loadIcon("icons/roles/Breeder.png"));
+    public static final AntRole ROLE_BREEDER = new AntRole(23, CLASS_PRINCESS, LanguageStrings.ROLE_BREEDER, loadIcon("icons/roles/Breeder.png"));
     static { antRoles.add(ROLE_BREEDER); }
-    public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, LanguageStrings.ROLE_DIPLOMAT, loadIcon("icons/roles/Diplomat.png"));
+    public static final AntRole ROLE_DIPLOMAT = new AntRole(24, CLASS_PRINCESS, LanguageStrings.ROLE_DIPLOMAT, loadIcon("icons/roles/Diplomat.png"));
     static { antRoles.add(ROLE_DIPLOMAT); }
-    public static final AntRole ROLE_SPY = new AntRole(39, TYPE_PRINCESS, LanguageStrings.ROLE_SPY, loadIcon("icons/roles/Spy.png"));
+    public static final AntRole ROLE_SPY = new AntRole(39, CLASS_PRINCESS, LanguageStrings.ROLE_SPY, loadIcon("icons/roles/Spy.png"));
     static { antRoles.add(ROLE_SPY); }
-    public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, LanguageStrings.ROLE_LAYER, loadIcon("icons/roles/Layer.png"));
+    public static final AntRole ROLE_LAYER = new AntRole(25, CLASS_QUEEN, LanguageStrings.ROLE_LAYER, loadIcon("icons/roles/Layer.png"));
     static { antRoles.add(ROLE_LAYER); }
-    public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER, loadIcon("icons/roles/Researcher.png"));
+    public static final AntRole ROLE_RESEARCHER = new AntRole(26, CLASS_QUEEN, LanguageStrings.ROLE_RESEARCHER, loadIcon("icons/roles/Researcher.png"));
     static { antRoles.add(ROLE_RESEARCHER); }
-    public static final AntRole ROLE_COMMANDER = new AntRole(35, TYPE_QUEEN, LanguageStrings.ROLE_COMMANDER, loadIcon("icons/roles/Commander.png"), true);
+    public static final AntRole ROLE_COMMANDER = new AntRole(35, CLASS_QUEEN, LanguageStrings.ROLE_COMMANDER, loadIcon("icons/roles/Commander.png"), true);
     static { antRoles.add(ROLE_COMMANDER); }
     static { SKILL_ARTILLERY_LEADER.setRequiredRole(ROLE_COMMANDER); }
-    public static final AntRole ROLE_CAPTAIN = new AntRole(36, TYPE_PRINCESS, LanguageStrings.ROLE_CAPTAIN, loadIcon("icons/roles/Captain.png"), true);
+    public static final AntRole ROLE_CAPTAIN = new AntRole(36, CLASS_PRINCESS, LanguageStrings.ROLE_CAPTAIN, loadIcon("icons/roles/Captain.png"), true);
     static { antRoles.add(ROLE_CAPTAIN); }
     static { SKILL_INFANTRY_LEADER.setRequiredRole(ROLE_CAPTAIN); }
-    public static final AntRole ROLE_AIR_SUPPORT = new AntRole(37, TYPE_PRINCESS, LanguageStrings.ROLE_AIR_SUPPORT, loadIcon("icons/roles/AirSupport.png"), true);
+    public static final AntRole ROLE_AIR_SUPPORT = new AntRole(37, CLASS_PRINCESS, LanguageStrings.ROLE_AIR_SUPPORT, loadIcon("icons/roles/AirSupport.png"), true);
     static { antRoles.add(ROLE_AIR_SUPPORT); }
     static { SKILL_CLOSE_ANT_SUPPORT.setRequiredRole(ROLE_AIR_SUPPORT); }
-    public static final AntRole ROLE_AIR_BOMBER = new AntRole(38, TYPE_PRINCESS, LanguageStrings.ROLE_AIR_BOMBER, loadIcon("icons/roles/AirBomber.png"), true);
+    public static final AntRole ROLE_AIR_BOMBER = new AntRole(38, CLASS_PRINCESS, LanguageStrings.ROLE_AIR_BOMBER, loadIcon("icons/roles/AirBomber.png"), true);
     static { antRoles.add(ROLE_AIR_BOMBER); }
     static { SKILL_AIR_BOMBING.setRequiredRole(ROLE_AIR_BOMBER); }
-    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA, loadIcon("icons/roles/Militia.png"), true);
+    public static final AntRole ROLE_MILITIA = new AntRole(27, CLASS_WORKER, LanguageStrings.ROLE_MILITIA, loadIcon("icons/roles/Militia.png"), true);
     static { antRoles.add(ROLE_MILITIA); }
-    public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER, loadIcon("icons/roles/Catcher.png"));
+    public static final AntRole ROLE_CATCHER = new AntRole(28, CLASS_SOLDIER, LanguageStrings.ROLE_CATCHER, loadIcon("icons/roles/Catcher.png"));
     static { antRoles.add(ROLE_CATCHER); }
-    public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, LanguageStrings.ROLE_CRANE, loadIcon("icons/roles/Crane.png"));
+    public static final AntRole ROLE_CRANE = new AntRole(29, CLASS_MAJOR, LanguageStrings.ROLE_CRANE, loadIcon("icons/roles/Crane.png"));
     static { antRoles.add(ROLE_CRANE); }
-    public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, LanguageStrings.ROLE_TRANSPORT, loadIcon("icons/roles/Transport.png"));
+    public static final AntRole ROLE_TRANSPORT = new AntRole(30, CLASS_MAJOR, LanguageStrings.ROLE_TRANSPORT, loadIcon("icons/roles/Transport.png"));
     static { antRoles.add(ROLE_TRANSPORT); }
-    public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, LanguageStrings.ROLE_ASSISTANT, loadIcon("icons/roles/Assistant.png"));
+    public static final AntRole ROLE_ASSISTANT = new AntRole(31, CLASS_PRINCESS, LanguageStrings.ROLE_ASSISTANT, loadIcon("icons/roles/Assistant.png"));
     static { antRoles.add(ROLE_ASSISTANT); }
-    public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, LanguageStrings.ROLE_ESCORT, loadIcon("icons/roles/Escort.png"));
+    public static final AntRole ROLE_ESCORT = new AntRole(32, CLASS_SOLDIER, LanguageStrings.ROLE_ESCORT, loadIcon("icons/roles/Escort.png"));
     static { antRoles.add(ROLE_ESCORT); }
-    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, LanguageStrings.ROLE_ENGINEER, loadIcon("icons/roles/Engineer.png"));
+    public static final AntRole ROLE_ENGINEER = new AntRole(33, CLASS_WORKER, LanguageStrings.ROLE_ENGINEER, loadIcon("icons/roles/Engineer.png"));
     static { antRoles.add(ROLE_ENGINEER); }
-    public static final AntRole ROLE_SKYTRANS = new AntRole(34, TYPE_PRINCESS, LanguageStrings.ROLE_SKYTRANS, loadIcon("icons/roles/Skytrans.png"));
+    public static final AntRole ROLE_SKYTRANS = new AntRole(34, CLASS_PRINCESS, LanguageStrings.ROLE_SKYTRANS, loadIcon("icons/roles/Skytrans.png"));
     static { antRoles.add(ROLE_SKYTRANS); }
 
     // --- Colony Ranks ---
@@ -1373,13 +1309,13 @@ public final class GameConstants {
         return isObtainableRole(role) && !isWarEconomyExclusiveRole(role);
     }
 
-    public static List<AntRole> eligibleDefaultHatchRoles(AntType type) {
+    public static List<AntRole> eligibleDefaultHatchRoles(AntClass type) {
         List<AntRole> out = new ArrayList<>();
         if (type == null) {
             return out;
         }
         for (AntRole role : antRoles) {
-            if (role.getAntType() == type && isEligibleDefaultHatchRole(role)) {
+            if (role.getAntClass() == type && isEligibleDefaultHatchRole(role)) {
                 out.add(role);
             }
         }
@@ -1412,10 +1348,6 @@ public final class GameConstants {
 
     public static int getMilitaryWeightForAntClass(AntClass type) {
         return type != null ? type.getMilitaryWeight() : 0;
-    }
-
-    public static int getMilitaryWeightForAntType(AntType type) {
-        return getMilitaryWeightForAntClass(type);
     }
 
     public static int getActiveMilitaryRoleWeight(AntRole role) {
@@ -1923,17 +1855,6 @@ public final class GameConstants {
         return null;
     }
 
-    public static List<AntType> getAntTypes() { return Collections.unmodifiableList(antTypes); }
-
-    public static AntType getAntTypeById(int id) {
-        for (AntType t : antTypes) {
-            if (t.getId() == id) {
-                return t;
-            }
-        }
-        return null;
-    }
-
     public static List<AntClass> getAntClasses() { return Collections.unmodifiableList(antClasses); }
 
     public static AntClass getAntClassById(int id) {
@@ -1943,49 +1864,6 @@ public final class GameConstants {
             }
         }
         return null;
-    }
-
-    public static List<AntSubtype> getAntSubtypes() { return Collections.unmodifiableList(antSubtypes); }
-
-    public static AntSubtype getAntSubtypeById(int id) {
-        for (AntSubtype subtype : antSubtypes) {
-            if (subtype.getId() == id) {
-                return subtype;
-            }
-        }
-        return null;
-    }
-
-    public static List<AntSubtypeSlot> getConfigurableSubtypeSlots() {
-        return List.of(AntSubtypeSlot.HEAD, AntSubtypeSlot.TORSO, AntSubtypeSlot.ABDOMEN);
-    }
-
-    public static AntSubtype getAntSubtypeBySlotAndDigit(AntSubtypeSlot slot, int digit) {
-        for (AntSubtype subtype : antSubtypes) {
-            if (subtype.getSlot() == slot && subtype.getDigit() == digit) {
-                return subtype;
-            }
-        }
-        return getDefaultSubtypeForSlot(slot);
-    }
-
-    public static AntSubtype getDefaultSubtypeForSlot(AntSubtypeSlot slot) {
-        return switch (slot) {
-            case HEAD -> SUBTYPE_HEAD_NONE;
-            case TORSO -> SUBTYPE_TORSO_NONE;
-            case ABDOMEN -> SUBTYPE_ABDOMEN_NONE;
-            case OTHER -> SUBTYPE_OTHER_NONE;
-        };
-    }
-
-    public static List<AntSubtype> getSubtypesForSlot(AntSubtypeSlot slot) {
-        List<AntSubtype> result = new ArrayList<>();
-        for (AntSubtype subtype : antSubtypes) {
-            if (subtype.getSlot() == slot) {
-                result.add(subtype);
-            }
-        }
-        return Collections.unmodifiableList(result);
     }
 
     public static List<AntMod> getAntMods() { return Collections.unmodifiableList(antMods); }

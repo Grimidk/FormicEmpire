@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyUnassignedAntService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -46,7 +46,7 @@ public class RoleManagementDialog extends ZeroDialog {
     private final JButton copyPeaceToWarButton;
     private boolean editingWarRoles;
     private final List<RolePanel> rolePanels = new ArrayList<>();
-    private final Set<AntType> initializedTypes = new HashSet<>();
+    private final Set<AntClass> initializedTypes = new HashSet<>();
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
@@ -178,19 +178,19 @@ public class RoleManagementDialog extends ZeroDialog {
         int currentIndex = 0;
         tabIndexMap.clear();
         
-        if (addRoleTab(GameConstants.TYPE_WORKER, GameUnlocks.TYPE_WORKER, currentIndex)) {
+        if (addRoleTab(GameConstants.CLASS_WORKER, GameUnlocks.TYPE_WORKER, currentIndex)) {
             tabIndexMap.put(TAB_WORKER, currentIndex++);
         }
-        if (addRoleTab(GameConstants.TYPE_SOLDIER, GameUnlocks.TYPE_SOLDIER, currentIndex)) {
+        if (addRoleTab(GameConstants.CLASS_SOLDIER, GameUnlocks.TYPE_SOLDIER, currentIndex)) {
             tabIndexMap.put(TAB_SOLDIER, currentIndex++);
         }
-        if (addRoleTab(GameConstants.TYPE_MAJOR, GameUnlocks.TYPE_MAJOR, currentIndex)) {
+        if (addRoleTab(GameConstants.CLASS_MAJOR, GameUnlocks.TYPE_MAJOR, currentIndex)) {
             tabIndexMap.put(TAB_MAJOR, currentIndex++);
         }
-        if (addRoleTab(GameConstants.TYPE_PRINCESS, GameUnlocks.TYPE_PRINCESS, currentIndex)) {
+        if (addRoleTab(GameConstants.CLASS_PRINCESS, GameUnlocks.TYPE_PRINCESS, currentIndex)) {
             tabIndexMap.put(TAB_PRINCESS, currentIndex++);
         }
-        if (addRoleTab(GameConstants.TYPE_QUEEN, GameUnlocks.TYPE_QUEEN, currentIndex)) {
+        if (addRoleTab(GameConstants.CLASS_QUEEN, GameUnlocks.TYPE_QUEEN, currentIndex)) {
             tabIndexMap.put(TAB_QUEEN, currentIndex++);
         }
 
@@ -208,7 +208,7 @@ public class RoleManagementDialog extends ZeroDialog {
         });
     }
     
-    private boolean addRoleTab(AntType type, Upgrade requiredUpgrade, int expectedIndex) {
+    private boolean addRoleTab(AntClass type, Upgrade requiredUpgrade, int expectedIndex) {
         if (!colony.hasUpgrade(requiredUpgrade)) {
             return false;
         }
@@ -306,7 +306,7 @@ public class RoleManagementDialog extends ZeroDialog {
     
     private static class RolePanel extends JPanel {
         private final Colony colony;
-        private final AntType antType;
+        private final AntClass antType;
         private final Engine engine;
         private final RoleManagementDialog owner;
         private final JLabel totalLabel;
@@ -315,12 +315,12 @@ public class RoleManagementDialog extends ZeroDialog {
         private final JPanel availableSubtypesPanel;
         private final JPanel rolesGrid;
         private final Map<AntRole, JSpinner> spinnerMap = new HashMap<>();
-        private final Map<AntRole, Map<AntSubtype, JCheckBox>> subtypeAllowMap = new HashMap<>();
+        private final Map<AntRole, Map<AntMod, JCheckBox>> subtypeAllowMap = new HashMap<>();
         private final Map<AntRole, JPanel> subtypeAllowPanels = new HashMap<>();
         private final Set<AntRole> displayedRoles = new HashSet<>();
         private boolean isUpdating = false;
 
-        RolePanel(Colony colony, AntType antType, Engine engine, RoleManagementDialog owner) {
+        RolePanel(Colony colony, AntClass antType, Engine engine, RoleManagementDialog owner) {
             this.colony = colony;
             this.antType = antType;
             this.engine = engine;
@@ -334,7 +334,7 @@ public class RoleManagementDialog extends ZeroDialog {
             summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
             summaryPanel.setOpaque(false);
 
-            int totalAnts = colony.getAntsByType(antType).size();
+            int totalAnts = colony.getAntsByClass(antType).size();
             
             totalLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_TOTAL_PREFIX, antType.getName(), totalAnts));
             totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
@@ -384,7 +384,7 @@ public class RoleManagementDialog extends ZeroDialog {
         private void checkAndAddRoles() {
             boolean addedAny = false;
             for (AntRole role : GameConstants.getAntRoles()) {
-                if (role.getAntType() != antType) {
+                if (role.getAntClass() != antType) {
                     continue;
                 }
                 if (!GameConstants.isObtainableRole(role)) {
@@ -474,12 +474,12 @@ public class RoleManagementDialog extends ZeroDialog {
                     otherSpinnersTotal += (Integer) entry.getValue().getValue();
                 }
 
-                int currentTotalAnts = RolePanel.this.colony.getAntsByType(RolePanel.this.antType).size();
+                int currentTotalAnts = RolePanel.this.colony.getAntsByClass(RolePanel.this.antType).size();
                 int newTotalAssigned = newValue + otherSpinnersTotal;
 
                 if (newTotalAssigned > currentTotalAnts) {
 
-                    AntRole defaultRole = Engine.resolveDefaultRoleForAntType(antType, engine);
+                    AntRole defaultRole = Engine.resolveDefaultRoleForAntClass(antType, engine);
                     
                     if (defaultRole != null && !role.equals(defaultRole) && spinnerMap.containsKey(defaultRole)
                             && usesWarRoleCounts(defaultRole) == warCounts) {
@@ -525,7 +525,7 @@ public class RoleManagementDialog extends ZeroDialog {
 
             JPanel subtypeAllows = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
             subtypeAllows.setOpaque(false);
-            Map<AntSubtype, JCheckBox> checks = new LinkedHashMap<>();
+            Map<AntMod, JCheckBox> checks = new LinkedHashMap<>();
             subtypeAllowMap.put(role, checks);
             subtypeAllowPanels.put(role, subtypeAllows);
             spinnerMap.put(role, spinner);
@@ -599,15 +599,15 @@ public class RoleManagementDialog extends ZeroDialog {
 
         private void rebuildSubtypeAllowControls(AntRole role) {
             JPanel host = subtypeAllowPanels.get(role);
-            Map<AntSubtype, JCheckBox> checks = subtypeAllowMap.get(role);
+            Map<AntMod, JCheckBox> checks = subtypeAllowMap.get(role);
             if (host == null || checks == null) {
                 return;
             }
             host.removeAll();
             checks.clear();
 
-            List<AntSubtype> unlocked = AntSubtypeService.listUnlockedSpecialSubtypes(colony);
-            for (AntSubtype subtype : unlocked) {
+            List<AntMod> unlocked = AntModService.listUnlockedSpecialMods(colony);
+            for (AntMod subtype : unlocked) {
                 JPanel cell = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
                 cell.setOpaque(false);
 
@@ -616,7 +616,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 cell.add(iconLabel);
 
                 boolean allowed = isSubtypeAllowed(role, subtype);
-                boolean forced = role.isSubtypeForcedAllowed(subtype);
+                boolean forced = role.isModForcedAllowed(subtype);
                 JCheckBox check = new JCheckBox();
                 check.setSelected(allowed || forced);
                 check.setEnabled(!forced);
@@ -640,19 +640,19 @@ public class RoleManagementDialog extends ZeroDialog {
         }
 
         private void syncSubtypeAllowControls(AntRole role) {
-            Map<AntSubtype, JCheckBox> checks = subtypeAllowMap.get(role);
-            List<AntSubtype> unlocked = AntSubtypeService.listUnlockedSpecialSubtypes(colony);
+            Map<AntMod, JCheckBox> checks = subtypeAllowMap.get(role);
+            List<AntMod> unlocked = AntModService.listUnlockedSpecialMods(colony);
             if (checks == null || checks.size() != unlocked.size() || !checks.keySet().containsAll(unlocked)) {
                 rebuildSubtypeAllowControls(role);
                 return;
             }
-            for (AntSubtype subtype : unlocked) {
+            for (AntMod subtype : unlocked) {
                 JCheckBox check = checks.get(subtype);
                 if (check == null) {
                     rebuildSubtypeAllowControls(role);
                     return;
                 }
-                boolean forced = role.isSubtypeForcedAllowed(subtype);
+                boolean forced = role.isModForcedAllowed(subtype);
                 boolean allowed = isSubtypeAllowed(role, subtype) || forced;
                 if (check.isSelected() != allowed) {
                     check.setSelected(allowed);
@@ -666,7 +666,7 @@ public class RoleManagementDialog extends ZeroDialog {
         private void refreshAvailableSubtypesSummary() {
             availableSubtypesPanel.removeAll();
 
-            List<AntSubtype> unlocked = AntSubtypeService.listUnlockedSpecialSubtypes(colony);
+            List<AntMod> unlocked = AntModService.listUnlockedSpecialMods(colony);
             if (unlocked.isEmpty()) {
                 availableSubtypesPanel.setVisible(false);
                 availableSubtypesPanel.revalidate();
@@ -676,21 +676,21 @@ public class RoleManagementDialog extends ZeroDialog {
 
             availableSubtypesPanel.setVisible(true);
 
-            JLabel prefix = new JLabel(LanguageStrings.get(LanguageStrings.ROLE_AVAILABLE_SUBTYPES_PREFIX));
+            JLabel prefix = new JLabel(LanguageStrings.get(LanguageStrings.ROLE_AVAILABLE_MODS_PREFIX));
             prefix.setForeground(AssetStyles.FONT_COLOR);
             prefix.setFont(AssetStyles.FONT_BOLD);
             availableSubtypesPanel.add(prefix);
 
-            int nothingCount = AntSubtypeService.countStandardAntsOfType(colony, antType);
-            AntSubtype nothing = GameConstants.SUBTYPE_HEAD_NONE;
+            int nothingCount = AntModService.countStandardAntsOfClass(colony, antType);
+            AntMod nothing = GameConstants.MOD_HEAD_NONE;
             availableSubtypesPanel.add(buildAvailableSubtypeChip(
                     nothing.getIcon(),
                     nothing.getName(),
                     nothing.getDesc(),
                     nothingCount));
 
-            for (AntSubtype subtype : unlocked) {
-                int count = AntSubtypeService.countAntsWithSubtype(colony, antType, subtype);
+            for (AntMod subtype : unlocked) {
+                int count = AntModService.countAntsWithMod(colony, antType, subtype);
                 availableSubtypesPanel.add(buildAvailableSubtypeChip(
                         subtype.getIcon(), subtype.getName(), subtype.getDesc(), count));
             }
@@ -712,7 +712,7 @@ public class RoleManagementDialog extends ZeroDialog {
             return chip;
         }
 
-        private static String subtypeEffectTooltip(AntSubtype subtype) {
+        private static String subtypeEffectTooltip(AntMod subtype) {
             if (subtype.isNone()) {
                 return formatStackedTooltip(subtype.getName(), subtype.getDesc());
             }
@@ -722,8 +722,8 @@ public class RoleManagementDialog extends ZeroDialog {
                     LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT));
         }
 
-        private static String subtypeAllowTooltip(AntSubtype subtype) {
-            String allowLine = LanguageStrings.format(LanguageStrings.ROLE_SUBTYPE_ALLOW_TIP, subtype.getName());
+        private static String subtypeAllowTooltip(AntMod subtype) {
+            String allowLine = LanguageStrings.format(LanguageStrings.ROLE_MOD_ALLOW_TIP, subtype.getName());
             if (subtype.isNone()) {
                 return formatStackedTooltip(allowLine, subtype.getDesc());
             }
@@ -767,17 +767,17 @@ public class RoleManagementDialog extends ZeroDialog {
             return owner.isEditingWarRoles() || role.isActiveMilitary();
         }
 
-        private boolean isSubtypeAllowed(AntRole role, AntSubtype subtype) {
+        private boolean isSubtypeAllowed(AntRole role, AntMod subtype) {
             return usesWarRoleCounts(role)
-                    ? colony.isWarRoleSubtypeAllowed(role, subtype)
-                    : colony.isPeaceRoleSubtypeAllowed(role, subtype);
+                    ? colony.isWarRoleModAllowed(role, subtype)
+                    : colony.isPeaceRoleModAllowed(role, subtype);
         }
 
-        private void setSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+        private void setSubtypeAllowed(AntRole role, AntMod subtype, boolean allowed) {
             if (usesWarRoleCounts(role)) {
-                colony.setWarRoleSubtypeAllowed(role, subtype, allowed);
+                colony.setWarRoleModAllowed(role, subtype, allowed);
             } else {
-                colony.setPeaceRoleSubtypeAllowed(role, subtype, allowed);
+                colony.setPeaceRoleModAllowed(role, subtype, allowed);
             }
         }
 
@@ -819,7 +819,7 @@ public class RoleManagementDialog extends ZeroDialog {
                     syncSubtypeAllowControls(role);
                 }
                 
-                int totalAnts = colony.getAntsByType(antType).size();
+                int totalAnts = colony.getAntsByClass(antType).size();
                 totalLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_TOTAL_PREFIX, antType.getName(), totalAnts));
 
                 int totalAssigned = 0;

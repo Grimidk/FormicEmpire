@@ -27,16 +27,16 @@ class ColonyLabourWorkingAntsTest {
         dynasty.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
 
         for (int i = 0; i < 5; i++) {
-            Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
+            Ant worker = new Ant(colony, GameConstants.CLASS_WORKER);
             worker.setRole(GameConstants.ROLE_FORAGER);
             colony.getWorkers().add(worker);
         }
         for (int i = 0; i < 3; i++) {
-            Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+            Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
             soldier.setRole(GameConstants.ROLE_HUNTER);
             colony.getSoldiers().add(soldier);
         }
-        Ant idle = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant idle = new Ant(colony, GameConstants.CLASS_WORKER);
         idle.setRole(GameConstants.ROLE_FARMER);
         colony.getWorkers().add(idle);
     }

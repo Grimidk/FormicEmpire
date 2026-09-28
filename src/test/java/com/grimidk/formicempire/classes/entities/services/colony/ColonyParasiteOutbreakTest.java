@@ -33,7 +33,7 @@ class ColonyParasiteOutbreakTest {
 
     private void addWorkers(int count) {
         for (int i = 0; i < count; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
     }
 

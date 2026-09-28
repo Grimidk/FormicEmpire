@@ -42,7 +42,6 @@ class WorldYearSimulationTest {
     private static final int FLIGHT_SEED_PAIRS = 4;
     private static final double MIN_MONTHLY_COLONY_GROWTH_RATE = 0.85;
     private static final double MIN_DYNASTIES_WITH_SECOND_COLONY = 0.75;
-    /** Second playable year, month 6 → calendar year index 1, month 6. */
     private static final int EXPANSION_CHECKPOINT_YEAR = 1;
     private static final int EXPANSION_CHECKPOINT_MONTH = 6;
 
@@ -289,7 +288,7 @@ class WorldYearSimulationTest {
                 colony.setAutomationEnabled(false);
                 int workers = Math.max(colony.getWorkers().size(), 40);
                 while (colony.getWorkers().size() < workers) {
-                    colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+                    colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
                 }
                 colony.setAssignedRoleCount(GameConstants.ROLE_NURSE, Math.max(10, workers / 3));
                 colony.setAssignedRoleCount(GameConstants.ROLE_FARMER, Math.max(4, workers / 8));
@@ -356,7 +355,7 @@ class WorldYearSimulationTest {
                     int workers = colony.getWorkers().size();
                     if (workers < 40) {
                         for (int i = workers; i < 40; i++) {
-                            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+                            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
                         }
                     }
                     int nurseTarget = Math.max(8, colony.getWorkers().size() / 3);
@@ -575,10 +574,10 @@ class WorldYearSimulationTest {
 
     private static void seedFlightStock(Colony colony, int pairs) {
         for (int i = 0; i < pairs; i++) {
-            Ant princess = new Ant(colony, GameConstants.TYPE_PRINCESS);
+            Ant princess = new Ant(colony, GameConstants.CLASS_PRINCESS);
             princess.setRole(GameConstants.ROLE_BREEDER);
             colony.getPrincesses().add(princess);
-            colony.getDrones().add(new Ant(colony, GameConstants.TYPE_DRONE));
+            colony.getDrones().add(new Ant(colony, GameConstants.CLASS_DRONE));
         }
         colony.setAssignedRoleCount(GameConstants.ROLE_BREEDER, pairs);
     }

@@ -4,10 +4,10 @@ import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
@@ -471,8 +471,8 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        for (AntType type : GameConstants.getAntTypes()) {
-            if (type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_ZOMBIE) continue;
+        for (AntClass type : GameConstants.getAntClasses()) {
+            if (type == GameConstants.CLASS_DEAD || type == GameConstants.CLASS_ZOMBIE) continue;
 
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -481,19 +481,19 @@ public class HelpPanel extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-            entry.add(HelpAnimatedSpriteLabel.forAnt(type, GameConstants.SPECIES_OMNI, AntSubtypeProfile.standard()),
+            entry.add(HelpAnimatedSpriteLabel.forAnt(type, GameConstants.SPECIES_OMNI, AntModProfile.standard()),
                     BorderLayout.WEST);
 
             String desc = "";
-            if (type == GameConstants.TYPE_EGG) desc = LanguageStrings.get("HELP_TYPE_EGG_DESC");
-            else if (type == GameConstants.TYPE_LARVA) desc = LanguageStrings.get("HELP_TYPE_LARVA_DESC");
-            else if (type == GameConstants.TYPE_PUPA) desc = LanguageStrings.get("HELP_TYPE_PUPA_DESC");
-            else if (type == GameConstants.TYPE_WORKER) desc = LanguageStrings.get("HELP_TYPE_WORKER_DESC");
-            else if (type == GameConstants.TYPE_SOLDIER) desc = LanguageStrings.get("HELP_TYPE_SOLDIER_DESC");
-            else if (type == GameConstants.TYPE_MAJOR) desc = LanguageStrings.get("HELP_TYPE_MAJOR_DESC");
-            else if (type == GameConstants.TYPE_PRINCESS) desc = LanguageStrings.get("HELP_TYPE_PRINCESS_DESC");
-            else if (type == GameConstants.TYPE_DRONE) desc = LanguageStrings.get("HELP_TYPE_DRONE_DESC");
-            else if (type == GameConstants.TYPE_QUEEN) desc = LanguageStrings.get("HELP_TYPE_QUEEN_DESC");
+            if (type == GameConstants.CLASS_EGG) desc = LanguageStrings.get("HELP_TYPE_EGG_DESC");
+            else if (type == GameConstants.CLASS_LARVA) desc = LanguageStrings.get("HELP_TYPE_LARVA_DESC");
+            else if (type == GameConstants.CLASS_PUPA) desc = LanguageStrings.get("HELP_TYPE_PUPA_DESC");
+            else if (type == GameConstants.CLASS_WORKER) desc = LanguageStrings.get("HELP_TYPE_WORKER_DESC");
+            else if (type == GameConstants.CLASS_SOLDIER) desc = LanguageStrings.get("HELP_TYPE_SOLDIER_DESC");
+            else if (type == GameConstants.CLASS_MAJOR) desc = LanguageStrings.get("HELP_TYPE_MAJOR_DESC");
+            else if (type == GameConstants.CLASS_PRINCESS) desc = LanguageStrings.get("HELP_TYPE_PRINCESS_DESC");
+            else if (type == GameConstants.CLASS_DRONE) desc = LanguageStrings.get("HELP_TYPE_DRONE_DESC");
+            else if (type == GameConstants.CLASS_QUEEN) desc = LanguageStrings.get("HELP_TYPE_QUEEN_DESC");
             
             JTextArea descArea = new JTextArea(desc);
             descArea.setFont(AssetStyles.FONT_NORMAL);
@@ -527,7 +527,7 @@ public class HelpPanel extends JPanel {
         intro.setBorder(new EmptyBorder(0, 0, 10, 0));
         panel.add(intro);
 
-        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
+        for (AntModSlot slot : GameConstants.getConfigurableModSlots()) {
             String sectionKey = switch (slot) {
                 case HEAD -> LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION;
                 case TORSO -> LanguageStrings.HATCH_SUBTYPE_TORSO_SECTION;
@@ -541,7 +541,7 @@ public class HelpPanel extends JPanel {
             sectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             panel.add(sectionLabel);
 
-            for (AntSubtype subtype : GameConstants.getSubtypesForSlot(slot)) {
+            for (AntMod subtype : GameConstants.getModsForSlot(slot)) {
                 if (subtype.isNone()) {
                     continue;
                 }
@@ -556,7 +556,7 @@ public class HelpPanel extends JPanel {
         return scrollPane;
     }
 
-    private JPanel buildAntSubtypeEntry(JPanel panel, AntSubtype subtype) {
+    private JPanel buildAntSubtypeEntry(JPanel panel, AntMod subtype) {
         JPanel entry = new JPanel(new BorderLayout(10, 0));
         entry.setBackground(AssetStyles.BACKGROUND_COLOR);
         entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, subtype.getName(),
@@ -933,7 +933,7 @@ public class HelpPanel extends JPanel {
             icon.setBorder(new EmptyBorder(5, 5, 5, 5));
             entry.add(icon, BorderLayout.WEST);
 
-            AntType antType = role.getAntType();
+            AntClass antType = role.getAntClass();
             String typeLine = antType != null
                     ? LanguageStrings.format(LanguageStrings.HELP_ROLE_ANT_TYPE, antType.getName())
                     : "";

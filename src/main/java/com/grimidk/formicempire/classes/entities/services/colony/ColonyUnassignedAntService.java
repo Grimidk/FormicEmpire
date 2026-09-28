@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -33,8 +33,8 @@ public final class ColonyUnassignedAntService {
             return false;
         }
         Engine resolved = engine != null ? engine : resolveEngine(colony);
-        AntType type = ant.getAntType();
-        AntRole defaultRole = Engine.resolveDefaultRoleForAntType(type, resolved);
+        AntClass type = ant.getAntClass();
+        AntRole defaultRole = Engine.resolveDefaultRoleForAntClass(type, resolved);
         AntRole role = ant.getRole();
         return defaultRole != null && defaultRole.equals(role);
     }
@@ -70,32 +70,36 @@ public final class ColonyUnassignedAntService {
         return count;
     }
 
-    public static Map<AntType, Integer> countUnassignedByTypes(Colony colony, List<AntType> types, Engine engine) {
-        Map<AntType, Integer> counts = new HashMap<>();
+    public static Map<AntClass, Integer> countUnassignedByClasses(Colony colony, List<AntClass> types, Engine engine) {
+        Map<AntClass, Integer> counts = new HashMap<>();
         if (colony == null || types == null) {
             return counts;
         }
-        for (AntType type : types) {
+        for (AntClass type : types) {
             if (type == null) {
                 continue;
             }
-            counts.put(type, countUnassignedInList(colony, colony.getAntsByType(type), engine));
+            counts.put(type, countUnassignedInList(colony, colony.getAntsByClass(type), engine));
         }
         return counts;
     }
 
-    public static List<Ant> buildPartyFromCounts(Colony colony, Map<AntType, Integer> partyCounts, Engine engine) {
+    public static Map<AntClass, Integer> countUnassignedByTypes(Colony colony, List<AntClass> types, Engine engine) {
+        return countUnassignedByClasses(colony, types, engine);
+    }
+
+    public static List<Ant> buildPartyFromCounts(Colony colony, Map<AntClass, Integer> partyCounts, Engine engine) {
         List<Ant> party = new ArrayList<>();
         if (colony == null || partyCounts == null) {
             return party;
         }
-        for (Map.Entry<AntType, Integer> entry : partyCounts.entrySet()) {
-            AntType type = entry.getKey();
+        for (Map.Entry<AntClass, Integer> entry : partyCounts.entrySet()) {
+            AntClass type = entry.getKey();
             int wanted = entry.getValue() != null ? entry.getValue() : 0;
             if (type == null || wanted <= 0) {
                 continue;
             }
-            appendFromList(colony, colony.getAntsByType(type), wanted, party, engine);
+            appendFromList(colony, colony.getAntsByClass(type), wanted, party, engine);
         }
         return party;
     }

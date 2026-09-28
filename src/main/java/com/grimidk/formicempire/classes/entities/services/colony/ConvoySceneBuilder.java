@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -43,7 +43,7 @@ public final class ConvoySceneBuilder {
 
         Dynasty dynasty = originColony.getDynasty();
         AntSpecies species = dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI;
-        Map<AntType, Integer> typeCounts = aggregateAntTypes(trade, method);
+        Map<AntClass, Integer> classCounts = aggregateAntClasses(trade, method);
 
         int totalHours = Math.max(1, trade.getTotalHours());
         int remainingHours = Math.max(0, trade.getRemainingHours());
@@ -56,7 +56,7 @@ public final class ConvoySceneBuilder {
                 backgroundKind,
                 landBiome,
                 species,
-                typeCounts,
+                classCounts,
                 returning,
                 legProgress,
                 remainingHours,
@@ -125,44 +125,44 @@ public final class ConvoySceneBuilder {
         return GameConstants.BIOME_PLAINS;
     }
 
-    private static Map<AntType, Integer> aggregateAntTypes(Trade trade, TradeMethod method) {
-        Map<AntType, Integer> byType = new HashMap<>();
+    private static Map<AntClass, Integer> aggregateAntClasses(Trade trade, TradeMethod method) {
+        Map<AntClass, Integer> byClass = new HashMap<>();
         boolean sky = method == GameConstants.METHOD_AIR;
         for (Ant ant : trade.getAntsOnTrip()) {
-            if (ant == null || !ant.isAlive() || ant.getAntType() == null) {
+            if (ant == null || !ant.isAlive() || ant.getAntClass() == null) {
                 continue;
             }
-            AntType type = ant.getAntType();
-            if (!includeConvoyType(type, sky)) {
+            AntClass antClass = ant.getAntClass();
+            if (!includeConvoyClass(antClass, sky)) {
                 continue;
             }
-            byType.merge(type, 1, Integer::sum);
+            byClass.merge(antClass, 1, Integer::sum);
         }
-        if (byType.isEmpty()) {
-            Map<AntType, Integer> transport = trade.getTransport();
+        if (byClass.isEmpty()) {
+            Map<AntClass, Integer> transport = trade.getTransport();
             if (transport != null) {
-                for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
-                    AntType type = entry.getKey();
-                    if (type == null || entry.getValue() == null || entry.getValue() <= 0) {
+                for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
+                    AntClass antClass = entry.getKey();
+                    if (antClass == null || entry.getValue() == null || entry.getValue() <= 0) {
                         continue;
                     }
-                    if (!includeConvoyType(type, sky)) {
+                    if (!includeConvoyClass(antClass, sky)) {
                         continue;
                     }
-                    byType.put(type, entry.getValue());
+                    byClass.put(antClass, entry.getValue());
                 }
             }
         }
-        return byType;
+        return byClass;
     }
 
-    private static boolean includeConvoyType(AntType type, boolean sky) {
-        if (type == null || type == GameConstants.TYPE_DEAD) {
+    private static boolean includeConvoyClass(AntClass antClass, boolean sky) {
+        if (antClass == null || antClass == GameConstants.CLASS_DEAD) {
             return false;
         }
         if (sky) {
-            return type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS;
+            return antClass == GameConstants.CLASS_DRONE || antClass == GameConstants.CLASS_PRINCESS;
         }
-        return type != GameConstants.TYPE_DRONE;
+        return antClass != GameConstants.CLASS_DRONE;
     }
 }

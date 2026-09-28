@@ -36,7 +36,7 @@ class ViewportPhysicsLodTest {
         Colony colony = new Colony(1, "c", true);
         Dynasty d = new Dynasty(1, "d", true, GameConstants.SPECIES_OMNI);
         colony.setDynasty(d);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         boolean any = false;
         for (long step = 1; step <= ViewportPhysicsLod.OFF_VIEWPORT_AI_PERIOD * 2; step++) {
             if (ViewportPhysicsLod.shouldRunOffViewportAi(step, ant)) {
@@ -52,7 +52,7 @@ class ViewportPhysicsLodTest {
         Colony colony = new Colony(1, "c", true);
         Dynasty d = new Dynasty(1, "d", true, GameConstants.SPECIES_OMNI);
         colony.setDynasty(d);
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         int hits = 0;
         for (long step = 0; step < ViewportPhysicsLod.OFF_VIEWPORT_MOVE_PERIOD * 8; step++) {
             if (ViewportPhysicsLod.shouldRunOffViewportPosition(step, ant)) {

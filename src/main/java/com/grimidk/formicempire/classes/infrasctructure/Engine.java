@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
@@ -784,79 +784,78 @@ public class Engine extends Thread {
         this.mapLayerBattles = mapLayerBattles;
     }
 
-    public static List<AntRole> antRolesForAntType(AntType type) {
+    public static List<AntRole> antRolesForAntClass(AntClass type) {
         List<AntRole> out = new ArrayList<>();
         for (AntRole r : GameConstants.getAntRoles()) {
-            if (r.getAntType() == type) {
+            if (r.getAntClass() == type) {
                 out.add(r);
             }
         }
         return out;
     }
-
-    public static AntRole resolveDefaultRoleForAntType(AntType type, Engine engine) {
+    public static AntRole resolveDefaultRoleForAntClass(AntClass type, Engine engine) {
         if (engine != null) {
             int roleId;
-            if (type == GameConstants.TYPE_WORKER) {
+            if (type == GameConstants.CLASS_WORKER) {
                 roleId = engine.getDefaultRoleWorker();
-            } else if (type == GameConstants.TYPE_SOLDIER) {
+            } else if (type == GameConstants.CLASS_SOLDIER) {
                 roleId = engine.getDefaultRoleSoldier();
-            } else if (type == GameConstants.TYPE_MAJOR) {
+            } else if (type == GameConstants.CLASS_MAJOR) {
                 roleId = engine.getDefaultRoleMajor();
-            } else if (type == GameConstants.TYPE_PRINCESS) {
+            } else if (type == GameConstants.CLASS_PRINCESS) {
                 roleId = engine.getDefaultRolePrincess();
-            } else if (type == GameConstants.TYPE_QUEEN) {
+            } else if (type == GameConstants.CLASS_QUEEN) {
                 roleId = engine.getDefaultRoleQueen();
             } else {
-                return builtinDefaultRoleForAntType(type);
+                return builtinDefaultRoleForAntClass(type);
             }
             AntRole chosen = GameConstants.getAntRoleById(roleId);
-            if (chosen != null && chosen.getAntType() == type
+            if (chosen != null && chosen.getAntClass() == type
                     && GameConstants.isEligibleDefaultHatchRole(chosen)) {
                 return chosen;
             }
         }
-        return builtinDefaultRoleForAntType(type);
+        return builtinDefaultRoleForAntClass(type);
     }
 
-    public static AntRole builtinDefaultRoleForAntType(AntType type) {
-        if (type == GameConstants.TYPE_WORKER) {
+    public static AntRole builtinDefaultRoleForAntClass(AntClass type) {
+        if (type == GameConstants.CLASS_WORKER) {
             return GameConstants.ROLE_FORAGER;
         }
-        if (type == GameConstants.TYPE_SOLDIER) {
+        if (type == GameConstants.CLASS_SOLDIER) {
             return GameConstants.ROLE_HUNTER;
         }
-        if (type == GameConstants.TYPE_MAJOR) {
+        if (type == GameConstants.CLASS_MAJOR) {
             return GameConstants.ROLE_CRANE;
         }
-        if (type == GameConstants.TYPE_PRINCESS) {
+        if (type == GameConstants.CLASS_PRINCESS) {
             return GameConstants.ROLE_BREEDER;
         }
-        if (type == GameConstants.TYPE_DRONE) {
+        if (type == GameConstants.CLASS_DRONE) {
             return GameConstants.ROLE_DRONE;
         }
-        if (type == GameConstants.TYPE_QUEEN) {
+        if (type == GameConstants.CLASS_QUEEN) {
             return GameConstants.ROLE_LAYER;
         }
         return null;
     }
 
-    public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
+    public static int sanitizeDefaultRoleId(AntClass type, int desiredRoleId, int fallbackRoleId) {
         AntRole r = GameConstants.getAntRoleById(desiredRoleId);
-        if (r != null && r.getAntType() == type && GameConstants.isEligibleDefaultHatchRole(r)) {
+        if (r != null && r.getAntClass() == type && GameConstants.isEligibleDefaultHatchRole(r)) {
             return desiredRoleId;
         }
         AntRole fallback = GameConstants.getAntRoleById(fallbackRoleId);
-        if (fallback != null && fallback.getAntType() == type
+        if (fallback != null && fallback.getAntClass() == type
                 && GameConstants.isEligibleDefaultHatchRole(fallback)) {
             return fallbackRoleId;
         }
-        AntRole builtin = builtinDefaultRoleForAntType(type);
+        AntRole builtin = builtinDefaultRoleForAntClass(type);
         return builtin != null ? builtin.getId() : fallbackRoleId;
     }
 
-    public static int defaultRoleIdForAntType(AntType type, Engine engine) {
-        AntRole r = resolveDefaultRoleForAntType(type, engine);
+    public static int defaultRoleIdForAntClass(AntClass type, Engine engine) {
+        AntRole r = resolveDefaultRoleForAntClass(type, engine);
         return r != null ? r.getId() : -1;
     }
 }

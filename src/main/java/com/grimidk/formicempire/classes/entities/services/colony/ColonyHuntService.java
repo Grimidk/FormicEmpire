@@ -12,7 +12,7 @@ import java.util.Set;
 import com.grimidk.formicempire.classes.constants.critter.BugRole;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
@@ -53,10 +53,10 @@ public final class ColonyHuntService {
         }
     }
 
-    private static final List<AntType> HUNT_ANT_TYPES = List.of(
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_PRINCESS);
+    private static final List<AntClass> HUNT_ANT_CLASSES = List.of(
+            GameConstants.CLASS_SOLDIER,
+            GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_PRINCESS);
 
     private ColonyHuntService() {
     }
@@ -75,14 +75,14 @@ public final class ColonyHuntService {
         return Math.max(1, capacity / GameNumbers.HUNT_MAX_PARTY_FROM_CAPACITY_DIVISOR);
     }
 
-    public static Map<AntType, Integer> getAvailableHunterCountsByType(Colony colony) {
-        return ColonyUnassignedAntService.countUnassignedByTypes(colony, HUNT_ANT_TYPES,
+    public static Map<AntClass, Integer> getAvailableHunterCountsByClass(Colony colony) {
+        return ColonyUnassignedAntService.countUnassignedByClasses(colony, HUNT_ANT_CLASSES,
                 ColonyUnassignedAntService.resolveEngine(colony));
     }
 
-    public static Map<AntType, Integer> countPartyByType(List<Ant> party) {
-        Map<AntType, Integer> counts = new HashMap<>();
-        for (AntType type : HUNT_ANT_TYPES) {
+    public static Map<AntClass, Integer> countPartyByClass(List<Ant> party) {
+        Map<AntClass, Integer> counts = new HashMap<>();
+        for (AntClass type : HUNT_ANT_CLASSES) {
             counts.put(type, 0);
         }
         if (party == null) {
@@ -92,7 +92,7 @@ public final class ColonyHuntService {
             if (ant == null) {
                 continue;
             }
-            AntType type = ant.getAntType();
+            AntClass type = ant.getAntClass();
             if (type != null && counts.containsKey(type)) {
                 counts.merge(type, 1, Integer::sum);
             }
@@ -105,7 +105,7 @@ public final class ColonyHuntService {
     }
 
     public static HuntDispatchPreview previewDispatch(Colony colony, KnownHuntTarget target,
-            Map<AntType, Integer> partyCounts) {
+            Map<AntClass, Integer> partyCounts) {
         List<Ant> party = buildPartyFromCounts(colony, partyCounts);
         Species species = target != null ? target.getSpecies() : null;
         if (species == null) {
@@ -294,13 +294,13 @@ public final class ColonyHuntService {
         return buildPartyFromCounts(colony, maxAvailableCounts(colony)).size();
     }
 
-    private static Map<AntType, Integer> maxAvailableCounts(Colony colony) {
-        Map<AntType, Integer> counts = new HashMap<>();
+    private static Map<AntClass, Integer> maxAvailableCounts(Colony colony) {
+        Map<AntClass, Integer> counts = new HashMap<>();
         if (colony == null) {
             return counts;
         }
-        Map<AntType, Integer> available = getAvailableHunterCountsByType(colony);
-        for (AntType type : HUNT_ANT_TYPES) {
+        Map<AntClass, Integer> available = getAvailableHunterCountsByClass(colony);
+        for (AntClass type : HUNT_ANT_CLASSES) {
             counts.put(type, available.getOrDefault(type, 0));
         }
         return counts;
@@ -310,7 +310,7 @@ public final class ColonyHuntService {
         return Math.min(maxPartyCapacity(colony), countAvailableHunters(colony));
     }
 
-    public static boolean dispatchHunt(Colony colony, int targetId, Map<AntType, Integer> partyCounts) {
+    public static boolean dispatchHunt(Colony colony, int targetId, Map<AntClass, Integer> partyCounts) {
         if (colony == null || !canDispatchHunt(colony, targetId) || partyCounts == null) {
             return false;
         }
@@ -322,8 +322,8 @@ public final class ColonyHuntService {
         if (party.isEmpty() || party.size() > maxPartyCapacity(colony)) {
             return false;
         }
-        Map<AntType, Integer> available = getAvailableHunterCountsByType(colony);
-        for (Map.Entry<AntType, Integer> entry : partyCounts.entrySet()) {
+        Map<AntClass, Integer> available = getAvailableHunterCountsByClass(colony);
+        for (Map.Entry<AntClass, Integer> entry : partyCounts.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) {
                 continue;
             }
@@ -444,10 +444,10 @@ public final class ColonyHuntService {
     }
 
     private static List<Ant> collectAvailableHunters(Colony colony, int maxCount) {
-        Map<AntType, Integer> available = getAvailableHunterCountsByType(colony);
-        Map<AntType, Integer> request = new HashMap<>();
+        Map<AntClass, Integer> available = getAvailableHunterCountsByClass(colony);
+        Map<AntClass, Integer> request = new HashMap<>();
         int remaining = maxCount;
-        for (AntType type : HUNT_ANT_TYPES) {
+        for (AntClass type : HUNT_ANT_CLASSES) {
             if (remaining <= 0) {
                 break;
             }
@@ -460,7 +460,7 @@ public final class ColonyHuntService {
         return buildPartyFromCounts(colony, request);
     }
 
-    private static List<Ant> buildPartyFromCounts(Colony colony, Map<AntType, Integer> partyCounts) {
+    private static List<Ant> buildPartyFromCounts(Colony colony, Map<AntClass, Integer> partyCounts) {
         return ColonyUnassignedAntService.buildPartyFromCounts(colony, partyCounts,
                 ColonyUnassignedAntService.resolveEngine(colony));
     }
@@ -639,10 +639,10 @@ public final class ColonyHuntService {
             }
         }
         AntRole role = ant.getRole();
-        AntType type = ant.getAntType();
+        AntClass antClass = ant.getAntClass();
         return new Savefile.SavedHuntPartyMember(
-                type != null ? type.getId() : 0,
-                ant.getSubtypeProfile() != null ? ant.getSubtypeProfile().getCode() : 0,
+                antClass != null ? antClass.getId() : 0,
+                ant.getModProfile() != null ? ant.getModProfile().getCode() : 0,
                 role != null ? role.getId() : 0,
                 slotIndexForAnt(colony, ant),
                 Math.round(ant.getHealth()),
@@ -709,14 +709,14 @@ public final class ColonyHuntService {
     }
 
     private static boolean matchesSavedPartyMember(Ant ant, Savefile.SavedHuntPartyMember savedMember) {
-        AntType type = ant.getAntType();
+        AntClass antClass = ant.getAntClass();
         AntRole role = ant.getRole();
-        int typeId = type != null ? type.getId() : 0;
+        int classId = antClass != null ? antClass.getId() : 0;
         int roleId = role != null ? role.getId() : 0;
-        int subtypeCode = ant.getSubtypeProfile() != null ? ant.getSubtypeProfile().getCode() : 0;
-        return typeId == savedMember.typeId
+        int modProfileCode = ant.getModProfile() != null ? ant.getModProfile().getCode() : 0;
+        return classId == savedMember.classId
                 && roleId == savedMember.roleId
-                && subtypeCode == savedMember.subtypeCode;
+                && modProfileCode == savedMember.modProfileCode;
     }
 
     private static int slotIndexForAnt(Colony colony, Ant ant) {
@@ -738,19 +738,19 @@ public final class ColonyHuntService {
         if (candidate == null || ant == null) {
             return false;
         }
-        AntType candidateType = candidate.getAntType();
-        AntType antType = ant.getAntType();
+        AntClass candidateClass = candidate.getAntClass();
+        AntClass antClass = ant.getAntClass();
         AntRole candidateRole = candidate.getRole();
         AntRole antRole = ant.getRole();
-        int candidateTypeId = candidateType != null ? candidateType.getId() : 0;
-        int antTypeId = antType != null ? antType.getId() : 0;
+        int candidateClassId = candidateClass != null ? candidateClass.getId() : 0;
+        int antClassId = antClass != null ? antClass.getId() : 0;
         int candidateRoleId = candidateRole != null ? candidateRole.getId() : 0;
         int antRoleId = antRole != null ? antRole.getId() : 0;
-        int candidateSubtype = candidate.getSubtypeProfile() != null ? candidate.getSubtypeProfile().getCode() : 0;
-        int antSubtype = ant.getSubtypeProfile() != null ? ant.getSubtypeProfile().getCode() : 0;
-        return candidateTypeId == antTypeId
+        int candidateModProfile = candidate.getModProfile() != null ? candidate.getModProfile().getCode() : 0;
+        int antModProfile = ant.getModProfile() != null ? ant.getModProfile().getCode() : 0;
+        return candidateClassId == antClassId
                 && candidateRoleId == antRoleId
-                && candidateSubtype == antSubtype;
+                && candidateModProfile == antModProfile;
     }
 
     private static List<List<Ant>> militaryAntLists(Colony colony) {

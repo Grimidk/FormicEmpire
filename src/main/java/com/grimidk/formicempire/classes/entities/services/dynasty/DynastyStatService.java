@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -26,12 +26,12 @@ public class DynastyStatService {
         return total;
     }
 
-    public Map<AntType, Integer> getGlobalPopulationByType(Dynasty dynasty) {
-        Map<AntType, Integer> totals = new HashMap<>();
+    public Map<AntClass, Integer> getGlobalPopulationByClass(Dynasty dynasty) {
+        Map<AntClass, Integer> totals = new HashMap<>();
         if (dynasty == null) return totals;
 
         for (Colony c : dynasty.getColonies()) {
-            for (Map.Entry<AntType, List<Ant>> entry : c.getAntGroups().entrySet()) {
+            for (Map.Entry<AntClass, List<Ant>> entry : c.getAntGroups().entrySet()) {
                 totals.merge(entry.getKey(), entry.getValue().size(), Integer::sum);
             }
         }

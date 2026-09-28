@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -39,11 +39,12 @@ public final class ColonyInvasionService {
         }
     }
 
-    private static final List<AntType> INVASION_ANT_TYPES = List.of(
-            GameConstants.TYPE_WORKER,
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_PRINCESS);
+    private static final List<AntClass> INVASION_ANT_CLASSES = List.of(
+            GameConstants.CLASS_WORKER,
+            GameConstants.CLASS_SOLDIER,
+            GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_PRINCESS);
+    private static final List<AntClass> INVASION_ANT_TYPES = INVASION_ANT_CLASSES;
 
     private ColonyInvasionService() {
     }
@@ -79,13 +80,13 @@ public final class ColonyInvasionService {
         }
     }
 
-    public static Map<AntType, Integer> getAvailableDefenderCountsByType(Colony colony) {
-        return ColonyUnassignedAntService.countUnassignedByTypes(colony, INVASION_ANT_TYPES,
+    public static Map<AntClass, Integer> getAvailableDefenderCountsByClass(Colony colony) {
+        return ColonyUnassignedAntService.countUnassignedByClasses(colony, INVASION_ANT_CLASSES,
                 ColonyUnassignedAntService.resolveEngine(colony));
     }
 
     public static int countAvailableDefenders(Colony colony) {
-        Map<AntType, Integer> counts = getAvailableDefenderCountsByType(colony);
+        Map<AntClass, Integer> counts = getAvailableDefenderCountsByClass(colony);
         int total = 0;
         for (Integer count : counts.values()) {
             total += count != null ? count : 0;
@@ -94,7 +95,7 @@ public final class ColonyInvasionService {
     }
 
     public static InvasionDispatchPreview previewDefense(Colony colony, InvasionAlert alert,
-            Map<AntType, Integer> partyCounts, int worldDay, int worldHour) {
+            Map<AntClass, Integer> partyCounts, int worldDay, int worldHour) {
         List<Ant> party = buildPartyFromCounts(colony, partyCounts);
         Species species = alert != null ? alert.getSpecies() : null;
         if (species == null) {
@@ -122,7 +123,7 @@ public final class ColonyInvasionService {
         return countAvailableDefenders(colony) > 0;
     }
 
-    public static boolean dispatchDefense(Colony colony, int alertId, Map<AntType, Integer> partyCounts,
+    public static boolean dispatchDefense(Colony colony, int alertId, Map<AntClass, Integer> partyCounts,
             int worldDay, int worldHour) {
         InvasionAlert alert = findAlert(colony, alertId);
         if (alert == null || !canDispatchDefense(colony, alert)) {
@@ -132,8 +133,8 @@ public final class ColonyInvasionService {
         if (party.isEmpty()) {
             return false;
         }
-        Map<AntType, Integer> available = getAvailableDefenderCountsByType(colony);
-        for (Map.Entry<AntType, Integer> entry : partyCounts.entrySet()) {
+        Map<AntClass, Integer> available = getAvailableDefenderCountsByClass(colony);
+        for (Map.Entry<AntClass, Integer> entry : partyCounts.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) {
                 continue;
             }
@@ -307,8 +308,8 @@ public final class ColonyInvasionService {
     private static void killUnassignedRaidVictims(Colony colony) {
         Engine engine = ColonyUnassignedAntService.resolveEngine(colony);
         List<Ant> candidates = new ArrayList<>();
-        for (AntType type : INVASION_ANT_TYPES) {
-            List<Ant> ants = colony.getAntsByType(type);
+        for (AntClass type : INVASION_ANT_CLASSES) {
+            List<Ant> ants = colony.getAntsByClass(type);
             if (ants == null) {
                 continue;
             }
@@ -329,17 +330,17 @@ public final class ColonyInvasionService {
             if (victim == null || !victim.isAlive()) {
                 continue;
             }
-            AntType type = victim.getAntType();
+            AntClass type = victim.getAntClass();
             victim.goDie(colony, DeathCause.CONFLICT);
             colony.recordAntDeath(victim, DeathCause.CONFLICT);
-            List<Ant> list = colony.getAntsByType(type);
+            List<Ant> list = colony.getAntsByClass(type);
             if (list != null) {
                 list.remove(victim);
             }
         }
     }
 
-    private static List<Ant> buildPartyFromCounts(Colony colony, Map<AntType, Integer> partyCounts) {
+    private static List<Ant> buildPartyFromCounts(Colony colony, Map<AntClass, Integer> partyCounts) {
         return ColonyUnassignedAntService.buildPartyFromCounts(colony, partyCounts,
                 ColonyUnassignedAntService.resolveEngine(colony));
     }
@@ -524,10 +525,10 @@ public final class ColonyInvasionService {
             }
         }
         AntRole role = ant.getRole();
-        AntType type = ant.getAntType();
+        AntClass type = ant.getAntClass();
         return new Savefile.SavedHuntPartyMember(
                 type != null ? type.getId() : 0,
-                ant.getSubtypeProfile() != null ? ant.getSubtypeProfile().getCode() : 0,
+                ant.getModProfile() != null ? ant.getModProfile().getCode() : 0,
                 role != null ? role.getId() : 0,
                 slotIndexForAnt(colony, ant),
                 Math.round(ant.getHealth()),
@@ -594,14 +595,14 @@ public final class ColonyInvasionService {
     }
 
     private static boolean matchesSavedPartyMember(Ant ant, Savefile.SavedHuntPartyMember savedMember) {
-        AntType type = ant.getAntType();
+        AntClass antClass = ant.getAntClass();
         AntRole role = ant.getRole();
-        int typeId = type != null ? type.getId() : 0;
+        int classId = antClass != null ? antClass.getId() : 0;
         int roleId = role != null ? role.getId() : 0;
-        int subtypeCode = ant.getSubtypeProfile() != null ? ant.getSubtypeProfile().getCode() : 0;
-        return typeId == savedMember.typeId
+        int modCode = ant.getModProfile() != null ? ant.getModProfile().getCode() : 0;
+        return classId == savedMember.classId
                 && roleId == savedMember.roleId
-                && subtypeCode == savedMember.subtypeCode;
+                && modCode == savedMember.modProfileCode;
     }
 
     private static int slotIndexForAnt(Colony colony, Ant ant) {
@@ -623,16 +624,16 @@ public final class ColonyInvasionService {
         if (candidate == null || ant == null) {
             return false;
         }
-        AntType candidateType = candidate.getAntType();
-        AntType antType = ant.getAntType();
+        AntClass candidateType = candidate.getAntClass();
+        AntClass antType = ant.getAntClass();
         AntRole candidateRole = candidate.getRole();
         AntRole antRole = ant.getRole();
         int candidateTypeId = candidateType != null ? candidateType.getId() : 0;
         int antTypeId = antType != null ? antType.getId() : 0;
         int candidateRoleId = candidateRole != null ? candidateRole.getId() : 0;
         int antRoleId = antRole != null ? antRole.getId() : 0;
-        int candidateSubtype = candidate.getSubtypeProfile() != null ? candidate.getSubtypeProfile().getCode() : 0;
-        int antSubtype = ant.getSubtypeProfile() != null ? ant.getSubtypeProfile().getCode() : 0;
+        int candidateSubtype = candidate.getModProfile() != null ? candidate.getModProfile().getCode() : 0;
+        int antSubtype = ant.getModProfile() != null ? ant.getModProfile().getCode() : 0;
         return candidateTypeId == antTypeId
                 && candidateRoleId == antRoleId
                 && candidateSubtype == antSubtype;

@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyInvasionService;
@@ -19,19 +19,19 @@ import java.util.Map;
 
 public final class InvasionDispatchDialog extends ZeroDialog {
 
-    private static final List<AntType> INVASION_ANT_TYPES = List.of(
-            GameConstants.TYPE_WORKER,
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_PRINCESS);
+    private static final List<AntClass> INVASION_ANT_TYPES = List.of(
+            GameConstants.CLASS_WORKER,
+            GameConstants.CLASS_SOLDIER,
+            GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_PRINCESS);
 
     private final Colony colony;
     private final InvasionAlert alert;
     private final int worldDay;
     private final int worldHour;
     private final java.util.function.IntConsumer onDispatched;
-    private final Map<AntType, JSpinner> antSpinners = new HashMap<>();
-    private final Map<AntType, Integer> availableByType = new HashMap<>();
+    private final Map<AntClass, JSpinner> antSpinners = new HashMap<>();
+    private final Map<AntClass, Integer> availableByType = new HashMap<>();
     private boolean updating;
 
     private final JLabel winChanceLabel = new JLabel(" ");
@@ -47,7 +47,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
         this.worldDay = worldDay;
         this.worldHour = worldHour;
         this.onDispatched = onDispatched;
-        availableByType.putAll(ColonyInvasionService.getAvailableDefenderCountsByType(colony));
+        availableByType.putAll(ColonyInvasionService.getAvailableDefenderCountsByClass(colony));
 
         JPanel headerPanel = new JPanel(new GridLayout(1, 3, 16, 8));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 10, 20));
@@ -74,7 +74,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
                 BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR),
                 LanguageStrings.get(LanguageStrings.INVASION_PERSONNEL)));
         antGrid.setBackground(AssetStyles.UI_BG_PRIMARY);
-        for (AntType type : INVASION_ANT_TYPES) {
+        for (AntClass type : INVASION_ANT_TYPES) {
             antGrid.add(buildAntRow(type));
         }
         mainPanel.add(antGrid);
@@ -93,11 +93,11 @@ public final class InvasionDispatchDialog extends ZeroDialog {
         updatePreview();
     }
 
-    private JPanel buildAntRow(AntType type) {
+    private JPanel buildAntRow(AntClass type) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
         row.setBackground(AssetStyles.UI_BG_PRIMARY);
         int available = availableByType.getOrDefault(type, 0);
-        row.add(CritterPanelUtils.buildAntTypeAvailabilityLabel(type, available));
+        row.add(CritterPanelUtils.buildAntClassAvailabilityLabel(type, available));
 
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, available, 1));
         spinner.setFocusable(false);
@@ -122,9 +122,9 @@ public final class InvasionDispatchDialog extends ZeroDialog {
         return row;
     }
 
-    private Map<AntType, Integer> getSelectedCounts() {
-        Map<AntType, Integer> counts = new HashMap<>();
-        for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+    private Map<AntClass, Integer> getSelectedCounts() {
+        Map<AntClass, Integer> counts = new HashMap<>();
+        for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
             counts.put(entry.getKey(), (Integer) entry.getValue().getValue());
         }
         return counts;
@@ -145,7 +145,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
     private void applyDefaultSelection() {
         updating = true;
         try {
-            for (AntType type : INVASION_ANT_TYPES) {
+            for (AntClass type : INVASION_ANT_TYPES) {
                 int available = availableByType.getOrDefault(type, 0);
                 if (available > 0) {
                     JSpinner spinner = antSpinners.get(type);

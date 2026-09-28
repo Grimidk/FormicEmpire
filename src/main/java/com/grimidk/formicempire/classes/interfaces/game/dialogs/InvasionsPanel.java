@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
@@ -26,11 +26,11 @@ import java.util.function.BiConsumer;
 
 public final class InvasionsPanel extends JPanel {
 
-    private static final List<AntType> INVASION_ANT_TYPES = List.of(
-            GameConstants.TYPE_WORKER,
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_PRINCESS);
+    private static final List<AntClass> INVASION_ANT_TYPES = List.of(
+            GameConstants.CLASS_WORKER,
+            GameConstants.CLASS_SOLDIER,
+            GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_PRINCESS);
 
     private final JFrame dialogOwner;
     private final Colony colony;
@@ -140,11 +140,11 @@ public final class InvasionsPanel extends JPanel {
         detailColumn.add(CritterPanelUtils.buildBoldDetailLine(
                 LanguageStrings.get(LanguageStrings.INVASION_EXPEDITION_PHASE_FIGHTING)));
 
-        Map<AntType, Integer> sentCounts = ColonyHuntService.countPartyByType(defense.getParty());
+        Map<AntClass, Integer> sentCounts = ColonyHuntService.countPartyByClass(defense.getParty());
         detailColumn.add(Box.createVerticalStrut(6));
         detailColumn.add(CritterPanelUtils.buildLabeledDetailRow(
                 LanguageStrings.INVASION_PERSONNEL,
-                CritterPanelUtils.buildAntTypeCountsRow(sentCounts, INVASION_ANT_TYPES)));
+                CritterPanelUtils.buildAntClassCountsRow(sentCounts, INVASION_ANT_TYPES)));
 
         int totalSent = defense.getParty().size();
         int living = totalSent;
@@ -164,7 +164,7 @@ public final class InvasionsPanel extends JPanel {
         List<Ant> previewParty = livingPartyForPreview(defense);
         ColonyInvasionService.InvasionDispatchPreview preview =
                 ColonyInvasionService.previewDefense(colony, alert,
-                        ColonyHuntService.countPartyByType(previewParty), 0, 0);
+                        ColonyHuntService.countPartyByClass(previewParty), 0, 0);
         detailColumn.add(Box.createVerticalStrut(4));
         detailColumn.add(CritterPanelUtils.buildDetailLine(LanguageStrings.format(
                 LanguageStrings.HUNT_WIN_CHANCE_FMT, Math.round(preview.winChance * 100f))));

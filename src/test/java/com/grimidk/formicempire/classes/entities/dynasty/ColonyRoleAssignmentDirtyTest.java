@@ -21,7 +21,7 @@ class ColonyRoleAssignmentDirtyTest {
         colony.setDynasty(dynasty);
         colony.setActive(true);
         for (int i = 0; i < 10; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 4);
         colony.runRoleAssignment(null);
@@ -56,7 +56,7 @@ class ColonyRoleAssignmentDirtyTest {
     @Test
     void populationChangeTriggersReassignmentViaPopKey() {
         assertFalse(colony.isRoleAssignmentDirty());
-        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         colony.runRoleAssignmentIfNeeded(null);
         assertFalse(colony.isRoleAssignmentDirty());
     }

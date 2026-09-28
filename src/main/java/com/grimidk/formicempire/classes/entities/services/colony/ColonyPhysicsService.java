@@ -3,8 +3,8 @@ package com.grimidk.formicempire.classes.entities.services.colony;
 import com.grimidk.formicempire.classes.entities.services.shared.ColonyAntAnimSampleLod;
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -44,8 +44,8 @@ public class ColonyPhysicsService {
                 * locsenseSpeedMultiplier
                 * heatresistSpeedMultiplier;
         // -- Ants --
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            AntType type = entry.getKey();
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntClass type = entry.getKey();
 
             ImageIcon spriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());
             int spriteW = spriteIcon != null ? spriteIcon.getIconWidth() : 16;
@@ -99,7 +99,7 @@ public class ColonyPhysicsService {
                         }
                         moveSpeed = offViewportBaseSpeed;
                     }
-                    if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+                    if (type == GameConstants.CLASS_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                         moveSpeed *= 2f;
                     }
                     if (ant.isParasiticMiteInfected()) {
@@ -171,8 +171,8 @@ public class ColonyPhysicsService {
     public void randomizeAllAntPositions(Colony colony) {
         int virtualWidth = Math.max(colony.getGameAreaWidth(), 2000);
 
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            if (entry.getKey() == GameConstants.TYPE_DEAD) continue;
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            if (entry.getKey() == GameConstants.CLASS_DEAD) continue;
             
             ImageIcon sprite = GameConstants.getAntSprite(entry.getKey(), colony.getSpecies());
             List<Ant> antList = entry.getValue();
@@ -268,7 +268,7 @@ public class ColonyPhysicsService {
             }
         } else {
             if (ant.getX() < -100 || ant.getX() > gameWidth + 100 || ant.getY() < -100 || ant.getY() > gameHeight + 100) {
-                colony.getAntsByType(ant.getAntType()).remove(ant);
+                colony.getAntsByClass(ant.getAntClass()).remove(ant);
                 return;
             }
 
@@ -315,7 +315,7 @@ public class ColonyPhysicsService {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT || ant.getRole() == GameConstants.ROLE_CATCHER) {
                          ant.moveTo(getRandomScoutPosition(colony));
                     } else {
-                         ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntType(), colony.getSpecies())));
+                         ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntClass(), colony.getSpecies())));
                     }
                 }
             } else {
@@ -429,7 +429,7 @@ public class ColonyPhysicsService {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT) {
                         ant.moveTo(getRandomScoutPosition(colony));
                     } else {
-                        ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntType(), colony.getSpecies())));
+                        ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntClass(), colony.getSpecies())));
                     }
                 }
             }
@@ -455,7 +455,7 @@ public class ColonyPhysicsService {
             return;
         }
 
-        if (ant.getAntType() == GameConstants.TYPE_EGG || ant.getAntType() == GameConstants.TYPE_PUPA) {
+        if (ant.getAntClass() == GameConstants.CLASS_EGG || ant.getAntClass() == GameConstants.CLASS_PUPA) {
             if (!isPointInSafeBounds(colony, myRoom, ant.getX(), ant.getY())) {
                 ant.setPosition(getRandomPointInRoom(colony, myRoom, virtualWidth));
             }
@@ -575,7 +575,7 @@ public class ColonyPhysicsService {
             return WorldSpaces.CONSTRUCTION_SITE;
         }
         
-        if (ant.getAntType() == GameConstants.TYPE_DRONE || ant.getRole() == GameConstants.ROLE_BREEDER) {
+        if (ant.getAntClass() == GameConstants.CLASS_DRONE || ant.getRole() == GameConstants.ROLE_BREEDER) {
             if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
                 return WorldSpaces.BREEDER_CHAMBER;
             }
@@ -600,8 +600,8 @@ public class ColonyPhysicsService {
     private boolean isAllowedInRoom(Room room, Ant ant) {
         if (room == null || ant == null) return false;
 
-        AntType type = ant.getAntType();
-        if (type != null && room.getAllowedAntTypes().contains(type)) {
+        AntClass type = ant.getAntClass();
+        if (type != null && room.getAllowedAntClasses().contains(type)) {
             return true;
         }
         
@@ -806,7 +806,7 @@ public class ColonyPhysicsService {
         if (isAllowedInRoom(WorldSpaces.STORAGE, ant)) return true; 
         
         if (ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) return true;
-        if (ant.getRole() == GameConstants.ROLE_BREEDER || ant.getAntType() == GameConstants.TYPE_DRONE) return true;
+        if (ant.getRole() == GameConstants.ROLE_BREEDER || ant.getAntClass() == GameConstants.CLASS_DRONE) return true;
         if (ant.getRole() == GameConstants.ROLE_ASSISTANT) return true;
         
         return false;
@@ -829,10 +829,10 @@ public class ColonyPhysicsService {
             return;
         }
         boolean lodActive = ViewportPhysicsLod.isLodActive(viewportBounds);
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            AntType type = entry.getKey();
-            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA
-                    || type == GameConstants.TYPE_PUPA || type == GameConstants.TYPE_DEAD) {
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntClass type = entry.getKey();
+            if (type == GameConstants.CLASS_EGG || type == GameConstants.CLASS_LARVA
+                    || type == GameConstants.CLASS_PUPA || type == GameConstants.CLASS_DEAD) {
                 continue;
             }
             ImageIcon spriteIcon = lodActive
@@ -868,11 +868,11 @@ public class ColonyPhysicsService {
         }
         boolean sample = ColonyAntAnimSampleLod.isSampleActive(colony.getAntTotal());
         Map<Long, List<Ant>> sampleBuckets = sample ? new HashMap<>() : null;
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            AntType type = entry.getKey();
-            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA
-                    || type == GameConstants.TYPE_PUPA || type == GameConstants.TYPE_DEAD
-                    || type == GameConstants.TYPE_ZOMBIE) {
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntClass type = entry.getKey();
+            if (type == GameConstants.CLASS_EGG || type == GameConstants.CLASS_LARVA
+                    || type == GameConstants.CLASS_PUPA || type == GameConstants.CLASS_DEAD
+                    || type == GameConstants.CLASS_ZOMBIE) {
                 continue;
             }
             ImageIcon spriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());

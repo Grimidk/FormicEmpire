@@ -7,7 +7,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -743,7 +743,7 @@ public class TriggerManager {
         if (playerColony.hasUpgrade(GameUnlocks.ABILITY_SUBTYPE_HATCH)) {
             return;
         }
-        if (!AntSubtypeService.hasSubtypeAssimilation(playerColony)) {
+        if (!AntModService.hasModAssimilation(playerColony)) {
             return;
         }
         fireLocalizedTrigger(GameUnlocks.ABILITY_SUBTYPE_HATCH,

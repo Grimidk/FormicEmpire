@@ -1019,7 +1019,7 @@ public final class LanguageStrings {
     public static final String STAT_MORTALITY = "STAT_MORTALITY";
     public static final String STAT_GLOBAL_DEATHS = "STAT_GLOBAL_DEATHS";
     public static final String STAT_TOTAL_FOOD = "STAT_TOTAL_FOOD";
-    public static final String STAT_SUBTYPE_FOOD_OVERHEAD = "STAT_SUBTYPE_FOOD_OVERHEAD";
+    public static final String STAT_MOD_FOOD_OVERHEAD = "STAT_MOD_FOOD_OVERHEAD";
     public static final String STAT_ADULTS = "STAT_ADULTS";
     public static final String STAT_JUVENILES = "STAT_JUVENILES";
     public static final String STAT_COLONY_TOTAL = "STAT_COLONY_TOTAL";
@@ -1056,8 +1056,8 @@ public final class LanguageStrings {
     public static final String ROLE_WAR_ECONOMY_TOGGLE = "ROLE_WAR_ECONOMY_TOGGLE";
     public static final String ROLE_WAR_ECONOMY_TOGGLE_TIP = "ROLE_WAR_ECONOMY_TOGGLE_TIP";
     public static final String ROLE_COPY_PEACE_TO_WAR = "ROLE_COPY_PEACE_TO_WAR";
-    public static final String ROLE_AVAILABLE_SUBTYPES_PREFIX = "ROLE_AVAILABLE_SUBTYPES_PREFIX";
-    public static final String ROLE_SUBTYPE_ALLOW_TIP = "ROLE_SUBTYPE_ALLOW_TIP";
+    public static final String ROLE_AVAILABLE_MODS_PREFIX = "ROLE_AVAILABLE_MODS_PREFIX";
+    public static final String ROLE_MOD_ALLOW_TIP = "ROLE_MOD_ALLOW_TIP";
     public static final String COLONY_AT_PEACE = "COLONY_AT_PEACE";
     public static final String COLONY_AT_WAR = "COLONY_AT_WAR";
 
@@ -1816,6 +1816,18 @@ public final class LanguageStrings {
     public static final String BUG_SPIDER_SCIENTIFIC = "BUG_SPIDER_SCIENTIFIC";
     public static final String BUG_TARANTULA = "BUG_TARANTULA";
     public static final String BUG_TARANTULA_SCIENTIFIC = "BUG_TARANTULA_SCIENTIFIC";
+
+    public static final String CLASS_EGG = "CLASS_EGG";
+    public static final String CLASS_LARVA = "CLASS_LARVA";
+    public static final String CLASS_PUPA = "CLASS_PUPA";
+    public static final String CLASS_WORKER = "CLASS_WORKER";
+    public static final String CLASS_SOLDIER = "CLASS_SOLDIER";
+    public static final String CLASS_MAJOR = "CLASS_MAJOR";
+    public static final String CLASS_DRONE = "CLASS_DRONE";
+    public static final String CLASS_PRINCESS = "CLASS_PRINCESS";
+    public static final String CLASS_QUEEN = "CLASS_QUEEN";
+    public static final String CLASS_DEAD = "CLASS_DEAD";
+    public static final String CLASS_ZOMBIE = "CLASS_ZOMBIE";
 
     public static final String TYPE_EGG = "TYPE_EGG";
     public static final String TYPE_LARVA = "TYPE_LARVA";

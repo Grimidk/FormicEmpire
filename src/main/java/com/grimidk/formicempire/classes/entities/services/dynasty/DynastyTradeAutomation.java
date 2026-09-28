@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -23,24 +23,24 @@ public final class DynastyTradeAutomation {
     private DynastyTradeAutomation() {
     }
 
-    public static Map<AntType, Integer> buildTransport(Colony origin) {
-        Map<AntType, Integer> transport = new HashMap<>();
+    public static Map<AntClass, Integer> buildTransport(Colony origin) {
+        Map<AntClass, Integer> transport = new HashMap<>();
 
         int couriers = origin.getAssignedRoleCount(GameConstants.ROLE_COURIER);
         if (couriers <= 0) {
             return transport;
         }
 
-        transport.put(GameConstants.TYPE_WORKER, Math.min(couriers, 3));
+        transport.put(GameConstants.CLASS_WORKER, Math.min(couriers, 3));
 
         int transports = origin.getAssignedRoleCount(GameConstants.ROLE_TRANSPORT);
         if (transports > 0 && origin.hasUpgrade(GameUnlocks.ROLE_TRANSPORT)) {
-            transport.put(GameConstants.TYPE_MAJOR, Math.min(transports, 1));
+            transport.put(GameConstants.CLASS_MAJOR, Math.min(transports, 1));
         }
 
         int escorts = origin.getAssignedRoleCount(GameConstants.ROLE_ESCORT);
         if (escorts > 0 && origin.hasUpgrade(GameUnlocks.ROLE_ESCORT)) {
-            transport.put(GameConstants.TYPE_SOLDIER, 1);
+            transport.put(GameConstants.CLASS_SOLDIER, 1);
         }
 
         return transport;
@@ -119,7 +119,7 @@ public final class DynastyTradeAutomation {
             return;
         }
 
-        Map<AntType, Integer> transport = trade.hasPendingUpdate() && trade.getPendingTransport() != null
+        Map<AntClass, Integer> transport = trade.hasPendingUpdate() && trade.getPendingTransport() != null
                 ? new HashMap<>(trade.getPendingTransport())
                 : new HashMap<>(trade.getTransport());
         TradeMethod method = trade.hasPendingUpdate() ? trade.getPendingMethod() : trade.getMethod();

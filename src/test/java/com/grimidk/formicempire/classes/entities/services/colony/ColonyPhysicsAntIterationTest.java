@@ -30,7 +30,7 @@ class ColonyPhysicsAntIterationTest {
     @Test
     void runPhysics_manySteps_doesNotThrowWithPopulation() {
         for (int a = 0; a < 40; a++) {
-            Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+            Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
             ant.setDimension(WorldSpaces.OVERWORLD);
             ant.setPosition(new Point(100 + a * 3, 200));
             colony.getWorkers().add(ant);

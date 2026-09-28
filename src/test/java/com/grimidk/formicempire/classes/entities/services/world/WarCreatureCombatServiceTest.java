@@ -62,7 +62,7 @@ class WarCreatureCombatServiceTest {
         WarCreatureCombatService.clear(war);
         defenderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 5);
         if (defenderColony.getQueens().isEmpty()) {
-            defenderColony.getQueens().add(new Ant(defenderColony, GameConstants.TYPE_QUEEN));
+            defenderColony.getQueens().add(new Ant(defenderColony, GameConstants.CLASS_QUEEN));
         }
 
         WarBattleState state = WarCreatureCombatService.startHexBattle(war, attacker, defenderColony);
@@ -80,7 +80,7 @@ class WarCreatureCombatServiceTest {
         defenderColony.getWarAssignedRoleCounts().clear();
         defenderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
         for (int i = 0; i < 5; i++) {
-            defenderColony.getSoldiers().add(new Ant(defenderColony, GameConstants.TYPE_SOLDIER));
+            defenderColony.getSoldiers().add(new Ant(defenderColony, GameConstants.CLASS_SOLDIER));
         }
         ColonyMilitaryService.refreshColonyMilitaryPower(defenderColony);
 
@@ -300,13 +300,13 @@ class WarCreatureCombatServiceTest {
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < Math.max(0, needed); i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         for (int i = 0; i < 40; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         if (colony.getQueens().isEmpty()) {
-            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+            colony.getQueens().add(new Ant(colony, GameConstants.CLASS_QUEEN));
         }
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 20);
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);

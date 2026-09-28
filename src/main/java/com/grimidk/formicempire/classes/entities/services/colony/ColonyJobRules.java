@@ -199,7 +199,7 @@ public final class ColonyJobRules {
 
         List<Ant> eggs = colony.getEggs();
         for (int i = 0; i < toLay; i++) {
-            Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
+            Ant newEgg = new Ant(colony, GameConstants.CLASS_EGG);
             newEgg.setDimension(WorldSpaces.UNDERWORLD);
             newEgg.setPosition(new Point(0, 0));
             eggs.add(newEgg);
@@ -457,7 +457,7 @@ public final class ColonyJobRules {
 
         List<Ant> victims = ColonyResourceDeathSelection.selectVictims(candidates, deaths, null);
         for (Ant victim : victims) {
-            List<Ant> typeList = colony.getAntsByType(victim.getAntType());
+            List<Ant> typeList = colony.getAntsByClass(victim.getAntClass());
             if (typeList != null) {
                 typeList.remove(victim);
             }

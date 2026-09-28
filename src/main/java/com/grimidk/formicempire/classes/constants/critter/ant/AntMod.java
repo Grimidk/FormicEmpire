@@ -188,8 +188,4 @@ public class AntMod extends Constant {
     public boolean hasSprite() {
         return spriteSpeciesDir != null && spriteFolder != null;
     }
-
-    public AntSubtype toSubtype() {
-        return com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants.getAntSubtypeById(getId());
-    }
 }

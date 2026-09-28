@@ -148,10 +148,10 @@ class WarCapitalCaptureTest {
 
     private static void seedMilitary(Dynasty dynasty, Colony colony) {
         for (int i = 0; i < GameNumbers.WAR_DECLARATION_MIN_POPULATION; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         for (int i = 0; i < 20; i++) {
-            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         }
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);
         ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
@@ -1553,7 +1553,7 @@ public class World {
                     putResourceLoad(st.load, load);
                     Map<ResourceType, Double> returnLoad = new HashMap<>();
                     putResourceLoad(st.returnLoad, returnLoad);
-                    Map<AntType, Integer> trans = new HashMap<>();
+                    Map<AntClass, Integer> trans = new HashMap<>();
                     putAntTransport(st.transport, trans);
                     TradeMethod method = GameConstants.getTradeMethodById(st.methodId);
                     if (method == null) {
@@ -1568,7 +1568,7 @@ public class World {
                         putResourceLoad(st.pendingLoad, pLoad);
                         Map<ResourceType, Double> pReturnLoad = new HashMap<>();
                         putResourceLoad(st.pendingReturnLoad, pReturnLoad);
-                        Map<AntType, Integer> pTrans = new HashMap<>();
+                        Map<AntClass, Integer> pTrans = new HashMap<>();
                         putAntTransport(st.pendingTransport, pTrans);
                         TradeMethod pMethod = GameConstants.getTradeMethodById(st.pendingMethodId);
                         if (pMethod == null) {
@@ -2000,14 +2000,14 @@ public class World {
         }
     }
 
-    private static void putAntTransport(Map<Integer, Integer> src, Map<AntType, Integer> dest) {
+    private static void putAntTransport(Map<Integer, Integer> src, Map<AntClass, Integer> dest) {
         if (src == null) {
             return;
         }
         for (Map.Entry<Integer, Integer> entry : src.entrySet()) {
-            AntType antType = GameConstants.getAntTypeById(entry.getKey());
-            if (antType != null) {
-                dest.put(antType, entry.getValue());
+            AntClass antClass = GameConstants.getAntClassById(entry.getKey());
+            if (antClass != null) {
+                dest.put(antClass, entry.getValue());
             }
         }
     }

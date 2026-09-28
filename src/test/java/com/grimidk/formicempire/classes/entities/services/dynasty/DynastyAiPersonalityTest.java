@@ -80,7 +80,7 @@ class DynastyAiPersonalityTest {
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
         for (int i = 0; i < 100; i++) {
-            capital.getWorkers().add(new Ant(capital, GameConstants.TYPE_WORKER));
+            capital.getWorkers().add(new Ant(capital, GameConstants.CLASS_WORKER));
         }
         npc.addColony(capital);
         npc.setCapital(capital);
@@ -118,7 +118,7 @@ class DynastyAiPersonalityTest {
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
         for (int i = 0; i < 100; i++) {
-            capital.getWorkers().add(new Ant(capital, GameConstants.TYPE_WORKER));
+            capital.getWorkers().add(new Ant(capital, GameConstants.CLASS_WORKER));
         }
         npc.addColony(capital);
         npc.setCapital(capital);
@@ -136,7 +136,7 @@ class DynastyAiPersonalityTest {
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
         for (int i = 0; i < 4; i++) {
-            capital.getPrincesses().add(new Ant(capital, GameConstants.TYPE_PRINCESS));
+            capital.getPrincesses().add(new Ant(capital, GameConstants.CLASS_PRINCESS));
         }
         npc.addColony(capital);
         npc.setCapital(capital);

@@ -1,9 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces.menu;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -24,9 +24,9 @@ public final class MenuChaoticWorld {
     private static final float COLONY_ENTRANCE_Y = 0.5f;
 
     public static final class ShowcaseAnt {
-        public final AntType type;
+        public final AntClass type;
         public final AntSpecies species;
-        public final AntSubtypeProfile profile;
+        public final AntModProfile profile;
         public final boolean attackerSide;
         public final BattleLine battleLine;
         public final boolean reserve;
@@ -55,7 +55,7 @@ public final class MenuChaoticWorld {
         private ShowcaseAnt(MenuChaoticAntEntry entry, Random random) {
             type = entry.type();
             species = entry.species();
-            profile = AntSubtypeProfile.fromCode(entry.profileCode());
+            profile = AntModProfile.fromCode(entry.profileCode());
             attackerSide = entry.attackerSide();
             battleLine = entry.battleLine();
             reserve = entry.reserve();
@@ -385,7 +385,7 @@ public final class MenuChaoticWorld {
             }
             return;
         }
-        if (ant.type == GameConstants.TYPE_WORKER) {
+        if (ant.type == GameConstants.CLASS_WORKER) {
             ResourceType[] pool = {
                     GameConstants.RESOURCE_PLANT,
                     GameConstants.RESOURCE_WATER,
@@ -398,7 +398,7 @@ public final class MenuChaoticWorld {
                     : null;
             return;
         }
-        if (ant.type == GameConstants.TYPE_SOLDIER) {
+        if (ant.type == GameConstants.CLASS_SOLDIER) {
             ant.carrying = random.nextBoolean() ? GameConstants.RESOURCE_MEAT : GameConstants.RESOURCE_ROCK;
             ant.carryingSec = null;
             return;

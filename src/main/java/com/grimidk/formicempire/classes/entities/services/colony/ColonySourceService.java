@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
@@ -134,8 +134,8 @@ public class ColonySourceService {
         return GatheringMath.computeFullEfficiencyRadius(colony, workers);
     }
 
-    public float computeFullEfficiencyRadiusForAntType(Colony colony, AntType type) {
-        return GatheringMath.computeFullEfficiencyRadiusForAntType(colony, type);
+    public float computeFullEfficiencyRadiusForAntClass(Colony colony, AntClass antClass) {
+        return GatheringMath.computeFullEfficiencyRadiusForAntClass(colony, antClass);
     }
 
     public boolean isActiveSource(ResourceSource source) {
@@ -250,7 +250,7 @@ public class ColonySourceService {
         }
 
         public static float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
-            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.TYPE_WORKER.getSpeedMult();
+            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.CLASS_WORKER.getSpeedMult();
             if (refTravel <= 1e-6f) {
                 return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
             }
@@ -276,39 +276,39 @@ public class ColonySourceService {
             return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE * (avg / refTravel) * colonyMult;
         }
 
-        public static float computeFullEfficiencyRadiusForAntType(Colony colony, AntType type) {
-            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.TYPE_WORKER.getSpeedMult();
-            if (refTravel <= 1e-6f || type == null) {
+        public static float computeFullEfficiencyRadiusForAntClass(Colony colony, AntClass antClass) {
+            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.CLASS_WORKER.getSpeedMult();
+            if (refTravel <= 1e-6f || antClass == null) {
                 return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
             }
-            float travel = effectiveTravelUnitsForType(colony, type);
+            float travel = effectiveTravelUnitsForClass(colony, antClass);
             float colonyMult = colony.hasUpgrade(GameUnlocks.STAT_ACID)
                     ? GameNumbers.GATHER_COLONY_SPEED_RADIUS_MULT
                     : 1f;
             return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE * (travel / refTravel) * colonyMult;
         }
 
-        private static float effectiveTravelUnitsForType(Colony colony, AntType type) {
-            float u = GameNumbers.BASE_SPRITE_SPEED * type.getSpeedMult();
+        private static float effectiveTravelUnitsForClass(Colony colony, AntClass antClass) {
+            float u = GameNumbers.BASE_SPRITE_SPEED * antClass.getSpeedMult();
             if (colony.isCreatineDietActive()) {
                 u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
             }
             u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
             u *= colony.getStatsService().getHeatresistSpeedMultiplier(colony);
-            if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+            if (antClass == GameConstants.CLASS_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                 u *= 2f;
             }
             return u;
         }
 
         private static float effectiveTravelUnits(Colony colony, Ant ant) {
-            float u = GameNumbers.BASE_SPRITE_SPEED * ant.getAntType().getSpeedMult();
+            float u = GameNumbers.BASE_SPRITE_SPEED * ant.getAntClass().getSpeedMult();
             if (colony.isCreatineDietActive()) {
                 u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
             }
             u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
             u *= colony.getStatsService().getHeatresistSpeedMultiplier(colony);
-            if (ant.getAntType() == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+            if (ant.getAntClass() == GameConstants.CLASS_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                 u *= 2f;
             }
             return u;

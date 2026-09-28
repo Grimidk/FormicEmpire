@@ -25,26 +25,26 @@ class ColonyAntAnimSampleLodTest {
     @Test
     void hourlyAnimSampleKeyGroupsNearbySameTypeAnts() {
         Colony colony = new Colony(1, "C", true);
-        Ant a = new Ant(colony, GameConstants.TYPE_WORKER);
-        Ant b = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant a = new Ant(colony, GameConstants.CLASS_WORKER);
+        Ant b = new Ant(colony, GameConstants.CLASS_WORKER);
         a.setPosition(new Point(10, 10));
         b.setPosition(new Point(12, 11));
 
-        long keyA = ColonyAntAnimSampleLod.hourlyAnimSampleKey(a, GameConstants.TYPE_WORKER);
-        long keyB = ColonyAntAnimSampleLod.hourlyAnimSampleKey(b, GameConstants.TYPE_WORKER);
+        long keyA = ColonyAntAnimSampleLod.hourlyAnimSampleKey(a, GameConstants.CLASS_WORKER);
+        long keyB = ColonyAntAnimSampleLod.hourlyAnimSampleKey(b, GameConstants.CLASS_WORKER);
         assertEquals(keyA, keyB);
     }
 
     @Test
     void hourlyAnimSampleKeySeparatesDistantAnts() {
         Colony colony = new Colony(1, "C", true);
-        Ant near = new Ant(colony, GameConstants.TYPE_WORKER);
-        Ant far = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant near = new Ant(colony, GameConstants.CLASS_WORKER);
+        Ant far = new Ant(colony, GameConstants.CLASS_WORKER);
         near.setPosition(new Point(10, 10));
         far.setPosition(new Point(10 + GameNumbers.SPRITE_MERGE_POSITION_CELL_PX, 10));
 
-        long nearKey = ColonyAntAnimSampleLod.hourlyAnimSampleKey(near, GameConstants.TYPE_WORKER);
-        long farKey = ColonyAntAnimSampleLod.hourlyAnimSampleKey(far, GameConstants.TYPE_WORKER);
+        long nearKey = ColonyAntAnimSampleLod.hourlyAnimSampleKey(near, GameConstants.CLASS_WORKER);
+        long farKey = ColonyAntAnimSampleLod.hourlyAnimSampleKey(far, GameConstants.CLASS_WORKER);
         assertNotEquals(nearKey, farKey);
     }
 }

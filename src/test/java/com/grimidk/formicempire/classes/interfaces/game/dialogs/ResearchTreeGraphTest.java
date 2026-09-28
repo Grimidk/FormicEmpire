@@ -192,7 +192,7 @@ class ResearchTreeGraphTest {
         assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
                 ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ROLE_BUILDER));
 
-        Ant corpse = new Ant(colony, GameConstants.TYPE_DEAD);
+        Ant corpse = new Ant(colony, GameConstants.CLASS_DEAD);
         colony.getDeadAnts().add(corpse);
         assertEquals(ResearchTreeGraph.NodeState.TRIGGER_PROGRESS,
                 ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ROLE_GRAVER));

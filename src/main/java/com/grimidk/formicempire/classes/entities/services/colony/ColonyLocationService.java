@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.util.List;
 import java.util.Queue;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -80,8 +80,8 @@ public class ColonyLocationService {
         return sourceService.computeFullEfficiencyRadius(colony, workers);
     }
 
-    public float computeFullEfficiencyRadiusForAntType(Colony colony, AntType type) {
-        return sourceService.computeFullEfficiencyRadiusForAntType(colony, type);
+    public float computeFullEfficiencyRadiusForAntClass(Colony colony, AntClass antClass) {
+        return sourceService.computeFullEfficiencyRadiusForAntClass(colony, antClass);
     }
 
     public boolean isActiveSource(ResourceSource source) {

@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -954,10 +954,10 @@ public class GameAreaPanel extends ZeroGamePanel {
         boolean colonyMergeActive = ColonySpriteMergeLod.isMergeActive(colonyAntTotal);
         int maxGroupSize = ColonySpriteMergeLod.maxGroupSize(colonyAntTotal);
 
-        for (AntType type : GameConstants.getAntTypes()) {
-            if (type == GameConstants.TYPE_DEAD) continue;
+        for (AntClass type : GameConstants.getAntClasses()) {
+            if (type == GameConstants.CLASS_DEAD) continue;
 
-            List<Ant> ants = colony.getAntsByType(type);
+            List<Ant> ants = colony.getAntsByClass(type);
             if (ants.isEmpty()) {
                 continue;
             }
@@ -966,7 +966,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             int typeW = typeSpriteIcon != null ? typeSpriteIcon.getIconWidth() : 16;
             int typeH = typeSpriteIcon != null ? typeSpriteIcon.getIconHeight() : 16;
 
-            List<AntSpecies> assimilatedSpecies = type == GameConstants.TYPE_DRONE
+            List<AntSpecies> assimilatedSpecies = type == GameConstants.CLASS_DRONE
                     ? assimilatedDroneSpeciesForPaint()
                     : List.of();
 
@@ -1018,14 +1018,14 @@ public class GameAreaPanel extends ZeroGamePanel {
         return ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), typeW, typeH);
     }
 
-    private void paintAntSprite(Graphics2D g2d, Ant ant, AntType type, List<AntSpecies> assimilatedSpecies) {
+    private void paintAntSprite(Graphics2D g2d, Ant ant, AntClass type, List<AntSpecies> assimilatedSpecies) {
         paintAntSpriteAt(g2d, ant, type, ant.getX(), ant.getY(), assimilatedSpecies);
     }
 
     private void paintAntSpriteAt(
             Graphics2D g2d,
             Ant ant,
-            AntType type,
+            AntClass type,
             int drawX,
             int drawY,
             List<AntSpecies> assimilatedSpecies) {
@@ -1033,7 +1033,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         ImageIcon antSpriteIcon = GameConstants.getAntSprite(
                 type,
                 colony.getSpecies(),
-                ant.getSubtypeProfile(),
+                ant.getModProfile(),
                 ant.getLegFrame(),
                 RouteViewVisuals.jawFrameForCarry(ant.getJawFrame(), showCarry),
                 ant.getWingFrame(),

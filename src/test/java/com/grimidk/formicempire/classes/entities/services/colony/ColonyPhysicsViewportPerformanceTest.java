@@ -34,7 +34,7 @@ class ColonyPhysicsViewportPerformanceTest {
 
     private void spawnWorkers(int count, int baseY) {
         for (int i = 0; i < count; i++) {
-            Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+            Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
             ant.setDimension(WorldSpaces.OVERWORLD);
             int x = 20 + (i % 2000);
             int y = baseY + (i / 2000);

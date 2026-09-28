@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -84,7 +84,7 @@ final class CritterPanelUtils {
         return label;
     }
 
-    static JLabel buildAntTypeAvailabilityLabel(AntType type, int available) {
+    static JLabel buildAntClassAvailabilityLabel(AntClass type, int available) {
         JLabel label = new JLabel(AssetStyles.formatNumber(available), type.getIcon(), SwingConstants.LEFT);
         label.setToolTipText(type.getName());
         label.setIconTextGap(6);
@@ -94,13 +94,13 @@ final class CritterPanelUtils {
         return label;
     }
 
-    static JPanel buildAntTypeCountsRow(Map<AntType, Integer> counts, List<AntType> order) {
+    static JPanel buildAntClassCountsRow(Map<AntClass, Integer> counts, List<AntClass> order) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         row.setOpaque(false);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
         boolean any = false;
         if (order != null) {
-            for (AntType type : order) {
+            for (AntClass type : order) {
                 if (type == null) {
                     continue;
                 }
@@ -109,7 +109,7 @@ final class CritterPanelUtils {
                     continue;
                 }
                 any = true;
-                row.add(buildAntTypeAvailabilityLabel(type, count));
+                row.add(buildAntClassAvailabilityLabel(type, count));
             }
         }
         if (!any) {

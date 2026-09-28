@@ -80,7 +80,7 @@ class HuntCreatureCombatServiceTest {
     void huntersCanDefeatCockroachWithLargeParty() {
         List<Ant> party = new ArrayList<>();
         for (int i = 0; i < 40; i++) {
-            Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+            Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
             soldier.setRole(GameConstants.ROLE_WARRIOR);
             party.add(soldier);
             colony.getSoldiers().add(soldier);

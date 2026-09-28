@@ -10,8 +10,8 @@ import com.grimidk.formicempire.classes.constants.Constant;
 
 public class AntRole extends Constant {
     private final AntClass antClass;
-    private final Set<AntSubtype> requiredSubtypes;
-    private final Set<AntSubtype> forcedAllowedSubtypes;
+    private final Set<AntMod> requiredMods;
+    private final Set<AntMod> forcedAllowedMods;
     private final boolean isActiveMilitary;
     private final boolean hexDefenseOnly;
 
@@ -24,35 +24,35 @@ public class AntRole extends Constant {
     }
 
     public AntRole(int id, AntClass antClass, String name, ImageIcon icon,
-            Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes) {
-        this(id, antClass, name, icon, requiredSubtypes, forcedAllowedSubtypes, false, false);
+            Set<AntMod> requiredMods, Set<AntMod> forcedAllowedMods) {
+        this(id, antClass, name, icon, requiredMods, forcedAllowedMods, false, false);
     }
 
     public AntRole(int id, AntClass antClass, String name, ImageIcon icon,
-            Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes,
+            Set<AntMod> requiredMods, Set<AntMod> forcedAllowedMods,
             boolean isActiveMilitary) {
-        this(id, antClass, name, icon, requiredSubtypes, forcedAllowedSubtypes, isActiveMilitary, false);
+        this(id, antClass, name, icon, requiredMods, forcedAllowedMods, isActiveMilitary, false);
     }
 
     public AntRole(int id, AntClass antClass, String name, ImageIcon icon,
-            Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes,
+            Set<AntMod> requiredMods, Set<AntMod> forcedAllowedMods,
             boolean isActiveMilitary, boolean hexDefenseOnly) {
         super(id, name, icon);
         this.antClass = antClass;
-        this.requiredSubtypes = copySubtypeSet(requiredSubtypes);
-        LinkedHashSet<AntSubtype> forced = copySubtypeSet(forcedAllowedSubtypes);
-        forced.addAll(this.requiredSubtypes);
-        this.forcedAllowedSubtypes = Collections.unmodifiableSet(forced);
+        this.requiredMods = copyModSet(requiredMods);
+        LinkedHashSet<AntMod> forced = copyModSet(forcedAllowedMods);
+        forced.addAll(this.requiredMods);
+        this.forcedAllowedMods = Collections.unmodifiableSet(forced);
         this.isActiveMilitary = isActiveMilitary;
         this.hexDefenseOnly = isActiveMilitary && hexDefenseOnly;
     }
 
-    private static LinkedHashSet<AntSubtype> copySubtypeSet(Set<AntSubtype> source) {
-        LinkedHashSet<AntSubtype> copy = new LinkedHashSet<>();
+    private static LinkedHashSet<AntMod> copyModSet(Set<AntMod> source) {
+        LinkedHashSet<AntMod> copy = new LinkedHashSet<>();
         if (source != null) {
-            for (AntSubtype subtype : source) {
-                if (subtype != null && !subtype.isNone()) {
-                    copy.add(subtype);
+            for (AntMod mod : source) {
+                if (mod != null && !mod.isNone()) {
+                    copy.add(mod);
                 }
             }
         }
@@ -63,38 +63,12 @@ public class AntRole extends Constant {
         return antClass;
     }
 
-    public AntType getAntType() {
-        return antClass instanceof AntType t ? t : null;
-    }
-
-    public Set<AntSubtype> getRequiredSubtypes() {
-        return requiredSubtypes;
-    }
-
-    public Set<AntSubtype> getForcedAllowedSubtypes() {
-        return forcedAllowedSubtypes;
-    }
-
     public Set<AntMod> getRequiredMods() {
-        LinkedHashSet<AntMod> set = new LinkedHashSet<>();
-        for (AntSubtype st : requiredSubtypes) {
-            AntMod mod = st.toMod();
-            if (mod != null) {
-                set.add(mod);
-            }
-        }
-        return Collections.unmodifiableSet(set);
+        return requiredMods;
     }
 
     public Set<AntMod> getForcedAllowedMods() {
-        LinkedHashSet<AntMod> set = new LinkedHashSet<>();
-        for (AntSubtype st : forcedAllowedSubtypes) {
-            AntMod mod = st.toMod();
-            if (mod != null) {
-                set.add(mod);
-            }
-        }
-        return Collections.unmodifiableSet(set);
+        return forcedAllowedMods;
     }
 
     public boolean isActiveMilitary() {
@@ -109,28 +83,16 @@ public class AntRole extends Constant {
         return isActiveMilitary && !hexDefenseOnly;
     }
 
-    public boolean requiresSubtypes() {
-        return !requiredSubtypes.isEmpty();
-    }
-
     public boolean requiresMods() {
-        return !requiredSubtypes.isEmpty();
-    }
-
-    public boolean isSubtypeForcedAllowed(AntSubtype subtype) {
-        return subtype != null && forcedAllowedSubtypes.contains(subtype);
+        return !requiredMods.isEmpty();
     }
 
     public boolean isModForcedAllowed(AntMod mod) {
-        return mod != null && forcedAllowedSubtypes.stream().anyMatch(s -> s.getId() == mod.getId());
-    }
-
-    public boolean isSubtypeRequired(AntSubtype subtype) {
-        return subtype != null && requiredSubtypes.contains(subtype);
+        return mod != null && forcedAllowedMods.contains(mod);
     }
 
     public boolean isModRequired(AntMod mod) {
-        return mod != null && requiredSubtypes.stream().anyMatch(s -> s.getId() == mod.getId());
+        return mod != null && requiredMods.contains(mod);
     }
 
     @Override

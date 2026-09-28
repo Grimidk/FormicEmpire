@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.hunt.HuntExpedition;
@@ -26,10 +26,10 @@ import java.util.function.BiConsumer;
 
 public final class HuntsPanel extends JPanel {
 
-    private static final List<AntType> HUNT_ANT_TYPES = List.of(
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_PRINCESS);
+    private static final List<AntClass> HUNT_ANT_TYPES = List.of(
+            GameConstants.CLASS_SOLDIER,
+            GameConstants.CLASS_MAJOR,
+            GameConstants.CLASS_PRINCESS);
 
     private final Colony colony;
     private final Engine engine;
@@ -136,11 +136,11 @@ public final class HuntsPanel extends JPanel {
         detailColumn.add(Box.createVerticalStrut(4));
         detailColumn.add(CritterPanelUtils.buildBoldDetailLine(LanguageStrings.get(phaseKey)));
 
-        Map<AntType, Integer> sentCounts = ColonyHuntService.countPartyByType(expedition.getParty());
+        Map<AntClass, Integer> sentCounts = ColonyHuntService.countPartyByClass(expedition.getParty());
         detailColumn.add(Box.createVerticalStrut(6));
         detailColumn.add(CritterPanelUtils.buildLabeledDetailRow(
                 LanguageStrings.HUNT_PERSONNEL,
-                CritterPanelUtils.buildAntTypeCountsRow(sentCounts, HUNT_ANT_TYPES)));
+                CritterPanelUtils.buildAntClassCountsRow(sentCounts, HUNT_ANT_TYPES)));
 
         if (expedition.getPhase() == HuntExpedition.Phase.TRAVELING) {
             int pct = Math.round(expedition.getTravelProgressRatio() * 100f);
@@ -169,7 +169,7 @@ public final class HuntsPanel extends JPanel {
 
         List<Ant> previewParty = livingPartyForPreview(expedition);
         ColonyHuntService.HuntDispatchPreview preview = ColonyHuntService.previewDispatch(
-                colony, target, ColonyHuntService.countPartyByType(previewParty));
+                colony, target, ColonyHuntService.countPartyByClass(previewParty));
         detailColumn.add(Box.createVerticalStrut(4));
         detailColumn.add(CritterPanelUtils.buildDetailLine(LanguageStrings.format(
                 LanguageStrings.HUNT_WIN_CHANCE_FMT, Math.round(preview.winChance * 100f))));
