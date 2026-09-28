@@ -122,7 +122,8 @@ public final class GameConstants {
     public static final ImageIcon ROOM_PASSIVE_FARM = loadIcon("sprites/buildings/rooms/PassiveFarm.png");
     public static final ImageIcon ROOM_PASSIVE_GRAVE = loadIcon("sprites/buildings/rooms/PassiveGrave.png");
     public static final ImageIcon ROOM_PASSIVE_COMPOSTER = loadIcon("sprites/buildings/rooms/PassiveComposter.png");
-    public static final ImageIcon ROOM_PASSIVE_WEB = loadIcon("sprites/buildings/rooms/PassiveWeb.png");
+    public static final ImageIcon ROOM_PASSIVE_PROTEIN = loadIcon("sprites/buildings/rooms/PassiveWeb.png");
+    public static final ImageIcon ROOM_PASSIVE_WEB = ROOM_PASSIVE_PROTEIN;
     public static final ImageIcon ROOM_MUSHROOM_MOUND_2 = loadIcon("sprites/buildings/rooms/MushroomMound2.png");
     public static final ImageIcon ROOM_MUSHROOM_MOUND_4 = loadIcon("sprites/buildings/rooms/MushroomMound4.png");
     public static final ImageIcon ROOM_PLANT_MOUND_2 = loadIcon("sprites/buildings/rooms/PlantMound2.png");

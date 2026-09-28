@@ -495,12 +495,12 @@ public final class GameUnlocks {
         static { buildings.add(PASSIVE_FARM); }
         public static final Building PASSIVE_GRAVE = new Building(106, "PASSIVE_GRAVE", 0, "PASSIVE_GRAVE_DESC", MEAT_CHAMBER_1, 150, 0, 600, loadIcon("icons/buildings/PassiveGrave.png"), GameConstants.ROOM_PASSIVE_GRAVE, 2);
         static { buildings.add(PASSIVE_GRAVE); }
-        public static final Building PASSIVE_WEB = new Building(108, "PASSIVE_WEB", 0, "PASSIVE_WEB_DESC", MEAT_CHAMBER_1, 200, 0, 800, loadIcon("icons/buildings/PassiveWeb.png"), GameConstants.ROOM_PASSIVE_WEB, 2);
-        static { buildings.add(PASSIVE_WEB); }
+        public static final Building PASSIVE_PROTEIN = new Building(108, "PASSIVE_PROTEIN", 0, "PASSIVE_PROTEIN_DESC", MEAT_CHAMBER_1, 200, 0, 800, loadIcon("icons/buildings/PassiveWeb.png"), GameConstants.ROOM_PASSIVE_PROTEIN, 2);
+        public static final Building PASSIVE_WEB = PASSIVE_PROTEIN;
+        static { buildings.add(PASSIVE_PROTEIN); }
         public static final Building BUILDING_COMPOSTER = new Building(107, "BUILDING_COMPOSTER", 0, "BUILDING_COMPOSTER_DESC", PASSIVE_GRAVE, 500, 0, 1000, loadIcon("icons/buildings/Composter.png"), GameConstants.ROOM_PASSIVE_COMPOSTER, 3);
         static { buildings.add(BUILDING_COMPOSTER); }
 
-        // Silkweave leaf L3 storages (tandem with resin L3; plant cost = 10× resin of matching L3)
         // TODO asset: sprites/buildings/rooms for Silkweave L3 storages
         public static final Building EGG_CHAMBER_3_SILK = new Building(201, "EGG_CHAMBER_3_SILK", 3, "EGG_CHAMBER_3_SILK_DESC", EGG_CHAMBER_2, 0, 0, 500 * GameNumbers.SILKWEAVE_PLANT_COST_MULT, 5000, loadIcon("icons/buildings/EggChamber3Silk.png"), GameConstants.ROOM_EGG_L3, 3);
         static { buildings.add(EGG_CHAMBER_3_SILK); }
@@ -771,7 +771,7 @@ public final class GameUnlocks {
                         }
                         return true;
                 }
-                if (building == PASSIVE_WEB || building == PASSIVE_WATER) {
+                if (building == PASSIVE_PROTEIN || building == PASSIVE_WATER) {
                         return colony.hasUpgrade(SYNERGY_WEB_BUILDING);
                 }
                 if (isInBuildingChain(building, BUILDING_CHAIN_ROCK)) {
@@ -817,7 +817,7 @@ public final class GameUnlocks {
                 if (isHiveMoundBuilding(building)) {
                         return colony.hasUpgrade(ASSIMILATED_HIVEBUILD);
                 }
-                if (building == PASSIVE_WEB || building == PASSIVE_WATER) {
+                if (building == PASSIVE_PROTEIN || building == PASSIVE_WATER) {
                         return colony.hasUpgrade(SYNERGY_WEB_BUILDING);
                 }
                 return true;

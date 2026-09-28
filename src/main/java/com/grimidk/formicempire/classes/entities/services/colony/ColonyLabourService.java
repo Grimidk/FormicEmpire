@@ -304,7 +304,7 @@ public class ColonyLabourService {
         }
 
         // --- Passive Web (Web Building synergy): 10% of protein cap per day ---
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB)) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_PROTEIN)) {
             double maxProtein = stats.getProteinCapacity(colony);
             double gain = (maxProtein * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
             resources.addResource(colony, GameConstants.RESOURCE_MEAT, gain);

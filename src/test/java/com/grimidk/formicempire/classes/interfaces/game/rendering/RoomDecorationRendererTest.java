@@ -65,4 +65,27 @@ class RoomDecorationRendererTest {
             g2.dispose();
         }
     }
+
+    @Test
+    void webYardDecorations_renderAndCacheCorrectly() {
+        Colony colony = new Colony(2, "WebColony", true);
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(300, 300, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g2 = img.createGraphics();
+        try {
+            RoomDecorationRenderer.clearWebYardCache();
+            RoomDecorationRenderer.drawWebYardDecorations(g2, colony, 0, 0, 256, 256, null);
+
+            colony.unlockBuilding(GameUnlocks.PASSIVE_WATER);
+            RoomDecorationRenderer.drawWebYardDecorations(g2, colony, 0, 0, 256, 256, null);
+            RoomDecorationRenderer.drawWebYardDecorations(g2, colony, 0, 0, 256, 256, null);
+
+            colony.unlockBuilding(GameUnlocks.PASSIVE_PROTEIN);
+            RoomDecorationRenderer.drawWebYardDecorations(g2, colony, 0, 0, 256, 256, null);
+            RoomDecorationRenderer.drawWebYardDecorations(g2, colony, 0, 0, 256, 256, null);
+
+            RoomDecorationRenderer.clearWebYardCache();
+        } finally {
+            g2.dispose();
+        }
+    }
 }

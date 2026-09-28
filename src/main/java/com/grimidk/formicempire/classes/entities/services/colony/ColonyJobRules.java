@@ -102,7 +102,7 @@ public final class ColonyJobRules {
         resources.addResource(colony, GameConstants.RESOURCE_MEAT, meatGain);
         resources.addResource(colony, GameConstants.RESOURCE_ROCK, rockGain);
 
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB)) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_PROTEIN)) {
             double maxProtein = stats.getProteinCapacity(colony);
             double webGain = (maxProtein * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
             resources.addResource(colony, GameConstants.RESOURCE_MEAT, webGain);

@@ -545,7 +545,7 @@ public class ColonyStatsService {
     public double getProteinProductionHourly(Colony colony) {
         int hunterCount = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
         double passive = 0;
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_WEB)) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_PROTEIN)) {
             passive = (getProteinCapacity(colony) * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
         }
         return (hunterCount * getCollectingRate(colony)) + passive;

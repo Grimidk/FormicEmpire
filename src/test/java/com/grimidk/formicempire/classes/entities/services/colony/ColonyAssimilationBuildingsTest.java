@@ -86,8 +86,8 @@ class ColonyAssimilationBuildingsTest {
 
     @Test
     void webBuildingSynergy_gatesPassiveWebAndWater() {
-        assertTrue(!GameUnlocks.meetsBuildingUnlockRequirement(colony, GameUnlocks.PASSIVE_WEB));
-        assertTrue(!GameUnlocks.isBuildingShownInTree(colony, GameUnlocks.PASSIVE_WEB));
+        assertTrue(!GameUnlocks.meetsBuildingUnlockRequirement(colony, GameUnlocks.PASSIVE_PROTEIN));
+        assertTrue(!GameUnlocks.isBuildingShownInTree(colony, GameUnlocks.PASSIVE_PROTEIN));
 
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_SILKWEAVE);
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HIVEBUILD);
@@ -97,9 +97,9 @@ class ColonyAssimilationBuildingsTest {
 
         colony.unlockBuilding(GameUnlocks.WATER_RESERVOIR_0);
         colony.unlockBuilding(GameUnlocks.WATER_RESERVOIR_1);
-        assertTrue(GameUnlocks.meetsBuildingUnlockRequirement(colony, GameUnlocks.PASSIVE_WEB));
+        assertTrue(GameUnlocks.meetsBuildingUnlockRequirement(colony, GameUnlocks.PASSIVE_PROTEIN));
         assertTrue(GameUnlocks.meetsBuildingUnlockRequirement(colony, GameUnlocks.PASSIVE_WATER));
-        assertTrue(GameUnlocks.isBuildingShownInTree(colony, GameUnlocks.PASSIVE_WEB));
+        assertTrue(GameUnlocks.isBuildingShownInTree(colony, GameUnlocks.PASSIVE_PROTEIN));
         assertTrue(GameUnlocks.isBuildingShownInTree(colony, GameUnlocks.PASSIVE_WATER));
     }
 
@@ -109,7 +109,7 @@ class ColonyAssimilationBuildingsTest {
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HIVEBUILD);
         DynastySynergyService.refreshUnlocked(dynasty);
         assertEquals(0.0, stats.getProteinProductionHourly(colony), 1e-9);
-        colony.unlockBuilding(GameUnlocks.PASSIVE_WEB);
+        colony.unlockBuilding(GameUnlocks.PASSIVE_PROTEIN);
         double expected = (stats.getProteinCapacity(colony) * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
         assertEquals(expected, stats.getProteinProductionHourly(colony), 1e-6);
     }

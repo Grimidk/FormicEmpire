@@ -2652,8 +2652,10 @@ public final class LanguageStrings {
     public static final String PASSIVE_LAB_DESC = "PASSIVE_LAB_DESC";
     public static final String PASSIVE_WATER = "PASSIVE_WATER";
     public static final String PASSIVE_WATER_DESC = "PASSIVE_WATER_DESC";
-    public static final String PASSIVE_WEB = "PASSIVE_WEB";
-    public static final String PASSIVE_WEB_DESC = "PASSIVE_WEB_DESC";
+    public static final String PASSIVE_PROTEIN = "PASSIVE_PROTEIN";
+    public static final String PASSIVE_PROTEIN_DESC = "PASSIVE_PROTEIN_DESC";
+    public static final String PASSIVE_WEB = PASSIVE_PROTEIN;
+    public static final String PASSIVE_WEB_DESC = PASSIVE_PROTEIN_DESC;
     public static final String PASSIVE_APHID = "PASSIVE_APHID";
     public static final String PASSIVE_APHID_DESC = "PASSIVE_APHID_DESC";
     public static final String PASSIVE_NURSE = "PASSIVE_NURSE";

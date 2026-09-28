@@ -51,6 +51,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Image middleHallwayImg;    
     private Image antHillImg;
     private Image basicYardImg;    
+    private Image webYardImg;
     private Image deadBodyImg;
     private Image tunnelSpriteImg;
     
@@ -78,6 +79,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     public Rectangle breederRoomBounds;
     public Rectangle transitRoomBounds;
     public Rectangle insectPenBounds;
+    public Rectangle webYardBounds;
 
     private int overworldDeadBodySpritesRemaining;
     private int lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
@@ -128,6 +130,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         middleHallwayImg = loadImage("sprites/buildings/MiddleHallway.png");
         antHillImg = loadImage("sprites/buildings/AntHill.png");
         basicYardImg = loadImage("sprites/buildings/BasicYard.png");
+        webYardImg = loadImage("sprites/buildings/WebYard.png");
         tunnelSpriteImg = loadImage("sprites/buildings/TunnelSprite.png");
 
         deadBodyImg = loadImage("sprites/ants/Dead.png");
@@ -233,6 +236,8 @@ public class GameAreaPanel extends ZeroGamePanel {
         this.overworldLayoutOffsetX = 0;
         this.overworldLayoutOffsetY = 0;
         this.backgroundImage = resolveBackgroundImage();
+        this.webYardBounds = null;
+        RoomDecorationRenderer.clearWebYardCache();
         invalidateBackgroundLayerCache();
         repaint();
     }
@@ -708,6 +713,24 @@ public class GameAreaPanel extends ZeroGamePanel {
             insectPenBounds = new Rectangle(x, y, w, h);
         } else {
             insectPenBounds = null;
+        }
+
+        if ((colony.hasBuilding(GameUnlocks.PASSIVE_WATER) || colony.hasBuilding(GameUnlocks.PASSIVE_PROTEIN)) && webYardImg != null) {
+            int w = webYardImg.getWidth(this);
+            int h = webYardImg.getHeight(this);
+            int x = ColonySpatialLayout.ANCHOR_WIDTH - w - 10;
+            int y = 10;
+
+            AffineTransform old = g2d.getTransform();
+            g2d.translate(x + w, y);
+            g2d.scale(-1, 1);
+            g2d.drawImage(webYardImg, 0, 0, this);
+            g2d.setTransform(old);
+
+            webYardBounds = new Rectangle(x, y, w, h);
+            RoomDecorationRenderer.drawWebYardDecorations(g2d, colony, x, y, w, h, this);
+        } else {
+            webYardBounds = null;
         }
     }
     

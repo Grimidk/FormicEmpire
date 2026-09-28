@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.game.rendering;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.awt.Component;
@@ -11,7 +12,11 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.ImageIcon;
 
@@ -220,6 +225,135 @@ public final class RoomDecorationRenderer {
         withInteriorClip(g, in, () -> {
             drawCenteredIconRow(g, in, in.y, icons, obs);
         });
+    }
+
+    public static void clearWebYardCache() {
+        WEB_YARD_CACHE.clear();
+    }
+
+    public static void drawWebYardDecorations(Graphics2D g, Colony colony, int rx, int ry, int rw, int rh, Component obs) {
+        if (colony == null) {
+            return;
+        }
+        boolean hasWater = colony.hasBuilding(GameUnlocks.PASSIVE_WATER);
+        boolean hasProtein = colony.hasBuilding(GameUnlocks.PASSIVE_PROTEIN);
+        if (!hasWater && !hasProtein) {
+            return;
+        }
+        int ix = rx + 16;
+        int iy = ry + 48;
+        int iw = rw - 16 - 64;
+        int ih = rh - 48 - 48;
+        Rectangle in = shrinkRect(new Rectangle(ix, iy, Math.max(1, iw), Math.max(1, ih)), DECORATION_CONTENT_MARGIN_PX);
+        List<WebYardItem> items = getOrCreateWebYardItems(colony.getId(), hasWater, hasProtein, in.width, in.height);
+        withInteriorClip(g, in, () -> {
+            for (WebYardItem item : items) {
+                if (item.icon != null) {
+                    drawSprite(g, item.icon, in.x + item.relX, in.y + item.relY, obs);
+                }
+            }
+        });
+    }
+
+    private static final class WebYardItem {
+        final ImageIcon icon;
+        final int relX;
+        final int relY;
+
+        WebYardItem(ImageIcon icon, int relX, int relY) {
+            this.icon = icon;
+            this.relX = relX;
+            this.relY = relY;
+        }
+    }
+
+    private static final class CachedWebYardSetup {
+        final boolean hasWater;
+        final boolean hasProtein;
+        final int width;
+        final int height;
+        final List<WebYardItem> items;
+
+        CachedWebYardSetup(boolean hasWater, boolean hasProtein, int width, int height, List<WebYardItem> items) {
+            this.hasWater = hasWater;
+            this.hasProtein = hasProtein;
+            this.width = width;
+            this.height = height;
+            this.items = items;
+        }
+    }
+
+    private static final Map<Integer, CachedWebYardSetup> WEB_YARD_CACHE = new ConcurrentHashMap<>();
+
+    private static List<WebYardItem> getOrCreateWebYardItems(
+            int colonyId, boolean hasWater, boolean hasProtein, int areaW, int areaH) {
+        CachedWebYardSetup cached = WEB_YARD_CACHE.get(colonyId);
+        if (cached != null
+                && cached.hasWater == hasWater
+                && cached.hasProtein == hasProtein
+                && cached.width == areaW
+                && cached.height == areaH) {
+            return cached.items;
+        }
+        List<WebYardItem> items = generateWebYardItems(colonyId, hasWater, hasProtein, areaW, areaH);
+        WEB_YARD_CACHE.put(colonyId, new CachedWebYardSetup(hasWater, hasProtein, areaW, areaH, items));
+        return items;
+    }
+
+    private static List<WebYardItem> generateWebYardItems(
+            int colonyId, boolean hasWater, boolean hasProtein, int areaW, int areaH) {
+        List<WebYardItem> result = new ArrayList<>();
+        if ((!hasWater && !hasProtein) || areaW <= 32 || areaH <= 32) {
+            return result;
+        }
+        ImageIcon waterIcon = GameConstants.RESOURCE_WATER.getIcon();
+        ImageIcon proteinIcon = GameConstants.RESOURCE_MEAT.getIcon();
+
+        long seed = ((long) colonyId * 6364136223846793005L + 1442695040888963407L)
+                ^ (hasWater ? 0x9E3779B97F4A7C15L : 0L)
+                ^ (hasProtein ? 0xC6A4A7935BD1E995L : 0L);
+        Random rng = new Random(seed);
+
+        int count;
+        List<ImageIcon> chosenIcons = new ArrayList<>();
+        if (hasWater && hasProtein) {
+            count = 2 + rng.nextInt(2);
+            chosenIcons.add(waterIcon);
+            chosenIcons.add(proteinIcon);
+            if (count > 2) {
+                chosenIcons.add(rng.nextBoolean() ? waterIcon : proteinIcon);
+            }
+        } else if (hasWater) {
+            count = 1 + rng.nextInt(3);
+            for (int i = 0; i < count; i++) {
+                chosenIcons.add(waterIcon);
+            }
+        } else {
+            count = 1 + rng.nextInt(3);
+            for (int i = 0; i < count; i++) {
+                chosenIcons.add(proteinIcon);
+            }
+        }
+
+        Collections.shuffle(chosenIcons, rng);
+
+        int zoneW = areaW / 3;
+        List<Integer> zones = new ArrayList<>(List.of(0, 1, 2));
+        Collections.shuffle(zones, rng);
+
+        for (int i = 0; i < count; i++) {
+            int zone = zones.get(i);
+            int minX = zone * zoneW + 6;
+            int maxX = Math.max(minX, (zone + 1) * zoneW - 22);
+            int minY = 10;
+            int maxY = Math.max(minY, areaH - 26);
+
+            int x = minX + (maxX > minX ? rng.nextInt(maxX - minX + 1) : 0);
+            int y = minY + (maxY > minY ? rng.nextInt(maxY - minY + 1) : 0);
+            result.add(new WebYardItem(chosenIcons.get(i), x, y));
+        }
+
+        return Collections.unmodifiableList(result);
     }
 
     public static void drawFarmRoomDecorations(
