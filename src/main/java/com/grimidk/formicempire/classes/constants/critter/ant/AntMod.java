@@ -7,10 +7,10 @@ import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
-public class AntSubtype extends Constant {
+public class AntMod extends Constant {
     public static final int DIGIT_NONE = 1;
 
-    private final AntSubtypeSlot slot;
+    private final AntModSlot slot;
     private final int digit;
     private final Upgrade requiredUpgrade;
     private final String spriteSpeciesDir;
@@ -26,7 +26,7 @@ public class AntSubtype extends Constant {
     private final Skill grantedSkill;
     private final Skill replacesSkill;
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             ImageIcon icon) {
@@ -35,7 +35,7 @@ public class AntSubtype extends Constant {
                 null, null, icon);
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             float regenMult, ImageIcon icon) {
@@ -44,7 +44,7 @@ public class AntSubtype extends Constant {
                 null, null, icon);
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             Skill grantedSkill, Skill replacesSkill, ImageIcon icon) {
@@ -53,7 +53,7 @@ public class AntSubtype extends Constant {
                 grantedSkill, replacesSkill, icon);
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             float regenMult, Skill grantedSkill, Skill replacesSkill, ImageIcon icon) {
@@ -62,7 +62,7 @@ public class AntSubtype extends Constant {
                 grantedSkill, replacesSkill, icon);
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             String descKey, ImageIcon icon) {
@@ -70,7 +70,7 @@ public class AntSubtype extends Constant {
                 attackMult, attackAdditive, defenseMult, speedMult, forageMult, 1f, descKey, null, null, icon);
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             float regenMult, String descKey, ImageIcon icon) {
@@ -79,7 +79,7 @@ public class AntSubtype extends Constant {
                 null, null, icon);
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             float regenMult, String descKey, Skill grantedSkill, Skill replacesSkill, ImageIcon icon) {
@@ -88,7 +88,7 @@ public class AntSubtype extends Constant {
                 grantedSkill, replacesSkill, icon);
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             float regenMult, float accuracyBonus, String descKey, Skill grantedSkill, Skill replacesSkill,
@@ -111,13 +111,13 @@ public class AntSubtype extends Constant {
         this.replacesSkill = replacesSkill;
     }
 
-    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+    public AntMod(int id, String nameKey, AntModSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder) {
         this(id, nameKey, slot, digit, requiredUpgrade, spriteSpeciesDir, spriteFolder,
                 1f, false, 1f, 1f, 1f, 1f, 0f, null, null, null, null);
     }
 
-    public AntSubtypeSlot getSlot() {
+    public AntModSlot getSlot() {
         return slot;
     }
 
@@ -189,7 +189,7 @@ public class AntSubtype extends Constant {
         return spriteSpeciesDir != null && spriteFolder != null;
     }
 
-    public AntMod toMod() {
-        return com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants.getAntModById(getId());
+    public AntSubtype toSubtype() {
+        return com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants.getAntSubtypeById(getId());
     }
 }

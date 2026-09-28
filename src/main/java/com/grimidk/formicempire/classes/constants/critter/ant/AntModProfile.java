@@ -2,27 +2,27 @@ package com.grimidk.formicempire.classes.constants.critter.ant;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
-public final class AntSubtypeProfile {
+public final class AntModProfile {
     public static final int STANDARD_CODE = 1111;
 
     private final int code;
 
-    private AntSubtypeProfile(int code) {
+    private AntModProfile(int code) {
         this.code = code;
     }
 
-    public static AntSubtypeProfile standard() {
-        return new AntSubtypeProfile(STANDARD_CODE);
+    public static AntModProfile standard() {
+        return new AntModProfile(STANDARD_CODE);
     }
 
-    public static AntSubtypeProfile fromCode(int code) {
+    public static AntModProfile fromCode(int code) {
         if (code < 1111 || code > 9999) {
             return standard();
         }
-        return new AntSubtypeProfile(code);
+        return new AntModProfile(code);
     }
 
-    public static AntSubtypeProfile of(int head, int torso, int abdomen, int other) {
+    public static AntModProfile of(int head, int torso, int abdomen, int other) {
         return fromCode(head * 1000 + torso * 100 + abdomen * 10 + other);
     }
 
@@ -30,7 +30,7 @@ public final class AntSubtypeProfile {
         return code;
     }
 
-    public int getDigit(AntSubtypeSlot slot) {
+    public int getDigit(AntModSlot slot) {
         return switch (slot) {
             case HEAD -> code / 1000;
             case TORSO -> (code / 100) % 10;
@@ -39,19 +39,19 @@ public final class AntSubtypeProfile {
         };
     }
 
-    public AntSubtype getSubtype(AntSubtypeSlot slot) {
-        return GameConstants.getAntSubtypeBySlotAndDigit(slot, getDigit(slot));
+    public AntMod getMod(AntModSlot slot) {
+        return GameConstants.getAntModBySlotAndDigit(slot, getDigit(slot));
     }
 
     public boolean isStandard() {
         return code == STANDARD_CODE;
     }
 
-    public int countActiveSubtypes() {
+    public int countActiveMods() {
         int count = 0;
-        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
-            AntSubtype subtype = getSubtype(slot);
-            if (subtype != null && !subtype.isNone()) {
+        for (AntModSlot slot : AntModSlot.values()) {
+            AntMod mod = getMod(slot);
+            if (mod != null && !mod.isNone()) {
                 count++;
             }
         }
@@ -63,13 +63,13 @@ public final class AntSubtypeProfile {
             return null;
         }
         StringBuilder folder = new StringBuilder();
-        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
-            AntSubtype subtype = getSubtype(slot);
-            if (subtype != null && !subtype.isNone() && subtype.hasSprite()) {
+        for (AntModSlot slot : GameConstants.getConfigurableModSlots()) {
+            AntMod mod = getMod(slot);
+            if (mod != null && !mod.isNone() && mod.hasSprite()) {
                 if (folder.length() > 0) {
                     folder.append('-');
                 }
-                folder.append(subtype.getSpriteFolder());
+                folder.append(mod.getSpriteFolder());
             }
         }
         return folder.isEmpty() ? null : folder.toString();
@@ -80,7 +80,7 @@ public final class AntSubtypeProfile {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AntSubtypeProfile other)) {
+        if (!(o instanceof AntModProfile other)) {
             return false;
         }
         return code == other.code;
@@ -91,11 +91,11 @@ public final class AntSubtypeProfile {
         return code;
     }
 
-    public AntModProfile toModProfile() {
-        return AntModProfile.fromCode(code);
+    public AntSubtypeProfile toSubtypeProfile() {
+        return AntSubtypeProfile.fromCode(code);
     }
 
-    public static AntSubtypeProfile fromModProfile(AntModProfile profile) {
+    public static AntModProfile fromSubtypeProfile(AntSubtypeProfile profile) {
         return profile != null ? fromCode(profile.getCode()) : standard();
     }
 }

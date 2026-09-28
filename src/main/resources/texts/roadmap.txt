@@ -12,7 +12,7 @@ To Fix (By decreasing priority):
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
-		can type be renamed to class and subtype to modificacion? 
+		(none right now)
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):
@@ -31,7 +31,6 @@ To Draw (PascalCase filenames; under src/main/resources):
 	Room sprites (sprites/buildings/rooms/ — 48x48 blank placeholders):
 		L0–L5 and L3S for Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin
 		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter,
-		PassiveWeb and water logic too for randomly spawning water drops and protein parts (look into renaming passiveweb to passive protein)
 
 To Compose (.mp3 in resources/audio)
 	Songs:

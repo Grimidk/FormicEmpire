@@ -8,6 +8,10 @@ import com.grimidk.formicempire.classes.constants.critter.BugRole;
 import com.grimidk.formicempire.classes.constants.critter.CritterClass;
 import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpeciesPalette;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntStatus;
@@ -307,7 +311,9 @@ public final class GameConstants {
     private static final List<Skill> skills = new ArrayList<>();
     private static final List<Species> critterSpecies = new ArrayList<>();
     private static final List<AntType> antTypes = new ArrayList<>();
+    private static final List<AntClass> antClasses = new ArrayList<>();
     private static final List<AntSubtype> antSubtypes = new ArrayList<>();
+    private static final List<AntMod> antMods = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<Rank> colonyRanks = new ArrayList<>();
     private static final List<GameSpeed> gameSpeeds = new ArrayList<>();
@@ -906,42 +912,54 @@ public final class GameConstants {
         return season == SEASON_AUTUMN || season == SEASON_WINTER;
     }
 
-    // --- Ant Types ---
+    // --- Ant Types and Classes ---
     public static final AntType TYPE_EGG = new AntType(1, LanguageStrings.TYPE_EGG, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Egg.png"), "Egg.png");
-    static { antTypes.add(TYPE_EGG); }    
+    static { antTypes.add(TYPE_EGG); antClasses.add(TYPE_EGG); }    
     public static final AntType TYPE_LARVA = new AntType(2, LanguageStrings.TYPE_LARVA, 0.01f, 0f, 0f, 1f, 0f, 0f, 0.5f,
         loadIcon("icons/ants/Larva.png"), "Larva.png");
-    static { antTypes.add(TYPE_LARVA); }
+    static { antTypes.add(TYPE_LARVA); antClasses.add(TYPE_LARVA); }
     public static final AntType TYPE_PUPA = new AntType(3, LanguageStrings.TYPE_PUPA, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Pupa.png"), "Pupa.png");
-    static { antTypes.add(TYPE_PUPA); }
+    static { antTypes.add(TYPE_PUPA); antClasses.add(TYPE_PUPA); }
     public static final AntType TYPE_WORKER = new AntType(4, LanguageStrings.TYPE_WORKER, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 1,
         loadIcon("icons/ants/omni/Worker.png"), "Worker.png");
-    static { antTypes.add(TYPE_WORKER); }
+    static { antTypes.add(TYPE_WORKER); antClasses.add(TYPE_WORKER); }
     public static final AntType TYPE_SOLDIER = new AntType(5, LanguageStrings.TYPE_SOLDIER, 3f, 3f, 1f, 2f, 2f, 0f, 3f, 5,
         loadIcon("icons/ants/omni/Soldier.png"), "Soldier.png");
-    static { antTypes.add(TYPE_SOLDIER); }
+    static { antTypes.add(TYPE_SOLDIER); antClasses.add(TYPE_SOLDIER); }
     public static final AntType TYPE_MAJOR = new AntType(6, LanguageStrings.TYPE_MAJOR, 10f, 15f, 1f, 5f, 2f, 20f, 2f, 15,
         loadIcon("icons/ants/omni/Major.png"), "Major.png");
-    static { antTypes.add(TYPE_MAJOR); }
+    static { antTypes.add(TYPE_MAJOR); antClasses.add(TYPE_MAJOR); }
     public static final AntType TYPE_DRONE = new AntType(7, LanguageStrings.TYPE_DRONE, 0.01f, 0f, 0f, 1f, 0f, 0f, 1f, 
         loadIcon("icons/ants/omni/Drone.png"), "Drone.png");
-    static { antTypes.add(TYPE_DRONE); }
+    static { antTypes.add(TYPE_DRONE); antClasses.add(TYPE_DRONE); }
     public static final AntType TYPE_PRINCESS = new AntType(8, LanguageStrings.TYPE_PRINCESS, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 10,
         loadIcon("icons/ants/omni/Princess.png"), "Princess.png");
-    static { antTypes.add(TYPE_PRINCESS); }
+    static { antTypes.add(TYPE_PRINCESS); antClasses.add(TYPE_PRINCESS); }
     public static final AntType TYPE_QUEEN = new AntType(9, LanguageStrings.TYPE_QUEEN, 50f, 2f, 1f, 10f, 1f, 20f, 1/4f, 50,
         loadIcon("icons/ants/omni/Queen.png"), "Queen.png");
-    static { antTypes.add(TYPE_QUEEN); }
+    static { antTypes.add(TYPE_QUEEN); antClasses.add(TYPE_QUEEN); }
     public static final AntType TYPE_DEAD = new AntType(10, LanguageStrings.TYPE_DEAD, 0, 0, 0, 0, 0, 0, 0,
         loadIcon("icons/ants/Dead.png"), "Dead.png");
-    static { antTypes.add(TYPE_DEAD); }
+    static { antTypes.add(TYPE_DEAD); antClasses.add(TYPE_DEAD); }
     public static final AntType TYPE_ZOMBIE = new AntType(11, LanguageStrings.TYPE_ZOMBIE,  1f, 1f, 1f, 1f, 1f, 0f, 1f, 
         loadIcon("icons/ants/Zombie.png"), "Zombie.png");
-    static { antTypes.add(TYPE_ZOMBIE); }
+    static { antTypes.add(TYPE_ZOMBIE); antClasses.add(TYPE_ZOMBIE); }
 
-    // --- Ant Subtypes ---
+    public static final AntClass CLASS_EGG = TYPE_EGG;
+    public static final AntClass CLASS_LARVA = TYPE_LARVA;
+    public static final AntClass CLASS_PUPA = TYPE_PUPA;
+    public static final AntClass CLASS_WORKER = TYPE_WORKER;
+    public static final AntClass CLASS_SOLDIER = TYPE_SOLDIER;
+    public static final AntClass CLASS_MAJOR = TYPE_MAJOR;
+    public static final AntClass CLASS_DRONE = TYPE_DRONE;
+    public static final AntClass CLASS_PRINCESS = TYPE_PRINCESS;
+    public static final AntClass CLASS_QUEEN = TYPE_QUEEN;
+    public static final AntClass CLASS_DEAD = TYPE_DEAD;
+    public static final AntClass CLASS_ZOMBIE = TYPE_ZOMBIE;
+
+    // --- Ant Subtypes and Mods ---
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
 
     public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
@@ -989,12 +1007,62 @@ public final class GameConstants {
             AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
 
+    public static final AntMod MOD_HEAD_NONE = new AntMod(1, LanguageStrings.SUBTYPE_NOTHING, AntModSlot.HEAD,
+            AntMod.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
+    static { antMods.add(MOD_HEAD_NONE); }
+    public static final AntMod MOD_HEAD_TRAPJAW = new AntMod(2, LanguageStrings.SUBTYPE_HEAD_TRAPJAW, AntModSlot.HEAD,
+            2, GameUnlocks.ASSIMILATED_TRAPJAW, "trapjaw/", "trapjaw",
+            1.5f, true, 1f, 1f, 1f,
+            SKILL_POWERFUL_BITE, SKILL_BASIC_BITE, loadIcon("icons/subtypes/trapjaw.png"));
+    static { antMods.add(MOD_HEAD_TRAPJAW); }
+    public static final AntMod MOD_HEAD_DOORHEAD = new AntMod(3, LanguageStrings.SUBTYPE_HEAD_DOORHEAD, AntModSlot.HEAD,
+            3, GameUnlocks.ASSIMILATED_DOORHEAD, "turtle/", "doorhead",
+            1f, false, 20f, 1f, 1f,
+            SKILL_SHIELDING, null, loadIcon("icons/subtypes/doorhead.png"));
+    static { antMods.add(MOD_HEAD_DOORHEAD); }
+    public static final AntMod MOD_HEAD_FARSIGHT = new AntMod(9, LanguageStrings.SUBTYPE_HEAD_FARSIGHT, AntModSlot.HEAD,
+            4, GameUnlocks.ASSIMILATED_FARSIGHT, "bulldog/", "farsight",
+            1f, false, 1f, 1f, 1f,
+            1f, 0.15f, LanguageStrings.SUBTYPE_HEAD_FARSIGHT_DESC, null, null, loadIcon("icons/subtypes/farsight.png"));
+    static { antMods.add(MOD_HEAD_FARSIGHT); }
+    public static final AntMod MOD_HEAD_LEAFCUTTER = new AntMod(10, LanguageStrings.SUBTYPE_HEAD_LEAFCUTTER, AntModSlot.HEAD,
+            5, GameUnlocks.ASSIMILATED_FARMING, "leafcutter/", "leafcutter",
+            1.25f, true, 1f, 1f, 2f,
+            SKILL_SHEARING_BITE, SKILL_BASIC_BITE, loadIcon("icons/subtypes/leafcutter.png"));
+    static { antMods.add(MOD_HEAD_LEAFCUTTER); }
+
+    public static final AntMod MOD_TORSO_NONE = new AntMod(4, LanguageStrings.SUBTYPE_NOTHING, AntModSlot.TORSO,
+            AntMod.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
+    static { antMods.add(MOD_TORSO_NONE); }
+
+    public static final AntMod MOD_ABDOMEN_NONE = new AntMod(5, LanguageStrings.SUBTYPE_NOTHING, AntModSlot.ABDOMEN,
+            AntMod.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
+    static { antMods.add(MOD_ABDOMEN_NONE); }
+    public static final AntMod MOD_ABDOMEN_STINGER = new AntMod(6, LanguageStrings.SUBTYPE_ABDOMEN_STINGER, AntModSlot.ABDOMEN,
+            2, GameUnlocks.ASSIMILATED_STINGING, "bullet/", "bullet",
+            1.5f, false, 1f, 1f, 1f,
+            SKILL_STINGING, null, loadIcon("icons/subtypes/bullet.png"));
+    static { antMods.add(MOD_ABDOMEN_STINGER); }
+    public static final AntMod MOD_ABDOMEN_HONEYPOT = new AntMod(7, LanguageStrings.SUBTYPE_ABDOMEN_HONEYPOT, AntModSlot.ABDOMEN,
+            3, GameUnlocks.ASSIMILATED_HONEYPOT, "honeypot/", "honeypot",
+            1f, false, 1f, 0.75f, 4f,
+            1.15f, SKILL_BOOST_REGEN, null, loadIcon("icons/subtypes/honeypot.png"));
+    static { antMods.add(MOD_ABDOMEN_HONEYPOT); }
+    public static final AntMod MOD_OTHER_NONE = new AntMod(8, LanguageStrings.SUBTYPE_NOTHING, AntModSlot.OTHER,
+            AntMod.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, LanguageStrings.SUBTYPE_NOTHING_DESC, SUBTYPE_ICON_NOTHING);
+    static { antMods.add(MOD_OTHER_NONE); }
+
     static {
         SKILL_POWERFUL_BITE.setRequiredSubtype(SUBTYPE_HEAD_TRAPJAW);
+        SKILL_POWERFUL_BITE.setRequiredMod(MOD_HEAD_TRAPJAW);
         SKILL_SHEARING_BITE.setRequiredSubtype(SUBTYPE_HEAD_LEAFCUTTER);
+        SKILL_SHEARING_BITE.setRequiredMod(MOD_HEAD_LEAFCUTTER);
         SKILL_STINGING.setRequiredSubtype(SUBTYPE_ABDOMEN_STINGER);
+        SKILL_STINGING.setRequiredMod(MOD_ABDOMEN_STINGER);
         SKILL_SHIELDING.setRequiredSubtype(SUBTYPE_HEAD_DOORHEAD);
+        SKILL_SHIELDING.setRequiredMod(MOD_HEAD_DOORHEAD);
         SKILL_BOOST_REGEN.setRequiredSubtype(SUBTYPE_ABDOMEN_HONEYPOT);
+        SKILL_BOOST_REGEN.setRequiredMod(MOD_ABDOMEN_HONEYPOT);
     }
 
     // --- Ant Roles ---
@@ -1342,12 +1410,16 @@ public final class GameConstants {
         return HEX_DEFENSE_ONLY_ROLES.clone();
     }
 
-    public static int getMilitaryWeightForAntType(AntType type) {
+    public static int getMilitaryWeightForAntClass(AntClass type) {
         return type != null ? type.getMilitaryWeight() : 0;
     }
 
+    public static int getMilitaryWeightForAntType(AntType type) {
+        return getMilitaryWeightForAntClass(type);
+    }
+
     public static int getActiveMilitaryRoleWeight(AntRole role) {
-        return role != null ? getMilitaryWeightForAntType(role.getAntType()) : 0;
+        return role != null ? getMilitaryWeightForAntClass(role.getAntClass()) : 0;
     }
 
     // --- Colony Loyalty ---
@@ -1862,6 +1934,17 @@ public final class GameConstants {
         return null;
     }
 
+    public static List<AntClass> getAntClasses() { return Collections.unmodifiableList(antClasses); }
+
+    public static AntClass getAntClassById(int id) {
+        for (AntClass c : antClasses) {
+            if (c.getId() == id) {
+                return c;
+            }
+        }
+        return null;
+    }
+
     public static List<AntSubtype> getAntSubtypes() { return Collections.unmodifiableList(antSubtypes); }
 
     public static AntSubtype getAntSubtypeById(int id) {
@@ -1900,6 +1983,49 @@ public final class GameConstants {
         for (AntSubtype subtype : antSubtypes) {
             if (subtype.getSlot() == slot) {
                 result.add(subtype);
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    public static List<AntMod> getAntMods() { return Collections.unmodifiableList(antMods); }
+
+    public static AntMod getAntModById(int id) {
+        for (AntMod mod : antMods) {
+            if (mod.getId() == id) {
+                return mod;
+            }
+        }
+        return null;
+    }
+
+    public static List<AntModSlot> getConfigurableModSlots() {
+        return List.of(AntModSlot.HEAD, AntModSlot.TORSO, AntModSlot.ABDOMEN);
+    }
+
+    public static AntMod getAntModBySlotAndDigit(AntModSlot slot, int digit) {
+        for (AntMod mod : antMods) {
+            if (mod.getSlot() == slot && mod.getDigit() == digit) {
+                return mod;
+            }
+        }
+        return getDefaultModForSlot(slot);
+    }
+
+    public static AntMod getDefaultModForSlot(AntModSlot slot) {
+        return switch (slot) {
+            case HEAD -> MOD_HEAD_NONE;
+            case TORSO -> MOD_TORSO_NONE;
+            case ABDOMEN -> MOD_ABDOMEN_NONE;
+            case OTHER -> MOD_OTHER_NONE;
+        };
+    }
+
+    public static List<AntMod> getModsForSlot(AntModSlot slot) {
+        List<AntMod> result = new ArrayList<>();
+        for (AntMod mod : antMods) {
+            if (mod.getSlot() == slot) {
+                result.add(mod);
             }
         }
         return Collections.unmodifiableList(result);

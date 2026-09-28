@@ -9,36 +9,36 @@ import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
 
 public class AntRole extends Constant {
-    private final AntType antType;
+    private final AntClass antClass;
     private final Set<AntSubtype> requiredSubtypes;
     private final Set<AntSubtype> forcedAllowedSubtypes;
     private final boolean isActiveMilitary;
     private final boolean hexDefenseOnly;
 
-    public AntRole(int id, AntType antType, String name, ImageIcon icon) {
-        this(id, antType, name, icon, Set.of(), Set.of(), false, false);
+    public AntRole(int id, AntClass antClass, String name, ImageIcon icon) {
+        this(id, antClass, name, icon, Set.of(), Set.of(), false, false);
     }
 
-    public AntRole(int id, AntType antType, String name, ImageIcon icon, boolean isActiveMilitary) {
-        this(id, antType, name, icon, Set.of(), Set.of(), isActiveMilitary, false);
+    public AntRole(int id, AntClass antClass, String name, ImageIcon icon, boolean isActiveMilitary) {
+        this(id, antClass, name, icon, Set.of(), Set.of(), isActiveMilitary, false);
     }
 
-    public AntRole(int id, AntType antType, String name, ImageIcon icon,
+    public AntRole(int id, AntClass antClass, String name, ImageIcon icon,
             Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes) {
-        this(id, antType, name, icon, requiredSubtypes, forcedAllowedSubtypes, false, false);
+        this(id, antClass, name, icon, requiredSubtypes, forcedAllowedSubtypes, false, false);
     }
 
-    public AntRole(int id, AntType antType, String name, ImageIcon icon,
+    public AntRole(int id, AntClass antClass, String name, ImageIcon icon,
             Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes,
             boolean isActiveMilitary) {
-        this(id, antType, name, icon, requiredSubtypes, forcedAllowedSubtypes, isActiveMilitary, false);
+        this(id, antClass, name, icon, requiredSubtypes, forcedAllowedSubtypes, isActiveMilitary, false);
     }
 
-    public AntRole(int id, AntType antType, String name, ImageIcon icon,
+    public AntRole(int id, AntClass antClass, String name, ImageIcon icon,
             Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes,
             boolean isActiveMilitary, boolean hexDefenseOnly) {
         super(id, name, icon);
-        this.antType = antType;
+        this.antClass = antClass;
         this.requiredSubtypes = copySubtypeSet(requiredSubtypes);
         LinkedHashSet<AntSubtype> forced = copySubtypeSet(forcedAllowedSubtypes);
         forced.addAll(this.requiredSubtypes);
@@ -59,8 +59,12 @@ public class AntRole extends Constant {
         return copy;
     }
 
+    public AntClass getAntClass() {
+        return antClass;
+    }
+
     public AntType getAntType() {
-        return antType;
+        return antClass instanceof AntType t ? t : null;
     }
 
     public Set<AntSubtype> getRequiredSubtypes() {
@@ -69,6 +73,28 @@ public class AntRole extends Constant {
 
     public Set<AntSubtype> getForcedAllowedSubtypes() {
         return forcedAllowedSubtypes;
+    }
+
+    public Set<AntMod> getRequiredMods() {
+        LinkedHashSet<AntMod> set = new LinkedHashSet<>();
+        for (AntSubtype st : requiredSubtypes) {
+            AntMod mod = st.toMod();
+            if (mod != null) {
+                set.add(mod);
+            }
+        }
+        return Collections.unmodifiableSet(set);
+    }
+
+    public Set<AntMod> getForcedAllowedMods() {
+        LinkedHashSet<AntMod> set = new LinkedHashSet<>();
+        for (AntSubtype st : forcedAllowedSubtypes) {
+            AntMod mod = st.toMod();
+            if (mod != null) {
+                set.add(mod);
+            }
+        }
+        return Collections.unmodifiableSet(set);
     }
 
     public boolean isActiveMilitary() {
@@ -87,12 +113,24 @@ public class AntRole extends Constant {
         return !requiredSubtypes.isEmpty();
     }
 
+    public boolean requiresMods() {
+        return !requiredSubtypes.isEmpty();
+    }
+
     public boolean isSubtypeForcedAllowed(AntSubtype subtype) {
         return subtype != null && forcedAllowedSubtypes.contains(subtype);
     }
 
+    public boolean isModForcedAllowed(AntMod mod) {
+        return mod != null && forcedAllowedSubtypes.stream().anyMatch(s -> s.getId() == mod.getId());
+    }
+
     public boolean isSubtypeRequired(AntSubtype subtype) {
         return subtype != null && requiredSubtypes.contains(subtype);
+    }
+
+    public boolean isModRequired(AntMod mod) {
+        return mod != null && requiredSubtypes.stream().anyMatch(s -> s.getId() == mod.getId());
     }
 
     @Override

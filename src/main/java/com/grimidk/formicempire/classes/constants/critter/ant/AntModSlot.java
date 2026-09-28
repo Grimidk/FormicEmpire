@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.constants.critter.ant;
 
-public enum AntSubtypeSlot {
+public enum AntModSlot {
     HEAD(0),
     TORSO(1),
     ABDOMEN(2),
@@ -8,7 +8,7 @@ public enum AntSubtypeSlot {
 
     private final int index;
 
-    AntSubtypeSlot(int index) {
+    AntModSlot(int index) {
         this.index = index;
     }
 
@@ -16,16 +16,16 @@ public enum AntSubtypeSlot {
         return index;
     }
 
-    public AntModSlot toModSlot() {
+    public AntSubtypeSlot toSubtypeSlot() {
         return switch (this) {
-            case HEAD -> AntModSlot.HEAD;
-            case TORSO -> AntModSlot.TORSO;
-            case ABDOMEN -> AntModSlot.ABDOMEN;
-            case OTHER -> AntModSlot.OTHER;
+            case HEAD -> AntSubtypeSlot.HEAD;
+            case TORSO -> AntSubtypeSlot.TORSO;
+            case ABDOMEN -> AntSubtypeSlot.ABDOMEN;
+            case OTHER -> AntSubtypeSlot.OTHER;
         };
     }
 
-    public static AntSubtypeSlot fromModSlot(AntModSlot slot) {
+    public static AntModSlot fromSubtypeSlot(AntSubtypeSlot slot) {
         if (slot == null) {
             return null;
         }

@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
@@ -77,6 +79,13 @@ public class Ant extends Critter {
     public AntType getAntType() { return type; }
     public void setAntType(AntType type) { this.type = type; }
 
+    public AntClass getAntClass() { return type; }
+    public void setAntClass(AntClass type) {
+        if (type instanceof AntType t) {
+            this.type = t;
+        }
+    }
+
     public AntRole getRole() { return role; }
     public void setRole(AntRole role) {
         if (this.role != role) {
@@ -94,6 +103,13 @@ public class Ant extends Critter {
     public AntSubtypeProfile getSubtypeProfile() { return subtypeProfile; }
     public void setSubtypeProfile(AntSubtypeProfile subtypeProfile) {
         this.subtypeProfile = subtypeProfile != null ? subtypeProfile : AntSubtypeProfile.standard();
+    }
+
+    public AntModProfile getModProfile() {
+        return subtypeProfile != null ? subtypeProfile.toModProfile() : AntModProfile.standard();
+    }
+    public void setModProfile(AntModProfile modProfile) {
+        this.subtypeProfile = modProfile != null ? modProfile.toSubtypeProfile() : AntSubtypeProfile.standard();
     }
 
     public float getTempRes() { return tempRes; }

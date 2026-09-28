@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.constants.critter;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
@@ -16,6 +17,7 @@ public class Skill extends Constant {
     private final float laneDamageBonus;
     private AntRole requiredRole;
     private AntSubtype requiredSubtype;
+    private AntMod requiredMod;
     private BattleLine battleLine;
     private boolean sacrificesSelf;
     private Skill replacesSkill;
@@ -75,11 +77,29 @@ public class Skill extends Constant {
     }
 
     public AntSubtype getRequiredSubtype() {
-        return requiredSubtype;
+        return requiredSubtype != null ? requiredSubtype : (requiredMod != null ? requiredMod.toSubtype() : null);
     }
 
     public void setRequiredSubtype(AntSubtype requiredSubtype) {
         this.requiredSubtype = requiredSubtype;
+        if (requiredSubtype != null) {
+            this.requiredMod = requiredSubtype.toMod();
+        } else {
+            this.requiredMod = null;
+        }
+    }
+
+    public AntMod getRequiredMod() {
+        return requiredMod != null ? requiredMod : (requiredSubtype != null ? requiredSubtype.toMod() : null);
+    }
+
+    public void setRequiredMod(AntMod requiredMod) {
+        this.requiredMod = requiredMod;
+        if (requiredMod != null) {
+            this.requiredSubtype = requiredMod.toSubtype();
+        } else {
+            this.requiredSubtype = null;
+        }
     }
 
     public BattleLine getBattleLine() {
