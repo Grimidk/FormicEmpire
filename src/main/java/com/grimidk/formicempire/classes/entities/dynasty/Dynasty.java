@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.Color;
 
 import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
@@ -144,7 +145,7 @@ public class Dynasty {
         this.isPlayer = isPlayer;
         this.species = species;
         this.aiPersonality = isPlayer ? null : AiPersonality.random();
-        this.colonies = new ArrayList<>();
+        this.colonies = new CopyOnWriteArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
         this.unlockedSkills = new LinkedHashSet<>();
         seedStartingSkills();

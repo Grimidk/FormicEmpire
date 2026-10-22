@@ -512,7 +512,7 @@ public class ColonyLabourService {
 
                 Colony primaryColony = null;
                 for (Colony c : dynasty.getColonies()) {
-                    if (c.isCapital()) {
+                    if (c != null && c.isCapital()) {
                         primaryColony = c;
                         break;
                     }

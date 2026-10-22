@@ -1,7 +1,9 @@
 package com.grimidk.formicempire.classes.constants;
 
-import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+
+import javax.swing.ImageIcon;
 
 public class Constant {
     private final int id;
@@ -27,6 +29,9 @@ public class Constant {
     }
     
     public ImageIcon getIcon() {
-        return icon;
+        if (icon != null) {
+            return icon;
+        }
+        return GameConstants.ICON_UNKNOWN;
     }
 }

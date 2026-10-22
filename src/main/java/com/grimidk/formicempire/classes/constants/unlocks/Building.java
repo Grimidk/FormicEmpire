@@ -82,7 +82,10 @@ public class Building extends Constant {
     }
 
     public ImageIcon getSprite() {
-        return sprite;
+        if (sprite != null && sprite != GameConstants.ICON_UNKNOWN) {
+            return sprite;
+        }
+        return GameConstants.SPRITE_UNKNOWN != null ? GameConstants.SPRITE_UNKNOWN : GameConstants.ICON_UNKNOWN;
     }
 
     public Tier getTier() {

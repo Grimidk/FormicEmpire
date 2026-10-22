@@ -273,7 +273,7 @@ public class World {
         colonizedHexesDirty = true;
     }
 
-    private void rebuildColonizedHexIndexIfNeeded() {
+    private synchronized void rebuildColonizedHexIndexIfNeeded() {
         if (!colonizedHexesDirty) {
             return;
         }
@@ -288,9 +288,9 @@ public class World {
         colonizedHexesDirty = false;
     }
 
-    private ArrayList<Hex> colonizedHexesForTicks() {
+    private synchronized ArrayList<Hex> colonizedHexesForTicks() {
         rebuildColonizedHexIndexIfNeeded();
-        return colonizedHexes;
+        return new ArrayList<>(colonizedHexes);
     }
 
     public void setHexes(ArrayList<Hex> hexes) {
@@ -1737,6 +1737,9 @@ public class World {
             int colonies = 0;
             boolean timingColonies = SimulationDiagnostics.isEnabled();
             for (Hex hex : colonizedHexesForTicks()) {
+                if (hex == null || hex.getColony() == null) {
+                    continue;
+                }
                 colonies++;
                 long colonyStart = timingColonies ? System.nanoTime() : 0L;
                 hex.getColony().runMinutelyJobs();
@@ -1765,6 +1768,9 @@ public class World {
             int colonies = 0;
             boolean timingColonies = SimulationDiagnostics.isEnabled();
             for (Hex hex : colonizedHexesForTicks()) {
+                if (hex == null || hex.getColony() == null) {
+                    continue;
+                }
                 colonies++;
                 long colonyStart = timingColonies ? System.nanoTime() : 0L;
                 hex.getColony().runHourlyJobs(hex.getBiome(), this.engine);
@@ -1834,6 +1840,9 @@ public class World {
             int colonies = 0;
             boolean timingColonies = SimulationDiagnostics.isEnabled();
             for (Hex hex : colonizedHexesForTicks()) {
+                if (hex == null || hex.getColony() == null) {
+                    continue;
+                }
                 colonies++;
                 Colony colony = hex.getColony();
                 long colonyStart = timingColonies ? System.nanoTime() : 0L;
@@ -1913,6 +1922,9 @@ public class World {
         Season monthSeason = GameConstants.seasonForMonth(this.month);
 
         for (Hex hex : colonizedHexesForTicks()) {
+            if (hex == null) {
+                continue;
+            }
             Colony colony = hex.getColony();
             if (colonyHasActiveDynasty(colony)) {
                 colony.runMonthlyJobs(monthSeason, hex.getBiome());

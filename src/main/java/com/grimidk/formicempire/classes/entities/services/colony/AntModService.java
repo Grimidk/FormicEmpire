@@ -707,9 +707,20 @@ public final class AntModService {
     }
 
     private static AntClass resolveModRateClass(String key) {
+        if (key == null) {
+            return null;
+        }
         for (AntClass type : getModRateClasses()) {
             if (type.getNameKey().equals(key)) {
                 return type;
+            }
+        }
+        if (key.startsWith("TYPE_")) {
+            String remapped = "CLASS_" + key.substring("TYPE_".length());
+            for (AntClass type : getModRateClasses()) {
+                if (type.getNameKey().equals(remapped)) {
+                    return type;
+                }
             }
         }
         return null;

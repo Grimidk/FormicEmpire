@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public final class CritterSpriteCompositor {
@@ -45,10 +46,14 @@ public final class CritterSpriteCompositor {
     }
 
     public static ImageIcon getSprite(Species species, int legFrame, int antennaFrame) {
-        if (species == null || !species.hasComposedSprite()) {
-            return species != null ? species.getSprite() : null;
+        if (species == null) {
+            return GameConstants.SPRITE_UNKNOWN;
         }
-        return getSprite(
+        if (!species.hasComposedSprite()) {
+            ImageIcon sprite = species.getSprite();
+            return sprite != null && sprite != GameConstants.ICON_UNKNOWN ? sprite : GameConstants.SPRITE_UNKNOWN;
+        }
+        ImageIcon composed = getSprite(
                 species.getSpriteFolder(),
                 species.getBodySpriteFile(),
                 species.hasLegWalkCycle(),
@@ -56,6 +61,11 @@ public final class CritterSpriteCompositor {
                 species.getLegFrameCount(),
                 antennaFrame,
                 species.getAntennaFrameCount());
+        if (composed != null && composed != GameConstants.ICON_UNKNOWN) {
+            return composed;
+        }
+        ImageIcon sprite = species.getSprite();
+        return sprite != null && sprite != GameConstants.ICON_UNKNOWN ? sprite : GameConstants.SPRITE_UNKNOWN;
     }
 
     public static ImageIcon getSprite(String folder, String bodyFile, boolean animated, int legFrame) {
@@ -73,7 +83,7 @@ public final class CritterSpriteCompositor {
             int antennaFrame,
             int antennaFrameCount) {
         if (folder == null || folder.isEmpty() || bodyFile == null || bodyFile.isEmpty()) {
-            return null;
+            return GameConstants.SPRITE_UNKNOWN;
         }
         int safeLeg = animated
                 ? clampFrame(legFrame, 1, Math.max(1, legFrameCount))
@@ -82,8 +92,9 @@ public final class CritterSpriteCompositor {
                 ? clampFrame(antennaFrame, 1, antennaFrameCount)
                 : DEFAULT_ANTENNA_FRAME;
         String cacheKey = folder + "|L" + safeLeg + "|A" + safeAntenna;
-        return COMPOSITE_CACHE.get(cacheKey,
+        ImageIcon result = COMPOSITE_CACHE.get(cacheKey,
                 k -> buildIcon(folder, bodyFile, animated, safeLeg, safeAntenna, antennaFrameCount));
+        return result != null ? result : GameConstants.SPRITE_UNKNOWN;
     }
 
     public static boolean hasLegWalkCycle(Species species) {

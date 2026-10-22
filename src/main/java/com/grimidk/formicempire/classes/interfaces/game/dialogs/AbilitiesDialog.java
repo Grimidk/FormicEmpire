@@ -98,7 +98,24 @@ public class AbilitiesDialog extends ZeroDialog {
                                     }
 
                                     if (targetHex != null) {
-                                        colony.forceNuptialFlight(world, targetHex);
+                                        boolean resumeAfter = !engine.isPaused();
+                                        if (resumeAfter) {
+                                            engine.pauseEngine();
+                                        }
+                                        java.util.concurrent.Semaphore sema = engine.getSema();
+                                        if (sema != null) {
+                                            sema.acquireUninterruptibly();
+                                        }
+                                        try {
+                                            colony.forceNuptialFlight(world, targetHex);
+                                        } finally {
+                                            if (sema != null) {
+                                                sema.release();
+                                            }
+                                            if (resumeAfter) {
+                                                engine.resumeEngine();
+                                            }
+                                        }
                                         refreshDialog();
                                     } else {
                                         UiOptionPane.showMessageDialog(this,
@@ -132,9 +149,16 @@ public class AbilitiesDialog extends ZeroDialog {
                             if (resumeAfter) {
                                 engine.pauseEngine();
                             }
+                            java.util.concurrent.Semaphore sema = engine.getSema();
+                            if (sema != null) {
+                                sema.acquireUninterruptibly();
+                            }
                             try {
                                 colony.getDynasty().runMassNuptialFlight(world);
                             } finally {
+                                if (sema != null) {
+                                    sema.release();
+                                }
                                 if (resumeAfter) {
                                     engine.resumeEngine();
                                 }

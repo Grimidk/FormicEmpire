@@ -1,12 +1,13 @@
 package com.grimidk.formicempire.classes.constants.critter;
 
+import com.grimidk.formicempire.classes.constants.Constant;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+
 import java.util.List;
 
 import javax.swing.ImageIcon;
-
-import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public class Species extends Constant {
     private final CritterClass critterClass;
@@ -132,7 +133,10 @@ public class Species extends Constant {
     }
 
     public ImageIcon getSprite() {
-        return sprite;
+        if (sprite != null && sprite != GameConstants.ICON_UNKNOWN) {
+            return sprite;
+        }
+        return GameConstants.SPRITE_UNKNOWN != null ? GameConstants.SPRITE_UNKNOWN : GameConstants.ICON_UNKNOWN;
     }
 
     public boolean hasComposedSprite() {

@@ -67,7 +67,12 @@ public final class GameConstants {
         URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(path);
         if (resourceUrl == null) {
             System.err.println("CRITICAL ERROR: Resource not found: " + path);
-            URL fallback = Thread.currentThread().getContextClassLoader().getResource("icons/misc/Unknown.png");
+            boolean isSprite = path != null && (path.startsWith("sprites/") || path.contains("sprite") || path.contains("backgrounds/"));
+            String fallbackPath = isSprite ? "icons/social/Help.png" : "icons/misc/Unknown.png";
+            URL fallback = Thread.currentThread().getContextClassLoader().getResource(fallbackPath);
+            if (fallback == null) {
+                fallback = Thread.currentThread().getContextClassLoader().getResource("icons/misc/Unknown.png");
+            }
             if (fallback == null) {
                 return null;
             }
@@ -87,38 +92,56 @@ public final class GameConstants {
     public static final ImageIcon ROOM_ROYAL_L1 = loadIcon("sprites/buildings/rooms/RoyalL1.png");
     public static final ImageIcon ROOM_ROYAL_L2 = loadIcon("sprites/buildings/rooms/RoyalL2.png");
     public static final ImageIcon ROOM_ROYAL_L3 = loadIcon("sprites/buildings/rooms/RoyalL3.png");
+    public static final ImageIcon ROOM_ROYAL_L4 = loadIcon("sprites/buildings/rooms/RoyalL4.png");
+    public static final ImageIcon ROOM_ROYAL_L5 = loadIcon("sprites/buildings/rooms/RoyalL5.png");
     public static final ImageIcon ROOM_EGG_L0 = loadIcon("sprites/buildings/rooms/EggL0.png");
     public static final ImageIcon ROOM_EGG_L1 = loadIcon("sprites/buildings/rooms/EggL1.png");
     public static final ImageIcon ROOM_EGG_L2 = loadIcon("sprites/buildings/rooms/EggL2.png");
     public static final ImageIcon ROOM_EGG_L3 = loadIcon("sprites/buildings/rooms/EggL3.png");
+    public static final ImageIcon ROOM_EGG_L4 = loadIcon("sprites/buildings/rooms/EggL4.png");
+    public static final ImageIcon ROOM_EGG_L5 = loadIcon("sprites/buildings/rooms/EggL5.png");
     public static final ImageIcon ROOM_MUSHROOM_L0 = loadIcon("sprites/buildings/rooms/MushroomL0.png");
     public static final ImageIcon ROOM_MUSHROOM_L1 = loadIcon("sprites/buildings/rooms/MushroomL1.png");
     public static final ImageIcon ROOM_MUSHROOM_L2 = loadIcon("sprites/buildings/rooms/MushroomL2.png");
     public static final ImageIcon ROOM_MUSHROOM_L3 = loadIcon("sprites/buildings/rooms/MushroomL3.png");
+    public static final ImageIcon ROOM_MUSHROOM_L4 = loadIcon("sprites/buildings/rooms/MushroomL4.png");
+    public static final ImageIcon ROOM_MUSHROOM_L5 = loadIcon("sprites/buildings/rooms/MushroomL5.png");
     public static final ImageIcon ROOM_PLANT_L0 = loadIcon("sprites/buildings/rooms/PlantL0.png");
     public static final ImageIcon ROOM_PLANT_L1 = loadIcon("sprites/buildings/rooms/PlantL1.png");
     public static final ImageIcon ROOM_PLANT_L2 = loadIcon("sprites/buildings/rooms/PlantL2.png");
     public static final ImageIcon ROOM_PLANT_L3 = loadIcon("sprites/buildings/rooms/PlantL3.png");
+    public static final ImageIcon ROOM_PLANT_L4 = loadIcon("sprites/buildings/rooms/PlantL4.png");
+    public static final ImageIcon ROOM_PLANT_L5 = loadIcon("sprites/buildings/rooms/PlantL5.png");
     public static final ImageIcon ROOM_WATER_L0 = loadIcon("sprites/buildings/rooms/WaterL0.png");
     public static final ImageIcon ROOM_WATER_L1 = loadIcon("sprites/buildings/rooms/WaterL1.png");
     public static final ImageIcon ROOM_WATER_L2 = loadIcon("sprites/buildings/rooms/WaterL2.png");
     public static final ImageIcon ROOM_WATER_L3 = loadIcon("sprites/buildings/rooms/WaterL3.png");
+    public static final ImageIcon ROOM_WATER_L4 = loadIcon("sprites/buildings/rooms/WaterL4.png");
+    public static final ImageIcon ROOM_WATER_L5 = loadIcon("sprites/buildings/rooms/WaterL5.png");
     public static final ImageIcon ROOM_MEAT_L0 = loadIcon("sprites/buildings/rooms/MeatL0.png");
     public static final ImageIcon ROOM_MEAT_L1 = loadIcon("sprites/buildings/rooms/MeatL1.png");
     public static final ImageIcon ROOM_MEAT_L2 = loadIcon("sprites/buildings/rooms/MeatL2.png");
     public static final ImageIcon ROOM_MEAT_L3 = loadIcon("sprites/buildings/rooms/MeatL3.png");
+    public static final ImageIcon ROOM_MEAT_L4 = loadIcon("sprites/buildings/rooms/MeatL4.png");
+    public static final ImageIcon ROOM_MEAT_L5 = loadIcon("sprites/buildings/rooms/MeatL5.png");
     public static final ImageIcon ROOM_SYRUP_L0 = loadIcon("sprites/buildings/rooms/SyrupL0.png");
     public static final ImageIcon ROOM_SYRUP_L1 = loadIcon("sprites/buildings/rooms/SyrupL1.png");
     public static final ImageIcon ROOM_SYRUP_L2 = loadIcon("sprites/buildings/rooms/SyrupL2.png");
     public static final ImageIcon ROOM_SYRUP_L3 = loadIcon("sprites/buildings/rooms/SyrupL3.png");
+    public static final ImageIcon ROOM_SYRUP_L4 = loadIcon("sprites/buildings/rooms/SyrupL4.png");
+    public static final ImageIcon ROOM_SYRUP_L5 = loadIcon("sprites/buildings/rooms/SyrupL5.png");
     public static final ImageIcon ROOM_ROCK_L0 = loadIcon("sprites/buildings/rooms/RockL0.png");
     public static final ImageIcon ROOM_ROCK_L1 = loadIcon("sprites/buildings/rooms/RockL1.png");
     public static final ImageIcon ROOM_ROCK_L2 = loadIcon("sprites/buildings/rooms/RockL2.png");
     public static final ImageIcon ROOM_ROCK_L3 = loadIcon("sprites/buildings/rooms/RockL3.png");
+    public static final ImageIcon ROOM_ROCK_L4 = loadIcon("sprites/buildings/rooms/RockL4.png");
+    public static final ImageIcon ROOM_ROCK_L5 = loadIcon("sprites/buildings/rooms/RockL5.png");
     public static final ImageIcon ROOM_RESIN_L0 = loadIcon("sprites/buildings/rooms/ResinL0.png");
     public static final ImageIcon ROOM_RESIN_L1 = loadIcon("sprites/buildings/rooms/ResinL1.png");
     public static final ImageIcon ROOM_RESIN_L2 = loadIcon("sprites/buildings/rooms/ResinL2.png");
     public static final ImageIcon ROOM_RESIN_L3 = loadIcon("sprites/buildings/rooms/ResinL3.png");
+    public static final ImageIcon ROOM_RESIN_L4 = loadIcon("sprites/buildings/rooms/ResinL4.png");
+    public static final ImageIcon ROOM_RESIN_L5 = loadIcon("sprites/buildings/rooms/ResinL5.png");
     public static final ImageIcon ROOM_PASSIVE_LAB = loadIcon("sprites/buildings/rooms/PassiveLab.png");
     public static final ImageIcon ROOM_PASSIVE_WATER = loadIcon("sprites/buildings/rooms/PassiveWater.png");
     public static final ImageIcon ROOM_PASSIVE_APHID = loadIcon("sprites/buildings/rooms/PassiveAphid.png");
@@ -160,12 +183,19 @@ public final class GameConstants {
 
     public static ImageIcon getCritterSprite(Species species, int legFrame, int antennaFrame) {
         if (species == null) {
-            return null;
+            return SPRITE_UNKNOWN;
         }
         if (species.hasComposedSprite()) {
-            return CritterSpriteCompositor.getSprite(species, legFrame, antennaFrame);
+            ImageIcon composed = CritterSpriteCompositor.getSprite(species, legFrame, antennaFrame);
+            if (composed != null && composed != ICON_UNKNOWN) {
+                return composed;
+            }
         }
-        return species.getSprite();
+        ImageIcon sprite = species.getSprite();
+        if (sprite != null && sprite != ICON_UNKNOWN) {
+            return sprite;
+        }
+        return SPRITE_UNKNOWN != null ? SPRITE_UNKNOWN : ICON_UNKNOWN;
     }
 
     public static ImageIcon getAntSprite(AntClass type, AntSpecies species) {
@@ -196,17 +226,31 @@ public final class GameConstants {
             int antennaFrame,
             boolean parasiticMites) {
         if (type == null) {
-            return null;
+            return SPRITE_UNKNOWN;
         }
         if (type == CLASS_EGG || type == CLASS_LARVA || type == CLASS_PUPA || type == CLASS_DEAD || type == CLASS_ZOMBIE) {
-            return loadIcon("sprites/ants/" + type.getSpriteName());
+            ImageIcon icon = loadIcon("sprites/ants/" + type.getSpriteName());
+            return icon != null ? icon : (SPRITE_UNKNOWN != null ? SPRITE_UNKNOWN : ICON_UNKNOWN);
         }
         AntSpecies resolveSpecies = species != null ? species : SPECIES_OMNI;
         if (resolveSpecies.getPalette() != null) {
-            return AntSpriteCompositor.getSprite(
+            ImageIcon icon = AntSpriteCompositor.getSprite(
                     type, resolveSpecies, profile, legFrame, jawFrame, wingFrame, antennaFrame, parasiticMites);
+            if (icon != null) {
+                return icon;
+            }
         }
-        return null;
+        return getBackupAntSprite(type);
+    }
+
+    public static ImageIcon getBackupAntSprite(AntClass type) {
+        if (type == CLASS_WORKER) return loadIcon("sprites/backups/BackupWorker.png");
+        if (type == CLASS_SOLDIER) return loadIcon("sprites/backups/BackupSoldier.png");
+        if (type == CLASS_MAJOR) return loadIcon("sprites/backups/BackupMajor.png");
+        if (type == CLASS_DRONE) return loadIcon("sprites/backups/BackupDrone.png");
+        if (type == CLASS_PRINCESS) return loadIcon("sprites/backups/BackupPrincess.png");
+        if (type == CLASS_QUEEN) return loadIcon("sprites/backups/BackupQueen.png");
+        return SPRITE_UNKNOWN != null ? SPRITE_UNKNOWN : ICON_UNKNOWN;
     }
 
     private static AntSpeciesPalette palette(
@@ -361,6 +405,8 @@ public final class GameConstants {
     static { misc.add(ICON_RAFT); }
     public static final ImageIcon ICON_UNKNOWN = loadIcon("icons/misc/Unknown.png");
     static { misc.add(ICON_UNKNOWN); }
+    public static final ImageIcon SPRITE_UNKNOWN = loadIcon("icons/social/Help.png");
+    static { misc.add(SPRITE_UNKNOWN); }
     public static final ImageIcon ICON_STAT_LOYALTY = loadIcon("icons/misc/Loyalty.png");
     static { misc.add(ICON_STAT_LOYALTY); }
     public static final ImageIcon ICON_STAT_REPUTATION = loadIcon("icons/misc/Reputation.png");

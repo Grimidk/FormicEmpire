@@ -37,6 +37,7 @@ public final class GameUnlocks {
         }
 
         private static final ImageIcon ICON_TODO = loadIconOrNull("icons/misc/Unknown.png");
+        private static final ImageIcon SPRITE_TODO = loadIconOrNull("icons/social/Help.png");
 
         private static ImageIcon loadIcon(String path) {
                 ImageIcon icon = loadIconOrNull(path);
@@ -44,7 +45,8 @@ public final class GameUnlocks {
                         return icon;
                 }
                 System.err.println("CRITICAL ERROR: Resource not found: " + path);
-                return ICON_TODO;
+                boolean isSprite = path != null && (path.startsWith("sprites/") || path.contains("sprite") || path.contains("backgrounds/"));
+                return isSprite && SPRITE_TODO != null ? SPRITE_TODO : ICON_TODO;
         }
 
         // --- Lists ---
@@ -445,42 +447,42 @@ public final class GameUnlocks {
         public static final Building RESIN_RESERVOIR_3 = new Building(36, "RESIN_RESERVOIR_3", 3, "RESIN_RESERVOIR_3_DESC", RESIN_RESERVOIR_2, 900, 0, 10000, loadIcon("icons/buildings/ResinReservoir3.png"), GameConstants.ROOM_RESIN_L3, 3);
         static { buildings.add(RESIN_RESERVOIR_3); }
         // -- Tier 4 --
-        public static final Building ROYAL_CHAMBER_4 = new Building(37, "ROYAL_CHAMBER_4", 4, "ROYAL_CHAMBER_4_DESC", ROYAL_CHAMBER_3, 2000, 1000, 37500, loadIcon("icons/buildings/RoyalChamber4.png"), GameConstants.ROOM_ROYAL_L3, 4);
+        public static final Building ROYAL_CHAMBER_4 = new Building(37, "ROYAL_CHAMBER_4", 4, "ROYAL_CHAMBER_4_DESC", ROYAL_CHAMBER_3, 2000, 1000, 37500, loadIcon("icons/buildings/RoyalChamber4.png"), GameConstants.ROOM_ROYAL_L4, 4);
         static { buildings.add(ROYAL_CHAMBER_4); }
-        public static final Building EGG_CHAMBER_4 = new Building(38, "EGG_CHAMBER_4", 4, "EGG_CHAMBER_4_DESC", EGG_CHAMBER_3, 1000, 500, 12500, loadIcon("icons/buildings/EggChamber4.png"), GameConstants.ROOM_EGG_L3, 4);
+        public static final Building EGG_CHAMBER_4 = new Building(38, "EGG_CHAMBER_4", 4, "EGG_CHAMBER_4_DESC", EGG_CHAMBER_3, 1000, 500, 12500, loadIcon("icons/buildings/EggChamber4.png"), GameConstants.ROOM_EGG_L4, 4);
         static { buildings.add(EGG_CHAMBER_4); }
-        public static final Building MUSHROOM_CHAMBER_4 = new Building(39, "MUSHROOM_CHAMBER_4", 4, "MUSHROOM_CHAMBER_4_DESC", MUSHROOM_CHAMBER_3, 1600, 800, 12500, loadIcon("icons/buildings/MushroomChamber4.png"), GameConstants.ROOM_MUSHROOM_L3, 4);
+        public static final Building MUSHROOM_CHAMBER_4 = new Building(39, "MUSHROOM_CHAMBER_4", 4, "MUSHROOM_CHAMBER_4_DESC", MUSHROOM_CHAMBER_3, 1600, 800, 12500, loadIcon("icons/buildings/MushroomChamber4.png"), GameConstants.ROOM_MUSHROOM_L4, 4);
         static { buildings.add(MUSHROOM_CHAMBER_4); }
-        public static final Building PLANT_CHAMBER_4 = new Building(40, "PLANT_CHAMBER_4", 4, "PLANT_CHAMBER_4_DESC", PLANT_CHAMBER_3, 1400, 700, 12500, loadIcon("icons/buildings/PlantChamber4.png"), GameConstants.ROOM_PLANT_L3, 4);
+        public static final Building PLANT_CHAMBER_4 = new Building(40, "PLANT_CHAMBER_4", 4, "PLANT_CHAMBER_4_DESC", PLANT_CHAMBER_3, 1400, 700, 12500, loadIcon("icons/buildings/PlantChamber4.png"), GameConstants.ROOM_PLANT_L4, 4);
         static { buildings.add(PLANT_CHAMBER_4); }
-        public static final Building WATER_RESERVOIR_4 = new Building(41, "WATER_RESERVOIR_4", 4, "WATER_RESERVOIR_4_DESC", WATER_RESERVOIR_3, 1800, 900, 12500, loadIcon("icons/buildings/WaterReservoir4.png"), GameConstants.ROOM_WATER_L3, 4);
+        public static final Building WATER_RESERVOIR_4 = new Building(41, "WATER_RESERVOIR_4", 4, "WATER_RESERVOIR_4_DESC", WATER_RESERVOIR_3, 1800, 900, 12500, loadIcon("icons/buildings/WaterReservoir4.png"), GameConstants.ROOM_WATER_L4, 4);
         static { buildings.add(WATER_RESERVOIR_4); }
-        public static final Building MEAT_CHAMBER_4 = new Building(42, "MEAT_CHAMBER_4", 4, "MEAT_CHAMBER_4_DESC", MEAT_CHAMBER_3, 1700, 850, 25000, loadIcon("icons/buildings/MeatChamber4.png"), GameConstants.ROOM_MEAT_L3, 4);
+        public static final Building MEAT_CHAMBER_4 = new Building(42, "MEAT_CHAMBER_4", 4, "MEAT_CHAMBER_4_DESC", MEAT_CHAMBER_3, 1700, 850, 25000, loadIcon("icons/buildings/MeatChamber4.png"), GameConstants.ROOM_MEAT_L4, 4);
         static { buildings.add(MEAT_CHAMBER_4); }
-        public static final Building SYRUP_RESERVOIR_4 = new Building(43, "SYRUP_RESERVOIR_4", 4, "SYRUP_RESERVOIR_4_DESC", SYRUP_RESERVOIR_3, 1600, 800, 25000, loadIcon("icons/buildings/SyrupReservoir4.png"), GameConstants.ROOM_SYRUP_L3, 4);
+        public static final Building SYRUP_RESERVOIR_4 = new Building(43, "SYRUP_RESERVOIR_4", 4, "SYRUP_RESERVOIR_4_DESC", SYRUP_RESERVOIR_3, 1600, 800, 25000, loadIcon("icons/buildings/SyrupReservoir4.png"), GameConstants.ROOM_SYRUP_L4, 4);
         static { buildings.add(SYRUP_RESERVOIR_4); }
-        public static final Building ROCK_WAREHOUSE_4 = new Building(44, "ROCK_WAREHOUSE_4", 4, "ROCK_WAREHOUSE_4_DESC", ROCK_WAREHOUSE_3, 1900, 950, 25000, loadIcon("icons/buildings/RockWarehouse4.png"), GameConstants.ROOM_ROCK_L3, 4);
+        public static final Building ROCK_WAREHOUSE_4 = new Building(44, "ROCK_WAREHOUSE_4", 4, "ROCK_WAREHOUSE_4_DESC", ROCK_WAREHOUSE_3, 1900, 950, 25000, loadIcon("icons/buildings/RockWarehouse4.png"), GameConstants.ROOM_ROCK_L4, 4);
         static { buildings.add(ROCK_WAREHOUSE_4); }
-        public static final Building RESIN_RESERVOIR_4 = new Building(45, "RESIN_RESERVOIR_4", 4, "RESIN_RESERVOIR_4_DESC", RESIN_RESERVOIR_3, 1800, 900, 25000, loadIcon("icons/buildings/ResinReservoir4.png"), GameConstants.ROOM_RESIN_L3, 4);
+        public static final Building RESIN_RESERVOIR_4 = new Building(45, "RESIN_RESERVOIR_4", 4, "RESIN_RESERVOIR_4_DESC", RESIN_RESERVOIR_3, 1800, 900, 25000, loadIcon("icons/buildings/ResinReservoir4.png"), GameConstants.ROOM_RESIN_L4, 4);
         static { buildings.add(RESIN_RESERVOIR_4); }
         // -- Tier 5 --
-        public static final Building ROYAL_CHAMBER_5 = new Building(46, "ROYAL_CHAMBER_5", 5, "ROYAL_CHAMBER_5_DESC", ROYAL_CHAMBER_4, 4000, 2500, 75000, loadIcon("icons/buildings/RoyalChamber5.png"), GameConstants.ROOM_ROYAL_L3, 5);
+        public static final Building ROYAL_CHAMBER_5 = new Building(46, "ROYAL_CHAMBER_5", 5, "ROYAL_CHAMBER_5_DESC", ROYAL_CHAMBER_4, 4000, 2500, 75000, loadIcon("icons/buildings/RoyalChamber5.png"), GameConstants.ROOM_ROYAL_L5, 5);
         static { buildings.add(ROYAL_CHAMBER_5); }
-        public static final Building EGG_CHAMBER_5 = new Building(47, "EGG_CHAMBER_5", 5, "EGG_CHAMBER_5_DESC", EGG_CHAMBER_4, 2000, 1250, 25000, loadIcon("icons/buildings/EggChamber5.png"), GameConstants.ROOM_EGG_L3, 5);
+        public static final Building EGG_CHAMBER_5 = new Building(47, "EGG_CHAMBER_5", 5, "EGG_CHAMBER_5_DESC", EGG_CHAMBER_4, 2000, 1250, 25000, loadIcon("icons/buildings/EggChamber5.png"), GameConstants.ROOM_EGG_L5, 5);
         static { buildings.add(EGG_CHAMBER_5); }
-        public static final Building MUSHROOM_CHAMBER_5 = new Building(48, "MUSHROOM_CHAMBER_5", 5, "MUSHROOM_CHAMBER_5_DESC", MUSHROOM_CHAMBER_4, 3200, 2000, 25000, loadIcon("icons/buildings/MushroomChamber5.png"), GameConstants.ROOM_MUSHROOM_L3, 5);
+        public static final Building MUSHROOM_CHAMBER_5 = new Building(48, "MUSHROOM_CHAMBER_5", 5, "MUSHROOM_CHAMBER_5_DESC", MUSHROOM_CHAMBER_4, 3200, 2000, 25000, loadIcon("icons/buildings/MushroomChamber5.png"), GameConstants.ROOM_MUSHROOM_L5, 5);
         static { buildings.add(MUSHROOM_CHAMBER_5); }
-        public static final Building PLANT_CHAMBER_5 = new Building(49, "PLANT_CHAMBER_5", 5, "PLANT_CHAMBER_5_DESC", PLANT_CHAMBER_4, 2800, 1750, 25000, loadIcon("icons/buildings/PlantChamber5.png"), GameConstants.ROOM_PLANT_L3, 5);
+        public static final Building PLANT_CHAMBER_5 = new Building(49, "PLANT_CHAMBER_5", 5, "PLANT_CHAMBER_5_DESC", PLANT_CHAMBER_4, 2800, 1750, 25000, loadIcon("icons/buildings/PlantChamber5.png"), GameConstants.ROOM_PLANT_L5, 5);
         static { buildings.add(PLANT_CHAMBER_5); }
-        public static final Building WATER_RESERVOIR_5 = new Building(50, "WATER_RESERVOIR_5", 5, "WATER_RESERVOIR_5_DESC", WATER_RESERVOIR_4, 3600, 2250, 25000, loadIcon("icons/buildings/WaterReservoir5.png"), GameConstants.ROOM_WATER_L3, 5);
+        public static final Building WATER_RESERVOIR_5 = new Building(50, "WATER_RESERVOIR_5", 5, "WATER_RESERVOIR_5_DESC", WATER_RESERVOIR_4, 3600, 2250, 25000, loadIcon("icons/buildings/WaterReservoir5.png"), GameConstants.ROOM_WATER_L5, 5);
         static { buildings.add(WATER_RESERVOIR_5); }
-        public static final Building MEAT_CHAMBER_5 = new Building(51, "MEAT_CHAMBER_5", 5, "MEAT_CHAMBER_5_DESC", MEAT_CHAMBER_4, 3400, 2125, 50000, loadIcon("icons/buildings/MeatChamber5.png"), GameConstants.ROOM_MEAT_L3, 5);
+        public static final Building MEAT_CHAMBER_5 = new Building(51, "MEAT_CHAMBER_5", 5, "MEAT_CHAMBER_5_DESC", MEAT_CHAMBER_4, 3400, 2125, 50000, loadIcon("icons/buildings/MeatChamber5.png"), GameConstants.ROOM_MEAT_L5, 5);
         static { buildings.add(MEAT_CHAMBER_5); }
-        public static final Building SYRUP_RESERVOIR_5 = new Building(52, "SYRUP_RESERVOIR_5", 5, "SYRUP_RESERVOIR_5_DESC", SYRUP_RESERVOIR_4, 3200, 2000, 50000, loadIcon("icons/buildings/SyrupReservoir5.png"), GameConstants.ROOM_SYRUP_L3, 5);
+        public static final Building SYRUP_RESERVOIR_5 = new Building(52, "SYRUP_RESERVOIR_5", 5, "SYRUP_RESERVOIR_5_DESC", SYRUP_RESERVOIR_4, 3200, 2000, 50000, loadIcon("icons/buildings/SyrupReservoir5.png"), GameConstants.ROOM_SYRUP_L5, 5);
         static { buildings.add(SYRUP_RESERVOIR_5); }
-        public static final Building ROCK_WAREHOUSE_5 = new Building(53, "ROCK_WAREHOUSE_5", 5, "ROCK_WAREHOUSE_5_DESC", ROCK_WAREHOUSE_4, 3800, 2375, 50000, loadIcon("icons/buildings/RockWarehouse5.png"), GameConstants.ROOM_ROCK_L3, 5);
+        public static final Building ROCK_WAREHOUSE_5 = new Building(53, "ROCK_WAREHOUSE_5", 5, "ROCK_WAREHOUSE_5_DESC", ROCK_WAREHOUSE_4, 3800, 2375, 50000, loadIcon("icons/buildings/RockWarehouse5.png"), GameConstants.ROOM_ROCK_L5, 5);
         static { buildings.add(ROCK_WAREHOUSE_5); }
-        public static final Building RESIN_RESERVOIR_5 = new Building(54, "RESIN_RESERVOIR_5", 5, "RESIN_RESERVOIR_5_DESC", RESIN_RESERVOIR_4, 3600, 2250, 50000, loadIcon("icons/buildings/ResinReservoir5.png"), GameConstants.ROOM_RESIN_L3, 5);
+        public static final Building RESIN_RESERVOIR_5 = new Building(54, "RESIN_RESERVOIR_5", 5, "RESIN_RESERVOIR_5_DESC", RESIN_RESERVOIR_4, 3600, 2250, 50000, loadIcon("icons/buildings/ResinReservoir5.png"), GameConstants.ROOM_RESIN_L5, 5);
         static { buildings.add(RESIN_RESERVOIR_5); }
         // -- Tier Misc. (passive overlays) --
         public static final Building PASSIVE_LAB = new Building(101, "PASSIVE_LAB", 0, "PASSIVE_LAB_DESC", ROYAL_CHAMBER_1, 150, 0, 800, loadIcon("icons/buildings/PassiveLab.png"), GameConstants.ROOM_PASSIVE_LAB, 2);

@@ -12,7 +12,6 @@ To Fix (By decreasing priority):
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
-		use big unknow sprite for fallback missing sprite and unknow icon for all mising icons,
 		evaluate how to save and persist age
 
 To Draw (PascalCase filenames; under src/main/resources):
@@ -91,6 +90,8 @@ Needed for launch (v1.0) (Launch Version):
 		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
 
 Post launch (v1.1) (Improvements Update):
+	better crash detection and reporting
+	spawn ant cheat and spawn bug
     engine clean up for reusability (Core Engine Package) with addiontal codegen tools for saves and repositories etc
 	air battles rework (prerequisite for paratroopers):
 		air vs air fighters on the air battle line

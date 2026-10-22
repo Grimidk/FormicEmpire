@@ -569,7 +569,7 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ABUNDANCES), LanguageStrings.get(LanguageStrings.RESOURCE_ROCK), String.format("%.2f", biome.getMineralAbundance())});
         }
 
-        model.addRow(new Object[]{null, null, sep, sep});
+        model.addRow(new Object[]{sep, sep, sep});
         int maxDepl = colony.hasUpgrade(GameUnlocks.STAT_HEX_SUSTAIN)
                 ? GameNumbers.HEX_SUSTAIN_MAX_DEPLETION_PCT
                 : 100;
@@ -593,7 +593,7 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_MAX_EFFICIENCY_DISTANCE), AssetStyles.formatNumber(maxEffDistance)});
 
         // Neighbors
-        model.addRow(new Object[]{null, null, sep, sep});
+        model.addRow(new Object[]{sep, sep, sep});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH), getHexSummary(hex.getNorth())});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_WEST), getHexSummary(hex.getNorthWest())});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_EAST), getHexSummary(hex.getNorthEast())});
@@ -611,78 +611,56 @@ public class StatsDialog extends ZeroDialog {
         return summary;
     }
 
+    private static void addStatRow(DefaultTableModel model, ImageIcon icon, String category, String property, Object value) {
+        if (model == null) {
+            return;
+        }
+        if (model.getColumnCount() >= 4) {
+            model.addRow(new Object[]{icon, category, property, value});
+        } else {
+            model.addRow(new Object[]{category, property, value});
+        }
+    }
+
     private void appendDynastyMilitaryRows(DefaultTableModel model, String category, Dynasty dynasty) {
         World world = engine != null ? engine.getWorld() : null;
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_MILITARY_POWER,
-                category,
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
                 LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
-                dynasty.getMilitaryPower()
-        });
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_MILITARY_POWER,
-                category,
+                dynasty.getMilitaryPower());
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
                 LanguageStrings.get(LanguageStrings.STAT_ACTIVE_MILITARY_POWER),
-                dynastyStatsService.getActiveMilitaryPower(dynasty)
-        });
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_MILITARY_POWER,
-                category,
+                dynastyStatsService.getActiveMilitaryPower(dynasty));
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
                 LanguageStrings.get(LanguageStrings.STAT_RESERVE_MILITARY_POWER),
-                dynastyStatsService.getReserveMilitaryPower(dynasty)
-        });
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_COMBAT_CAPACITY,
-                category,
+                dynastyStatsService.getReserveMilitaryPower(dynasty));
+        addStatRow(model, GameConstants.ICON_STAT_COMBAT_CAPACITY, category,
                 LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY),
-                dynastyStatsService.getCombatCapacity(dynasty)
-        });
-        model.addRow(new Object[]{
-                GameConstants.ROLE_CARRIER.getIcon(),
-                category,
+                dynastyStatsService.getCombatCapacity(dynasty));
+        addStatRow(model, GameConstants.ROLE_CARRIER.getIcon(), category,
                 LanguageStrings.get(LanguageStrings.STAT_ASSIGNED_CARRIERS),
-                dynastyStatsService.getTotalAssignedCarriers(dynasty)
-        });
+                dynastyStatsService.getTotalAssignedCarriers(dynasty));
         float reinforcementRate = dynastyStatsService.getDailyReinforcementRate(dynasty, world);
-        model.addRow(new Object[]{
-                null,
-                category,
+        addStatRow(model, null, category,
                 LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_RATE),
-                String.format("%.0f%%", reinforcementRate * 100f)
-        });
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_COMBAT_CAPACITY,
-                category,
+                String.format("%.0f%%", reinforcementRate * 100f));
+        addStatRow(model, GameConstants.ICON_STAT_COMBAT_CAPACITY, category,
                 LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_ALLOWANCE),
-                dynastyStatsService.getDailyReinforcementAllowancePerLine(dynasty, world)
-        });
+                dynastyStatsService.getDailyReinforcementAllowancePerLine(dynasty, world));
     }
 
     private void appendColonyMilitaryRows(DefaultTableModel model, String category, Colony targetColony) {
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_MILITARY_POWER,
-                category,
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
                 LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
-                targetColony.getMilitaryPower()
-        });
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_MILITARY_POWER,
-                category,
+                targetColony.getMilitaryPower());
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
                 LanguageStrings.get(LanguageStrings.STAT_ACTIVE_MILITARY_POWER),
-                targetColony.getActiveMilitaryPower()
-        });
-        model.addRow(new Object[]{
-                GameConstants.ICON_STAT_MILITARY_POWER,
-                category,
+                targetColony.getActiveMilitaryPower());
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
                 LanguageStrings.get(LanguageStrings.STAT_RESERVE_MILITARY_POWER),
-                targetColony.getReserveMilitaryPower()
-        });
-        model.addRow(new Object[]{
-                GameConstants.ROLE_CARRIER.getIcon(),
-                category,
+                targetColony.getReserveMilitaryPower());
+        addStatRow(model, GameConstants.ROLE_CARRIER.getIcon(), category,
                 LanguageStrings.get(LanguageStrings.STAT_ASSIGNED_CARRIERS),
-                dynastyStatsService.getAssignedCarriers(targetColony)
-        });
+                dynastyStatsService.getAssignedCarriers(targetColony));
     }
 
     private void updateGeneralData() {

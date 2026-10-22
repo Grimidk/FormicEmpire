@@ -383,6 +383,8 @@ public class Engine extends Thread {
                         this.world.runMinute();
                         notifyMinuteListeners();
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 } finally {
                     semaphore.release();
                 }

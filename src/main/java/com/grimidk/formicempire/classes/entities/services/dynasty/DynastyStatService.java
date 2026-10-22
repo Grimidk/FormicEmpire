@@ -21,7 +21,9 @@ public class DynastyStatService {
         if (dynasty == null) return 0;
         int total = 0;
         for (Colony c : dynasty.getColonies()) {
-            total += c.getAntTotal();
+            if (c != null) {
+                total += c.getAntTotal();
+            }
         }
         return total;
     }
@@ -31,8 +33,10 @@ public class DynastyStatService {
         if (dynasty == null) return totals;
 
         for (Colony c : dynasty.getColonies()) {
-            for (Map.Entry<AntClass, List<Ant>> entry : c.getAntGroups().entrySet()) {
-                totals.merge(entry.getKey(), entry.getValue().size(), Integer::sum);
+            if (c != null && c.getAntGroups() != null) {
+                for (Map.Entry<AntClass, List<Ant>> entry : c.getAntGroups().entrySet()) {
+                    totals.merge(entry.getKey(), entry.getValue().size(), Integer::sum);
+                }
             }
         }
         return totals;
