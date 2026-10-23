@@ -54,6 +54,8 @@ public final class GameNumbers {
     public static final int[] WORLD_COASTAL_LAND_CHANCE_PERCENT = { 80, 40, 20, 10, 5 };
     public static final int WORLD_MIN_ISLAND_COUNT = 6;
     public static final int WORLD_MIN_HEXES_PER_BIOME = 2;
+    public static final int WORLD_RECT_WIDTH = 128;
+    public static final int WORLD_RECT_HEIGHT = 64;
 
     public static int worldRadiusForContinentCore(int continentCoreRadius) {
         return Math.max(0, continentCoreRadius)
@@ -61,12 +63,14 @@ public final class GameNumbers {
                 + WORLD_OUTER_OCEAN_RING_COUNT;
     }
 
-    public static final double MAP_ZOOM_MIN = 1.0;
+    public static final double MAP_ZOOM_MIN = 0.85;
     public static final double MAP_ZOOM_MAX = 4.0;
-    public static final double MAP_ZOOM_STEP = 1.15;
-    public static final int MAP_ZOOM_SLIDER_MAX = 100;
+    public static final double MAP_ZOOM_STEP = 1.25;
+    public static final int MAP_ZOOM_SLIDER_MAX = 7;
     public static final int MAP_ZOOM_SLIDER_TRACK_HEIGHT = 100;
-    public static final double MAP_HEX_FIT_MIN = 10.0;
+    public static final double[] MAP_ZOOM_STEPS = {0.85, 1.00, 1.25, 1.60, 2.00, 2.50, 3.20, 4.00};
+    public static final int MAP_ZOOM_DEFAULT_STEP_INDEX = 1;
+    public static final double MAP_HEX_FIT_MIN = 2.0;
     public static final double MAP_HEX_FIT_MAX = 55.0;
 
     // --- Hex resources / spawn ---
@@ -105,6 +109,7 @@ public final class GameNumbers {
     public static final int RAFTING_WATER_CROSS_RANGE_1 = 1;
     public static final int RAFTING_WATER_CROSS_RANGE_2 = 2;
     public static final int RAFTING_WATER_CROSS_RANGE_3 = 3;
+    public static final float RIVER_BATTLE_NO_RAFTING_ACCURACY_MULT = 0.80f;
 
     // --- Woodburrow / Silkweave / Hivebuild / Web ---
     public static final double WOODBURROW_TIME_MULT = 0.8;

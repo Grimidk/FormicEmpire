@@ -8,7 +8,7 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;

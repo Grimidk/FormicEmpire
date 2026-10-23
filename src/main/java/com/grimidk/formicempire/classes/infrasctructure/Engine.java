@@ -82,6 +82,12 @@ public class Engine extends Thread {
     private int defaultRolePrincess = GameConstants.ROLE_BREEDER.getId();
     private int defaultRoleQueen = GameConstants.ROLE_LAYER.getId();
     private boolean mapLayerBorders = true;
+    private boolean mapLayerRivers = true;
+    private boolean mapLayerMeridian = true;
+    private boolean mapLayerEquator = true;
+    private double mapViewportCenterCol = 0.0;
+    private double mapViewportSpanCols = 0.0;
+    private boolean mapViewportActive = false;
     private boolean mapLayerBiomeIcons = true;
     private boolean mapLayerColonyRanks = true;
     private boolean mapLayerTrades = true;
@@ -744,6 +750,48 @@ public class Engine extends Thread {
 
     public void setMapLayerBorders(boolean mapLayerBorders) {
         this.mapLayerBorders = mapLayerBorders;
+    }
+
+    public boolean isMapLayerRivers() {
+        return mapLayerRivers;
+    }
+
+    public void setMapLayerRivers(boolean mapLayerRivers) {
+        this.mapLayerRivers = mapLayerRivers;
+    }
+
+    public boolean isMapLayerMeridian() {
+        return mapLayerMeridian;
+    }
+
+    public void setMapLayerMeridian(boolean mapLayerMeridian) {
+        this.mapLayerMeridian = mapLayerMeridian;
+    }
+
+    public boolean isMapLayerEquator() {
+        return mapLayerEquator;
+    }
+
+    public void setMapLayerEquator(boolean mapLayerEquator) {
+        this.mapLayerEquator = mapLayerEquator;
+    }
+
+    public double getMapViewportCenterCol() {
+        return mapViewportCenterCol;
+    }
+
+    public double getMapViewportSpanCols() {
+        return mapViewportSpanCols;
+    }
+
+    public boolean isMapViewportActive() {
+        return mapViewportActive;
+    }
+
+    public void setMapViewport(double centerCol, double spanCols, boolean active) {
+        this.mapViewportCenterCol = centerCol;
+        this.mapViewportSpanCols = spanCols;
+        this.mapViewportActive = active;
     }
 
     public boolean isMapLayerBiomeIcons() {

@@ -527,6 +527,9 @@ MAP_ACTIVE_WARS_HIDE,Hide active wars,Ocultar guerras activas,Ocultar guerras at
 MAP_ACTIVE_WAR_OPEN,Click to manage your wars,Clic para gestionar tus guerras,Clique para gerir as suas guerras,Cliquer pour gérer vos guerres,,,
 MAP_LAYERS,Layers,Capas,Camadas,Calques,,,
 MAP_LAYER_BORDERS,Dynasty borders,Bordes de dinastía,Bordas de dinastia,Bordures de dynastie,,,
+MAP_LAYER_RIVERS,Rivers,Ríos,Rios,Rivières,,,
+MAP_LAYER_MERIDIAN,Meridian,Meridiano,Meridiano,Méridien,,,
+MAP_LAYER_EQUATOR,Equator,Ecuador,Equador,Équateur,,,
 MAP_LAYER_BIOME_ICONS,Biome icons,Iconos de bioma,Ícones de bioma,Icônes de biome,,,
 MAP_LAYER_COLONY_RANKS,Colony ranks,Rangos de colonia,Postos de colónia,Rangs de colonie,,,
 MAP_LAYER_TRADES,Trades,Comercio,Comércio,Commerce,,,
@@ -975,6 +978,13 @@ BIOME_MOUNTAIN,Mountain,Montaña,Montanha,Montagne,,,
 BIOME_VOLCANIC,Volcanic,Volcánico,Vulcânico,Volcanique,,,
 BIOME_LAKE,Lake,Lago,Lago,Lac,,,
 BIOME_OCEAN,Ocean,Océano,Oceano,Océan,,,
+BIOME_BEACH,Beach,Playa,Praia,Plage,,,
+BIOME_CLIFFS,Cliffs,Acantilados,Falésias,Falaises,,,
+BIOME_WETLANDS,Wetlands,Humedales,Zonas Húmidas,Zones humides,,,
+BIOME_MANGROVE,Mangrove,Manglar,Manguezal,Mangrove,,,
+BIOME_PRAIRIE,Prairie,Pradera,Pradaria,Prairie,,,
+BIOME_BURNT_FOREST,Burnt Forest,Bosque Quemado,Floresta Queimada,Forêt brûlée,,,
+BIOME_ICE_FIELD,Ice Field,Campo de Hielo,Campo de Gelo,Champ de glace,,,
 TEMP_FREEZING,Freezing,Gélido,Gélido,Gel,,,
 TEMP_COLD,Cold,Frío,Frio,Froid,,,
 TEMP_CHILLY,Chilly,Fresco,Fresco,Frais,,,
@@ -2525,3 +2535,63 @@ ROLE_UNASSIGNED_LOW_TT,Low unassigned reserve — critter parties and exhaustion
 SETTINGS_MAP_EDITOR_ENABLED,Upgrade Tree Editing,Edición del Árbol de Mejoras,Edición del Árbol de Mejoras,Édition de l'Arbre d'Améliorations
 SETTINGS_MAP_EDITOR_ENABLED_TT,Enable dragging nodes in the Research Tree.,Habilita arrastrar nodos en el Árbol de Investigación.,Permite arrastar nós na Árvore de Pesquisa.,Permet de glisser les nœuds dans l'Arbre de Recherche.
 SETTINGS_MAP_EDITOR_NOTE,(Not recommended for non-dev purposes),(No recomendado para fines que no sean de desarrollo),(Não recomendado para fins não relacionados a desenvolvimento),(Non recommandé pour des usages autres que le développement)
+CONTINENT_LABEL,Continent,Continente,Continente,Continent
+CONTINENT_FMT,Continent %s,Continente %s,Continente %s,Continent %s
+ARCHIPELAGO_LABEL,Archipelago,Archipiélago,Arquipélago,Archipel
+ICE_CAP_LABEL,Ice Cap,Casquete Polar,Calota Polar,Calotte Glaciaire
+ICE_CAP_ARTICA,Artica,Ártica,Ártica,Artica
+ICE_CAP_ANTARTICA,Antartica,Antártica,Antártica,Antartica
+CONTINENT_NAME_FORMICA,Formica,Formica,Formica,Formica
+CONTINENT_NAME_TROPICA,Tropica,Trópica,Trópica,Tropica
+CONTINENT_NAME_PANGAEA,Pangaea,Pangea,Pangeia,Pangée
+CONTINENT_NAME_ATLANTIS,Atlantis,Atlántida,Atlântida,Atlantide
+CONTINENT_NAME_AVALON,Avalon,Ávalon,Avalon,Avalon
+CONTINENT_NAME_HYPERBOREA,Hyperborea,Hiperbórea,Hiperbórea,Hyperborée
+CONTINENT_NAME_LEMURIA,Lemuria,Lemuria,Lemúria,Lémurie
+CONTINENT_NAME_ARCADIA,Arcadia,Arcadia,Arcádia,Arcadie
+CONTINENT_NAME_MYRMIDONIA,Myrmidonia,Mirmidonia,Mirmidônia,Myrmidonie
+CONTINENT_NAME_ELDORIA,Eldoria,Eldoria,Eldoria,Eldoria
+CONTINENT_NAME_SOLARIA,Solaria,Solaria,Solária,Solaria
+CONTINENT_NAME_ZEPHYRIA,Zephyria,Zefiria,Zefíria,Zéphyria
+CONTINENT_NAME_BOREALIA,Borealia,Borealia,Boreália,Boréalie
+CONTINENT_NAME_TARTARIA,Tartaria,Tartaria,Tartária,Tartarie
+CONTINENT_NAME_ELYSIUM,Elysium,Elíseo,Elísio,Élysée
+CONTINENT_NAME_HESPERIA,Hesperia,Hesperia,Hespéria,Hespérie
+CONTINENT_NAME_GONDWANA,Gondwana,Gondwana,Gondwana,Gondwana
+CONTINENT_NAME_VALORIA,Valoria,Valoria,Valória,Valoria
+CONTINENT_NAME_THULE,Thule,Tule,Tule,Thulé
+CONTINENT_NAME_AETHELGARD,Aethelgard,Aethelgard,Aethelgard,Aethelgard
+CONTINENT_NAME_AMERICA,America,América,América,Amérique
+CONTINENT_NAME_ASIA,Asia,Asia,Ásia,Asie
+CONTINENT_NAME_AUSTRALIA,Australia,Australia,Austrália,Australie
+CONTINENT_NAME_AFRICA,Africa,África,África,Afrique
+ARCHIPELAGO_NAME_FIRE_ISLANDS,Fire Islands,Islas de Fuego,Ilhas de Fogo,Îles de Feu
+ARCHIPELAGO_NAME_GOLD_ARCHIPELAGO,Gold Archipelago,Archipiélago de Oro,Arquipélago de Ouro,Archipel d'Or
+ARCHIPELAGO_NAME_SILVER_ISLES,Silver Isles,Islas de Plata,Ilhas de Prata,Îles d'Argent
+ARCHIPELAGO_NAME_CORAL_ARCHIPELAGO,Coral Archipelago,Archipiélago de Coral,Arquipélago de Coral,Archipel de Corail
+ARCHIPELAGO_NAME_STORM_ISLANDS,Storm Islands,Islas de la Tormenta,Ilhas da Tempestade,Îles de la Tempête
+ARCHIPELAGO_NAME_EMERALD_ARCHIPELAGO,Emerald Archipelago,Archipiélago Esmeralda,Arquipélago Esmeralda,Archipel d'Émeraude
+ARCHIPELAGO_NAME_SUNKEN_ISLES,Sunken Isles,Islas Hundidas,Ilhas Submersas,Îles Englouties
+ARCHIPELAGO_NAME_MOON_ARCHIPELAGO,Moon Archipelago,Archipiélago de la Luna,Arquipélago da Lua,Archipel de la Lune
+ARCHIPELAGO_NAME_PEARL_ISLANDS,Pearl Islands,Islas de las Perlas,Ilhas das Pérolas,Îles aux Perles
+ARCHIPELAGO_NAME_OBSIDIAN_ARCHIPELAGO,Obsidian Archipelago,Archipiélago de Obsidiana,Arquipélago de Obsidiana,Archipel d'Obsidienne
+ARCHIPELAGO_NAME_DRAGON_ISLES,Dragon Isles,Islas Dragón,Ilhas Dragão,Îles du Dragon
+ARCHIPELAGO_NAME_MIST_ARCHIPELAGO,Mist Archipelago,Archipiélago de la Niebla,Arquipélago da Névoa,Archipel des Brumes
+ARCHIPELAGO_NAME_WHISPERING_ISLES,Whispering Isles,Islas Susurrantes,Ilhas Sussurrantes,Îles Murmurantes
+ARCHIPELAGO_NAME_AMBER_ARCHIPELAGO,Amber Archipelago,Archipiélago de Ámbar,Arquipélago de Âmbar,Archipel d'Ambre
+ARCHIPELAGO_NAME_SHADOW_ISLES,Shadow Isles,Islas de las Sombras,Ilhas das Sombras,Îles des Ombres
+ARCHIPELAGO_NAME_JADE_ISLES,Jade Isles,Islas de Jade,Ilhas de Jade,Îles de Jade
+ARCHIPELAGO_NAME_WINDWARD_ISLES,Windward Isles,Islas de Barlovento,Ilhas de Barlavento,Îles du Vent
+ARCHIPELAGO_NAME_CRYSTAL_ISLES,Crystal Isles,Islas de Cristal,Ilhas de Cristal,Îles de Cristal
+ARCHIPELAGO_NAME_SAPPHIRE_ARCHIPELAGO,Sapphire Archipelago,Archipiélago de Zafiro,Arquipélago de Safira,Archipel de Saphir
+ARCHIPELAGO_NAME_RUBY_ISLES,Ruby Isles,Islas de Rubí,Ilhas de Rubi,Îles de Rubis
+ARCHIPELAGO_NAME_SERPENT_ISLES,Serpent Isles,Islas de la Serpiente,Ilhas da Serpente,Îles du Serpent
+ARCHIPELAGO_NAME_STAR_ARCHIPELAGO,Star Archipelago,Archipiélago de las Estrellas,Arquipélago das Estrelas,Archipel des Étoiles
+ARCHIPELAGO_NAME_AZURE_ISLES,Azure Isles,Islas Azules,Ilhas Azuis,Îles d'Azur
+ARCHIPELAGO_NAME_VOLCANIC_ISLES,Volcanic Isles,Islas Volcánicas,Ilhas Vulcânicas,Îles Volcaniques
+ARCHIPELAGO_NAME_IRON_ISLANDS,Iron Islands,Islas de Hierro,Ilhas de Ferro,Îles de Fer
+ARCHIPELAGO_NAME_CLOUD_ISLES,Cloud Isles,Islas de las Nubes,Ilhas das Nuvens,Îles des Nuages
+ARCHIPELAGO_NAME_FROST_ARCHIPELAGO,Frost Archipelago,Archipiélago Helado,Arquipélago Congelado,Archipel du Givre
+ARCHIPELAGO_NAME_TWILIGHT_ISLES,Twilight Isles,Islas del Crepúsculo,Ilhas do Crepúsculo,Îles du Crépuscule
+ARCHIPELAGO_NAME_ECHO_ARCHIPELAGO,Echo Archipelago,Archipiélago del Eco,Arquipélago do Eco,Archipel de l'Écho
+ARCHIPELAGO_NAME_HIDDEN_ISLES,Hidden Isles,Islas Ocultas,Ilhas Ocultas,Îles Cachées

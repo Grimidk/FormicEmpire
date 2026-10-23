@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;

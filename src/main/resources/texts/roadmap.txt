@@ -13,6 +13,8 @@ To Fix (By decreasing priority):
 		(none right now)
 	Important not Urgent:
 		evaluate how to save and persist age
+		saves and have the option to update version
+		rethink layer menu so its prettier maybe with icons
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):
@@ -22,13 +24,15 @@ To Draw (PascalCase filenames; under src/main/resources):
 			sprites/critters/arachnid/spider/ — Spider.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/arachnid/tarantula/ — Tarantula.png, Leg1–Leg4 (Jaw1, Jaw2)
 			sprites/critters/insect/diptera/commonFly/ — CommonFly.png, Leg1–Leg4 (+ Wing1, Wing2)
-		Skill icons (icons/skills/): (future ant-lion / bombardier attack skills when designed)
+		Skill icons (icons/skills/): (future ant-lion / bombardier / spider and tarantula / fly attack skills when designed)
 	Hivebuild mound room + overworld art:
 		sprites/buildings/rooms/ (14): MushroomMound2.png, MushroomMound4.png, PlantMound2.png, PlantMound4.png, WaterMound2.png, WaterMound4.png, MeatMound2.png, MeatMound4.png, SyrupMound2.png, SyrupMound4.png, RockMound2.png, RockMound4.png, ResinMound2.png, ResinMound4.png
 		overworld mound sprites (path TBD)
 	Room sprites (sprites/buildings/rooms/ — 48x48 blank placeholders):
 		L0–L5 and L3S for Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin
 		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter,
+	Biomes (icons/biomes/ and sprites/world/tiles/):
+		sprites/world/tiles/ (2): BeachTile.png, CliffsTile.png
 
 To Compose (.mp3 in resources/audio)
 	Songs:
@@ -46,7 +50,9 @@ Needed for launch (v1.0) (Launch Version):
 			Bugs: Bombardier(B), Ant lion(I), CommonFly(H)
 			Arachnids: Spider(I), Tarantula(H)
 		uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
-		more biomes (coastal vs inland prairies)(beach, cliffs, wetlands, mangrove, prairie, burnt forest [resin source, no water, cant start], ice field [cant start], continent variation, rivers on borders, unpassable terrain, lock species to biome, protein-only ant, bigger world)(maybe a systems that generates water first then see how far is a biome from water body)
+		carnivore ant
+		implement burnt forest
+		costal biome tile
 	Everything else :
 		swarm vs swarm system
 		more enemies (single battle or swarm battles):
@@ -79,7 +85,7 @@ Needed for launch (v1.0) (Launch Version):
 		rework saves to be cleaner and efficient
 		rework manager and aux files
 		promo video and images 
-		langs (GER, RUS, CHN, JAP) and translate credits and roadmap
+		langs (GER, RUS, CHN, JAP) and translate credits and roadmap and recheck known languages
 		more proper start animation and roadmap and credits design
 		register Grim Games or Grimidk in steam as dev team
 		steam upload and demo version and make sure saves are not overwritten by updates
@@ -90,6 +96,7 @@ Needed for launch (v1.0) (Launch Version):
 		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
 
 Post launch (v1.1) (Improvements Update):
+	tectonic plates to determine mountain ranges, volcanic chains, valleys, give altitude to hexes (and restrictions) so rivers go from high to low forking on tie and making lakes where they surrond
 	better crash detection and reporting
 	spawn ant cheat and spawn bug
     engine clean up for reusability (Core Engine Package) with addiontal codegen tools for saves and repositories etc

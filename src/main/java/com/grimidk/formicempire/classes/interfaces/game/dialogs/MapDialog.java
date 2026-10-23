@@ -5,14 +5,16 @@ import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.entities.world.Continent;
 import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexGridMesh;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapGeometry;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapOverlays;
@@ -21,11 +23,13 @@ import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -34,10 +38,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,15 +66,28 @@ public class MapDialog extends ZeroDialog {
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
     private boolean showBorders = true;
+    private boolean showRivers = true;
+    private boolean showMeridian = true;
+    private boolean showEquator = true;
     private boolean showBiomeIcons = true;
     private boolean showColonyRanks = true;
     private boolean showTrades = true;
     private boolean showTunnels = true;
     private boolean showBattles = true;
     private boolean syncingZoomUi;
+    private boolean holdingLeftA;
+    private boolean holdingLeftArrow;
+    private boolean holdingRightD;
+    private boolean holdingRightArrow;
+    private boolean holdingZoomInW;
+    private boolean holdingZoomInArrow;
+    private boolean holdingZoomOutS;
+    private boolean holdingZoomOutArrow;
+    private Timer navHoldTimer;
+    private int navZoomHoldTicks;
 
     public MapDialog(JFrame owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
-        super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.MAP_DIALOG_SIZE);
+        super(owner, LanguageStrings.DIALOG_MAP_TITLE, owner != null ? owner.getSize() : AssetStyles.MAP_DIALOG_SIZE);
         this.engine = engine;
         this.world = world;
         this.onHexChange = onHexChange;
@@ -87,11 +108,13 @@ public class MapDialog extends ZeroDialog {
         zoomSlider = new JSlider(
                 JSlider.VERTICAL,
                 0,
-                GameNumbers.MAP_ZOOM_SLIDER_MAX,
-                zoomToSliderValue(GameNumbers.MAP_ZOOM_MIN));
+                GameNumbers.MAP_ZOOM_STEPS.length - 1,
+                GameNumbers.MAP_ZOOM_DEFAULT_STEP_INDEX);
         zoomSlider.setFocusable(false);
         zoomSlider.setPaintTicks(false);
         zoomSlider.setPaintLabels(false);
+        zoomSlider.setSnapToTicks(true);
+        zoomSlider.setMajorTickSpacing(1);
         AssetStyles.styleSlider(zoomSlider);
         Dimension zoomTrack = new Dimension(
                 AssetStyles.MIN_CONTROL_HIT_SIZE,
@@ -103,7 +126,7 @@ public class MapDialog extends ZeroDialog {
             if (syncingZoomUi || mapPanel == null) {
                 return;
             }
-            mapPanel.setZoomLevel(sliderValueToZoom(zoomSlider.getValue()));
+            mapPanel.setZoomStepIndex(zoomSlider.getValue());
         });
 
         zoomRail = new JPanel();
@@ -148,8 +171,198 @@ public class MapDialog extends ZeroDialog {
         add(zoomRail, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                stopNavigationHolding();
+            }
+        });
+
         registerCloseKey(KeyEvent.VK_M);
+        registerNavigationKeys();
         updateZoomControls();
+    }
+
+    private void registerNavigationKeys() {
+        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        InputMap ancestorMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = getRootPane().getActionMap();
+
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_A, "mapPanLeft", "mapPanLeftRelease", () -> {
+            holdingLeftA = true;
+            if (mapPanel != null) {
+                mapPanel.panContinuous(-1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingLeftA = false;
+            checkStopNavTimer();
+        });
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_LEFT, "mapPanLeftArrow", "mapPanLeftArrowRelease", () -> {
+            holdingLeftArrow = true;
+            if (mapPanel != null) {
+                mapPanel.panContinuous(-1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingLeftArrow = false;
+            checkStopNavTimer();
+        });
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_D, "mapPanRight", "mapPanRightRelease", () -> {
+            holdingRightD = true;
+            if (mapPanel != null) {
+                mapPanel.panContinuous(1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingRightD = false;
+            checkStopNavTimer();
+        });
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_RIGHT, "mapPanRightArrow", "mapPanRightArrowRelease", () -> {
+            holdingRightArrow = true;
+            if (mapPanel != null) {
+                mapPanel.panContinuous(1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingRightArrow = false;
+            checkStopNavTimer();
+        });
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_W, "mapZoomIn", "mapZoomInRelease", () -> {
+            holdingZoomInW = true;
+            if (mapPanel != null) {
+                mapPanel.zoomStep(1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingZoomInW = false;
+            checkStopNavTimer();
+        });
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_UP, "mapZoomInArrow", "mapZoomInArrowRelease", () -> {
+            holdingZoomInArrow = true;
+            if (mapPanel != null) {
+                mapPanel.zoomStep(1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingZoomInArrow = false;
+            checkStopNavTimer();
+        });
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_S, "mapZoomOut", "mapZoomOutRelease", () -> {
+            holdingZoomOutS = true;
+            if (mapPanel != null) {
+                mapPanel.zoomStep(-1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingZoomOutS = false;
+            checkStopNavTimer();
+        });
+        bindNavKey(inputMap, ancestorMap, actionMap, KeyEvent.VK_DOWN, "mapZoomOutArrow", "mapZoomOutArrowRelease", () -> {
+            holdingZoomOutArrow = true;
+            if (mapPanel != null) {
+                mapPanel.zoomStep(-1);
+            }
+            ensureNavTimer();
+        }, () -> {
+            holdingZoomOutArrow = false;
+            checkStopNavTimer();
+        });
+    }
+
+    private void bindNavKey(
+            InputMap inputMap,
+            InputMap ancestorMap,
+            ActionMap actionMap,
+            int keyCode,
+            String pressActionId,
+            String releaseActionId,
+            Runnable onPress,
+            Runnable onRelease) {
+        EdgeTriggeredKeyBindings.bind(inputMap, ancestorMap, actionMap, keyCode, pressActionId, onPress);
+        KeyStroke release = KeyStroke.getKeyStroke(keyCode, 0, true);
+        if (inputMap != null) {
+            inputMap.put(release, releaseActionId);
+        }
+        if (ancestorMap != null) {
+            ancestorMap.put(release, releaseActionId);
+        }
+        actionMap.put(releaseActionId, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onRelease.run();
+            }
+        });
+    }
+
+    private void ensureNavTimer() {
+        if (navHoldTimer == null) {
+            navHoldTimer = new Timer(25, e -> onNavTick());
+            navHoldTimer.setRepeats(true);
+        }
+        if (!navHoldTimer.isRunning()) {
+            navHoldTimer.start();
+        }
+    }
+
+    private void stopNavigationHolding() {
+        holdingLeftA = false;
+        holdingLeftArrow = false;
+        holdingRightD = false;
+        holdingRightArrow = false;
+        holdingZoomInW = false;
+        holdingZoomInArrow = false;
+        holdingZoomOutS = false;
+        holdingZoomOutArrow = false;
+        navZoomHoldTicks = 0;
+        if (navHoldTimer != null && navHoldTimer.isRunning()) {
+            navHoldTimer.stop();
+        }
+    }
+
+    private void checkStopNavTimer() {
+        if (!holdingLeftA && !holdingLeftArrow
+                && !holdingRightD && !holdingRightArrow
+                && !holdingZoomInW && !holdingZoomInArrow
+                && !holdingZoomOutS && !holdingZoomOutArrow) {
+            navZoomHoldTicks = 0;
+            if (navHoldTimer != null && navHoldTimer.isRunning()) {
+                navHoldTimer.stop();
+            }
+        }
+    }
+
+    private void onNavTick() {
+        if (mapPanel == null) {
+            return;
+        }
+        int panDir = 0;
+        if (holdingLeftA || holdingLeftArrow) {
+            panDir -= 1;
+        }
+        if (holdingRightD || holdingRightArrow) {
+            panDir += 1;
+        }
+        if (panDir != 0) {
+            mapPanel.panContinuous(panDir);
+        }
+
+        int zoomStepDir = 0;
+        if (holdingZoomInW || holdingZoomInArrow) {
+            zoomStepDir += 1;
+        }
+        if (holdingZoomOutS || holdingZoomOutArrow) {
+            zoomStepDir -= 1;
+        }
+        if (zoomStepDir != 0) {
+            navZoomHoldTicks++;
+            if (navZoomHoldTicks >= 8) {
+                navZoomHoldTicks = 0;
+                mapPanel.zoomStep(zoomStepDir);
+            }
+        } else {
+            navZoomHoldTicks = 0;
+        }
     }
 
     private JButton createZoomStepButton(String label, String tooltipKey, double notches) {
@@ -163,7 +376,7 @@ public class MapDialog extends ZeroDialog {
         button.setMargin(new Insets(0, 0, 0, 0));
         applyZoomStepButtonColors(button);
         button.setToolTipText(LanguageStrings.get(tooltipKey));
-        button.addActionListener(e -> mapPanel.zoomBy(notches));
+        button.addActionListener(e -> mapPanel.zoomStep(notches > 0 ? 1 : -1));
         return button;
     }
 
@@ -218,6 +431,9 @@ public class MapDialog extends ZeroDialog {
             return;
         }
         showBorders = eng.isMapLayerBorders();
+        showRivers = eng.isMapLayerRivers();
+        showMeridian = eng.isMapLayerMeridian();
+        showEquator = eng.isMapLayerEquator();
         showBiomeIcons = eng.isMapLayerBiomeIcons();
         showColonyRanks = eng.isMapLayerColonyRanks();
         showTrades = eng.isMapLayerTrades();
@@ -231,6 +447,9 @@ public class MapDialog extends ZeroDialog {
             return;
         }
         eng.setMapLayerBorders(showBorders);
+        eng.setMapLayerRivers(showRivers);
+        eng.setMapLayerMeridian(showMeridian);
+        eng.setMapLayerEquator(showEquator);
         eng.setMapLayerBiomeIcons(showBiomeIcons);
         eng.setMapLayerColonyRanks(showColonyRanks);
         eng.setMapLayerTrades(showTrades);
@@ -251,6 +470,21 @@ public class MapDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_BORDERS),
                 showBorders,
                 selected -> setLayerVisible(Layer.BORDERS, selected)));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_RIVERS),
+                showRivers,
+                selected -> setLayerVisible(Layer.RIVERS, selected)));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_MERIDIAN),
+                showMeridian,
+                selected -> setLayerVisible(Layer.MERIDIAN, selected)));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLayerCheckBox(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_EQUATOR),
+                showEquator,
+                selected -> setLayerVisible(Layer.EQUATOR, selected)));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLayerCheckBox(
                 LanguageStrings.get(LanguageStrings.MAP_LAYER_BIOME_ICONS),
@@ -285,17 +519,25 @@ public class MapDialog extends ZeroDialog {
     }
 
     private enum Layer {
-        BORDERS, BIOME_ICONS, COLONY_RANKS, TRADES, TUNNELS, BATTLES
+        BORDERS, RIVERS, MERIDIAN, EQUATOR, BIOME_ICONS, COLONY_RANKS, TRADES, TUNNELS, BATTLES
     }
 
     private void setLayerVisible(Layer layer, boolean visible) {
         switch (layer) {
             case BORDERS -> showBorders = visible;
+            case RIVERS -> showRivers = visible;
+            case MERIDIAN -> showMeridian = visible;
+            case EQUATOR -> showEquator = visible;
             case BIOME_ICONS -> showBiomeIcons = visible;
             case COLONY_RANKS -> showColonyRanks = visible;
             case TRADES -> showTrades = visible;
             case TUNNELS -> showTunnels = visible;
             case BATTLES -> showBattles = visible;
+        }
+        if (layer != Layer.TRADES && layer != Layer.TUNNELS && layer != Layer.BATTLES) {
+            if (mapPanel != null) {
+                mapPanel.invalidateBakedImage();
+            }
         }
         persistLayerSettings();
         mapPanel.repaint();
@@ -353,9 +595,9 @@ public class MapDialog extends ZeroDialog {
         if (zoomInButton == null || zoomOutButton == null || zoomSlider == null || mapPanel == null) {
             return;
         }
-        zoomOutButton.setEnabled(true);
-        zoomInButton.setEnabled(true);
-        int sliderValue = zoomToSliderValue(mapPanel.getZoom());
+        zoomOutButton.setEnabled(mapPanel.canZoomOut());
+        zoomInButton.setEnabled(mapPanel.canZoomIn());
+        int sliderValue = mapPanel.getZoomStepIndex();
         if (zoomSlider.getValue() != sliderValue) {
             syncingZoomUi = true;
             zoomSlider.setValue(sliderValue);
@@ -365,17 +607,21 @@ public class MapDialog extends ZeroDialog {
     }
 
     private static int zoomToSliderValue(double zoom) {
-        double min = GameNumbers.MAP_ZOOM_MIN;
-        double max = GameNumbers.MAP_ZOOM_MAX;
-        double clamped = Math.max(min, Math.min(max, zoom));
-        double t = (clamped - min) / (max - min);
-        return (int) Math.round(t * GameNumbers.MAP_ZOOM_SLIDER_MAX);
+        int bestIdx = 0;
+        double bestDiff = Double.MAX_VALUE;
+        for (int i = 0; i < GameNumbers.MAP_ZOOM_STEPS.length; i++) {
+            double diff = Math.abs(GameNumbers.MAP_ZOOM_STEPS[i] - zoom);
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                bestIdx = i;
+            }
+        }
+        return bestIdx;
     }
 
     private static double sliderValueToZoom(int sliderValue) {
-        double t = sliderValue / (double) GameNumbers.MAP_ZOOM_SLIDER_MAX;
-        return GameNumbers.MAP_ZOOM_MIN
-                + (GameNumbers.MAP_ZOOM_MAX - GameNumbers.MAP_ZOOM_MIN) * t;
+        int idx = Math.max(0, Math.min(GameNumbers.MAP_ZOOM_STEPS.length - 1, sliderValue));
+        return GameNumbers.MAP_ZOOM_STEPS[idx];
     }
 
     private void conquerActiveHex() {
@@ -396,6 +642,7 @@ public class MapDialog extends ZeroDialog {
                 onHexChange.run();
             }
             if (mapPanel != null) {
+                mapPanel.invalidateBakedImage();
                 mapPanel.repaint();
             }
             if (legendPanel != null) {
@@ -416,6 +663,7 @@ public class MapDialog extends ZeroDialog {
             onHexChange.run();
         }
         if (mapPanel != null) {
+            mapPanel.invalidateBakedImage();
             mapPanel.repaint();
         }
         if (closeDialog) {
@@ -425,8 +673,43 @@ public class MapDialog extends ZeroDialog {
         }
     }
 
+    @Override
+    public void dispose() {
+        stopNavigationHolding();
+        Engine eng = resolveEngine();
+        if (eng != null) {
+            eng.setMapViewport(0, 0, false);
+        }
+        super.dispose();
+    }
+
     private Dynasty findPlayerDynasty() {
         return SandboxCheatService.findPlayerDynasty(currentWorld());
+    }
+
+    @Override
+    public void showDialog() {
+        if (getOwner() != null && getOwner().isVisible()) {
+            setBounds(getOwner().getBounds());
+            setPreferredSize(getOwner().getSize());
+        }
+        refreshDialog();
+        normalizeSouthPanelButtons();
+        disableFocusTraversal(this);
+        if (getOwner() != null && getOwner().isVisible()) {
+            setBounds(getOwner().getBounds());
+        } else {
+            Dimension size = getPreferredSize();
+            if (size == null || size.width < AssetStyles.DEFAULT_DIALOG_SIZE.width) {
+                size = AssetStyles.DEFAULT_DIALOG_SIZE;
+            }
+            setSize(size);
+            setLocationRelativeTo(null);
+        }
+        if (getOwner() instanceof MainFrame mainFrame) {
+            mainFrame.applyGameCursors(this);
+        }
+        setVisible(true);
     }
 
     @Override
@@ -1021,17 +1304,48 @@ public class MapDialog extends ZeroDialog {
     private class HexMapPanel extends JPanel {
         private static final int CLICK_SLOP_PX = 6;
 
+        private static final class BakedStepCacheEntry {
+            final BufferedImage image;
+            final double hexSize;
+            final int minX;
+            final int minY;
+
+            BakedStepCacheEntry(BufferedImage image, double hexSize, int minX, int minY) {
+                this.image = image;
+                this.hexSize = hexSize;
+                this.minX = minX;
+                this.minY = minY;
+            }
+        }
+
         private double hexSize = 26;
-        private double zoom = GameNumbers.MAP_ZOOM_MIN;
+        private int zoomStepIndex = GameNumbers.MAP_ZOOM_DEFAULT_STEP_INDEX;
+        private double zoom = GameNumbers.MAP_ZOOM_STEPS[GameNumbers.MAP_ZOOM_DEFAULT_STEP_INDEX];
         private double panX;
         private double panY;
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
+        private final Map<Integer, Color> biomeFadedColorCache = new HashMap<>();
         private final Map<Long, Hex> hexLookup = new HashMap<>();
+        private final Map<Integer, Image> scaledBiomeIconCache = new HashMap<>();
+        private final Map<Integer, Image> scaledRankIconCache = new HashMap<>();
+        private int cachedIconSize = -1;
+        private final Map<Integer, BakedStepCacheEntry> bakedStepCache = new LinkedHashMap<Integer, BakedStepCacheEntry>(16, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<Integer, BakedStepCacheEntry> eldest) {
+                return size() > 5;
+            }
+        };
+        private World cachedBakedWorld;
+        private Hex cachedBakedActiveHex;
+        private boolean cachedBakedBorders;
+        private boolean cachedBakedRivers;
+        private boolean cachedBakedBiomeIcons;
+        private boolean cachedBakedColonyRanks;
+        private boolean cachedBakedMeridian;
+        private boolean cachedBakedEquator;
         private HexGridMesh cachedMesh;
         private World cachedMeshWorld;
         private double cachedMeshHexSize = Double.NaN;
-        private int cachedCenterX;
-        private int cachedCenterY;
         private int cachedHexCount;
         private Point pressPoint;
         private Point lastDragPoint;
@@ -1111,7 +1425,12 @@ public class MapDialog extends ZeroDialog {
                 }
             });
             addMouseWheelListener(e -> {
-                applyZoom(-e.getPreciseWheelRotation(), e.getPoint());
+                double rot = e.getPreciseWheelRotation();
+                if (rot < 0) {
+                    zoomStep(1, e.getPoint());
+                } else if (rot > 0) {
+                    zoomStep(-1, e.getPoint());
+                }
                 e.consume();
             });
             addComponentListener(new ComponentAdapter() {
@@ -1120,6 +1439,7 @@ public class MapDialog extends ZeroDialog {
                     refreshHexSize();
                     clampCamera();
                     updateZoomControls();
+                    invalidateBakedImage();
                     repaint();
                 }
             });
@@ -1129,20 +1449,113 @@ public class MapDialog extends ZeroDialog {
             return zoom;
         }
 
+        int getZoomStepIndex() {
+            return zoomStepIndex;
+        }
+
         boolean canZoomIn() {
-            return zoom < GameNumbers.MAP_ZOOM_MAX - 1e-6;
+            return zoomStepIndex < GameNumbers.MAP_ZOOM_STEPS.length - 1;
         }
 
         boolean canZoomOut() {
-            return zoom > GameNumbers.MAP_ZOOM_MIN + 1e-6;
+            return zoomStepIndex > 0;
+        }
+
+        void zoomStep(int delta) {
+            zoomStep(delta, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
+        }
+
+        void zoomStep(int delta, Point focus) {
+            if (focus == null || world == null || delta == 0) {
+                return;
+            }
+            int nextIndex = Math.max(0, Math.min(GameNumbers.MAP_ZOOM_STEPS.length - 1, zoomStepIndex + delta));
+            setZoomStepIndex(nextIndex, focus);
         }
 
         void zoomBy(double notches) {
-            applyZoom(notches, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
+            if (notches > 0) {
+                zoomStep(1);
+            } else if (notches < 0) {
+                zoomStep(-1);
+            }
+        }
+
+        void zoomContinuous(double direction) {
+            if (direction > 0) {
+                zoomStep(1);
+            } else if (direction < 0) {
+                zoomStep(-1);
+            }
         }
 
         void setZoomLevel(double targetZoom) {
-            applyZoomAbsolute(targetZoom, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
+            int bestIdx = 0;
+            double bestDiff = Double.MAX_VALUE;
+            for (int i = 0; i < GameNumbers.MAP_ZOOM_STEPS.length; i++) {
+                double diff = Math.abs(GameNumbers.MAP_ZOOM_STEPS[i] - targetZoom);
+                if (diff < bestDiff) {
+                    bestDiff = diff;
+                    bestIdx = i;
+                }
+            }
+            setZoomStepIndex(bestIdx, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
+        }
+
+        void setZoomStepIndex(int targetIndex) {
+            setZoomStepIndex(targetIndex, new Point(Math.max(0, getWidth() / 2), Math.max(0, getHeight() / 2)));
+        }
+
+        void setZoomStepIndex(int targetIndex, Point focus) {
+            if (focus == null || world == null) {
+                return;
+            }
+            double fit = fittedHexSize();
+            if (!(fit > 0)) {
+                return;
+            }
+            targetIndex = Math.max(0, Math.min(GameNumbers.MAP_ZOOM_STEPS.length - 1, targetIndex));
+            if (targetIndex == zoomStepIndex && Math.abs(zoom - GameNumbers.MAP_ZOOM_STEPS[targetIndex]) < 1e-9) {
+                updateZoomControls();
+                return;
+            }
+            double oldZoom = zoom;
+            zoomStepIndex = targetIndex;
+            zoom = GameNumbers.MAP_ZOOM_STEPS[zoomStepIndex];
+            double oldSize = fit * oldZoom;
+            double newSize = fit * zoom;
+            double centerX = getWidth() / 2.0;
+            double centerY = getHeight() / 2.0;
+            panX = HexMapGeometry.panAfterZoom(panX, focus.x - centerX, oldSize, newSize);
+            panY = HexMapGeometry.panAfterZoom(panY, focus.y - centerY, oldSize, newSize);
+            hexSize = newSize;
+            clampCamera();
+            updateZoomControls();
+            repaint();
+        }
+
+        void panBy(int horizontalDirection) {
+            refreshHexSize();
+            double step = Math.max(50.0, hexSize * 2.0);
+            if (horizontalDirection < 0) {
+                panX += step;
+            } else {
+                panX -= step;
+            }
+            clampCamera();
+            repaint();
+        }
+
+        void panContinuous(int horizontalDirection) {
+            refreshHexSize();
+            double step = Math.max(10.0, hexSize * 0.4);
+            if (horizontalDirection < 0) {
+                panX += step;
+            } else {
+                panX -= step;
+            }
+            clampCamera();
+            repaint();
         }
 
         void centerOn(Hex hex) {
@@ -1157,52 +1570,9 @@ public class MapDialog extends ZeroDialog {
             repaint();
         }
 
-        private void applyZoom(double notches, Point focus) {
-            if (focus == null || world == null || Math.abs(notches) < 1e-9) {
-                return;
-            }
-            double oldZoom = zoom;
-            double factor = Math.pow(GameNumbers.MAP_ZOOM_STEP, notches);
-            double next = HexMapGeometry.nextZoom(
-                    oldZoom,
-                    factor,
-                    GameNumbers.MAP_ZOOM_MIN,
-                    GameNumbers.MAP_ZOOM_MAX);
-            applyZoomAbsolute(next, focus);
-        }
-
-        private void applyZoomAbsolute(double targetZoom, Point focus) {
-            if (focus == null || world == null) {
-                return;
-            }
-            double fit = fittedHexSize();
-            if (!(fit > 0)) {
-                return;
-            }
-            double oldZoom = zoom;
-            zoom = HexMapGeometry.nextZoom(
-                    targetZoom,
-                    1.0,
-                    GameNumbers.MAP_ZOOM_MIN,
-                    GameNumbers.MAP_ZOOM_MAX);
-            if (Math.abs(zoom - oldZoom) < 1e-9) {
-                updateZoomControls();
-                return;
-            }
-            double oldSize = fit * oldZoom;
-            double newSize = fit * zoom;
-            double centerX = getWidth() / 2.0;
-            double centerY = getHeight() / 2.0;
-            panX = HexMapGeometry.panAfterZoom(panX, focus.x - centerX, oldSize, newSize);
-            panY = HexMapGeometry.panAfterZoom(panY, focus.y - centerY, oldSize, newSize);
-            hexSize = newSize;
-            clampCamera();
-            updateZoomControls();
-            repaint();
-        }
-
         void onThemeChanged() {
             biomeColorCache.clear();
+            biomeFadedColorCache.clear();
             invalidateMeshCache();
             setBackground(AssetStyles.BACKGROUND_COLOR);
             repaint();
@@ -1217,14 +1587,38 @@ public class MapDialog extends ZeroDialog {
             cachedMeshWorld = null;
             cachedMeshHexSize = Double.NaN;
             cachedHexCount = -1;
+            biomeFadedColorCache.clear();
+            invalidateBakedImage();
         }
 
-        private HexGridMesh ensureMeshCache(Point centerOffset, List<Hex> hexes) {
-            int cx = centerOffset.x;
-            int cy = centerOffset.y;
+        void invalidateBakedImage() {
+            bakedStepCache.clear();
+            cachedBakedWorld = null;
+            cachedBakedActiveHex = null;
+            scaledBiomeIconCache.clear();
+            scaledRankIconCache.clear();
+            cachedIconSize = -1;
+        }
+
+        private boolean isBakedImageValid(Hex activeHex) {
+            BakedStepCacheEntry entry = bakedStepCache.get(zoomStepIndex);
+            return entry != null
+                    && entry.image != null
+                    && cachedBakedWorld == world
+                    && Math.abs(entry.hexSize - hexSize) < 1e-6
+                    && cachedBakedActiveHex == activeHex
+                    && cachedBakedBorders == showBorders
+                    && cachedBakedRivers == showRivers
+                    && cachedBakedBiomeIcons == showBiomeIcons
+                    && cachedBakedColonyRanks == showColonyRanks
+                    && cachedBakedMeridian == showMeridian
+                    && cachedBakedEquator == showEquator;
+        }
+
+        private HexGridMesh ensureMeshCache(List<Hex> hexes) {
             int hexCount = hexes != null ? hexes.size() : 0;
             if (cachedMesh != null && cachedMeshWorld == world && cachedMeshHexSize == hexSize
-                    && cachedCenterX == cx && cachedCenterY == cy && cachedHexCount == hexCount) {
+                    && cachedHexCount == hexCount) {
                 return cachedMesh;
             }
             hexLookup.clear();
@@ -1237,21 +1631,52 @@ public class MapDialog extends ZeroDialog {
             }
             cachedMesh = HexGridMesh.build(
                     hexes,
-                    cx,
-                    cy,
+                    0,
+                    0,
                     hexSize,
                     (q, r) -> hexLookup.get(hexKey(q, r)));
             cachedMeshWorld = world;
             cachedMeshHexSize = hexSize;
-            cachedCenterX = cx;
-            cachedCenterY = cy;
             cachedHexCount = hexCount;
             return cachedMesh;
+        }
+
+        private double getWorldWidthPx() {
+            if (world == null) return 0;
+            if (world.getWorldWidth() > 0) {
+                return HexMapGeometry.rectangularWorldWidth(world.getWorldWidth(), hexSize);
+            }
+            return HexMapGeometry.worldWidth(world.getWorldRadius(), hexSize);
+        }
+
+        private double getWorldHeightPx() {
+            if (world == null) return 0;
+            if (world.getWorldHeight() > 0) {
+                return HexMapGeometry.rectangularWorldHeight(world.getWorldHeight(), hexSize);
+            }
+            return HexMapGeometry.worldHeight(world.getWorldRadius(), hexSize);
         }
 
         private double fittedHexSize() {
             if (world == null) {
                 return GameNumbers.MAP_HEX_FIT_MIN;
+            }
+            if (world.getWorldWidth() > 0 && world.getWorldHeight() > 0) {
+                int panelH = getHeight();
+                if (panelH > 0) {
+                    int minR = -world.getWorldHeight() / 2;
+                    int maxR = world.getWorldHeight() / 2 - 1;
+                    double spanH = (maxR - minR) * 1.5 + 2.0;
+                    double sizeH = (panelH - 36.0) / spanH;
+                    return HexMapGeometry.clamp(sizeH, GameNumbers.MAP_HEX_FIT_MIN, GameNumbers.MAP_HEX_FIT_MAX);
+                }
+                return HexMapGeometry.fittedRectangularHexSize(
+                        world.getWorldWidth(),
+                        world.getWorldHeight(),
+                        getWidth(),
+                        getHeight(),
+                        GameNumbers.MAP_HEX_FIT_MIN,
+                        GameNumbers.MAP_HEX_FIT_MAX);
             }
             return HexMapGeometry.fittedHexSize(
                     world.getWorldRadius(),
@@ -1280,13 +1705,57 @@ public class MapDialog extends ZeroDialog {
                 return;
             }
             refreshHexSize();
-            panX = HexMapGeometry.clampPan(panX, HexMapGeometry.worldWidth(world.getWorldRadius(), hexSize), getWidth());
-            panY = HexMapGeometry.clampPan(panY, HexMapGeometry.worldHeight(world.getWorldRadius(), hexSize), getHeight());
+            double worldW = getWorldWidthPx();
+            if (worldW > 0) {
+                int panelW = getWidth();
+                if (panelW > 0 && worldW <= panelW) {
+                    panX = 0;
+                } else {
+                    while (panX > worldW / 2.0) {
+                        panX -= worldW;
+                    }
+                    while (panX < -worldW / 2.0) {
+                        panX += worldW;
+                    }
+                }
+            }
+            panY = HexMapGeometry.clampPan(panY, getWorldHeightPx(), getHeight());
+            updateViewportInEngine();
+        }
+
+        private void updateViewportInEngine() {
+            Engine eng = resolveEngine();
+            if (eng != null && world != null && world.getWorldWidth() > 0) {
+                double worldW_px = getWorldWidthPx();
+                if (worldW_px > 0) {
+                    double spanCols = (getWidth() / worldW_px) * world.getWorldWidth();
+                    double centerCol = ((-panX / worldW_px) * world.getWorldWidth());
+                    eng.setMapViewport(centerCol, spanCols, isShowing());
+                }
+            }
         }
 
         private void calculateHexSize() {
             refreshHexSize();
             clampCamera();
+        }
+
+        private Hex findHexAtLocal(double relX, double relY) {
+            Point axial = HexMapGeometry.flatTopAxialRound(relX, relY, hexSize);
+            HexGridMesh mesh = cachedMesh;
+            if (mesh != null) {
+                HexGridMesh.Face face = mesh.faceAt(axial.x, axial.y);
+                if (face != null && face.toPolygon().contains(relX, relY)) {
+                    return face.hex;
+                }
+                for (int[] offset : HexMapGeometry.FLAT_TOP_NEIGHBOR_OFFSETS) {
+                    HexGridMesh.Face nFace = mesh.faceAt(axial.x + offset[0], axial.y + offset[1]);
+                    if (nFace != null && nFace.toPolygon().contains(relX, relY)) {
+                        return nFace.hex;
+                    }
+                }
+            }
+            return null;
         }
 
         @Override
@@ -1296,82 +1765,105 @@ public class MapDialog extends ZeroDialog {
 
             calculateHexSize();
             Point p = e.getPoint();
+            if (p == null) return null;
             Point centerOffset = getCenterOffset();
 
-            for (Hex hex : world.getHexes()) {
-                Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
-                if (poly.contains(p)) {
-                    StringBuilder sb = new StringBuilder("<html>");
-
-                    Colony c = hex.getColony();
-                    boolean hasColonyName = c != null && c.getName() != null;
-                    if (hasColonyName) {
-                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_COLONY_NAME))
-                                .append(c.getName());
+            double worldW = (world.getWorldWidth() > 0) ? getWorldWidthPx() : 0;
+            double relX = p.x - centerOffset.x;
+            if (worldW > 0) {
+                int panelW = getWidth();
+                if (panelW > 0 && worldW <= panelW) {
+                    if (relX > worldW / 2.0 || relX < -worldW / 2.0) {
+                        return null;
                     }
-
-                    if (hex.getBiome() != null) {
-                        if (hasColonyName) {
-                            sb.append("<br>");
-                        }
-                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
-                                .append(hex.getBiome().getName());
-                    } else if (hasColonyName) {
-                        sb.append("<br>").append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
-                                .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
-                    } else {
-                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
-                                .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
-                    }
-
-                    if (c != null) {
-                        if (c.getRank() != null) {
-                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_RANK)).append(c.getRank().getName());
-                        }
-
-                        if (c.getSpecies() != null) {
-                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(c.getSpecies().getName());
-                        } else {
-                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
-                        }
-
-                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_MILITARY_POWER))
-                                .append(AssetStyles.formatNumber(c.getMilitaryPower()));
-
-                        Dynasty dynasty = c.getDynasty();
-                        if (dynasty != null) {
-                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY)).append(dynasty.getName());
-                            if (dynasty.isDefeated()) {
-                                sb.append(" (").append(GameConstants.CLASS_DEAD.getName()).append(")");
-                            }
-                            if (dynasty.getRank() != null) {
-                                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
-                            }
-                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_MILITARY_POWER))
-                                    .append(AssetStyles.formatNumber(dynasty.getMilitaryPower()));
-                            Dynasty playerDynasty = findPlayerDynasty();
-                            if (!dynasty.isDefeated() && playerDynasty != null && !dynasty.isPlayer()
-                                    && playerDynasty.getDiplomacyService() != null) {
-                                int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);
-                                DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
-                                sb.append("<br><b>")
-                                        .append(LanguageStrings.get(LanguageStrings.DYNASTY_REPUTATION))
-                                        .append(":</b> ")
-                                        .append(stance.getName())
-                                        .append(" (")
-                                        .append(rep)
-                                        .append(")");
-                            }
-                        }
-                    } else {
-                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_EMPTY));
-                    }
-
-                    sb.append("</html>");
-                    return sb.toString();
+                } else {
+                    while (relX > worldW / 2.0) relX -= worldW;
+                    while (relX < -worldW / 2.0) relX += worldW;
                 }
             }
-            return null;
+            double relY = p.y - centerOffset.y;
+
+            Hex hex = findHexAtLocal(relX, relY);
+            if (hex == null) return null;
+
+            StringBuilder sb = new StringBuilder("<html>");
+
+            Colony c = hex.getColony();
+            boolean hasColonyName = c != null && c.getName() != null;
+            if (hasColonyName) {
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_COLONY_NAME))
+                        .append(c.getName());
+            }
+
+            if (hex.getBiome() != null) {
+                if (hasColonyName) {
+                    sb.append("<br>");
+                }
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
+                        .append(hex.getBiome().getName());
+            } else if (hasColonyName) {
+                sb.append("<br>").append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
+                        .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+            } else {
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
+                        .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+            }
+
+            Continent cont = world.getContinentForHex(hex);
+            if (cont != null && cont.getName() != null) {
+                String labelKey = cont.isIceCap() ? LanguageStrings.ICE_CAP_LABEL
+                        : (cont.isArchipelago() ? LanguageStrings.ARCHIPELAGO_LABEL : LanguageStrings.CONTINENT_LABEL);
+                sb.append("<br>")
+                        .append(LanguageStrings.get(labelKey))
+                        .append(": ")
+                        .append(cont.getName());
+            }
+
+            if (c != null) {
+                if (c.getRank() != null) {
+                    sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_RANK)).append(c.getRank().getName());
+                }
+
+                if (c.getSpecies() != null) {
+                    sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(c.getSpecies().getName());
+                } else {
+                    sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+                }
+
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_MILITARY_POWER))
+                        .append(AssetStyles.formatNumber(c.getMilitaryPower()));
+
+                Dynasty dynasty = c.getDynasty();
+                if (dynasty != null) {
+                    sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY)).append(dynasty.getName());
+                    if (dynasty.isDefeated()) {
+                        sb.append(" (").append(GameConstants.CLASS_DEAD.getName()).append(")");
+                    }
+                    if (dynasty.getRank() != null) {
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
+                    }
+                    sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_MILITARY_POWER))
+                            .append(AssetStyles.formatNumber(dynasty.getMilitaryPower()));
+                    Dynasty playerDynasty = findPlayerDynasty();
+                    if (!dynasty.isDefeated() && playerDynasty != null && !dynasty.isPlayer()
+                            && playerDynasty.getDiplomacyService() != null) {
+                        int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);
+                        DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
+                        sb.append("<br><b>")
+                                .append(LanguageStrings.get(LanguageStrings.DYNASTY_REPUTATION))
+                                .append(":</b> ")
+                                .append(stance.getName())
+                                .append(" (")
+                                .append(rep)
+                                .append(")");
+                    }
+                }
+            } else {
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_EMPTY));
+            }
+
+            sb.append("</html>");
+            return sb.toString();
         }
 
         private void handleMouseClick(Point p) {
@@ -1382,23 +1874,149 @@ public class MapDialog extends ZeroDialog {
 
             calculateHexSize();
             Point centerOffset = getCenterOffset();
-            List<Hex> snapshot;
-            try {
-                snapshot = new ArrayList<>(world.getHexes());
-            } catch (ConcurrentModificationException ignored) {
+
+            double worldW = (world.getWorldWidth() > 0) ? getWorldWidthPx() : 0;
+            double relX = p.x - centerOffset.x;
+            if (worldW > 0) {
+                int panelW = getWidth();
+                if (panelW > 0 && worldW <= panelW) {
+                    if (relX > worldW / 2.0 || relX < -worldW / 2.0) {
+                        return;
+                    }
+                } else {
+                    while (relX > worldW / 2.0) relX -= worldW;
+                    while (relX < -worldW / 2.0) relX += worldW;
+                }
+            }
+            double relY = p.y - centerOffset.y;
+
+            Hex hex = findHexAtLocal(relX, relY);
+            if (hex != null) {
+                changeHex(hex, !keepMapOpenForSandbox());
+            }
+        }
+
+        private void bakeBaseImage(HexGridMesh mesh, Hex activeHex) {
+            if (mesh == null || world == null) {
                 return;
             }
+            int pad = (int) Math.ceil(hexSize * 2.0);
+            int minX = mesh.boundsMinX() - pad;
+            int maxX = mesh.boundsMaxX() + pad;
+            int minY = mesh.boundsMinY() - pad;
+            int maxY = mesh.boundsMaxY() + pad;
+            int imgW = maxX - minX + 1;
+            int imgH = maxY - minY + 1;
+            if (imgW <= 0 || imgH <= 0 || (long) imgW * imgH > 30_000_000L) {
+                return;
+            }
+            BufferedImage image;
+            try {
+                image = new BufferedImage(imgW, imgH, BufferedImage.TYPE_INT_ARGB);
+            } catch (Throwable t) {
+                return;
+            }
+            Graphics2D bg = image.createGraphics();
+            bg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            bg.translate(-minX, -minY);
 
-            for (int i = snapshot.size() - 1; i >= 0; i--) {
-                Hex hex = snapshot.get(i);
-                if (hex == null) {
-                    continue;
+            mesh.paintFills(bg, face -> resolveFillColor(face.hex));
+            mesh.paintDividers(
+                    bg,
+                    showBorders,
+                    face -> resolveFillColor(face.hex),
+                    AssetStyles.BORDER_COLOR);
+            if (showRivers) {
+                mesh.paintRivers(bg);
+            }
+            if (showBiomeIcons || showColonyRanks) {
+                for (HexGridMesh.Face face : mesh.faces()) {
+                    drawHexIcons(bg, face);
                 }
-                Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
-                if (poly.contains(p)) {
-                    changeHex(hex, !keepMapOpenForSandbox());
-                    return;
+            }
+            if (world.getWorldWidth() > 0) {
+                double worldW = getWorldWidthPx();
+                double topY = -(world.getWorldHeight() * 1.5 * hexSize) / 2.0 - 0.75 * hexSize;
+                double botY = +(world.getWorldHeight() * 1.5 * hexSize) / 2.0 - 0.75 * hexSize;
+                float[] dash = {6f, 4f};
+                BasicStroke lineStroke = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash, 0f);
+                if (showMeridian) {
+                    bg.setColor(new Color(255, 255, 255, 130));
+                    bg.setStroke(lineStroke);
+                    bg.drawLine(0, (int) Math.round(topY), 0, (int) Math.round(botY));
                 }
+                if (showEquator) {
+                    bg.setColor(new Color(255, 255, 255, 130));
+                    bg.setStroke(lineStroke);
+                    double eqY = -0.75 * hexSize;
+                    double leftX = -worldW / 2.0;
+                    double rightX = worldW / 2.0;
+                    bg.drawLine((int) Math.round(leftX), (int) Math.round(eqY), (int) Math.round(rightX), (int) Math.round(eqY));
+                }
+            }
+            bg.dispose();
+
+            bakedStepCache.put(zoomStepIndex, new BakedStepCacheEntry(image, hexSize, minX, minY));
+            cachedBakedWorld = world;
+            cachedBakedActiveHex = activeHex;
+            cachedBakedBorders = showBorders;
+            cachedBakedRivers = showRivers;
+            cachedBakedBiomeIcons = showBiomeIcons;
+            cachedBakedColonyRanks = showColonyRanks;
+            cachedBakedMeridian = showMeridian;
+            cachedBakedEquator = showEquator;
+        }
+
+        private Image getScaledBiomeIcon(Biome biome, int size) {
+            if (biome == null || biome.getIcon() == null || biome.getIcon().getImage() == null || size <= 0) {
+                return null;
+            }
+            if (size != cachedIconSize) {
+                scaledBiomeIconCache.clear();
+                scaledRankIconCache.clear();
+                cachedIconSize = size;
+            }
+            Image cached = scaledBiomeIconCache.get(biome.getId());
+            if (cached != null) {
+                return cached;
+            }
+            try {
+                BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D ig = img.createGraphics();
+                ig.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                ig.drawImage(biome.getIcon().getImage(), 0, 0, size, size, null);
+                ig.dispose();
+                scaledBiomeIconCache.put(biome.getId(), img);
+                return img;
+            } catch (Throwable t) {
+                return biome.getIcon().getImage();
+            }
+        }
+
+        private Image getScaledRankIcon(Rank rank, int size) {
+            if (rank == null || rank.getIcon() == null || rank.getIcon().getImage() == null || size <= 0) {
+                return null;
+            }
+            if (size != cachedIconSize) {
+                scaledBiomeIconCache.clear();
+                scaledRankIconCache.clear();
+                cachedIconSize = size;
+            }
+            Image cached = scaledRankIconCache.get(rank.getId());
+            if (cached != null) {
+                return cached;
+            }
+            try {
+                BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D ig = img.createGraphics();
+                ig.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                ig.drawImage(rank.getIcon().getImage(), 0, 0, size, size, null);
+                ig.dispose();
+                scaledRankIconCache.put(rank.getId(), img);
+                return img;
+            } catch (Throwable t) {
+                return rank.getIcon().getImage();
             }
         }
 
@@ -1418,78 +2036,153 @@ public class MapDialog extends ZeroDialog {
             Hex activeHex = world.getActiveHex();
             List<Hex> hexes = world.getHexes();
 
-            HexGridMesh mesh = ensureMeshCache(centerOffset, hexes);
+            HexGridMesh mesh = ensureMeshCache(hexes);
+            if (!isBakedImageValid(activeHex)) {
+                bakeBaseImage(mesh, activeHex);
+            }
 
-            mesh.paintFills(g2d, face -> resolveFillColor(face.hex));
-            mesh.paintDividers(
-                    g2d,
-                    showBorders,
-                    face -> resolveFillColor(face.hex),
-                    AssetStyles.BORDER_COLOR);
-            if (showBiomeIcons || showColonyRanks) {
-                for (HexGridMesh.Face face : mesh.faces()) {
-                    drawHexIcons(g2d, face);
+            double worldW = (world.getWorldWidth() > 0) ? getWorldWidthPx() : 0;
+            List<Double> horizontalShifts = new ArrayList<>();
+            if (worldW > 0) {
+                int panelW = getWidth();
+                if (panelW > 0 && worldW <= panelW) {
+                    horizontalShifts.add(0.0);
+                } else {
+                    double leftBound = centerOffset.x - worldW / 2.0;
+                    int minK = (int) Math.floor(-(leftBound + worldW) / worldW);
+                    int maxK = (int) Math.ceil((panelW - leftBound) / worldW);
+                    for (int k = minK; k <= maxK; k++) {
+                        double s = k * worldW;
+                        if (leftBound + s + worldW >= 0 && leftBound + s <= panelW) {
+                            horizontalShifts.add(s);
+                        }
+                    }
+                    if (horizontalShifts.isEmpty()) {
+                        horizontalShifts.add(0.0);
+                    }
                 }
+            } else {
+                horizontalShifts.add(0.0);
             }
-            if (showTunnels) {
-                HexMapOverlays.paintTunnels(g2d, world, mesh);
-            }
-            if (showTrades) {
-                HexMapOverlays.paintTrades(g2d, world, mesh);
-            }
-            if (showBattles) {
-                HexMapOverlays.paintBattles(g2d, world, mesh);
-            }
-            if (activeHex != null) {
-                HexGridMesh.Face activeFace = mesh.faceAt(activeHex.getQ(), activeHex.getR());
-                if (activeFace != null) {
-                    g2d.setColor(AssetStyles.FONT_COLOR_ERROR);
-                    g2d.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
-                    g2d.drawPolygon(activeFace.toPolygon());
+            BakedStepCacheEntry bakedEntry = bakedStepCache.get(zoomStepIndex);
+            for (double shiftX : horizontalShifts) {
+                Graphics2D sg = (Graphics2D) g2d.create();
+                sg.translate(centerOffset.x + shiftX, centerOffset.y);
+                if (bakedEntry != null && bakedEntry.image != null) {
+                    sg.drawImage(bakedEntry.image, bakedEntry.minX, bakedEntry.minY, null);
+                } else {
+                    mesh.paintFills(sg, face -> resolveFillColor(face.hex));
+                    mesh.paintDividers(
+                            sg,
+                            showBorders,
+                            face -> resolveFillColor(face.hex),
+                            AssetStyles.BORDER_COLOR);
+                    if (showRivers) {
+                        mesh.paintRivers(sg);
+                    }
+                    if (showBiomeIcons || showColonyRanks) {
+                        Rectangle localClip = sg.getClipBounds();
+                        for (HexGridMesh.Face face : mesh.faces()) {
+                            if (localClip == null || face.intersects(localClip)) {
+                                drawHexIcons(sg, face);
+                            }
+                        }
+                    }
+                    if (world.getWorldWidth() > 0) {
+                        double topY = -(world.getWorldHeight() * 1.5 * hexSize) / 2.0 - 0.75 * hexSize;
+                        double botY = +(world.getWorldHeight() * 1.5 * hexSize) / 2.0 - 0.75 * hexSize;
+                        float[] dash = {6f, 4f};
+                        BasicStroke lineStroke = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash, 0f);
+                        if (showMeridian) {
+                            sg.setColor(new Color(255, 255, 255, 130));
+                            sg.setStroke(lineStroke);
+                            sg.drawLine(0, (int) Math.round(topY), 0, (int) Math.round(botY));
+                        }
+                        if (showEquator) {
+                            sg.setColor(new Color(255, 255, 255, 130));
+                            sg.setStroke(lineStroke);
+                            double eqY = -0.75 * hexSize;
+                            double leftX = -worldW / 2.0;
+                            double rightX = worldW / 2.0;
+                            sg.drawLine((int) Math.round(leftX), (int) Math.round(eqY), (int) Math.round(rightX), (int) Math.round(eqY));
+                        }
+                    }
                 }
+                if (showTunnels) {
+                    HexMapOverlays.paintTunnels(sg, world, mesh);
+                }
+                if (showTrades) {
+                    HexMapOverlays.paintTrades(sg, world, mesh);
+                }
+                if (showBattles) {
+                    HexMapOverlays.paintBattles(sg, world, mesh);
+                }
+                if (activeHex != null) {
+                    HexGridMesh.Face activeFace = mesh.faceAt(activeHex.getQ(), activeHex.getR());
+                    if (activeFace != null) {
+                        sg.setColor(AssetStyles.FONT_COLOR_ERROR);
+                        sg.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
+                        sg.drawPolygon(activeFace.toPolygon());
+                    }
+                }
+                sg.dispose();
             }
         }
 
         private Point getCenterOffset() {
+            double vertAdjust = (world != null && world.getWorldWidth() > 0) ? (0.75 * hexSize) : 0.0;
             return new Point(
                     (int) Math.round(getWidth() / 2.0 + panX),
-                    (int) Math.round(getHeight() / 2.0 + panY));
+                    (int) Math.round(getHeight() / 2.0 + vertAdjust + panY));
         }
 
         private Color resolveFillColor(Hex hex) {
             Biome biome = hex.getBiome();
-            Color fillColor = AssetStyles.BACKGROUND_COLOR;
-            if (biome != null) {
-                fillColor = getBiomeColor(biome);
+            if (hex == world.getActiveHex()) {
+                return biome != null ? getBiomeColor(biome) : AssetStyles.BACKGROUND_COLOR;
             }
-            if (hex != world.getActiveHex()) {
+            if (biome == null) {
+                return AssetStyles.BACKGROUND_COLOR;
+            }
+            Color faded = biomeFadedColorCache.get(biome.getId());
+            if (faded == null) {
+                Color base = getBiomeColor(biome);
                 float fade = AssetStyles.mapInactiveHexFade();
-                fillColor = AssetStyles.fadeTowardBackground(fillColor, fade);
+                faded = AssetStyles.fadeTowardBackground(base, fade);
+                biomeFadedColorCache.put(biome.getId(), faded);
             }
-            return fillColor;
+            return faded;
         }
 
         private void drawHexIcons(Graphics2D g2d, HexGridMesh.Face face) {
+            Rectangle clip = g2d.getClipBounds();
+            if (clip != null && !clip.intersects(face.centerX - hexSize, face.centerY - hexSize, hexSize * 2.0, hexSize * 2.0)) {
+                return;
+            }
             Hex hex = face.hex;
             int iconSize = Math.max(1, (int) Math.round(hexSize * 0.72));
 
             if (showBiomeIcons) {
                 Biome biome = hex.getBiome();
-                if (biome != null && biome.getIcon() != null) {
-                    Image icon = biome.getIcon().getImage();
-                    int iconX = HexMapGeometry.centeredIconOrigin(face.centerX, iconSize);
-                    int iconY = HexMapGeometry.centeredIconOrigin(face.centerY, iconSize);
-                    g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+                if (biome != null) {
+                    Image icon = getScaledBiomeIcon(biome, iconSize);
+                    if (icon != null) {
+                        int iconX = HexMapGeometry.centeredIconOrigin(face.centerX, iconSize);
+                        int iconY = HexMapGeometry.centeredIconOrigin(face.centerY, iconSize);
+                        g2d.drawImage(icon, iconX, iconY, null);
+                    }
                 }
             }
 
             if (showColonyRanks && hex.getColony() != null) {
                 Rank rank = hex.getColony().getRank();
-                if (rank != null && rank.getIcon() != null) {
-                    Image rankImg = rank.getIcon().getImage();
-                    int rankX = HexMapGeometry.centeredIconOrigin(face.centerX, iconSize);
-                    int rankY = HexMapGeometry.centeredIconOrigin(face.centerY - hexSize * 0.78, iconSize);
-                    g2d.drawImage(rankImg, rankX, rankY, iconSize, iconSize, null);
+                if (rank != null) {
+                    Image rankImg = getScaledRankIcon(rank, iconSize);
+                    if (rankImg != null) {
+                        int rankX = HexMapGeometry.centeredIconOrigin(face.centerX, iconSize);
+                        int rankY = HexMapGeometry.centeredIconOrigin(face.centerY - hexSize * 0.78, iconSize);
+                        g2d.drawImage(rankImg, rankX, rankY, null);
+                    }
                 }
             }
         }

@@ -229,6 +229,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         private final JTextPane progressHintPane;
         private final JLabel progressMetricLabel;
         private final JPanel progressCopyPanel;
+        private final JLabel costLabel;
         private final JProgressBar costBar;
         private final JButton buyButton;
         private final JButton cancelButton;
@@ -285,6 +286,12 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             progressCopyPanel.add(Box.createRigidArea(new Dimension(0, 2)));
             progressCopyPanel.add(progressMetricLabel);
             progressCopyPanel.setVisible(false);
+            costLabel = new JLabel("", GameConstants.ICON_RESEARCH, SwingConstants.LEFT);
+            costLabel.setFont(AssetStyles.FONT_BOLD);
+            costLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+            costLabel.setIconTextGap(4);
+            costLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            costLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
             costBar = new JProgressBar(0, 100);
             AssetStyles.styleProgressBar(costBar);
             costBar.setStringPainted(true);
@@ -294,6 +301,8 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             meta.add(tierLabel);
             meta.add(Box.createRigidArea(new Dimension(0, 4)));
             meta.add(requirementLabel);
+            meta.add(Box.createRigidArea(new Dimension(0, 4)));
+            meta.add(costLabel);
             meta.add(Box.createRigidArea(new Dimension(0, 4)));
             meta.add(progressCopyPanel);
             meta.add(Box.createRigidArea(new Dimension(0, 4)));
@@ -349,6 +358,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         void hideCard() {
             selectedUpgrade = null;
             selectedState = null;
+            costLabel.setVisible(false);
             setVisible(false);
         }
 
@@ -447,6 +457,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         private void updateCostBar(Upgrade upgrade) {
             if (selectedState == ResearchTreeGraph.NodeState.OWNED) {
                 clearTriggerProgressCopy();
+                setVisibleIfChanged(costLabel, false);
                 costBar.setValue(0);
                 costBar.setString("");
                 setVisibleIfChanged(costBar, false);
@@ -476,6 +487,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 if (!metric.equals(progressMetricLabel.getText())) {
                     progressMetricLabel.setText(metric);
                 }
+                setVisibleIfChanged(costLabel, false);
                 setVisibleIfChanged(progressCopyPanel, true);
                 setVisibleIfChanged(costBar, true);
                 return;
@@ -484,19 +496,21 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             clearTriggerProgressCopy();
 
             if (upgrade.getCost() > 0) {
+                costLabel.setText(AssetStyles.formatNumber(upgrade.getCost()));
+                setVisibleIfChanged(costLabel, true);
                 long owned = colony != null ? colony.getResearchPoints() : 0L;
                 int cost = upgrade.getCost();
                 costBar.setMaximum(cost);
                 costBar.setValue((int) Math.min(Math.max(0L, owned), cost));
-                String barText = LanguageStrings.format(
-                        LanguageStrings.UPGRADE_COST_RP,
-                        AssetStyles.formatNumber(owned) + " / " + AssetStyles.formatNumber(cost));
+                String barText = AssetStyles.formatNumber(owned) + " / " + AssetStyles.formatNumber(cost);
                 if (!barText.equals(costBar.getString())) {
                     costBar.setString(barText);
                 }
                 setVisibleIfChanged(costBar, true);
                 return;
             }
+
+            setVisibleIfChanged(costLabel, false);
 
             if (progress != null && progress.getRequired() > 0) {
                 int current = Math.max(0, progress.getCurrent());

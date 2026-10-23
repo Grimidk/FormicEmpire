@@ -1,9 +1,11 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class Savefile implements Serializable {
     // --- Global Save Data ---
     private final int id; 
     private final String name; 
+    private String version;
     private long timestamp;
     private int playTime;
     private int minute;
@@ -27,8 +30,11 @@ public class Savefile implements Serializable {
     private int year;
     private int worldRadius;
     private int continentCoreRadius;
+    private int worldWidth = GameNumbers.WORLD_RECT_WIDTH;
+    private int worldHeight = GameNumbers.WORLD_RECT_HEIGHT;
     private String playerDynastyTitleKey;
     private int playerDynastyTitleId;
+    private int starterBiomeId = 1;
     
     // --- Root Summary Data ---
     private int colonyId;
@@ -59,6 +65,7 @@ public class Savefile implements Serializable {
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
+        this.version = ClasspathTextFiles.load(AssetStyles.META_VERSION, LanguageStrings.VERSION_UNAVAILABLE).trim();
         this.timestamp = System.currentTimeMillis();
         this.worldHexes = new ArrayList<>();
         this.colonies = new ArrayList<>();
@@ -71,8 +78,8 @@ public class Savefile implements Serializable {
         this.day = 1;
         this.month = 1;
         this.year = 0; 
-        this.worldRadius = GameNumbers.worldRadiusForContinentCore(GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
-        this.continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
+        this.worldRadius = 32;
+        this.continentCoreRadius = 0;
         this.playerDynastyTitleKey = LanguageStrings.DYNASTY_TITLE_DYNASTY;
     }
 
@@ -336,6 +343,10 @@ public class Savefile implements Serializable {
         public int timeOffset;
         public int weatherId;
         public int nonWaterResourceSourcesGenerated;
+        public boolean[] riverEdges = new boolean[6];
+        public int continentId;
+        public int waterDistance;
+        public boolean coastal;
 
         public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
             this.q = q;
@@ -463,6 +474,10 @@ public class Savefile implements Serializable {
     public void setWorldRadius(int worldRadius) { this.worldRadius = worldRadius; }
     public int getContinentCoreRadius() { return continentCoreRadius; }
     public void setContinentCoreRadius(int continentCoreRadius) { this.continentCoreRadius = continentCoreRadius; }
+    public int getWorldWidth() { return worldWidth; }
+    public void setWorldWidth(int worldWidth) { this.worldWidth = worldWidth; }
+    public int getWorldHeight() { return worldHeight; }
+    public void setWorldHeight(int worldHeight) { this.worldHeight = worldHeight; }
 
     public String getPlayerDynastyTitleKey() { return playerDynastyTitleKey; }
     public void setPlayerDynastyTitleKey(String playerDynastyTitleKey) {
@@ -551,5 +566,21 @@ public class Savefile implements Serializable {
 
     public void disableAchievements() {
         this.allowsAchievements = false;
+    }
+
+    public int getStarterBiomeId() {
+        return starterBiomeId > 0 ? starterBiomeId : 1;
+    }
+
+    public void setStarterBiomeId(int starterBiomeId) {
+        this.starterBiomeId = starterBiomeId;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

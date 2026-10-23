@@ -14,8 +14,9 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 
 public final class GameSpritePreloader {
 
@@ -95,6 +96,11 @@ public final class GameSpritePreloader {
             for (ResourceSource source : colony.getLocationService().getDiscoveredSources()) {
                 collectIcon(images, source.getIconForDisplay());
             }
+        }
+
+        for (Biome biome : GameConstants.getBiomes()) {
+            collectIcon(images, biome.getIcon());
+            collectIcon(images, biome.getTile());
         }
 
         for (Image image : images) {

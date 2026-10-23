@@ -5,7 +5,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
@@ -93,6 +93,7 @@ public class GamePanel extends ZeroGamePanel {
     private boolean overworldPanDragging;
     private Point overworldPanLastScreen;
     private Timer overworldSpringTimer;
+    private Hex lastStaticActiveHex;
     private Point overworldSpringStartPos;
     private Point overworldSpringTargetPos;
     private long overworldSpringStartMs;
@@ -1341,6 +1342,7 @@ public class GamePanel extends ZeroGamePanel {
         }
         alertManager = null;
         lastPeaceOfferPromptWarId = -1;
+        lastStaticActiveHex = null;
 
         if (gameAreaPanel != null) {
             stopOverworldSpring();
@@ -1705,6 +1707,7 @@ public class GamePanel extends ZeroGamePanel {
     private void updateStaticWorldInfo() {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
+        lastStaticActiveHex = world.getActiveHex();
         worldPanel.updateStaticData(world);
         if (miniMapPanel != null) {
             miniMapPanel.refreshMap();
@@ -1745,7 +1748,10 @@ public class GamePanel extends ZeroGamePanel {
         if (colony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
             updateGameAreaSize();
         }
-        updateStaticWorldInfo();
+        Hex activeHex = world != null ? world.getActiveHex() : null;
+        if (activeHex != lastStaticActiveHex) {
+            updateStaticWorldInfo();
+        }
 
         if (world == null) {
             return;

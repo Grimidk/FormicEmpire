@@ -1,9 +1,11 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
@@ -22,7 +24,7 @@ import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
     private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(460, 32);
-    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 220);
+    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 260);
     private static final Dimension SLOT_LABEL_SIZE = new Dimension(AssetStyles.MENU_BUTTON_WIDTH, 28);
     private static final int SLOT_ACTION_GAP = 8;
 
@@ -203,6 +205,7 @@ public class SaveSelectPanel extends JPanel {
                     displayName = LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_STAR_PREFIX) + displayName;
                 }
                 slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, displayName, totalDays));
+                slotLabels[i].setToolTipText(s.getVersion() != null && !s.getVersion().isEmpty() ? s.getVersion() : null);
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
                 deleteButtons[i].setEnabled(slotActionsEnabled);
@@ -255,6 +258,10 @@ public class SaveSelectPanel extends JPanel {
 
             Savefile save = new Savefile(slotId, request.baseName());
             save.setPlayerDynastyTitleId(request.titleId());
+            save.setStarterBiomeId(request.starterBiomeId());
+            save.setVersion(SaveManager.getAppVersion());
+            save.setWorldWidth(GameNumbers.WORLD_RECT_WIDTH);
+            save.setWorldHeight(GameNumbers.WORLD_RECT_HEIGHT);
             if (frame.getEngine().hasAchievementTaintingSandbox()) {
                 save.disableAchievements();
             }
@@ -290,6 +297,10 @@ public class SaveSelectPanel extends JPanel {
                 return;
             }
             taintSavefileIfSandboxActive(fresh);
+            if (fresh.getVersion() == null || !fresh.getVersion().equals(SaveManager.getAppVersion())) {
+                fresh.setVersion(SaveManager.getAppVersion());
+                saveManager.saveUserSlotAsync(fresh, null);
+            }
             cachedSaves[idx] = fresh;
             applySlotLabels();
             frame.openGameWithSave(fresh);
@@ -346,12 +357,39 @@ public class SaveSelectPanel extends JPanel {
         c.weightx = 1.0;
         form.add(titleCombo, c);
 
+        JLabel biomeLabel = new JLabel(LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX).trim());
+        biomeLabel.setFont(AssetStyles.FONT_NORMAL);
+        biomeLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridx = 0;
+        c.gridy = 2;
+        c.weightx = 0;
+        form.add(biomeLabel, c);
+
+        JComboBox<Biome> biomeCombo = new JComboBox<>(
+                GameConstants.getStartingBiomes().toArray(new Biome[0]));
+        biomeCombo.setSelectedItem(GameConstants.BIOME_PLAINS);
+        biomeCombo.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
+        biomeCombo.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
+        biomeCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel(value != null ? value.getName() : "");
+            if (isSelected) {
+                label.setOpaque(true);
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            }
+            return label;
+        });
+        AssetStyles.styleComboBox(biomeCombo);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        form.add(biomeCombo, c);
+
         JLabel previewLabel = new JLabel();
         previewLabel.setFont(AssetStyles.FONT_BOLD);
         previewLabel.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         previewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 3;
         c.gridwidth = 2;
         c.insets = new Insets(14, 0, 0, 0);
         form.add(previewLabel, c);
@@ -414,7 +452,9 @@ public class SaveSelectPanel extends JPanel {
             return null;
         }
 
-        return new NewSaveRequest(baseName, titleId);
+        Biome selectedBiome = (Biome) biomeCombo.getSelectedItem();
+        int starterBiomeId = selectedBiome != null ? selectedBiome.getId() : GameConstants.BIOME_PLAINS.getId();
+        return new NewSaveRequest(baseName, titleId, starterBiomeId);
     }
 
     private static void updateDynastyPreview(JLabel previewLabel, JTextField nameField, JComboBox<DynastyTitle> titleCombo) {
@@ -447,5 +487,5 @@ public class SaveSelectPanel extends JPanel {
         refreshSlots();
     }
 
-    private record NewSaveRequest(String baseName, int titleId) {}
+    private record NewSaveRequest(String baseName, int titleId, int starterBiomeId) {}
 }

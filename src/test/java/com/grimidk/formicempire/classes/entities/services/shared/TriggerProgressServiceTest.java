@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;

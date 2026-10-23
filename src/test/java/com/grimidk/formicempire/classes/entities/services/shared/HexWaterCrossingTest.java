@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -98,6 +98,19 @@ class HexWaterCrossingTest {
         assertTrue(colonizable.contains(adjacentLand));
         assertFalse(colonizable.contains(landB));
         assertFalse(colonizable.contains(nearShore));
+    }
+
+    @Test
+    void riverCrossingRequiresRafting() {
+        Hex a = landHex();
+        Hex b = landHex();
+        a.setNorth(b);
+        b.setSouth(a);
+        a.setRiverEdge(4, true);
+
+        Dynasty bare = new Dynasty(2, "Bare", true, GameConstants.SPECIES_OMNI);
+        assertFalse(HexWaterCrossing.canCrossBetween(a, b, bare));
+        assertTrue(HexWaterCrossing.canCrossBetween(a, b, dynasty));
     }
 
     private static Hex landHex() {

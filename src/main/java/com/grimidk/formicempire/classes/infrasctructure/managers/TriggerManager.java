@@ -5,8 +5,8 @@ import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -186,9 +186,9 @@ public class TriggerManager {
     }
 
     private void checkAllNPCTriggers() {
-        if (world == null || world.getHexes() == null) return;
+        if (world == null) return;
 
-        for (Hex hex : world.getHexes()) {
+        for (Hex hex : world.getColonizedHexes()) {
             Colony npc = hex.getColony();
             if (npc == null || npc.isPlayer()) continue;
 

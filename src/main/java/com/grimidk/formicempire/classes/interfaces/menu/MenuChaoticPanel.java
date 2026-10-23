@@ -647,18 +647,11 @@ public class MenuChaoticPanel extends JPanel {
     }
 
     private void loadBiomeTiles() {
-        putBiomeTile(GameConstants.BIOME_PLAINS, "backgrounds/biomes/PlainsTile.png");
-        putBiomeTile(GameConstants.BIOME_FOREST, "backgrounds/biomes/ForestTile.png");
-        putBiomeTile(GameConstants.BIOME_JUNGLE, "backgrounds/biomes/JungleTile.png");
-        putBiomeTile(GameConstants.BIOME_SWAMP, "backgrounds/biomes/SwampTile.png");
-        putBiomeTile(GameConstants.BIOME_TUNDRA, "backgrounds/biomes/TundraTile.png");
-        putBiomeTile(GameConstants.BIOME_TAIGA, "backgrounds/biomes/TaigaTile.png");
-        putBiomeTile(GameConstants.BIOME_DESERT, "backgrounds/biomes/DesertTile.png");
-        putBiomeTile(GameConstants.BIOME_URBAN, "backgrounds/biomes/UrbanTile.png");
-        putBiomeTile(GameConstants.BIOME_MOUNTAIN, "backgrounds/biomes/MountainTile.png");
-        putBiomeTile(GameConstants.BIOME_VOLCANIC, "backgrounds/biomes/VolcanicTile.png");
-        putBiomeTile(GameConstants.BIOME_LAKE, "backgrounds/biomes/LakeTile.png");
-        putBiomeTile(GameConstants.BIOME_OCEAN, "backgrounds/biomes/OceanTile.png");
+        for (Biome b : GameConstants.getBiomes()) {
+            if (b != null && b.getTile() != null) {
+                biomeTileCache.put(b.getId(), b.getTile().getImage());
+            }
+        }
     }
 
     private void putBiomeTile(Biome biome, String path) {

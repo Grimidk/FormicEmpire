@@ -10,7 +10,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -47,7 +47,24 @@ public final class HexWaterCrossing {
         return 0;
     }
 
-    public static List<Hex> adjacentColonizableLandHexes(Hex origin) {
+    public static boolean canCrossBetween(Hex a, Hex b, Dynasty dynasty) {
+        if (a == null || b == null) {
+            return false;
+        }
+        if (!a.hasRiverTo(b) && !b.hasRiverTo(a)) {
+            return true;
+        }
+        if (dynasty == null) {
+            return false;
+        }
+        if (waterCrossRange(dynasty) > 0) {
+            return true;
+        }
+        var tunnel = dynasty.getTunnelBetween(a, b);
+        return tunnel != null && tunnel.isComplete();
+    }
+
+    public static List<Hex> adjacentColonizableLandHexes(Hex origin, Dynasty dynasty) {
         List<Hex> result = new ArrayList<>();
         if (origin == null) {
             return result;
@@ -56,9 +73,17 @@ public final class HexWaterCrossing {
             if (!isLandHex(neighbor) || neighbor.isIsland()) {
                 continue;
             }
+            if (origin.hasRiverTo(neighbor) && !canCrossBetween(origin, neighbor, dynasty)) {
+                continue;
+            }
             result.add(neighbor);
         }
         return result;
+    }
+
+    public static List<Hex> adjacentColonizableLandHexes(Hex origin) {
+        Dynasty d = origin != null && origin.getColony() != null ? origin.getColony().getDynasty() : null;
+        return adjacentColonizableLandHexes(origin, d);
     }
 
     public static List<Hex> waterCrossLandHexes(Hex origin, int waterCrossRange) {
@@ -99,8 +124,8 @@ public final class HexWaterCrossing {
         return result;
     }
 
-    public static List<Hex> colonizableLandHexes(Hex origin, int waterCrossRange) {
-        List<Hex> result = new ArrayList<>(adjacentColonizableLandHexes(origin));
+    public static List<Hex> colonizableLandHexes(Hex origin, int waterCrossRange, Dynasty dynasty) {
+        List<Hex> result = new ArrayList<>(adjacentColonizableLandHexes(origin, dynasty));
         Set<Hex> seen = new HashSet<>(result);
         for (Hex across : waterCrossLandHexes(origin, waterCrossRange)) {
             if (seen.add(across)) {
@@ -110,7 +135,12 @@ public final class HexWaterCrossing {
         return result;
     }
 
-    public static List<Hex> tradeReachableLandHexes(Hex origin, int waterCrossRange) {
+    public static List<Hex> colonizableLandHexes(Hex origin, int waterCrossRange) {
+        Dynasty d = origin != null && origin.getColony() != null ? origin.getColony().getDynasty() : null;
+        return colonizableLandHexes(origin, waterCrossRange, d);
+    }
+
+    public static List<Hex> tradeReachableLandHexes(Hex origin, int waterCrossRange, Dynasty dynasty) {
         List<Hex> result = new ArrayList<>();
         if (origin == null) {
             return result;
@@ -118,6 +148,9 @@ public final class HexWaterCrossing {
         Set<Hex> seen = new HashSet<>();
         for (Hex neighbor : origin.getAdjacentNeighbors()) {
             if (!isLandHex(neighbor) || !seen.add(neighbor)) {
+                continue;
+            }
+            if (origin.hasRiverTo(neighbor) && !canCrossBetween(origin, neighbor, dynasty)) {
                 continue;
             }
             result.add(neighbor);
@@ -128,5 +161,10 @@ public final class HexWaterCrossing {
             }
         }
         return result;
+    }
+
+    public static List<Hex> tradeReachableLandHexes(Hex origin, int waterCrossRange) {
+        Dynasty d = origin != null && origin.getColony() != null ? origin.getColony().getDynasty() : null;
+        return tradeReachableLandHexes(origin, waterCrossRange, d);
     }
 }

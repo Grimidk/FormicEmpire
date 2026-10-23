@@ -27,8 +27,8 @@ import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifi
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Polygon;
 
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 
 public final class HexMapGeometry {
@@ -27,6 +27,27 @@ public final class HexMapGeometry {
         double cx = originX + flatTopCenterX(q, r, layoutSize);
         double cy = originY + flatTopCenterY(q, r, layoutSize);
         return new Point((int) Math.round(cx), (int) Math.round(cy));
+    }
+
+    public static Point flatTopAxialRound(double x, double y, double layoutSize) {
+        if (!(layoutSize > 0)) {
+            return new Point(0, 0);
+        }
+        double qFrac = (Math.sqrt(3.0) / 3.0 * x - 1.0 / 3.0 * y) / layoutSize;
+        double rFrac = (2.0 / 3.0 * y) / layoutSize;
+        double sFrac = -qFrac - rFrac;
+        int rq = (int) Math.round(qFrac);
+        int rr = (int) Math.round(rFrac);
+        int rs = (int) Math.round(sFrac);
+        double qDiff = Math.abs(rq - qFrac);
+        double rDiff = Math.abs(rr - rFrac);
+        double sDiff = Math.abs(rs - sFrac);
+        if (qDiff > rDiff && qDiff > sDiff) {
+            rq = -rr - rs;
+        } else if (rDiff > sDiff) {
+            rr = -rq - rs;
+        }
+        return new Point(rq, rr);
     }
 
     public static int centeredIconOrigin(double center, int iconSize) {
@@ -122,6 +143,35 @@ public final class HexMapGeometry {
 
     public static double worldHeight(int worldRadius, double hexSize) {
         return hexesAcross(worldRadius) * 1.5 * hexSize;
+    }
+
+    public static double rectangularWorldWidth(int widthHexes, double hexSize) {
+        return Math.max(0, widthHexes) * Math.sqrt(3.0) * hexSize;
+    }
+
+    public static double rectangularWorldHeight(int heightHexes, double hexSize) {
+        return ((Math.max(1, heightHexes) - 1) * 1.5 + 2.0) * hexSize;
+    }
+
+    public static double fittedRectangularHexSize(
+            int worldW,
+            int worldH,
+            int panelW,
+            int panelH,
+            double minSize,
+            double maxSize) {
+        if (panelW <= 0 || panelH <= 0 || worldW <= 0 || worldH <= 0) {
+            return minSize;
+        }
+        double maxRadiusW = panelW / (worldW * Math.sqrt(3.0));
+        double spanH = (worldH - 1) * 1.5 + 2.0;
+        double maxRadiusH = Math.max(0, panelH - 36.0) / spanH;
+        double size = Math.min(maxRadiusW, maxRadiusH);
+        size = Math.min(size, maxSize);
+        if (size < minSize) {
+            size = minSize;
+        }
+        return size;
     }
 
     public static double nextZoom(double zoom, double factor, double min, double max) {

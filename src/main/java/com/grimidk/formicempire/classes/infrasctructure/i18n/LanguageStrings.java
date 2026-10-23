@@ -1088,6 +1088,9 @@ public final class LanguageStrings {
     public static final String MAP_ACTIVE_WAR_OPEN = "MAP_ACTIVE_WAR_OPEN";
     public static final String MAP_LAYERS = "MAP_LAYERS";
     public static final String MAP_LAYER_BORDERS = "MAP_LAYER_BORDERS";
+    public static final String MAP_LAYER_RIVERS = "MAP_LAYER_RIVERS";
+    public static final String MAP_LAYER_MERIDIAN = "MAP_LAYER_MERIDIAN";
+    public static final String MAP_LAYER_EQUATOR = "MAP_LAYER_EQUATOR";
     public static final String MAP_LAYER_BIOME_ICONS = "MAP_LAYER_BIOME_ICONS";
     public static final String MAP_LAYER_COLONY_RANKS = "MAP_LAYER_COLONY_RANKS";
     public static final String MAP_LAYER_TRADES = "MAP_LAYER_TRADES";
@@ -1710,6 +1713,79 @@ public final class LanguageStrings {
     public static final String BIOME_VOLCANIC = "BIOME_VOLCANIC";
     public static final String BIOME_LAKE = "BIOME_LAKE";
     public static final String BIOME_OCEAN = "BIOME_OCEAN";
+    public static final String BIOME_BEACH = "BIOME_BEACH";
+    public static final String BIOME_CLIFFS = "BIOME_CLIFFS";
+    public static final String BIOME_WETLANDS = "BIOME_WETLANDS";
+    public static final String BIOME_MANGROVE = "BIOME_MANGROVE";
+    public static final String BIOME_PRAIRIE = "BIOME_PRAIRIE";
+    public static final String BIOME_BURNT_FOREST = "BIOME_BURNT_FOREST";
+    public static final String BIOME_ICE_FIELD = "BIOME_ICE_FIELD";
+    public static final String CONTINENT_LABEL = "CONTINENT_LABEL";
+    public static final String CONTINENT_FMT = "CONTINENT_FMT";
+    public static final String ARCHIPELAGO_LABEL = "ARCHIPELAGO_LABEL";
+    public static final String ICE_CAP_LABEL = "ICE_CAP_LABEL";
+    public static final String ICE_CAP_ARTICA = "ICE_CAP_ARTICA";
+    public static final String ICE_CAP_ANTARTICA = "ICE_CAP_ANTARTICA";
+
+    public static final String[] CONTINENT_NAMES = {
+        "CONTINENT_NAME_FORMICA",
+        "CONTINENT_NAME_TROPICA",
+        "CONTINENT_NAME_PANGAEA",
+        "CONTINENT_NAME_ATLANTIS",
+        "CONTINENT_NAME_AVALON",
+        "CONTINENT_NAME_HYPERBOREA",
+        "CONTINENT_NAME_LEMURIA",
+        "CONTINENT_NAME_ARCADIA",
+        "CONTINENT_NAME_MYRMIDONIA",
+        "CONTINENT_NAME_ELDORIA",
+        "CONTINENT_NAME_SOLARIA",
+        "CONTINENT_NAME_ZEPHYRIA",
+        "CONTINENT_NAME_BOREALIA",
+        "CONTINENT_NAME_TARTARIA",
+        "CONTINENT_NAME_ELYSIUM",
+        "CONTINENT_NAME_HESPERIA",
+        "CONTINENT_NAME_GONDWANA",
+        "CONTINENT_NAME_VALORIA",
+        "CONTINENT_NAME_THULE",
+        "CONTINENT_NAME_AETHELGARD",
+        "CONTINENT_NAME_AMERICA",
+        "CONTINENT_NAME_ASIA",
+        "CONTINENT_NAME_AUSTRALIA",
+        "CONTINENT_NAME_AFRICA"
+    };
+
+    public static final String[] ARCHIPELAGO_NAMES = {
+        "ARCHIPELAGO_NAME_FIRE_ISLANDS",
+        "ARCHIPELAGO_NAME_GOLD_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_SILVER_ISLES",
+        "ARCHIPELAGO_NAME_CORAL_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_STORM_ISLANDS",
+        "ARCHIPELAGO_NAME_EMERALD_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_SUNKEN_ISLES",
+        "ARCHIPELAGO_NAME_MOON_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_PEARL_ISLANDS",
+        "ARCHIPELAGO_NAME_OBSIDIAN_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_DRAGON_ISLES",
+        "ARCHIPELAGO_NAME_MIST_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_WHISPERING_ISLES",
+        "ARCHIPELAGO_NAME_AMBER_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_SHADOW_ISLES",
+        "ARCHIPELAGO_NAME_JADE_ISLES",
+        "ARCHIPELAGO_NAME_WINDWARD_ISLES",
+        "ARCHIPELAGO_NAME_CRYSTAL_ISLES",
+        "ARCHIPELAGO_NAME_SAPPHIRE_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_RUBY_ISLES",
+        "ARCHIPELAGO_NAME_SERPENT_ISLES",
+        "ARCHIPELAGO_NAME_STAR_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_AZURE_ISLES",
+        "ARCHIPELAGO_NAME_VOLCANIC_ISLES",
+        "ARCHIPELAGO_NAME_IRON_ISLANDS",
+        "ARCHIPELAGO_NAME_CLOUD_ISLES",
+        "ARCHIPELAGO_NAME_FROST_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_TWILIGHT_ISLES",
+        "ARCHIPELAGO_NAME_ECHO_ARCHIPELAGO",
+        "ARCHIPELAGO_NAME_HIDDEN_ISLES"
+    };
 
     public static final String TEMP_FREEZING = "TEMP_FREEZING";
     public static final String TEMP_COLD = "TEMP_COLD";

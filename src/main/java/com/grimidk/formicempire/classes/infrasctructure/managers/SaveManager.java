@@ -23,19 +23,21 @@ import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
 import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyHuntService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyInvasionService;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +84,14 @@ public class SaveManager {
         return new File(savesDir, "settings.json");
     }
 
+    public static String getAppVersion() {
+        return ClasspathTextFiles.load(AssetStyles.META_VERSION, LanguageStrings.VERSION_UNAVAILABLE).trim();
+    }
+
     private void writeSaveToFile(Savefile save, File targetFile) throws IOException {
+        if (save != null) {
+            save.setVersion(getAppVersion());
+        }
         File tmp = new File(targetFile.getAbsolutePath() + ".tmp");
         try (BufferedWriter bw = Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
             writeSaveToWriter(save, bw);
@@ -329,6 +338,7 @@ public class SaveManager {
     }
 
     private void populateSavefileFromGame(Savefile save, World w, Engine engine) {
+        save.setVersion(getAppVersion());
         save.setTimestamp(System.currentTimeMillis());
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
@@ -338,6 +348,8 @@ public class SaveManager {
         save.setPlayTime(computePlayTime(w));
         save.setWorldRadius(w.getWorldRadius());
         save.setContinentCoreRadius(w.getContinentCoreRadius());
+        save.setWorldWidth(w.getWorldWidth());
+        save.setWorldHeight(w.getWorldHeight());
         if (engine != null && engine.hasAchievementTaintingSandbox()) {
             w.disableAchievements();
         }
@@ -546,6 +558,12 @@ public class SaveManager {
                 int weatherId = (h.getLocalWeather() != null) ? h.getLocalWeather().getId() : 1;
                 Savefile.SavedHex sh = new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId);
                 sh.nonWaterResourceSourcesGenerated = h.getNonWaterResourceSourcesGenerated();
+                if (h.getRiverEdges() != null) {
+                    System.arraycopy(h.getRiverEdges(), 0, sh.riverEdges, 0, Math.min(6, h.getRiverEdges().length));
+                }
+                sh.continentId = h.getContinentId();
+                sh.waterDistance = h.getWaterDistance();
+                sh.coastal = h.isCoastal();
                 hexList.add(sh);
                 
                 if (hasColony) {
@@ -714,6 +732,7 @@ public class SaveManager {
 
         // - Global -
         writeJsonLine(w, "id", s.getId(), false);
+        writeJsonLine(w, "version", s.getVersion() != null && !s.getVersion().isEmpty() ? s.getVersion() : getAppVersion(), false);
         writeJsonLine(w, "name", s.getName() != null ? s.getName() : "", false);
         writeJsonLine(w, "timestamp", s.getTimestamp(), false);
         writeJsonLine(w, "playTime", s.getPlayTime(), false);
@@ -724,6 +743,8 @@ public class SaveManager {
         writeJsonLine(w, "year", s.getYear(), false);
         writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
         writeJsonLine(w, "continentCoreRadius", s.getContinentCoreRadius(), false);
+        writeJsonLine(w, "worldWidth", s.getWorldWidth(), false);
+        writeJsonLine(w, "worldHeight", s.getWorldHeight(), false);
         writeJsonLine(w, "playerDynastyTitleId", s.resolvePlayerDynastyTitleId(), false);
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         writeJsonLine(w, "allowsAchievements", s.allowsAchievements(), false);
@@ -955,6 +976,8 @@ public class SaveManager {
         int id = Integer.parseInt(rootMap.getOrDefault("id", "0"));
         String name = rootMap.getOrDefault("name", "");
         Savefile s = new Savefile(id, name);
+        String version = rootMap.getOrDefault("version", getAppVersion());
+        s.setVersion(version);
         
         s.setTimestamp(Long.parseLong(rootMap.getOrDefault("timestamp", "0")));
         s.setPlayTime(Integer.parseInt(rootMap.getOrDefault("playTime", "0")));
@@ -965,6 +988,10 @@ public class SaveManager {
         s.setYear(Integer.parseInt(rootMap.getOrDefault("year", "0")));
         s.setWorldRadius(Integer.parseInt(rootMap.getOrDefault("worldRadius", "8")));
         s.setContinentCoreRadius(Integer.parseInt(rootMap.getOrDefault("continentCoreRadius", "0")));
+        int defaultW = (rootMap.containsKey("continentCoreRadius") && Integer.parseInt(rootMap.get("continentCoreRadius")) > 0 && !rootMap.containsKey("worldWidth")) ? 0 : GameNumbers.WORLD_RECT_WIDTH;
+        int defaultH = (rootMap.containsKey("continentCoreRadius") && Integer.parseInt(rootMap.get("continentCoreRadius")) > 0 && !rootMap.containsKey("worldHeight")) ? 0 : GameNumbers.WORLD_RECT_HEIGHT;
+        s.setWorldWidth(Integer.parseInt(rootMap.getOrDefault("worldWidth", String.valueOf(defaultW))));
+        s.setWorldHeight(Integer.parseInt(rootMap.getOrDefault("worldHeight", String.valueOf(defaultH))));
         s.setPlayerDynastyTitleId(Integer.parseInt(rootMap.getOrDefault("playerDynastyTitleId", "0")));
         s.setPlayerDynastyTitleKey(rootMap.getOrDefault("playerDynastyTitleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY));
         if (!Boolean.parseBoolean(rootMap.getOrDefault("allowsAchievements", "true"))) {
@@ -1720,6 +1747,16 @@ public class SaveManager {
             sb.append("\"t\":").append(h.timeOffset).append(","); 
             sb.append("\"w\":").append(h.weatherId).append(",");
             sb.append("\"nw\":").append(h.nonWaterResourceSourcesGenerated);
+            int rv = 0;
+            if (h.riverEdges != null) {
+                for (int j = 0; j < 6 && j < h.riverEdges.length; j++) {
+                    if (h.riverEdges[j]) rv |= (1 << j);
+                }
+            }
+            if (rv > 0) sb.append(",\"rv\":").append(rv);
+            if (h.continentId != 0) sb.append(",\"cid\":").append(h.continentId);
+            if (h.waterDistance != 0) sb.append(",\"wd\":").append(h.waterDistance);
+            if (h.coastal) sb.append(",\"co\":true");
             sb.append("}");
             if (i < hexes.size() - 1) {
                 sb.append(",");
@@ -2232,6 +2269,10 @@ public class SaveManager {
             int t = 0; 
             int w = 1;
             int nw = 0;
+            int rv = 0;
+            int cid = 0;
+            int wd = 0;
+            boolean co = false;
             
             try {
                 String clean = objStr.replace("{", "").replace("}", "");
@@ -2249,10 +2290,20 @@ public class SaveManager {
                         else if (k.equals("t")) t = Integer.parseInt(v);
                         else if (k.equals("w")) w = Integer.parseInt(v);
                         else if (k.equals("nw")) nw = Integer.parseInt(v);
+                        else if (k.equals("rv")) rv = Integer.parseInt(v);
+                        else if (k.equals("cid")) cid = Integer.parseInt(v);
+                        else if (k.equals("wd")) wd = Integer.parseInt(v);
+                        else if (k.equals("co")) co = Boolean.parseBoolean(v);
                     }
                 }
                 Savefile.SavedHex saved = new Savefile.SavedHex(q, r, b, c, t, w);
                 saved.nonWaterResourceSourcesGenerated = nw;
+                for (int j = 0; j < 6; j++) {
+                    saved.riverEdges[j] = (rv & (1 << j)) != 0;
+                }
+                saved.continentId = cid;
+                saved.waterDistance = wd;
+                saved.coastal = co;
                 list.add(saved);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -2473,6 +2524,9 @@ public class SaveManager {
             writeJsonLine(w, "defaultRolePrincess", engine.getDefaultRolePrincess(), false);
             writeJsonLine(w, "defaultRoleQueen", engine.getDefaultRoleQueen(), false);
             writeJsonLine(w, "mapLayerBorders", engine.isMapLayerBorders(), false);
+            writeJsonLine(w, "mapLayerRivers", engine.isMapLayerRivers(), false);
+            writeJsonLine(w, "mapLayerMeridian", engine.isMapLayerMeridian(), false);
+            writeJsonLine(w, "mapLayerEquator", engine.isMapLayerEquator(), false);
             writeJsonLine(w, "mapLayerBiomeIcons", engine.isMapLayerBiomeIcons(), false);
             writeJsonLine(w, "mapLayerColonyRanks", engine.isMapLayerColonyRanks(), false);
             writeJsonLine(w, "mapLayerTrades", engine.isMapLayerTrades(), false);
@@ -2623,6 +2677,12 @@ public class SaveManager {
                     Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_QUEEN).getId()));
             engine.setMapLayerBorders(Boolean.parseBoolean(m.getOrDefault("mapLayerBorders",
                     String.valueOf(engine.isMapLayerBorders()))));
+            engine.setMapLayerRivers(Boolean.parseBoolean(m.getOrDefault("mapLayerRivers",
+                    String.valueOf(engine.isMapLayerRivers()))));
+            engine.setMapLayerMeridian(Boolean.parseBoolean(m.getOrDefault("mapLayerMeridian",
+                    String.valueOf(engine.isMapLayerMeridian()))));
+            engine.setMapLayerEquator(Boolean.parseBoolean(m.getOrDefault("mapLayerEquator",
+                    String.valueOf(engine.isMapLayerEquator()))));
             engine.setMapLayerBiomeIcons(Boolean.parseBoolean(m.getOrDefault("mapLayerBiomeIcons",
                     String.valueOf(engine.isMapLayerBiomeIcons()))));
             engine.setMapLayerColonyRanks(Boolean.parseBoolean(m.getOrDefault("mapLayerColonyRanks",

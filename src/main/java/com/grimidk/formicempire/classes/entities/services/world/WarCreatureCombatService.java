@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.shared.CritterSkillService;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.entities.services.shared.WarCombatSkillService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -279,7 +280,7 @@ public final class WarCreatureCombatService {
             if (!target.isAlive()) {
                 continue;
             }
-            if (!rollHit(skill, actor, target)) {
+            if (!rollHit(state, skill, actor, target, actingSide)) {
                 continue;
             }
             applyDamage(state, actor, target, opposingSide, skill, actorIsAttacker);
@@ -297,10 +298,17 @@ public final class WarCreatureCombatService {
         }
     }
 
-    private static boolean rollHit(Skill skill, WarBattleParticipant actor, WarBattleParticipant target) {
+    private static boolean rollHit(WarBattleState state, Skill skill, WarBattleParticipant actor,
+            WarBattleParticipant target, WarBattleSideState actingSide) {
         float skillAcc = CritterSkillService.resolveAccuracyMult(skill, actor.getAnt().getModProfile());
         float lineAcc = actor.getBattleLine().getBaseAccuracyPercent() / 100f;
         float baseChance = Math.min(1f, Math.max(0f, skillAcc * lineAcc));
+        if (state != null && state.isRiverBattle()) {
+            Dynasty d = actingSide != null ? actingSide.getDynasty() : null;
+            if (HexWaterCrossing.waterCrossRange(d) <= 0) {
+                baseChance *= GameNumbers.RIVER_BATTLE_NO_RAFTING_ACCURACY_MULT;
+            }
+        }
         float targetEvasion = target != null && target.getAnt() != null
                 ? target.getAnt().getEvasionChance()
                 : 0f;

@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 
 public class TradeTest {
 

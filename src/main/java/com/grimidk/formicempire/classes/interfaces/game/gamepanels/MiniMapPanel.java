@@ -1,14 +1,16 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexGridMesh;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapGeometry;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -18,6 +20,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -29,6 +32,16 @@ public class MiniMapPanel extends ZeroGamePanel {
     private final Runnable openMapAction;
     private final Map<Integer, Color> biomeColorCache = new HashMap<>();
     private final Map<Long, Hex> hexLookup = new HashMap<>();
+    private BufferedImage cachedBakedBaseImage;
+    private int cachedBakedW = -1;
+    private int cachedBakedH = -1;
+    private double cachedHexRadius;
+    private double cachedOriginX;
+    private double cachedOriginY;
+    private double cachedWorldBoxX;
+    private double cachedWorldBoxY;
+    private double cachedWorldBoxW;
+    private double cachedWorldBoxH;
 
     public MiniMapPanel(Engine engine, Runnable openMapAction) {
         super(null);
@@ -79,9 +92,16 @@ public class MiniMapPanel extends ZeroGamePanel {
     protected void initLayout() {
     }
 
+    public void invalidateMapCache() {
+        cachedBakedBaseImage = null;
+        cachedBakedW = -1;
+        cachedBakedH = -1;
+    }
+
     @Override
     public void refreshTheme() {
         biomeColorCache.clear();
+        invalidateMapCache();
         super.refreshTheme();
         repaint();
     }
@@ -93,6 +113,7 @@ public class MiniMapPanel extends ZeroGamePanel {
     public void reset() {
         biomeColorCache.clear();
         hexLookup.clear();
+        invalidateMapCache();
         repaint();
     }
 
@@ -103,8 +124,122 @@ public class MiniMapPanel extends ZeroGamePanel {
         if (world == null) {
             return;
         }
+
+        Insets insets = getInsets();
+        int availW = getWidth() - insets.left - insets.right - 8;
+        int availH = getHeight() - insets.top - insets.bottom - 8;
+        if (availW <= 0 || availH <= 0) {
+            return;
+        }
+
+        int panelW = getWidth();
+        int panelH = getHeight();
+
+        if (cachedBakedBaseImage == null || cachedBakedW != panelW || cachedBakedH != panelH) {
+            double hexRadius;
+            double originX;
+            double originY;
+            double worldBoxX = 0;
+            double worldBoxY = 0;
+            double worldBoxW = 0;
+            double worldBoxH = 0;
+
+            if (world.getWorldWidth() > 0 && world.getWorldHeight() > 0) {
+                int wW = world.getWorldWidth();
+                int wH = world.getWorldHeight();
+                double spanX = wW * Math.sqrt(3.0);
+                double spanY = (wH - 1) * 1.5 + 2.0;
+                hexRadius = Math.min(availW / spanX, availH / spanY);
+                if (hexRadius < 0.6) {
+                    hexRadius = 0.6;
+                }
+                originX = insets.left + 4 + availW / 2.0;
+                originY = insets.top + 4 + availH / 2.0 + 0.75 * hexRadius;
+
+                worldBoxW = wW * Math.sqrt(3.0) * hexRadius;
+                worldBoxH = spanY * hexRadius;
+                worldBoxX = originX - worldBoxW / 2.0;
+                worldBoxY = insets.top + 4 + (availH - worldBoxH) / 2.0;
+            } else {
+                int rad = world.getWorldRadius();
+                double span = HexMapGeometry.hexesAcross(rad);
+                hexRadius = Math.min(availW / span, availH / (span * 0.866));
+                if (hexRadius < 1.0) hexRadius = 1.0;
+                originX = insets.left + 4 + availW / 2.0;
+                originY = insets.top + 4 + availH / 2.0;
+            }
+
+            bakeBaseImage(world, panelW, panelH, originX, originY, hexRadius,
+                    worldBoxX, worldBoxY, worldBoxW, worldBoxH);
+        }
+
+        if (cachedBakedBaseImage == null) {
+            return;
+        }
+
+        Graphics2D g2d = (Graphics2D) g.create();
+        try {
+            g2d.drawImage(cachedBakedBaseImage, 0, 0, null);
+
+            double originX = cachedOriginX;
+            double originY = cachedOriginY;
+            double hexRadius = cachedHexRadius;
+            double worldBoxX = cachedWorldBoxX;
+            double worldBoxY = cachedWorldBoxY;
+            double worldBoxW = cachedWorldBoxW;
+            double worldBoxH = cachedWorldBoxH;
+
+            if (world.getWorldWidth() > 0) {
+                if (engine != null && engine.isMapViewportActive() && engine.getMapViewportSpanCols() > 0) {
+                    double spanCols = Math.min(world.getWorldWidth(), engine.getMapViewportSpanCols());
+                    double centerCol = engine.getMapViewportCenterCol();
+                    double viewW = spanCols * Math.sqrt(3.0) * hexRadius;
+                    double viewCenterX = originX + (centerCol * Math.sqrt(3.0) * hexRadius);
+                    double leftX = viewCenterX - viewW / 2.0;
+
+                    while (leftX < worldBoxX) leftX += worldBoxW;
+                    while (leftX >= worldBoxX + worldBoxW) leftX -= worldBoxW;
+
+                    g2d.setColor(new Color(255, 255, 255, 40));
+                    g2d.fillRect((int) Math.round(leftX), (int) Math.round(worldBoxY), (int) Math.round(viewW), (int) Math.round(worldBoxH));
+                    g2d.setColor(new Color(255, 255, 255, 220));
+                    g2d.setStroke(new BasicStroke(1.5f));
+                    g2d.drawRect((int) Math.round(leftX), (int) Math.round(worldBoxY), (int) Math.round(viewW), (int) Math.round(worldBoxH));
+
+                    if (leftX + viewW > worldBoxX + worldBoxW) {
+                        double wrapW = (leftX + viewW) - (worldBoxX + worldBoxW);
+                        g2d.setColor(new Color(255, 255, 255, 40));
+                        g2d.fillRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(wrapW), (int) Math.round(worldBoxH));
+                        g2d.setColor(new Color(255, 255, 255, 220));
+                        g2d.drawRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(wrapW), (int) Math.round(worldBoxH));
+                    }
+                } else {
+                    Hex active = world.getActiveHex();
+                    if (active != null) {
+                        int r = active.getR();
+                        int col = active.getQ() + (r >> 1);
+                        double hx = originX + col * Math.sqrt(3.0) * hexRadius + ((r & 1) != 0 ? (Math.sqrt(3.0) / 2.0) * hexRadius : 0.0);
+                        double hy = originY + (1.5 * r) * hexRadius;
+                        int markerSize = Math.max(6, (int) Math.round(hexRadius * 3.0));
+                        g2d.setColor(new Color(255, 255, 255, 50));
+                        g2d.fillRect((int) Math.round(hx - markerSize / 2.0), (int) Math.round(hy - markerSize / 2.0), markerSize, markerSize);
+                        g2d.setColor(AssetStyles.FONT_COLOR_ERROR);
+                        g2d.setStroke(new BasicStroke(1.5f));
+                        g2d.drawRect((int) Math.round(hx - markerSize / 2.0), (int) Math.round(hy - markerSize / 2.0), markerSize, markerSize);
+                    }
+                }
+            }
+        } finally {
+            g2d.dispose();
+        }
+    }
+
+    private void bakeBaseImage(World world, int panelW, int panelH, double originX, double originY,
+                               double hexRadius, double worldBoxX, double worldBoxY,
+                               double worldBoxW, double worldBoxH) {
         List<Hex> hexes = world.getHexes();
         if (hexes == null || hexes.isEmpty()) {
+            cachedBakedBaseImage = null;
             return;
         }
 
@@ -125,67 +260,48 @@ public class MiniMapPanel extends ZeroGamePanel {
             hexLookup.put(packKey(hex.getQ(), hex.getR()), hex);
         }
         if (landHexes.isEmpty()) {
+            cachedBakedBaseImage = null;
             return;
         }
 
-        Insets insets = getInsets();
-        int availW = getWidth() - insets.left - insets.right - 4;
-        int availH = getHeight() - insets.top - insets.bottom - 4;
-        if (availW <= 0 || availH <= 0) {
-            return;
-        }
-
-        double minCx = Double.POSITIVE_INFINITY;
-        double maxCx = Double.NEGATIVE_INFINITY;
-        double minCy = Double.POSITIVE_INFINITY;
-        double maxCy = Double.NEGATIVE_INFINITY;
-        for (Hex hex : landHexes) {
-            double cx = axialX(hex.getQ(), hex.getR());
-            double cy = axialY(hex.getR());
-            if (cx < minCx) {
-                minCx = cx;
-            }
-            if (cx > maxCx) {
-                maxCx = cx;
-            }
-            if (cy < minCy) {
-                minCy = cy;
-            }
-            if (cy > maxCy) {
-                maxCy = cy;
-            }
-        }
-
-        double spanX = Math.max(0.001, maxCx - minCx);
-        double spanY = Math.max(0.001, maxCy - minCy);
-        double hexRadius = Math.min(availW / (spanX + 2.0), availH / (spanY + 2.0));
-        if (hexRadius < 1.0) {
-            hexRadius = 1.0;
-        }
-
-        double midCx = (minCx + maxCx) * 0.5;
-        double midCy = (minCy + maxCy) * 0.5;
-        double originX = insets.left + 2 + availW / 2.0 - midCx * hexRadius;
-        double originY = insets.top + 2 + availH / 2.0 - midCy * hexRadius;
-
-        Graphics2D g2d = (Graphics2D) g.create();
+        BufferedImage baked = new BufferedImage(panelW, panelH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D bg2d = baked.createGraphics();
         try {
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            bg2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            if (world.getWorldWidth() > 0) {
+                bg2d.setColor(GameConstants.BIOME_OCEAN.getMapColor());
+                bg2d.fillRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(worldBoxW), (int) Math.round(worldBoxH));
+                bg2d.setColor(AssetStyles.BORDER_COLOR);
+                bg2d.drawRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(worldBoxW), (int) Math.round(worldBoxH));
+            }
+
             HexGridMesh mesh = HexGridMesh.build(
                     landHexes,
                     originX,
                     originY,
                     hexRadius,
                     (q, r) -> hexLookup.get(packKey(q, r)));
-            mesh.paintFills(g2d, face -> getBiomeColor(face.hex.getBiome()));
+            mesh.paintFills(bg2d, face -> getBiomeColor(face.hex.getBiome()));
             mesh.paintDividers(
-                    g2d,
+                    bg2d,
                     true,
                     face -> getBiomeColor(face.hex.getBiome()),
                     AssetStyles.BORDER_COLOR);
+            mesh.paintRivers(bg2d);
         } finally {
-            g2d.dispose();
+            bg2d.dispose();
         }
+
+        cachedBakedBaseImage = baked;
+        cachedBakedW = panelW;
+        cachedBakedH = panelH;
+        cachedOriginX = originX;
+        cachedOriginY = originY;
+        cachedHexRadius = hexRadius;
+        cachedWorldBoxX = worldBoxX;
+        cachedWorldBoxY = worldBoxY;
+        cachedWorldBoxW = worldBoxW;
+        cachedWorldBoxH = worldBoxH;
     }
 
     private Color getBiomeColor(Biome biome) {

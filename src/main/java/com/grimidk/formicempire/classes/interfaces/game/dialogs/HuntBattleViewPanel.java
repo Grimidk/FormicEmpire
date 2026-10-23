@@ -272,7 +272,7 @@ public class HuntBattleViewPanel extends JPanel {
         if (world == null || colony == null) {
             return GameConstants.BIOME_PLAINS;
         }
-        com.grimidk.formicempire.classes.entities.Hex hex = world.getHexOfColony(colony);
+        com.grimidk.formicempire.classes.entities.world.Hex hex = world.getHexOfColony(colony);
         return hex != null && hex.getBiome() != null ? hex.getBiome() : GameConstants.BIOME_PLAINS;
     }
 
@@ -293,12 +293,11 @@ public class HuntBattleViewPanel extends JPanel {
     }
 
     private void loadBiomeTiles() {
-        putBiomeTile(GameConstants.BIOME_PLAINS, "backgrounds/biomes/PlainsTile.png");
-        putBiomeTile(GameConstants.BIOME_FOREST, "backgrounds/biomes/ForestTile.png");
-        putBiomeTile(GameConstants.BIOME_JUNGLE, "backgrounds/biomes/JungleTile.png");
-        putBiomeTile(GameConstants.BIOME_SWAMP, "backgrounds/biomes/SwampTile.png");
-        putBiomeTile(GameConstants.BIOME_TAIGA, "backgrounds/biomes/TaigaTile.png");
-        putBiomeTile(GameConstants.BIOME_URBAN, "backgrounds/biomes/UrbanTile.png");
+        for (Biome b : GameConstants.getBiomes()) {
+            if (b != null && b.getTile() != null) {
+                biomeTileCache.put(b.getId(), b.getTile().getImage());
+            }
+        }
     }
 
     private void putBiomeTile(Biome biome, String path) {

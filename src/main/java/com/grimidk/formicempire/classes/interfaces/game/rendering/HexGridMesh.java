@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
@@ -8,6 +8,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -44,14 +45,26 @@ public final class HexGridMesh {
         public final Vertex b;
         public final Face faceA;
         public final Face faceB;
+        public final int directionInFaceA;
 
-        private Edge(Vertex a, Vertex b, Face faceA, Face faceB) {
+        private Edge(Vertex a, Vertex b, Face faceA, Face faceB, int directionInFaceA) {
             this.a = a;
             this.b = b;
             this.faceA = faceA;
             this.faceB = faceB;
+            this.directionInFaceA = directionInFaceA;
             a.edges.add(this);
             b.edges.add(this);
+        }
+
+        public boolean isRiver() {
+            if (faceA != null && faceA.hex != null && faceA.hex.hasRiverEdge(directionInFaceA)) {
+                return true;
+            }
+            if (faceB != null && faceB.hex != null && faceB.hex.hasRiverEdge((directionInFaceA + 3) % 6)) {
+                return true;
+            }
+            return false;
         }
 
         public boolean isDynastyFrontier() {
@@ -114,44 +127,79 @@ public final class HexGridMesh {
         public final Vertex[] corners = new Vertex[6];
         public final double centerX;
         public final double centerY;
+        public final int minX;
+        public final int maxX;
+        public final int minY;
+        public final int maxY;
+        private Polygon cachedPolygon;
 
-        private Face(Hex hex, double centerX, double centerY) {
+        private Face(Hex hex, double centerX, double centerY, double layoutSize) {
             this.hex = hex;
             this.q = hex.getQ();
             this.r = hex.getR();
             this.centerX = centerX;
             this.centerY = centerY;
+            this.minX = (int) Math.floor(centerX - layoutSize);
+            this.maxX = (int) Math.ceil(centerX + layoutSize);
+            this.minY = (int) Math.floor(centerY - layoutSize);
+            this.maxY = (int) Math.ceil(centerY + layoutSize);
+        }
+
+        public boolean intersects(Rectangle clip) {
+            if (clip == null) return true;
+            return !(maxX < clip.x || minX > clip.x + clip.width || maxY < clip.y || minY > clip.y + clip.height);
         }
 
         public Polygon toPolygon() {
-            Polygon poly = new Polygon();
-            for (Vertex corner : corners) {
-                poly.addPoint((int) Math.round(corner.x), (int) Math.round(corner.y));
+            if (cachedPolygon == null) {
+                Polygon poly = new Polygon();
+                for (Vertex corner : corners) {
+                    poly.addPoint((int) Math.round(corner.x), (int) Math.round(corner.y));
+                }
+                cachedPolygon = poly;
             }
-            return poly;
+            return cachedPolygon;
         }
     }
 
     private final List<Face> faces;
+    private final Map<Long, Face> facesByKey;
     private final List<Edge> edges;
+    private final List<Edge> riverEdges;
     private final List<Vertex> vertices;
     private final double layoutSize;
     private final double mapCenterX;
     private final double mapCenterY;
+    private final int boundsMinX;
+    private final int boundsMaxX;
+    private final int boundsMinY;
+    private final int boundsMaxY;
 
     private HexGridMesh(
             List<Face> faces,
+            Map<Long, Face> facesByKey,
             List<Edge> edges,
+            List<Edge> riverEdges,
             List<Vertex> vertices,
             double layoutSize,
             double mapCenterX,
-            double mapCenterY) {
+            double mapCenterY,
+            int boundsMinX,
+            int boundsMaxX,
+            int boundsMinY,
+            int boundsMaxY) {
         this.faces = List.copyOf(faces);
+        this.facesByKey = Map.copyOf(facesByKey);
         this.edges = List.copyOf(edges);
+        this.riverEdges = List.copyOf(riverEdges);
         this.vertices = List.copyOf(vertices);
         this.layoutSize = layoutSize;
         this.mapCenterX = mapCenterX;
         this.mapCenterY = mapCenterY;
+        this.boundsMinX = boundsMinX;
+        this.boundsMaxX = boundsMaxX;
+        this.boundsMinY = boundsMinY;
+        this.boundsMaxY = boundsMaxY;
     }
 
     public List<Face> faces() {
@@ -178,13 +226,24 @@ public final class HexGridMesh {
         return mapCenterY;
     }
 
+    public int boundsMinX() {
+        return boundsMinX;
+    }
+
+    public int boundsMaxX() {
+        return boundsMaxX;
+    }
+
+    public int boundsMinY() {
+        return boundsMinY;
+    }
+
+    public int boundsMaxY() {
+        return boundsMaxY;
+    }
+
     public Face faceAt(int q, int r) {
-        for (Face face : faces) {
-            if (face.q == q && face.r == r) {
-                return face;
-            }
-        }
-        return null;
+        return facesByKey.get(packFaceKey(q, r));
     }
 
     public static HexGridMesh build(
@@ -200,6 +259,11 @@ public final class HexGridMesh {
         Map<Long, Vertex> verticesByKey = new HashMap<>();
         List<Face> faces = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
+        List<Edge> riverEdges = new ArrayList<>();
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
 
         for (Hex hex : hexes) {
             if (hex == null) {
@@ -207,20 +271,34 @@ public final class HexGridMesh {
             }
             double cx = HexMapGeometry.flatTopCenterXAbs(hex.getQ(), hex.getR(), originX, layoutSize);
             double cy = HexMapGeometry.flatTopCenterYAbs(hex.getQ(), hex.getR(), originY, layoutSize);
-            Face face = new Face(hex, cx, cy);
+            Face face = new Face(hex, cx, cy, layoutSize);
+            if (face.minX < minX) minX = face.minX;
+            if (face.maxX > maxX) maxX = face.maxX;
+            if (face.minY < minY) minY = face.minY;
+            if (face.maxY > maxY) maxY = face.maxY;
+            Polygon poly = new Polygon();
             for (int i = 0; i < 6; i++) {
                 double angleRad = Math.PI / 180.0 * (60 * i - 30);
                 double vx = cx + layoutSize * Math.cos(angleRad);
                 double vy = cy + layoutSize * Math.sin(angleRad);
                 face.corners[i] = getOrCreateVertex(verticesByKey, vx, vy);
+                poly.addPoint((int) Math.round(vx), (int) Math.round(vy));
             }
+            face.cachedPolygon = poly;
             faces.add(face);
             facesByKey.put(packFaceKey(hex.getQ(), hex.getR()), face);
         }
 
+        if (faces.isEmpty()) {
+            minX = 0;
+            maxX = 0;
+            minY = 0;
+            maxY = 0;
+        }
+
         for (Face face : faces) {
             for (int i = 0; i < 6; i++) {
-                int[] offset = HexMapGeometry.FLAT_TOP_NEIGHBOR_OFFSETS[i];
+                int[] offset = FLAT_TOP_NEIGHBOR_OFFSET_FOR(i);
                 int nq = face.q + offset[0];
                 int nr = face.r + offset[1];
                 Hex neighborHex = neighborAt.apply(nq, nr);
@@ -230,11 +308,19 @@ public final class HexGridMesh {
                 Face neighborFace = neighborHex != null ? facesByKey.get(packFaceKey(nq, nr)) : null;
                 Vertex a = face.corners[i];
                 Vertex b = face.corners[(i + 1) % 6];
-                edges.add(new Edge(a, b, face, neighborFace));
+                Edge edge = new Edge(a, b, face, neighborFace, i);
+                edges.add(edge);
+                if (edge.isRiver()) {
+                    riverEdges.add(edge);
+                }
             }
         }
 
-        return new HexGridMesh(faces, edges, new ArrayList<>(verticesByKey.values()), layoutSize, originX, originY);
+        return new HexGridMesh(faces, facesByKey, edges, riverEdges, new ArrayList<>(verticesByKey.values()), layoutSize, originX, originY, minX, maxX, minY, maxY);
+    }
+
+    private static int[] FLAT_TOP_NEIGHBOR_OFFSET_FOR(int i) {
+        return HexMapGeometry.FLAT_TOP_NEIGHBOR_OFFSETS[i];
     }
 
     public void paintFills(Graphics2D g2d, Function<Face, Color> fillColor) {
@@ -242,7 +328,11 @@ public final class HexGridMesh {
         Objects.requireNonNull(fillColor, "fillColor");
         Object previousAa = g2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        Rectangle clip = g2d.getClipBounds();
         for (Face face : faces) {
+            if (clip != null && !face.intersects(clip)) {
+                continue;
+            }
             Color color = fillColor.apply(face);
             if (color == null) {
                 continue;
@@ -256,15 +346,19 @@ public final class HexGridMesh {
     public void paintDividers(Graphics2D g2d, boolean dynastyBorderMode, Function<Face, Color> plainEdgeColor, Color dynastyFallback) {
         Objects.requireNonNull(g2d, "g2d");
         Objects.requireNonNull(plainEdgeColor, "plainEdgeColor");
-        Object previousAa = g2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        BasicStroke stroke = new BasicStroke(DIVIDER_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+        float dividerStroke = (float) Math.max(1.0, Math.min(2.0, layoutSize * 0.08));
+        BasicStroke stroke = new BasicStroke(dividerStroke, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
         g2d.setStroke(stroke);
+        Line2D.Double edgeLine = new Line2D.Double();
+        Rectangle clip = g2d.getClipBounds();
         for (Edge edge : edges) {
+            if (clip != null && !edgeIntersects(edge, clip)) {
+                continue;
+            }
             Color color = null;
             Color plain = plainColor(edge, plainEdgeColor);
             if (dynastyBorderMode && edge.isRivalDynastyFrontier()) {
-                paintAlternatingRivalEdge(g2d, edge, dynastyFallback != null ? dynastyFallback : plain);
+                paintAlternatingRivalEdge(g2d, edge, dynastyFallback != null ? dynastyFallback : plain, edgeLine);
                 continue;
             }
             if (dynastyBorderMode && edge.isDynastyFrontier()) {
@@ -277,26 +371,89 @@ public final class HexGridMesh {
                 continue;
             }
             g2d.setColor(color);
-            g2d.draw(new Line2D.Double(edge.a.x, edge.a.y, edge.b.x, edge.b.y));
+            edgeLine.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
+            g2d.draw(edgeLine);
         }
 
-        double nodeRadius = DIVIDER_STROKE * 0.5;
-        for (Vertex vertex : vertices) {
-            Color nodeColor = nodeColor(vertex, dynastyBorderMode, plainEdgeColor, dynastyFallback);
-            if (nodeColor == null) {
-                continue;
+        if (dividerStroke >= 1.5f) {
+            double nodeRadius = dividerStroke * 0.5;
+            Ellipse2D.Double nodeEllipse = new Ellipse2D.Double();
+            for (Vertex vertex : vertices) {
+                if (clip != null && !clip.intersects(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0)) {
+                    continue;
+                }
+                Color nodeColor = nodeColor(vertex, dynastyBorderMode, plainEdgeColor, dynastyFallback);
+                if (nodeColor == null) {
+                    continue;
+                }
+                g2d.setColor(nodeColor);
+                nodeEllipse.setFrame(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0);
+                g2d.fill(nodeEllipse);
             }
-            g2d.setColor(nodeColor);
-            g2d.fill(new Ellipse2D.Double(
-                    vertex.x - nodeRadius,
-                    vertex.y - nodeRadius,
-                    nodeRadius * 2.0,
-                    nodeRadius * 2.0));
+        }
+    }
+
+    private static boolean edgeIntersects(Edge edge, Rectangle clip) {
+        double minX = Math.min(edge.a.x, edge.b.x);
+        double maxX = Math.max(edge.a.x, edge.b.x);
+        double minY = Math.min(edge.a.y, edge.b.y);
+        double maxY = Math.max(edge.a.y, edge.b.y);
+        return !(maxX < clip.x || minX > clip.x + clip.width || maxY < clip.y || minY > clip.y + clip.height);
+    }
+
+    public void paintRivers(Graphics2D g2d) {
+        paintRivers(g2d, 1.0f);
+    }
+
+    public void paintRivers(Graphics2D g2d, float strokeMultiplier) {
+        Objects.requireNonNull(g2d, "g2d");
+        Object previousAa = g2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Line2D.Double line = new Line2D.Double();
+        Rectangle clip = g2d.getClipBounds();
+
+        if (layoutSize <= 4.0) {
+            float width = (float) Math.max(0.4, Math.min(0.9, layoutSize * 0.30)) * strokeMultiplier;
+            BasicStroke stroke = new BasicStroke(width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+            g2d.setStroke(stroke);
+            g2d.setColor(new Color(0, 180, 240, 230));
+            for (Edge edge : riverEdges) {
+                if (clip != null && !edgeIntersects(edge, clip)) {
+                    continue;
+                }
+                line.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
+                g2d.draw(line);
+            }
+        } else {
+            float outerWidth = (float) Math.max(2.2, layoutSize * 0.18) * strokeMultiplier;
+            float innerWidth = (float) Math.max(1.2, outerWidth * 0.50);
+
+            BasicStroke outerStroke = new BasicStroke(outerWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+            g2d.setStroke(outerStroke);
+            g2d.setColor(new Color(0, 50, 140, 240));
+            for (Edge edge : riverEdges) {
+                if (clip != null && !edgeIntersects(edge, clip)) {
+                    continue;
+                }
+                line.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
+                g2d.draw(line);
+            }
+
+            BasicStroke innerStroke = new BasicStroke(innerWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+            g2d.setStroke(innerStroke);
+            g2d.setColor(new Color(0, 225, 255, 255));
+            for (Edge edge : riverEdges) {
+                if (clip != null && !edgeIntersects(edge, clip)) {
+                    continue;
+                }
+                line.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
+                g2d.draw(line);
+            }
         }
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, previousAa);
     }
 
-    private void paintAlternatingRivalEdge(Graphics2D g2d, Edge edge, Color fallback) {
+    private void paintAlternatingRivalEdge(Graphics2D g2d, Edge edge, Color fallback, Line2D.Double line) {
         Face closer = edge.closerFace(mapCenterX, mapCenterY);
         Face farther = closer == edge.faceA ? edge.faceB : edge.faceA;
         Color first = dynastyColorOf(closer, fallback);
@@ -310,15 +467,17 @@ public final class HexGridMesh {
         if (second == null) {
             second = first;
         }
-        for (int i = 0; i < RIVAL_BORDER_SEGMENTS; i++) {
-            double t0 = i / (double) RIVAL_BORDER_SEGMENTS;
-            double t1 = (i + 1) / (double) RIVAL_BORDER_SEGMENTS;
+        int segments = Math.max(2, Math.min(RIVAL_BORDER_SEGMENTS, (int) Math.round(layoutSize / 3.0)));
+        for (int i = 0; i < segments; i++) {
+            double t0 = i / (double) segments;
+            double t1 = (i + 1) / (double) segments;
             double x0 = edge.a.x + (edge.b.x - edge.a.x) * t0;
             double y0 = edge.a.y + (edge.b.y - edge.a.y) * t0;
             double x1 = edge.a.x + (edge.b.x - edge.a.x) * t1;
             double y1 = edge.a.y + (edge.b.y - edge.a.y) * t1;
             g2d.setColor(i % 2 == 0 ? first : second);
-            g2d.draw(new Line2D.Double(x0, y0, x1, y1));
+            line.setLine(x0, y0, x1, y1);
+            g2d.draw(line);
         }
     }
 

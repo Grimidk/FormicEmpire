@@ -7,6 +7,11 @@ public final class WarBattleState {
     private final int contestedColonyId;
     private int tickIndex;
     private int worldDay;
+    private boolean riverBattle;
+
+    public WarBattleState() {
+        this(null, null, false, 0);
+    }
 
     WarBattleState(WarBattleSideState attacker, WarBattleSideState defender, boolean hexAssault,
             int contestedColonyId) {
@@ -48,5 +53,13 @@ public final class WarBattleState {
 
     void advanceTick() {
         tickIndex++;
+    }
+
+    public boolean isRiverBattle() {
+        return riverBattle;
+    }
+
+    public void setRiverBattle(boolean riverBattle) {
+        this.riverBattle = riverBattle;
     }
 }

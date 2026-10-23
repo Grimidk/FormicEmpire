@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -163,5 +163,27 @@ class HexGridMeshTest {
                 .filter(edge -> edge.faceA != null && edge.faceB != null)
                 .findFirst()
                 .orElseThrow();
+    }
+
+    @Test
+    void riverEdgeDetection() {
+        Hex a = hex(0, 0);
+        Hex b = hex(1, 0);
+        a.setSouthEast(b);
+        b.setNorthWest(a);
+        a.setRiverEdge(0, true);
+        HexGridMesh.Edge edge = sharedEdge(a, b, 0, 0);
+        assertTrue(edge.isRiver());
+    }
+
+    @Test
+    void faceAtAndAxialRoundingMatch() {
+        Hex a = hex(2, 3);
+        HexGridMesh mesh = HexGridMesh.build(List.of(a), 0, 0, 20, (q, r) -> (q == 2 && r == 3) ? a : null);
+        assertNotNull(mesh.faceAt(2, 3));
+        HexGridMesh.Face face = mesh.faceAt(2, 3);
+        java.awt.Point coord = HexMapGeometry.flatTopAxialRound(face.centerX, face.centerY, 20);
+        assertEquals(2, coord.x);
+        assertEquals(3, coord.y);
     }
 }

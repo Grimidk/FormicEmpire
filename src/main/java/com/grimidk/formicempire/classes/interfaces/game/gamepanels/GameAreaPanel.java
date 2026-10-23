@@ -3,13 +3,14 @@ package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
@@ -91,6 +92,24 @@ public class GameAreaPanel extends ZeroGamePanel {
     private int cachedBackgroundBiomeId = -1;
     private Dimension cachedBackgroundDimension;
 
+    private BufferedImage cachedUnderworldStructureImage;
+    private int cachedUnderworldW = -1;
+    private int cachedUnderworldH = -1;
+    private boolean cachedHasBreeder = false;
+    private boolean cachedShowsLogistics = false;
+    private boolean cachedHasTunnel = false;
+    private int cachedStructureColonyId = -1;
+
+    private BufferedImage cachedUnderworldDecorationsImage;
+    private int cachedDecorationsW = -1;
+    private int cachedDecorationsH = -1;
+    private int cachedDecorationsSignature = -1;
+
+    private BufferedImage cachedDeadBodyPileImage;
+    private int cachedDeadBodyCount = -1;
+    private int cachedDeadBodyW = -1;
+    private int cachedDeadBodyH = -1;
+
     public GameAreaPanel() {
         super(null);
         setOpaque(true);
@@ -110,18 +129,11 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     private void loadImages() {
-        biomeTextureCache.put(GameConstants.BIOME_PLAINS.getId(), loadImage("backgrounds/biomes/PlainsTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_FOREST.getId(), loadImage("backgrounds/biomes/ForestTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_JUNGLE.getId(), loadImage("backgrounds/biomes/JungleTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_SWAMP.getId(), loadImage("backgrounds/biomes/SwampTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_TUNDRA.getId(), loadImage("backgrounds/biomes/TundraTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_TAIGA.getId(), loadImage("backgrounds/biomes/TaigaTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_DESERT.getId(), loadImage("backgrounds/biomes/DesertTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_URBAN.getId(), loadImage("backgrounds/biomes/UrbanTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_MOUNTAIN.getId(), loadImage("backgrounds/biomes/MountainTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_VOLCANIC.getId(), loadImage("backgrounds/biomes/VolcanicTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_LAKE.getId(), loadImage("backgrounds/biomes/LakeTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_OCEAN.getId(), loadImage("backgrounds/biomes/OceanTile.png"));
+        for (Biome b : GameConstants.getBiomes()) {
+            if (b != null && b.getTile() != null) {
+                biomeTextureCache.put(b.getId(), b.getTile().getImage());
+            }
+        }
         undergroundTexture = loadImage("backgrounds/colony/UndergroundTile.png");
 
         basicRoomImg = loadImage("sprites/buildings/BasicRoom.png");
@@ -188,6 +200,9 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
     
     public void setColony(Colony colony) {
+        if (this.colony != colony) {
+            invalidateStructuralCaches();
+        }
         this.colony = colony;
         this.lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
         this.cachedAssimilatedDroneSignature = Integer.MIN_VALUE;
@@ -239,6 +254,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         this.webYardBounds = null;
         RoomDecorationRenderer.clearWebYardCache();
         invalidateBackgroundLayerCache();
+        invalidateStructuralCaches();
         repaint();
     }
 
@@ -300,6 +316,17 @@ public class GameAreaPanel extends ZeroGamePanel {
     private void invalidateBackgroundLayerCache() {
         cachedBackgroundLayer = null;
         cachedBackgroundBiomeId = -1;
+    }
+
+    private void invalidateStructuralCaches() {
+        cachedUnderworldStructureImage = null;
+        cachedUnderworldW = -1;
+        cachedUnderworldH = -1;
+        cachedUnderworldDecorationsImage = null;
+        cachedDecorationsW = -1;
+        cachedDecorationsH = -1;
+        cachedDeadBodyPileImage = null;
+        cachedDeadBodyCount = -1;
     }
     
     public void refreshSize(int viewportWidth, int viewportHeight) {
@@ -690,7 +717,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                     int deadSprites = Math.min(
                             GameNumbers.capPenNonAntSprites(colony.getDeadAnts().size()),
                             overworldDeadBodySpritesRemaining);
-                    drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, deadSprites);
+                    drawCachedDeadAntPile(g2d, safeX, safeY, safeW, safeH, deadSprites);
                     overworldDeadBodySpritesRemaining -= deadSprites;
                 }
             }
@@ -791,6 +818,27 @@ public class GameAreaPanel extends ZeroGamePanel {
         return new UnderworldRoomLayout(hallX, hallY, hallW, hallH, leftRoomX, rightRoomX, roomW, roomH, hallY, roomY2);
     }
 
+    private void drawCachedDeadAntPile(Graphics2D g2d, int safeX, int safeY, int safeW, int safeH, int count) {
+        if (count <= 0 || deadBodyImg == null) {
+            return;
+        }
+        if (cachedDeadBodyPileImage == null || cachedDeadBodyCount != count
+                || cachedDeadBodyW != safeW || cachedDeadBodyH != safeH) {
+            BufferedImage baked = new BufferedImage(safeW, safeH, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D bg2d = baked.createGraphics();
+            try {
+                drawStaticItemsLocal(bg2d, deadBodyImg, 0, 0, safeW, safeH, count);
+            } finally {
+                bg2d.dispose();
+            }
+            cachedDeadBodyPileImage = baked;
+            cachedDeadBodyCount = count;
+            cachedDeadBodyW = safeW;
+            cachedDeadBodyH = safeH;
+        }
+        g2d.drawImage(cachedDeadBodyPileImage, safeX, safeY, this);
+    }
+
     private void drawUnderworldRoomDecorationsOverlay(Graphics2D g2d) {
         if (colony == null) {
             return;
@@ -800,10 +848,54 @@ public class GameAreaPanel extends ZeroGamePanel {
             return;
         }
 
-        RoomDecorationRenderer.drawStorageRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow1, L.roomW, L.roomH, this);
-        RoomDecorationRenderer.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this);
-        RoomDecorationRenderer.drawNurseryRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
-        RoomDecorationRenderer.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this);
+        int panelW = getWidth();
+        int panelH = getHeight();
+        int sig = computeUnderworldDecorationsSignature(colony);
+
+        if (cachedUnderworldDecorationsImage == null || cachedDecorationsW != panelW || cachedDecorationsH != panelH
+                || cachedDecorationsSignature != sig) {
+            BufferedImage baked = new BufferedImage(panelW, panelH, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D bg2d = baked.createGraphics();
+            try {
+                RoomDecorationRenderer.drawStorageRoomDecorations(bg2d, colony, L.leftRoomX, L.roomYRow1, L.roomW, L.roomH, this);
+                RoomDecorationRenderer.drawFarmRoomDecorations(bg2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this);
+                RoomDecorationRenderer.drawNurseryRoomDecorations(bg2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
+                RoomDecorationRenderer.drawRoyalRoomDecorations(bg2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this);
+            } finally {
+                bg2d.dispose();
+            }
+            cachedUnderworldDecorationsImage = baked;
+            cachedDecorationsW = panelW;
+            cachedDecorationsH = panelH;
+            cachedDecorationsSignature = sig;
+        }
+
+        g2d.drawImage(cachedUnderworldDecorationsImage, 0, 0, null);
+    }
+
+    private int computeUnderworldDecorationsSignature(Colony c) {
+        if (c == null) {
+            return 0;
+        }
+        int h = c.getId();
+        Building[][] chains = {
+                GameUnlocks.BUILDING_CHAIN_WATER, GameUnlocks.BUILDING_CHAIN_SYRUP,
+                GameUnlocks.BUILDING_CHAIN_ROCK, GameUnlocks.BUILDING_CHAIN_RESIN,
+                GameUnlocks.BUILDING_CHAIN_MUSHROOM, GameUnlocks.BUILDING_CHAIN_PLANT,
+                GameUnlocks.BUILDING_CHAIN_MEAT, GameUnlocks.BUILDING_CHAIN_EGG,
+                GameUnlocks.BUILDING_CHAIN_ROYAL
+        };
+        for (Building[] chain : chains) {
+            Building b = RoomDecorationRenderer.highestUnlocked(c, chain);
+            h = 31 * h + (b != null ? b.getId() : 0);
+        }
+        Building[] passives = {
+                GameUnlocks.PASSIVE_FARM, GameUnlocks.PASSIVE_NURSE, GameUnlocks.PASSIVE_LAB
+        };
+        for (Building b : passives) {
+            h = 31 * h + (c.hasBuilding(b) ? b.getId() : 0);
+        }
+        return h;
     }
 
     private void drawUnderworldStructure(Graphics2D g2d) {
@@ -825,71 +917,34 @@ public class GameAreaPanel extends ZeroGamePanel {
         int leftRoomX = L.leftRoomX;
         int rightRoomX = L.rightRoomX;
         int roomY = L.roomYRow1;
-        
-        g2d.drawImage(firstHallwayImg, hallX, hallY, this);
-        entranceBounds = new Rectangle(hallX, hallY, hallW, hallH);
-        
-        g2d.drawImage(basicRoomImg, leftRoomX, roomY, this);
-        room1Bounds = new Rectangle(leftRoomX, roomY, roomW, roomH);
-        
-        AffineTransform old = g2d.getTransform();
-        
-        double rotateCenterX = rightRoomX + (roomW / 2.0);
-        double rotateCenterY = roomY + (roomH / 2.0);
-        
-        g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
-        g2d.drawImage(basicRoomImg, rightRoomX, roomY, this);
-        room2Bounds = new Rectangle(rightRoomX, roomY, roomW, roomH);
-        
-        g2d.setTransform(old);
-
-        // --- ROW 2 (Floor 2) ---
         int roomY2 = L.roomYRow2;
 
-        g2d.drawImage(basicRoomImg, leftRoomX, roomY2, this);
+        entranceBounds = new Rectangle(hallX, hallY, hallW, hallH);
+        room1Bounds = new Rectangle(leftRoomX, roomY, roomW, roomH);
+        room2Bounds = new Rectangle(rightRoomX, roomY, roomW, roomH);
         room3Bounds = new Rectangle(leftRoomX, roomY2, roomW, roomH);
-
-        AffineTransform old2 = g2d.getTransform();
-        
-        double rotateCenter2X = rightRoomX + (roomW / 2.0);
-        double rotateCenter2Y = roomY2 + (roomH / 2.0);
-        
-        g2d.rotate(Math.toRadians(180), rotateCenter2X, rotateCenter2Y);
-        g2d.drawImage(basicRoomImg, rightRoomX, roomY2, this);
         room4Bounds = new Rectangle(rightRoomX, roomY2, roomW, roomH);
-        
-        g2d.setTransform(old2);
-        
-        // --- ROW 3 (Floor 3) — breeder + logistics portal row ---
+
         boolean hasBreeder = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER);
         boolean showLogisticsChamber = showsLogisticsChamber();
+        World world = engine != null ? engine.getWorld() : null;
+        boolean hasCompleteTunnel = world != null && colony.hasCompleteTunnel(world);
+
+        int panelW = getWidth();
+        int panelH = getHeight();
 
         if (hasBreeder || showLogisticsChamber) {
             int thirdRowYOffset = 512;
             int roomY3 = hallY + thirdRowYOffset;
-            
-            g2d.drawImage(middleHallwayImg, hallX, roomY3, this);            
-            
             if (hasBreeder) {
-                g2d.drawImage(basicRoomImg, leftRoomX, roomY3, this);
                 breederRoomBounds = new Rectangle(leftRoomX, roomY3, roomW, roomH);
             } else {
                 breederRoomBounds = null;
             }
-
             if (showLogisticsChamber && doubleRoomImg != null) {
                 int dRoomW = doubleRoomImg.getWidth(this);
                 int dRoomH = doubleRoomImg.getHeight(this);
-                
-                AffineTransform old3 = g2d.getTransform();
-                double rotateCenter3X = rightRoomX + (dRoomW / 2.0);
-                double rotateCenter3Y = roomY3 + (dRoomH / 2.0);
-                
-                g2d.rotate(Math.toRadians(180), rotateCenter3X, rotateCenter3Y);
-                g2d.drawImage(doubleRoomImg, rightRoomX, roomY3, this);
                 transitRoomBounds = new Rectangle(rightRoomX, roomY3, dRoomW, dRoomH);
-                g2d.setTransform(old3);
-                drawTunnelBesideLogisticsRoom(g2d, transitRoomBounds);
             } else {
                 transitRoomBounds = null;
             }
@@ -897,6 +952,68 @@ public class GameAreaPanel extends ZeroGamePanel {
             breederRoomBounds = null;
             transitRoomBounds = null;
         }
+
+        if (cachedUnderworldStructureImage == null || cachedUnderworldW != panelW || cachedUnderworldH != panelH
+                || cachedHasBreeder != hasBreeder || cachedShowsLogistics != showLogisticsChamber
+                || cachedHasTunnel != hasCompleteTunnel || cachedStructureColonyId != colony.getId()) {
+            BufferedImage baked = new BufferedImage(panelW, panelH, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D bg2d = baked.createGraphics();
+            try {
+                bg2d.drawImage(firstHallwayImg, hallX, hallY, this);
+                bg2d.drawImage(basicRoomImg, leftRoomX, roomY, this);
+
+                AffineTransform old = bg2d.getTransform();
+                double rotateCenterX = rightRoomX + (roomW / 2.0);
+                double rotateCenterY = roomY + (roomH / 2.0);
+                bg2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
+                bg2d.drawImage(basicRoomImg, rightRoomX, roomY, this);
+                bg2d.setTransform(old);
+
+                bg2d.drawImage(basicRoomImg, leftRoomX, roomY2, this);
+
+                AffineTransform old2 = bg2d.getTransform();
+                double rotateCenter2X = rightRoomX + (roomW / 2.0);
+                double rotateCenter2Y = roomY2 + (roomH / 2.0);
+                bg2d.rotate(Math.toRadians(180), rotateCenter2X, rotateCenter2Y);
+                bg2d.drawImage(basicRoomImg, rightRoomX, roomY2, this);
+                bg2d.setTransform(old2);
+
+                if (hasBreeder || showLogisticsChamber) {
+                    int thirdRowYOffset = 512;
+                    int roomY3 = hallY + thirdRowYOffset;
+                    bg2d.drawImage(middleHallwayImg, hallX, roomY3, this);
+
+                    if (hasBreeder) {
+                        bg2d.drawImage(basicRoomImg, leftRoomX, roomY3, this);
+                    }
+
+                    if (showLogisticsChamber && doubleRoomImg != null) {
+                        int dRoomW = doubleRoomImg.getWidth(this);
+                        int dRoomH = doubleRoomImg.getHeight(this);
+
+                        AffineTransform old3 = bg2d.getTransform();
+                        double rotateCenter3X = rightRoomX + (dRoomW / 2.0);
+                        double rotateCenter3Y = roomY3 + (dRoomH / 2.0);
+                        bg2d.rotate(Math.toRadians(180), rotateCenter3X, rotateCenter3Y);
+                        bg2d.drawImage(doubleRoomImg, rightRoomX, roomY3, this);
+                        bg2d.setTransform(old3);
+                        drawTunnelBesideLogisticsRoom(bg2d, transitRoomBounds);
+                    }
+                }
+            } finally {
+                bg2d.dispose();
+            }
+
+            cachedUnderworldStructureImage = baked;
+            cachedUnderworldW = panelW;
+            cachedUnderworldH = panelH;
+            cachedHasBreeder = hasBreeder;
+            cachedShowsLogistics = showLogisticsChamber;
+            cachedHasTunnel = hasCompleteTunnel;
+            cachedStructureColonyId = colony.getId();
+        }
+
+        g2d.drawImage(cachedUnderworldStructureImage, 0, 0, null);
     }
 
     private void drawTunnelBesideLogisticsRoom(Graphics2D g2d, Rectangle logisticsBounds) {

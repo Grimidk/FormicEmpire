@@ -38,7 +38,10 @@ import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.BiomeRarity;
+import com.grimidk.formicempire.classes.constants.world.ClimateZone;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
+import com.grimidk.formicempire.classes.constants.world.HydrologyLevel;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
@@ -475,41 +478,81 @@ public final class GameConstants {
 
     // --- Biomes ---
     public static final Biome BIOME_PLAINS = new Biome(1, LanguageStrings.BIOME_PLAINS, 25, 2, 1f, 1f, 0f, 0f, 0f, 1,
-        "#A8C76A", loadIcon("icons/biomes/Plains.png"), null);
+        "#A8C76A", loadIcon("icons/biomes/Plains.png"), loadIcon("backgrounds/biomes/PlainsTile.png"),
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.MODERATE, true);
     static { biomes.add(BIOME_PLAINS); }
     public static final Biome BIOME_FOREST = new Biome(2, LanguageStrings.BIOME_FOREST, 22, 3, 2f, 2f, 0.1f, 2f, 0.1f, 1,
-        "#3D7A3D", loadIcon("icons/biomes/Forest.png"), null);
+        "#3D7A3D", loadIcon("icons/biomes/Forest.png"), loadIcon("backgrounds/biomes/ForestTile.png"),
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.MODERATE, true);
     static { biomes.add(BIOME_FOREST); }
     public static final Biome BIOME_JUNGLE = new Biome(3, LanguageStrings.BIOME_JUNGLE, 30, 4, 2.5f, 2.5f, 0.2f, 2.5f, 0.15f, 3,
-        "#1E6B3C", loadIcon("icons/biomes/Jungle.png"), null);
+        "#1E6B3C", loadIcon("icons/biomes/Jungle.png"), loadIcon("backgrounds/biomes/JungleTile.png"),
+        BiomeRarity.COMMON, ClimateZone.TROPICAL, false, HydrologyLevel.WET, true);
     static { biomes.add(BIOME_JUNGLE); }
     public static final Biome BIOME_SWAMP = new Biome(4, LanguageStrings.BIOME_SWAMP, 26, 5, 1.5f, 1.5f, 0f, 1.5f, 0.08f, 2,
-        "#5A6B3A", loadIcon("icons/biomes/Swamp.png"), null);
+        "#5A6B3A", loadIcon("icons/biomes/Swamp.png"), loadIcon("backgrounds/biomes/SwampTile.png"),
+        BiomeRarity.UNCOMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.WET, true);
     static { biomes.add(BIOME_SWAMP); }
     public static final Biome BIOME_URBAN = new Biome(5, LanguageStrings.BIOME_URBAN, 28, 1, 0.5f, 0.5f, 0.5f, 0f, 0f, 2,
-        "#8A8A8A", loadIcon("icons/biomes/Urban.png"), null);
+        "#8A8A8A", loadIcon("icons/biomes/Urban.png"), loadIcon("backgrounds/biomes/UrbanTile.png"),
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.DRY, true);
     static { biomes.add(BIOME_URBAN); }
     public static final Biome BIOME_TUNDRA = new Biome(6, LanguageStrings.BIOME_TUNDRA, 5, 2, 0.2f, 0.2f, 0.3f, 0f, 0f, 4,
-        "#D8E0E8", loadIcon("icons/biomes/Tundra.png"), null);
+        "#D8E0E8", loadIcon("icons/biomes/Tundra.png"), loadIcon("backgrounds/biomes/TundraTile.png"),
+        BiomeRarity.COMMON, ClimateZone.ARCTIC, false, HydrologyLevel.DRY, true);
     static { biomes.add(BIOME_TUNDRA); }
     public static final Biome BIOME_TAIGA = new Biome(7, LanguageStrings.BIOME_TAIGA, 12, 1, 0.4f, 0.3f, 0.5f, 1f, 0.05f, 3,
-        "#4A6B5A", loadIcon("icons/biomes/Taiga.png"), null);
+        "#4A6B5A", loadIcon("icons/biomes/Taiga.png"), loadIcon("backgrounds/biomes/TaigaTile.png"),
+        BiomeRarity.COMMON, ClimateZone.SUBPOLAR, false, HydrologyLevel.MODERATE, true);
     static { biomes.add(BIOME_TAIGA); }
     public static final Biome BIOME_DESERT = new Biome(8, LanguageStrings.BIOME_DESERT, 45, 0, 0.05f, 0.02f, 1f, 0f, 0f, 4,
-        "#E0C070", loadIcon("icons/biomes/Dessert.png"), null);
+        "#E0C070", loadIcon("icons/biomes/Dessert.png"), loadIcon("backgrounds/biomes/DesertTile.png"),
+        BiomeRarity.COMMON, ClimateZone.ARID, false, HydrologyLevel.ARID, true);
     static { biomes.add(BIOME_DESERT); }
     public static final Biome BIOME_MOUNTAIN = new Biome(9, LanguageStrings.BIOME_MOUNTAIN, 12, 1, 0.1f, 0.3f, 2f, 0f, 0f, 3,
-        "#8B7D6B", loadIcon("icons/biomes/Mountain.png"), null);
+        "#8B7D6B", loadIcon("icons/biomes/Mountain.png"), loadIcon("backgrounds/biomes/MountainTile.png"),
+        BiomeRarity.UNCOMMON, ClimateZone.ANY, false, HydrologyLevel.DRY, true);
     static { biomes.add(BIOME_MOUNTAIN); }
     public static final Biome BIOME_VOLCANIC = new Biome(10, LanguageStrings.BIOME_VOLCANIC, 60, 0, 0.01f, 0.01f, 5f, 0f, 0f, 5,
-        "#5A3030", loadIcon("icons/biomes/Volcanic.png"), null);
+        "#5A3030", loadIcon("icons/biomes/Volcanic.png"), loadIcon("backgrounds/biomes/VolcanicTile.png"),
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, true);
     static { biomes.add(BIOME_VOLCANIC); }
     public static final Biome BIOME_LAKE = new Biome(11, LanguageStrings.BIOME_LAKE, 25, 5, 0.5f, 0.5f, 0f, 0f, 0f, 1,
-        "#4A90A8", loadIcon("icons/biomes/Lake.png"), null);
+        "#4A90A8", loadIcon("icons/biomes/Lake.png"), loadIcon("backgrounds/biomes/LakeTile.png"),
+        BiomeRarity.UNCOMMON, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false);
     static { biomes.add(BIOME_LAKE); }
     public static final Biome BIOME_OCEAN = new Biome(12, LanguageStrings.BIOME_OCEAN, 20, 5, 0.2f, 0.2f, 0f, 0f, 0f, 2,
-        "#1E4A6E", loadIcon("icons/biomes/Ocean.png"), null);
+        "#1E4A6E", loadIcon("icons/biomes/Ocean.png"), loadIcon("backgrounds/biomes/OceanTile.png"),
+        BiomeRarity.COMMON, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false);
     static { biomes.add(BIOME_OCEAN); }
+    public static final Biome BIOME_BEACH = new Biome(13, LanguageStrings.BIOME_BEACH, 24, 3, 0.3f, 0.5f, 0.5f, 0f, 0f, 1,
+        "#f7e26b", loadIcon("icons/biomes/Beach.png"), loadIcon("backgrounds/biomes/BeachTile.png"),
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, true, HydrologyLevel.WET, true);
+    static { biomes.add(BIOME_BEACH); }
+    public static final Biome BIOME_CLIFFS = new Biome(14, LanguageStrings.BIOME_CLIFFS, 18, 2, 0.2f, 0.4f, 2.0f, 0f, 0f, 2,
+        "#676767", loadIcon("icons/biomes/Cliffs.png"), loadIcon("backgrounds/biomes/CliffsTile.png"),
+        BiomeRarity.UNCOMMON, ClimateZone.ANY, true, HydrologyLevel.MODERATE, true);
+    static { biomes.add(BIOME_CLIFFS); }
+    public static final Biome BIOME_WETLANDS = new Biome(15, LanguageStrings.BIOME_WETLANDS, 22, 5, 2.0f, 1.8f, 0f, 1.2f, 0.05f, 2,
+        "#2f484e", loadIcon("icons/biomes/Wetlands.png"), loadIcon("backgrounds/biomes/WetlandsTile.png"),
+        BiomeRarity.UNCOMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.WET, true);
+    static { biomes.add(BIOME_WETLANDS); }
+    public static final Biome BIOME_MANGROVE = new Biome(16, LanguageStrings.BIOME_MANGROVE, 28, 5, 2.2f, 2.0f, 0.1f, 1.0f, 0.15f, 3,
+        "#32100a", loadIcon("icons/biomes/Mangrove.png"), loadIcon("backgrounds/biomes/MangroveTile.png"),
+        BiomeRarity.UNCOMMON, ClimateZone.TROPICAL, true, HydrologyLevel.WET, true);
+    static { biomes.add(BIOME_MANGROVE); }
+    public static final Biome BIOME_PRAIRIE = new Biome(17, LanguageStrings.BIOME_PRAIRIE, 20, 2, 1.2f, 1.2f, 0f, 0.1f, 0f, 1,
+        "#a3ce27", loadIcon("icons/biomes/Prairie.png"), loadIcon("backgrounds/biomes/PrairieTile.png"),
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.DRY, true);
+    static { biomes.add(BIOME_PRAIRIE); }
+    public static final Biome BIOME_BURNT_FOREST = new Biome(18, LanguageStrings.BIOME_BURNT_FOREST, 35, 0, 0.1f, 0.1f, 1.0f, 0.3f, 0.4f, 4,
+        "#493c2b", loadIcon("icons/biomes/BurntForest.png"), loadIcon("backgrounds/biomes/BurntForestTile.png"),
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, false);
+    static { biomes.add(BIOME_BURNT_FOREST); }
+    public static final Biome BIOME_ICE_FIELD = new Biome(19, LanguageStrings.BIOME_ICE_FIELD, -15, 1, 0f, 0.05f, 0.2f, 0f, 0f, 5,
+        "#b2dcef", loadIcon("icons/biomes/IceField.png"), loadIcon("backgrounds/biomes/IceFieldTile.png"),
+        BiomeRarity.RARE, ClimateZone.ARCTIC, false, HydrologyLevel.DRY, false);
+    static { biomes.add(BIOME_ICE_FIELD); }
 
     // --- Resources ---
     public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false,
@@ -1584,6 +1627,7 @@ public final class GameConstants {
                 LanguageStrings.DYNASTY_THEME_BUG, LanguageStrings.DYNASTY_THEME_SILVER, LanguageStrings.DYNASTY_THEME_COPPER,
                 LanguageStrings.DYNASTY_THEME_BRONZE, LanguageStrings.DYNASTY_THEME_STEEL),
         palette("751717", "751717", "751717", "eb8931", "a46422", "1b2632", "31a2f2", "005784", "eb8931"),
+        BIOME_PLAINS,
         loadIcon("icons/species/Omni.png"));
     static { species.add(SPECIES_OMNI); }
     
@@ -1594,6 +1638,7 @@ public final class GameConstants {
                 LanguageStrings.DYNASTY_THEME_ROOT, LanguageStrings.DYNASTY_THEME_FOREST, LanguageStrings.DYNASTY_THEME_JUNGLE,
                 LanguageStrings.DYNASTY_THEME_MUSHROOM),
         palette("be2633", "be2633", "be2633", "eb8931", "a46422", "676767", "31a2f2", "005784", "eb8931"),
+        BIOME_JUNGLE,
         loadIcon("icons/species/Leafcutter.png"));
     static { species.add(SPECIES_LEAFCUTTER); }
     
@@ -1604,6 +1649,7 @@ public final class GameConstants {
                 LanguageStrings.DYNASTY_THEME_SAPPHIRE, LanguageStrings.DYNASTY_THEME_GOLD, LanguageStrings.DYNASTY_THEME_SILVER,
                 LanguageStrings.DYNASTY_THEME_SILK),
         palette("f7e26b", "f7e26b", "f7e26b", "a46422", "eb8931", "751717", "e06f8b", "be2633", "eb8931"),
+        BIOME_URBAN,
         loadIcon("icons/species/Pharaoh.png"));
     static { species.add(SPECIES_PHARAOH); }
     
@@ -1614,6 +1660,7 @@ public final class GameConstants {
                 LanguageStrings.DYNASTY_THEME_STORM, LanguageStrings.DYNASTY_THEME_SHADOW, LanguageStrings.DYNASTY_THEME_NIGHT,
                 LanguageStrings.DYNASTY_THEME_MARSH, LanguageStrings.DYNASTY_THEME_SWAMP),
         palette("eb8931", "eb8931", "eb8931", "f7e26b", "a46422", "676767", "9d9d9d", "434343", "f7e26b"),
+        BIOME_PRAIRIE,
         loadIcon("icons/species/Marauder.png"));
     static { species.add(SPECIES_MARAUDER); }
 
@@ -1621,6 +1668,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_TRAPJAW),
         Set.of(LanguageStrings.DYNASTY_THEME_TRAPJAW, LanguageStrings.DYNASTY_THEME_TRAP, LanguageStrings.DYNASTY_THEME_JAW),
         palette("493c2b", "493c2b", "493c2b", "751717", "32100a", "a46422", "32100a", "751717", "eb8931"),
+        BIOME_SWAMP,
         loadIcon("icons/species/Trapjaw.png"));
     static { species.add(SPECIES_TRAPJAW); }
 
@@ -1628,6 +1676,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HONEYPOT),
         Set.of(LanguageStrings.DYNASTY_THEME_HONEYPOT, LanguageStrings.DYNASTY_THEME_HONEY, LanguageStrings.DYNASTY_THEME_BEE),
         palette("a46422", "a46422", "a46422", "32100a", "751717", "a46422", "f7e26b", "eb8931", "eb8931"),
+        BIOME_DESERT,
         loadIcon("icons/species/Honeypot.png"));
     static { species.add(SPECIES_HONEYPOT); }
 
@@ -1635,6 +1684,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DOORHEAD),
         Set.of(LanguageStrings.DYNASTY_THEME_TURTLE, LanguageStrings.DYNASTY_THEME_SHELL, LanguageStrings.DYNASTY_THEME_TORTOISE),
         palette("434343", "434343", "434343", "751717", "32100a", "32100a", "a3ce27", "676767", "eb8931"),
+        BIOME_FOREST,
         loadIcon("icons/species/Turtle.png"));
     static { species.add(SPECIES_TURTLE); }
 
@@ -1642,6 +1692,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_WOODBURROW),
         Set.of(LanguageStrings.DYNASTY_THEME_CARPENTER, LanguageStrings.DYNASTY_THEME_WOOD, LanguageStrings.DYNASTY_THEME_TREE),
         palette("a3ce27", "a3ce27", "eb8931", "d24f14", "32100a", "32100a", "a46422", "d24f14", "eb8931"),
+        BIOME_FOREST,
         loadIcon("icons/species/Carpenter.png"));
     static { species.add(SPECIES_CARPENTER); }
 
@@ -1649,6 +1700,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SILKWEAVE),
         Set.of(LanguageStrings.DYNASTY_THEME_WEAVER, LanguageStrings.DYNASTY_THEME_SILK, LanguageStrings.DYNASTY_THEME_SPIDER),
         palette("493c2b", "493c2b", "be2633", "9427c4", "ae7ee5", "ae7ee5", "493c2b", "be2633", "be2633"),
+        BIOME_MANGROVE,
         loadIcon("icons/species/Weaver.png"));
     static { species.add(SPECIES_WEAVER); }
 
@@ -1656,6 +1708,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_RAFTING),
         Set.of(LanguageStrings.DYNASTY_THEME_FLOODPLAIN, LanguageStrings.DYNASTY_THEME_RIVER, LanguageStrings.DYNASTY_THEME_WATER),
         palette("be2633", "d24f14", "be2633", "b2dcef", "005784", "005784", "32100a", "d24f14", "be2633"),
+        BIOME_WETLANDS,
         loadIcon("icons/species/Floodplain.png"));
     static { species.add(SPECIES_FLOODPLAIN); }
 
@@ -1663,6 +1716,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FIREVENOM),
         Set.of(LanguageStrings.DYNASTY_THEME_FIRE, LanguageStrings.DYNASTY_THEME_FLAME, LanguageStrings.DYNASTY_THEME_BURN),
         palette("d24f14", "d24f14", "d24f14", "a3ce27", "eb8931", "f7e26b", "eb8931", "d24f14", "f7e26b"),
+        BIOME_VOLCANIC,
         loadIcon("icons/species/Fire.png"));
     static { species.add(SPECIES_FIRE); }
 
@@ -1670,6 +1724,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_JUMPING),
         Set.of(LanguageStrings.DYNASTY_THEME_JET, LanguageStrings.DYNASTY_THEME_TORNADO, LanguageStrings.DYNASTY_THEME_WIND),
         palette("0e141a", "0e141a", "0e141a", "32100a", "1b2632", "a46422", "0e141a", "44891a", "a46422"),
+        BIOME_CLIFFS,
         loadIcon("icons/species/Jet.png"));
     static { species.add(SPECIES_JET); }
 
@@ -1677,6 +1732,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STINGING),
         Set.of(LanguageStrings.DYNASTY_THEME_BULLET, LanguageStrings.DYNASTY_THEME_STING, LanguageStrings.DYNASTY_THEME_PUNCH),
         palette("32100a", "32100a", "32100a", "be2633", "751717", "a3ce27", "9d9d9d", "676767", "eb8931"),
+        BIOME_JUNGLE,
         loadIcon("icons/species/Bullet.png"));
     static { species.add(SPECIES_BULLET); }
 
@@ -1684,6 +1740,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SWARMING),
         Set.of(LanguageStrings.DYNASTY_THEME_ARMY, LanguageStrings.DYNASTY_THEME_SOLDIER, LanguageStrings.DYNASTY_THEME_WARRIOR),
         palette("d24f14", "eb8931", "eb8931", "eb8931", "31a2f2", "31a2f2", "d24f14", "f7e26b", "f7e26b"),
+        BIOME_JUNGLE,
         loadIcon("icons/species/Army.png"));
     static { species.add(SPECIES_ARMY); }
 
@@ -1692,6 +1749,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STEALTH),
         Set.of(LanguageStrings.DYNASTY_THEME_GHOST, LanguageStrings.DYNASTY_THEME_SHADOW, LanguageStrings.DYNASTY_THEME_PHANTOM),
         palette("ffffff", "ffffff", "ffffff", "676767", "434343", "32100a", "ffffff", "0e141a", "ffffff"),
+        BIOME_URBAN,
         loadIcon("icons/species/Ghost.png"));
     static { species.add(SPECIES_GHOST); }
 
@@ -1699,6 +1757,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FASTBITE),
         Set.of(LanguageStrings.DYNASTY_THEME_DRACULA, LanguageStrings.DYNASTY_THEME_VAMPIRE, LanguageStrings.DYNASTY_THEME_BLOOD),
         palette("751717", "a46422", "a46422", "b2dcef", "31a2f2", "d24f14", "b2dcef", "31a2f2", "eb8931"),
+        BIOME_FOREST,
         loadIcon("icons/species/Dracula.png"));
     static { species.add(SPECIES_DRACULA); }
 
@@ -1706,6 +1765,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST),
         Set.of(LanguageStrings.DYNASTY_THEME_SILVER, LanguageStrings.DYNASTY_THEME_METAL, LanguageStrings.DYNASTY_THEME_GOLD),
         palette("9d9d9d", "9d9d9d", "9d9d9d", "b2dcef", "ae7ee5", "44891a", "751717", "ae7ee5", "44891a"),
+        BIOME_DESERT,
         loadIcon("icons/species/Silver.png"));
     static { species.add(SPECIES_SILVER); }
 
@@ -1713,6 +1773,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM),
         Set.of(LanguageStrings.DYNASTY_THEME_MARICOPA, LanguageStrings.DYNASTY_THEME_VENOM, LanguageStrings.DYNASTY_THEME_POISON),
         palette("e06f8b", "e06f8b", "e06f8b", "d24f14", "be2633", "9427c4", "be2633", "751717", "f7e26b"),
+        BIOME_DESERT,
         loadIcon("icons/species/Maricopa.png"));
     static { species.add(SPECIES_MARICOPA); }
 
@@ -1720,6 +1781,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SELFDESTRUCT),
         Set.of(LanguageStrings.DYNASTY_THEME_EXPLODING, LanguageStrings.DYNASTY_THEME_BOMB, LanguageStrings.DYNASTY_THEME_EXPLOSION),
         palette("be2633", "be2633", "434343", "d24f14", "eb8931", "be2633", "005784", "31a2f2", "eb8931"),
+        BIOME_MANGROVE,
         loadIcon("icons/species/Exploding.png"));
     static { species.add(SPECIES_EXPLODING); }
 
@@ -1727,6 +1789,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARSIGHT),
         Set.of(LanguageStrings.DYNASTY_THEME_BULLDOG, LanguageStrings.DYNASTY_THEME_DOG, LanguageStrings.DYNASTY_THEME_HOUND),
         palette("d24f14", "d24f14", "32100a", "be2633", "751717", "1b2632", "9427c4", "be2633", "eb8931"),
+        BIOME_BEACH,
         loadIcon("icons/species/Bulldog.png"));
     static { species.add(SPECIES_BULLDOG); }
 
@@ -1734,6 +1797,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HIVEBUILD),
         Set.of(LanguageStrings.DYNASTY_THEME_SHINING, LanguageStrings.DYNASTY_THEME_BLACK, LanguageStrings.DYNASTY_THEME_DARK),
         palette("0e141a", "0e141a", "434343", "0e141a", "434343", "ffffff", "0e141a", "676767", "434343"),
+        BIOME_TAIGA,
         loadIcon("icons/species/ShiningBlack.png"));
     static { species.add(SPECIES_SHININGBLACK); }
 
@@ -1741,6 +1805,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_LOCSENSE),
         Set.of(LanguageStrings.DYNASTY_THEME_DESERT, LanguageStrings.DYNASTY_THEME_SAND, LanguageStrings.DYNASTY_THEME_DIRT),
         palette("be2633", "751717", "751717", "f7e26b", "eb8931", "f7e26b", "a46422", "493c2b", "a46422"),
+        BIOME_DESERT,
         loadIcon("icons/species/Desert.png"));
     static { species.add(SPECIES_DESERT); }
 
@@ -1748,6 +1813,7 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_ACIDSPIT),
         Set.of(LanguageStrings.DYNASTY_THEME_GREEN, LanguageStrings.DYNASTY_THEME_ACID, LanguageStrings.DYNASTY_THEME_EMERALD),
         palette("a3ce27", "a3ce27", "a3ce27", "31a2f2", "005784", "d24f14", "751717", "32100a", "eb8931"),
+        BIOME_FOREST,
         loadIcon("icons/species/Green.png"));
     static { species.add(SPECIES_GREEN); }
 
@@ -1827,6 +1893,21 @@ public final class GameConstants {
 
     // --- Getters ---
     public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
+    public static ImageIcon getBiomeTile(Biome biome) {
+        if (biome == null) return BIOME_PLAINS.getTile();
+        ImageIcon tile = biome.getTile();
+        return tile != null ? tile : BIOME_PLAINS.getTile();
+    }
+
+    public static List<Biome> getStartingBiomes() {
+        List<Biome> list = new ArrayList<>();
+        for (Biome b : biomes) {
+            if (b.canStart()) {
+                list.add(b);
+            }
+        }
+        return Collections.unmodifiableList(list);
+    }
 
     public static List<ResourceType> getResources() { return Collections.unmodifiableList(resources); }
 
@@ -2323,7 +2404,12 @@ public final class GameConstants {
                 || biome == BIOME_JUNGLE
                 || biome == BIOME_SWAMP
                 || biome == BIOME_URBAN
-                || biome == BIOME_TAIGA;
+                || biome == BIOME_TAIGA
+                || biome == BIOME_BEACH
+                || biome == BIOME_CLIFFS
+                || biome == BIOME_WETLANDS
+                || biome == BIOME_MANGROVE
+                || biome == BIOME_PRAIRIE;
     }
 
     public static List<Species> getHuntSpeciesForBiome(Biome biome) {

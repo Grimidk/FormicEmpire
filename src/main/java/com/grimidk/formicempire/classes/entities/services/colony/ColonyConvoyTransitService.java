@@ -8,7 +8,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

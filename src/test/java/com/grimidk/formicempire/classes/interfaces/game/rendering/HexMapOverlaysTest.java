@@ -8,7 +8,7 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 

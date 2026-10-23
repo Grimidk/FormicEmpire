@@ -498,8 +498,10 @@ public class UpgradeDialog extends ZeroDialog {
             east.setOpaque(false);
             east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
             
-            JLabel cost = new JLabel(LanguageStrings.format(LanguageStrings.ASSIMILATION_TARGET,
-                    colony.getDynasty().getAssimilationTargetCost()));
+            JLabel cost = new JLabel(AssetStyles.formatNumber(colony.getDynasty().getAssimilationTargetCost()),
+                    GameConstants.ICON_RESEARCH, SwingConstants.CENTER);
+            cost.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
+            cost.setIconTextGap(4);
             cost.setForeground(AssetStyles.FONT_COLOR_VALUE);
             cost.setFont(AssetStyles.FONT_BOLD);
             cost.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -15,8 +16,8 @@ import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
@@ -51,6 +52,7 @@ public final class HexMapOverlays {
         g2d.setStroke(stroke);
         int minuteOfHour = Math.max(0, Math.min(59, world.getMinute()));
 
+        Rectangle clip = g2d.getClipBounds();
         for (Trade trade : tradeManager.getActiveTrades()) {
             if (trade == null || !trade.isActive()) {
                 continue;
@@ -63,6 +65,9 @@ public final class HexMapOverlays {
             HexGridMesh.Face originFace = mesh.faceAt(origin.getQ(), origin.getR());
             HexGridMesh.Face destFace = mesh.faceAt(destination.getQ(), destination.getR());
             if (originFace == null || destFace == null) {
+                continue;
+            }
+            if (clip != null && !clip.intersectsLine(originFace.centerX, originFace.centerY, destFace.centerX, destFace.centerY)) {
                 continue;
             }
 
@@ -133,6 +138,7 @@ public final class HexMapOverlays {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         double layoutSize = mesh.layoutSize();
         Set<Long> drawn = new HashSet<>();
+        Rectangle clip = g2d.getClipBounds();
 
         for (Dynasty dynasty : world.getDynastys()) {
             if (dynasty == null || dynasty.getTunnels() == null) {
@@ -157,6 +163,9 @@ public final class HexMapOverlays {
                 if (faceA == null || faceB == null) {
                     continue;
                 }
+                if (clip != null && !clip.intersectsLine(faceA.centerX, faceA.centerY, faceB.centerX, faceB.centerY)) {
+                    continue;
+                }
                 paintTunnelBridge(g2d, faceA, faceB, layoutSize, lineColor, tunnel.isComplete());
             }
         }
@@ -175,6 +184,7 @@ public final class HexMapOverlays {
             return;
         }
 
+        Rectangle clip = g2d.getClipBounds();
         Set<Long> drawnEdges = new HashSet<>();
         for (War war : wars) {
             if (war == null || !war.isActive()) {
@@ -182,33 +192,30 @@ public final class HexMapOverlays {
             }
             int idA = war.getDynastyIdA();
             int idB = war.getDynastyIdB();
-            for (HexGridMesh.Face face : mesh.faces()) {
-                Dynasty dynasty = HexMapGeometry.dynastyOf(face.hex);
-                if (dynasty == null) {
+            for (HexGridMesh.Edge edge : mesh.edges()) {
+                if (edge.faceA == null || edge.faceB == null) {
                     continue;
                 }
-                int faceId = dynasty.getId();
-                if (faceId != idA && faceId != idB) {
+                Dynasty dynA = HexMapGeometry.dynastyOf(edge.faceA.hex);
+                Dynasty dynB = HexMapGeometry.dynastyOf(edge.faceB.hex);
+                if (dynA == null || dynB == null) {
                     continue;
                 }
-                int rivalId = faceId == idA ? idB : idA;
-                for (int[] offset : HexMapGeometry.FLAT_TOP_NEIGHBOR_OFFSETS) {
-                    HexGridMesh.Face neighbor = mesh.faceAt(face.q + offset[0], face.r + offset[1]);
-                    if (neighbor == null) {
-                        continue;
-                    }
-                    Dynasty neighborDynasty = HexMapGeometry.dynastyOf(neighbor.hex);
-                    if (neighborDynasty == null || neighborDynasty.getId() != rivalId) {
-                        continue;
-                    }
-                    long key = edgeKey(face.q, face.r, neighbor.q, neighbor.r);
-                    if (!drawnEdges.add(key)) {
-                        continue;
-                    }
-                    double midX = (face.centerX + neighbor.centerX) * 0.5;
-                    double midY = (face.centerY + neighbor.centerY) * 0.5;
-                    drawCenteredIcon(g2d, warIcon, midX, midY, iconSize);
+                int aId = dynA.getId();
+                int bId = dynB.getId();
+                if (!((aId == idA && bId == idB) || (aId == idB && bId == idA))) {
+                    continue;
                 }
+                double midX = (edge.a.x + edge.b.x) * 0.5;
+                double midY = (edge.a.y + edge.b.y) * 0.5;
+                if (clip != null && !clip.intersects(midX - iconSize, midY - iconSize, iconSize * 2.0, iconSize * 2.0)) {
+                    continue;
+                }
+                long key = edgeKey(edge.faceA.q, edge.faceA.r, edge.faceB.q, edge.faceB.r);
+                if (!drawnEdges.add(key)) {
+                    continue;
+                }
+                drawCenteredIcon(g2d, warIcon, midX, midY, iconSize);
             }
         }
     }

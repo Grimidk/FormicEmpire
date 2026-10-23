@@ -34,7 +34,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -51,8 +51,8 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.hunt.HuntExpedition;
 import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
 import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 
 public class Colony {
     

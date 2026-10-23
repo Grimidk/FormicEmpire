@@ -14,7 +14,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

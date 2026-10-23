@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -16,7 +16,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyResourceS
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 
 public class Trade {
 

@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.managers;
 
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

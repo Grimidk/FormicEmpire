@@ -17,15 +17,30 @@ public class Biome extends Constant{
     private final float mushroomAbundance;
     private final float resinAbundance;
     private final int difficulty;
+    private final ImageIcon tile;
     private final ImageIcon background;
     private final String mapColorHex;
     private final Color mapColor;
+    private final BiomeRarity rarity;
+    private final ClimateZone climateZone;
+    private final boolean coastal;
+    private final HydrologyLevel hydrologyLevel;
+    private final boolean canStart;
     private List<Species> nativeBugs = List.of();
     private List<Species> nativeParasites = List.of();
 
     public Biome(int id, String name, int temperature, int humidity, float plantAbundance, float animalAbundance,
             float mineralAbundance, float mushroomAbundance, float resinAbundance, int difficulty, String mapColorHex,
-            ImageIcon icon, ImageIcon background) {
+            ImageIcon icon, ImageIcon tile) {
+        this(id, name, temperature, humidity, plantAbundance, animalAbundance, mineralAbundance, mushroomAbundance,
+                resinAbundance, difficulty, mapColorHex, icon, tile, BiomeRarity.COMMON, ClimateZone.ANY, false,
+                HydrologyLevel.MODERATE, true);
+    }
+
+    public Biome(int id, String name, int temperature, int humidity, float plantAbundance, float animalAbundance,
+            float mineralAbundance, float mushroomAbundance, float resinAbundance, int difficulty, String mapColorHex,
+            ImageIcon icon, ImageIcon tile, BiomeRarity rarity, ClimateZone climateZone, boolean coastal,
+            HydrologyLevel hydrologyLevel, boolean canStart) {
         super(id, name, icon);
         this.temperature = temperature;
         this.humidity = humidity;
@@ -37,7 +52,13 @@ public class Biome extends Constant{
         this.difficulty = difficulty;
         this.mapColorHex = normalizeMapColorHex(mapColorHex);
         this.mapColor = new Color(Integer.parseInt(this.mapColorHex, 16));
-        this.background = background;
+        this.tile = tile;
+        this.background = tile;
+        this.rarity = rarity != null ? rarity : BiomeRarity.COMMON;
+        this.climateZone = climateZone != null ? climateZone : ClimateZone.ANY;
+        this.coastal = coastal;
+        this.hydrologyLevel = hydrologyLevel != null ? hydrologyLevel : HydrologyLevel.MODERATE;
+        this.canStart = canStart;
     }
 
     public static String normalizeMapColorHex(String hex) {
@@ -94,8 +115,12 @@ public class Biome extends Constant{
         return difficulty;
     }
 
+    public ImageIcon getTile() {
+        return tile != null ? tile : background;
+    }
+
     public ImageIcon getBackground() {
-        return background;
+        return background != null ? background : tile;
     }
 
     public String getMapColorHex() {
@@ -113,4 +138,10 @@ public class Biome extends Constant{
     public float getMineralAbundance() { return mineralAbundance; }
     public float getMushroomAbundance() { return mushroomAbundance; }
     public float getResinAbundance() { return resinAbundance; }
+    public BiomeRarity getRarity() { return rarity; }
+    public ClimateZone getClimateZone() { return climateZone; }
+    public boolean isCoastal() { return coastal; }
+    public HydrologyLevel getHydrologyLevel() { return hydrologyLevel; }
+    public boolean canStart() { return canStart; }
+    public boolean isCanStart() { return canStart; }
 }

@@ -4,7 +4,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
@@ -389,7 +389,8 @@ public final class WarProgressService {
     private static void resolveActiveClashHour(World world, War war, Dynasty stageAttacker, Dynasty stageDefender) {
         if (!WarCreatureCombatService.hasLivingCombatants(war)) {
             WarCreatureCombatService.clear(war);
-            WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender, world.getDay());
+            var state = WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender, world.getDay());
+            applyRiverBattleFlag(world, war, state);
         }
         WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war, world.getDay());
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
@@ -436,14 +437,16 @@ public final class WarProgressService {
         war.setStageAttackerDynastyId(activeWinner.getId());
         war.setStagePhase(GameConstants.WAR_STAGE_RESERVE_ASSAULT);
         WarCreatureCombatService.clear(war);
-        WarCreatureCombatService.startHexBattle(war, activeWinner, reserveTarget, world.getDay());
+        var state = WarCreatureCombatService.startHexBattle(war, activeWinner, reserveTarget, world.getDay());
+        applyRiverBattleFlag(world, war, state);
     }
 
     private static void resolveReserveAssaultHour(World world, WarService warService, War war,
             Dynasty aggressor, Dynasty defender, Dynasty stageAttacker, Dynasty stageDefender, Colony contested) {
         if (!WarCreatureCombatService.hasLivingCombatants(war)) {
             WarCreatureCombatService.clear(war);
-            WarCreatureCombatService.startHexBattle(war, stageAttacker, contested, world.getDay());
+            var state = WarCreatureCombatService.startHexBattle(war, stageAttacker, contested, world.getDay());
+            applyRiverBattleFlag(world, war, state);
         }
         WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war, world.getDay());
         ColonyMilitaryService.refreshColonyMilitaryPower(contested);
@@ -620,7 +623,8 @@ public final class WarProgressService {
         war.setStageStartActiveAggressor(ColonyMilitaryService.powerForWarStanding(aggressor));
         war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(defender));
         WarCreatureCombatService.clear(war);
-        WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender, world.getDay());
+        var state = WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender, world.getDay());
+        applyRiverBattleFlag(world, war, state);
     }
 
     private static void beginDirectReserveAssault(World world, War war, Dynasty stageAttacker,
@@ -638,7 +642,8 @@ public final class WarProgressService {
         war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(
                 world.findDynastyById(war.getDefenderDynastyId())));
         WarCreatureCombatService.clear(war);
-        WarCreatureCombatService.startHexBattle(war, stageAttacker, contested, world.getDay());
+        var state = WarCreatureCombatService.startHexBattle(war, stageAttacker, contested, world.getDay());
+        applyRiverBattleFlag(world, war, state);
     }
 
     private static void reassignContestedColony(World world, War war, Dynasty aggressor, Dynasty defender) {
@@ -650,6 +655,16 @@ public final class WarProgressService {
             war.setContestedColonyId(contested.getId());
             war.setStageAttackerDynastyId(aggressor.getId());
             beginActiveClash(world, war, aggressor, defender);
+        }
+    }
+
+    private static void applyRiverBattleFlag(World world, War war, WarBattleState state) {
+        if (state == null || world == null || war == null) {
+            return;
+        }
+        Hex hex = world.findHexForColonyId(war.getContestedColonyId());
+        if (hex != null && hex.hasAnyRiver()) {
+            state.setRiverBattle(true);
         }
     }
 

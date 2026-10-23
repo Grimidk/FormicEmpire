@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.entities;
+package com.grimidk.formicempire.classes.entities.world;
 
 import javax.swing.ImageIcon;
 

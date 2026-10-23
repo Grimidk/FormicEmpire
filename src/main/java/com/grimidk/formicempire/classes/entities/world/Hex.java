@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.entities;
+package com.grimidk.formicempire.classes.entities.world;
 
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -127,5 +127,97 @@ public class Hex {
             return;
         }
         nonWaterResourceSourcesGenerated++;
+    }
+
+    private final boolean[] riverEdges = new boolean[6];
+    private int continentId;
+    private int waterDistance;
+    private boolean coastal;
+
+    public boolean hasRiverEdge(int direction) {
+        if (direction < 0 || direction >= riverEdges.length) {
+            return false;
+        }
+        return riverEdges[direction];
+    }
+
+    public void setRiverEdge(int direction, boolean river) {
+        if (direction >= 0 && direction < riverEdges.length) {
+            riverEdges[direction] = river;
+        }
+    }
+
+    public boolean hasAnyRiver() {
+        for (boolean r : riverEdges) {
+            if (r) return true;
+        }
+        return false;
+    }
+
+    public boolean[] getRiverEdges() {
+        return riverEdges;
+    }
+
+    public int directionTo(Hex other) {
+        if (other == null) return -1;
+        if (other == southEast) return 0;
+        if (other == south) return 1;
+        if (other == southWest) return 2;
+        if (other == northWest) return 3;
+        if (other == north) return 4;
+        if (other == northEast) return 5;
+        return -1;
+    }
+
+    public boolean hasRiverTo(Hex neighbor) {
+        int dir = directionTo(neighbor);
+        if (dir >= 0 && dir < 6) {
+            return riverEdges[dir];
+        }
+        return false;
+    }
+
+    public Hex getNeighbor(int direction) {
+        return switch (direction) {
+            case 0 -> southEast;
+            case 1 -> south;
+            case 2 -> southWest;
+            case 3 -> northWest;
+            case 4 -> north;
+            case 5 -> northEast;
+            default -> null;
+        };
+    }
+
+    public int getRiverEdgeCount() {
+        int count = 0;
+        for (boolean r : riverEdges) {
+            if (r) count++;
+        }
+        return count;
+    }
+
+    public int getContinentId() {
+        return continentId;
+    }
+
+    public void setContinentId(int continentId) {
+        this.continentId = continentId;
+    }
+
+    public int getWaterDistance() {
+        return waterDistance;
+    }
+
+    public void setWaterDistance(int waterDistance) {
+        this.waterDistance = waterDistance;
+    }
+
+    public boolean isCoastal() {
+        return coastal;
+    }
+
+    public void setCoastal(boolean coastal) {
+        this.coastal = coastal;
     }
 }

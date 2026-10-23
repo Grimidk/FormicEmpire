@@ -10,6 +10,8 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 
 class DynastyAutoUpgradePrerequisitesTest {
 
