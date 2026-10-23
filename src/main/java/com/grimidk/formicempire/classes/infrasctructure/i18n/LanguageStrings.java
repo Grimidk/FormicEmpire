@@ -1087,6 +1087,7 @@ public final class LanguageStrings {
     public static final String MAP_ACTIVE_WARS_HIDE = "MAP_ACTIVE_WARS_HIDE";
     public static final String MAP_ACTIVE_WAR_OPEN = "MAP_ACTIVE_WAR_OPEN";
     public static final String MAP_LAYERS = "MAP_LAYERS";
+    public static final String MAP_LAYERS_TT = "MAP_LAYERS_TT";
     public static final String MAP_LAYER_BORDERS = "MAP_LAYER_BORDERS";
     public static final String MAP_LAYER_RIVERS = "MAP_LAYER_RIVERS";
     public static final String MAP_LAYER_MERIDIAN = "MAP_LAYER_MERIDIAN";
@@ -1604,6 +1605,8 @@ public final class LanguageStrings {
     public static final String SAVE_ACHIEVEMENTS_WARN_TITLE = "SAVE_ACHIEVEMENTS_WARN_TITLE";
     public static final String SAVE_ACHIEVEMENTS_WARN_CREATE = "SAVE_ACHIEVEMENTS_WARN_CREATE";
     public static final String SAVE_ACHIEVEMENTS_WARN_LOAD = "SAVE_ACHIEVEMENTS_WARN_LOAD";
+    public static final String SAVE_UPDATE_VERSION_PROMPT = "SAVE_UPDATE_VERSION_PROMPT";
+    public static final String SAVE_UPDATE_VERSION_TITLE = "SAVE_UPDATE_VERSION_TITLE";
     public static final String SETTINGS_SANDBOX_WARN_IN_GAME = "SETTINGS_SANDBOX_WARN_IN_GAME";
 
     public static final String SETTINGS_LANGUAGE = "SETTINGS_LANGUAGE";

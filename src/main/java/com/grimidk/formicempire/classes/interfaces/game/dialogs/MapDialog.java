@@ -144,8 +144,17 @@ public class MapDialog extends ZeroDialog {
 
         layersButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_LAYERS));
         layersButton.setFocusable(false);
-        AssetStyles.styleButton(layersButton);
+        layersButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_LAYERS_TT));
+        layersButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        AssetStyles.styleCompactButton(layersButton);
+        Dimension layersBtnSize = AssetStyles.minControlHitSize();
+        layersButton.setPreferredSize(layersBtnSize);
+        layersButton.setMinimumSize(layersBtnSize);
+        layersButton.setMaximumSize(layersBtnSize);
+        layersButton.setMargin(new Insets(0, 0, 0, 0));
         layersButton.addActionListener(e -> showLayersMenu());
+        zoomRail.add(Box.createVerticalStrut(8));
+        zoomRail.add(layersButton);
 
         conquerButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY));
         conquerButton.setFocusable(false);
@@ -162,7 +171,6 @@ public class MapDialog extends ZeroDialog {
         bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(homeButton);
-        bottomPanel.add(layersButton);
         bottomPanel.add(conquerButton);
         bottomPanel.add(closeButton);
 
@@ -515,7 +523,8 @@ public class MapDialog extends ZeroDialog {
         menu.setBorder(BorderFactory.createEmptyBorder());
         menu.setBackground(AssetStyles.BACKGROUND_COLOR);
         menu.add(panel);
-        UiTableStyles.showComponentPopupMenu(menu, layersButton);
+        Dimension menuSize = menu.getPreferredSize();
+        menu.show(layersButton, -menuSize.width - 4, 0);
     }
 
     private enum Layer {
@@ -750,7 +759,12 @@ public class MapDialog extends ZeroDialog {
         zoomSlider.setPreferredSize(zoomTrack);
         zoomSlider.setMinimumSize(zoomTrack);
         zoomSlider.setMaximumSize(zoomTrack);
-        AssetStyles.styleButton(layersButton);
+        AssetStyles.styleCompactButton(layersButton);
+        Dimension layersBtnSize = AssetStyles.minControlHitSize();
+        layersButton.setPreferredSize(layersBtnSize);
+        layersButton.setMinimumSize(layersBtnSize);
+        layersButton.setMaximumSize(layersBtnSize);
+        layersButton.setMargin(new Insets(0, 0, 0, 0));
         AssetStyles.styleButton(conquerButton);
         AssetStyles.styleButton(closeButton);
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);

@@ -298,8 +298,16 @@ public class SaveSelectPanel extends JPanel {
             }
             taintSavefileIfSandboxActive(fresh);
             if (fresh.getVersion() == null || !fresh.getVersion().equals(SaveManager.getAppVersion())) {
-                fresh.setVersion(SaveManager.getAppVersion());
-                saveManager.saveUserSlotAsync(fresh, null);
+                int choice = UiOptionPane.showConfirmDialog(
+                        frame,
+                        LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_PROMPT),
+                        LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_TITLE),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (choice == JOptionPane.YES_OPTION) {
+                    fresh.setVersion(SaveManager.getAppVersion());
+                    saveManager.saveUserSlotAsync(fresh, null);
+                }
             }
             cachedSaves[idx] = fresh;
             applySlotLabels();
