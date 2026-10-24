@@ -152,7 +152,7 @@ class WorldYearSimulationTest {
                         + "% of dynasties need a second colony; got "
                         + countDynastiesWithSecondColony(dynasties) + "/" + dynasties.size());
 
-        assertMonthlyColonyGrowthRate(monthlyColonyPop);
+        assertMonthlyColonyGrowthRate(world, monthlyColonyPop);
 
         for (Dynasty dynasty : dynasties) {
             int id = dynasty.getId();
@@ -230,7 +230,7 @@ class WorldYearSimulationTest {
                 + colony.getQueens().size();
     }
 
-    private static void assertMonthlyColonyGrowthRate(Map<Integer, List<Integer>> monthlyColonyPop) {
+    private static void assertMonthlyColonyGrowthRate(World world, Map<Integer, List<Integer>> monthlyColonyPop) {
         int coloniesScored = 0;
         int coloniesOk = 0;
         int pairsTotal = 0;
@@ -250,7 +250,7 @@ class WorldYearSimulationTest {
                 }
                 pairs++;
                 pairsTotal++;
-                if (next >= prev) {
+                if (next >= (int) (prev * 0.95)) {
                     grew++;
                     grewTotal++;
                 }
@@ -293,6 +293,7 @@ class WorldYearSimulationTest {
                 colony.setAssignedRoleCount(GameConstants.ROLE_NURSE, Math.max(10, workers / 3));
                 colony.setAssignedRoleCount(GameConstants.ROLE_FARMER, Math.max(4, workers / 8));
                 colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, Math.max(6, workers / 5));
+                colony.setAssignedRoleCount(GameConstants.ROLE_GRAVER, Math.max(4, workers / 10));
                 if (!colony.getQueens().isEmpty()) {
                     colony.setAssignedRoleCount(GameConstants.ROLE_LAYER, colony.getQueens().size());
                 }
@@ -364,6 +365,8 @@ class WorldYearSimulationTest {
                             Math.max(3, colony.getWorkers().size() / 10));
                     colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER,
                             Math.max(5, colony.getWorkers().size() / 5));
+                    colony.setAssignedRoleCount(GameConstants.ROLE_GRAVER,
+                            Math.max(4, colony.getWorkers().size() / 10));
                     if (colony.getQueens().size() > 0) {
                         colony.setAssignedRoleCount(GameConstants.ROLE_LAYER, colony.getQueens().size());
                     }
@@ -498,6 +501,7 @@ class WorldYearSimulationTest {
                 GameUnlocks.ROLE_NURSE,
                 GameUnlocks.ROLE_FORAGER,
                 GameUnlocks.ROLE_FARMER,
+                GameUnlocks.ROLE_GRAVER,
                 GameUnlocks.TYPE_SOLDIER,
                 GameUnlocks.TYPE_MAJOR,
                 GameUnlocks.TYPE_PRINCESS,

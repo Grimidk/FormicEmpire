@@ -29,6 +29,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyPopulationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -124,6 +125,10 @@ public class SaveManager {
 
     public void saveAutosave(World w, Engine e) {
         if (w == null) return;
+        if (isPlayerDynastyAboutToDieWithoutQueen(w)) {
+            System.out.println("[SaveManager] Skipping autosave: player dynasty is about to die without a queen.");
+            return;
+        }
         int slotId = 0;
         try {
             slotId = w.getSaveSlotId();
@@ -173,8 +178,49 @@ public class SaveManager {
         return removed;
     }
 
+    public static boolean isPlayerDynastyAboutToDieWithoutQueen(World w) {
+        if (w == null || w.getDynastys() == null) {
+            return false;
+        }
+        for (Dynasty d : w.getDynastys()) {
+            if (d == null || d.isDefeated() || !d.isPlayer()) {
+                continue;
+            }
+            if (isDynastyAboutToDieWithoutQueen(d)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isDynastyAboutToDieWithoutQueen(Dynasty dynasty) {
+        if (dynasty == null || dynasty.isDefeated() || dynasty.getColonies() == null) {
+            return false;
+        }
+        boolean anyQueenInDynasty = false;
+        for (Colony c : dynasty.getColonies()) {
+            if (c != null && !c.getQueens().isEmpty()) {
+                anyQueenInDynasty = true;
+                break;
+            }
+        }
+        if (!anyQueenInDynasty) {
+            return true;
+        }
+        for (Colony c : dynasty.getColonies()) {
+            if (c != null && c.getQueens().isEmpty() && c.getDaysWithoutQueen() >= 5) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void saveWorldToSlot(World w, int slotId) {
         if (w == null) return;
+        if (isPlayerDynastyAboutToDieWithoutQueen(w)) {
+            System.out.println("[SaveManager] Skipping save: player dynasty is about to die without a queen.");
+            return;
+        }
         
         if (slotId == 0) {
             System.out.println("[SaveManager] Skipping autosave for new game (Slot ID 0).");
@@ -295,6 +341,10 @@ public class SaveManager {
     
     public void saveWorldToSlotUser(World w, int slotId, String name) throws IOException {
         if (w == null) return;
+        if (isPlayerDynastyAboutToDieWithoutQueen(w)) {
+            System.out.println("[SaveManager] Skipping manual save: player dynasty is about to die without a queen.");
+            return;
+        }
         
         String saveName = (name != null && !name.isEmpty()) ? name : String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotId);
         Savefile save = new Savefile(slotId, saveName);
@@ -621,6 +671,15 @@ public class SaveManager {
                     sc.majorMods = AntModService.aggregateModCounts(c.getMajors());
                     sc.princessMods = AntModService.aggregateModCounts(c.getPrincesses());
                     sc.queenMods = AntModService.aggregateModCounts(c.getQueens());
+                    sc.eggAges = ColonyPopulationService.aggregateAgeCounts(c.getEggs());
+                    sc.larvaAges = ColonyPopulationService.aggregateAgeCounts(c.getLarvae());
+                    sc.pupaAges = ColonyPopulationService.aggregateAgeCounts(c.getPupae());
+                    sc.workerAges = ColonyPopulationService.aggregateAgeCounts(c.getWorkers());
+                    sc.soldierAges = ColonyPopulationService.aggregateAgeCounts(c.getSoldiers());
+                    sc.majorAges = ColonyPopulationService.aggregateAgeCounts(c.getMajors());
+                    sc.droneAges = ColonyPopulationService.aggregateAgeCounts(c.getDrones());
+                    sc.princessAges = ColonyPopulationService.aggregateAgeCounts(c.getPrincesses());
+                    sc.queenAges = ColonyPopulationService.aggregateAgeCounts(c.getQueens());
                     
                     // Stats
                     sc.aphids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_APHID);
@@ -915,6 +974,15 @@ public class SaveManager {
         w.write("      \"majorMods\": " + serializeMapToJson(sc.majorMods) + ","); w.newLine();
         w.write("      \"princessMods\": " + serializeMapToJson(sc.princessMods) + ","); w.newLine();
         w.write("      \"queenMods\": " + serializeMapToJson(sc.queenMods) + ","); w.newLine();
+        w.write("      \"eggAges\": " + serializeMapToJson(sc.eggAges) + ","); w.newLine();
+        w.write("      \"larvaAges\": " + serializeMapToJson(sc.larvaAges) + ","); w.newLine();
+        w.write("      \"pupaAges\": " + serializeMapToJson(sc.pupaAges) + ","); w.newLine();
+        w.write("      \"workerAges\": " + serializeMapToJson(sc.workerAges) + ","); w.newLine();
+        w.write("      \"soldierAges\": " + serializeMapToJson(sc.soldierAges) + ","); w.newLine();
+        w.write("      \"majorAges\": " + serializeMapToJson(sc.majorAges) + ","); w.newLine();
+        w.write("      \"droneAges\": " + serializeMapToJson(sc.droneAges) + ","); w.newLine();
+        w.write("      \"princessAges\": " + serializeMapToJson(sc.princessAges) + ","); w.newLine();
+        w.write("      \"queenAges\": " + serializeMapToJson(sc.queenAges) + ","); w.newLine();
         
         writeJsonLine(w, "aphids", sc.aphids, false);
         writeJsonLine(w, "symbioticMites", sc.symbioticMites, false);
@@ -1258,6 +1326,15 @@ public class SaveManager {
         sc.majorMods = deserializeJsonToMap(map.get("majorMods"));
         sc.princessMods = deserializeJsonToMap(map.get("princessMods"));
         sc.queenMods = deserializeJsonToMap(map.get("queenMods"));
+        sc.eggAges = deserializeJsonToMap(map.get("eggAges"));
+        sc.larvaAges = deserializeJsonToMap(map.get("larvaAges"));
+        sc.pupaAges = deserializeJsonToMap(map.get("pupaAges"));
+        sc.workerAges = deserializeJsonToMap(map.get("workerAges"));
+        sc.soldierAges = deserializeJsonToMap(map.get("soldierAges"));
+        sc.majorAges = deserializeJsonToMap(map.get("majorAges"));
+        sc.droneAges = deserializeJsonToMap(map.get("droneAges"));
+        sc.princessAges = deserializeJsonToMap(map.get("princessAges"));
+        sc.queenAges = deserializeJsonToMap(map.get("queenAges"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
         sc.symbioticMites = Integer.parseInt(map.getOrDefault("symbioticMites",

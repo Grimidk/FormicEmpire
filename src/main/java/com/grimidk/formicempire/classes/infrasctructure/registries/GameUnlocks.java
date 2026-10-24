@@ -229,6 +229,10 @@ public final class GameUnlocks {
                 static { upgrades.add(STAT_ACID); }
         public static final Upgrade STAT_LONGEVITY = new Upgrade(103, "STAT_LONGEVITY", "STAT_LONGEVITY_FLAVOR", "STAT_LONGEVITY_DESC", TYPE_EGG, 0, loadIcon("icons/upgrades/StatLongevity.png"), 0, 4, 1);
                 static { upgrades.add(STAT_LONGEVITY); }
+        public static final Upgrade STAT_LONGEVITY_2 = new Upgrade(144, "STAT_LONGEVITY_2", "STAT_LONGEVITY_2_FLAVOR", "STAT_LONGEVITY_2_DESC", STAT_LONGEVITY, 6000, loadIcon("icons/upgrades/StatLongevity2.png"), 2, 6, 1);
+                static { upgrades.add(STAT_LONGEVITY_2); }
+        public static final Upgrade STAT_LONGEVITY_3 = new Upgrade(145, "STAT_LONGEVITY_3", "STAT_LONGEVITY_3_FLAVOR", "STAT_LONGEVITY_3_DESC", STAT_LONGEVITY_2, 25000, loadIcon("icons/upgrades/StatLongevity3.png"), 3, 7, 1);
+                static { upgrades.add(STAT_LONGEVITY_3); }
         public static final Upgrade STAT_RESEARCH_1 = new Upgrade(104, "STAT_RESEARCH_1", "STAT_RESEARCH_1_FLAVOR", "STAT_RESEARCH_1_DESC", ROLE_RESEARCHER, 500, loadIcon("icons/upgrades/StatResearch1.png"), 1, -4, -3);
                 static { upgrades.add(STAT_RESEARCH_1); }
         public static final Upgrade STAT_RESEARCH_2 = new Upgrade(105, "STAT_RESEARCH_2", "STAT_RESEARCH_2_FLAVOR", "STAT_RESEARCH_2_DESC", STAT_RESEARCH_1, 2000, loadIcon("icons/upgrades/StatResearch2.png"), 2, -4, -4);

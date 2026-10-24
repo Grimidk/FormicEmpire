@@ -1982,6 +1982,15 @@ public final class GameConstants {
         return null;
     }
 
+    public static boolean isAdultClass(AntClass type) {
+        return type == CLASS_WORKER
+                || type == CLASS_SOLDIER
+                || type == CLASS_MAJOR
+                || type == CLASS_DRONE
+                || type == CLASS_PRINCESS
+                || type == CLASS_QUEEN;
+    }
+
     public static List<AntClass> getAntClasses() { return Collections.unmodifiableList(antClasses); }
 
     public static AntClass getAntClassById(int id) {

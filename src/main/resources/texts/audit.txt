@@ -20,7 +20,7 @@ Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic change
 ================================================================================
 General:
 [X] Language, autosave frequency, arachnophobia mode, pause on focus loss, confirm on quit, ESC behavior, tooltips, overworld auto-recenter, fuzz parasite ant numbers
-[ ] Disable popups (not recommended — unlocks still apply silently)
+[X] Disable popups (not recommended — unlocks still apply silently)
 [X] Reset tab to defaults
 
 Video:
@@ -30,7 +30,7 @@ Video:
 
 Audio:
 [X] Master / music / SFX volume; popup, spinner, and battle-finished SFX
-[ ] Building start/finish, close-window, research purchased, assimilation finished, menu click SFX
+[X] Building start/finish, close-window, research purchased, assimilation finished, menu click SFX
 [X] Reset tab to defaults
 
 Roles (default hatch roles):
@@ -57,7 +57,7 @@ Sandbox:
 ================================================================================
 [X] Speed controls (− / + / = keys and buttons), play/pause (Space), turbo gated by settings, menu button
 [X] Side panels — time, world, colony, resources, population, alerts, minimap (biome colors, dynasty frontiers, click opens map), music player
-[ ] Resources panel — overworld mushroom/resin source availability (Scouting 2+/3+)
+[X] Resources panel — overworld mushroom/resin source availability (Scouting 2+/3+)
 [X] Menu music after intro; session music on load; volumes from Settings > Audio
 
 ================================================================================
@@ -89,7 +89,7 @@ Sandbox:
 ================================================================================
 [X] Research tree UI — radial layout, detail card, buy gates, pan/zoom, hidden locked nodes, Help reveals full tree
 [X] Ant types, worker/soldier/major/princess/queen roles, advanced logistics roles, colony abilities (through Auto-Diplomacy)
-[ ] Pending unlocks — Miner, Bomber, Troop-Carrier/Siege detail, Spy, Air Bomber, Auto-Logistics; Scouting 2/3 overworld sources
+[X] Pending unlocks — Miner, Bomber, Troop-Carrier/Siege detail, Spy, Air Bomber, Auto-Logistics; Scouting 2/3 overworld sources
 [X] Stat upgrade tiers (Skeleton through Worker Speed 2, Symbiotic Mite, Dermestid, Graving, Policing, Hex Sustain)
 [X] Selfdestruct, Farsight, Acidspit, Assimilation/Genome Bridge; insufficient RP and prerequisite messaging
 
@@ -99,7 +99,7 @@ Sandbox:
 [X] Building tree UI — chains, tier dividers, detail card, progress bar, build/cancel, hidden locked nodes, Help reveals full tree
 [X] Storage chains L0–L5 — Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock (Miner), Resin (Resin ability)
 [X] Passive rooms — Lab, Aphid, Nurse, Farm, Grave, Composter
-[ ] Passive Water + Passive Web (Web Building synergy)
+[X] Passive Water + Passive Web (Web Building synergy)
 [X] Build queues, under-construction progress, completed rooms in underworld layout
 
 ================================================================================
@@ -123,9 +123,9 @@ Sandbox:
 ================================================================================
 14. CRITTER MANAGEMENT (H)
 ================================================================================
-[ ] Hunts — scout discovery, party from unassigned soldiers/majors/princesses, travel preview, hourly battle, rewards/loss, escape timer, blocked at war
+[X] Hunts — scout discovery, party from unassigned soldiers/majors/princesses, travel preview, hourly battle, rewards/loss, escape timer, blocked at war
 [ ] Invasions — alerts, 72h deadline, unassigned defense party, immediate hourly battle, raid on timeout/defeat
-[ ] Pets / Parasites tabs — counts, capacity, natives, outbreak info; role management unassigned % warning below 10%
+[X] Pets / Parasites tabs — counts, capacity, natives, outbreak info; role management unassigned % warning below 10%
 
 ================================================================================
 15. DYNASTY — OVERVIEW (A)
@@ -156,7 +156,7 @@ Sandbox:
 19. WORLD MAP (M)
 ================================================================================
 [X] Hex select; dynasty legend (collapse, color jump, hover tooltip); war sidebar focus; tunnel/battle layers; Easy conquering; Go Home; randomized city titles
-[ ] Mouse wheel zoom + pan when zoomed; trade route layer animation on map
+[X] Mouse wheel zoom + pan when zoomed; trade route layer animation on map
 
 ================================================================================
 20. STATISTICS (X)
@@ -175,7 +175,7 @@ Sandbox:
 ================================================================================
 [X] Monthly — Researcher; parasitic mite outbreak (+ Catch Symbiotic Mite)
 [X] Daily — Graver; Queendom Air Support; Commander (+ capacity bump); Research/Build; Bilateral Trade; Borer; Assimilation ability; subtype hatch UI; Colony Operations; Mass Flight; rank-ups (Police/Cloning fused); Auto-Tunnels/Auto-Diplomacy; colony death; NPC triggers
-[ ] Daily — Scout→Hunts; Hunts backfill popup; Miner gate; Hunter/Warrior/Militia; Breeder+Spread; Brute+Crane+Carrier; Dynasty/Trade/Courier/Management/Spread 2/Automation chain
+[X] Daily — Scout→Hunts; Hunts backfill popup; Miner gate; Hunter/Warrior/Militia; Breeder+Spread; Brute+Crane+Carrier; Dynasty/Trade/Courier/Management/Spread 2/Automation chain
 [X] Hourly trigger checks; popup pauses game and grants unlock
 
 ================================================================================

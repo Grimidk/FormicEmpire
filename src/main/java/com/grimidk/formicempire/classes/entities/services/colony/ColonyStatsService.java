@@ -392,6 +392,51 @@ public class ColonyStatsService {
         return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? GameNumbers.ANT_REGEN_PERCENT_BASE : 0;
     }
     public int getBaseConsumption(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }
+    public int getBaseLifespan(Colony colony) {
+        if (colony == null) {
+            return GameNumbers.LIFESPAN_BASE_DAYS;
+        }
+        if (colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY_3)) {
+            return GameNumbers.LIFESPAN_UPGRADE_3_DAYS;
+        }
+        if (colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY_2)) {
+            return GameNumbers.LIFESPAN_UPGRADE_2_DAYS;
+        }
+        if (colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {
+            return GameNumbers.LIFESPAN_BASE_DAYS;
+        }
+        return GameNumbers.LIFESPAN_NO_UPGRADE_DAYS;
+    }
+
+    public int getAntLifespan(Colony colony, AntClass antClass) {
+        int baseDays = getBaseLifespan(colony);
+        if (antClass == GameConstants.CLASS_WORKER) {
+            return GameNumbers.calculateLifespan(baseDays, GameNumbers.LIFESPAN_MULT_WORKER);
+        }
+        if (antClass == GameConstants.CLASS_SOLDIER) {
+            return GameNumbers.calculateLifespan(baseDays, GameNumbers.LIFESPAN_MULT_SOLDIER);
+        }
+        if (antClass == GameConstants.CLASS_MAJOR) {
+            return GameNumbers.calculateLifespan(baseDays, GameNumbers.LIFESPAN_MULT_MAJOR);
+        }
+        if (antClass == GameConstants.CLASS_DRONE) {
+            return GameNumbers.calculateLifespan(baseDays, GameNumbers.LIFESPAN_MULT_DRONE);
+        }
+        if (antClass == GameConstants.CLASS_PRINCESS) {
+            return GameNumbers.calculateLifespan(baseDays, GameNumbers.LIFESPAN_MULT_PRINCESS);
+        }
+        if (antClass == GameConstants.CLASS_QUEEN) {
+            return GameNumbers.calculateLifespan(baseDays, GameNumbers.LIFESPAN_MULT_QUEEN);
+        }
+        return baseDays;
+    }
+
+    public int getAntLifespan(Colony colony, Ant ant) {
+        if (ant == null) {
+            return getBaseLifespan(colony);
+        }
+        return getAntLifespan(colony, ant.getAntClass());
+    }
 
     public static float getAssimilatedDamageMultiplier(Dynasty dynasty) {
         if (dynasty == null) {
@@ -673,5 +718,45 @@ public class ColonyStatsService {
 
     public int getSubtypeFoodOverhead(Colony colony) {
         return getModFoodOverhead(colony);
+    }
+
+    public double getAverageAntAge(Colony colony, AntClass antClass) {
+        if (colony == null || antClass == null) {
+            return 0.0;
+        }
+        List<Ant> ants = colony.getAntsByClass(antClass);
+        if (ants == null || ants.isEmpty()) {
+            return 0.0;
+        }
+        long sum = 0;
+        int count = 0;
+        for (Ant ant : ants) {
+            if (ant != null && ant.isAlive()) {
+                sum += ant.getAge();
+                count++;
+            }
+        }
+        return count > 0 ? (double) sum / count : 0.0;
+    }
+
+    public double getAverageAntAge(Colony colony) {
+        if (colony == null || colony.getAntGroups() == null) {
+            return 0.0;
+        }
+        long sum = 0;
+        int count = 0;
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            List<Ant> ants = entry.getValue();
+            if (ants == null) {
+                continue;
+            }
+            for (Ant ant : ants) {
+                if (ant != null && ant.isAlive()) {
+                    sum += ant.getAge();
+                    count++;
+                }
+            }
+        }
+        return count > 0 ? (double) sum / count : 0.0;
     }
 }

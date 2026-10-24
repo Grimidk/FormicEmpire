@@ -30,6 +30,7 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.world.Hex;
@@ -57,6 +58,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -3508,9 +3510,35 @@ public class World {
         }
         historyService.setRecordingEnabled(true);
 
+        ensurePlayerDynastyHasQueenAfterLoad();
         relocalizeDynastyNames();
         changeActiveHex(getSpawnHex());
         updateEnvironmentalConditions();
+    }
+
+    private void ensurePlayerDynastyHasQueenAfterLoad() {
+        for (Dynasty dynasty : getDynastys()) {
+            if (dynasty == null || !dynasty.isPlayer() || dynasty.isDefeated()) {
+                continue;
+            }
+            boolean hasQueen = false;
+            for (Colony c : dynasty.getColonies()) {
+                if (c != null && !c.getQueens().isEmpty()) {
+                    hasQueen = true;
+                    break;
+                }
+            }
+            if (!hasQueen) {
+                Colony target = dynasty.getCapital() != null ? dynasty.getCapital() : (dynasty.getColonies().isEmpty() ? null : dynasty.getColonies().get(0));
+                if (target != null) {
+                    Ant freeQueen = new Ant(target, GameConstants.CLASS_QUEEN);
+                    freeQueen.setDimension(WorldSpaces.UNDERWORLD);
+                    freeQueen.setRole(GameConstants.ROLE_LAYER);
+                    target.getQueens().add(freeQueen);
+                    target.setDaysWithoutQueen(0);
+                }
+            }
+        }
     }
 
     private void reapplyRoleAssignmentsAfterLoad() {

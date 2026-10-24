@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -179,11 +180,24 @@ public class ColonyPopulationService {
     }
 
     public void runAging(Colony colony){
+        if (colony == null || colony.getAntGroups() == null) {
+            return;
+        }
         List<Ant> antsToKill = new ArrayList<>();
 
-        for (List<Ant> antList : colony.getAntGroups().values()) {
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntClass antClass = entry.getKey();
+            List<Ant> antList = entry.getValue();
+            if (antList == null || antList.isEmpty()) {
+                continue;
+            }
+            boolean isAdult = GameConstants.isAdultClass(antClass);
+            int lifespan = isAdult ? colony.getStatsService().getAntLifespan(colony, antClass) : Integer.MAX_VALUE;
             for (Ant ant : antList) {
                 ant.setAge(ant.getAge() + 1);
+                if (isAdult && ant.getAge() >= lifespan) {
+                    antsToKill.add(ant);
+                }
             }
         }
         
@@ -558,5 +572,40 @@ public class ColonyPopulationService {
         else if (total >= GameConstants.RANK_COUNTY.getPopulation()) colony.setRank(GameConstants.RANK_COUNTY);
         else if (total >= GameConstants.RANK_COLONY.getPopulation()) colony.setRank(GameConstants.RANK_COLONY);
         else colony.setRank(GameConstants.RANK_ANT);
+    }
+
+    public static Map<String, Integer> aggregateAgeCounts(List<Ant> ants) {
+        Map<String, Integer> counts = new HashMap<>();
+        if (ants == null) {
+            return counts;
+        }
+        for (Ant ant : ants) {
+            if (ant == null || !ant.isAlive()) {
+                continue;
+            }
+            int age = ant.getAge();
+            String key = String.valueOf(age);
+            counts.merge(key, 1, Integer::sum);
+        }
+        return counts;
+    }
+
+    public static void applyAgesFromCounts(List<Ant> ants, Map<String, Integer> ageCounts) {
+        if (ants == null || ants.isEmpty() || ageCounts == null || ageCounts.isEmpty()) {
+            return;
+        }
+        int antIndex = 0;
+        for (Map.Entry<String, Integer> entry : ageCounts.entrySet()) {
+            int age;
+            try {
+                age = Integer.parseInt(entry.getKey());
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            int count = entry.getValue() != null ? entry.getValue() : 0;
+            for (int i = 0; i < count && antIndex < ants.size(); i++) {
+                ants.get(antIndex++).setAge(age);
+            }
+        }
     }
 }

@@ -189,6 +189,15 @@ public class Savefile implements Serializable {
         public Map<String, Integer> majorMods = new HashMap<>();
         public Map<String, Integer> princessMods = new HashMap<>();
         public Map<String, Integer> queenMods = new HashMap<>();
+        public Map<String, Integer> eggAges = new HashMap<>();
+        public Map<String, Integer> larvaAges = new HashMap<>();
+        public Map<String, Integer> pupaAges = new HashMap<>();
+        public Map<String, Integer> workerAges = new HashMap<>();
+        public Map<String, Integer> soldierAges = new HashMap<>();
+        public Map<String, Integer> majorAges = new HashMap<>();
+        public Map<String, Integer> droneAges = new HashMap<>();
+        public Map<String, Integer> princessAges = new HashMap<>();
+        public Map<String, Integer> queenAges = new HashMap<>();
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
         public int pheromoneStormMonthsRemaining;
         public int recentlyConqueredMonthsRemaining;

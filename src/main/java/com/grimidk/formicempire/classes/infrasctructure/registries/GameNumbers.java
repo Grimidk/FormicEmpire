@@ -203,6 +203,16 @@ public final class GameNumbers {
     public static final float ASSIMILATED_HEATRESIST_SPEED_MULT = 1.4f;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
+    public static final int LIFESPAN_BASE_DAYS = 180;
+    public static final int LIFESPAN_NO_UPGRADE_DAYS = 90;
+    public static final int LIFESPAN_UPGRADE_2_DAYS = LIFESPAN_BASE_DAYS * 2;
+    public static final int LIFESPAN_UPGRADE_3_DAYS = LIFESPAN_BASE_DAYS * 4;
+    public static final float LIFESPAN_MULT_WORKER = 1.0f;
+    public static final float LIFESPAN_MULT_SOLDIER = 1.0f;
+    public static final float LIFESPAN_MULT_MAJOR = 1.0f;
+    public static final float LIFESPAN_MULT_DRONE = 1.0f / 3.0f;
+    public static final float LIFESPAN_MULT_PRINCESS = 2.0f;
+    public static final float LIFESPAN_MULT_QUEEN = 20.0f;
 
     // --- Integration / calendar ---
     public static final float INTEGRATION_MILITARY_RATIO_REQUIRED = 5f;
@@ -547,6 +557,13 @@ public final class GameNumbers {
 
     public static int clampEvasionPercent(int evasionPercent) {
         return Math.round(clampEvasionPercent((float) evasionPercent));
+    }
+
+    public static int calculateLifespan(int baseDays, float casteMultiplier) {
+        if (baseDays <= 0 || casteMultiplier <= 0f) {
+            return 1;
+        }
+        return Math.max(1, Math.round(baseDays * casteMultiplier));
     }
 
     public static float applyEvasionToHitChance(float hitChance, float evasionPercent) {

@@ -12,9 +12,9 @@ To Fix (By decreasing priority):
 	Can't reproduce:
 		(none right now)
 	Important not Urgent:
-		evaluate how to save and persist age
 		saves and have the option to update version
-		rethink layer menu so its prettier maybe with icons
+		bring back visti diplomacy action and use the square in map dialog to visit
+		allow dynasty dialog while visiting but it opens the player's
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):
@@ -96,7 +96,7 @@ Needed for launch (v1.0) (Launch Version):
 		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
 
 Post launch (v1.1) (Improvements Update):
-	tectonic plates to determine mountain ranges, volcanic chains, valleys, give altitude to hexes (and restrictions) so rivers go from high to low forking on tie and making lakes where they surrond
+	tectonic plates to determine mountain ranges, volcanic chains, valleys, give altitude to hexes (and restrictions) so rivers go from high to low forking on tie and making lakes where they surrond, need mountain, peak. shallow and deep ocean biome (make sure world gen is: 1 tectonic plates and faults (going up, going down or sliding), 2 determine oceans vs continental shelfs by height ( from (abyss)0 to 3 (sea level) to 10 (peak) determine ice caps and set lakes, 4 make rivers by going down 5 determing land biomes by latitude, humidity and height)
 	better crash detection and reporting
 	spawn ant cheat and spawn bug
     engine clean up for reusability (Core Engine Package) with addiontal codegen tools for saves and repositories etc

@@ -96,4 +96,78 @@ public class ColonyStatsServiceTest {
         
         assertEquals(10, statsService.getTotalConsumption(colony));
     }
+
+    @Test
+    public void testLifespanBaseAndUpgrades() {
+        assertEquals(GameNumbers.LIFESPAN_NO_UPGRADE_DAYS, statsService.getBaseLifespan(colony));
+        assertEquals(90, statsService.getAntLifespan(colony, GameConstants.CLASS_WORKER));
+        assertEquals(90, statsService.getAntLifespan(colony, GameConstants.CLASS_SOLDIER));
+        assertEquals(90, statsService.getAntLifespan(colony, GameConstants.CLASS_MAJOR));
+        assertEquals(30, statsService.getAntLifespan(colony, GameConstants.CLASS_DRONE));
+        assertEquals(180, statsService.getAntLifespan(colony, GameConstants.CLASS_PRINCESS));
+        assertEquals(1800, statsService.getAntLifespan(colony, GameConstants.CLASS_QUEEN));
+
+        dynasty.unlockUpgrade(GameUnlocks.STAT_LONGEVITY);
+
+        assertEquals(GameNumbers.LIFESPAN_BASE_DAYS, statsService.getBaseLifespan(colony));
+        assertEquals(180, statsService.getAntLifespan(colony, GameConstants.CLASS_WORKER));
+        assertEquals(180, statsService.getAntLifespan(colony, GameConstants.CLASS_SOLDIER));
+        assertEquals(180, statsService.getAntLifespan(colony, GameConstants.CLASS_MAJOR));
+        assertEquals(60, statsService.getAntLifespan(colony, GameConstants.CLASS_DRONE));
+        assertEquals(360, statsService.getAntLifespan(colony, GameConstants.CLASS_PRINCESS));
+        assertEquals(3600, statsService.getAntLifespan(colony, GameConstants.CLASS_QUEEN));
+
+        dynasty.unlockUpgrade(GameUnlocks.STAT_LONGEVITY_2);
+
+        assertEquals(GameNumbers.LIFESPAN_UPGRADE_2_DAYS, statsService.getBaseLifespan(colony));
+        assertEquals(360, statsService.getAntLifespan(colony, GameConstants.CLASS_WORKER));
+        assertEquals(360, statsService.getAntLifespan(colony, GameConstants.CLASS_SOLDIER));
+        assertEquals(360, statsService.getAntLifespan(colony, GameConstants.CLASS_MAJOR));
+        assertEquals(120, statsService.getAntLifespan(colony, GameConstants.CLASS_DRONE));
+        assertEquals(720, statsService.getAntLifespan(colony, GameConstants.CLASS_PRINCESS));
+        assertEquals(7200, statsService.getAntLifespan(colony, GameConstants.CLASS_QUEEN));
+
+        dynasty.unlockUpgrade(GameUnlocks.STAT_LONGEVITY_3);
+
+        assertEquals(GameNumbers.LIFESPAN_UPGRADE_3_DAYS, statsService.getBaseLifespan(colony));
+        assertEquals(720, statsService.getAntLifespan(colony, GameConstants.CLASS_WORKER));
+        assertEquals(720, statsService.getAntLifespan(colony, GameConstants.CLASS_SOLDIER));
+        assertEquals(720, statsService.getAntLifespan(colony, GameConstants.CLASS_MAJOR));
+        assertEquals(240, statsService.getAntLifespan(colony, GameConstants.CLASS_DRONE));
+        assertEquals(1440, statsService.getAntLifespan(colony, GameConstants.CLASS_PRINCESS));
+        assertEquals(14400, statsService.getAntLifespan(colony, GameConstants.CLASS_QUEEN));
+    }
+
+    @Test
+    public void testAverageAntAge() {
+        assertEquals(0.0, statsService.getAverageAntAge(colony, GameConstants.CLASS_WORKER));
+        assertEquals(0.0, statsService.getAverageAntAge(colony));
+        assertEquals(0.0, dynasty.getAverageAntAge(GameConstants.CLASS_WORKER));
+        assertEquals(0.0, dynasty.getAverageAntAge());
+
+        Ant w1 = new Ant(colony, GameConstants.CLASS_WORKER);
+        w1.setAge(10);
+        Ant w2 = new Ant(colony, GameConstants.CLASS_WORKER);
+        w2.setAge(20);
+        colony.getWorkers().add(w1);
+        colony.getWorkers().add(w2);
+
+        Ant s1 = new Ant(colony, GameConstants.CLASS_SOLDIER);
+        s1.setAge(60);
+        colony.getSoldiers().add(s1);
+
+        assertEquals(15.0, statsService.getAverageAntAge(colony, GameConstants.CLASS_WORKER), 0.0001);
+        assertEquals(60.0, statsService.getAverageAntAge(colony, GameConstants.CLASS_SOLDIER), 0.0001);
+        assertEquals(0.0, statsService.getAverageAntAge(colony, GameConstants.CLASS_MAJOR), 0.0001);
+        assertEquals(30.0, statsService.getAverageAntAge(colony), 0.0001);
+
+        Colony colony2 = new Colony(2, "Second Colony", true);
+        dynasty.addColony(colony2);
+        Ant w3 = new Ant(colony2, GameConstants.CLASS_WORKER);
+        w3.setAge(30);
+        colony2.getWorkers().add(w3);
+
+        assertEquals(20.0, dynasty.getAverageAntAge(GameConstants.CLASS_WORKER), 0.0001);
+        assertEquals(30.0, dynasty.getAverageAntAge(), 0.0001);
+    }
 }

@@ -362,6 +362,10 @@ public class AssetStyles {
         UiTableStyles.layoutColumnsForViewport(table, viewportWidth, growableColumns);
     }
 
+    public static void layoutTableColumnsForViewport(JTable table, int viewportWidth, boolean[] growableColumns, int[] minColumnWidths) {
+        UiTableStyles.layoutColumnsForViewport(table, viewportWidth, growableColumns, minColumnWidths);
+    }
+
     public static void applyTableColumnAlignment(JTable table, int columnIndex, int alignment) {
         UiTableStyles.applyColumnAlignment(table, columnIndex, alignment);
     }
@@ -376,6 +380,10 @@ public class AssetStyles {
 
     public static void relayoutTableInScrollPane(JScrollPane scrollPane, boolean[] growableColumns) {
         UiTableStyles.relayoutTableInScrollPane(scrollPane, growableColumns);
+    }
+
+    public static void relayoutTableInScrollPane(JScrollPane scrollPane, boolean[] growableColumns, int[] minColumnWidths) {
+        UiTableStyles.relayoutTableInScrollPane(scrollPane, growableColumns, minColumnWidths);
     }
 
     public static void styleTableBooleanColumn(JTable table, int columnIndex) {

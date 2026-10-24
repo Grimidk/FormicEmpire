@@ -216,4 +216,54 @@ public class DynastyStatService {
         }
         return (totalQuota + fronts - 1) / fronts;
     }
+
+    public double getAverageAntAge(Dynasty dynasty, AntClass antClass) {
+        if (dynasty == null || antClass == null) {
+            return 0.0;
+        }
+        long sum = 0;
+        int count = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == null) {
+                continue;
+            }
+            List<Ant> ants = colony.getAntsByClass(antClass);
+            if (ants == null) {
+                continue;
+            }
+            for (Ant ant : ants) {
+                if (ant != null && ant.isAlive()) {
+                    sum += ant.getAge();
+                    count++;
+                }
+            }
+        }
+        return count > 0 ? (double) sum / count : 0.0;
+    }
+
+    public double getAverageAntAge(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0.0;
+        }
+        long sum = 0;
+        int count = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == null || colony.getAntGroups() == null) {
+                continue;
+            }
+            for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+                List<Ant> ants = entry.getValue();
+                if (ants == null) {
+                    continue;
+                }
+                for (Ant ant : ants) {
+                    if (ant != null && ant.isAlive()) {
+                        sum += ant.getAge();
+                        count++;
+                    }
+                }
+            }
+        }
+        return count > 0 ? (double) sum / count : 0.0;
+    }
 }

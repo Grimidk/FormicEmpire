@@ -520,4 +520,83 @@ public class SaveManagerTest {
         assertTrue(save.getTotalAnts() > satellite.getAntTotal());
         assertTrue(save.getWorkers() > 0);
     }
+
+    @Test
+    void antAgeCountsRoundTripThroughColonyJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "AgeColony";
+        sc.workers = 3;
+        sc.soldiers = 2;
+        sc.workerAges.put("15", 2);
+        sc.workerAges.put("30", 1);
+        sc.soldierAges.put("50", 2);
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        assertTrue(json.contains("\"workerAges\":"));
+        assertTrue(json.contains("\"soldierAges\":"));
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+
+        assertEquals(2, loaded.workerAges.get("15"));
+        assertEquals(1, loaded.workerAges.get("30"));
+        assertEquals(2, loaded.soldierAges.get("50"));
+
+        Colony colony = new Colony(loaded);
+        assertEquals(3, colony.getWorkers().size());
+        assertEquals(2, colony.getSoldiers().size());
+        assertEquals(15, colony.getWorkers().get(0).getAge());
+        assertEquals(15, colony.getWorkers().get(1).getAge());
+        assertEquals(30, colony.getWorkers().get(2).getAge());
+        assertEquals(50, colony.getSoldiers().get(0).getAge());
+        assertEquals(50, colony.getSoldiers().get(1).getAge());
+        assertEquals(20.0, colony.getAverageAntAge(GameConstants.CLASS_WORKER), 0.0001);
+        assertEquals(50.0, colony.getAverageAntAge(GameConstants.CLASS_SOLDIER), 0.0001);
+    }
+
+    @Test
+    void colonyWithoutQueenOnLoadGetsFreeQueenAndZeroDays() {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "QueenlessColony";
+        sc.queens = 0;
+        sc.daysWithoutQueen = 6;
+        sc.workers = 10;
+
+        Colony colony = new Colony(sc);
+        assertEquals(1, colony.getQueens().size());
+        assertEquals(0, colony.getDaysWithoutQueen());
+        assertEquals(GameConstants.CLASS_QUEEN, colony.getQueens().get(0).getAntClass());
+    }
+
+    @Test
+    void isPlayerDynastyAboutToDieWithoutQueenDetection() {
+        Dynasty playerDynasty = new Dynasty(1, "PlayerDynasty", true, GameConstants.SPECIES_OMNI);
+        Colony colony = new Colony(1, "PlayerCapital", true);
+        playerDynasty.addColony(colony);
+        colony.setDynasty(playerDynasty);
+
+        colony.getQueens().clear();
+        colony.setDaysWithoutQueen(0);
+        assertTrue(SaveManager.isDynastyAboutToDieWithoutQueen(playerDynasty));
+
+        Ant queen = new Ant(colony, GameConstants.CLASS_QUEEN);
+        colony.getQueens().add(queen);
+        assertFalse(SaveManager.isDynastyAboutToDieWithoutQueen(playerDynasty));
+
+        colony.getQueens().clear();
+        colony.setDaysWithoutQueen(6);
+        assertTrue(SaveManager.isDynastyAboutToDieWithoutQueen(playerDynasty));
+    }
 }

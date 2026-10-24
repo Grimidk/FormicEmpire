@@ -439,7 +439,25 @@ public class Colony {
                 savedColony.princessMods, savedColony.princesses);
         AntModService.populateAntsFromModCounts(this, getQueens(), GameConstants.CLASS_QUEEN,
                 savedColony.queenMods, savedColony.queens);
+        if (getQueens().isEmpty()) {
+            Ant freeQueen = new Ant(this, GameConstants.CLASS_QUEEN);
+            freeQueen.setDimension(WorldSpaces.UNDERWORLD);
+            freeQueen.setRole(GameConstants.ROLE_LAYER);
+            getQueens().add(freeQueen);
+            this.daysWithoutQueen = 0;
+        } else {
+            this.daysWithoutQueen = 0;
+        }
         populateAntList(deadAnts, savedColony.deadAnts, GameConstants.CLASS_DEAD);
+        ColonyPopulationService.applyAgesFromCounts(getEggs(), savedColony.eggAges);
+        ColonyPopulationService.applyAgesFromCounts(getLarvae(), savedColony.larvaAges);
+        ColonyPopulationService.applyAgesFromCounts(getPupae(), savedColony.pupaAges);
+        ColonyPopulationService.applyAgesFromCounts(getWorkers(), savedColony.workerAges);
+        ColonyPopulationService.applyAgesFromCounts(getSoldiers(), savedColony.soldierAges);
+        ColonyPopulationService.applyAgesFromCounts(getMajors(), savedColony.majorAges);
+        ColonyPopulationService.applyAgesFromCounts(getDrones(), savedColony.droneAges);
+        ColonyPopulationService.applyAgesFromCounts(getPrincesses(), savedColony.princessAges);
+        ColonyPopulationService.applyAgesFromCounts(getQueens(), savedColony.queenAges);
 
         this.plants = savedColony.plants;
         this.mushrooms = savedColony.mushrooms;
@@ -1829,6 +1847,9 @@ public class Colony {
     public int getBaseTempRes() { return statsService.getBaseTempRes(this); }
     public int getBaseRegen() { return statsService.getBaseRegen(this); }
     public int getBaseConsumption() { return statsService.getBaseConsumption(this); }
+    public int getBaseLifespan() { return statsService.getBaseLifespan(this); }
+    public int getAntLifespan(AntClass antClass) { return statsService.getAntLifespan(this, antClass); }
+    public int getAntLifespan(Ant ant) { return statsService.getAntLifespan(this, ant); }
     public int getBaseAttack() { return statsService.getBaseAttack(this); }
     public int getBaseAttackSpeed() { return statsService.getBaseAttackSpeed(this); }
     public int getBaseDefense() { return statsService.getBaseDefense(this); }
@@ -2251,5 +2272,13 @@ public class Colony {
                 a.updateStatsFromColony(this);
             }
         }
+    }
+
+    public double getAverageAntAge(AntClass antClass) {
+        return statsService != null ? statsService.getAverageAntAge(this, antClass) : 0.0;
+    }
+
+    public double getAverageAntAge() {
+        return statsService != null ? statsService.getAverageAntAge(this) : 0.0;
     }
 }

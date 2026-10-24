@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationMo
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.critter.Skill;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifier;
@@ -2315,4 +2316,11 @@ public class Dynasty {
         this.reserveMilitaryPower = Math.max(0, reserveMilitaryPower);
     }
 
+    public double getAverageAntAge(AntClass antClass) {
+        return statService != null ? statService.getAverageAntAge(this, antClass) : 0.0;
+    }
+
+    public double getAverageAntAge() {
+        return statService != null ? statService.getAverageAntAge(this) : 0.0;
+    }
 }

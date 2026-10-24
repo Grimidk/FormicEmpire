@@ -972,6 +972,7 @@ public final class LanguageStrings {
     public static final String COL_CAUSE = "COL_CAUSE";
     public static final String COL_TOTAL = "COL_TOTAL";
     public static final String COL_CARETAKERS = "COL_CARETAKERS";
+    public static final String COL_AVG_AGE = "COL_AVG_AGE";
     public static final String STAT_STATUS_NO_HEX = "STAT_STATUS_NO_HEX";
     public static final String STAT_COORDS = "STAT_COORDS";
     public static final String STAT_LOCAL_WEATHER = "STAT_LOCAL_WEATHER";
@@ -988,6 +989,7 @@ public final class LanguageStrings {
     public static final String STAT_SPECIES_SCIENTIFIC = "STAT_SPECIES_SCIENTIFIC";
     public static final String STAT_AGE = "STAT_AGE";
     public static final String STAT_DAYS_SUFFIX = "STAT_DAYS_SUFFIX";
+    public static final String STAT_AVG_AGE = "STAT_AVG_AGE";
     public static final String STAT_QUEEN_STATUS = "STAT_QUEEN_STATUS";
     public static final String STAT_AUTOMATION = "STAT_AUTOMATION";
     public static final String STAT_AUTO_BUILD = "STAT_AUTO_BUILD";
@@ -2486,6 +2488,10 @@ public final class LanguageStrings {
     public static final String STAT_ACID_DESC = "STAT_ACID_DESC";
     public static final String STAT_LONGEVITY_FLAVOR = "STAT_LONGEVITY_FLAVOR";
     public static final String STAT_LONGEVITY_DESC = "STAT_LONGEVITY_DESC";
+    public static final String STAT_LONGEVITY_2_FLAVOR = "STAT_LONGEVITY_2_FLAVOR";
+    public static final String STAT_LONGEVITY_2_DESC = "STAT_LONGEVITY_2_DESC";
+    public static final String STAT_LONGEVITY_3_FLAVOR = "STAT_LONGEVITY_3_FLAVOR";
+    public static final String STAT_LONGEVITY_3_DESC = "STAT_LONGEVITY_3_DESC";
     public static final String STAT_RESEARCH_1_FLAVOR = "STAT_RESEARCH_1_FLAVOR";
     public static final String STAT_RESEARCH_1_DESC = "STAT_RESEARCH_1_DESC";
     public static final String STAT_RESEARCH_2_FLAVOR = "STAT_RESEARCH_2_FLAVOR";
