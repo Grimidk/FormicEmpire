@@ -979,10 +979,30 @@ public class GamePanel extends ZeroGamePanel {
         statsDialog.showDialog();
     }
 
+    private Dynasty resolvePlayerDynasty(Engine engine) {
+        if (engine == null) {
+            return null;
+        }
+        World world = engine.getWorld();
+        if (world != null) {
+            Dynasty playerDynasty = world.findPlayerDynasty();
+            if (playerDynasty != null) {
+                return playerDynasty;
+            }
+        }
+        Colony colony = getColonyFromEngine(engine);
+        return colony != null ? colony.getDynasty() : null;
+    }
+
     private void showDynastyDialog() {
         Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || colony.getDynasty() == null) return;
+        Dynasty playerDynasty = resolvePlayerDynasty(engine);
+        if (playerDynasty == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.getDynasty() != playerDynasty) {
+            dynastyDialog.dispose();
+            dynastyDialog = null;
+        }
 
         if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_OVERVIEW)) {
             dynastyDialog.dispose();
@@ -999,7 +1019,7 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog.dispose();
         }
 
-        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+        dynastyDialog = new DynastyManagementDialog(frame, playerDynasty, engine, this::handleGoToColony,
                 this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_OVERVIEW);
     }
@@ -1010,9 +1030,14 @@ public class GamePanel extends ZeroGamePanel {
 
     private void showDynastyWarsTab() {
         Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || colony.getDynasty() == null) {
+        Dynasty playerDynasty = resolvePlayerDynasty(engine);
+        if (playerDynasty == null) {
             return;
+        }
+
+        if (dynastyDialog != null && dynastyDialog.getDynasty() != playerDynasty) {
+            dynastyDialog.dispose();
+            dynastyDialog = null;
         }
 
         if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_WARS)) {
@@ -1030,7 +1055,7 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog.dispose();
         }
 
-        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+        dynastyDialog = new DynastyManagementDialog(frame, playerDynasty, engine, this::handleGoToColony,
                 this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_WARS);
     }
@@ -1077,8 +1102,13 @@ public class GamePanel extends ZeroGamePanel {
 
     private void showDynastyDialogTab(int tabIndex) {
         Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || colony.getDynasty() == null) return;
+        Dynasty playerDynasty = resolvePlayerDynasty(engine);
+        if (playerDynasty == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.getDynasty() != playerDynasty) {
+            dynastyDialog.dispose();
+            dynastyDialog = null;
+        }
 
         if (dynastyDialog != null && dynastyDialog.isTabOpen(tabIndex)) {
             dynastyDialog.requestFocus();
@@ -1095,15 +1125,20 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog.dispose();
         }
 
-        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+        dynastyDialog = new DynastyManagementDialog(frame, playerDynasty, engine, this::handleGoToColony,
                 this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(tabIndex);
     }
 
     private void showTradeDialog() {
         Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || colony.getDynasty() == null) return;
+        Dynasty playerDynasty = resolvePlayerDynasty(engine);
+        if (playerDynasty == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.getDynasty() != playerDynasty) {
+            dynastyDialog.dispose();
+            dynastyDialog = null;
+        }
 
         if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_TRADE)) {
             dynastyDialog.dispose();
@@ -1120,16 +1155,21 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog.dispose();
         }
 
-        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+        dynastyDialog = new DynastyManagementDialog(frame, playerDynasty, engine, this::handleGoToColony,
                 this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_TRADE);
     }
 
     private void showDiplomacyDialog() {
         Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || colony.getDynasty() == null) {
+        Dynasty playerDynasty = resolvePlayerDynasty(engine);
+        if (playerDynasty == null) {
             return;
+        }
+
+        if (dynastyDialog != null && dynastyDialog.getDynasty() != playerDynasty) {
+            dynastyDialog.dispose();
+            dynastyDialog = null;
         }
 
         if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_DIPLOMACY)) {
@@ -1147,7 +1187,7 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog.dispose();
         }
 
-        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+        dynastyDialog = new DynastyManagementDialog(frame, playerDynasty, engine, this::handleGoToColony,
                 this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_DIPLOMACY);
     }

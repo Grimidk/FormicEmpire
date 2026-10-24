@@ -13,8 +13,6 @@ To Fix (By decreasing priority):
 		(none right now)
 	Important not Urgent:
 		saves and have the option to update version
-		bring back visti diplomacy action and use the square in map dialog to visit
-		allow dynasty dialog while visiting but it opens the player's
 
 To Draw (PascalCase filenames; under src/main/resources):
 	Launch critters (hunt / invasion):

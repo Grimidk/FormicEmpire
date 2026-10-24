@@ -2070,6 +2070,7 @@ public final class LanguageStrings {
     public static final String DIPLO_ACTION_TRADE = "DIPLO_ACTION_TRADE";
     public static final String DIPLO_ACTION_REQUEST_TRADE = "DIPLO_ACTION_REQUEST_TRADE";
     public static final String DIPLO_ACTION_SEND_DIPLOMATS = "DIPLO_ACTION_SEND_DIPLOMATS";
+    public static final String DIPLO_ACTION_VISIT = "DIPLO_ACTION_VISIT";
     public static final String DIPLO_ACTION_SEND_SPIES = "DIPLO_ACTION_SEND_SPIES";
     public static final String DIPLO_ACTION_INTELLIGENCE = "DIPLO_ACTION_INTELLIGENCE";
     public static final String DIPLO_SEND_SPIES_TITLE = "DIPLO_SEND_SPIES_TITLE";
@@ -2145,6 +2146,7 @@ public final class LanguageStrings {
     public static final String DIPLO_ERROR_LOYALTY_REQUIRED = "DIPLO_ERROR_LOYALTY_REQUIRED";
     public static final String DIPLO_ERROR_NO_BORDER = "DIPLO_ERROR_NO_BORDER";
     public static final String DIPLO_ERROR_ACTIVE_COLONY = "DIPLO_ERROR_ACTIVE_COLONY";
+    public static final String DIPLO_ERROR_NO_COLONY = "DIPLO_ERROR_NO_COLONY";
     public static final String DIPLO_TRADE_REQUEST_SENT = "DIPLO_TRADE_REQUEST_SENT";
     public static final String DIPLO_TRADE_OFFER_SENT_FMT = "DIPLO_TRADE_OFFER_SENT_FMT";
     public static final String DIPLO_TRADE_ACCEPTED_FMT = "DIPLO_TRADE_ACCEPTED_FMT";

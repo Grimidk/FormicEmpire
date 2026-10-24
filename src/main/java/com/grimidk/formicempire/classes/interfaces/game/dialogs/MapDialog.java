@@ -1193,7 +1193,8 @@ public class MapDialog extends ZeroDialog {
                     nameStr += LanguageStrings.get(LanguageStrings.MAP_YOU_PLAYER);
                 }
 
-                Colony capital = d.getCapital();
+                Colony capital = d.getCapital() != null ? d.getCapital()
+                        : (d.getColonies() != null && !d.getColonies().isEmpty() ? d.getColonies().get(0) : null);
                 Hex capitalHex = capital != null ? world.getHexOfColony(capital) : null;
                 if (capitalHex != null) {
                     Runnable goToCapital = () -> changeHex(capitalHex, !keepMapOpenForSandbox());

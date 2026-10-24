@@ -316,6 +316,10 @@ public class DynastyManagementDialog extends ZeroDialog {
         void updateData();
     }
 
+    public Dynasty getDynasty() {
+        return dynasty;
+    }
+
     private Colony getActivePlayerColony() {
         World world = engine.getWorld();
         if (world == null) {
@@ -324,6 +328,15 @@ public class DynastyManagementDialog extends ZeroDialog {
         Hex mapActive = world.getActiveHex();
         if (mapActive != null && mapActive.getColony() != null && mapActive.getColony().isPlayer()) {
             return mapActive.getColony();
+        }
+        if (dynasty != null) {
+            Colony capital = dynasty.getCapital();
+            if (capital != null) {
+                return capital;
+            }
+            if (dynasty.getColonies() != null && !dynasty.getColonies().isEmpty()) {
+                return dynasty.getColonies().get(0);
+            }
         }
         return null;
     }
@@ -368,6 +381,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             AssetStyles.styleMenuItem(convoy);
             menu.add(convoy);
         }
+
+        JMenuItem visit = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
+        visit.addActionListener(e -> performView(data.neighbor));
+        AssetStyles.styleMenuItem(visit);
+        menu.add(visit);
 
         if (outgoing == null) {
             JMenuItem establish = new JMenuItem(LanguageStrings.get(LanguageStrings.UI_ESTABLISH));
@@ -2549,6 +2567,35 @@ public class DynastyManagementDialog extends ZeroDialog {
             Colony activeColony = getActivePlayerColony();
             DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
 
+            if (other.getColonies() != null && other.getColonies().size() > 1) {
+                JMenu visitMenu = new JMenu(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
+                AssetStyles.styleMenuItem(visitMenu);
+                for (Colony c : other.getColonies()) {
+                    if (c == null) {
+                        continue;
+                    }
+                    String label = c.getName() + (c.isCapital() ? " (" + LanguageStrings.get(LanguageStrings.STAT_CAPITAL) + ")" : "");
+                    JMenuItem cItem = new JMenuItem(label);
+                    cItem.addActionListener(e -> performView(c));
+                    AssetStyles.styleMenuItem(cItem);
+                    visitMenu.add(cItem);
+                }
+                menu.add(visitMenu);
+            } else {
+                JMenuItem visitItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
+                Colony target = (other.getColonies() != null && !other.getColonies().isEmpty())
+                        ? other.getColonies().get(0)
+                        : other.getCapital();
+                if (target != null && world != null && world.getHexOfColony(target) != null) {
+                    visitItem.addActionListener(e -> performView(target));
+                } else {
+                    visitItem.setEnabled(false);
+                    visitItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_COLONY));
+                }
+                AssetStyles.styleMenuItem(visitItem);
+                menu.add(visitItem);
+            }
+
             JMenuItem pactItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_PACT));
             if (diplo.hasNonAggressionPact(other)) {
                 pactItem.setText(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_BREAK_PACT));
@@ -3349,7 +3396,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         AssetStyles.styleMenuItem(renameItem);
         menu.add(renameItem);
 
-        JMenuItem viewItem = new JMenuItem(LanguageStrings.get(LanguageStrings.UI_VIEW));
+        JMenuItem viewItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
         viewItem.addActionListener(e -> performView(colony));
         AssetStyles.styleMenuItem(viewItem);
         menu.add(viewItem);

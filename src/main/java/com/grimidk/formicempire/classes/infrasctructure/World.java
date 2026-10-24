@@ -397,6 +397,21 @@ public class World {
         return null;
     }
 
+    public Dynasty findPlayerDynasty() {
+        if (dynastys != null) {
+            for (Dynasty dynasty : dynastys) {
+                if (dynasty != null && dynasty.isPlayer()) {
+                    return dynasty;
+                }
+            }
+        }
+        Hex spawn = getSpawnHex();
+        if (spawn != null && spawn.getColony() != null) {
+            return spawn.getColony().getDynasty();
+        }
+        return null;
+    }
+
     public void bindDynastyTradeServices() {
         if (engine == null || engine.getTradeManager() == null) {
             return;

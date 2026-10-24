@@ -84,18 +84,7 @@ public final class SandboxCheatService {
         if (world == null) {
             return null;
         }
-        if (world.getDynastys() != null) {
-            for (Dynasty dynasty : world.getDynastys()) {
-                if (dynasty != null && dynasty.isPlayer()) {
-                    return dynasty;
-                }
-            }
-        }
-        Hex spawn = world.getSpawnHex();
-        if (spawn != null && spawn.getColony() != null && spawn.getColony().getDynasty() != null) {
-            return spawn.getColony().getDynasty();
-        }
-        return null;
+        return world.findPlayerDynasty();
     }
 
     public static boolean isForeignColony(World world, Colony colony) {
