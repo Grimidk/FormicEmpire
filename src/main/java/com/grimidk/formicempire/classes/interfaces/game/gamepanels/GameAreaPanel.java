@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
@@ -24,6 +25,7 @@ import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreload
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.CoastalTideRenderer;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.ColonySpriteMergeLod;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
@@ -91,6 +93,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     private int cachedBackgroundH;
     private int cachedBackgroundBiomeId = -1;
     private Dimension cachedBackgroundDimension;
+    private int cachedBackgroundWaterBordersKey = Integer.MIN_VALUE;
 
     private BufferedImage cachedUnderworldStructureImage;
     private int cachedUnderworldW = -1;
@@ -202,6 +205,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     public void setColony(Colony colony) {
         if (this.colony != colony) {
             invalidateStructuralCaches();
+            invalidateBackgroundLayerCache();
         }
         this.colony = colony;
         this.lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
@@ -213,6 +217,13 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     public void setPaintViewportRect(Rectangle viewRect) {
+        if (this.paintViewportRect == null && viewRect != null) {
+            invalidateBackgroundLayerCache();
+        } else if (this.paintViewportRect != null && viewRect != null) {
+            if (this.paintViewportRect.width != viewRect.width || this.paintViewportRect.height != viewRect.height) {
+                invalidateBackgroundLayerCache();
+            }
+        }
         this.paintViewportRect = viewRect != null ? new Rectangle(viewRect) : null;
         this.lodViewportRect = computeLodViewportRect();
     }
@@ -316,6 +327,25 @@ public class GameAreaPanel extends ZeroGamePanel {
     private void invalidateBackgroundLayerCache() {
         cachedBackgroundLayer = null;
         cachedBackgroundBiomeId = -1;
+        cachedBackgroundWaterBordersKey = Integer.MIN_VALUE;
+    }
+
+    private Hex resolveCurrentHex() {
+        if (engine != null && engine.getWorld() != null) {
+            World world = engine.getWorld();
+            if (colony != null) {
+                Hex colonyHex = world.findHexForColony(colony);
+                if (colonyHex != null) {
+                    return colonyHex;
+                }
+            }
+            Hex active = world.getActiveHex();
+            if (active != null) {
+                return active;
+            }
+            return world.getSpawnHex();
+        }
+        return null;
     }
 
     private void invalidateStructuralCaches() {
@@ -478,15 +508,14 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (backgroundImage == null) {
             return;
         }
-        if (shouldTileBackgroundDirectly(g2d)) {
-            tileBackgroundWithinClip(g2d);
-            return;
-        }
         int panelW = getWidth();
         int panelH = getHeight();
+        Hex currentHex = resolveCurrentHex();
+        int bordersKey = CoastalTideRenderer.getWaterBordersKey(currentHex, currentBiomeId);
         if (cachedBackgroundLayer != null && cachedBackgroundW == panelW && cachedBackgroundH == panelH
                 && cachedBackgroundBiomeId == currentBiomeId
-                && cachedBackgroundDimension == currentDimension) {
+                && cachedBackgroundDimension == currentDimension
+                && cachedBackgroundWaterBordersKey == bordersKey) {
             g2d.drawImage(cachedBackgroundLayer, 0, 0, null);
             return;
         }
@@ -503,6 +532,11 @@ public class GameAreaPanel extends ZeroGamePanel {
                     layerGraphics.drawImage(backgroundImage, x, y, this);
                 }
             }
+            if (currentDimension == WorldSpaces.OVERWORLD) {
+                int contentPadX = (paintViewportRect != null) ? Math.max(0, (panelW - paintViewportRect.width) / 2) : 0;
+                int contentPadY = (paintViewportRect != null) ? Math.max(0, (panelH - paintViewportRect.height) / 2) : 0;
+                CoastalTideRenderer.bakeCoastalBackground(layerGraphics, currentBiomeId, currentHex, contentPadX, contentPadY, panelW, panelH, paintViewportRect);
+            }
         } finally {
             layerGraphics.dispose();
         }
@@ -511,40 +545,8 @@ public class GameAreaPanel extends ZeroGamePanel {
         cachedBackgroundH = panelH;
         cachedBackgroundBiomeId = currentBiomeId;
         cachedBackgroundDimension = currentDimension;
+        cachedBackgroundWaterBordersKey = bordersKey;
         g2d.drawImage(cachedBackgroundLayer, 0, 0, null);
-    }
-
-    private boolean shouldTileBackgroundDirectly(Graphics2D g2d) {
-        if (currentDimension != WorldSpaces.OVERWORLD || paintViewportRect == null) {
-            return false;
-        }
-        int panelW = getWidth();
-        int panelH = getHeight();
-        if (panelW <= paintViewportRect.width + 256 && panelH <= paintViewportRect.height + 256) {
-            return false;
-        }
-        return g2d.getClipBounds() != null;
-    }
-
-    private void tileBackgroundWithinClip(Graphics2D g2d) {
-        Rectangle clip = g2d.getClipBounds();
-        if (clip == null) {
-            return;
-        }
-        int tileWidth = backgroundImage.getWidth(this);
-        int tileHeight = backgroundImage.getHeight(this);
-        if (tileWidth <= 0 || tileHeight <= 0) {
-            return;
-        }
-        int startX = Math.floorDiv(clip.x, tileWidth) * tileWidth;
-        int startY = Math.floorDiv(clip.y, tileHeight) * tileHeight;
-        int endX = clip.x + clip.width;
-        int endY = clip.y + clip.height;
-        for (int x = startX; x < endX; x += tileWidth) {
-            for (int y = startY; y < endY; y += tileHeight) {
-                g2d.drawImage(backgroundImage, x, y, this);
-            }
-        }
     }
 
     private void drawResourceSources(Graphics2D g2d) {

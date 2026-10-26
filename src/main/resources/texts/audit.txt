@@ -25,7 +25,7 @@ General:
 
 Video:
 [X] Window size preset, full screen, daylight overlay, weather overlay, dark mode
-[ ] Frame rate cap (Uncapped / 30 / 60 / 120)
+[X] Frame rate cap (Uncapped / 30 / 60 / 120)
 [X] Reset tab to defaults
 
 Audio:
