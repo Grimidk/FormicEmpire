@@ -580,6 +580,12 @@ public final class ResearchTreeGraph {
                 layout.maxY);
     }
 
+    public static void invalidateLayoutCache() {
+        synchronized (ResearchTreeGraph.class) {
+            layoutCache = null;
+        }
+    }
+
     public static Result refreshStates(Result previous, Colony colony, Engine engine) {
         return build(colony, engine);
     }

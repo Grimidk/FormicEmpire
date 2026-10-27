@@ -89,9 +89,9 @@ public final class GameUnlocks {
                 static { upgrades.add(ROLE_RESEARCHER); }
         public static final Upgrade ROLE_COMMANDER = new Upgrade(40, "ROLE_COMMANDER_UPGRADE", "ROLE_COMMANDER_FLAVOR", "ROLE_COMMANDER_DESC", TYPE_QUEEN, 0, loadIcon("icons/upgrades/RoleCommander.png"), 0, -3, -3);
                 static { upgrades.add(ROLE_COMMANDER); }
-        public static final Upgrade ROLE_CAPTAIN = new Upgrade(41, "ROLE_CAPTAIN_UPGRADE", "ROLE_CAPTAIN_FLAVOR", "ROLE_CAPTAIN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleCaptain.png"), 1, 2, -1);
+        public static final Upgrade ROLE_CAPTAIN = new Upgrade(41, "ROLE_CAPTAIN_UPGRADE", "ROLE_CAPTAIN_FLAVOR", "ROLE_CAPTAIN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleCaptain.png"), 1, 1, -2);
                 static { upgrades.add(ROLE_CAPTAIN); }
-        public static final Upgrade ROLE_AIR_SUPPORT = new Upgrade(42, "ROLE_AIR_SUPPORT_UPGRADE", "ROLE_AIR_SUPPORT_FLAVOR", "ROLE_AIR_SUPPORT_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirSupport.png"), 1, 2, -2);
+        public static final Upgrade ROLE_AIR_SUPPORT = new Upgrade(42, "ROLE_AIR_SUPPORT_UPGRADE", "ROLE_AIR_SUPPORT_FLAVOR", "ROLE_AIR_SUPPORT_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirSupport.png"), 1, -1, -1);
                 static { upgrades.add(ROLE_AIR_SUPPORT); }
         public static final Upgrade ROLE_AIR_BOMBER = new Upgrade(43, "ROLE_AIR_BOMBER_UPGRADE", "ROLE_AIR_BOMBER_FLAVOR", "ROLE_AIR_BOMBER_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirBomber.png"), 1, 2, -3);
                 static { upgrades.add(ROLE_AIR_BOMBER); }
@@ -225,13 +225,13 @@ public final class GameUnlocks {
         // -- Stats -- 
         public static final Upgrade STAT_SKELETON = new Upgrade(101, "STAT_SKELETON", "STAT_SKELETON_FLAVOR", "STAT_SKELETON_DESC", TYPE_EGG, 0, loadIcon("icons/upgrades/StatSkeleton.png"), 0, 4, 0);
                 static { upgrades.add(STAT_SKELETON); }
-        public static final Upgrade STAT_ACID = new Upgrade(102, "STAT_ACID", "STAT_ACID_FLAVOR", "STAT_ACID_DESC", TYPE_EGG, 0, loadIcon("icons/upgrades/StatAcid.png"), 0, 4, -1);
+        public static final Upgrade STAT_ACID = new Upgrade(102, "STAT_ACID", "STAT_ACID_FLAVOR", "STAT_ACID_DESC", TYPE_EGG, 0, loadIcon("icons/upgrades/StatAcid.png"), 0, 3, -1);
                 static { upgrades.add(STAT_ACID); }
         public static final Upgrade STAT_LONGEVITY = new Upgrade(103, "STAT_LONGEVITY", "STAT_LONGEVITY_FLAVOR", "STAT_LONGEVITY_DESC", TYPE_EGG, 0, loadIcon("icons/upgrades/StatLongevity.png"), 0, 4, 1);
                 static { upgrades.add(STAT_LONGEVITY); }
-        public static final Upgrade STAT_LONGEVITY_2 = new Upgrade(144, "STAT_LONGEVITY_2", "STAT_LONGEVITY_2_FLAVOR", "STAT_LONGEVITY_2_DESC", STAT_LONGEVITY, 6000, loadIcon("icons/upgrades/StatLongevity2.png"), 2, 6, 1);
+        public static final Upgrade STAT_LONGEVITY_2 = new Upgrade(144, "STAT_LONGEVITY_2", "STAT_LONGEVITY_2_FLAVOR", "STAT_LONGEVITY_2_DESC", STAT_LONGEVITY, 6000, loadIcon("icons/upgrades/StatLongevity2.png"), 2, 5, 1);
                 static { upgrades.add(STAT_LONGEVITY_2); }
-        public static final Upgrade STAT_LONGEVITY_3 = new Upgrade(145, "STAT_LONGEVITY_3", "STAT_LONGEVITY_3_FLAVOR", "STAT_LONGEVITY_3_DESC", STAT_LONGEVITY_2, 25000, loadIcon("icons/upgrades/StatLongevity3.png"), 3, 7, 1);
+        public static final Upgrade STAT_LONGEVITY_3 = new Upgrade(145, "STAT_LONGEVITY_3", "STAT_LONGEVITY_3_FLAVOR", "STAT_LONGEVITY_3_DESC", STAT_LONGEVITY_2, 25000, loadIcon("icons/upgrades/StatLongevity3.png"), 3, 6, 1);
                 static { upgrades.add(STAT_LONGEVITY_3); }
         public static final Upgrade STAT_RESEARCH_1 = new Upgrade(104, "STAT_RESEARCH_1", "STAT_RESEARCH_1_FLAVOR", "STAT_RESEARCH_1_DESC", ROLE_RESEARCHER, 500, loadIcon("icons/upgrades/StatResearch1.png"), 1, -4, -3);
                 static { upgrades.add(STAT_RESEARCH_1); }
@@ -241,9 +241,9 @@ public final class GameUnlocks {
                 static { upgrades.add(STAT_RESEARCH_3); }
         public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "STAT_GROWTH_1", "STAT_GROWTH_1_FLAVOR", "STAT_GROWTH_1_DESC", STAT_LONGEVITY, 3500, loadIcon("icons/upgrades/StatGrowth1.png"), 2, 4, 2);
                 static { upgrades.add(STAT_GROWTH_1); }
-        public static final Upgrade STAT_GROWTH_2 = new Upgrade(108, "STAT_GROWTH_2", "STAT_GROWTH_2_FLAVOR", "STAT_GROWTH_2_DESC", STAT_GROWTH_1, 9000, loadIcon("icons/upgrades/StatGrowth2.png"), 3, 5, 3);
+        public static final Upgrade STAT_GROWTH_2 = new Upgrade(108, "STAT_GROWTH_2", "STAT_GROWTH_2_FLAVOR", "STAT_GROWTH_2_DESC", STAT_GROWTH_1, 9000, loadIcon("icons/upgrades/StatGrowth2.png"), 3, 4, 3);
                 static { upgrades.add(STAT_GROWTH_2); }
-        public static final Upgrade STAT_GROWTH_3 = new Upgrade(109, "STAT_GROWTH_3", "STAT_GROWTH_3_FLAVOR", "STAT_GROWTH_3_DESC", STAT_GROWTH_2, 20000, loadIcon("icons/upgrades/StatGrowth3.png"), 4, 6, 4);
+        public static final Upgrade STAT_GROWTH_3 = new Upgrade(109, "STAT_GROWTH_3", "STAT_GROWTH_3_FLAVOR", "STAT_GROWTH_3_DESC", STAT_GROWTH_2, 20000, loadIcon("icons/upgrades/StatGrowth3.png"), 4, 5, 4);
                 static { upgrades.add(STAT_GROWTH_3); }
         public static final Upgrade STAT_THIRST_1 = new Upgrade(110, "STAT_THIRST_1", "STAT_THIRST_1_FLAVOR", "STAT_THIRST_1_DESC", STAT_LONGEVITY, 1500, loadIcon("icons/upgrades/StatThirst1.png"), 2, 5, 2);
                 static { upgrades.add(STAT_THIRST_1); }
@@ -297,19 +297,19 @@ public final class GameUnlocks {
                 static { upgrades.add(STAT_HEX_SUSTAIN); }
         public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, loadIcon("icons/upgrades/StatWorkerSpeed2.png"), 5, 0, 8);
                 static { upgrades.add(STAT_WORKER_SPEED_2); }
-        public static final Upgrade STAT_HEALTH_1 = new Upgrade(137, "STAT_HEALTH_1", "STAT_HEALTH_1_FLAVOR", "STAT_HEALTH_1_DESC", STAT_SKELETON, 12000, loadIcon("icons/upgrades/StatHealth1.png"), 3, 5, 1);
+        public static final Upgrade STAT_HEALTH_1 = new Upgrade(137, "STAT_HEALTH_1", "STAT_HEALTH_1_FLAVOR", "STAT_HEALTH_1_DESC", STAT_SKELETON, 12000, loadIcon("icons/upgrades/StatHealth1.png"), 3, 5, 0);
                 static { upgrades.add(STAT_HEALTH_1); }
-        public static final Upgrade STAT_ATTACK_1 = new Upgrade(138, "STAT_ATTACK_1", "STAT_ATTACK_1_FLAVOR", "STAT_ATTACK_1_DESC", STAT_ACID, 12000, loadIcon("icons/upgrades/StatAttack1.png"), 3, 5, -1);
+        public static final Upgrade STAT_ATTACK_1 = new Upgrade(138, "STAT_ATTACK_1", "STAT_ATTACK_1_FLAVOR", "STAT_ATTACK_1_DESC", STAT_ACID, 12000, loadIcon("icons/upgrades/StatAttack1.png"), 3, 3, -2);
                 static { upgrades.add(STAT_ATTACK_1); }
-        public static final Upgrade STAT_DEFENSE_1 = new Upgrade(139, "STAT_DEFENSE_1", "STAT_DEFENSE_1_FLAVOR", "STAT_DEFENSE_1_DESC", STAT_SKELETON, 10000, loadIcon("icons/upgrades/StatDefense1.png"), 3, 5, 0);
+        public static final Upgrade STAT_DEFENSE_1 = new Upgrade(139, "STAT_DEFENSE_1", "STAT_DEFENSE_1_FLAVOR", "STAT_DEFENSE_1_DESC", STAT_SKELETON, 10000, loadIcon("icons/upgrades/StatDefense1.png"), 3, 5, -1);
                 static { upgrades.add(STAT_DEFENSE_1); }
-        public static final Upgrade STAT_HEALTH_2 = new Upgrade(140, "STAT_HEALTH_2", "STAT_HEALTH_2_FLAVOR", "STAT_HEALTH_2_DESC", STAT_HEALTH_1, 500000, loadIcon("icons/upgrades/StatHealth2.png"), 6, 6, 2);
+        public static final Upgrade STAT_HEALTH_2 = new Upgrade(140, "STAT_HEALTH_2", "STAT_HEALTH_2_FLAVOR", "STAT_HEALTH_2_DESC", STAT_HEALTH_1, 500000, loadIcon("icons/upgrades/StatHealth2.png"), 6, 6, 0);
                 static { upgrades.add(STAT_HEALTH_2); }
-        public static final Upgrade STAT_ATTACK_2 = new Upgrade(141, "STAT_ATTACK_2", "STAT_ATTACK_2_FLAVOR", "STAT_ATTACK_2_DESC", STAT_ATTACK_1, 500000, loadIcon("icons/upgrades/StatAttack2.png"), 6, 6, -1);
+        public static final Upgrade STAT_ATTACK_2 = new Upgrade(141, "STAT_ATTACK_2", "STAT_ATTACK_2_FLAVOR", "STAT_ATTACK_2_DESC", STAT_ATTACK_1, 500000, loadIcon("icons/upgrades/StatAttack2.png"), 6, 3, -3);
                 static { upgrades.add(STAT_ATTACK_2); }
-        public static final Upgrade STAT_DEFENSE_2 = new Upgrade(142, "STAT_DEFENSE_2", "STAT_DEFENSE_2_FLAVOR", "STAT_DEFENSE_2_DESC", STAT_DEFENSE_1, 450000, loadIcon("icons/upgrades/StatDefense2.png"), 6, 6, 0);
+        public static final Upgrade STAT_DEFENSE_2 = new Upgrade(142, "STAT_DEFENSE_2", "STAT_DEFENSE_2_FLAVOR", "STAT_DEFENSE_2_DESC", STAT_DEFENSE_1, 450000, loadIcon("icons/upgrades/StatDefense2.png"), 6, 6, -1);
                 static { upgrades.add(STAT_DEFENSE_2); }
-        public static final Upgrade STAT_ATTACK_SPEED_1 = new Upgrade(143, "STAT_ATTACK_SPEED_1", "STAT_ATTACK_SPEED_1_FLAVOR", "STAT_ATTACK_SPEED_1_DESC", STAT_ATTACK_1, 550000, loadIcon("icons/upgrades/StatAttackSpeed1.png"), 6, 6, -2);
+        public static final Upgrade STAT_ATTACK_SPEED_1 = new Upgrade(143, "STAT_ATTACK_SPEED_1", "STAT_ATTACK_SPEED_1_FLAVOR", "STAT_ATTACK_SPEED_1_DESC", STAT_ATTACK_1, 550000, loadIcon("icons/upgrades/StatAttackSpeed1.png"), 6, 4, -3);
                 static { upgrades.add(STAT_ATTACK_SPEED_1); }
         // -- Assimilated --
         public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "ASSIMILATED_FARMING", "ASSIMILATED_FARMING_FLAVOR", "ASSIMILATED_FARMING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFarming.png"), 0, -7, 0);
@@ -721,6 +721,27 @@ public final class GameUnlocks {
 
         // --- Getters ---
         public static List<Upgrade> getUpgrades() { return Collections.unmodifiableList(upgrades); }
+
+        public static Upgrade getUpgradeById(int id) {
+                for (Upgrade u : upgrades) {
+                        if (u.getId() == id) {
+                                return u;
+                        }
+                }
+                return null;
+        }
+
+        public static Upgrade getUpgradeByNameKey(String nameKey) {
+                if (nameKey == null) {
+                        return null;
+                }
+                for (Upgrade u : upgrades) {
+                        if (nameKey.equals(u.getNameKey())) {
+                                return u;
+                        }
+                }
+                return null;
+        }
 
         public static List<Building> getBuildings() { return Collections.unmodifiableList(buildings); }
 

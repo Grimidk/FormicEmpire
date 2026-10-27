@@ -67,7 +67,7 @@ public class Engine extends Thread {
     private boolean showAuditMenu = false;
     private boolean showFpsCounter = false;
     private boolean overworldAutoRecenter = true;
-    private boolean darkMode = false;
+    private boolean darkMode = true;
     private int frameRateCap = 60;
     private boolean freeAbilities = false;
     private boolean infiniteResearch = false;

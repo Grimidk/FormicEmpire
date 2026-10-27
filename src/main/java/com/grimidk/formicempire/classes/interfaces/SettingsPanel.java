@@ -738,7 +738,7 @@ public class SettingsPanel extends JPanel {
         fullScreenCheck.setSelected(true);
         daylightColorOverlayCheck.setSelected(true);
         weatherColorOverlayCheck.setSelected(true);
-        darkModeCheck.setSelected(false);
+        darkModeCheck.setSelected(true);
         selectFrameRateByValue(60);
     }
 

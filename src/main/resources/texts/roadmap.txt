@@ -119,6 +119,7 @@ Post launch (v1.1) (Improvements Update):
 	click and react minigame
 	expectator mode
 	discord integration
+	sound board
 
 Post launch (v1.2) (Civilization Update):
 	(Secret for now)

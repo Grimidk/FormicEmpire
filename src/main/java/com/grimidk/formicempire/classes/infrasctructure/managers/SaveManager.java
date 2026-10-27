@@ -38,6 +38,8 @@ import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFile
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchTreeGraph;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.util.ArrayList;
@@ -2645,6 +2647,7 @@ public class SaveManager {
             try { if (tmp.exists()) tmp.delete(); } catch (Exception ignore) {}
             e.printStackTrace();
         }
+        writeUpgradePositionsFile();
         System.out.println("[SaveManager] Saved global settings.");
     }
 
@@ -2771,10 +2774,115 @@ public class SaveManager {
             engine.setMapLayerBattles(Boolean.parseBoolean(m.getOrDefault("mapLayerBattles",
                     String.valueOf(engine.isMapLayerBattles()))));
 
+            loadUpgradePositionsFromFile();
+            if (m.containsKey("upgradePositions")) {
+                loadUpgradePositionsFromSettings(m.get("upgradePositions"));
+            }
+
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("[SaveManager] Error parsing settings.json, using defaults.");
+        }
+    }
+
+    private void writeUpgradePositionsFile() {
+        try {
+            File dest = new File(GamePaths.resolveSavesDirectory(), "upgrade_positions.json");
+            try (BufferedWriter pw = Files.newBufferedWriter(dest.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                pw.write("{\n");
+                boolean first = true;
+                for (Upgrade u : GameUnlocks.getUpgrades()) {
+                    if (!first) pw.write(",\n");
+                    pw.write("  \"" + escapeJsonString(u.getNameKey()) + "\": { ");
+                    pw.write("\"defaultX\": " + u.getDefaultGridX() + ", ");
+                    pw.write("\"defaultY\": " + u.getDefaultGridY() + ", ");
+                    pw.write("\"setX\": " + u.getGridX() + ", ");
+                    pw.write("\"setY\": " + u.getGridY());
+                    pw.write(" }");
+                    first = false;
+                }
+                pw.write("\n}\n");
+            }
+        } catch (Exception ignore) {}
+    }
+
+    private void loadUpgradePositionsFromFile() {
+        File file = new File(GamePaths.resolveSavesDirectory(), "upgrade_positions.json");
+        if (!file.exists()) {
+            return;
+        }
+        boolean loadedAny = false;
+        try (BufferedReader r = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                line = line.trim();
+                int nameKeyEnd = line.indexOf("\":");
+                if (nameKeyEnd <= 0) continue;
+                String nameKey = line.substring(0, nameKeyEnd).trim();
+                if (nameKey.startsWith("\"")) nameKey = nameKey.substring(1);
+
+                int setXIdx = line.indexOf("\"setX\":");
+                int setYIdx = line.indexOf("\"setY\":");
+                if (setXIdx < 0 || setYIdx < 0) continue;
+
+                int commaAfterX = line.indexOf(',', setXIdx);
+                int braceAfterY = line.indexOf('}', setYIdx);
+                if (commaAfterX < 0 || braceAfterY < 0) continue;
+
+                String strX = line.substring(setXIdx + 7, commaAfterX).trim();
+                String strY = line.substring(setYIdx + 7, braceAfterY).trim();
+
+                try {
+                    int gx = Integer.parseInt(strX);
+                    int gy = Integer.parseInt(strY);
+                    Upgrade u = GameUnlocks.getUpgradeByNameKey(nameKey);
+                    if (u != null) {
+                        u.setGridX(gx);
+                        u.setGridY(gy);
+                        loadedAny = true;
+                    }
+                } catch (NumberFormatException ignore) {}
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (loadedAny) {
+            ResearchTreeGraph.invalidateLayoutCache();
+        }
+    }
+
+    private void loadUpgradePositionsFromSettings(String serialized) {
+        if (serialized == null || serialized.isBlank() || serialized.equals("{}")) {
+            return;
+        }
+        boolean loadedAny = false;
+        String unescaped = unescapeJsonString(serialized);
+        if (unescaped.startsWith("{")) unescaped = unescaped.substring(1);
+        if (unescaped.endsWith("}")) unescaped = unescaped.substring(0, unescaped.length() - 1);
+        String[] pairs = unescaped.split(",");
+        for (String pair : pairs) {
+            int col = pair.indexOf(':');
+            if (col <= 0) continue;
+            String key = pair.substring(0, col).trim().replace("\"", "");
+            String val = pair.substring(col + 1).trim().replace("\"", "");
+            String[] coords = val.split(",");
+            if (coords.length == 2) {
+                try {
+                    int id = Integer.parseInt(key);
+                    int gx = Integer.parseInt(coords[0].trim());
+                    int gy = Integer.parseInt(coords[1].trim());
+                    Upgrade u = GameUnlocks.getUpgradeById(id);
+                    if (u != null) {
+                        u.setGridX(gx);
+                        u.setGridY(gy);
+                        loadedAny = true;
+                    }
+                } catch (NumberFormatException ignore) {}
+            }
+        }
+        if (loadedAny) {
+            ResearchTreeGraph.invalidateLayoutCache();
         }
     }
 

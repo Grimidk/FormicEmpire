@@ -216,7 +216,7 @@ public class AssetStyles {
     public static final Font FONT_SMALL = UiFonts.FONT_SMALL;
     public static final Font FONT_MONOSPACED = UiFonts.FONT_MONOSPACED;
 
-    private static boolean darkMode = false;
+    private static boolean darkMode = true;
 
     public static boolean isDarkMode() {
         return darkMode;

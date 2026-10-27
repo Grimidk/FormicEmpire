@@ -640,6 +640,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                             pw.println("\n}");
                             pw.close();
                             System.out.println("Saved manual positions to " + dest.getAbsolutePath());
+                            ResearchTreeGraph.invalidateLayoutCache();
                             if (engine != null) {
                                 engine.getSaveManager().saveSettings(engine);
                             }
@@ -689,6 +690,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                             pressedNode.getUpgrade().setGridY(gy);
                             pressedNode.setPosX(gx * ResearchTreeGraph.GRID_STEP);
                             pressedNode.setPosY(gy * ResearchTreeGraph.GRID_STEP);
+                            ResearchTreeGraph.invalidateLayoutCache();
                             rebuildLayout();
                             repaint();
                         }
