@@ -26,11 +26,6 @@ import java.util.function.BiConsumer;
 
 public final class InvasionsPanel extends JPanel {
 
-    private static final List<AntClass> INVASION_ANT_TYPES = List.of(
-            GameConstants.CLASS_WORKER,
-            GameConstants.CLASS_SOLDIER,
-            GameConstants.CLASS_MAJOR,
-            GameConstants.CLASS_PRINCESS);
 
     private final JFrame dialogOwner;
     private final Colony colony;
@@ -144,7 +139,7 @@ public final class InvasionsPanel extends JPanel {
         detailColumn.add(Box.createVerticalStrut(6));
         detailColumn.add(CritterPanelUtils.buildLabeledDetailRow(
                 LanguageStrings.INVASION_PERSONNEL,
-                CritterPanelUtils.buildAntClassCountsRow(sentCounts, INVASION_ANT_TYPES)));
+                CritterPanelUtils.buildAntClassCountsRow(sentCounts, ColonyInvasionService.INVASION_ANT_CLASSES)));
 
         int totalSent = defense.getParty().size();
         int living = totalSent;

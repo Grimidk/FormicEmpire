@@ -39,12 +39,11 @@ public final class ColonyInvasionService {
         }
     }
 
-    private static final List<AntClass> INVASION_ANT_CLASSES = List.of(
+    public static final List<AntClass> INVASION_ANT_CLASSES = List.of(
             GameConstants.CLASS_WORKER,
             GameConstants.CLASS_SOLDIER,
             GameConstants.CLASS_MAJOR,
             GameConstants.CLASS_PRINCESS);
-    private static final List<AntClass> INVASION_ANT_TYPES = INVASION_ANT_CLASSES;
 
     private ColonyInvasionService() {
     }

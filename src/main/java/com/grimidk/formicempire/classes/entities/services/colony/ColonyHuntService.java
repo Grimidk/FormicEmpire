@@ -53,7 +53,7 @@ public final class ColonyHuntService {
         }
     }
 
-    private static final List<AntClass> HUNT_ANT_CLASSES = List.of(
+    public static final List<AntClass> HUNT_ANT_CLASSES = List.of(
             GameConstants.CLASS_SOLDIER,
             GameConstants.CLASS_MAJOR,
             GameConstants.CLASS_PRINCESS);

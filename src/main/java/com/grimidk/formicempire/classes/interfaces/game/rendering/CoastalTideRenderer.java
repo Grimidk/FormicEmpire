@@ -26,80 +26,20 @@ public final class CoastalTideRenderer {
 
     public static final int TIDE_AMPLITUDE_PX = 50;
 
-    private static Image loadOptional(String path) {
-        try {
-            URL url = CoastalTideRenderer.class.getResource(path);
-            if (url != null) {
-                return new ImageIcon(url).getImage();
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
+    private static Image loadRequired(String path) {
+        URL url = CoastalTideRenderer.class.getResource(path);
+        return url != null ? new ImageIcon(url).getImage() : null;
     }
 
-    private static Image[] resolveFrames(String baseDir, String baseName) {
-        Image single = loadOptional(baseDir + baseName + ".png");
-        if (single != null) {
-            return new Image[] { single };
-        }
-        List<Image> list = new ArrayList<>();
-        for (int i = 1; i <= 6; i++) {
-            Image frame = loadOptional(baseDir + baseName + i + ".png");
-            if (frame != null) {
-                list.add(frame);
-            }
-        }
-        return list.toArray(new Image[0]);
+    private static Image[] resolveFrame(String name) {
+        Image img = loadRequired("/backgrounds/biomes/" + name + ".png");
+        return img != null ? new Image[] { img } : new Image[0];
     }
 
-    private static Image[] loadShoreFrames() {
-        Image[] frames = resolveFrames("/backgrounds/biomes/", "CoastShore");
-        if (frames.length > 0) {
-            return frames;
-        }
-        return resolveFrames("/sprites/world/coast/", "CoastShore");
-    }
-
-    private static Image[] loadCliffFrames() {
-        Image[] frames = resolveFrames("/backgrounds/biomes/", "CoastCliffs");
-        if (frames.length > 0) {
-            return frames;
-        }
-        frames = resolveFrames("/backgrounds/biomes/", "CoastCliff");
-        if (frames.length > 0) {
-            return frames;
-        }
-        frames = resolveFrames("/sprites/world/coast/", "CoastCliffs");
-        if (frames.length > 0) {
-            return frames;
-        }
-        return resolveFrames("/sprites/world/coast/", "CoastCliff");
-    }
-
-    private static Image[] loadCornerFrames() {
-        Image[] frames = resolveFrames("/backgrounds/biomes/", "CoastShoreCorner");
-        if (frames.length > 0) {
-            return frames;
-        }
-        return resolveFrames("/sprites/world/coast/", "CoastShoreCorner");
-    }
-
-    private static Image[] loadCliffCornerFrames() {
-        Image[] frames = resolveFrames("/backgrounds/biomes/", "CoastCliffsCorner");
-        if (frames.length > 0) {
-            return frames;
-        }
-        frames = resolveFrames("/backgrounds/biomes/", "CoastCliffCorner");
-        if (frames.length > 0) {
-            return frames;
-        }
-        return loadCornerFrames();
-    }
-
-    private static final Image[] SHORE_FRAMES = loadShoreFrames();
-    private static final Image[] CLIFF_FRAMES = loadCliffFrames();
-    private static final Image[] CORNER_FRAMES = loadCornerFrames();
-    private static final Image[] CLIFF_CORNER_FRAMES = loadCliffCornerFrames();
+    private static final Image[] SHORE_FRAMES = resolveFrame("CoastShore");
+    private static final Image[] CLIFF_FRAMES = resolveFrame("CoastCliffs");
+    private static final Image[] CORNER_FRAMES = resolveFrame("CoastShoreCorner");
+    private static final Image[] CLIFF_CORNER_FRAMES = resolveFrame("CoastCliffsCorner");
 
     private static Image selectFrame(Image[] frames, long animTimeMs) {
         if (frames == null || frames.length == 0) {

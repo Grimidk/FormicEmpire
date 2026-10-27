@@ -4,8 +4,7 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		fix upgrade tree
-		make sure dark mode is deafult
+		(none right now)
 	Mid:
 		(none right now)
 	Low:

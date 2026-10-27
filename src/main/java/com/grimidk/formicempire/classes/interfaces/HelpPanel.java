@@ -471,6 +471,26 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
+        JPanel agingEntry = new JPanel(new BorderLayout(10, 0));
+        agingEntry.setBackground(AssetStyles.BACKGROUND_COLOR);
+        agingEntry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(LanguageStrings.HELP_ANT_AGING_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        JTextArea agingArea = new JTextArea(LanguageStrings.get(LanguageStrings.HELP_ANT_AGING_DESC));
+        agingArea.setFont(AssetStyles.FONT_NORMAL);
+        agingArea.setForeground(AssetStyles.FONT_COLOR);
+        agingArea.setWrapStyleWord(true);
+        agingArea.setLineWrap(true);
+        agingArea.setEditable(false);
+        agingArea.setFocusable(false);
+        agingArea.setBackground(panel.getBackground());
+        agingArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        agingEntry.add(agingArea, BorderLayout.CENTER);
+        panel.add(agingEntry);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
+
         for (AntClass type : GameConstants.getAntClasses()) {
             if (type == GameConstants.CLASS_DEAD || type == GameConstants.CLASS_ZOMBIE) continue;
 
@@ -605,6 +625,8 @@ public class HelpPanel extends JPanel {
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_REINFORCEMENT, buildCombatReinforcementSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WATER_CROSSING, buildCombatWaterCrossingSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_PHASES, buildCombatWarPhasesSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_STANDING, buildCombatWarStandingSection()));
@@ -683,9 +705,23 @@ public class HelpPanel extends JPanel {
     }
 
     private JPanel buildCombatReinforcementSection() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         JLabel body = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_REINFORCEMENT_BODY)));
+        styleTutorialLabel(body);
+        body.setBorder(new EmptyBorder(0, 0, 8, 0));
+        body.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(body);
+        panel.add(buildCombatConstantEntry(panel, GameConstants.ROLE_CARRIER.getName(), GameConstants.ROLE_CARRIER.getIcon(),
+                LanguageStrings.get(LanguageStrings.HELP_COMBAT_CARRIER_DESC)));
+        return panel;
+    }
+
+    private JPanel buildCombatWaterCrossingSection() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        JLabel body = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_WATER_CROSSING_BODY)));
         styleTutorialLabel(body);
         panel.add(body, BorderLayout.CENTER);
         return panel;
@@ -840,6 +876,21 @@ public class HelpPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(AssetStyles.BACKGROUND_COLOR);
+        header.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(LanguageStrings.CRITTER_TAB_HUNTS) + " & " + LanguageStrings.get(LanguageStrings.CRITTER_TAB_INVASIONS),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        JLabel headerLabel = new JLabel(helpHtml("width:500px;font-size:11pt;",
+                LanguageStrings.get(LanguageStrings.HELP_HUNTS_INVASIONS_INTRO)));
+        headerLabel.setFont(AssetStyles.FONT_NORMAL);
+        headerLabel.setForeground(AssetStyles.FONT_COLOR);
+        header.add(headerLabel, BorderLayout.CENTER);
+        panel.add(header);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         for (Species type : GameConstants.getCritterSpecies()) {
             JPanel entry = new JPanel(new BorderLayout(10, 0));
@@ -1429,6 +1480,8 @@ public class HelpPanel extends JPanel {
         panel.add(createMusicControlsSection());
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(createGameSpeedIconsSection());
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(createMapLayersSection());
 
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -1506,6 +1559,27 @@ public class HelpPanel extends JPanel {
         wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
         wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
         wrapper.add(grid, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel createMapLayersSection() {
+        JPanel section = new JPanel(new BorderLayout(8, 8));
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_MAP_LAYERS),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel label = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_UI_MAP_LAYERS_DESC)));
+        styleTutorialLabel(label);
+        label.setBorder(new EmptyBorder(4, 8, 6, 8));
+        section.add(label, BorderLayout.CENTER);
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(section, BorderLayout.CENTER);
         return wrapper;
     }
 
@@ -1587,9 +1661,31 @@ public class HelpPanel extends JPanel {
     }
 
     private JComponent createBuildingTreeHelpPanel() {
-        BuildingTreePanel panel = new BuildingTreePanel(resolveHelpColony(), null, true);
-        panel.updateData();
-        return panel;
+        BuildingTreePanel treePanel = new BuildingTreePanel(resolveHelpColony(), null, true);
+        treePanel.updateData();
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JPanel specialInfo = new JPanel(new BorderLayout());
+        specialInfo.setBackground(AssetStyles.BACKGROUND_COLOR);
+        specialInfo.setBorder(BorderFactory.createCompoundBorder(
+                new EmptyBorder(6, 6, 4, 6),
+                BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                        LanguageStrings.get(LanguageStrings.HELP_BUILDINGS_SPECIAL_TITLE),
+                        javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                        javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                        AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER)));
+        JLabel infoLabel = new JLabel(helpHtml("width:650px;font-size:10pt;",
+                LanguageStrings.get(LanguageStrings.HELP_BUILDINGS_SPECIAL_BODY)));
+        infoLabel.setFont(AssetStyles.FONT_NORMAL);
+        infoLabel.setForeground(AssetStyles.FONT_COLOR);
+        infoLabel.setBorder(new EmptyBorder(4, 8, 6, 8));
+        specialInfo.add(infoLabel, BorderLayout.CENTER);
+
+        wrapper.add(specialInfo, BorderLayout.NORTH);
+        wrapper.add(treePanel, BorderLayout.CENTER);
+        return wrapper;
     }
 
     private JComponent createDictionaryPanel(List<Constant> items) {

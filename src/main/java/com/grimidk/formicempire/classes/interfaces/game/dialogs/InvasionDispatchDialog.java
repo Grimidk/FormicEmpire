@@ -19,11 +19,6 @@ import java.util.Map;
 
 public final class InvasionDispatchDialog extends ZeroDialog {
 
-    private static final List<AntClass> INVASION_ANT_TYPES = List.of(
-            GameConstants.CLASS_WORKER,
-            GameConstants.CLASS_SOLDIER,
-            GameConstants.CLASS_MAJOR,
-            GameConstants.CLASS_PRINCESS);
 
     private final Colony colony;
     private final InvasionAlert alert;
@@ -74,7 +69,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
                 BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR),
                 LanguageStrings.get(LanguageStrings.INVASION_PERSONNEL)));
         antGrid.setBackground(AssetStyles.UI_BG_PRIMARY);
-        for (AntClass type : INVASION_ANT_TYPES) {
+        for (AntClass type : ColonyInvasionService.INVASION_ANT_CLASSES) {
             antGrid.add(buildAntRow(type));
         }
         mainPanel.add(antGrid);
@@ -145,7 +140,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
     private void applyDefaultSelection() {
         updating = true;
         try {
-            for (AntClass type : INVASION_ANT_TYPES) {
+            for (AntClass type : ColonyInvasionService.INVASION_ANT_CLASSES) {
                 int available = availableByType.getOrDefault(type, 0);
                 if (available > 0) {
                     JSpinner spinner = antSpinners.get(type);

@@ -26,10 +26,6 @@ import java.util.function.BiConsumer;
 
 public final class HuntsPanel extends JPanel {
 
-    private static final List<AntClass> HUNT_ANT_TYPES = List.of(
-            GameConstants.CLASS_SOLDIER,
-            GameConstants.CLASS_MAJOR,
-            GameConstants.CLASS_PRINCESS);
 
     private final Colony colony;
     private final Engine engine;
@@ -140,7 +136,7 @@ public final class HuntsPanel extends JPanel {
         detailColumn.add(Box.createVerticalStrut(6));
         detailColumn.add(CritterPanelUtils.buildLabeledDetailRow(
                 LanguageStrings.HUNT_PERSONNEL,
-                CritterPanelUtils.buildAntClassCountsRow(sentCounts, HUNT_ANT_TYPES)));
+                CritterPanelUtils.buildAntClassCountsRow(sentCounts, ColonyHuntService.HUNT_ANT_CLASSES)));
 
         if (expedition.getPhase() == HuntExpedition.Phase.TRAVELING) {
             int pct = Math.round(expedition.getTravelProgressRatio() * 100f);

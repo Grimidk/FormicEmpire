@@ -1103,6 +1103,8 @@ public class StatsDialog extends ZeroDialog {
         boolean showPool = false;
         boolean showParasitic = false;
         boolean showParasiteAnts = false;
+        boolean showHunts = false, showInvasions = false;
+        int knownTargets = 0, activeExpeditions = 0, activeInvasions = 0, huntCapacity = 0;
 
         World world = engine != null ? engine.getWorld() : null;
         Season season = world != null ? world.getSeason() : null;
@@ -1156,10 +1158,21 @@ public class StatsDialog extends ZeroDialog {
                 showParasiteAnts = true;
                 parasiteAnts += c.getParasiteAnts();
             }
+            if (c.hasUpgrade(GameUnlocks.ABILITY_HUNTS) || !c.getKnownHuntTargets().isEmpty()
+                    || !c.getActiveHuntExpeditions().isEmpty()) {
+                showHunts = true;
+                knownTargets += c.getKnownHuntTargets().size();
+                activeExpeditions += c.getActiveHuntExpeditions().size();
+                huntCapacity += c.getSourceCapacity();
+            }
+            if (!c.getInvasionAlerts().isEmpty() || !c.getActiveInvasionDefenses().isEmpty()) {
+                showInvasions = true;
+                activeInvasions += c.getInvasionAlerts().size();
+            }
         }
 
         if (!showAphids && !showSymbioticMites && !showDermestids && !showPool
-                && !showParasitic && !showParasiteAnts) {
+                && !showParasitic && !showParasiteAnts && !showHunts && !showInvasions) {
             return;
         }
 
@@ -1252,6 +1265,35 @@ public class StatsDialog extends ZeroDialog {
                     parasiteAnts,
                     "—",
                     LanguageStrings.get(LanguageStrings.WORLD_NA)
+                });
+            }
+        }
+
+        if (showHunts || showInvasions) {
+            if (showAphids || showSymbioticMites || showDermestids || showPool || showParasitic || showParasiteAnts) {
+                model.addRow(new Object[]{null, sep, sep, sep, sep, sep});
+            }
+            if (showHunts) {
+                String expStatus = activeExpeditions > 0
+                        ? LanguageStrings.format(LanguageStrings.HUNT_ACTIVE_EXPEDITIONS_FMT, activeExpeditions)
+                        : "—";
+                model.addRow(new Object[]{
+                    GameUnlocks.ABILITY_HUNTS.getIcon(),
+                    LanguageStrings.get(LanguageStrings.DIALOG_HUNTS_TITLE),
+                    expStatus,
+                    knownTargets,
+                    "—",
+                    huntCapacity
+                });
+            }
+            if (showInvasions) {
+                model.addRow(new Object[]{
+                    GameConstants.ROLE_DEFENDER.getIcon(),
+                    LanguageStrings.get(LanguageStrings.INVASION_LABEL_THREAT),
+                    LanguageStrings.get(LanguageStrings.INVASION_SCOPE_COLONY),
+                    activeInvasions,
+                    "—",
+                    "—"
                 });
             }
         }

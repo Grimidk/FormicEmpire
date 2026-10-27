@@ -19,10 +19,6 @@ import java.util.Map;
 
 public final class HuntDispatchDialog extends ZeroDialog {
 
-    private static final List<AntClass> HUNT_ANT_TYPES = List.of(
-            GameConstants.CLASS_SOLDIER,
-            GameConstants.CLASS_MAJOR,
-            GameConstants.CLASS_PRINCESS);
 
     private final Colony colony;
     private final KnownHuntTarget target;
@@ -73,7 +69,7 @@ public final class HuntDispatchDialog extends ZeroDialog {
                 BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR),
                 LanguageStrings.get(LanguageStrings.HUNT_PERSONNEL)));
         antGrid.setBackground(AssetStyles.UI_BG_PRIMARY);
-        for (AntClass type : HUNT_ANT_TYPES) {
+        for (AntClass type : ColonyHuntService.HUNT_ANT_CLASSES) {
             antGrid.add(buildAntRow(type));
         }
         mainPanel.add(antGrid);
@@ -192,7 +188,7 @@ public final class HuntDispatchDialog extends ZeroDialog {
     private void applyDefaultSelection() {
         updating = true;
         try {
-            for (AntClass type : HUNT_ANT_TYPES) {
+            for (AntClass type : ColonyHuntService.HUNT_ANT_CLASSES) {
                 if (availableByType.getOrDefault(type, 0) > 0) {
                     JSpinner spinner = antSpinners.get(type);
                     if (spinner != null) {

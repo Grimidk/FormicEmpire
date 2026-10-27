@@ -3018,4 +3018,15 @@ public final class LanguageStrings {
     public static final String TRIGGER_SUBTYPE_HATCH_MSG = "TRIGGER_SUBTYPE_HATCH_MSG";
     public static final String TRIGGER_OPERATIONS_ABILITY_TITLE = "TRIGGER_OPERATIONS_ABILITY_TITLE";
     public static final String TRIGGER_OPERATIONS_ABILITY_MSG = "TRIGGER_OPERATIONS_ABILITY_MSG";
+
+    public static final String HELP_HUNTS_INVASIONS_INTRO = "HELP_HUNTS_INVASIONS_INTRO";
+    public static final String HELP_UI_MAP_LAYERS = "HELP_UI_MAP_LAYERS";
+    public static final String HELP_UI_MAP_LAYERS_DESC = "HELP_UI_MAP_LAYERS_DESC";
+    public static final String HELP_BUILDINGS_SPECIAL_TITLE = "HELP_BUILDINGS_SPECIAL_TITLE";
+    public static final String HELP_BUILDINGS_SPECIAL_BODY = "HELP_BUILDINGS_SPECIAL_BODY";
+    public static final String HELP_ANT_AGING_TITLE = "HELP_ANT_AGING_TITLE";
+    public static final String HELP_ANT_AGING_DESC = "HELP_ANT_AGING_DESC";
+    public static final String HELP_COMBAT_WATER_CROSSING = "HELP_COMBAT_WATER_CROSSING";
+    public static final String HELP_COMBAT_WATER_CROSSING_BODY = "HELP_COMBAT_WATER_CROSSING_BODY";
+    public static final String HELP_COMBAT_CARRIER_DESC = "HELP_COMBAT_CARRIER_DESC";
 }
