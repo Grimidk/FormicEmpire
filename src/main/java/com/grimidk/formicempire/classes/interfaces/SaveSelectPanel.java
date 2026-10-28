@@ -277,7 +277,6 @@ public class SaveSelectPanel extends JPanel {
 
                 Savefile newSave = cachedSaves[idx];
                 if (newSave != null) {
-                    HelpPanel.showTutorialDialog(frame);
                     frame.openGameWithSave(newSave);
                 } else {
                     UiOptionPane.showMessageDialog(frame, LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE), LanguageStrings.get(LanguageStrings.UI_ERROR), JOptionPane.ERROR_MESSAGE);

@@ -56,6 +56,9 @@ public final class GameNumbers {
     public static final int WORLD_MIN_HEXES_PER_BIOME = 2;
     public static final int WORLD_RECT_WIDTH = 128;
     public static final int WORLD_RECT_HEIGHT = 64;
+    public static final double WORLD_DEFAULT_CONTINENTAL_LAND_PERCENTAGE = 0.28;
+    public static final boolean WORLD_DEFAULT_HAS_ICE_CAPS = true;
+    public static final double WORLD_DEFAULT_ICECAP_POLAR_LIMIT = 0.82;
 
     public static int worldRadiusForContinentCore(int continentCoreRadius) {
         return Math.max(0, continentCoreRadius)

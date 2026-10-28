@@ -22,11 +22,24 @@ public abstract class ZeroDialog extends JDialog {
     private boolean hideOnClose;
 
     public ZeroDialog(JFrame owner, String titleKey, Dimension preferredSize) {
-        super(owner, LanguageStrings.get(titleKey), true);
+        this((Window) owner, titleKey, preferredSize);
+    }
+
+    public ZeroDialog(Window owner, String titleKey, Dimension preferredSize) {
+        this(owner, titleKey, preferredSize, ModalityType.APPLICATION_MODAL);
+    }
+
+    public ZeroDialog(Window owner, String titleKey, Dimension preferredSize, ModalityType modalityType) {
+        super(owner, LanguageStrings.get(titleKey), modalityType != null ? modalityType : ModalityType.APPLICATION_MODAL);
         this.titleKey = titleKey;
 
         if (owner instanceof MainFrame mainFrame) {
             mainFrame.applyGameCursors(this);
+        } else if (owner != null) {
+            Window root = SwingUtilities.getWindowAncestor(owner);
+            if (root instanceof MainFrame mf) {
+                mf.applyGameCursors(this);
+            }
         }
         
         getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);

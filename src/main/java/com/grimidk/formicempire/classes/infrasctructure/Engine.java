@@ -76,6 +76,8 @@ public class Engine extends Thread {
     private boolean mapEditorEnabled = false;
     private boolean easyConquering = false;
     private boolean instantIntegration = false;
+    private boolean animateWorldGen = false;
+    private WorldGenStepListener worldGenStepListener;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
     private int defaultRoleSoldier = GameConstants.ROLE_HUNTER.getId();
     private int defaultRoleMajor = GameConstants.ROLE_CRANE.getId();
@@ -142,6 +144,9 @@ public class Engine extends Thread {
         this.world = world;
         if (this.world != null) {
             this.world.setEngine(this);
+            if (this.worldGenStepListener != null) {
+                this.world.setWorldGenStepListener(this.worldGenStepListener);
+            }
         }
     }
 
@@ -642,6 +647,25 @@ public class Engine extends Thread {
 
     public void setInstantIntegration(boolean instantIntegration) {
         this.instantIntegration = instantIntegration;
+    }
+
+    public boolean isAnimateWorldGen() {
+        return animateWorldGen;
+    }
+
+    public void setAnimateWorldGen(boolean animateWorldGen) {
+        this.animateWorldGen = animateWorldGen;
+    }
+
+    public WorldGenStepListener getWorldGenStepListener() {
+        return worldGenStepListener;
+    }
+
+    public void setWorldGenStepListener(WorldGenStepListener worldGenStepListener) {
+        this.worldGenStepListener = worldGenStepListener;
+        if (this.world != null) {
+            this.world.setWorldGenStepListener(worldGenStepListener);
+        }
     }
 
     public boolean hasAchievementTaintingSandbox() {

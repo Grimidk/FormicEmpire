@@ -2597,6 +2597,7 @@ public class SaveManager {
             writeJsonLine(w, "mapEditorEnabled", engine.isMapEditorEnabled(), false);
             writeJsonLine(w, "easyConquering", engine.isEasyConquering(), false);
             writeJsonLine(w, "instantIntegration", engine.isInstantIntegration(), false);
+            writeJsonLine(w, "animateWorldGen", engine.isAnimateWorldGen(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
@@ -2735,6 +2736,7 @@ public class SaveManager {
             engine.setMapEditorEnabled(Boolean.parseBoolean(m.getOrDefault("mapEditorEnabled", "false")));
             engine.setEasyConquering(Boolean.parseBoolean(m.getOrDefault("easyConquering", "false")));
             engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
+            engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "false")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.CLASS_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),

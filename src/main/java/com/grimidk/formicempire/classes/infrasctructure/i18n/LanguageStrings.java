@@ -1637,6 +1637,24 @@ public final class LanguageStrings {
     public static final String SETTINGS_ASSIMILATE_ALL = "SETTINGS_ASSIMILATE_ALL";
     public static final String SETTINGS_EASY_CONQUERING = "SETTINGS_EASY_CONQUERING";
     public static final String SETTINGS_INSTANT_INTEGRATION = "SETTINGS_INSTANT_INTEGRATION";
+    public static final String SETTINGS_ANIMATE_WORLD_GEN = "SETTINGS_ANIMATE_WORLD_GEN";
+    public static final String SETTINGS_MULTI_MAP_PREVIEW = "SETTINGS_MULTI_MAP_PREVIEW";
+    public static final String MULTI_MAP_TITLE = "MULTI_MAP_TITLE";
+    public static final String MULTI_MAP_REGENERATE = "MULTI_MAP_REGENERATE";
+    public static final String MULTI_MAP_CLOSE = "MULTI_MAP_CLOSE";
+    public static final String MULTI_MAP_COPY_BUTTON = "MULTI_MAP_COPY_BUTTON";
+    public static final String MULTI_MAP_COPIED = "MULTI_MAP_COPIED";
+    public static final String MULTI_MAP_SAVED_FMT = "MULTI_MAP_SAVED_FMT";
+    public static final String MULTI_MAP_NO_SLOTS = "MULTI_MAP_NO_SLOTS";
+    public static final String MULTI_MAP_PARAM_CONTINENTS = "MULTI_MAP_PARAM_CONTINENTS";
+    public static final String MULTI_MAP_PARAM_ISLANDS = "MULTI_MAP_PARAM_ISLANDS";
+    public static final String MULTI_MAP_PARAM_LAND_SHARE = "MULTI_MAP_PARAM_LAND_SHARE";
+    public static final String MULTI_MAP_PARAM_ICECAP = "MULTI_MAP_PARAM_ICECAP";
+    public static final String MULTI_MAP_PARAM_RESET = "MULTI_MAP_PARAM_RESET";
+    public static final String MULTI_MAP_PARAM_RANDOMIZE = "MULTI_MAP_PARAM_RANDOMIZE";
+    public static final String MULTI_MAP_INSPECT_MAP = "MULTI_MAP_INSPECT_MAP";
+    public static final String WORLDGEN_STEP_TITLE = "WORLDGEN_STEP_TITLE";
+    public static final String WORLDGEN_STEP_SKIP = "WORLDGEN_STEP_SKIP";
     
     public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY = "SETTINGS_DAYLIGHT_COLOR_OVERLAY";
     public static final String SETTINGS_WEATHER_COLOR_OVERLAY = "SETTINGS_WEATHER_COLOR_OVERLAY";
@@ -1686,6 +1704,8 @@ public final class LanguageStrings {
     public static final String SETTINGS_ASSIMILATE_ALL_TT = "SETTINGS_ASSIMILATE_ALL_TT";
     public static final String SETTINGS_EASY_CONQUERING_TT = "SETTINGS_EASY_CONQUERING_TT";
     public static final String SETTINGS_INSTANT_INTEGRATION_TT = "SETTINGS_INSTANT_INTEGRATION_TT";
+    public static final String SETTINGS_ANIMATE_WORLD_GEN_TT = "SETTINGS_ANIMATE_WORLD_GEN_TT";
+    public static final String SETTINGS_MULTI_MAP_PREVIEW_TT = "SETTINGS_MULTI_MAP_PREVIEW_TT";
     public static final String SETTINGS_SCREEN_SIZE_TT = "SETTINGS_SCREEN_SIZE_TT";
     public static final String SETTINGS_FULLSCREEN_TT = "SETTINGS_FULLSCREEN_TT";
     public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT = "SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT";

@@ -1478,24 +1478,36 @@ public class GamePanel extends ZeroGamePanel {
         cancelLoadWorker();
         statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_STARTING));
         Engine engine = frame.getEngine();
-        
-        JDialog loadingDialog = new JDialog(frame, LanguageStrings.get(LanguageStrings.UI_DIALOG_LOADING_TITLE), true);
-        loadingDialog.setUndecorated(true);
-        loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        boolean isNewWorld = (savefile == null || savefile.getWorldHexes() == null || savefile.getWorldHexes().isEmpty());
+        boolean animateGen = engine.isAnimateWorldGen() && isNewWorld;
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_EXTERNAL));
-        panel.setBackground(AssetStyles.BACKGROUND_DARK);
+        WorldGenVisualizerDialog visualizerDialog = animateGen ? new WorldGenVisualizerDialog(frame) : null;
+        if (visualizerDialog != null) {
+            engine.setWorldGenStepListener(visualizerDialog);
+        }
 
-        JLabel label = new JLabel(LanguageStrings.get(LanguageStrings.UI_LOADING_WAIT), SwingConstants.CENTER);
-        label.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
-        label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
+        JDialog loadingDialog;
+        if (visualizerDialog != null) {
+            loadingDialog = visualizerDialog;
+        } else {
+            loadingDialog = new JDialog(frame, LanguageStrings.get(LanguageStrings.UI_DIALOG_LOADING_TITLE), true);
+            loadingDialog.setUndecorated(true);
+            loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-        panel.add(label, BorderLayout.CENTER);
-        loadingDialog.add(panel);
-        UiDialogUtils.prepareDialog(loadingDialog, frame);
-        loadingDialog.pack();
-        loadingDialog.setLocationRelativeTo(frame);
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_EXTERNAL));
+            panel.setBackground(AssetStyles.BACKGROUND_DARK);
+
+            JLabel label = new JLabel(LanguageStrings.get(LanguageStrings.UI_LOADING_WAIT), SwingConstants.CENTER);
+            label.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
+            label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
+
+            panel.add(label, BorderLayout.CENTER);
+            loadingDialog.add(panel);
+            UiDialogUtils.prepareDialog(loadingDialog, frame);
+            loadingDialog.pack();
+            loadingDialog.setLocationRelativeTo(frame);
+        }
 
         loadWorker = new SwingWorker<Void, Void>() {
             @Override
@@ -1518,6 +1530,7 @@ public class GamePanel extends ZeroGamePanel {
 
             @Override
             protected void done() {
+                engine.setWorldGenStepListener(null);
                 loadingDialog.dispose();
                 if (isCancelled()) {
                     return;
@@ -1572,6 +1585,9 @@ public class GamePanel extends ZeroGamePanel {
                     paintGameAreaWhilePaused();
                     if (engine.getMusicService() != null) {
                         engine.getMusicService().enterSession();
+                    }
+                    if (isNewWorld) {
+                        HelpPanel.showTutorialDialog(frame);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

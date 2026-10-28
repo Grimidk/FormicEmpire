@@ -87,7 +87,12 @@ public class MapDialog extends ZeroDialog {
     private int navZoomHoldTicks;
 
     public MapDialog(JFrame owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
-        super(owner, LanguageStrings.DIALOG_MAP_TITLE, owner != null ? owner.getSize() : AssetStyles.MAP_DIALOG_SIZE);
+        this((Window) owner, engine, world, onHexChange, onOpenWarDialog);
+    }
+
+    public MapDialog(Window owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
+        super(owner, LanguageStrings.DIALOG_MAP_TITLE, owner != null ? owner.getSize() : AssetStyles.MAP_DIALOG_SIZE,
+                owner instanceof JDialog ? ModalityType.DOCUMENT_MODAL : ModalityType.APPLICATION_MODAL);
         this.engine = engine;
         this.world = world;
         this.onHexChange = onHexChange;
@@ -419,11 +424,14 @@ public class MapDialog extends ZeroDialog {
     }
 
     private World currentWorld() {
+        if (world != null) {
+            return world;
+        }
         Engine eng = resolveEngine();
         if (eng != null && eng.getWorld() != null) {
             return eng.getWorld();
         }
-        return world;
+        return null;
     }
 
     private void syncWorldFromEngine() {

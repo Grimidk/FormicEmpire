@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.MultiMapGalleryDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
@@ -66,6 +67,8 @@ public class SettingsPanel extends JPanel {
     private JCheckBox mapEditorEnabledCheck;
     private JCheckBox easyConqueringCheck;
     private JCheckBox instantIntegrationCheck;
+    private JCheckBox animateWorldGenCheck;
+    private JButton multiMapPreviewButton;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -81,7 +84,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, disablePopupsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
-    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel;
+    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel, animateWorldGenLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -532,6 +535,31 @@ public class SettingsPanel extends JPanel {
 
         c.gridy = 11;
         c.gridx = 0;
+        animateWorldGenLabel = new JLabel();
+        animateWorldGenLabel.setFont(AssetStyles.FONT_NORMAL);
+        animateWorldGenLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(animateWorldGenLabel, c);
+
+        animateWorldGenCheck = new JCheckBox();
+        styleCheckBox(animateWorldGenCheck);
+
+        multiMapPreviewButton = new JButton(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW));
+        AssetStyles.styleCompactButton(multiMapPreviewButton);
+        multiMapPreviewButton.addActionListener(e -> {
+            java.awt.Window parent = javax.swing.SwingUtilities.getWindowAncestor(multiMapPreviewButton);
+            new MultiMapGalleryDialog(parent != null ? parent : frame, engine).setVisible(true);
+        });
+
+        JPanel worldGenPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 0));
+        worldGenPanel.setOpaque(false);
+        worldGenPanel.add(animateWorldGenCheck);
+        worldGenPanel.add(multiMapPreviewButton);
+
+        c.gridx = 1;
+        panel.add(worldGenPanel, c);
+
+        c.gridy = 12;
+        c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(16, 15, 5, 15);
@@ -728,6 +756,7 @@ public class SettingsPanel extends JPanel {
         mapEditorEnabledCheck.setSelected(false);
         easyConqueringCheck.setSelected(false);
         instantIntegrationCheck.setSelected(false);
+        animateWorldGenCheck.setSelected(false);
     }
 
     private void resetVideoTabToDefaults() {
@@ -1018,6 +1047,8 @@ public class SettingsPanel extends JPanel {
         mapEditorEnabledLabel.setText(LanguageStrings.get("SETTINGS_MAP_EDITOR_ENABLED") + " " + LanguageStrings.get("SETTINGS_MAP_EDITOR_NOTE"));
         easyConqueringLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_EASY_CONQUERING));
         instantIntegrationLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_INTEGRATION));
+        animateWorldGenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN));
+        multiMapPreviewButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -1101,6 +1132,8 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(mapEditorEnabledLabel, mapEditorEnabledCheck, "SETTINGS_MAP_EDITOR_ENABLED_TT");
         setSettingTooltip(easyConqueringLabel, easyConqueringCheck, LanguageStrings.SETTINGS_EASY_CONQUERING_TT);
         setSettingTooltip(instantIntegrationLabel, instantIntegrationCheck, LanguageStrings.SETTINGS_INSTANT_INTEGRATION_TT);
+        setSettingTooltip(animateWorldGenLabel, animateWorldGenCheck, LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN_TT);
+        multiMapPreviewButton.setToolTipText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW_TT));
         setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
         setSettingTooltip(fsLabel, fullScreenCheck, LanguageStrings.SETTINGS_FULLSCREEN_TT);
         setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
@@ -1158,6 +1191,7 @@ public class SettingsPanel extends JPanel {
         mapEditorEnabledCheck.setSelected(engine.isMapEditorEnabled());
         easyConqueringCheck.setSelected(engine.isEasyConquering());
         instantIntegrationCheck.setSelected(engine.isInstantIntegration());
+        animateWorldGenCheck.setSelected(engine.isAnimateWorldGen());
         
         refreshScreenSizeCombo(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
@@ -1332,6 +1366,7 @@ public class SettingsPanel extends JPanel {
         engine.setMapEditorEnabled(mapEditorEnabledCheck.isSelected());
         engine.setEasyConquering(easyConqueringCheck.isSelected());
         engine.setInstantIntegration(instantIntegrationCheck.isSelected());
+        engine.setAnimateWorldGen(animateWorldGenCheck.isSelected());
         engine.applySandboxTaintToActiveWorld();
         SandboxCheatService.applyEnabledCheats(engine);
         if (frame.getGamePanel() != null) {
@@ -1405,6 +1440,9 @@ public class SettingsPanel extends JPanel {
         styleButton(resetAudioButton);
         styleButton(resetRolesButton);
         styleButton(resetSandboxButton);
+        if (multiMapPreviewButton != null) {
+            AssetStyles.styleCompactButton(multiMapPreviewButton);
+        }
         AssetStyles.applyThemeToContainer(this);
     }
 

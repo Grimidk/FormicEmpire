@@ -110,6 +110,13 @@ public class World {
     private final List<Continent> iceCaps = new ArrayList<>();
     private int worldWidth = 0;
     private int worldHeight = 0;
+    private boolean hasIceCaps = GameNumbers.WORLD_DEFAULT_HAS_ICE_CAPS;
+    private double iceCapPolarLimit = GameNumbers.WORLD_DEFAULT_ICECAP_POLAR_LIMIT;
+    private double continentalLandPercentage = GameNumbers.WORLD_DEFAULT_CONTINENTAL_LAND_PERCENTAGE;
+    private int targetContinentCount = 0;
+    private int minIslandCount = -1;
+    private int targetRivalDynastyCount = -1;
+    private WorldGenStepListener worldGenStepListener;
     private int colonyIdCounter = 1;
     private int dynastyIdCounter = 1;
     private final DynastyNamingService namingService;
@@ -543,7 +550,7 @@ public class World {
         Map<Integer, Continent> map = new HashMap<>();
         List<Hex> landHexes = new ArrayList<>();
         for (Hex hex : this.hexes) {
-            if (hex == null || hex.isIsland() || !isLandHex(hex) || hex.getBiome() == GameConstants.BIOME_ICE_FIELD) {
+            if (hex == null || hex.isIsland() || !isLandHex(hex)) {
                 continue;
             }
             int cid = hex.getContinentId();
@@ -621,7 +628,7 @@ public class World {
             assignedLand.addAll(c.getHexes());
         }
 
-        if (this.worldHeight > 0) {
+        if (this.hasIceCaps && this.worldHeight > 0) {
             Continent artica = new Continent(-1, LanguageStrings.get(LanguageStrings.ICE_CAP_ARTICA), LanguageStrings.ICE_CAP_ARTICA);
             artica.setIceCap(true);
             Continent antartica = new Continent(-2, LanguageStrings.get(LanguageStrings.ICE_CAP_ANTARTICA), LanguageStrings.ICE_CAP_ANTARTICA);
@@ -898,16 +905,87 @@ public class World {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
+    public boolean hasIceCaps() {
+        return hasIceCaps;
+    }
+
+    public void setHasIceCaps(boolean hasIceCaps) {
+        this.hasIceCaps = hasIceCaps;
+    }
+
+    public double getIceCapPolarLimit() {
+        return iceCapPolarLimit;
+    }
+
+    public void setIceCapPolarLimit(double iceCapPolarLimit) {
+        this.iceCapPolarLimit = Math.max(0.40, Math.min(1.0, iceCapPolarLimit));
+    }
+
+    public DynastyNamingService getNamingService() {
+        return namingService;
+    }
+
+    public double getContinentalLandPercentage() {
+        return continentalLandPercentage;
+    }
+
+    public void setContinentalLandPercentage(double continentalLandPercentage) {
+        this.continentalLandPercentage = Math.max(0.05, Math.min(0.90, continentalLandPercentage));
+    }
+
+    public int getTargetContinentCount() {
+        return targetContinentCount;
+    }
+
+    public void setTargetContinentCount(int targetContinentCount) {
+        this.targetContinentCount = Math.max(0, targetContinentCount);
+    }
+
+    public int getMinIslandCount() {
+        return minIslandCount;
+    }
+
+    public void setMinIslandCount(int minIslandCount) {
+        this.minIslandCount = minIslandCount;
+    }
+
+    public int getTargetRivalDynastyCount() {
+        return targetRivalDynastyCount;
+    }
+
+    public void setTargetRivalDynastyCount(int targetRivalDynastyCount) {
+        this.targetRivalDynastyCount = targetRivalDynastyCount;
+    }
+
+    public WorldGenStepListener getWorldGenStepListener() {
+        return worldGenStepListener;
+    }
+
+    public void setWorldGenStepListener(WorldGenStepListener worldGenStepListener) {
+        this.worldGenStepListener = worldGenStepListener;
+    }
+
+    private void notifyStep(int stepNumber, String stepName) {
+        if (this.worldGenStepListener != null) {
+            this.worldGenStepListener.onStepCompleted(stepNumber, stepName, this);
+        }
+    }
+
     public void generateRectangularWorld(Biome startBiome, Colony startColony, String baseName, String playerTitleKey) {
         generateRectangularWorld(startBiome, startColony, baseName, playerTitleKey, GameNumbers.WORLD_RECT_HEIGHT);
     }
 
     public void generateRectangularWorld(Biome startBiome, Colony startColony, String baseName, String playerTitleKey, int height) {
-        int n = (height > 0) ? height : GameNumbers.WORLD_RECT_HEIGHT;
+        generateRectangularWorld(startBiome, startColony, baseName, playerTitleKey, 2 * height, height);
+    }
+
+    public void generateRectangularWorld(Biome startBiome, Colony startColony, String baseName, String playerTitleKey, int width, int height) {
+        int h = (height > 0) ? height : GameNumbers.WORLD_RECT_HEIGHT;
+        int w = (width > 0) ? width : 2 * h;
         this.continentCoreRadius = 0;
-        this.worldHeight = n;
-        this.worldWidth = 2 * n;
-        this.worldRadius = n;
+        this.worldHeight = h;
+        this.worldWidth = w;
+        this.worldRadius = h;
         initAndGenerateWorld(startBiome, startColony, baseName, playerTitleKey);
     }
 
@@ -919,8 +997,25 @@ public class World {
         generateRectangularWorld(startBiome, startColony, baseName, playerTitleKey, height);
     }
 
+    public void generateWorld(Biome startBiome, int width, int height, Colony startColony, String baseName, String playerTitleKey) {
+        generateRectangularWorld(startBiome, startColony, baseName, playerTitleKey, width, height);
+    }
+
     private void initAndGenerateWorld(Biome startBiome, Colony startColony, String baseName, String playerTitleKey) {
         System.out.println("Generating World... Globe size: " + this.worldWidth + "x" + this.worldHeight + ".");
+        if (startBiome == null) {
+            startBiome = GameConstants.BIOME_PLAINS;
+        }
+        if (baseName == null || baseName.isEmpty()) {
+            baseName = "Player";
+        }
+        if (playerTitleKey == null || playerTitleKey.isEmpty()) {
+            playerTitleKey = GameConstants.DYNASTY_TITLE_DYNASTY.getNameKey();
+        }
+        if (startColony == null) {
+            startColony = new Colony(1, baseName + " Prime", true);
+        }
+        // Step 1: Initialize world state and player dynasty
         this.hexes.clear();
         this.hexCoordCache.clear();
         markColonizedHexIndexDirty();
@@ -930,6 +1025,9 @@ public class World {
         this.islandCount = 0;
         Map<String, Hex> hexMap = new HashMap<>();
         ColonyStarterService starterService = ColonyStarterService.shared();
+        if (startColony.getAntTotal() == 0) {
+            starterService.initializeNewColony(startColony);
+        }
         
         baseName = formatName(baseName);
         DynastyTitle playerTitle = GameConstants.getDynastyTitleByKey(playerTitleKey);
@@ -955,7 +1053,9 @@ public class World {
                 WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
         
         this.colonyIdCounter = startColony.getId() + 1;
+        notifyStep(1, "Initialize World");
 
+        // Step 2: Allocate hex grid and polar boundaries
         int minR = -this.worldHeight / 2;
         int maxR = this.worldHeight / 2 - 1;
         int minCol = -this.worldWidth / 2;
@@ -974,20 +1074,22 @@ public class World {
                 hex.setColony(null);
                 hex.setIsland(false);
 
-                double wave = 0.07 * Math.sin(col * 0.18 + (r > 0 ? 1.0 : -1.0))
-                        + 0.04 * Math.cos(col * 0.38)
-                        + 0.02 * Math.sin(col * 0.75);
-                double oneRow = 1.0 / Math.max(1, this.worldHeight / 2.0);
-                double polarLimit = 0.82 + oneRow + wave;
-                double transitionLimit = polarLimit - 0.08;
-
                 boolean isIce = false;
-                if (absLat >= polarLimit) {
-                    isIce = true;
-                } else if (absLat >= transitionLimit) {
-                    double fraction = (absLat - transitionLimit) / (polarLimit - transitionLimit);
-                    int chance = (int) Math.round(fraction * 70.0);
-                    isIce = (GameRandom.nextInt(100) < chance);
+                if (this.hasIceCaps) {
+                    double wave = 0.07 * Math.sin(col * 0.18 + (r > 0 ? 1.0 : -1.0))
+                            + 0.04 * Math.cos(col * 0.38)
+                            + 0.02 * Math.sin(col * 0.75);
+                    double oneRow = 1.0 / Math.max(1, this.worldHeight / 2.0);
+                    double polarLimit = this.iceCapPolarLimit + oneRow + wave;
+                    double transitionLimit = polarLimit - 0.08;
+
+                    if (absLat >= polarLimit) {
+                        isIce = true;
+                    } else if (absLat >= transitionLimit) {
+                        double fraction = (absLat - transitionLimit) / (polarLimit - transitionLimit);
+                        int chance = (int) Math.round(fraction * 70.0);
+                        isIce = (GameRandom.nextInt(100) < chance);
+                    }
                 }
 
                 if (isIce) {
@@ -1002,20 +1104,28 @@ public class World {
                 this.hexes.add(hex);
             }
         }
+        notifyStep(2, "Allocate Hex Grid");
+        // Step 3: Link hex neighbor adjacency
         linkNeighbors(hexMap);
+        notifyStep(3, "Link Neighbors");
         generateMultiContinents(startBiome, startColony);
 
+        // Step 16: Finalize indexing and bind dynasty trade services
         markColonizedHexIndexDirty();
         rebuildColonizedHexIndexIfNeeded();
         bindDynastyTradeServices();
+        notifyStep(16, "Finalize World");
         System.out.println("[World] Landmasses: " + this.continentCount + " continent(s), "
                 + this.islandCount + " island(s).");
     }
 
     private void generateMultiContinents(Biome startBiome, Colony startColony) {
-        int numContinents = (this.worldHeight < 25)
-                ? (2 + GameRandom.nextInt(2))
-                : (4 + GameRandom.nextInt(4));
+        // Step 4: Seed and grow continental landmasses
+        int numContinents = (this.targetContinentCount > 0)
+                ? this.targetContinentCount
+                : ((this.worldHeight < 25)
+                        ? (2 + GameRandom.nextInt(2))
+                        : (4 + GameRandom.nextInt(4)));
         List<Hex> seeds = new ArrayList<>();
 
         int sectorWidth = this.worldWidth / numContinents;
@@ -1069,7 +1179,7 @@ public class World {
             nonIceHexCount++;
         }
 
-        int totalContinentalTarget = (int) Math.round(nonIceHexCount * 0.28);
+        int totalContinentalTarget = (int) Math.round(nonIceHexCount * this.continentalLandPercentage);
         int basePerContinent = totalContinentalTarget / seeds.size();
         int minHexesPerContinent = (int) Math.round(basePerContinent * 0.70);
 
@@ -1153,8 +1263,7 @@ public class World {
                 if (frontier.isEmpty() && cSet.size() < targets[i]) {
                     for (Hex h : cSet) {
                         for (Hex n : h.getAdjacentNeighbors()) {
-                            if (n != null && n.getContinentId() == 0 && n.getBiome() != GameConstants.BIOME_ICE_FIELD) {
-                                if (Math.abs(n.getR()) >= Math.max(2, (int) Math.round(this.worldHeight * 0.38))) continue;
+                            if (n != null && n.getContinentId() == 0) {
                                 frontier.add(h);
                                 break;
                             }
@@ -1171,9 +1280,7 @@ public class World {
 
                 for (Hex n : current.getAdjacentNeighbors()) {
                     if (n == null) continue;
-                    if (Math.abs(n.getR()) >= Math.max(2, (int) Math.round(this.worldHeight * 0.38))) continue;
                     if (n.getContinentId() != 0) continue;
-                    if (n.getBiome() == GameConstants.BIOME_ICE_FIELD) continue;
 
                     boolean touchesOtherContinent = false;
                     for (Hex nn : n.getAdjacentNeighbors()) {
@@ -1257,9 +1364,13 @@ public class World {
         for (Set<Hex> cSet : continentHexes.values()) {
             allLand.addAll(cSet);
         }
+        notifyStep(4, "Grow Continents");
 
+        // Step 5: Convert enclosed oceans to lakes
         List<List<Hex>> enclosedLakeComponents = convertEnclosedOceansToLakes(continentHexes, allLand);
+        notifyStep(5, "Convert Enclosed Lakes");
 
+        // Step 6: Compute coastal water distance via BFS
         ArrayDeque<Hex> bfsQueue = new ArrayDeque<>();
         for (Hex h : allLand) {
             boolean coastal = false;
@@ -1288,7 +1399,9 @@ public class World {
                 }
             }
         }
+        notifyStep(6, "Compute Coastal Distance");
 
+        // Step 7: Generate inland lakes
         List<Hex> createdLakes = new ArrayList<>();
         for (Map.Entry<Integer, Set<Hex>> entry : continentHexes.entrySet()) {
             Set<Hex> cSet = entry.getValue();
@@ -1339,7 +1452,9 @@ public class World {
                 }
             }
         }
+        notifyStep(7, "Generate Inland Lakes");
 
+        // Step 8: Assign land biomes by latitude, hydrology, and coastal proximity
         int latScale = this.worldHeight / 2;
         for (Hex h : allLand) {
             if (h.getBiome() == GameConstants.BIOME_LAKE) {
@@ -1349,25 +1464,46 @@ public class World {
             h.setBiome(biome);
             h.setLocalWeather(getRandomWeather(biome));
         }
+        notifyStep(8, "Assign Biomes");
 
+        // Step 9: Generate archipelagos and solitary islands
         generateArchipelagosAndIslands();
+        notifyStep(9, "Generate Archipelagos & Islands");
 
-        ensureMinimumIslands(this.worldHeight >= 30 ? GameNumbers.WORLD_MIN_ISLAND_COUNT : 2);
+        // Step 10: Ensure minimum island counts
+        int minIslands = (this.minIslandCount >= 0)
+                ? this.minIslandCount
+                : (this.worldHeight >= 30 ? GameNumbers.WORLD_MIN_ISLAND_COUNT : 2);
+        ensureMinimumIslands(minIslands);
+        notifyStep(10, "Ensure Island Counts");
+
+        // Step 11: Classify landmasses into continents, archipelagos, and ice caps
         classifyLandmasses();
+        notifyStep(11, "Classify Landmasses");
+
+        // Step 12: Enforce minimum biome diversity quotas
         ensureMinimumBiomeCounts(this.worldHeight >= 30 ? 25 : Math.max(1, allLand.size() / 35));
         classifyLandmasses();
 
         convertEnclosedOceansToLakes(continentHexes, allLand);
         classifyLandmasses();
+        notifyStep(12, "Enforce Biome Quotas");
 
+        // Step 13: Generate edge river networks from lakes to oceans
         generateAllLakeRivers();
         preventSurroundedHexes();
         ensureAllLakesHaveRivers();
         cleanupOrphanRivers();
+        notifyStep(13, "Generate River Networks");
 
+        // Step 14: Spawn player dynasty on matching biome continent
         spawnPlayerOnRandomContinent(startBiome, startColony, continentHexes);
+        notifyStep(14, "Spawn Player Dynasty");
+
+        // Step 15: Distribute rival dynasties across continents
         distributeRivalDynastiesAcrossContinents(continentHexes);
         rebuildColonizedHexIndexIfNeeded();
+        notifyStep(15, "Distribute Rival Dynasties");
     }
 
     private void generateArchipelagosAndIslands() {
@@ -2291,7 +2427,10 @@ public class World {
             placedCapitals.add(getActiveHex());
         }
 
-        for (int i = 0; i < speciesList.size(); i++) {
+        int dynastyLimit = (this.targetRivalDynastyCount >= 0)
+                ? Math.min(this.targetRivalDynastyCount, speciesList.size())
+                : speciesList.size();
+        for (int i = 0; i < dynastyLimit; i++) {
             AntSpecies npcSpecies = speciesList.get(i);
             int cid = continentIds.get(i % continentIds.size());
             Set<Hex> cSet = continentHexes.get(cid);
@@ -2945,9 +3084,15 @@ public class World {
                     if (neighbor == null || !isLandHex(neighbor) || visited.contains(neighbor)) {
                         continue;
                     }
-                    boolean neighborIsIce = (neighbor.getBiome() == GameConstants.BIOME_ICE_FIELD);
-                    if (startIsIce != neighborIsIce) {
-                        continue;
+                    if (this.worldWidth > 0 && this.worldHeight > 0) {
+                        if (current.getContinentId() != neighbor.getContinentId()) {
+                            continue;
+                        }
+                    } else {
+                        boolean neighborIsIce = (neighbor.getBiome() == GameConstants.BIOME_ICE_FIELD);
+                        if (startIsIce != neighborIsIce) {
+                            continue;
+                        }
                     }
                     visited.add(neighbor);
                     queue.add(neighbor);
@@ -2962,19 +3107,21 @@ public class World {
             }
 
             boolean isIceCap = false;
-            if (startIsIce) {
-                isIceCap = true;
-            } else if (this.worldHeight > 0 && existingIds.isEmpty()) {
-                int polarMargin = Math.max(2, (int) Math.round(this.worldHeight * 0.38));
-                boolean inPolarZone = true;
-                for (Hex h : component) {
-                    if (Math.abs(h.getR()) < polarMargin) {
-                        inPolarZone = false;
-                        break;
-                    }
-                }
-                if (inPolarZone) {
+            if (existingIds.isEmpty()) {
+                if (startIsIce) {
                     isIceCap = true;
+                } else if (this.worldHeight > 0) {
+                    int polarMargin = Math.max(2, (int) Math.round(this.worldHeight * 0.38));
+                    boolean inPolarZone = true;
+                    for (Hex h : component) {
+                        if (Math.abs(h.getR()) < polarMargin) {
+                            inPolarZone = false;
+                            break;
+                        }
+                    }
+                    if (inPolarZone) {
+                        isIceCap = true;
+                    }
                 }
             }
 

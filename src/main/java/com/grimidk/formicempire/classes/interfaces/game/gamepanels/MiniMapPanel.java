@@ -42,13 +42,33 @@ public class MiniMapPanel extends ZeroGamePanel {
     private double cachedWorldBoxY;
     private double cachedWorldBoxW;
     private double cachedWorldBoxH;
+    private World explicitWorld;
 
     public MiniMapPanel(Engine engine, Runnable openMapAction) {
+        this(engine, null, openMapAction);
+    }
+
+    public MiniMapPanel(World world) {
+        this(null, world, null);
+    }
+
+    public MiniMapPanel(Engine engine, World explicitWorld, Runnable openMapAction) {
         super(null);
         this.engine = engine;
+        this.explicitWorld = explicitWorld;
         this.openMapAction = openMapAction;
         initComponents();
         initLayout();
+    }
+
+    public World getWorld() {
+        return explicitWorld != null ? explicitWorld : (engine != null ? engine.getWorld() : null);
+    }
+
+    public void setExplicitWorld(World explicitWorld) {
+        this.explicitWorld = explicitWorld;
+        invalidateMapCache();
+        repaint();
     }
 
     @Override
@@ -80,7 +100,7 @@ public class MiniMapPanel extends ZeroGamePanel {
                 if (dx * dx + dy * dy > 36) {
                     return;
                 }
-                if (engine == null || engine.getWorld() == null || openMapAction == null) {
+                if (getWorld() == null || openMapAction == null) {
                     return;
                 }
                 openMapAction.run();
@@ -120,7 +140,7 @@ public class MiniMapPanel extends ZeroGamePanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        World world = engine != null ? engine.getWorld() : null;
+        World world = getWorld();
         if (world == null) {
             return;
         }
@@ -259,7 +279,7 @@ public class MiniMapPanel extends ZeroGamePanel {
             landHexes.add(hex);
             hexLookup.put(packKey(hex.getQ(), hex.getR()), hex);
         }
-        if (landHexes.isEmpty()) {
+        if (landHexes.isEmpty() && world.getWorldWidth() <= 0) {
             cachedBakedBaseImage = null;
             return;
         }
@@ -275,19 +295,21 @@ public class MiniMapPanel extends ZeroGamePanel {
                 bg2d.drawRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(worldBoxW), (int) Math.round(worldBoxH));
             }
 
-            HexGridMesh mesh = HexGridMesh.build(
-                    landHexes,
-                    originX,
-                    originY,
-                    hexRadius,
-                    (q, r) -> hexLookup.get(packKey(q, r)));
-            mesh.paintFills(bg2d, face -> getBiomeColor(face.hex.getBiome()));
-            mesh.paintDividers(
-                    bg2d,
-                    true,
-                    face -> getBiomeColor(face.hex.getBiome()),
-                    AssetStyles.BORDER_COLOR);
-            mesh.paintRivers(bg2d);
+            if (!landHexes.isEmpty()) {
+                HexGridMesh mesh = HexGridMesh.build(
+                        landHexes,
+                        originX,
+                        originY,
+                        hexRadius,
+                        (q, r) -> hexLookup.get(packKey(q, r)));
+                mesh.paintFills(bg2d, face -> getBiomeColor(face.hex.getBiome()));
+                mesh.paintDividers(
+                        bg2d,
+                        true,
+                        face -> getBiomeColor(face.hex.getBiome()),
+                        AssetStyles.BORDER_COLOR);
+                mesh.paintRivers(bg2d);
+            }
         } finally {
             bg2d.dispose();
         }

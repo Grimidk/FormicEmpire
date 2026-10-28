@@ -445,8 +445,7 @@ class GlobeWorldGenerationTest {
         int maxR = world.getWorldHeight() / 2 - 1;
 
         for (Hex h : world.getHexes()) {
-            if (h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
-                assertEquals(0, h.getContinentId(), "Ice field at (" + h.getQ() + "," + h.getR() + ") must never have a continentId > 0");
+            if (h.getBiome() == GameConstants.BIOME_ICE_FIELD && h.getContinentId() == 0) {
                 Continent cap = world.getContinentForHex(h);
                 assertNotNull(cap, "Ice field at (" + h.getQ() + "," + h.getR() + ") must belong to an ice cap");
                 assertTrue(cap.isIceCap());
@@ -460,7 +459,7 @@ class GlobeWorldGenerationTest {
     }
 
     @Test
-    void iceFieldsNeverMergeWithContinentsOrArchipelagosAndPopulatedHexesCached() {
+    void continentsCanExtendIntoIceFieldsAndPopulatedHexesCached() {
         World world = new World();
         Colony colony = new Colony(1, "Player Capital", true);
         world.generateRectangularWorld(
@@ -472,9 +471,6 @@ class GlobeWorldGenerationTest {
         for (Continent c : world.getContinents()) {
             assertFalse(c.isIceCap());
             assertFalse(c.isArchipelago());
-            for (Hex h : c.getHexes()) {
-                assertNotEquals(GameConstants.BIOME_ICE_FIELD, h.getBiome());
-            }
             assertEquals(c.getColonies().size(), c.getPopulatedHexes().size());
             assertEquals(!c.getColonies().isEmpty(), c.hasPopulatedHexes());
         }

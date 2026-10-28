@@ -79,4 +79,23 @@ class MiniMapPanelTest {
             }
         });
     }
+
+    @Test
+    void multiMapGalleryWorldGenerationAndPaint() throws Exception {
+        World world = new World();
+        world.generateRectangularWorld(null, null, "World 1", null);
+        SwingUtilities.invokeAndWait(() -> {
+            MiniMapPanel panel = new MiniMapPanel((World) null);
+            panel.setSize(280, 190);
+            panel.doLayout();
+            panel.setExplicitWorld(world);
+            BufferedImage img = new BufferedImage(280, 190, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = img.createGraphics();
+            try {
+                panel.paint(g2d);
+            } finally {
+                g2d.dispose();
+            }
+        });
+    }
 }
