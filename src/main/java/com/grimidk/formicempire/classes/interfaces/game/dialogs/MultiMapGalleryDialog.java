@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -65,6 +66,7 @@ public class MultiMapGalleryDialog extends JDialog {
     private final JSpinner islandSpinner;
     private final JSpinner landShareSpinner;
     private final JSpinner icecapSpinner;
+    private final JSpinner plateSpinner;
     private final JCheckBox randomizeCheck;
     private final JButton resetParamsButton;
     private final JButton regenerateButton;
@@ -108,15 +110,15 @@ public class MultiMapGalleryDialog extends JDialog {
         JLabel contLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_CONTINENTS));
         contLabel.setFont(AssetStyles.FONT_NORMAL);
         contLabel.setForeground(AssetStyles.FONT_COLOR);
-        continentSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 8, 1));
+        continentSpinner = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
         continentSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
         AssetStyles.styleSpinner(continentSpinner);
-        continentSpinner.setToolTipText("0 = Auto, 1 - 8");
+        continentSpinner.setToolTipText("0 = Auto, 1 - 10");
 
         JLabel islandLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_ISLANDS));
         islandLabel.setFont(AssetStyles.FONT_NORMAL);
         islandLabel.setForeground(AssetStyles.FONT_COLOR);
-        islandSpinner = new JSpinner(new SpinnerNumberModel(-1, -1, 50, 1));
+        islandSpinner = new JSpinner(new SpinnerNumberModel(10, -1, 50, 1));
         islandSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
         AssetStyles.styleSpinner(islandSpinner);
         islandSpinner.setToolTipText("-1 = Auto, 0 - 50");
@@ -132,10 +134,18 @@ public class MultiMapGalleryDialog extends JDialog {
         JLabel icecapLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_ICECAP));
         icecapLabel.setFont(AssetStyles.FONT_NORMAL);
         icecapLabel.setForeground(AssetStyles.FONT_COLOR);
-        icecapSpinner = new JSpinner(new SpinnerNumberModel(18, 0, 45, 1));
+        icecapSpinner = new JSpinner(new SpinnerNumberModel(18, 0, 50, 1));
         icecapSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
         AssetStyles.styleSpinner(icecapSpinner);
-        icecapSpinner.setToolTipText("0% = None, 18% = Default");
+        icecapSpinner.setToolTipText("0% = None, 50% = Max");
+
+        JLabel plateLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_PLATES));
+        plateLabel.setFont(AssetStyles.FONT_NORMAL);
+        plateLabel.setForeground(AssetStyles.FONT_COLOR);
+        plateSpinner = new JSpinner(new SpinnerNumberModel(6, 0, 16, 1));
+        plateSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
+        AssetStyles.styleSpinner(plateSpinner);
+        plateSpinner.setToolTipText("0 = Auto, 4 - 16");
 
         randomizeCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_RANDOMIZE));
         randomizeCheck.setFont(AssetStyles.FONT_NORMAL);
@@ -156,6 +166,8 @@ public class MultiMapGalleryDialog extends JDialog {
         northPanel.add(landShareSpinner);
         northPanel.add(icecapLabel);
         northPanel.add(icecapSpinner);
+        northPanel.add(plateLabel);
+        northPanel.add(plateSpinner);
         northPanel.add(randomizeCheck);
         northPanel.add(resetParamsButton);
         contentPane.add(northPanel, BorderLayout.NORTH);
@@ -205,7 +217,7 @@ public class MultiMapGalleryDialog extends JDialog {
             JButton copyBtn = new JButton(LanguageStrings.get(LanguageStrings.MULTI_MAP_COPY_BUTTON));
             AssetStyles.styleCompactButton(copyBtn);
             copyBtn.setEnabled(false);
-            copyBtn.addActionListener(e -> copyMapToNewSave(cardIndex));
+            copyBtn.addActionListener(e -> saveMapToFile(cardIndex));
             copyButtons.add(copyBtn);
             cardSouth.add(copyBtn, BorderLayout.SOUTH);
 
@@ -275,10 +287,11 @@ public class MultiMapGalleryDialog extends JDialog {
 
     private void resetParameters() {
         randomizeCheck.setSelected(false);
-        continentSpinner.setValue(0);
-        islandSpinner.setValue(-1);
+        continentSpinner.setValue(3);
+        islandSpinner.setValue(10);
         landShareSpinner.setValue(28);
         icecapSpinner.setValue(18);
+        plateSpinner.setValue(6);
         updateParamControlsState();
     }
 
@@ -288,6 +301,7 @@ public class MultiMapGalleryDialog extends JDialog {
         islandSpinner.setEnabled(!random);
         landShareSpinner.setEnabled(!random);
         icecapSpinner.setEnabled(!random);
+        plateSpinner.setEnabled(!random);
         resetParamsButton.setEnabled(!random);
     }
 
@@ -325,6 +339,7 @@ public class MultiMapGalleryDialog extends JDialog {
             return;
         }
         MapDialog dialog = new MapDialog(this, null, targetWorld, null, null);
+        dialog.setLegendVisible(false);
         dialog.showDialog();
     }
 
@@ -458,7 +473,7 @@ public class MultiMapGalleryDialog extends JDialog {
         return trimmed.substring(0, 1).toUpperCase() + trimmed.substring(1);
     }
 
-    private void copyMapToNewSave(int index) {
+    private void saveMapToFile(int index) {
         if (index < 0 || index >= generatedWorlds.length) {
             return;
         }
@@ -466,70 +481,31 @@ public class MultiMapGalleryDialog extends JDialog {
         if (targetWorld == null) {
             return;
         }
-        SaveManager sm = resolveSaveManager();
-        if (sm == null) {
+        String defaultName = "Map " + (index + 1);
+        String input = UiOptionPane.showInputDialog(
+                this,
+                LanguageStrings.get(LanguageStrings.SAVED_MAP_PROMPT_NAME),
+                defaultName);
+        if (input == null || input.trim().isEmpty()) {
             return;
         }
-        int emptySlot = -1;
-        for (int s = 1; s <= 3; s++) {
-            if (sm.loadSlot(s) == null) {
-                emptySlot = s;
-                break;
-            }
-        }
-        if (emptySlot <= 0) {
-            UiOptionPane.showMessageDialog(this,
-                    LanguageStrings.get(LanguageStrings.MULTI_MAP_NO_SLOTS),
-                    LanguageStrings.get(LanguageStrings.UI_ERROR),
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        Dynasty existingPlayerDynasty = targetWorld.findPlayerDynasty();
-        String initialName = existingPlayerDynasty != null && existingPlayerDynasty.getThemeBase() != null
-                ? existingPlayerDynasty.getThemeBase()
-                : "Formica";
-        DynastyTitle initialTitle = existingPlayerDynasty != null && existingPlayerDynasty.getTitle() != null
-                ? existingPlayerDynasty.getTitle()
-                : GameConstants.DYNASTY_TITLE_DYNASTY;
-
-        DynastyCustomization custom = promptDynastyCreation(initialName, initialTitle);
-        if (custom == null) {
-            return;
-        }
-
-        final int slotId = emptySlot;
+        String mapName = input.trim();
         JButton btn = copyButtons.get(index);
-        btn.setEnabled(false);
-        targetWorld.setSaveSlotId(slotId);
-
-        Dynasty playerDynasty = targetWorld.findPlayerDynasty();
-        if (playerDynasty != null) {
-            playerDynasty.setThemeBase(custom.baseName());
-            playerDynasty.setTitleKey(custom.title().getNameKey());
-            playerDynasty.applyLocalizedName();
-            if (targetWorld.getNamingService() != null && playerDynasty.getCapital() != null) {
-                String capName = targetWorld.getNamingService().generateCapitalName(custom.baseName());
-                playerDynasty.getCapital().setName(capName);
-            }
+        try {
+            SavedMapService.saveMap(targetWorld, mapName);
+            btn.setText(LanguageStrings.get(LanguageStrings.MULTI_MAP_COPIED));
+            btn.setEnabled(false);
+            UiOptionPane.showMessageDialog(this,
+                    LanguageStrings.format(LanguageStrings.MULTI_MAP_SAVED_FMT, mapName),
+                    LanguageStrings.get(LanguageStrings.MULTI_MAP_TITLE),
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            UiOptionPane.showMessageDialog(this,
+                    LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE),
+                    LanguageStrings.get(LanguageStrings.UI_ERROR),
+                    JOptionPane.ERROR_MESSAGE);
         }
-
-        String slotName = custom.baseName();
-        sm.saveWorldToSlotUserAsync(targetWorld, engine, slotId, slotName, success -> {
-            if (success) {
-                btn.setText(LanguageStrings.get(LanguageStrings.MULTI_MAP_COPIED));
-                UiOptionPane.showMessageDialog(this,
-                        String.format(LanguageStrings.get(LanguageStrings.MULTI_MAP_SAVED_FMT), slotId),
-                        LanguageStrings.get(LanguageStrings.MULTI_MAP_COPY_BUTTON),
-                        JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                btn.setEnabled(true);
-                UiOptionPane.showMessageDialog(this,
-                        LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE),
-                        LanguageStrings.get(LanguageStrings.UI_ERROR),
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
     }
 
     private void generateBatch() {
@@ -551,6 +527,7 @@ public class MultiMapGalleryDialog extends JDialog {
         final int targetIslands = ((Number) islandSpinner.getValue()).intValue();
         final int landSharePct = ((Number) landShareSpinner.getValue()).intValue();
         final int icecapPct = ((Number) icecapSpinner.getValue()).intValue();
+        final int targetPlates = ((Number) plateSpinner.getValue()).intValue();
 
         currentWorker = new SwingWorker<Void, World>() {
             @Override
@@ -562,18 +539,21 @@ public class MultiMapGalleryDialog extends JDialog {
                     try {
                         World world = new World();
                         if (isFullRandom) {
-                            int rContinents = 1 + GameRandom.nextInt(7);
-                            int rIslands = GameRandom.nextInt(41);
-                            double rLandShare = (15 + GameRandom.nextInt(31)) / 100.0;
-                            boolean rHasIce = GameRandom.nextInt(100) >= 15;
-                            double rIcePolar = 1.0 - ((10 + GameRandom.nextInt(26)) / 100.0);
+                            int rContinents = 1 + GameRandom.nextInt(10);
+                            int rIslands = GameRandom.nextInt(51);
+                            double rLandShare = (10 + GameRandom.nextInt(51)) / 100.0;
+                            int rIceCapPct = GameRandom.nextInt(51);
+                            int rPlates = 2 + GameRandom.nextInt(15);
 
                             world.setTargetContinentCount(rContinents);
                             world.setMinIslandCount(rIslands);
                             world.setContinentalLandPercentage(rLandShare);
-                            world.setHasIceCaps(rHasIce);
-                            if (rHasIce) {
-                                world.setIceCapPolarLimit(rIcePolar);
+                            world.setTectonicPlateCount(rPlates);
+                            if (rIceCapPct <= 0) {
+                                world.setHasIceCaps(false);
+                            } else {
+                                world.setHasIceCaps(true);
+                                world.setIceCapPolarLimit(1.0 - (rIceCapPct / 100.0));
                             }
                         } else {
                             if (targetContinents > 0) {
@@ -583,6 +563,7 @@ public class MultiMapGalleryDialog extends JDialog {
                             }
                             world.setMinIslandCount(targetIslands);
                             world.setContinentalLandPercentage(landSharePct / 100.0);
+                            world.setTectonicPlateCount(targetPlates);
                             if (icecapPct <= 0) {
                                 world.setHasIceCaps(false);
                             } else {
@@ -590,7 +571,7 @@ public class MultiMapGalleryDialog extends JDialog {
                                 world.setIceCapPolarLimit(1.0 - (icecapPct / 100.0));
                             }
                         }
-                        world.generateRectangularWorld(null, null, "World " + (i + 1), null);
+                        world.generateRectangularWorld(null, null, "World " + (i + 1), null, false);
                         if (!isCancelled()) {
                             publish(world);
                         }
@@ -614,17 +595,27 @@ public class MultiMapGalleryDialog extends JDialog {
                         panel.setExplicitWorld(w);
 
                         int totalHexes = (w.getHexes() != null) ? w.getHexes().size() : 0;
-                        int landHexes = 0;
+                        int contHexes = 0;
+                        int iceHexes = 0;
                         if (w.getHexes() != null) {
                             for (Hex h : w.getHexes()) {
-                                if (h != null && h.getBiome() != GameConstants.BIOME_OCEAN) {
-                                    landHexes++;
+                                if (h != null) {
+                                    if (h.getBiome() == GameConstants.BIOME_ICE_FIELD
+                                            || (h.getContinentId() == 0 && !h.isIsland()
+                                                    && h.getBiome() != GameConstants.BIOME_OCEAN
+                                                    && h.getBiome() != GameConstants.BIOME_DEEP_OCEAN
+                                                    && h.getBiome() != GameConstants.BIOME_SHALLOW_OCEAN)) {
+                                        iceHexes++;
+                                    } else if (h.getContinentId() > 0 || h.isIsland()) {
+                                        contHexes++;
+                                    }
                                 }
                             }
                         }
-                        double landPct = (totalHexes > 0) ? (100.0 * landHexes / totalHexes) : 0.0;
-                        String info = String.format("%dx%d | Land: %.1f%% | Cont: %d | Isl: %d",
-                                w.getWorldWidth(), w.getWorldHeight(), landPct, w.getContinentCount(), w.getIslandCount());
+                        double contPct = (totalHexes > 0) ? (100.0 * contHexes / totalHexes) : 0.0;
+                        double icePct = (totalHexes > 0) ? (100.0 * iceHexes / totalHexes) : 0.0;
+                        String info = String.format("Cont: %d | Isl: %d | Land: %.0f%% | Ice: %.0f%%",
+                                w.getContinentCount(), w.getIslandCount(), contPct, icePct);
                         statLabels.get(index).setText(info);
                         copyButtons.get(index).setEnabled(true);
                         generatedCount++;

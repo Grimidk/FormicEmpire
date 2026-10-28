@@ -20,7 +20,10 @@ public final class HexWaterCrossing {
     private HexWaterCrossing() {}
 
     public static boolean isWaterBiome(Biome biome) {
-        return biome == GameConstants.BIOME_OCEAN || biome == GameConstants.BIOME_LAKE;
+        return biome == GameConstants.BIOME_OCEAN
+                || biome == GameConstants.BIOME_DEEP_OCEAN
+                || biome == GameConstants.BIOME_SHALLOW_OCEAN
+                || biome == GameConstants.BIOME_LAKE;
     }
 
     public static boolean isWaterHex(Hex hex) {

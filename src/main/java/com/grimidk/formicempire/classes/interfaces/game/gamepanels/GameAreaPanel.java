@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
@@ -639,8 +640,9 @@ public class GameAreaPanel extends ZeroGamePanel {
         World world = engine.getWorld();
         if (world == null) return;
 
-        if (dayOn && world.getTimeOfDay() != null && world.getTimeOfDay().getOverlayColor() != null) {
-            g2d.setColor(world.getTimeOfDay().getOverlayColor());
+        TimeOfDay tod = (world.getActiveHex() != null) ? world.getTimeOfDay(world.getActiveHex()) : world.getTimeOfDay();
+        if (dayOn && tod != null && tod.getOverlayColor() != null) {
+            g2d.setColor(tod.getOverlayColor());
             g2d.fillRect(0, 0, getWidth(), getHeight());
         }
 

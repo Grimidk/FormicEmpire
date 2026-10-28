@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.world.Continent;
+import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -61,6 +62,7 @@ public class MapDialog extends ZeroDialog {
     private final JSlider zoomSlider;
     private final JPanel zoomRail;
     private final JButton layersButton;
+    private final JButton modesButton;
     private final JButton conquerButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
@@ -73,6 +75,44 @@ public class MapDialog extends ZeroDialog {
     private boolean showColonyRanks = true;
     private boolean showTrades = true;
     private boolean showTunnels = true;
+    public enum MapMode {
+        BIOME, HEIGHT, TECTONIC_PLATES
+    }
+    private MapMode mapMode = MapMode.BIOME;
+    public static final Color FAULT_CONVERGENT_COLOR = new Color(175, 65, 230);
+    public static final Color FAULT_DIVERGENT_COLOR = new Color(245, 215, 30);
+    public static final Color FAULT_TRANSFORM_COLOR = new Color(50, 150, 255);
+    private static final Color[] PLATE_COLORS = {
+        new Color(185, 85, 85),
+        new Color(65, 145, 185),
+        new Color(75, 165, 105),
+        new Color(185, 145, 65),
+        new Color(145, 95, 185),
+        new Color(75, 175, 165),
+        new Color(195, 105, 145),
+        new Color(135, 165, 65),
+        new Color(165, 115, 85),
+        new Color(105, 125, 195),
+        new Color(165, 165, 75),
+        new Color(135, 95, 145),
+        new Color(95, 165, 145),
+        new Color(195, 135, 105),
+        new Color(115, 145, 115),
+        new Color(155, 105, 115)
+    };
+    private static final Color[] HEIGHT_COLORS = {
+        new Color(110, 15, 20),
+        new Color(160, 25, 25),
+        new Color(200, 45, 30),
+        new Color(225, 75, 30),
+        new Color(240, 115, 35),
+        new Color(250, 155, 40),
+        new Color(252, 190, 45),
+        new Color(252, 220, 60),
+        new Color(254, 242, 120),
+        new Color(255, 250, 190),
+        new Color(255, 255, 255)
+    };
     private boolean showBattles = true;
     private boolean syncingZoomUi;
     private boolean holdingLeftA;
@@ -160,6 +200,19 @@ public class MapDialog extends ZeroDialog {
         layersButton.addActionListener(e -> showLayersMenu());
         zoomRail.add(Box.createVerticalStrut(8));
         zoomRail.add(layersButton);
+
+        modesButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_MODE_BUTTON));
+        modesButton.setFocusable(false);
+        modesButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_MODE_BUTTON_TT));
+        modesButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        AssetStyles.styleCompactButton(modesButton);
+        modesButton.setPreferredSize(layersBtnSize);
+        modesButton.setMinimumSize(layersBtnSize);
+        modesButton.setMaximumSize(layersBtnSize);
+        modesButton.setMargin(new Insets(0, 0, 0, 0));
+        modesButton.addActionListener(e -> showModesMenu());
+        zoomRail.add(Box.createVerticalStrut(4));
+        zoomRail.add(modesButton);
 
         conquerButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY));
         conquerButton.setFocusable(false);
@@ -412,6 +465,18 @@ public class MapDialog extends ZeroDialog {
         }
     }
 
+    public void setLegendVisible(boolean visible) {
+        if (legendPanel != null) {
+            legendPanel.setVisible(visible);
+            revalidate();
+            repaint();
+        }
+    }
+
+    public boolean isLegendVisible() {
+        return legendPanel != null && legendPanel.isVisible();
+    }
+
     private Engine resolveEngine() {
         if (engine != null) {
             return engine;
@@ -533,6 +598,77 @@ public class MapDialog extends ZeroDialog {
         menu.add(panel);
         Dimension menuSize = menu.getPreferredSize();
         menu.show(layersButton, -menuSize.width - 4, 0);
+    }
+
+    private void showModesMenu() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_BUTTON),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+
+        JCheckBox biomeBox = new JCheckBox(LanguageStrings.get(LanguageStrings.MAP_MODE_BIOME), mapMode == MapMode.BIOME);
+        AssetStyles.styleCheckBox(biomeBox);
+
+        JCheckBox heightBox = new JCheckBox(LanguageStrings.get(LanguageStrings.MAP_MODE_HEIGHT), mapMode == MapMode.HEIGHT);
+        AssetStyles.styleCheckBox(heightBox);
+
+        JCheckBox tectonicBox = new JCheckBox(LanguageStrings.get(LanguageStrings.MAP_MODE_TECTONIC_PLATES), mapMode == MapMode.TECTONIC_PLATES);
+        AssetStyles.styleCheckBox(tectonicBox);
+
+        biomeBox.addActionListener(e -> {
+            setMapMode(MapMode.BIOME);
+            biomeBox.setSelected(true);
+            heightBox.setSelected(false);
+            tectonicBox.setSelected(false);
+        });
+        panel.add(biomeBox);
+
+        panel.add(Box.createVerticalStrut(6));
+
+        heightBox.addActionListener(e -> {
+            setMapMode(MapMode.HEIGHT);
+            heightBox.setSelected(true);
+            biomeBox.setSelected(false);
+            tectonicBox.setSelected(false);
+        });
+        panel.add(heightBox);
+
+        panel.add(Box.createVerticalStrut(6));
+
+        tectonicBox.addActionListener(e -> {
+            setMapMode(MapMode.TECTONIC_PLATES);
+            tectonicBox.setSelected(true);
+            biomeBox.setSelected(false);
+            heightBox.setSelected(false);
+        });
+        panel.add(tectonicBox);
+
+        JPopupMenu menu = new JPopupMenu();
+        menu.setBorder(BorderFactory.createEmptyBorder());
+        menu.setBackground(AssetStyles.BACKGROUND_COLOR);
+        menu.add(panel);
+        Dimension menuSize = menu.getPreferredSize();
+        menu.show(modesButton, -menuSize.width - 4, 0);
+    }
+
+    public MapMode getMapMode() {
+        return mapMode;
+    }
+
+    public void setMapMode(MapMode mapMode) {
+        if (this.mapMode != mapMode) {
+            this.mapMode = mapMode;
+            if (mapPanel != null) {
+                mapPanel.invalidateBakedImage();
+                mapPanel.repaint();
+            }
+        }
+    }
+
+    String getHexToolTip(MouseEvent e) {
+        return (mapPanel != null) ? mapPanel.getToolTipText(e) : null;
     }
 
     private enum Layer {
@@ -773,6 +909,11 @@ public class MapDialog extends ZeroDialog {
         layersButton.setMinimumSize(layersBtnSize);
         layersButton.setMaximumSize(layersBtnSize);
         layersButton.setMargin(new Insets(0, 0, 0, 0));
+        AssetStyles.styleCompactButton(modesButton);
+        modesButton.setPreferredSize(layersBtnSize);
+        modesButton.setMinimumSize(layersBtnSize);
+        modesButton.setMaximumSize(layersBtnSize);
+        modesButton.setMargin(new Insets(0, 0, 0, 0));
         AssetStyles.styleButton(conquerButton);
         AssetStyles.styleButton(closeButton);
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
@@ -1360,6 +1501,7 @@ public class MapDialog extends ZeroDialog {
         };
         private World cachedBakedWorld;
         private Hex cachedBakedActiveHex;
+        private MapMode cachedBakedMapMode;
         private boolean cachedBakedBorders;
         private boolean cachedBakedRivers;
         private boolean cachedBakedBiomeIcons;
@@ -1618,6 +1760,7 @@ public class MapDialog extends ZeroDialog {
             bakedStepCache.clear();
             cachedBakedWorld = null;
             cachedBakedActiveHex = null;
+            cachedBakedMapMode = null;
             scaledBiomeIconCache.clear();
             scaledRankIconCache.clear();
             cachedIconSize = -1;
@@ -1630,6 +1773,7 @@ public class MapDialog extends ZeroDialog {
                     && cachedBakedWorld == world
                     && Math.abs(entry.hexSize - hexSize) < 1e-6
                     && cachedBakedActiveHex == activeHex
+                    && cachedBakedMapMode == mapMode
                     && cachedBakedBorders == showBorders
                     && cachedBakedRivers == showRivers
                     && cachedBakedBiomeIcons == showBiomeIcons
@@ -1824,12 +1968,22 @@ public class MapDialog extends ZeroDialog {
                 }
                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
                         .append(hex.getBiome().getName());
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_HEIGHT))
+                        .append(hex.getElevation());
             } else if (hasColonyName) {
                 sb.append("<br>").append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
                         .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_HEIGHT))
+                        .append(hex.getElevation());
             } else {
                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
                         .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_HEIGHT))
+                        .append(hex.getElevation());
+            }
+            if (mapMode == MapMode.TECTONIC_PLATES && hex.getPlateId() > 0) {
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_PLATE))
+                        .append(hex.getPlateId());
             }
 
             Continent cont = world.getContinentForHex(hex);
@@ -1950,6 +2104,9 @@ public class MapDialog extends ZeroDialog {
                     showBorders,
                     face -> resolveFillColor(face.hex),
                     AssetStyles.BORDER_COLOR);
+            if (mapMode == MapMode.TECTONIC_PLATES) {
+                mesh.paintFaultBoundariesWithStyles(bg, this::resolveFaultStyle);
+            }
             if (showRivers) {
                 mesh.paintRivers(bg);
             }
@@ -1983,6 +2140,7 @@ public class MapDialog extends ZeroDialog {
             bakedStepCache.put(zoomStepIndex, new BakedStepCacheEntry(image, hexSize, minX, minY));
             cachedBakedWorld = world;
             cachedBakedActiveHex = activeHex;
+            cachedBakedMapMode = mapMode;
             cachedBakedBorders = showBorders;
             cachedBakedRivers = showRivers;
             cachedBakedBiomeIcons = showBiomeIcons;
@@ -2100,6 +2258,9 @@ public class MapDialog extends ZeroDialog {
                             showBorders,
                             face -> resolveFillColor(face.hex),
                             AssetStyles.BORDER_COLOR);
+                    if (mapMode == MapMode.TECTONIC_PLATES) {
+                        mesh.paintFaultBoundariesWithStyles(sg, this::resolveFaultStyle);
+                    }
                     if (showRivers) {
                         mesh.paintRivers(sg);
                     }
@@ -2159,7 +2320,62 @@ public class MapDialog extends ZeroDialog {
                     (int) Math.round(getHeight() / 2.0 + vertAdjust + panY));
         }
 
+        private HexGridMesh.FaultStyle resolveFaultStyle(HexGridMesh.Edge edge) {
+            if (world == null || edge == null || edge.faceA == null || edge.faceB == null) {
+                return null;
+            }
+            Hex hA = edge.faceA.hex;
+            Hex hB = edge.faceB.hex;
+            if (hA == null || hB == null) {
+                return null;
+            }
+            int pA = hA.getPlateId();
+            int pB = hB.getPlateId();
+            if (pA <= 0 || pB <= 0 || pA == pB) {
+                return null;
+            }
+            FaultLine.FaultType type = world.getFaultTypeBetweenPlates(pA, pB);
+            Color color = null;
+            if (type == FaultLine.FaultType.CONVERGENT) {
+                color = FAULT_CONVERGENT_COLOR;
+            } else if (type == FaultLine.FaultType.DIVERGENT) {
+                color = FAULT_DIVERGENT_COLOR;
+            } else if (type == FaultLine.FaultType.TRANSFORM) {
+                color = FAULT_TRANSFORM_COLOR;
+            }
+            if (color == null) {
+                return null;
+            }
+            int intensity = world.getFaultIntensityBetweenPlates(pA, pB);
+            return new HexGridMesh.FaultStyle(color, intensity);
+        }
+
+        private Color resolveFaultBorderColor(HexGridMesh.Edge edge) {
+            HexGridMesh.FaultStyle style = resolveFaultStyle(edge);
+            return style != null ? style.color : null;
+        }
+
         private Color resolveFillColor(Hex hex) {
+            if (mapMode == MapMode.HEIGHT) {
+                int elev = Math.max(0, Math.min(10, hex.getElevation()));
+                Color base = HEIGHT_COLORS[elev];
+                if (hex == world.getActiveHex()) {
+                    return base;
+                }
+                float fade = AssetStyles.mapInactiveHexFade();
+                return AssetStyles.fadeTowardBackground(base, fade);
+            }
+            if (mapMode == MapMode.TECTONIC_PLATES) {
+                int plateId = hex.getPlateId();
+                if (plateId > 0) {
+                    Color base = PLATE_COLORS[(plateId - 1) % PLATE_COLORS.length];
+                    if (hex == world.getActiveHex()) {
+                        return base;
+                    }
+                    float fade = AssetStyles.mapInactiveHexFade();
+                    return AssetStyles.fadeTowardBackground(base, fade);
+                }
+            }
             Biome biome = hex.getBiome();
             if (hex == world.getActiveHex()) {
                 return biome != null ? getBiomeColor(biome) : AssetStyles.BACKGROUND_COLOR;

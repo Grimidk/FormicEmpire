@@ -97,7 +97,10 @@ public final class CoastalTideRenderer {
             return true;
         }
         Biome b = neighbor.getBiome();
-        return b == GameConstants.BIOME_OCEAN || b == GameConstants.BIOME_LAKE;
+        return b == GameConstants.BIOME_OCEAN
+                || b == GameConstants.BIOME_DEEP_OCEAN
+                || b == GameConstants.BIOME_SHALLOW_OCEAN
+                || b == GameConstants.BIOME_LAKE;
     }
 
     public static final class WaterBorders {

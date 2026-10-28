@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
@@ -717,11 +718,17 @@ public class StatsDialog extends ZeroDialog {
         // World Info
         World world = engine != null ? engine.getWorld() : null;
         if (world != null) {
+            Hex activeHex = world.getActiveHex();
+            int hour = (activeHex != null) ? world.getLocalHour(activeHex) : world.getHour();
+            int day = (activeHex != null) ? world.getLocalDay(activeHex) : world.getDay();
+            int month = (activeHex != null) ? world.getLocalMonth(activeHex) : world.getMonth();
+            int year = (activeHex != null) ? world.getLocalYear(activeHex) : world.getYear();
             String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
-                world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
+                hour, world.getMinute(), day, month, year);
+            TimeOfDay tod = (activeHex != null) ? world.getTimeOfDay(activeHex) : world.getTimeOfDay();
             
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_DATE_TIME), dateTime});
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_TIME_DAY), world.getTimeOfDay().getName()});
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_TIME_DAY), tod != null ? tod.getName() : ""});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_MOON_PHASE), world.getMoonPhase().getName()});
             
             Season season = world.getSeason();

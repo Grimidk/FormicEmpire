@@ -616,6 +616,10 @@ public class SaveManager {
                 sh.continentId = h.getContinentId();
                 sh.waterDistance = h.getWaterDistance();
                 sh.coastal = h.isCoastal();
+                sh.elevation = h.getElevation();
+                sh.hydrology = h.getHydrology();
+                sh.island = h.isIsland();
+                sh.plateId = h.getPlateId();
                 hexList.add(sh);
                 
                 if (hasColony) {
@@ -1836,6 +1840,10 @@ public class SaveManager {
             if (h.continentId != 0) sb.append(",\"cid\":").append(h.continentId);
             if (h.waterDistance != 0) sb.append(",\"wd\":").append(h.waterDistance);
             if (h.coastal) sb.append(",\"co\":true");
+            if (h.elevation != 0) sb.append(",\"el\":").append(h.elevation);
+            if (h.hydrology != 0) sb.append(",\"hy\":").append(h.hydrology);
+            if (h.island) sb.append(",\"isl\":true");
+            if (h.plateId != 0) sb.append(",\"pl\":").append(h.plateId);
             sb.append("}");
             if (i < hexes.size() - 1) {
                 sb.append(",");
@@ -2352,6 +2360,10 @@ public class SaveManager {
             int cid = 0;
             int wd = 0;
             boolean co = false;
+            int el = 0;
+            int hy = 0;
+            boolean isl = false;
+            int pl = 0;
             
             try {
                 String clean = objStr.replace("{", "").replace("}", "");
@@ -2373,6 +2385,10 @@ public class SaveManager {
                         else if (k.equals("cid")) cid = Integer.parseInt(v);
                         else if (k.equals("wd")) wd = Integer.parseInt(v);
                         else if (k.equals("co")) co = Boolean.parseBoolean(v);
+                        else if (k.equals("el")) el = Integer.parseInt(v);
+                        else if (k.equals("hy")) hy = Integer.parseInt(v);
+                        else if (k.equals("isl")) isl = Boolean.parseBoolean(v);
+                        else if (k.equals("pl")) pl = Integer.parseInt(v);
                     }
                 }
                 Savefile.SavedHex saved = new Savefile.SavedHex(q, r, b, c, t, w);
@@ -2383,6 +2399,10 @@ public class SaveManager {
                 saved.continentId = cid;
                 saved.waterDistance = wd;
                 saved.coastal = co;
+                saved.elevation = el;
+                saved.hydrology = hy;
+                saved.island = isl;
+                saved.plateId = pl;
                 list.add(saved);
             } catch (Exception e) {
                 e.printStackTrace();

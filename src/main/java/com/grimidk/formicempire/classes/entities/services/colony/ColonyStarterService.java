@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
@@ -174,7 +175,7 @@ public class ColonyStarterService {
         if (world == null || dynasty == null || hex == null) {
             return null;
         }
-        if (hex.getBiome() == GameConstants.BIOME_OCEAN || hex.getBiome() == GameConstants.BIOME_LAKE) {
+        if (HexWaterCrossing.isWaterBiome(hex.getBiome())) {
             return null;
         }
         Colony existing = hex.getColony();

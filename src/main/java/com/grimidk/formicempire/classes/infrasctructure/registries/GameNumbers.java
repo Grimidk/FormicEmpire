@@ -446,6 +446,22 @@ public final class GameNumbers {
         return (days + DAYS_PER_MONTH - 1) / DAYS_PER_MONTH;
     }
 
+    public static int calculateTimeZoneOffset(int col, int worldWidth) {
+        if (worldWidth <= 0) {
+            return 0;
+        }
+        int minCol = -worldWidth / 2;
+        int maxCol = worldWidth / 2 - 1;
+        int normalizedCol = col;
+        while (normalizedCol < minCol) normalizedCol += worldWidth;
+        while (normalizedCol > maxCol) normalizedCol -= worldWidth;
+        double colsPerZone = (double) worldWidth / 24.0;
+        int offset = (int) Math.round(normalizedCol / colsPerZone);
+        while (offset > 12) offset -= 24;
+        while (offset < -12) offset += 24;
+        return offset;
+    }
+
     public static int initialModifierRemainingDays(DiplomaticReputationModifier modifier) {
         if (modifier == null || !modifier.hasExpiration()) {
             return MODIFIER_PERMANENT;

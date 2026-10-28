@@ -2,10 +2,12 @@ package com.grimidk.formicempire.classes.entities.world;
 
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
-import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 
 public class Hex {
     private Biome biome;
@@ -24,6 +26,9 @@ public class Hex {
     private Weather localWeather;
     private boolean isActive;
     private boolean island;
+    private int elevation = 3;
+    private int hydrology = 0;
+    private int plateId = 0;
 
     private int nonWaterResourceSourcesGenerated;
 
@@ -92,6 +97,14 @@ public class Hex {
     public int getTimeOffset() { return timeOffset;}
 
     public void setTimeOffset(int timeOffset) { this.timeOffset = timeOffset; }
+
+    public int getLocalHour(World world) {
+        return world != null ? world.getLocalHour(this) : 0;
+    }
+
+    public TimeOfDay getLocalTimeOfDay(World world) {
+        return world != null ? world.getTimeOfDay(this) : GameConstants.TIME_DAY;
+    }
 
     public Weather getLocalWeather() { return localWeather; }
 
@@ -219,5 +232,29 @@ public class Hex {
 
     public void setCoastal(boolean coastal) {
         this.coastal = coastal;
+    }
+
+    public int getElevation() {
+        return elevation;
+    }
+
+    public void setElevation(int elevation) {
+        this.elevation = Math.max(0, Math.min(10, elevation));
+    }
+
+    public int getPlateId() {
+        return plateId;
+    }
+
+    public void setPlateId(int plateId) {
+        this.plateId = plateId;
+    }
+
+    public int getHydrology() {
+        return hydrology;
+    }
+
+    public void setHydrology(int hydrology) {
+        this.hydrology = hydrology;
     }
 }

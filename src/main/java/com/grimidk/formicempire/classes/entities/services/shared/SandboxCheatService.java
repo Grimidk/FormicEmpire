@@ -102,7 +102,7 @@ public final class SandboxCheatService {
         if (hex == null) {
             return false;
         }
-        if (hex.getBiome() == GameConstants.BIOME_OCEAN || hex.getBiome() == GameConstants.BIOME_LAKE) {
+        if (HexWaterCrossing.isWaterBiome(hex.getBiome())) {
             return false;
         }
         Colony existing = hex.getColony();

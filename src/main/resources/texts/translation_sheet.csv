@@ -516,6 +516,7 @@ MAP_TOOLTIP_MILITARY_POWER,<br><b>Colony Military Power:</b> ,<br><b>Poder milit
 MAP_TOOLTIP_DYNASTY_MILITARY_POWER,<br><b>Dynasty Military Power:</b> ,<br><b>Poder militar de dinastía:</b> ,<br><b>Poder militar da dinastia:</b> ,<br><b>Puissance militaire de dynastie :</b> ,,,
 MAP_LEGEND_MILITARY,Power,Poder,Poder,Puiss.,,,
 MAP_TOOLTIP_EMPTY,<br><i>Empty</i>,<br><i>Vacío</i>,<br><i>Vazio</i>,<br><i>Vide</i>,,,
+MAP_TOOLTIP_HEIGHT,<br><b>Height:</b> ,<br><b>Altura:</b> ,<br><b>Altura:</b> ,<br><b>Altitude :</b> ,,,
 MAP_DYNASTY_DIPLO_FORMAT,%s · %s,%s · %s,%s · %s,%s · %s,,,
 MAP_SORT_BY_POPULATION,Sort: Population,Orden: Población,Ordenar: População,Tri : Population,,,
 MAP_SORT_BY_DIPLOMACY,Sort: Diplomacy (hostile → friendly),Orden: Diplomacia (hostil → amistoso),Ordenar: Diplomacia (hostil → amigável),Tri : Diplomatie (hostile → amicale),,,
@@ -925,8 +926,9 @@ MULTI_MAP_SAVED_FMT,Map saved to slot %s.,Mapa guardado en el espacio %s.,Mapa s
 MULTI_MAP_NO_SLOTS,No empty save slots available. Delete an existing save first.,No hay espacios libres. Elimina una partida primero.,Não há slots livres. Exclua um save primeiro.,Aucun emplacement libre. Supprimez une sauvegarde d'abord.,,,
 MULTI_MAP_PARAM_CONTINENTS,Continents:,Continentes:,Continentes:,Continents:,,,
 MULTI_MAP_PARAM_ISLANDS,Islands:,Islas:,Ilhas:,Îles:,,,
-MULTI_MAP_PARAM_LAND_SHARE,Land %:,% Tierra:,% Terra:,% Terre:,,,
+MULTI_MAP_PARAM_LAND_SHARE,Cont. Land %:,% Tierra Cont.:,% Terra Cont.:,% Terre Cont.:,,,
 MULTI_MAP_PARAM_ICECAP,Icecap %:,% Casquetes:,% Calotas:,% Polaire:,,,
+MULTI_MAP_PARAM_PLATES,Plates:,Placas:,Placas:,Plaques:,,,
 MULTI_MAP_PARAM_RESET,Reset,Restablecer,Redefinir,Réinitialiser,,,
 MULTI_MAP_PARAM_RANDOMIZE,Full Random,Totalmente aleatorio,Totalmente aleatório,Aléatoire complet,,,
 MULTI_MAP_INSPECT_MAP,Click to inspect map,Clic para inspeccionar mapa,Clique para inspecionar o mapa,Cliquer pour inspecter la carte,,,
@@ -1010,6 +1012,9 @@ BIOME_MANGROVE,Mangrove,Manglar,Manguezal,Mangrove,,,
 BIOME_PRAIRIE,Prairie,Pradera,Pradaria,Prairie,,,
 BIOME_BURNT_FOREST,Burnt Forest,Bosque Quemado,Floresta Queimada,Forêt brûlée,,,
 BIOME_ICE_FIELD,Ice Field,Campo de Hielo,Campo de Gelo,Champ de glace,,,
+BIOME_DEEP_OCEAN,Deep Ocean,Océano Profundo,Oceano Profundo,Océan profond,,,
+BIOME_SHALLOW_OCEAN,Shallow Ocean,Océano Somero,Oceano Raso,Océan peu profond,,,
+BIOME_PEAK,Mountain Peak,Pico Montañoso,Pico da Montanha,Pic montagneux,,,
 TEMP_FREEZING,Freezing,Gélido,Gélido,Gel,,,
 TEMP_COLD,Cold,Frío,Frio,Froid,,,
 TEMP_CHILLY,Chilly,Fresco,Fresco,Frais,,,
@@ -2628,6 +2633,36 @@ ARCHIPELAGO_NAME_FROST_ARCHIPELAGO,Frost Archipelago,Archipiélago Helado,Arquip
 ARCHIPELAGO_NAME_TWILIGHT_ISLES,Twilight Isles,Islas del Crepúsculo,Ilhas do Crepúsculo,Îles du Crépuscule
 ARCHIPELAGO_NAME_ECHO_ARCHIPELAGO,Echo Archipelago,Archipiélago del Eco,Arquipélago do Eco,Archipel de l'Écho
 ARCHIPELAGO_NAME_HIDDEN_ISLES,Hidden Isles,Islas Ocultas,Ilhas Ocultas,Îles Cachées
+ISLAND_NAME_FIRE_ISLAND,Fire Island,Isla de Fuego,Ilha de Fogo,Île de Feu
+ISLAND_NAME_GOLD_ISLAND,Gold Island,Isla de Oro,Ilha de Ouro,Île d'Or
+ISLAND_NAME_SILVER_ISLE,Silver Isle,Isla de Plata,Ilha de Prata,Île d'Argent
+ISLAND_NAME_CORAL_ISLAND,Coral Island,Isla de Coral,Ilha de Coral,Île de Corail
+ISLAND_NAME_STORM_ISLAND,Storm Island,Isla de la Tormenta,Ilha da Tempestade,Île de la Tempête
+ISLAND_NAME_EMERALD_ISLAND,Emerald Island,Isla Esmeralda,Ilha Esmeralda,Île d'Émeraude
+ISLAND_NAME_SUNKEN_ISLE,Sunken Isle,Isla Hundida,Ilha Submersa,Île Engloutie
+ISLAND_NAME_MOON_ISLAND,Moon Island,Isla de la Luna,Ilha da Lua,Île de la Lune
+ISLAND_NAME_PEARL_ISLAND,Pearl Island,Isla de las Perlas,Ilha das Pérolas,Île de la Perle
+ISLAND_NAME_OBSIDIAN_ISLAND,Obsidian Island,Isla de Obsidiana,Ilha de Obsidiana,Île d'Obsidienne
+ISLAND_NAME_DRAGON_ISLE,Dragon Isle,Isla Dragón,Ilha Dragão,Île du Dragon
+ISLAND_NAME_MIST_ISLAND,Mist Island,Isla de la Niebla,Ilha da Névoa,Île des Brumes
+ISLAND_NAME_WHISPERING_ISLE,Whispering Isle,Isla Susurrante,Ilha Sussurrante,Île Murmurante
+ISLAND_NAME_AMBER_ISLAND,Amber Island,Isla de Ámbar,Ilha de Âmbar,Île d'Ambre
+ISLAND_NAME_SHADOW_ISLE,Shadow Isle,Isla de las Sombras,Ilha das Sombras,Île des Ombres
+ISLAND_NAME_JADE_ISLE,Jade Isle,Isla de Jade,Ilha de Jade,Île de Jade
+ISLAND_NAME_WINDWARD_ISLE,Windward Isle,Isla de Barlovento,Ilha de Barlavento,Île du Vent
+ISLAND_NAME_CRYSTAL_ISLE,Crystal Isle,Isla de Cristal,Ilha de Cristal,Île de Cristal
+ISLAND_NAME_SAPPHIRE_ISLAND,Sapphire Island,Isla de Zafiro,Ilha de Safira,Île de Saphir
+ISLAND_NAME_RUBY_ISLE,Ruby Isle,Isla de Rubí,Ilha de Rubi,Île de Rubis
+ISLAND_NAME_SERPENT_ISLE,Serpent Isle,Isla de la Serpiente,Ilha da Serpente,Île du Serpent
+ISLAND_NAME_STAR_ISLAND,Star Island,Isla de las Estrellas,Ilha das Estrelas,Île de l'Étoile
+ISLAND_NAME_AZURE_ISLE,Azure Isle,Isla Azul,Ilha Azul,Île d'Azur
+ISLAND_NAME_VOLCANIC_ISLE,Volcanic Isle,Isla Volcánica,Ilha Vulcânica,Île Volcanique
+ISLAND_NAME_IRON_ISLAND,Iron Island,Isla de Hierro,Ilha de Ferro,Île de Fer
+ISLAND_NAME_CLOUD_ISLE,Cloud Isle,Isla de las Nubes,Ilha das Nuvens,Île des Nuages
+ISLAND_NAME_FROST_ISLAND,Frost Island,Isla Helada,Ilha Congelada,Île du Givre
+ISLAND_NAME_TWILIGHT_ISLE,Twilight Isle,Isla del Crepúsculo,Ilha do Crepúsculo,Île du Crépuscule
+ISLAND_NAME_ECHO_ISLAND,Echo Island,Isla del Eco,Ilha do Eco,Île de l'Écho
+ISLAND_NAME_HIDDEN_ISLE,Hidden Isle,Isla Oculta,Ilha Oculta,Île Cachée
 HELP_HUNTS_INVASIONS_INTRO,"<b>Hunts:</b> Unlocked via Ability Hunts (H key). Scouts discover overworld prey bugs. Dispatch parties of unassigned soldiers, majors, or princesses to fight targets for meat, fungi, and RP before they escape.<br><br><b>Invasions:</b> Hostile bug raids attack colonies with a 72-hour deadline. Assemble an unassigned defense force; failing or timing out causes a raid that steals resources and kills unassigned ants.","<b>Cacerías:</b> Desbloqueadas con la habilidad Cacerías (tecla H). Las exploradoras descubren bichos en el supramundo. Envía partidas de soldados, mayores o princesas sin asignar para cazar presas y ganar carne, hongos y PI antes de que escapen.<br><br><b>Invasiones:</b> Incursiones de bichos atacan colonias con un plazo de 72 horas. Reúne una defensa sin asignar; fallar o agotar el tiempo provoca una incursión que roba recursos y mata hormigas sin asignar.","<b>Caçadas:</b> Desbloqueadas com a habilidade Caçadas (tecla H). Batedores descobrem insetos no mapa. Envie grupos de soldados, majores ou princesas sem função para caçar e obter carne, fungos e PP antes que escapem.<br><br><b>Invasões:</b> Ataques de insetos com prazo de 72 horas. Reúna uma defesa sem função; falhar ou esgotar o prazo causa um saque que rouba recursos e mata formigas sem função.","<b>Chasses :</b> Débloquées par la compétence Chasses (touche H). Les éclaireurs repèrent des insectes sauvages. Envoyez des groupes de soldats, majors ou princesses non assignés pour gagner viande, champignons et PR avant leur fuite.<br><br><b>Invasions :</b> Raids hostiles avec un délai de 72 heures. Rassemblez une force de défense non assignée ; l'échec ou l'expiration entraîne un raid qui pille des ressources et tue des fourmis non assignées."
 HELP_UI_MAP_LAYERS,Map Layers,Capas del mapa,Camadas do mapa,Calques de la carte
 HELP_UI_MAP_LAYERS_DESC,"Toggle Tunnels, Trade routes, Battles, and Dynasty borders on the World Map (M).","Alterna túneles, rutas comerciales, batallas y fronteras de dinastía en el Mapa Mundial (M).","Alterne túneis, rotas comerciais, batalhas e fronteiras dinásticas no Mapa do Mundo (M).","Basculez tunnels, routes commerciales, batailles et frontières dynastiques sur la Carte du Monde (M)."
@@ -2638,3 +2673,19 @@ HELP_ANT_AGING_DESC,"Ants age 1 hour every in-game hour. Lifespans vary by caste
 HELP_COMBAT_WATER_CROSSING,Water Crossing & Rafting,Cruce de Agua y Balsas,Travessia de Água e Jangadas,Traversée d'Eau et Radeaux
 HELP_COMBAT_WATER_CROSSING_BODY,"Crossing aquatic hexes (oceans, lakes) during military campaigns requires the Rafting assimilation and upgrades (Rafting 1 and 2). Without rafting adaptations, armies cannot march across open water borders or suffer heavy combat and movement penalties unless utilizing subterranean tunnels.","Cruzar hexágonos acuáticos (océanos, lagos) en campañas militares requiere la asimilación de Balsas y sus mejoras (Balsas 1 y 2). Sin adaptaciones de balsa, los ejércitos no pueden cruzar fronteras acuáticas o sufren graves penalizaciones de combate y velocidad a menos que utilicen túneles subterráneos.","Atravessar hexágonos aquáticos (oceanos, lagos) em campanhas militares requer a assimilação de Jangadas e suas melhorias (Jangada 1 e 2). Sem adaptação, os exércitos não podem cruzar fronteiras aquáticas ou sofrem pesadas penalidades de combate e velocidade, exceto via túneis subterrâneos.","Traverser des hexagones aquatiques (océans, lacs) en campagne militaire nécessite l'assimilation Radeaux et ses améliorations (Radeaux 1 et 2). Sans cette adaptation, les armées ne peuvent franchir les frontières aquatiques ou subissent de lourdes pénalités de combat et de vitesse, sauf via des tunnels souterrains."
 HELP_COMBAT_CARRIER_DESC,"Major Troop-Carriers transport reserve military ants to frontline battle lines. Each carrier increases daily reinforcement rates up to the daily allowance, remaining in reserve and not fighting directly.","Los transportes de tropas (Mayores) transportan hormigas de reserva a las líneas del frente. Cada transporte aumenta la tasa de refuerzo diario hasta el cupo permitido, permaneciendo en reserva sin combatir directamente.","Os transportes de tropas (Majores) levam formigas de reserva para as linhas de combate. Cada transporte aumenta a taxa diária de reforços até ao limite diário, ficando na reserva sem combater diretamente.","Les transporteurs de troupes (Majors) acheminent les fourmis de réserve vers les lignes de front. Chaque transporteur augmente le taux de renfort quotidien jusqu'à la limite autorisée, restant en réserve sans combattre directement."
+MAP_MODE_BUTTON,◈,◈,◈,◈
+MAP_MODE_BUTTON_TT,Toggle map display mode,Cambiar modo de visualización del mapa,Alternar modo de exibição do mapa,Changer le mode d'affichage de la carte
+MAP_MODE_BIOME,Biome,Bioma,Bioma,Biome
+MAP_MODE_HEIGHT,Height,Altura,Altura,Altitude
+MAP_MODE_TECTONIC_PLATES,Tectonic Plates,Placas Tectónicas,Placas Tectônicas,Plaques Tectoniques
+MAP_TOOLTIP_PLATE,<br>Plate: ,<br>Placa: ,<br>Placa: ,<br>Plaque: 
+SAVED_MAP_CHOOSE_MODE_TITLE,World Setup,Configuración del mundo,Configuração do mundo,Configuration du monde
+SAVED_MAP_CHOOSE_MODE_MSG,Select how the world for this game should be created:,Selecciona cómo crear el mundo para esta partida:,Selecione como o mundo deste jogo deve ser criado:,Sélectionnez comment le monde de cette partie doit être créé :
+SAVED_MAP_GENERATE_NEW,Generate New Map,Generar nuevo mapa,Gerar novo mapa,Générer une nouvelle carte
+SAVED_MAP_LOAD_SAVED,Choose Saved Map,Elegir mapa guardado,Escolher mapa salvo,Choisir une carte enregistrée
+SAVED_MAP_GALLERY_TITLE,Saved Maps Gallery,Galería de mapas guardados,Galeria de mapas salvos,Galerie des cartes enregistrées
+SAVED_MAP_PAGE_FMT,Page %s / %s,Página %s / %s,Página %s / %s,Page %s / %s
+SAVED_MAP_SELECT,Play Map,Jugar mapa,Jogar mapa,Jouer la carte
+SAVED_MAP_PROMPT_NAME,Enter a name for this saved map:,Introduce un nombre para este mapa guardado:,Digite um nome para este mapa salvo:,Entrez un nom pour cette carte enregistrée :
+SAVED_MAP_EMPTY_GALLERY,No saved maps found.,No se encontraron mapas guardados.,Nenhum mapa salvo encontrado.,Aucune carte enregistrée trouvée.
+SAVED_MAP_CONFIRM_DELETE,Delete saved map '%s'?,¿Eliminar el mapa guardado '%s'?,Excluir mapa salvo '%s'?,Supprimer la carte enregistrée '%s' ?

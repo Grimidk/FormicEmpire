@@ -401,6 +401,54 @@ public final class HexGridMesh {
         return !(maxX < clip.x || minX > clip.x + clip.width || maxY < clip.y || minY > clip.y + clip.height);
     }
 
+    public static final class FaultStyle {
+        public final Color color;
+        public final int intensity;
+
+        public FaultStyle(Color color, int intensity) {
+            this.color = color;
+            this.intensity = intensity;
+        }
+    }
+
+    public void paintFaultBoundaries(Graphics2D g2d, Function<Edge, Color> faultColorProvider) {
+        paintFaultBoundariesWithStyles(g2d, edge -> {
+            Color c = faultColorProvider.apply(edge);
+            return c != null ? new FaultStyle(c, 1) : null;
+        });
+    }
+
+    public void paintFaultBoundariesWithStyles(Graphics2D g2d, Function<Edge, FaultStyle> faultStyleProvider) {
+        Objects.requireNonNull(g2d, "g2d");
+        Objects.requireNonNull(faultStyleProvider, "faultStyleProvider");
+        float baseStrokeWidth = (float) Math.max(1.8, Math.min(3.0, layoutSize * 0.12));
+        float strongStrokeWidth = (float) Math.max(3.2, Math.min(5.4, layoutSize * 0.22));
+        BasicStroke baseStroke = new BasicStroke(baseStrokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        BasicStroke strongStroke = new BasicStroke(strongStrokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        Line2D.Double edgeLine = new Line2D.Double();
+        Rectangle clip = g2d.getClipBounds();
+
+        for (int pass = 1; pass <= 2; pass++) {
+            g2d.setStroke(pass == 1 ? baseStroke : strongStroke);
+            for (Edge edge : edges) {
+                if (clip != null && !edgeIntersects(edge, clip)) {
+                    continue;
+                }
+                FaultStyle style = faultStyleProvider.apply(edge);
+                if (style == null || style.color == null) {
+                    continue;
+                }
+                int intn = Math.max(1, Math.min(2, style.intensity));
+                if (intn != pass) {
+                    continue;
+                }
+                g2d.setColor(style.color);
+                edgeLine.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
+                g2d.draw(edgeLine);
+            }
+        }
+    }
+
     public void paintRivers(Graphics2D g2d) {
         paintRivers(g2d, 1.0f);
     }
@@ -527,7 +575,9 @@ public final class HexGridMesh {
     private static boolean isOceanFace(Face face) {
         return face != null
                 && face.hex != null
-                && face.hex.getBiome() == GameConstants.BIOME_OCEAN;
+                && (face.hex.getBiome() == GameConstants.BIOME_OCEAN
+                    || face.hex.getBiome() == GameConstants.BIOME_DEEP_OCEAN
+                    || face.hex.getBiome() == GameConstants.BIOME_SHALLOW_OCEAN);
     }
 
     private static Color plainColor(Edge edge, Function<Face, Color> plainEdgeColor) {

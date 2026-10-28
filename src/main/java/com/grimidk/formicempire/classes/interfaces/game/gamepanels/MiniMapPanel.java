@@ -289,7 +289,7 @@ public class MiniMapPanel extends ZeroGamePanel {
         try {
             bg2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             if (world.getWorldWidth() > 0) {
-                bg2d.setColor(GameConstants.BIOME_OCEAN.getMapColor());
+                bg2d.setColor(GameConstants.BIOME_DEEP_OCEAN.getMapColor());
                 bg2d.fillRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(worldBoxW), (int) Math.round(worldBoxH));
                 bg2d.setColor(AssetStyles.BORDER_COLOR);
                 bg2d.drawRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(worldBoxW), (int) Math.round(worldBoxH));
@@ -343,7 +343,8 @@ public class MiniMapPanel extends ZeroGamePanel {
     }
 
     private static boolean isOcean(Hex hex) {
-        return hex.getBiome() == GameConstants.BIOME_OCEAN;
+        return hex != null && (hex.getBiome() == GameConstants.BIOME_OCEAN
+                || hex.getBiome() == GameConstants.BIOME_DEEP_OCEAN);
     }
 
     private static double axialX(int q, int r) {

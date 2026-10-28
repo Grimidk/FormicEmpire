@@ -23,6 +23,7 @@ import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.world.Continent;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleState;
 import com.grimidk.formicempire.classes.entities.services.world.WarCreatureCombatService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -34,7 +35,7 @@ class GlobeWorldGenerationTest {
 
     @Test
     void allBiomesHavePropertiesAssigned() {
-        assertEquals(19, GameConstants.getBiomes().size());
+        assertEquals(22, GameConstants.getBiomes().size());
         for (Biome b : GameConstants.getBiomes()) {
             assertNotNull(b.getRarity(), "Biome " + b.getId() + " has null rarity");
             assertNotNull(b.getClimateZone(), "Biome " + b.getId() + " has null climateZone");
@@ -45,6 +46,9 @@ class GlobeWorldGenerationTest {
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_BURNT_FOREST));
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_OCEAN));
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_LAKE));
+        assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_DEEP_OCEAN));
+        assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_SHALLOW_OCEAN));
+        assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_PEAK));
     }
 
     @Test
@@ -78,7 +82,7 @@ class GlobeWorldGenerationTest {
                 continue;
             }
             nonIceTotal++;
-            if (h.getBiome() != GameConstants.BIOME_OCEAN) {
+            if (!isOcean(h)) {
                 nonIceLand++;
             }
         }
@@ -264,7 +268,7 @@ class GlobeWorldGenerationTest {
             }
         }
 
-        assertEquals(19, counts.size(), "All 19 biomes must be present on the globe");
+        assertEquals(22, counts.size(), "All 22 biomes must be present on the globe");
         for (Biome b : GameConstants.getBiomes()) {
             int count = counts.getOrDefault(b, 0);
             assertTrue(count >= 20, "Biome " + b.getId() + " count (" + count + ") should be at least 20");
@@ -283,7 +287,7 @@ class GlobeWorldGenerationTest {
 
         Set<Hex> visited = new HashSet<>();
         for (Hex h : world.getHexes()) {
-            if (h.getBiome() == GameConstants.BIOME_OCEAN && !visited.contains(h)) {
+            if (isOcean(h) && !visited.contains(h)) {
                 Set<Hex> component = new HashSet<>();
                 List<Hex> queue = new ArrayList<>();
                 queue.add(h);
@@ -294,7 +298,7 @@ class GlobeWorldGenerationTest {
                     component.add(curr);
                     for (int dir = 0; dir < 6; dir++) {
                         Hex n = curr.getNeighbor(dir);
-                        if (n != null && n.getBiome() == GameConstants.BIOME_OCEAN && visited.add(n)) {
+                        if (n != null && isOcean(n) && visited.add(n)) {
                             queue.add(n);
                         }
                     }
@@ -399,12 +403,9 @@ class GlobeWorldGenerationTest {
                 }
             }
             for (Hex w : mutual) {
-                boolean touchesWater = u.getBiome() == GameConstants.BIOME_OCEAN
-                        || v.getBiome() == GameConstants.BIOME_OCEAN
-                        || w.getBiome() == GameConstants.BIOME_OCEAN
-                        || u.getBiome() == GameConstants.BIOME_LAKE
-                        || v.getBiome() == GameConstants.BIOME_LAKE
-                        || w.getBiome() == GameConstants.BIOME_LAKE;
+                boolean touchesWater = HexWaterCrossing.isWaterBiome(u.getBiome())
+                        || HexWaterCrossing.isWaterBiome(v.getBiome())
+                        || HexWaterCrossing.isWaterBiome(w.getBiome());
                 boolean touchesOtherRiver = edges.contains(new RiverEdge(u, w)) || edges.contains(new RiverEdge(v, w));
                 assertTrue(touchesWater || touchesOtherRiver,
                         "River edge between (" + u.getQ() + "," + u.getR() + ") and (" + v.getQ() + "," + v.getR() + ") dead-ends at vertex with (" + w.getQ() + "," + w.getR() + ") without connecting to water or river");
@@ -491,5 +492,11 @@ class GlobeWorldGenerationTest {
             assertEquals(cap.getColonies().size(), cap.getPopulatedHexes().size());
             assertEquals(!cap.getColonies().isEmpty(), cap.hasPopulatedHexes());
         }
+    }
+
+    private static boolean isOcean(Hex h) {
+        return h != null && (h.getBiome() == GameConstants.BIOME_OCEAN
+                || h.getBiome() == GameConstants.BIOME_DEEP_OCEAN
+                || h.getBiome() == GameConstants.BIOME_SHALLOW_OCEAN);
     }
 }

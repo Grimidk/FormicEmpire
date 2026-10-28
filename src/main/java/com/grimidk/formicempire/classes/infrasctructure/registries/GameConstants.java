@@ -479,80 +479,92 @@ public final class GameConstants {
     // --- Biomes ---
     public static final Biome BIOME_PLAINS = new Biome(1, LanguageStrings.BIOME_PLAINS, 25, 2, 1f, 1f, 0f, 0f, 0f, 1,
         "#A8C76A", loadIcon("icons/biomes/Plains.png"), loadIcon("backgrounds/biomes/PlainsTile.png"),
-        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.MODERATE, true);
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.MODERATE, true, 4, 6);
     static { biomes.add(BIOME_PLAINS); }
     public static final Biome BIOME_FOREST = new Biome(2, LanguageStrings.BIOME_FOREST, 22, 3, 2f, 2f, 0.1f, 2f, 0.1f, 1,
         "#3D7A3D", loadIcon("icons/biomes/Forest.png"), loadIcon("backgrounds/biomes/ForestTile.png"),
-        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.MODERATE, true);
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.MODERATE, true, 4, 6);
     static { biomes.add(BIOME_FOREST); }
     public static final Biome BIOME_JUNGLE = new Biome(3, LanguageStrings.BIOME_JUNGLE, 30, 4, 2.5f, 2.5f, 0.2f, 2.5f, 0.15f, 3,
         "#1E6B3C", loadIcon("icons/biomes/Jungle.png"), loadIcon("backgrounds/biomes/JungleTile.png"),
-        BiomeRarity.COMMON, ClimateZone.TROPICAL, false, HydrologyLevel.WET, true);
+        BiomeRarity.COMMON, ClimateZone.TROPICAL, false, HydrologyLevel.WET, true, 4, 6);
     static { biomes.add(BIOME_JUNGLE); }
     public static final Biome BIOME_SWAMP = new Biome(4, LanguageStrings.BIOME_SWAMP, 26, 5, 1.5f, 1.5f, 0f, 1.5f, 0.08f, 2,
         "#5A6B3A", loadIcon("icons/biomes/Swamp.png"), loadIcon("backgrounds/biomes/SwampTile.png"),
-        BiomeRarity.UNCOMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.WET, true);
+        BiomeRarity.UNCOMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.WET, true, 3, 5);
     static { biomes.add(BIOME_SWAMP); }
     public static final Biome BIOME_URBAN = new Biome(5, LanguageStrings.BIOME_URBAN, 28, 1, 0.5f, 0.5f, 0.5f, 0f, 0f, 2,
         "#8A8A8A", loadIcon("icons/biomes/Urban.png"), loadIcon("backgrounds/biomes/UrbanTile.png"),
-        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.DRY, true);
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.DRY, true, 4, 6);
     static { biomes.add(BIOME_URBAN); }
     public static final Biome BIOME_TUNDRA = new Biome(6, LanguageStrings.BIOME_TUNDRA, 5, 2, 0.2f, 0.2f, 0.3f, 0f, 0f, 4,
         "#D8E0E8", loadIcon("icons/biomes/Tundra.png"), loadIcon("backgrounds/biomes/TundraTile.png"),
-        BiomeRarity.COMMON, ClimateZone.ARCTIC, false, HydrologyLevel.DRY, true);
+        BiomeRarity.COMMON, ClimateZone.ARCTIC, false, HydrologyLevel.DRY, true, 4, 7);
     static { biomes.add(BIOME_TUNDRA); }
     public static final Biome BIOME_TAIGA = new Biome(7, LanguageStrings.BIOME_TAIGA, 12, 1, 0.4f, 0.3f, 0.5f, 1f, 0.05f, 3,
         "#4A6B5A", loadIcon("icons/biomes/Taiga.png"), loadIcon("backgrounds/biomes/TaigaTile.png"),
-        BiomeRarity.COMMON, ClimateZone.SUBPOLAR, false, HydrologyLevel.MODERATE, true);
+        BiomeRarity.COMMON, ClimateZone.SUBPOLAR, false, HydrologyLevel.MODERATE, true, 4, 7);
     static { biomes.add(BIOME_TAIGA); }
     public static final Biome BIOME_DESERT = new Biome(8, LanguageStrings.BIOME_DESERT, 45, 0, 0.05f, 0.02f, 1f, 0f, 0f, 4,
         "#E0C070", loadIcon("icons/biomes/Dessert.png"), loadIcon("backgrounds/biomes/DesertTile.png"),
-        BiomeRarity.COMMON, ClimateZone.ARID, false, HydrologyLevel.ARID, true);
+        BiomeRarity.COMMON, ClimateZone.ARID, false, HydrologyLevel.ARID, true, 4, 6);
     static { biomes.add(BIOME_DESERT); }
     public static final Biome BIOME_MOUNTAIN = new Biome(9, LanguageStrings.BIOME_MOUNTAIN, 12, 1, 0.1f, 0.3f, 2f, 0f, 0f, 3,
         "#8B7D6B", loadIcon("icons/biomes/Mountain.png"), loadIcon("backgrounds/biomes/MountainTile.png"),
-        BiomeRarity.UNCOMMON, ClimateZone.ANY, false, HydrologyLevel.DRY, true);
+        BiomeRarity.UNCOMMON, ClimateZone.ANY, false, HydrologyLevel.DRY, true, 7, 8);
     static { biomes.add(BIOME_MOUNTAIN); }
     public static final Biome BIOME_VOLCANIC = new Biome(10, LanguageStrings.BIOME_VOLCANIC, 60, 0, 0.01f, 0.01f, 5f, 0f, 0f, 5,
         "#5A3030", loadIcon("icons/biomes/Volcanic.png"), loadIcon("backgrounds/biomes/VolcanicTile.png"),
-        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, true);
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, true, 5, 8);
     static { biomes.add(BIOME_VOLCANIC); }
     public static final Biome BIOME_LAKE = new Biome(11, LanguageStrings.BIOME_LAKE, 25, 5, 0.5f, 0.5f, 0f, 0f, 0f, 1,
         "#4A90A8", loadIcon("icons/biomes/Lake.png"), loadIcon("backgrounds/biomes/LakeTile.png"),
-        BiomeRarity.UNCOMMON, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false);
+        BiomeRarity.UNCOMMON, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false, 3, 6);
     static { biomes.add(BIOME_LAKE); }
     public static final Biome BIOME_OCEAN = new Biome(12, LanguageStrings.BIOME_OCEAN, 20, 5, 0.2f, 0.2f, 0f, 0f, 0f, 2,
         "#1E4A6E", loadIcon("icons/biomes/Ocean.png"), loadIcon("backgrounds/biomes/OceanTile.png"),
-        BiomeRarity.COMMON, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false);
+        BiomeRarity.COMMON, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false, 1, 2);
     static { biomes.add(BIOME_OCEAN); }
     public static final Biome BIOME_BEACH = new Biome(13, LanguageStrings.BIOME_BEACH, 24, 3, 0.3f, 0.5f, 0.5f, 0f, 0f, 1,
         "#f7e26b", loadIcon("icons/biomes/Beach.png"), loadIcon("backgrounds/biomes/BeachTile.png"),
-        BiomeRarity.COMMON, ClimateZone.TEMPERATE, true, HydrologyLevel.WET, true);
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, true, HydrologyLevel.WET, true, 3, 4);
     static { biomes.add(BIOME_BEACH); }
     public static final Biome BIOME_CLIFFS = new Biome(14, LanguageStrings.BIOME_CLIFFS, 18, 2, 0.2f, 0.4f, 2.0f, 0f, 0f, 2,
         "#676767", loadIcon("icons/biomes/Cliffs.png"), loadIcon("backgrounds/biomes/CliffsTile.png"),
-        BiomeRarity.UNCOMMON, ClimateZone.ANY, true, HydrologyLevel.MODERATE, true);
+        BiomeRarity.UNCOMMON, ClimateZone.ANY, true, HydrologyLevel.MODERATE, true, 3, 6);
     static { biomes.add(BIOME_CLIFFS); }
     public static final Biome BIOME_WETLANDS = new Biome(15, LanguageStrings.BIOME_WETLANDS, 22, 5, 2.0f, 1.8f, 0f, 1.2f, 0.05f, 2,
         "#2f484e", loadIcon("icons/biomes/Wetlands.png"), loadIcon("backgrounds/biomes/WetlandsTile.png"),
-        BiomeRarity.UNCOMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.WET, true);
+        BiomeRarity.UNCOMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.WET, true, 3, 5);
     static { biomes.add(BIOME_WETLANDS); }
     public static final Biome BIOME_MANGROVE = new Biome(16, LanguageStrings.BIOME_MANGROVE, 28, 5, 2.2f, 2.0f, 0.1f, 1.0f, 0.15f, 3,
         "#32100a", loadIcon("icons/biomes/Mangrove.png"), loadIcon("backgrounds/biomes/MangroveTile.png"),
-        BiomeRarity.UNCOMMON, ClimateZone.TROPICAL, true, HydrologyLevel.WET, true);
+        BiomeRarity.UNCOMMON, ClimateZone.TROPICAL, true, HydrologyLevel.WET, true, 3, 4);
     static { biomes.add(BIOME_MANGROVE); }
     public static final Biome BIOME_PRAIRIE = new Biome(17, LanguageStrings.BIOME_PRAIRIE, 20, 2, 1.2f, 1.2f, 0f, 0.1f, 0f, 1,
         "#a3ce27", loadIcon("icons/biomes/Prairie.png"), loadIcon("backgrounds/biomes/PrairieTile.png"),
-        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.DRY, true);
+        BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.DRY, true, 4, 6);
     static { biomes.add(BIOME_PRAIRIE); }
     public static final Biome BIOME_BURNT_FOREST = new Biome(18, LanguageStrings.BIOME_BURNT_FOREST, 35, 0, 0.1f, 0.1f, 1.0f, 0.3f, 0.4f, 4,
         "#493c2b", loadIcon("icons/biomes/BurntForest.png"), loadIcon("backgrounds/biomes/BurntForestTile.png"),
-        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, false);
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, false, 4, 6);
     static { biomes.add(BIOME_BURNT_FOREST); }
     public static final Biome BIOME_ICE_FIELD = new Biome(19, LanguageStrings.BIOME_ICE_FIELD, -15, 1, 0f, 0.05f, 0.2f, 0f, 0f, 5,
         "#b2dcef", loadIcon("icons/biomes/IceField.png"), loadIcon("backgrounds/biomes/IceFieldTile.png"),
-        BiomeRarity.RARE, ClimateZone.ARCTIC, false, HydrologyLevel.DRY, false);
+        BiomeRarity.RARE, ClimateZone.ARCTIC, false, HydrologyLevel.DRY, false, 0, 10);
     static { biomes.add(BIOME_ICE_FIELD); }
+    public static final Biome BIOME_DEEP_OCEAN = new Biome(20, LanguageStrings.BIOME_DEEP_OCEAN, 10, 5, 0.05f, 0.1f, 0f, 0f, 0f, 3,
+        "#1b2632", loadIcon("icons/biomes/DeepOcean.png"), loadIcon("backgrounds/biomes/DeepOceanTile.png"),
+        BiomeRarity.UNCOMMON, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false, 0, 1);
+    static { biomes.add(BIOME_DEEP_OCEAN); }
+    public static final Biome BIOME_SHALLOW_OCEAN = new Biome(21, LanguageStrings.BIOME_SHALLOW_OCEAN, 22, 5, 0.4f, 0.6f, 0.1f, 0f, 0f, 1,
+        "#31a2f2", loadIcon("icons/biomes/ShallowOcean.png"), loadIcon("backgrounds/biomes/ShallowOceanTile.png"),
+        BiomeRarity.COMMON, ClimateZone.ANY, true, HydrologyLevel.AQUATIC, false, 2, 3);
+    static { biomes.add(BIOME_SHALLOW_OCEAN); }
+    public static final Biome BIOME_PEAK = new Biome(22, LanguageStrings.BIOME_PEAK, -5, 2, 0.02f, 0.05f, 3.5f, 0f, 0f, 5,
+        "#b2dcef", loadIcon("icons/biomes/Peak.png"), loadIcon("backgrounds/biomes/PeakTile.png"),
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.DRY, false, 9, 10);
+    static { biomes.add(BIOME_PEAK); }
 
     // --- Resources ---
     public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false,
@@ -1909,6 +1921,15 @@ public final class GameConstants {
         return Collections.unmodifiableList(list);
     }
 
+    public static Biome getBiomeById(int id) {
+        for (Biome b : biomes) {
+            if (b.getId() == id) {
+                return b;
+            }
+        }
+        return null;
+    }
+
     public static List<ResourceType> getResources() { return Collections.unmodifiableList(resources); }
 
     public static ResourceType getResourceById(int id) {
@@ -1921,6 +1942,19 @@ public final class GameConstants {
     }
 
     public static List<TimeOfDay> getTimesOfDay() { return Collections.unmodifiableList(timesOfDay); }  
+
+    public static TimeOfDay getTimeOfDayForHour(int hour) {
+        int h = ((hour % 24) + 24) % 24;
+        if (h >= 5 && h < 7) {
+            return TIME_DAWN;
+        } else if (h >= 7 && h < 18) {
+            return TIME_DAY;
+        } else if (h >= 18 && h < 20) {
+            return TIME_DUSK;
+        } else {
+            return TIME_NIGHT;
+        }
+    }
 
     public static List<MoonPhase> getMoonPhases() { return Collections.unmodifiableList(moonPhases); }
 

@@ -127,8 +127,8 @@ Post launch (v1.3) (Globalization Update):
 	(Secret for now)
 
 World Generation Overhaul Phases:
-	Phase 1: Hex Elevation, Tectonic Plates, and Downhill Topography (0-10 height scale, convergent/divergent/transform faults, mountain peaks, shallow/deep oceans, downhill rivers)
 	Phase 2: Geographic Feature Naming Service (procedural names for rivers, mountain ranges, valleys, and lake basins)
 	Phase 3: Hex Fog of War and Exploration System (sight radius, scout exploration, colonization/diplomacy fog gating, intel trade)
 	Phase 4: Dynamic Cloud Shadows and Natural Disasters (drifting cloud noise layer, earthquakes, tsunamis, tornadoes, meteors)
 	Phase 5: World Generation Setup UI and Debug Map Editor (world parameters configuration dialog, brush paint tool for biomes/altitude/rivers)
+	Phase 6: spectactor mode

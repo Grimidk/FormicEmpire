@@ -1077,6 +1077,7 @@ public final class LanguageStrings {
     public static final String MAP_TOOLTIP_DYNASTY = "MAP_TOOLTIP_DYNASTY";
     public static final String MAP_TOOLTIP_DYNASTY_RANK = "MAP_TOOLTIP_DYNASTY_RANK";
     public static final String MAP_TOOLTIP_EMPTY = "MAP_TOOLTIP_EMPTY";
+    public static final String MAP_TOOLTIP_HEIGHT = "MAP_TOOLTIP_HEIGHT";
     public static final String MAP_DYNASTY_DIPLO_FORMAT = "MAP_DYNASTY_DIPLO_FORMAT";
     public static final String MAP_SORT_BY_POPULATION = "MAP_SORT_BY_POPULATION";
     public static final String MAP_SORT_BY_DIPLOMACY = "MAP_SORT_BY_DIPLOMACY";
@@ -1650,6 +1651,7 @@ public final class LanguageStrings {
     public static final String MULTI_MAP_PARAM_ISLANDS = "MULTI_MAP_PARAM_ISLANDS";
     public static final String MULTI_MAP_PARAM_LAND_SHARE = "MULTI_MAP_PARAM_LAND_SHARE";
     public static final String MULTI_MAP_PARAM_ICECAP = "MULTI_MAP_PARAM_ICECAP";
+    public static final String MULTI_MAP_PARAM_PLATES = "MULTI_MAP_PARAM_PLATES";
     public static final String MULTI_MAP_PARAM_RESET = "MULTI_MAP_PARAM_RESET";
     public static final String MULTI_MAP_PARAM_RANDOMIZE = "MULTI_MAP_PARAM_RANDOMIZE";
     public static final String MULTI_MAP_INSPECT_MAP = "MULTI_MAP_INSPECT_MAP";
@@ -1745,6 +1747,9 @@ public final class LanguageStrings {
     public static final String BIOME_PRAIRIE = "BIOME_PRAIRIE";
     public static final String BIOME_BURNT_FOREST = "BIOME_BURNT_FOREST";
     public static final String BIOME_ICE_FIELD = "BIOME_ICE_FIELD";
+    public static final String BIOME_DEEP_OCEAN = "BIOME_DEEP_OCEAN";
+    public static final String BIOME_SHALLOW_OCEAN = "BIOME_SHALLOW_OCEAN";
+    public static final String BIOME_PEAK = "BIOME_PEAK";
     public static final String CONTINENT_LABEL = "CONTINENT_LABEL";
     public static final String CONTINENT_FMT = "CONTINENT_FMT";
     public static final String ARCHIPELAGO_LABEL = "ARCHIPELAGO_LABEL";
@@ -1810,6 +1815,39 @@ public final class LanguageStrings {
         "ARCHIPELAGO_NAME_TWILIGHT_ISLES",
         "ARCHIPELAGO_NAME_ECHO_ARCHIPELAGO",
         "ARCHIPELAGO_NAME_HIDDEN_ISLES"
+    };
+
+    public static final String[] ISLAND_NAMES = {
+        "ISLAND_NAME_FIRE_ISLAND",
+        "ISLAND_NAME_GOLD_ISLAND",
+        "ISLAND_NAME_SILVER_ISLE",
+        "ISLAND_NAME_CORAL_ISLAND",
+        "ISLAND_NAME_STORM_ISLAND",
+        "ISLAND_NAME_EMERALD_ISLAND",
+        "ISLAND_NAME_SUNKEN_ISLE",
+        "ISLAND_NAME_MOON_ISLAND",
+        "ISLAND_NAME_PEARL_ISLAND",
+        "ISLAND_NAME_OBSIDIAN_ISLAND",
+        "ISLAND_NAME_DRAGON_ISLE",
+        "ISLAND_NAME_MIST_ISLAND",
+        "ISLAND_NAME_WHISPERING_ISLE",
+        "ISLAND_NAME_AMBER_ISLAND",
+        "ISLAND_NAME_SHADOW_ISLE",
+        "ISLAND_NAME_JADE_ISLE",
+        "ISLAND_NAME_WINDWARD_ISLE",
+        "ISLAND_NAME_CRYSTAL_ISLE",
+        "ISLAND_NAME_SAPPHIRE_ISLAND",
+        "ISLAND_NAME_RUBY_ISLE",
+        "ISLAND_NAME_SERPENT_ISLE",
+        "ISLAND_NAME_STAR_ISLAND",
+        "ISLAND_NAME_AZURE_ISLE",
+        "ISLAND_NAME_VOLCANIC_ISLE",
+        "ISLAND_NAME_IRON_ISLAND",
+        "ISLAND_NAME_CLOUD_ISLE",
+        "ISLAND_NAME_FROST_ISLAND",
+        "ISLAND_NAME_TWILIGHT_ISLE",
+        "ISLAND_NAME_ECHO_ISLAND",
+        "ISLAND_NAME_HIDDEN_ISLE"
     };
 
     public static final String TEMP_FREEZING = "TEMP_FREEZING";
@@ -3049,4 +3087,21 @@ public final class LanguageStrings {
     public static final String HELP_COMBAT_WATER_CROSSING = "HELP_COMBAT_WATER_CROSSING";
     public static final String HELP_COMBAT_WATER_CROSSING_BODY = "HELP_COMBAT_WATER_CROSSING_BODY";
     public static final String HELP_COMBAT_CARRIER_DESC = "HELP_COMBAT_CARRIER_DESC";
+
+    public static final String MAP_MODE_BUTTON = "MAP_MODE_BUTTON";
+    public static final String MAP_MODE_BUTTON_TT = "MAP_MODE_BUTTON_TT";
+    public static final String MAP_MODE_BIOME = "MAP_MODE_BIOME";
+    public static final String MAP_MODE_HEIGHT = "MAP_MODE_HEIGHT";
+    public static final String MAP_MODE_TECTONIC_PLATES = "MAP_MODE_TECTONIC_PLATES";
+    public static final String MAP_TOOLTIP_PLATE = "MAP_TOOLTIP_PLATE";
+    public static final String SAVED_MAP_CHOOSE_MODE_TITLE = "SAVED_MAP_CHOOSE_MODE_TITLE";
+    public static final String SAVED_MAP_CHOOSE_MODE_MSG = "SAVED_MAP_CHOOSE_MODE_MSG";
+    public static final String SAVED_MAP_GENERATE_NEW = "SAVED_MAP_GENERATE_NEW";
+    public static final String SAVED_MAP_LOAD_SAVED = "SAVED_MAP_LOAD_SAVED";
+    public static final String SAVED_MAP_GALLERY_TITLE = "SAVED_MAP_GALLERY_TITLE";
+    public static final String SAVED_MAP_PAGE_FMT = "SAVED_MAP_PAGE_FMT";
+    public static final String SAVED_MAP_SELECT = "SAVED_MAP_SELECT";
+    public static final String SAVED_MAP_PROMPT_NAME = "SAVED_MAP_PROMPT_NAME";
+    public static final String SAVED_MAP_EMPTY_GALLERY = "SAVED_MAP_EMPTY_GALLERY";
+    public static final String SAVED_MAP_CONFIRM_DELETE = "SAVED_MAP_CONFIRM_DELETE";
 }

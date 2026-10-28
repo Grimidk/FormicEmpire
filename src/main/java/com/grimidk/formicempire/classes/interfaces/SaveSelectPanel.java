@@ -9,6 +9,9 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
+import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapData;
+import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapService;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.SavedMapSelectionDialog;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
@@ -256,12 +259,43 @@ public class SaveSelectPanel extends JPanel {
             NewSaveRequest request = promptNewSave();
             if (request == null) return;
 
+            SavedMapData chosenMapData = null;
+            if (SavedMapService.hasSavedMaps()) {
+                String[] options = {
+                    LanguageStrings.get(LanguageStrings.SAVED_MAP_GENERATE_NEW),
+                    LanguageStrings.get(LanguageStrings.SAVED_MAP_LOAD_SAVED)
+                };
+                int choice = UiOptionPane.showOptionDialog(
+                        frame,
+                        LanguageStrings.get(LanguageStrings.SAVED_MAP_CHOOSE_MODE_MSG),
+                        LanguageStrings.get(LanguageStrings.SAVED_MAP_CHOOSE_MODE_TITLE),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        options,
+                        options[0]);
+                if (choice == 1) {
+                    SavedMapSelectionDialog dialog = new SavedMapSelectionDialog(frame);
+                    Rectangle maxBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+                    dialog.setBounds(maxBounds);
+                    dialog.setVisible(true);
+                    chosenMapData = dialog.getSelectedMapData();
+                    if (chosenMapData == null) {
+                        return;
+                    }
+                } else if (choice != 0) {
+                    return;
+                }
+            }
+
             Savefile save = new Savefile(slotId, request.baseName());
             save.setPlayerDynastyTitleId(request.titleId());
             save.setStarterBiomeId(request.starterBiomeId());
             save.setVersion(SaveManager.getAppVersion());
             save.setWorldWidth(GameNumbers.WORLD_RECT_WIDTH);
             save.setWorldHeight(GameNumbers.WORLD_RECT_HEIGHT);
+            if (chosenMapData != null) {
+                SavedMapService.populateSavefileFromMapData(save, chosenMapData);
+            }
             if (frame.getEngine().hasAchievementTaintingSandbox()) {
                 save.disableAchievements();
             }

@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -149,11 +150,19 @@ public class WorldPanel extends ZeroGamePanel {
         if (world.getActiveHex().getBiome() != null) {
             biomeLabel.setIcon(world.getActiveHex().getBiome().getIcon());
         }
+        updateMinuteData(world);
+        updateHourData(world);
     }
     
     public void updateMinuteData(World world) {
+        if (world == null) return;
+        Hex activeHex = world.getActiveHex();
+        int hour = (activeHex != null) ? world.getLocalHour(activeHex) : world.getHour();
+        int day = (activeHex != null) ? world.getLocalDay(activeHex) : world.getDay();
+        int month = (activeHex != null) ? world.getLocalMonth(activeHex) : world.getMonth();
+        int year = (activeHex != null) ? world.getLocalYear(activeHex) : world.getYear();
         String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
-            world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
+            hour, world.getMinute(), day, month, year);
         if (!dateTime.equals(lastDateTime)) {
             dateTimeLabel.setText(dateTime);
             lastDateTime = dateTime;
@@ -162,10 +171,12 @@ public class WorldPanel extends ZeroGamePanel {
     
     public void updateHourData(World world) {
         this.lastWorldRef = world;
-        TimeOfDay currentTimeOfDay = world.getTimeOfDay();
+        if (world == null) return;
+        Hex activeHex = world.getActiveHex();
+        TimeOfDay currentTimeOfDay = (activeHex != null) ? world.getTimeOfDay(activeHex) : world.getTimeOfDay();
         if (currentTimeOfDay != lastTimeOfDay) {
-            timeOfDayLabel.setIcon(currentTimeOfDay.getIcon());
-            timeOfDayLabel.setToolTipText(currentTimeOfDay.getName());
+            timeOfDayLabel.setIcon(currentTimeOfDay != null ? currentTimeOfDay.getIcon() : null);
+            timeOfDayLabel.setToolTipText(currentTimeOfDay != null ? currentTimeOfDay.getName() : null);
             lastTimeOfDay = currentTimeOfDay;
         }
         Weather currentWeather = world.getWeather();

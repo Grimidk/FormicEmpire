@@ -26,6 +26,8 @@ public class Biome extends Constant{
     private final boolean coastal;
     private final HydrologyLevel hydrologyLevel;
     private final boolean canStart;
+    private final int minElevation;
+    private final int maxElevation;
     private List<Species> nativeBugs = List.of();
     private List<Species> nativeParasites = List.of();
 
@@ -41,6 +43,15 @@ public class Biome extends Constant{
             float mineralAbundance, float mushroomAbundance, float resinAbundance, int difficulty, String mapColorHex,
             ImageIcon icon, ImageIcon tile, BiomeRarity rarity, ClimateZone climateZone, boolean coastal,
             HydrologyLevel hydrologyLevel, boolean canStart) {
+        this(id, name, temperature, humidity, plantAbundance, animalAbundance, mineralAbundance, mushroomAbundance,
+                resinAbundance, difficulty, mapColorHex, icon, tile, rarity, climateZone, coastal,
+                hydrologyLevel, canStart, 0, 10);
+    }
+
+    public Biome(int id, String name, int temperature, int humidity, float plantAbundance, float animalAbundance,
+            float mineralAbundance, float mushroomAbundance, float resinAbundance, int difficulty, String mapColorHex,
+            ImageIcon icon, ImageIcon tile, BiomeRarity rarity, ClimateZone climateZone, boolean coastal,
+            HydrologyLevel hydrologyLevel, boolean canStart, int minElevation, int maxElevation) {
         super(id, name, icon);
         this.temperature = temperature;
         this.humidity = humidity;
@@ -59,6 +70,8 @@ public class Biome extends Constant{
         this.coastal = coastal;
         this.hydrologyLevel = hydrologyLevel != null ? hydrologyLevel : HydrologyLevel.MODERATE;
         this.canStart = canStart;
+        this.minElevation = Math.max(0, Math.min(10, minElevation));
+        this.maxElevation = Math.max(this.minElevation, Math.min(10, maxElevation));
     }
 
     public static String normalizeMapColorHex(String hex) {
@@ -144,4 +157,9 @@ public class Biome extends Constant{
     public HydrologyLevel getHydrologyLevel() { return hydrologyLevel; }
     public boolean canStart() { return canStart; }
     public boolean isCanStart() { return canStart; }
+    public int getMinElevation() { return minElevation; }
+    public int getMaxElevation() { return maxElevation; }
+    public boolean supportsElevation(int elevation) {
+        return elevation >= minElevation && elevation <= maxElevation;
+    }
 }
