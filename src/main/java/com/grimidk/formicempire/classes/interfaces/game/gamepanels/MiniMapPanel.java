@@ -270,16 +270,16 @@ public class MiniMapPanel extends ZeroGamePanel {
             return;
         }
 
-        List<Hex> landHexes = new ArrayList<>();
+        List<Hex> validHexes = new ArrayList<>();
         hexLookup.clear();
         for (Hex hex : snapshot) {
-            if (hex == null || isOcean(hex)) {
+            if (hex == null) {
                 continue;
             }
-            landHexes.add(hex);
+            validHexes.add(hex);
             hexLookup.put(packKey(hex.getQ(), hex.getR()), hex);
         }
-        if (landHexes.isEmpty() && world.getWorldWidth() <= 0) {
+        if (validHexes.isEmpty()) {
             cachedBakedBaseImage = null;
             return;
         }
@@ -289,27 +289,25 @@ public class MiniMapPanel extends ZeroGamePanel {
         try {
             bg2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             if (world.getWorldWidth() > 0) {
-                bg2d.setColor(GameConstants.BIOME_DEEP_OCEAN.getMapColor());
+                bg2d.setColor(getBiomeColor(GameConstants.BIOME_DEEP_OCEAN));
                 bg2d.fillRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(worldBoxW), (int) Math.round(worldBoxH));
                 bg2d.setColor(AssetStyles.BORDER_COLOR);
                 bg2d.drawRect((int) Math.round(worldBoxX), (int) Math.round(worldBoxY), (int) Math.round(worldBoxW), (int) Math.round(worldBoxH));
             }
 
-            if (!landHexes.isEmpty()) {
-                HexGridMesh mesh = HexGridMesh.build(
-                        landHexes,
-                        originX,
-                        originY,
-                        hexRadius,
-                        (q, r) -> hexLookup.get(packKey(q, r)));
-                mesh.paintFills(bg2d, face -> getBiomeColor(face.hex.getBiome()));
-                mesh.paintDividers(
-                        bg2d,
-                        true,
-                        face -> getBiomeColor(face.hex.getBiome()),
-                        AssetStyles.BORDER_COLOR);
-                mesh.paintRivers(bg2d);
-            }
+            HexGridMesh mesh = HexGridMesh.build(
+                    validHexes,
+                    originX,
+                    originY,
+                    hexRadius,
+                    (q, r) -> hexLookup.get(packKey(q, r)));
+            mesh.paintFills(bg2d, face -> getBiomeColor(face.hex.getBiome()));
+            mesh.paintDividers(
+                    bg2d,
+                    false,
+                    face -> getBiomeColor(face.hex.getBiome()),
+                    AssetStyles.BORDER_COLOR);
+            mesh.paintRivers(bg2d);
         } finally {
             bg2d.dispose();
         }
@@ -338,13 +336,10 @@ public class MiniMapPanel extends ZeroGamePanel {
         if (mapColor == null) {
             return AssetStyles.BACKGROUND_COLOR;
         }
-        biomeColorCache.put(biome.getId(), mapColor);
-        return mapColor;
-    }
-
-    private static boolean isOcean(Hex hex) {
-        return hex != null && (hex.getBiome() == GameConstants.BIOME_OCEAN
-                || hex.getBiome() == GameConstants.BIOME_DEEP_OCEAN);
+        float fade = AssetStyles.mapInactiveHexFade();
+        Color faded = AssetStyles.fadeTowardBackground(mapColor, fade);
+        biomeColorCache.put(biome.getId(), faded);
+        return faded;
     }
 
     private static double axialX(int q, int r) {

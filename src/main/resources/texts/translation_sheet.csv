@@ -2689,3 +2689,150 @@ SAVED_MAP_SELECT,Play Map,Jugar mapa,Jogar mapa,Jouer la carte
 SAVED_MAP_PROMPT_NAME,Enter a name for this saved map:,Introduce un nombre para este mapa guardado:,Digite um nome para este mapa salvo:,Entrez un nom pour cette carte enregistrée :
 SAVED_MAP_EMPTY_GALLERY,No saved maps found.,No se encontraron mapas guardados.,Nenhum mapa salvo encontrado.,Aucune carte enregistrée trouvée.
 SAVED_MAP_CONFIRM_DELETE,Delete saved map '%s'?,¿Eliminar el mapa guardado '%s'?,Excluir mapa salvo '%s'?,Supprimer la carte enregistrée '%s' ?
+MAP_LAYER_GEOGRAPHIC_NAMES,Geographic Names,Nombres Geográficos,Nomes Geográficos,Noms Géographiques
+MAP_TOOLTIP_GEOGRAPHIC_FEATURE,<br>Feature: ,<br>Accidente: ,<br>Acidente: ,<br>Caractéristique : 
+GEOGRAPHIC_FEATURE_RIVER,River,Río,Rio,Rivière
+GEOGRAPHIC_FEATURE_MOUNTAIN_RANGE,Mountain Range,Cordillera,Cordilheira,Chaîne de montagnes
+GEOGRAPHIC_FEATURE_VALLEY,Valley,Valle,Vale,Vallée
+GEOGRAPHIC_FEATURE_LAKE_BASIN,Lake,Lago,Lago,Lac
+FEATURE_NAME_RIVER_SILVER,Silver River,Río de Plata,Rio de Prata,Rivière d'Argent
+FEATURE_NAME_RIVER_WHISPERING,Whispering Stream,Arroyo Susurrante,Riacho Sussurrante,Ruisseau Murmurant
+FEATURE_NAME_RIVER_SERPENT,Serpent River,Río Serpiente,Rio Serpente,Rivière du Serpent
+FEATURE_NAME_RIVER_CRYSTAL,Crystal Flow,Corriente de Cristal,Fluxo de Cristal,Courant de Cristal
+FEATURE_NAME_RIVER_GOLDEN,Golden River,Río Dorado,Rio Dourado,Rivière Dorée
+FEATURE_NAME_RIVER_EMERALD,Emerald Brook,Arroyo Esmeralda,Riacho Esmeralda,Ruisseau d'Émeraude
+FEATURE_NAME_RIVER_COLD,Cold River,Río Frío,Rio Frio,Rivière Froide
+FEATURE_NAME_RIVER_SHADOW,Shadow Stream,Corriente Sombría,Fluxo das Sombras,Courant des Ombres
+FEATURE_NAME_RIVER_SUN,Sun Waters,Aguas del Sol,Águas do Sol,Eaux du Soleil
+FEATURE_NAME_RIVER_WILD,Wild River,Río Salvaje,Rio Selvagem,Rivière Sauvage
+FEATURE_NAME_RIVER_MIST,Mist Brook,Arroyo de la Niebla,Riacho da Névoa,Ruisseau des Brumes
+FEATURE_NAME_RIVER_BLUE,Blue River,Río Azul,Rio Azul,Rivière Bleue
+FEATURE_NAME_RIVER_AMBER,Amber Flow,Corriente de Ámbar,Fluxo de Âmbar,Courant d'Ambre
+FEATURE_NAME_RIVER_JADE,Jade Stream,Arroyo de Jade,Riacho de Jade,Ruisseau de Jade
+FEATURE_NAME_RIVER_ECHO,Echo River,Río del Eco,Rio do Eco,Rivière de l'Écho
+FEATURE_NAME_RIVER_RAPID,Rapid Flow,Torrente Rápido,Torrente Rápida,Flot Rapide
+FEATURE_NAME_RIVER_MOON,Moon Waters,Aguas de la Luna,Águas da Lua,Eaux de la Lune
+FEATURE_NAME_RIVER_TWILIGHT,Twilight Stream,Arroyo del Crepúsculo,Riacho do Crepúsculo,Ruisseau du Crépuscule
+FEATURE_NAME_RIVER_IRON,Iron River,Río de Hierro,Rio de Ferro,Rivière de Fer
+FEATURE_NAME_RIVER_CLEAR,Clear Waters,Aguas Claras,Águas Claras,Eaux Claires
+FEATURE_NAME_MOUNTAIN_IRON_PEAKS,Iron Peaks,Picos de Hierro,Picos de Ferro,Pics de Fer
+FEATURE_NAME_MOUNTAIN_CRYSTAL_HEIGHTS,Crystal Heights,Alturas de Cristal,Alturas de Cristal,Hauteurs de Cristal
+FEATURE_NAME_MOUNTAIN_DRAGON_SPINE,Dragon Spine,Espina del Dragón,Espinha do Dragão,Échine du Dragon
+FEATURE_NAME_MOUNTAIN_MIST_RANGE,Mist Range,Sierra de la Niebla,Serra da Névoa,Chaîne des Brumes
+FEATURE_NAME_MOUNTAIN_SHADOW_RIDGE,Shadow Ridge,Cresta de las Sombras,Crista das Sombras,Crête des Ombres
+FEATURE_NAME_MOUNTAIN_FROZEN_PEAKS,Frozen Peaks,Picos Helados,Picos Congelados,Pics Gelés
+FEATURE_NAME_MOUNTAIN_GOLDEN_RANGE,Golden Range,Sierra Dorada,Serra Dourada,Chaîne Dorée
+FEATURE_NAME_MOUNTAIN_EMERALD_HEIGHTS,Emerald Heights,Alturas Esmeralda,Alturas Esmeralda,Hauteurs d'Émeraude
+FEATURE_NAME_MOUNTAIN_CLOUD_PEAKS,Cloud Peaks,Picos de las Nubes,Picos das Nuvens,Pics des Nuages
+FEATURE_NAME_MOUNTAIN_OBSIDIAN_RIDGE,Obsidian Ridge,Cresta de Obsidiana,Crista de Obsidiana,Crête d'Obsidienne
+FEATURE_NAME_MOUNTAIN_THUNDER_PEAKS,Thunder Peaks,Picos del Trueno,Picos do Trovão,Pics du Tonnerre
+FEATURE_NAME_MOUNTAIN_SILVER_RANGE,Silver Range,Sierra de Plata,Serra de Prata,Chaîne d'Argent
+FEATURE_NAME_MOUNTAIN_ANCIENT_MOUNTAINS,Ancient Mountains,Montes Antiguos,Montes Antigos,Montagnes Anciennes
+FEATURE_NAME_MOUNTAIN_STORM_HEIGHTS,Storm Heights,Alturas de la Tormenta,Alturas da Tempestade,Hauteurs de la Tempête
+FEATURE_NAME_MOUNTAIN_SUN_PEAKS,Sun Peaks,Picos del Sol,Picos do Sol,Pics du Soleil
+FEATURE_NAME_MOUNTAIN_ECHO_RIDGE,Echo Ridge,Cresta del Eco,Crista do Eco,Crête de l'Écho
+FEATURE_NAME_MOUNTAIN_WIND_RANGE,Wind Range,Sierra del Viento,Serra do Vento,Chaîne du Vent
+FEATURE_NAME_MOUNTAIN_SERPENT_SPINE,Serpent Spine,Espina de la Serpiente,Espinha da Serpente,Échine du Serpent
+FEATURE_NAME_MOUNTAIN_TWILIGHT_PEAKS,Twilight Peaks,Picos del Crepúsculo,Picos do Crepúsculo,Pics du Crépuscule
+FEATURE_NAME_MOUNTAIN_VOLCANIC_RIDGE,Volcanic Ridge,Cresta Volcánica,Crista Vulcânica,Crête Volcanique
+FEATURE_NAME_VALLEY_GREEN,Green Valley,Valle Verde,Vale Verde,Vallée Verte
+FEATURE_NAME_VALLEY_SHADOW,Shadow Hollow,Hondonada de las Sombras,Garganta das Sombras,Combe des Ombres
+FEATURE_NAME_VALLEY_SILENT,Silent Glen,Cañada Silenciosa,Ravina Silenciosa,Vallon Silencieux
+FEATURE_NAME_VALLEY_MISTY,Misty Valley,Valle Brumoso,Vale Nebuloso,Vallée Brumeuse
+FEATURE_NAME_VALLEY_GOLDEN,Golden Canyon,Cañón Dorado,Cânion Dourado,Canyon Doré
+FEATURE_NAME_VALLEY_LOST,Lost Valley,Valle Perdido,Vale Perdido,Vallée Perdue
+FEATURE_NAME_VALLEY_EMERALD,Emerald Glen,Cañada Esmeralda,Ravina Esmeralda,Vallon d'Émeraude
+FEATURE_NAME_VALLEY_HIDDEN,Hidden Hollow,Hondonada Oculta,Garganta Oculta,Combe Cachée
+FEATURE_NAME_VALLEY_SUN,Sun Valley,Valle del Sol,Vale do Sol,Vallée du Soleil
+FEATURE_NAME_VALLEY_ECHO,Echo Canyon,Cañón del Eco,Cânion do Eco,Canyon de l'Écho
+FEATURE_NAME_VALLEY_PEACEFUL,Peaceful Valley,Valle Apacible,Vale Pacífico,Vallée Paisible
+FEATURE_NAME_VALLEY_WIND,Wind Gorge,Garganta del Viento,Desfiladeiro do Vento,Gorge du Vent
+FEATURE_NAME_VALLEY_FORGOTTEN,Forgotten Hollow,Hondonada Olvidada,Garganta Esquecida,Combe Oubliée
+FEATURE_NAME_VALLEY_AMBER,Amber Valley,Valle de Ámbar,Vale de Âmbar,Vallée d'Ambre
+FEATURE_NAME_VALLEY_TWILIGHT,Twilight Glen,Cañada del Crepúsculo,Ravina do Crepúsculo,Vallon du Crépuscule
+FEATURE_NAME_VALLEY_DEEP,Deep Canyon,Cañón Profundo,Cânion Profundo,Canyon Profond
+FEATURE_NAME_VALLEY_BLOOMING,Blooming Valley,Valle Florido,Vale Florido,Vallée Fleurie
+FEATURE_NAME_VALLEY_WHISPERING,Whispering Hollow,Hondonada Susurrante,Garganta Sussurrante,Combe Murmurante
+FEATURE_NAME_VALLEY_SERPENT,Serpent Gorge,Garganta de la Serpiente,Desfiladeiro da Serpente,Gorge du Serpent
+FEATURE_NAME_VALLEY_CRYSTAL,Crystal Valley,Valle de Cristal,Vale de Cristal,Vallée de Cristal
+FEATURE_NAME_LAKE_CRYSTAL,Crystal Lake,Lago de Cristal,Lago de Cristal,Lac de Cristal
+FEATURE_NAME_LAKE_MIRROR,Mirror Basin,Cuenca del Espejo,Bacia do Espelho,Bassin du Miroir
+FEATURE_NAME_LAKE_SILVER,Silver Waters,Aguas de Plata,Águas de Prata,Eaux d'Argent
+FEATURE_NAME_LAKE_DEEP,Deep Lake,Lago Profundo,Lago Profundo,Lac Profond
+FEATURE_NAME_LAKE_MOON,Moon Basin,Cuenca de la Luna,Bacia da Lua,Bassin de la Lune
+FEATURE_NAME_LAKE_EMERALD,Emerald Lake,Lago Esmeralda,Lago Esmeralda,Lac d'Émeraude
+FEATURE_NAME_LAKE_STILL,Still Waters,Aguas Tranquilas,Águas Calmas,Eaux Calmes
+FEATURE_NAME_LAKE_SUNKEN,Sunken Basin,Cuenca Hundida,Bacia Submersa,Bassin Englouti
+FEATURE_NAME_LAKE_BLUE,Blue Lake,Lago Azul,Lago Azul,Lac Bleu
+FEATURE_NAME_LAKE_MIST,Mist Waters,Aguas de la Niebla,Águas da Névoa,Eaux des Brumes
+FEATURE_NAME_LAKE_GOLDEN,Golden Lake,Lago Dorado,Lago Dourado,Lac Doré
+FEATURE_NAME_LAKE_SHADOW,Shadow Basin,Cuenca de las Sombras,Bacia das Sombras,Bassin des Ombres
+FEATURE_NAME_LAKE_PEARL,Pearl Lake,Lago de las Perlas,Lago das Pérolas,Lac aux Perles
+FEATURE_NAME_LAKE_ECHO,Echo Waters,Aguas del Eco,Águas do Eco,Eaux de l'Écho
+FEATURE_NAME_LAKE_CLEAR,Clear Lake,Lago Claro,Lago Claro,Lac Clair
+FEATURE_NAME_LAKE_TWILIGHT,Twilight Basin,Cuenca del Crepúsculo,Bacia do Crepúsculo,Bassin du Crépuscule
+FEATURE_NAME_LAKE_STAR,Star Lake,Lago de las Estrellas,Lago das Estrelas,Lac des Étoiles
+FEATURE_NAME_LAKE_SACRED,Sacred Waters,Aguas Sagradas,Águas Sagradas,Eaux Sacrées
+FEATURE_NAME_LAKE_OBSIDIAN,Obsidian Lake,Lago de Obsidiana,Lago de Obsidiana,Lac d'Obsidienne
+FEATURE_NAME_LAKE_AMBER,Amber Basin,Cuenca de Ámbar,Bacia de Âmbar,Bassin d'Ambre
+SAVED_MAP_DELETE,Delete,Eliminar,Excluir,Supprimer
+SAVED_MAP_CLEAR_ALL,Clear All,Borrar todos,Limpar tudo,Tout effacer
+SAVED_MAP_CONFIRM_CLEAR_ALL,Delete all saved maps? This cannot be undone.,¿Eliminar todos los mapas guardados? Esta acción no se puede deshacer.,Excluir todos os mapas salvos? Esta ação não pode ser desfeita.,Supprimer toutes les cartes enregistrées ? Cette action est irréversible.
+GEOGRAPHIC_FEATURE_OCEAN,Ocean,Océano,Oceano,Océan
+GEOGRAPHIC_FEATURE_PENINSULA,Peninsula,Península,Península,Péninsule
+GEOGRAPHIC_FEATURE_ARCHIPELAGO,Archipelago,Archipiélago,Arquipélago,Archipel
+GEOGRAPHIC_FEATURE_ICE_CAP,Ice Cap,Casquete Polar,Calota Polar,Calotte Glaciaire
+GEOGRAPHIC_FEATURE_CONTINENT,Continent,Continente,Continente,Continent
+FEATURE_NAME_OCEAN_ABYSSAL,Abyssal Ocean,Océano Abisal,Oceano Abissal,Océan Abyssal
+FEATURE_NAME_OCEAN_SAPPHIRE,Sapphire Sea,Mar de Zafiro,Mar de Safira,Mer de Saphir
+FEATURE_NAME_OCEAN_STORMY,Stormy Expanse,Extensión Tormentosa,Extensão Tempestuosa,Étendue Tempétueuse
+FEATURE_NAME_OCEAN_TRANQUIL,Tranquil Deep,Fosa Tranquila,Profundeza Tranquila,Fosse Tranquille
+FEATURE_NAME_OCEAN_AZURE,Azure Ocean,Océano Azur,Oceano Azul,Océan Azur
+FEATURE_NAME_OCEAN_VERDANT,Emerald Reach,Estrecho Esmeralda,Estreito Esmeralda,Détroit d'Émeraude
+FEATURE_NAME_OCEAN_CORAL,Coral Sea,Mar de Coral,Mar de Coral,Mer de Corail
+FEATURE_NAME_OCEAN_ENDLESS,Endless Sea,Mar Infinito,Mar Infinito,Mer Infinie
+FEATURE_NAME_OCEAN_COLD,Frozen Sea,Mar Helado,Mar Congelado,Mer Glacée
+FEATURE_NAME_OCEAN_SUNKEN,Sunken Basin,Cuenca Hundida,Bacia Submersa,Bassin Englouti
+FEATURE_NAME_OCEAN_MYSTIC,Mystic Tides,Mareas Místicas,Marés Místicas,Marées Mystiques
+FEATURE_NAME_OCEAN_TITAN,Titan Ocean,Océano Titán,Oceano Titã,Océan Titan
+FEATURE_NAME_PENINSULA_SERPENT,Serpent Cape,Cabo Serpiente,Cabo Serpente,Cap du Serpent
+FEATURE_NAME_PENINSULA_SPEAR,Spearhead Peninsula,Península de la Lanza,Península da Lança,Péninsule du Harpon
+FEATURE_NAME_PENINSULA_CRESCENT,Crescent Horn,Cuerno Creciente,Chifre Crescente,Corne Croissante
+FEATURE_NAME_PENINSULA_TALON,Talon Reach,Saliente de la Garra,Ponta da Garra,Pointe de la Serre
+FEATURE_NAME_PENINSULA_DRAGON,Dragon's Tail,Cola de Dragón,Cauda de Dragão,Queue de Dragon
+FEATURE_NAME_PENINSULA_SUN,Sunken Promontory,Promontorio Hundido,Promontório Submerso,Promontoire Englouti
+FEATURE_NAME_PENINSULA_WINDSWEPT,Windswept Point,Punta Ventosa,Ponta dos Ventos,Pointe Balayée
+FEATURE_NAME_PENINSULA_EMERALD,Emerald Peninsula,Península Esmeralda,Península Esmeralda,Péninsule d'Émeraude
+FEATURE_NAME_PENINSULA_CLIFF,Cliffhead,Escarpa Costera,Ponta do Penhasco,Falaise Côtière
+FEATURE_NAME_PENINSULA_JAGGED,Jagged Spit,Saliente Dentado,Pontal Espinhoso,Flèche Dentelée
+FEATURE_NAME_PENINSULA_SILVER,Silver Horn,Cuerno de Plata,Chifre de Prata,Corne d'Argent
+FEATURE_NAME_PENINSULA_GOLDEN,Golden Cape,Cabo Dorado,Cabo Dourado,Cap Doré
+BIOME_ABYSS,Abyss,Abismo,Abismo,Abysse
+GEOGRAPHIC_FEATURE_TRENCH,Trench,Fosa,Fossa,Fosse
+FEATURE_NAME_TRENCH_MARIANA,Mariana Trench,Fosa de las Marianas,Fossa das Marianas,Fosse des Mariannes
+FEATURE_NAME_TRENCH_ABYSSAL,Abyssal Trench,Fosa Abisal,Fossa Abissal,Fosse Abyssale
+FEATURE_NAME_TRENCH_HADAL,Hadal Chasm,Sima Hadal,Abismo Hadal,Fosse Hadale
+FEATURE_NAME_TRENCH_ECLIPSE,Eclipse Trench,Fosa Eclipse,Fossa Eclipse,Fosse Eclipse
+FEATURE_NAME_TRENCH_VOID,Void Trench,Fosa del Vacío,Fossa do Vazio,Fosse du Vide
+FEATURE_NAME_TRENCH_LEVIATHAN,Leviathan Trench,Fosa de Leviatán,Fossa do Leviatã,Fosse du Léviathan
+FEATURE_NAME_TRENCH_CHASM,Silent Chasm,Sima Silenciosa,Abismo Silencioso,Gouffre Silencieux
+FEATURE_NAME_TRENCH_OBSIDIAN,Obsidian Trench,Fosa Obsidiana,Fossa Obsidiana,Fosse Obsidienne
+FEATURE_NAME_TRENCH_NEPTUNE,Neptune Trench,Fosa de Neptuno,Fossa de Neptuno,Fosse de Neptune
+FEATURE_NAME_TRENCH_KRAKEN,Kraken Trench,Fosa del Kraken,Fossa do Kraken,Fosse du Kraken
+FEATURE_NAME_TRENCH_MIDNIGHT,Midnight Trench,Fosa de Medianoche,Fossa da Meia-Noite,Fosse de Minuit
+FEATURE_NAME_TRENCH_TETHYS,Tethys Trench,Fosa de Tetis,Fossa de Tétis,Fosse de Téthys
+MAP_LAYER_GROUP_DYNASTIC,Dynastic,Dinástico,Dinástico,Dynastique
+MAP_LAYER_GROUP_GEOGRAPHICAL,Geographical,Geográfico,Geográfico,Géographique
+MAP_LAYER_GROUP_LABELS,Labels,Etiquetas,Rótulos,Étiquettes
+MAP_LAYER_CAPITALS,Capitals,Capitales,Capitais,Capitales
+MAP_LAYER_LABEL_CONTINENTS,Continents,Continentes,Continentes,Continents
+MAP_LAYER_LABEL_ICE_CAPS,Ice caps,Casquetes polares,Calotas polares,Calottes glaciaires
+MAP_LAYER_LABEL_ARCHIPELAGOS,Archipelagos,Archipiélagos,Arquipélagos,Archipels
+MAP_LAYER_LABEL_OCEANS,Oceans,Océanos,Oceanos,Océans
+MAP_LAYER_LABEL_TRENCHES,Trenches,Fosas marinas,Fossas oceânicas,Fosses marines
+MAP_LAYER_LABEL_MOUNTAINS,Mountain ranges,Cordilleras,Cordilheiras,Chaînes de montagnes
+MAP_LAYER_LABEL_VALLEYS,Valleys,Valles,Vales,Vallées
+MAP_LAYER_LABEL_LAKES,Lake basins,Cuencas de lagos,Bacias de lagos,Bassins lacustres
+MAP_LAYER_LABEL_RIVERS,River names,Nombres de ríos,Nomes de rios,Noms de rivières
+MAP_LAYER_LABEL_PENINSULAS,Peninsulas,Penínsulas,Penínsulas,Péninsules
+MAP_LAYER_ALL,All layers,Todas las capas,Todas as camadas,Tous les calques

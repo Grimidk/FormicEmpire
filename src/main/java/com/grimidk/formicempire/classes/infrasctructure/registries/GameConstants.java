@@ -562,9 +562,13 @@ public final class GameConstants {
         BiomeRarity.COMMON, ClimateZone.ANY, true, HydrologyLevel.AQUATIC, false, 2, 3);
     static { biomes.add(BIOME_SHALLOW_OCEAN); }
     public static final Biome BIOME_PEAK = new Biome(22, LanguageStrings.BIOME_PEAK, -5, 2, 0.02f, 0.05f, 3.5f, 0f, 0f, 5,
-        "#b2dcef", loadIcon("icons/biomes/Peak.png"), loadIcon("backgrounds/biomes/PeakTile.png"),
+        "#e8ecf2", loadIcon("icons/biomes/Peak.png"), loadIcon("backgrounds/biomes/PeakTile.png"),
         BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.DRY, false, 9, 10);
     static { biomes.add(BIOME_PEAK); }
+    public static final Biome BIOME_ABYSS = new Biome(23, LanguageStrings.BIOME_ABYSS, 4, 5, 0f, 0.02f, 0.1f, 0f, 0f, 5,
+        "#090f1a", loadIcon("icons/biomes/Abyss.png"), loadIcon("backgrounds/biomes/AbyssTile.png"),
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false, 0, 0);
+    static { biomes.add(BIOME_ABYSS); }
 
     // --- Resources ---
     public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false,

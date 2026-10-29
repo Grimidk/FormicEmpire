@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MapDialogModeTest {
 
@@ -113,6 +115,81 @@ class MapDialogModeTest {
                 Graphics2D g = img.createGraphics();
                 dialog.paint(g);
                 g.dispose();
+            } finally {
+                dialog.dispose();
+            }
+        });
+    }
+
+    @Test
+    void geographicNamesLayerToggleAndRendering() throws Exception {
+        World world = new World();
+        world.setWorldWidth(10);
+        world.setWorldHeight(10);
+
+        Map<String, Hex> hexMap = new HashMap<>();
+        for (int r = -5; r < 5; r++) {
+            for (int q = -5; q < 5; q++) {
+                Hex h = new Hex();
+                h.setQ(q);
+                h.setR(r);
+                h.setBiome(GameConstants.BIOME_PLAINS);
+                h.setElevation(2);
+                hexMap.put(q + "," + r, h);
+            }
+        }
+        world.linkNeighbors(hexMap);
+        world.setHexes(new ArrayList<>(hexMap.values()));
+
+        Hex m1 = hexMap.get("0,0");
+        Hex m2 = hexMap.get("1,0");
+        m1.setBiome(GameConstants.BIOME_MOUNTAIN);
+        m1.setElevation(8);
+        m2.setBiome(GameConstants.BIOME_PEAK);
+        m2.setElevation(9);
+        world.generateGeographicFeatures();
+
+        SwingUtilities.invokeAndWait(() -> {
+            MapDialog dialog = new MapDialog(null, null, world, null, null);
+            try {
+                dialog.setSize(800, 600);
+                dialog.doLayout();
+
+                assertTrue(dialog.isShowGeographicNames());
+
+                BufferedImage img = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = img.createGraphics();
+                dialog.paint(g);
+
+                dialog.setShowGeographicNames(false);
+                assertFalse(dialog.isShowGeographicNames());
+                dialog.paint(g);
+
+                dialog.setShowGeographicNames(true);
+                assertTrue(dialog.isShowGeographicNames());
+                dialog.paint(g);
+                g.dispose();
+            } finally {
+                dialog.dispose();
+            }
+        });
+    }
+
+    @Test
+    void testMapDialogLayersMenuAndGroupToggles() throws Exception {
+        World world = new World();
+        world.generateRectangularWorld(GameConstants.BIOME_PLAINS, new Colony(1, "Capital", true), "Player", LanguageStrings.DYNASTY_TITLE_DYNASTY);
+        SwingUtilities.invokeAndWait(() -> {
+            MapDialog dialog = new MapDialog(null, null, world, null, null);
+            try {
+                dialog.setSize(800, 600);
+                dialog.doLayout();
+                dialog.showLayersMenu();
+                assertTrue(dialog.isShowCapitals());
+                dialog.setShowCapitals(false);
+                assertFalse(dialog.isShowCapitals());
+                dialog.setShowCapitals(true);
+                assertTrue(dialog.isShowCapitals());
             } finally {
                 dialog.dispose();
             }

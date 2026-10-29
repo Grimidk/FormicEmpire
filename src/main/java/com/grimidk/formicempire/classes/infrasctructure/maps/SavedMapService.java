@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.infrasctructure.maps;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.grimidk.formicempire.classes.entities.world.GeographicFeature;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -48,6 +49,26 @@ public class SavedMapService {
         return files;
     }
 
+    public static boolean deleteMapFile(File file) {
+        if (file != null && file.exists()) {
+            return file.delete();
+        }
+        return false;
+    }
+
+    public static boolean clearAllSavedMaps() {
+        File[] files = getSavedMapFiles();
+        boolean allSuccess = true;
+        for (File f : files) {
+            if (f != null && f.exists()) {
+                if (!f.delete()) {
+                    allSuccess = false;
+                }
+            }
+        }
+        return allSuccess;
+    }
+
     public static SavedMapData createSavedMapData(World world, String mapName) {
         SavedMapData data = new SavedMapData();
         data.mapName = mapName;
@@ -85,6 +106,23 @@ public class SavedMapService {
                     System.arraycopy(h.getRiverEdges(), 0, sh.riverEdges, 0, Math.min(6, h.getRiverEdges().length));
                 }
                 data.hexes.add(sh);
+            }
+        }
+
+        if (world.getGeographicFeatures() != null) {
+            for (GeographicFeature gf : world.getGeographicFeatures()) {
+                if (gf == null) continue;
+                SavedMapData.SavedMapFeature smf = new SavedMapData.SavedMapFeature();
+                smf.id = gf.getId();
+                smf.type = gf.getType().name();
+                smf.name = gf.getName();
+                smf.nameKey = gf.getNameKey();
+                for (Hex h : gf.getHexes()) {
+                    if (h != null) {
+                        smf.hexCoords.add(new int[]{h.getQ(), h.getR()});
+                    }
+                }
+                data.features.add(smf);
             }
         }
         return data;
@@ -152,6 +190,27 @@ public class SavedMapService {
         world.linkNeighbors(hexMap);
         world.classifyLandmasses();
         world.ensureFaultLinesReconstructed();
+
+        if (data.features != null && !data.features.isEmpty()) {
+            world.clearGeographicFeatures();
+            for (SavedMapData.SavedMapFeature smf : data.features) {
+                try {
+                    GeographicFeature.FeatureType type = GeographicFeature.FeatureType.valueOf(smf.type);
+                    GeographicFeature gf = new GeographicFeature(smf.id, type, smf.name, smf.nameKey);
+                    if (smf.hexCoords != null) {
+                        for (int[] coord : smf.hexCoords) {
+                            Hex h = world.getHexAt(coord[0], coord[1]);
+                            if (h != null) {
+                                gf.addHex(h);
+                            }
+                        }
+                    }
+                    world.addGeographicFeature(gf);
+                } catch (Exception ignore) {}
+            }
+        } else {
+            world.ensureGeographicFeaturesReconstructed();
+        }
         return world;
     }
 

@@ -100,6 +100,7 @@ public final class CoastalTideRenderer {
         return b == GameConstants.BIOME_OCEAN
                 || b == GameConstants.BIOME_DEEP_OCEAN
                 || b == GameConstants.BIOME_SHALLOW_OCEAN
+                || b == GameConstants.BIOME_ABYSS
                 || b == GameConstants.BIOME_LAKE;
     }
 

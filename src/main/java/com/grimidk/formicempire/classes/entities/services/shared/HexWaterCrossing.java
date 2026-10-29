@@ -23,6 +23,7 @@ public final class HexWaterCrossing {
         return biome == GameConstants.BIOME_OCEAN
                 || biome == GameConstants.BIOME_DEEP_OCEAN
                 || biome == GameConstants.BIOME_SHALLOW_OCEAN
+                || biome == GameConstants.BIOME_ABYSS
                 || biome == GameConstants.BIOME_LAKE;
     }
 

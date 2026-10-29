@@ -52,10 +52,12 @@ public class SavedMapSelectionDialog extends JDialog {
     private final List<JLabel> nameLabels = new ArrayList<>();
     private final List<JLabel> statLabels = new ArrayList<>();
     private final List<JButton> selectButtons = new ArrayList<>();
+    private final List<JButton> deleteButtons = new ArrayList<>();
 
     private final JButton prevButton;
     private final JButton nextButton;
     private final JLabel pageLabel;
+    private final JButton clearAllButton;
     private final JButton closeButton;
 
     private int currentPage = 0;
@@ -120,12 +122,24 @@ public class SavedMapSelectionDialog extends JDialog {
             statLabels.add(statLabel);
             cardSouth.add(statLabel, BorderLayout.NORTH);
 
+            JPanel actionPanel = new JPanel(new GridLayout(1, 2, 6, 0));
+            actionPanel.setOpaque(false);
+
             JButton selectBtn = new JButton(LanguageStrings.get(LanguageStrings.SAVED_MAP_SELECT));
             AssetStyles.styleCompactButton(selectBtn);
             selectBtn.setEnabled(false);
             selectBtn.addActionListener(e -> selectMapAt(slotIndex));
             selectButtons.add(selectBtn);
-            cardSouth.add(selectBtn, BorderLayout.SOUTH);
+            actionPanel.add(selectBtn);
+
+            JButton deleteBtn = new JButton(LanguageStrings.get(LanguageStrings.SAVED_MAP_DELETE));
+            AssetStyles.styleCompactButton(deleteBtn);
+            deleteBtn.setEnabled(false);
+            deleteBtn.addActionListener(e -> deleteMapAt(slotIndex));
+            deleteButtons.add(deleteBtn);
+            actionPanel.add(deleteBtn);
+
+            cardSouth.add(actionPanel, BorderLayout.SOUTH);
 
             card.add(cardSouth, BorderLayout.SOUTH);
             cards.add(card);
@@ -162,13 +176,22 @@ public class SavedMapSelectionDialog extends JDialog {
         nextButton.addActionListener(e -> changePage(1));
         navPanel.add(nextButton);
 
+        clearAllButton = new JButton(LanguageStrings.get(LanguageStrings.SAVED_MAP_CLEAR_ALL));
+        AssetStyles.styleButton(clearAllButton);
+        clearAllButton.addActionListener(e -> clearAllMaps());
+
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         AssetStyles.styleButton(closeButton);
         closeButton.setPreferredSize(new Dimension(Math.max(100, AssetStyles.MIN_CONTROL_HIT_SIZE * 4), AssetStyles.MIN_CONTROL_HIT_SIZE + 8));
         closeButton.addActionListener(e -> dispose());
 
+        JPanel eastActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        eastActions.setOpaque(false);
+        eastActions.add(clearAllButton);
+        eastActions.add(closeButton);
+
         southPanel.add(navPanel, BorderLayout.WEST);
-        southPanel.add(closeButton, BorderLayout.EAST);
+        southPanel.add(eastActions, BorderLayout.EAST);
         contentPane.add(southPanel, BorderLayout.SOUTH);
 
         setContentPane(contentPane);
@@ -240,6 +263,7 @@ public class SavedMapSelectionDialog extends JDialog {
         pageLabel.setText(LanguageStrings.format(LanguageStrings.SAVED_MAP_PAGE_FMT, currentPage + 1, totalPages));
         prevButton.setEnabled(currentPage > 0);
         nextButton.setEnabled(currentPage < totalPages - 1);
+        clearAllButton.setEnabled(totalFiles > 0);
 
         int startIndex = currentPage * PAGE_SIZE;
 
@@ -251,6 +275,7 @@ public class SavedMapSelectionDialog extends JDialog {
                 nameLabels.get(i).setText("Loading...");
                 statLabels.get(i).setText("");
                 selectButtons.get(i).setEnabled(false);
+                deleteButtons.get(i).setEnabled(false);
                 miniMaps.get(i).setExplicitWorld(null);
             } else {
                 cards.get(i).setVisible(false);
@@ -312,7 +337,8 @@ public class SavedMapSelectionDialog extends JDialog {
                         for (Hex h : w.getHexes()) {
                             if (h != null && h.getBiome() != GameConstants.BIOME_OCEAN
                                     && h.getBiome() != GameConstants.BIOME_DEEP_OCEAN
-                                    && h.getBiome() != GameConstants.BIOME_SHALLOW_OCEAN) {
+                                    && h.getBiome() != GameConstants.BIOME_SHALLOW_OCEAN
+                                    && h.getBiome() != GameConstants.BIOME_ABYSS) {
                                 landHexes++;
                             }
                         }
@@ -322,6 +348,7 @@ public class SavedMapSelectionDialog extends JDialog {
                             w.getWorldWidth(), w.getWorldHeight(), landPct, w.getContinentCount(), w.getIslandCount());
                     statLabels.get(idx).setText(info);
                     selectButtons.get(idx).setEnabled(true);
+                    deleteButtons.get(idx).setEnabled(true);
                 }
             }
         };
@@ -339,6 +366,49 @@ public class SavedMapSelectionDialog extends JDialog {
         this.selectedMapData = data;
         cancelCurrentWorker();
         dispose();
+    }
+
+    private void deleteMapAt(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= PAGE_SIZE) {
+            return;
+        }
+        int fileIndex = currentPage * PAGE_SIZE + slotIndex;
+        if (fileIndex >= allFiles.length) {
+            return;
+        }
+        File f = allFiles[fileIndex];
+        SavedMapData data = pageData[slotIndex];
+        String mapName = (data != null && data.mapName != null && !data.mapName.isEmpty())
+                ? data.mapName
+                : f.getName();
+        int res = UiOptionPane.showConfirmDialog(
+                this,
+                LanguageStrings.format(LanguageStrings.SAVED_MAP_CONFIRM_DELETE, mapName),
+                LanguageStrings.get(LanguageStrings.SAVED_MAP_DELETE),
+                JOptionPane.YES_NO_OPTION);
+        if (res == JOptionPane.YES_OPTION) {
+            SavedMapService.deleteMapFile(f);
+            cachedData.remove(f.getAbsolutePath());
+            cachedWorlds.remove(f.getAbsolutePath());
+            loadFilesAndRenderPage();
+        }
+    }
+
+    private void clearAllMaps() {
+        if (allFiles.length == 0) {
+            return;
+        }
+        int res = UiOptionPane.showConfirmDialog(
+                this,
+                LanguageStrings.get(LanguageStrings.SAVED_MAP_CONFIRM_CLEAR_ALL),
+                LanguageStrings.get(LanguageStrings.SAVED_MAP_CLEAR_ALL),
+                JOptionPane.YES_NO_OPTION);
+        if (res == JOptionPane.YES_OPTION) {
+            SavedMapService.clearAllSavedMaps();
+            cachedData.clear();
+            cachedWorlds.clear();
+            loadFilesAndRenderPage();
+        }
     }
 
     public SavedMapData getSelectedMapData() {

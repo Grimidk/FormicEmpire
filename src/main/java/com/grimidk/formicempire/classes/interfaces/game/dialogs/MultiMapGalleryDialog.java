@@ -604,7 +604,8 @@ public class MultiMapGalleryDialog extends JDialog {
                                             || (h.getContinentId() == 0 && !h.isIsland()
                                                     && h.getBiome() != GameConstants.BIOME_OCEAN
                                                     && h.getBiome() != GameConstants.BIOME_DEEP_OCEAN
-                                                    && h.getBiome() != GameConstants.BIOME_SHALLOW_OCEAN)) {
+                                                    && h.getBiome() != GameConstants.BIOME_SHALLOW_OCEAN
+                                                    && h.getBiome() != GameConstants.BIOME_ABYSS)) {
                                         iceHexes++;
                                     } else if (h.getContinentId() > 0 || h.isIsland()) {
                                         contHexes++;

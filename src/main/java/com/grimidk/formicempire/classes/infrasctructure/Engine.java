@@ -95,6 +95,18 @@ public class Engine extends Thread {
     private boolean mapLayerTrades = true;
     private boolean mapLayerTunnels = true;
     private boolean mapLayerBattles = true;
+    private boolean mapLayerGeographicNames = true;
+    private boolean mapLayerCapitals = true;
+    private boolean mapLayerLabelContinents = true;
+    private boolean mapLayerLabelIceCaps = true;
+    private boolean mapLayerLabelArchipelagos = true;
+    private boolean mapLayerLabelOceans = true;
+    private boolean mapLayerLabelTrenches = true;
+    private boolean mapLayerLabelMountains = true;
+    private boolean mapLayerLabelValleys = true;
+    private boolean mapLayerLabelLakes = true;
+    private boolean mapLayerLabelRivers = true;
+    private boolean mapLayerLabelPeninsulas = true;
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
@@ -856,6 +868,102 @@ public class Engine extends Thread {
 
     public void setMapLayerBattles(boolean mapLayerBattles) {
         this.mapLayerBattles = mapLayerBattles;
+    }
+
+    public boolean isMapLayerGeographicNames() {
+        return mapLayerGeographicNames;
+    }
+
+    public void setMapLayerGeographicNames(boolean mapLayerGeographicNames) {
+        this.mapLayerGeographicNames = mapLayerGeographicNames;
+    }
+
+    public boolean isMapLayerCapitals() {
+        return mapLayerCapitals;
+    }
+
+    public void setMapLayerCapitals(boolean mapLayerCapitals) {
+        this.mapLayerCapitals = mapLayerCapitals;
+    }
+
+    public boolean isMapLayerLabelContinents() {
+        return mapLayerLabelContinents;
+    }
+
+    public void setMapLayerLabelContinents(boolean mapLayerLabelContinents) {
+        this.mapLayerLabelContinents = mapLayerLabelContinents;
+    }
+
+    public boolean isMapLayerLabelIceCaps() {
+        return mapLayerLabelIceCaps;
+    }
+
+    public void setMapLayerLabelIceCaps(boolean mapLayerLabelIceCaps) {
+        this.mapLayerLabelIceCaps = mapLayerLabelIceCaps;
+    }
+
+    public boolean isMapLayerLabelArchipelagos() {
+        return mapLayerLabelArchipelagos;
+    }
+
+    public void setMapLayerLabelArchipelagos(boolean mapLayerLabelArchipelagos) {
+        this.mapLayerLabelArchipelagos = mapLayerLabelArchipelagos;
+    }
+
+    public boolean isMapLayerLabelOceans() {
+        return mapLayerLabelOceans;
+    }
+
+    public void setMapLayerLabelOceans(boolean mapLayerLabelOceans) {
+        this.mapLayerLabelOceans = mapLayerLabelOceans;
+    }
+
+    public boolean isMapLayerLabelTrenches() {
+        return mapLayerLabelTrenches;
+    }
+
+    public void setMapLayerLabelTrenches(boolean mapLayerLabelTrenches) {
+        this.mapLayerLabelTrenches = mapLayerLabelTrenches;
+    }
+
+    public boolean isMapLayerLabelMountains() {
+        return mapLayerLabelMountains;
+    }
+
+    public void setMapLayerLabelMountains(boolean mapLayerLabelMountains) {
+        this.mapLayerLabelMountains = mapLayerLabelMountains;
+    }
+
+    public boolean isMapLayerLabelValleys() {
+        return mapLayerLabelValleys;
+    }
+
+    public void setMapLayerLabelValleys(boolean mapLayerLabelValleys) {
+        this.mapLayerLabelValleys = mapLayerLabelValleys;
+    }
+
+    public boolean isMapLayerLabelLakes() {
+        return mapLayerLabelLakes;
+    }
+
+    public void setMapLayerLabelLakes(boolean mapLayerLabelLakes) {
+        this.mapLayerLabelLakes = mapLayerLabelLakes;
+    }
+
+    public boolean isMapLayerLabelRivers() {
+        return mapLayerLabelRivers;
+    }
+
+    public void setMapLayerLabelRivers(boolean mapLayerLabelRivers) {
+        this.mapLayerLabelRivers = mapLayerLabelRivers;
+    }
+
+    public boolean isMapLayerLabelPeninsulas() {
+        return mapLayerLabelPeninsulas;
+    }
+
+    public void setMapLayerLabelPeninsulas(boolean mapLayerLabelPeninsulas) {
+        this.mapLayerLabelPeninsulas = mapLayerLabelPeninsulas;
     }
 
     public static List<AntRole> antRolesForAntClass(AntClass type) {

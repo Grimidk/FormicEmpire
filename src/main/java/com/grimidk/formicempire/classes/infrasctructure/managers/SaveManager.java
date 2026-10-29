@@ -2632,6 +2632,18 @@ public class SaveManager {
             writeJsonLine(w, "mapLayerTrades", engine.isMapLayerTrades(), false);
             writeJsonLine(w, "mapLayerTunnels", engine.isMapLayerTunnels(), false);
             writeJsonLine(w, "mapLayerBattles", engine.isMapLayerBattles(), false);
+            writeJsonLine(w, "mapLayerGeographicNames", engine.isMapLayerGeographicNames(), false);
+            writeJsonLine(w, "mapLayerCapitals", engine.isMapLayerCapitals(), false);
+            writeJsonLine(w, "mapLayerLabelContinents", engine.isMapLayerLabelContinents(), false);
+            writeJsonLine(w, "mapLayerLabelIceCaps", engine.isMapLayerLabelIceCaps(), false);
+            writeJsonLine(w, "mapLayerLabelArchipelagos", engine.isMapLayerLabelArchipelagos(), false);
+            writeJsonLine(w, "mapLayerLabelOceans", engine.isMapLayerLabelOceans(), false);
+            writeJsonLine(w, "mapLayerLabelTrenches", engine.isMapLayerLabelTrenches(), false);
+            writeJsonLine(w, "mapLayerLabelMountains", engine.isMapLayerLabelMountains(), false);
+            writeJsonLine(w, "mapLayerLabelValleys", engine.isMapLayerLabelValleys(), false);
+            writeJsonLine(w, "mapLayerLabelLakes", engine.isMapLayerLabelLakes(), false);
+            writeJsonLine(w, "mapLayerLabelRivers", engine.isMapLayerLabelRivers(), false);
+            writeJsonLine(w, "mapLayerLabelPeninsulas", engine.isMapLayerLabelPeninsulas(), false);
             
             // Serialize Upgrade Coordinates
             StringBuilder sb = new StringBuilder();
@@ -2795,6 +2807,30 @@ public class SaveManager {
                     String.valueOf(engine.isMapLayerTunnels()))));
             engine.setMapLayerBattles(Boolean.parseBoolean(m.getOrDefault("mapLayerBattles",
                     String.valueOf(engine.isMapLayerBattles()))));
+            engine.setMapLayerGeographicNames(Boolean.parseBoolean(m.getOrDefault("mapLayerGeographicNames",
+                    String.valueOf(engine.isMapLayerGeographicNames()))));
+            engine.setMapLayerCapitals(Boolean.parseBoolean(m.getOrDefault("mapLayerCapitals",
+                    String.valueOf(engine.isMapLayerCapitals()))));
+            engine.setMapLayerLabelContinents(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelContinents",
+                    String.valueOf(engine.isMapLayerLabelContinents()))));
+            engine.setMapLayerLabelIceCaps(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelIceCaps",
+                    String.valueOf(engine.isMapLayerLabelIceCaps()))));
+            engine.setMapLayerLabelArchipelagos(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelArchipelagos",
+                    String.valueOf(engine.isMapLayerLabelArchipelagos()))));
+            engine.setMapLayerLabelOceans(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelOceans",
+                    String.valueOf(engine.isMapLayerLabelOceans()))));
+            engine.setMapLayerLabelTrenches(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelTrenches",
+                    String.valueOf(engine.isMapLayerLabelTrenches()))));
+            engine.setMapLayerLabelMountains(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelMountains",
+                    String.valueOf(engine.isMapLayerLabelMountains()))));
+            engine.setMapLayerLabelValleys(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelValleys",
+                    String.valueOf(engine.isMapLayerLabelValleys()))));
+            engine.setMapLayerLabelLakes(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelLakes",
+                    String.valueOf(engine.isMapLayerLabelLakes()))));
+            engine.setMapLayerLabelRivers(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelRivers",
+                    String.valueOf(engine.isMapLayerLabelRivers()))));
+            engine.setMapLayerLabelPeninsulas(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelPeninsulas",
+                    String.valueOf(engine.isMapLayerLabelPeninsulas()))));
 
             loadUpgradePositionsFromFile();
             if (m.containsKey("upgradePositions")) {

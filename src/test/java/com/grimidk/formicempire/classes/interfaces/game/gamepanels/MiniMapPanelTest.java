@@ -98,4 +98,19 @@ class MiniMapPanelTest {
             }
         });
     }
+
+    @Test
+    void miniMapBiomeColorsMatchBigMapFadedColors() throws Exception {
+        MiniMapPanel panel = new MiniMapPanel((World) null);
+        java.lang.reflect.Method m = MiniMapPanel.class.getDeclaredMethod("getBiomeColor", com.grimidk.formicempire.classes.constants.world.Biome.class);
+        m.setAccessible(true);
+        for (com.grimidk.formicempire.classes.constants.world.Biome biome : GameConstants.getBiomes()) {
+            java.awt.Color miniColor = (java.awt.Color) m.invoke(panel, biome);
+            java.awt.Color expected = com.grimidk.formicempire.classes.interfaces.ui.AssetStyles.fadeTowardBackground(
+                    biome.getMapColor(),
+                    com.grimidk.formicempire.classes.interfaces.ui.AssetStyles.mapInactiveHexFade());
+            org.junit.jupiter.api.Assertions.assertEquals(expected, miniColor,
+                    "Minimap color for biome " + biome.getId() + " must match big map faded color");
+        }
+    }
 }

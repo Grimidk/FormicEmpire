@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.world.Continent;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
+import com.grimidk.formicempire.classes.entities.world.GeographicFeature;
 import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -43,6 +44,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -114,6 +116,18 @@ public class MapDialog extends ZeroDialog {
         new Color(255, 255, 255)
     };
     private boolean showBattles = true;
+    private boolean showGeographicNames = true;
+    private boolean showCapitals = true;
+    private boolean showLabelContinents = true;
+    private boolean showLabelIceCaps = true;
+    private boolean showLabelArchipelagos = true;
+    private boolean showLabelOceans = true;
+    private boolean showLabelTrenches = true;
+    private boolean showLabelMountains = true;
+    private boolean showLabelValleys = true;
+    private boolean showLabelLakes = true;
+    private boolean showLabelRivers = true;
+    private boolean showLabelPeninsulas = true;
     private boolean syncingZoomUi;
     private boolean holdingLeftA;
     private boolean holdingLeftArrow;
@@ -135,6 +149,9 @@ public class MapDialog extends ZeroDialog {
                 owner instanceof JDialog ? ModalityType.DOCUMENT_MODAL : ModalityType.APPLICATION_MODAL);
         this.engine = engine;
         this.world = world;
+        if (this.world != null) {
+            this.world.ensureGeographicFeaturesReconstructed();
+        }
         this.onHexChange = onHexChange;
         this.onOpenWarDialog = onOpenWarDialog;
         loadLayerSettingsFromEngine();
@@ -503,6 +520,7 @@ public class MapDialog extends ZeroDialog {
         World current = currentWorld();
         if (current != null) {
             this.world = current;
+            this.world.ensureGeographicFeaturesReconstructed();
         }
     }
 
@@ -516,10 +534,22 @@ public class MapDialog extends ZeroDialog {
         showMeridian = eng.isMapLayerMeridian();
         showEquator = eng.isMapLayerEquator();
         showBiomeIcons = eng.isMapLayerBiomeIcons();
+        showCapitals = eng.isMapLayerCapitals();
         showColonyRanks = eng.isMapLayerColonyRanks();
         showTrades = eng.isMapLayerTrades();
         showTunnels = eng.isMapLayerTunnels();
         showBattles = eng.isMapLayerBattles();
+        showGeographicNames = eng.isMapLayerGeographicNames();
+        showLabelContinents = eng.isMapLayerLabelContinents();
+        showLabelIceCaps = eng.isMapLayerLabelIceCaps();
+        showLabelArchipelagos = eng.isMapLayerLabelArchipelagos();
+        showLabelOceans = eng.isMapLayerLabelOceans();
+        showLabelTrenches = eng.isMapLayerLabelTrenches();
+        showLabelMountains = eng.isMapLayerLabelMountains();
+        showLabelValleys = eng.isMapLayerLabelValleys();
+        showLabelLakes = eng.isMapLayerLabelLakes();
+        showLabelRivers = eng.isMapLayerLabelRivers();
+        showLabelPeninsulas = eng.isMapLayerLabelPeninsulas();
     }
 
     private void persistLayerSettings() {
@@ -532,72 +562,236 @@ public class MapDialog extends ZeroDialog {
         eng.setMapLayerMeridian(showMeridian);
         eng.setMapLayerEquator(showEquator);
         eng.setMapLayerBiomeIcons(showBiomeIcons);
+        eng.setMapLayerCapitals(showCapitals);
         eng.setMapLayerColonyRanks(showColonyRanks);
         eng.setMapLayerTrades(showTrades);
         eng.setMapLayerTunnels(showTunnels);
         eng.setMapLayerBattles(showBattles);
+        eng.setMapLayerGeographicNames(showGeographicNames);
+        eng.setMapLayerLabelContinents(showLabelContinents);
+        eng.setMapLayerLabelIceCaps(showLabelIceCaps);
+        eng.setMapLayerLabelArchipelagos(showLabelArchipelagos);
+        eng.setMapLayerLabelOceans(showLabelOceans);
+        eng.setMapLayerLabelTrenches(showLabelTrenches);
+        eng.setMapLayerLabelMountains(showLabelMountains);
+        eng.setMapLayerLabelValleys(showLabelValleys);
+        eng.setMapLayerLabelLakes(showLabelLakes);
+        eng.setMapLayerLabelRivers(showLabelRivers);
+        eng.setMapLayerLabelPeninsulas(showLabelPeninsulas);
         eng.saveGlobalSettings();
     }
 
-    private void showLayersMenu() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    private static class LayerItemEntry {
+        final Layer layer;
+        final String label;
+        final boolean initialSelected;
+        JCheckBox checkBox;
+
+        LayerItemEntry(Layer layer, String label, boolean initialSelected) {
+            this.layer = layer;
+            this.label = label;
+            this.initialSelected = initialSelected;
+        }
+    }
+
+    private static class LayerGroupPanel {
+        final JPanel panel;
+        final JCheckBox groupCheckBox;
+        final List<LayerItemEntry> items;
+
+        LayerGroupPanel(JPanel panel, JCheckBox groupCheckBox, List<LayerItemEntry> items) {
+            this.panel = panel;
+            this.groupCheckBox = groupCheckBox;
+            this.items = items;
+        }
+
+        boolean areAllSelected() {
+            for (LayerItemEntry item : items) {
+                if (item.checkBox != null && !item.checkBox.isSelected()) {
+                    return false;
+                }
+            }
+            return !items.isEmpty();
+        }
+
+        void updateGroupCheckState() {
+            if (groupCheckBox != null) {
+                groupCheckBox.setSelected(areAllSelected());
+            }
+        }
+    }
+
+    void showLayersMenu() {
+        JPanel panel = new JPanel(new BorderLayout(0, 10));
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 AssetStyles.BUTTON_BORDER,
-                new EmptyBorder(8, 10, 8, 10)));
+                new EmptyBorder(10, 14, 10, 14)));
 
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_BORDERS),
-                showBorders,
-                selected -> setLayerVisible(Layer.BORDERS, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_RIVERS),
-                showRivers,
-                selected -> setLayerVisible(Layer.RIVERS, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_MERIDIAN),
-                showMeridian,
-                selected -> setLayerVisible(Layer.MERIDIAN, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_EQUATOR),
-                showEquator,
-                selected -> setLayerVisible(Layer.EQUATOR, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_BIOME_ICONS),
-                showBiomeIcons,
-                selected -> setLayerVisible(Layer.BIOME_ICONS, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_COLONY_RANKS),
-                showColonyRanks,
-                selected -> setLayerVisible(Layer.COLONY_RANKS, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_TRADES),
-                showTrades,
-                selected -> setLayerVisible(Layer.TRADES, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_TUNNELS),
-                showTunnels,
-                selected -> setLayerVisible(Layer.TUNNELS, selected)));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(createLayerCheckBox(
-                LanguageStrings.get(LanguageStrings.MAP_LAYER_BATTLES),
-                showBattles,
-                selected -> setLayerVisible(Layer.BATTLES, selected)));
+        List<LayerItemEntry> dynasticItems = List.of(
+                new LayerItemEntry(Layer.BORDERS, LanguageStrings.get(LanguageStrings.MAP_LAYER_BORDERS), showBorders),
+                new LayerItemEntry(Layer.TRADES, LanguageStrings.get(LanguageStrings.MAP_LAYER_TRADES), showTrades),
+                new LayerItemEntry(Layer.TUNNELS, LanguageStrings.get(LanguageStrings.MAP_LAYER_TUNNELS), showTunnels),
+                new LayerItemEntry(Layer.CAPITALS, LanguageStrings.get(LanguageStrings.MAP_LAYER_CAPITALS), showCapitals),
+                new LayerItemEntry(Layer.COLONY_RANKS, LanguageStrings.get(LanguageStrings.MAP_LAYER_COLONY_RANKS), showColonyRanks),
+                new LayerItemEntry(Layer.BATTLES, LanguageStrings.get(LanguageStrings.MAP_LAYER_BATTLES), showBattles)
+        );
+
+        List<LayerItemEntry> geographicalItems = List.of(
+                new LayerItemEntry(Layer.MERIDIAN, LanguageStrings.get(LanguageStrings.MAP_LAYER_MERIDIAN), showMeridian),
+                new LayerItemEntry(Layer.EQUATOR, LanguageStrings.get(LanguageStrings.MAP_LAYER_EQUATOR), showEquator),
+                new LayerItemEntry(Layer.RIVERS, LanguageStrings.get(LanguageStrings.MAP_LAYER_RIVERS), showRivers),
+                new LayerItemEntry(Layer.BIOME_ICONS, LanguageStrings.get(LanguageStrings.MAP_LAYER_BIOME_ICONS), showBiomeIcons)
+        );
+
+        List<LayerItemEntry> labelItems = List.of(
+                new LayerItemEntry(Layer.LABEL_CONTINENTS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_CONTINENTS), showLabelContinents),
+                new LayerItemEntry(Layer.LABEL_ICE_CAPS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_ICE_CAPS), showLabelIceCaps),
+                new LayerItemEntry(Layer.LABEL_ARCHIPELAGOS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_ARCHIPELAGOS), showLabelArchipelagos),
+                new LayerItemEntry(Layer.LABEL_OCEANS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_OCEANS), showLabelOceans),
+                new LayerItemEntry(Layer.LABEL_TRENCHES, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_TRENCHES), showLabelTrenches),
+                new LayerItemEntry(Layer.LABEL_MOUNTAINS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_MOUNTAINS), showLabelMountains),
+                new LayerItemEntry(Layer.LABEL_VALLEYS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_VALLEYS), showLabelValleys),
+                new LayerItemEntry(Layer.LABEL_LAKES, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_LAKES), showLabelLakes),
+                new LayerItemEntry(Layer.LABEL_RIVERS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_RIVERS), showLabelRivers),
+                new LayerItemEntry(Layer.LABEL_PENINSULAS, LanguageStrings.get(LanguageStrings.MAP_LAYER_LABEL_PENINSULAS), showLabelPeninsulas)
+        );
+
+        JCheckBox allLayersCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.MAP_LAYER_ALL).toUpperCase(java.util.Locale.ROOT));
+        AssetStyles.styleCheckBox(allLayersCheck);
+        allLayersCheck.setFont(AssetStyles.FONT_BOLD.deriveFont(12f));
+        allLayersCheck.setForeground(AssetStyles.FONT_COLOR_HEADER);
+
+        List<LayerGroupPanel> groupPanels = new ArrayList<>();
+        Runnable updateAllLayersCheckState = () -> {
+            boolean allSelected = true;
+            for (LayerGroupPanel lgp : groupPanels) {
+                if (!lgp.areAllSelected()) {
+                    allSelected = false;
+                    break;
+                }
+            }
+            allLayersCheck.setSelected(allSelected);
+        };
+
+        LayerGroupPanel dynasticPanel = createLayerGroupPanel(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_GROUP_DYNASTIC),
+                updateAllLayersCheckState,
+                dynasticItems);
+        LayerGroupPanel geoPanel = createLayerGroupPanel(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_GROUP_GEOGRAPHICAL),
+                updateAllLayersCheckState,
+                geographicalItems);
+        LayerGroupPanel labelPanel = createLayerGroupPanel(
+                LanguageStrings.get(LanguageStrings.MAP_LAYER_GROUP_LABELS),
+                updateAllLayersCheckState,
+                labelItems);
+
+        groupPanels.add(dynasticPanel);
+        groupPanels.add(geoPanel);
+        groupPanels.add(labelPanel);
+
+        allLayersCheck.addActionListener(e -> {
+            boolean target = allLayersCheck.isSelected();
+            List<Layer> allLayers = new ArrayList<>();
+            for (LayerGroupPanel lgp : groupPanels) {
+                lgp.groupCheckBox.setSelected(target);
+                for (LayerItemEntry item : lgp.items) {
+                    if (item.checkBox != null) {
+                        item.checkBox.setSelected(target);
+                    }
+                    allLayers.add(item.layer);
+                }
+            }
+            setLayersVisible(allLayers, target);
+        });
+
+        updateAllLayersCheckState.run();
+
+        JPanel topBar = new JPanel();
+        topBar.setLayout(new BoxLayout(topBar, BoxLayout.Y_AXIS));
+        topBar.setBackground(AssetStyles.BACKGROUND_COLOR);
+        allLayersCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topBar.add(allLayersCheck);
+        topBar.add(Box.createVerticalStrut(6));
+        JSeparator topSep = AssetStyles.createInternalSeparator();
+        topSep.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topSep.setMaximumSize(new Dimension(Short.MAX_VALUE, 1));
+        topBar.add(topSep);
+
+        panel.add(topBar, BorderLayout.NORTH);
+
+        JPanel columns = new JPanel(new GridLayout(1, 3, 16, 0));
+        columns.setBackground(AssetStyles.BACKGROUND_COLOR);
+        columns.add(dynasticPanel.panel);
+        columns.add(geoPanel.panel);
+        columns.add(labelPanel.panel);
+        panel.add(columns, BorderLayout.CENTER);
 
         JPopupMenu menu = new JPopupMenu();
         menu.setBorder(BorderFactory.createEmptyBorder());
         menu.setBackground(AssetStyles.BACKGROUND_COLOR);
         menu.add(panel);
         Dimension menuSize = menu.getPreferredSize();
-        menu.show(layersButton, -menuSize.width - 4, 0);
+        if (layersButton != null && layersButton.isShowing()) {
+            menu.show(layersButton, -menuSize.width - 4, 0);
+        }
+    }
+
+    private LayerGroupPanel createLayerGroupPanel(String title, Runnable onAnyChange, List<LayerItemEntry> items) {
+        JPanel group = new JPanel();
+        group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
+        group.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JCheckBox groupCheck = new JCheckBox(title.toUpperCase(java.util.Locale.ROOT));
+        AssetStyles.styleCheckBox(groupCheck);
+        groupCheck.setFont(AssetStyles.FONT_BOLD.deriveFont(11f));
+        groupCheck.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        groupCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
+        group.add(groupCheck);
+        group.add(Box.createVerticalStrut(4));
+
+        JSeparator sep = AssetStyles.createInternalSeparator();
+        sep.setAlignmentX(Component.LEFT_ALIGNMENT);
+        sep.setMaximumSize(new Dimension(Short.MAX_VALUE, 1));
+        group.add(sep);
+        group.add(Box.createVerticalStrut(6));
+
+        LayerGroupPanel lgp = new LayerGroupPanel(group, groupCheck, items);
+
+        groupCheck.addActionListener(e -> {
+            boolean target = groupCheck.isSelected();
+            List<Layer> layers = new ArrayList<>();
+            for (LayerItemEntry item : items) {
+                if (item.checkBox != null) {
+                    item.checkBox.setSelected(target);
+                }
+                layers.add(item.layer);
+            }
+            setLayersVisible(layers, target);
+            if (onAnyChange != null) {
+                onAnyChange.run();
+            }
+        });
+
+        for (LayerItemEntry item : items) {
+            JCheckBox box = new JCheckBox(item.label, item.initialSelected);
+            item.checkBox = box;
+            AssetStyles.styleCheckBox(box);
+            box.setAlignmentX(Component.LEFT_ALIGNMENT);
+            box.addActionListener(e -> {
+                setLayerVisible(item.layer, box.isSelected());
+                lgp.updateGroupCheckState();
+                if (onAnyChange != null) {
+                    onAnyChange.run();
+                }
+            });
+            group.add(box);
+            group.add(Box.createVerticalStrut(4));
+        }
+
+        lgp.updateGroupCheckState();
+        return lgp;
     }
 
     private void showModesMenu() {
@@ -650,7 +844,9 @@ public class MapDialog extends ZeroDialog {
         menu.setBackground(AssetStyles.BACKGROUND_COLOR);
         menu.add(panel);
         Dimension menuSize = menu.getPreferredSize();
-        menu.show(modesButton, -menuSize.width - 4, 0);
+        if (modesButton != null && modesButton.isShowing()) {
+            menu.show(modesButton, -menuSize.width - 4, 0);
+        }
     }
 
     public MapMode getMapMode() {
@@ -671,23 +867,80 @@ public class MapDialog extends ZeroDialog {
         return (mapPanel != null) ? mapPanel.getToolTipText(e) : null;
     }
 
-    private enum Layer {
-        BORDERS, RIVERS, MERIDIAN, EQUATOR, BIOME_ICONS, COLONY_RANKS, TRADES, TUNNELS, BATTLES
+    public boolean isShowGeographicNames() {
+        return showGeographicNames;
     }
 
-    private void setLayerVisible(Layer layer, boolean visible) {
+    public void setShowGeographicNames(boolean showGeographicNames) {
+        setLayerVisible(Layer.GEOGRAPHIC_NAMES, showGeographicNames);
+    }
+
+    public boolean isShowCapitals() {
+        return showCapitals;
+    }
+
+    public void setShowCapitals(boolean showCapitals) {
+        setLayerVisible(Layer.CAPITALS, showCapitals);
+    }
+
+    private enum Layer {
+        BORDERS, RIVERS, MERIDIAN, EQUATOR, BIOME_ICONS, COLONY_RANKS, TRADES, TUNNELS, BATTLES, GEOGRAPHIC_NAMES,
+        CAPITALS, LABEL_CONTINENTS, LABEL_ICE_CAPS, LABEL_ARCHIPELAGOS, LABEL_OCEANS, LABEL_TRENCHES,
+        LABEL_MOUNTAINS, LABEL_VALLEYS, LABEL_LAKES, LABEL_RIVERS, LABEL_PENINSULAS
+    }
+
+    private boolean isOverlayLayer(Layer layer) {
+        return layer == Layer.TRADES || layer == Layer.TUNNELS || layer == Layer.BATTLES
+                || layer == Layer.GEOGRAPHIC_NAMES || layer == Layer.LABEL_CONTINENTS
+                || layer == Layer.LABEL_ICE_CAPS || layer == Layer.LABEL_ARCHIPELAGOS
+                || layer == Layer.LABEL_OCEANS || layer == Layer.LABEL_TRENCHES
+                || layer == Layer.LABEL_MOUNTAINS || layer == Layer.LABEL_VALLEYS
+                || layer == Layer.LABEL_LAKES || layer == Layer.LABEL_RIVERS
+                || layer == Layer.LABEL_PENINSULAS;
+    }
+
+    private void applyLayerState(Layer layer, boolean visible) {
         switch (layer) {
             case BORDERS -> showBorders = visible;
             case RIVERS -> showRivers = visible;
             case MERIDIAN -> showMeridian = visible;
             case EQUATOR -> showEquator = visible;
             case BIOME_ICONS -> showBiomeIcons = visible;
+            case CAPITALS -> showCapitals = visible;
             case COLONY_RANKS -> showColonyRanks = visible;
             case TRADES -> showTrades = visible;
             case TUNNELS -> showTunnels = visible;
             case BATTLES -> showBattles = visible;
+            case GEOGRAPHIC_NAMES -> {
+                showGeographicNames = visible;
+                showLabelContinents = visible;
+                showLabelIceCaps = visible;
+                showLabelArchipelagos = visible;
+                showLabelOceans = visible;
+                showLabelTrenches = visible;
+                showLabelMountains = visible;
+                showLabelValleys = visible;
+                showLabelLakes = visible;
+                showLabelRivers = visible;
+                showLabelPeninsulas = visible;
+            }
+            case LABEL_CONTINENTS -> showLabelContinents = visible;
+            case LABEL_ICE_CAPS -> showLabelIceCaps = visible;
+            case LABEL_ARCHIPELAGOS -> showLabelArchipelagos = visible;
+            case LABEL_OCEANS -> showLabelOceans = visible;
+            case LABEL_TRENCHES -> showLabelTrenches = visible;
+            case LABEL_MOUNTAINS -> showLabelMountains = visible;
+            case LABEL_VALLEYS -> showLabelValleys = visible;
+            case LABEL_LAKES -> showLabelLakes = visible;
+            case LABEL_RIVERS -> showLabelRivers = visible;
+            case LABEL_PENINSULAS -> showLabelPeninsulas = visible;
         }
-        if (layer != Layer.TRADES && layer != Layer.TUNNELS && layer != Layer.BATTLES) {
+    }
+
+    private void setLayerVisible(Layer layer, boolean visible) {
+        applyLayerState(layer, visible);
+        boolean isOverlay = isOverlayLayer(layer);
+        if (!isOverlay) {
             if (mapPanel != null) {
                 mapPanel.invalidateBakedImage();
             }
@@ -696,13 +949,23 @@ public class MapDialog extends ZeroDialog {
         mapPanel.repaint();
     }
 
-    private JCheckBox createLayerCheckBox(String label, boolean selected, java.util.function.Consumer<Boolean> onToggle) {
-        JCheckBox box = new JCheckBox(label, selected);
-        AssetStyles.styleCheckBox(box);
-        box.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.addActionListener(e -> onToggle.accept(box.isSelected()));
-        return box;
+    private void setLayersVisible(Collection<Layer> layers, boolean visible) {
+        boolean hasNonOverlay = false;
+        for (Layer layer : layers) {
+            applyLayerState(layer, visible);
+            if (!isOverlayLayer(layer)) {
+                hasNonOverlay = true;
+            }
+        }
+        if (hasNonOverlay && mapPanel != null) {
+            mapPanel.invalidateBakedImage();
+        }
+        persistLayerSettings();
+        if (mapPanel != null) {
+            mapPanel.repaint();
+        }
     }
+
 
     private void travelToHomeHex() {
         syncWorldFromEngine();
@@ -1506,6 +1769,7 @@ public class MapDialog extends ZeroDialog {
         private boolean cachedBakedRivers;
         private boolean cachedBakedBiomeIcons;
         private boolean cachedBakedColonyRanks;
+        private boolean cachedBakedCapitals;
         private boolean cachedBakedMeridian;
         private boolean cachedBakedEquator;
         private HexGridMesh cachedMesh;
@@ -1778,6 +2042,7 @@ public class MapDialog extends ZeroDialog {
                     && cachedBakedRivers == showRivers
                     && cachedBakedBiomeIcons == showBiomeIcons
                     && cachedBakedColonyRanks == showColonyRanks
+                    && cachedBakedCapitals == showCapitals
                     && cachedBakedMeridian == showMeridian
                     && cachedBakedEquator == showEquator;
         }
@@ -1996,6 +2261,21 @@ public class MapDialog extends ZeroDialog {
                         .append(cont.getName());
             }
 
+            GeographicFeature gf = world.getFeatureForHex(hex);
+            if (gf != null && gf.getName() != null && isFeatureLabelVisible(gf.getType())) {
+                sb.append("<br>")
+                        .append(LanguageStrings.get(gf.getType().getLabelKey()))
+                        .append(": ")
+                        .append(gf.getName());
+            }
+            GeographicFeature rf = world.getRiverFeatureForHex(hex);
+            if (rf != null && rf.getName() != null && rf != gf && isFeatureLabelVisible(rf.getType())) {
+                sb.append("<br>")
+                        .append(LanguageStrings.get(rf.getType().getLabelKey()))
+                        .append(": ")
+                        .append(rf.getName());
+            }
+
             if (c != null) {
                 if (c.getRank() != null) {
                     sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_RANK)).append(c.getRank().getName());
@@ -2110,7 +2390,7 @@ public class MapDialog extends ZeroDialog {
             if (showRivers) {
                 mesh.paintRivers(bg);
             }
-            if (showBiomeIcons || showColonyRanks) {
+            if (showBiomeIcons || showColonyRanks || showCapitals) {
                 for (HexGridMesh.Face face : mesh.faces()) {
                     drawHexIcons(bg, face);
                 }
@@ -2145,6 +2425,7 @@ public class MapDialog extends ZeroDialog {
             cachedBakedRivers = showRivers;
             cachedBakedBiomeIcons = showBiomeIcons;
             cachedBakedColonyRanks = showColonyRanks;
+            cachedBakedCapitals = showCapitals;
             cachedBakedMeridian = showMeridian;
             cachedBakedEquator = showEquator;
         }
@@ -2264,7 +2545,7 @@ public class MapDialog extends ZeroDialog {
                     if (showRivers) {
                         mesh.paintRivers(sg);
                     }
-                    if (showBiomeIcons || showColonyRanks) {
+                    if (showBiomeIcons || showColonyRanks || showCapitals) {
                         Rectangle localClip = sg.getClipBounds();
                         for (HexGridMesh.Face face : mesh.faces()) {
                             if (localClip == null || face.intersects(localClip)) {
@@ -2310,6 +2591,285 @@ public class MapDialog extends ZeroDialog {
                     }
                 }
                 sg.dispose();
+            }
+
+            if (hasAnyGeographicLabelVisible()) {
+                for (double shiftX : horizontalShifts) {
+                    Graphics2D sg = (Graphics2D) g2d.create();
+                    sg.translate(centerOffset.x + shiftX, centerOffset.y);
+                    paintGeographicNames(sg, world, mesh);
+                    sg.dispose();
+                }
+            }
+        }
+
+        private boolean isFeatureLabelVisible(GeographicFeature.FeatureType type) {
+            if (!showGeographicNames || type == null) return false;
+            return switch (type) {
+                case CONTINENT -> showLabelContinents;
+                case ICE_CAP -> showLabelIceCaps;
+                case OCEAN -> showLabelOceans;
+                case ARCHIPELAGO -> showLabelArchipelagos;
+                case TRENCH -> showLabelTrenches;
+                case PENINSULA -> showLabelPeninsulas;
+                case RIVER -> showLabelRivers;
+                case MOUNTAIN_RANGE -> showLabelMountains;
+                case VALLEY -> showLabelValleys;
+                case LAKE_BASIN -> showLabelLakes;
+            };
+        }
+
+        private boolean hasAnyGeographicLabelVisible() {
+            return showGeographicNames && (showLabelContinents || showLabelIceCaps || showLabelArchipelagos || showLabelOceans
+                    || showLabelTrenches || showLabelMountains || showLabelValleys || showLabelLakes
+                    || showLabelRivers || showLabelPeninsulas);
+        }
+
+        private int getFeaturePriority(GeographicFeature.FeatureType type) {
+            return switch (type) {
+                case CONTINENT, ICE_CAP -> 0;
+                case OCEAN, ARCHIPELAGO -> 1;
+                case MOUNTAIN_RANGE, RIVER, TRENCH -> 2;
+                case PENINSULA, VALLEY, LAKE_BASIN -> 3;
+            };
+        }
+
+        private void paintGeographicNames(Graphics2D g2, World world, HexGridMesh mesh) {
+            if (world == null || mesh == null) return;
+            List<GeographicFeature> features = world.getGeographicFeatures();
+            if (features == null || features.isEmpty()) return;
+
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            List<GeographicFeature> sortedFeatures = new ArrayList<>(features);
+            sortedFeatures.sort((a, b) -> {
+                int pA = getFeaturePriority(a.getType());
+                int pB = getFeaturePriority(b.getType());
+                if (pA != pB) {
+                    return Integer.compare(pA, pB);
+                }
+                int sA = (a.getHexes() != null) ? a.getHexes().size() : 0;
+                int sB = (b.getHexes() != null) ? b.getHexes().size() : 0;
+                return Integer.compare(sB, sA);
+            });
+
+            Font fontBig = AssetStyles.FONT_BOLD.deriveFont(15f);
+            Font fontMid = AssetStyles.FONT_BOLD.deriveFont(13f);
+            Font fontNorm = AssetStyles.FONT_BOLD.deriveFont(11f);
+
+            FontMetrics fmBig = g2.getFontMetrics(fontBig);
+            FontMetrics fmMid = g2.getFontMetrics(fontMid);
+            FontMetrics fmNorm = g2.getFontMetrics(fontNorm);
+
+            List<Rectangle> placedBoxes = new ArrayList<>();
+
+            for (GeographicFeature feature : sortedFeatures) {
+                if (feature == null) continue;
+                if (!isFeatureLabelVisible(feature.getType())) continue;
+                String name = feature.getName();
+                if (name == null || name.isEmpty()) continue;
+
+                Font font = fontNorm;
+                FontMetrics fm = fmNorm;
+                int padW = 16;
+                int padH = 5;
+                int arc = 6;
+                float strokeWidth = 1.0f;
+                Color borderColor = new Color(215, 195, 100, 220);
+                Color textColor = Color.WHITE;
+
+                switch (feature.getType()) {
+                    case CONTINENT -> {
+                        font = fontBig;
+                        fm = fmBig;
+                        padW = 24;
+                        padH = 8;
+                        arc = 8;
+                        strokeWidth = 1.8f;
+                        borderColor = new Color(245, 185, 75, 235);
+                        textColor = new Color(255, 248, 235);
+                    }
+                    case ICE_CAP -> {
+                        font = fontBig;
+                        fm = fmBig;
+                        padW = 24;
+                        padH = 8;
+                        arc = 8;
+                        strokeWidth = 1.8f;
+                        borderColor = new Color(220, 240, 255, 240);
+                        textColor = new Color(245, 250, 255);
+                    }
+                    case OCEAN -> {
+                        font = fontMid;
+                        fm = fmMid;
+                        padW = 20;
+                        padH = 6;
+                        arc = 7;
+                        strokeWidth = 1.3f;
+                        borderColor = new Color(75, 160, 245, 225);
+                        textColor = new Color(230, 245, 255);
+                    }
+                    case ARCHIPELAGO -> {
+                        font = fontMid;
+                        fm = fmMid;
+                        padW = 20;
+                        padH = 6;
+                        arc = 7;
+                        strokeWidth = 1.3f;
+                        borderColor = new Color(90, 215, 185, 225);
+                        textColor = new Color(230, 255, 250);
+                    }
+                    case TRENCH -> {
+                        font = fontNorm;
+                        fm = fmNorm;
+                        padW = 16;
+                        padH = 5;
+                        arc = 6;
+                        strokeWidth = 1.2f;
+                        borderColor = new Color(85, 115, 235, 230);
+                        textColor = new Color(215, 235, 255);
+                    }
+                    case PENINSULA -> {
+                        font = fontNorm;
+                        fm = fmNorm;
+                        padW = 16;
+                        padH = 5;
+                        arc = 6;
+                        strokeWidth = 1.0f;
+                        borderColor = new Color(215, 195, 100, 220);
+                        textColor = Color.WHITE;
+                    }
+                    case RIVER -> {
+                        font = fontNorm;
+                        fm = fmNorm;
+                        padW = 16;
+                        padH = 5;
+                        arc = 6;
+                        strokeWidth = 1.0f;
+                        borderColor = new Color(70, 150, 240, 220);
+                        textColor = Color.WHITE;
+                    }
+                    case MOUNTAIN_RANGE -> {
+                        font = fontNorm;
+                        fm = fmNorm;
+                        padW = 16;
+                        padH = 5;
+                        arc = 6;
+                        strokeWidth = 1.0f;
+                        borderColor = new Color(230, 175, 80, 220);
+                        textColor = Color.WHITE;
+                    }
+                    case VALLEY -> {
+                        font = fontNorm;
+                        fm = fmNorm;
+                        padW = 16;
+                        padH = 5;
+                        arc = 6;
+                        strokeWidth = 1.0f;
+                        borderColor = new Color(90, 200, 110, 220);
+                        textColor = Color.WHITE;
+                    }
+                    case LAKE_BASIN -> {
+                        font = fontNorm;
+                        fm = fmNorm;
+                        padW = 16;
+                        padH = 5;
+                        arc = 6;
+                        strokeWidth = 1.0f;
+                        borderColor = new Color(80, 210, 230, 220);
+                        textColor = Color.WHITE;
+                    }
+                }
+
+                int tw = fm.stringWidth(name);
+                int th = fm.getHeight();
+                int pw = tw + padW;
+                int ph = th + padH;
+
+                List<Hex> hexes = feature.getHexes();
+                Hex centroid = feature.getCentroidHex();
+                if (centroid == null && (hexes == null || hexes.isEmpty())) continue;
+
+                double cQ = feature.getCentroidQ();
+                double cR = feature.getCentroidR();
+
+                List<Hex> candidates = new ArrayList<>();
+                if (centroid != null) {
+                    candidates.add(centroid);
+                }
+                if (hexes != null) {
+                    List<Hex> otherHexes = new ArrayList<>(hexes);
+                    otherHexes.sort(Comparator.comparingDouble(h -> {
+                        double dq = h.getQ() - cQ;
+                        double dr = h.getR() - cR;
+                        return dq * dq + dr * dr + dq * dr;
+                    }));
+                    for (Hex h : otherHexes) {
+                        if (h != centroid && !candidates.contains(h)) {
+                            candidates.add(h);
+                            if (candidates.size() >= 12) break;
+                        }
+                    }
+                }
+
+                Rectangle chosenRect = null;
+                HexGridMesh.Face chosenFace = null;
+
+                for (Hex cand : candidates) {
+                    HexGridMesh.Face face = mesh.faceAt(cand.getQ(), cand.getR());
+                    if (face == null) continue;
+
+                    int cx = (int) Math.round(face.centerX);
+                    int cy = (int) Math.round(face.centerY);
+                    int px = cx - pw / 2;
+                    int py = cy - ph / 2;
+
+                    Rectangle testRect = new Rectangle(px - 3, py - 2, pw + 6, ph + 4);
+                    boolean collides = false;
+                    for (Rectangle placed : placedBoxes) {
+                        if (testRect.intersects(placed)) {
+                            collides = true;
+                            break;
+                        }
+                    }
+
+                    if (!collides) {
+                        chosenRect = new Rectangle(px, py, pw, ph);
+                        chosenFace = face;
+                        break;
+                    }
+                }
+
+                if (chosenRect == null) {
+                    if (getFeaturePriority(feature.getType()) == 0 && centroid != null) {
+                        HexGridMesh.Face face = mesh.faceAt(centroid.getQ(), centroid.getR());
+                        if (face != null) {
+                            int cx = (int) Math.round(face.centerX);
+                            int cy = (int) Math.round(face.centerY);
+                            chosenRect = new Rectangle(cx - pw / 2, cy - ph / 2, pw, ph);
+                            chosenFace = face;
+                        }
+                    }
+                }
+
+                if (chosenRect == null || chosenFace == null) {
+                    continue;
+                }
+
+                placedBoxes.add(chosenRect);
+
+                g2.setFont(font);
+                g2.setColor(new Color(18, 22, 28, 215));
+                g2.fillRoundRect(chosenRect.x, chosenRect.y, chosenRect.width, chosenRect.height, arc, arc);
+
+                g2.setColor(borderColor);
+                g2.setStroke(new BasicStroke(strokeWidth));
+                g2.drawRoundRect(chosenRect.x, chosenRect.y, chosenRect.width, chosenRect.height, arc, arc);
+
+                g2.setColor(textColor);
+                int textX = chosenRect.x + (chosenRect.width - tw) / 2;
+                int textY = chosenRect.y + (chosenRect.height - th) / 2 + fm.getAscent();
+                g2.drawString(name, textX, textY);
             }
         }
 
@@ -2423,6 +2983,20 @@ public class MapDialog extends ZeroDialog {
                         g2d.drawImage(rankImg, rankX, rankY, null);
                     }
                 }
+            }
+
+            if (showCapitals && hex.getColony() != null && hex.getColony().isCapital()) {
+                Font starFont = AssetStyles.FONT_BOLD.deriveFont((float) Math.max(9, hexSize * 0.7));
+                g2d.setFont(starFont);
+                FontMetrics fm = g2d.getFontMetrics(starFont);
+                String star = "★";
+                int sw = fm.stringWidth(star);
+                int sx = (int) Math.round(face.centerX - sw / 2.0);
+                int sy = (int) Math.round(face.centerY + hexSize * 0.65);
+                g2d.setColor(new Color(25, 20, 10, 200));
+                g2d.drawString(star, sx + 1, sy + 1);
+                g2d.setColor(new Color(255, 215, 0));
+                g2d.drawString(star, sx, sy);
             }
         }
 

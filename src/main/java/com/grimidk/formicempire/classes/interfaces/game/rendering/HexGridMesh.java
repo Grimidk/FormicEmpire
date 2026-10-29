@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.game.rendering;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -569,7 +570,7 @@ public final class HexGridMesh {
                 return fill;
             }
         }
-        return GameConstants.BIOME_OCEAN.getMapColor();
+        return AssetStyles.fadeTowardBackground(GameConstants.BIOME_OCEAN.getMapColor(), AssetStyles.mapInactiveHexFade());
     }
 
     private static boolean isOceanFace(Face face) {
@@ -577,7 +578,8 @@ public final class HexGridMesh {
                 && face.hex != null
                 && (face.hex.getBiome() == GameConstants.BIOME_OCEAN
                     || face.hex.getBiome() == GameConstants.BIOME_DEEP_OCEAN
-                    || face.hex.getBiome() == GameConstants.BIOME_SHALLOW_OCEAN);
+                    || face.hex.getBiome() == GameConstants.BIOME_SHALLOW_OCEAN
+                    || face.hex.getBiome() == GameConstants.BIOME_ABYSS);
     }
 
     private static Color plainColor(Edge edge, Function<Face, Color> plainEdgeColor) {

@@ -21,6 +21,7 @@ public class SavedMapData {
     public List<SavedMapPlate> tectonicPlates = new ArrayList<>();
     public List<SavedMapFault> faultLines = new ArrayList<>();
     public List<SavedMapContinent> continents = new ArrayList<>();
+    public List<SavedMapFeature> features = new ArrayList<>();
 
     public static class SavedMapHex {
         public int q;
@@ -61,5 +62,13 @@ public class SavedMapData {
         public int id;
         public String name;
         public int coreRadius;
+    }
+
+    public static class SavedMapFeature {
+        public int id;
+        public String type;
+        public String name;
+        public String nameKey;
+        public List<int[]> hexCoords = new ArrayList<>();
     }
 }

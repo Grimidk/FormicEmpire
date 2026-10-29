@@ -37,9 +37,11 @@ import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.world.Continent;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.world.FaultLine.FaultType;
+import com.grimidk.formicempire.classes.entities.world.GeographicFeature;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.TectonicPlate;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
+import com.grimidk.formicempire.classes.entities.services.world.GeographicFeatureNamingService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics;
@@ -124,6 +126,11 @@ public class World {
     private int peakValleyCount = 8;
     private final List<TectonicPlate> tectonicPlates = new ArrayList<>();
     private final List<FaultLine> faultLines = new ArrayList<>();
+    private final List<GeographicFeature> geographicFeatures = new ArrayList<>();
+    private final Map<Hex, GeographicFeature> hexToFeature = new HashMap<>();
+    private final Map<Hex, GeographicFeature> hexToRiverFeature = new HashMap<>();
+    private final Map<RiverEdgeKey, GeographicFeature> riverEdgeToFeature = new HashMap<>();
+    private final GeographicFeatureNamingService geographicNamingService = new GeographicFeatureNamingService();
     private WorldGenStepListener worldGenStepListener;
     private int colonyIdCounter = 1;
     private int dynastyIdCounter = 1;
@@ -1243,6 +1250,413 @@ public class World {
         return null;
     }
 
+    public List<GeographicFeature> getGeographicFeatures() {
+        return Collections.unmodifiableList(geographicFeatures);
+    }
+
+    public GeographicFeature getFeatureForHex(Hex hex) {
+        return hex != null ? hexToFeature.get(hex) : null;
+    }
+
+    public GeographicFeature getRiverFeatureForHex(Hex hex) {
+        return hex != null ? hexToRiverFeature.get(hex) : null;
+    }
+
+    public GeographicFeature getFeatureForRiverEdge(Hex a, Hex b) {
+        return (a != null && b != null) ? riverEdgeToFeature.get(new RiverEdgeKey(a, b)) : null;
+    }
+
+    public void clearGeographicFeatures() {
+        this.geographicFeatures.clear();
+        this.hexToFeature.clear();
+        this.hexToRiverFeature.clear();
+        this.riverEdgeToFeature.clear();
+        this.geographicNamingService.reset();
+    }
+
+    public void addGeographicFeature(GeographicFeature feature) {
+        if (feature == null) return;
+        this.geographicFeatures.add(feature);
+        for (Hex h : feature.getHexes()) {
+            if (feature.getType() == GeographicFeature.FeatureType.RIVER) {
+                this.hexToRiverFeature.putIfAbsent(h, feature);
+            } else if (feature.getType() != GeographicFeature.FeatureType.CONTINENT
+                    && feature.getType() != GeographicFeature.FeatureType.ICE_CAP
+                    && feature.getType() != GeographicFeature.FeatureType.ARCHIPELAGO
+                    && feature.getType() != GeographicFeature.FeatureType.OCEAN) {
+                this.hexToFeature.putIfAbsent(h, feature);
+            }
+        }
+        if (feature.getType() == GeographicFeature.FeatureType.RIVER) {
+            for (Hex h : feature.getHexes()) {
+                for (int d = 0; d < 6; d++) {
+                    if (h.hasRiverEdge(d)) {
+                        Hex n = h.getNeighbor(d);
+                        if (n != null && feature.containsHex(n)) {
+                            this.riverEdgeToFeature.put(new RiverEdgeKey(h, n), feature);
+                        }
+                    }
+                }
+            }
+        }
+        feature.recalculateCentroid(this.worldWidth);
+    }
+
+    public void generateGeographicFeatures() {
+        clearGeographicFeatures();
+        if (this.hexes == null || this.hexes.isEmpty()) {
+            return;
+        }
+        int featureIdCounter = 1;
+
+        Set<Hex> visitedMountains = new HashSet<>();
+        for (Hex h : this.hexes) {
+            if (h == null || visitedMountains.contains(h)) continue;
+            boolean isMtn = (h.getElevation() >= 7
+                    || h.getBiome() == GameConstants.BIOME_MOUNTAIN
+                    || h.getBiome() == GameConstants.BIOME_PEAK)
+                    && !isWaterBiome(h.getBiome());
+            if (!isMtn) continue;
+
+            List<Hex> cluster = new ArrayList<>();
+            ArrayDeque<Hex> queue = new ArrayDeque<>();
+            visitedMountains.add(h);
+            queue.add(h);
+
+            while (!queue.isEmpty()) {
+                Hex curr = queue.poll();
+                cluster.add(curr);
+                for (int d = 0; d < 6; d++) {
+                    Hex n = curr.getNeighbor(d);
+                    if (n != null && !visitedMountains.contains(n) && !isWaterBiome(n.getBiome())) {
+                        boolean nMtn = (n.getElevation() >= 7
+                                || n.getBiome() == GameConstants.BIOME_MOUNTAIN
+                                || n.getBiome() == GameConstants.BIOME_PEAK);
+                        if (nMtn) {
+                            visitedMountains.add(n);
+                            queue.add(n);
+                        }
+                    }
+                }
+            }
+
+            if (cluster.size() >= 2) {
+                int fid = featureIdCounter++;
+                String key = geographicNamingService.claimNameKey(GeographicFeature.FeatureType.MOUNTAIN_RANGE, fid);
+                String dispName = geographicNamingService.formatDisplayName(key, fid);
+                GeographicFeature feat = new GeographicFeature(fid, GeographicFeature.FeatureType.MOUNTAIN_RANGE, dispName, key);
+                for (Hex ch : cluster) {
+                    feat.addHex(ch);
+                }
+                addGeographicFeature(feat);
+            }
+        }
+
+        Set<Hex> visitedLakes = new HashSet<>();
+        for (Hex h : this.hexes) {
+            if (h == null || visitedLakes.contains(h)) continue;
+            if (h.getBiome() != GameConstants.BIOME_LAKE) continue;
+
+            List<Hex> cluster = new ArrayList<>();
+            ArrayDeque<Hex> queue = new ArrayDeque<>();
+            visitedLakes.add(h);
+            queue.add(h);
+
+            while (!queue.isEmpty()) {
+                Hex curr = queue.poll();
+                cluster.add(curr);
+                for (int d = 0; d < 6; d++) {
+                    Hex n = curr.getNeighbor(d);
+                    if (n != null && !visitedLakes.contains(n) && n.getBiome() == GameConstants.BIOME_LAKE) {
+                        visitedLakes.add(n);
+                        queue.add(n);
+                    }
+                }
+            }
+
+            int fid = featureIdCounter++;
+            String key = geographicNamingService.claimNameKey(GeographicFeature.FeatureType.LAKE_BASIN, fid);
+            String dispName = geographicNamingService.formatDisplayName(key, fid);
+            GeographicFeature feat = new GeographicFeature(fid, GeographicFeature.FeatureType.LAKE_BASIN, dispName, key);
+            for (Hex ch : cluster) {
+                feat.addHex(ch);
+            }
+            addGeographicFeature(feat);
+        }
+
+        Set<Hex> visitedValleys = new HashSet<>();
+        for (Hex h : this.hexes) {
+            if (h == null || visitedValleys.contains(h)) continue;
+            if (isWaterBiome(h.getBiome()) || h.getBiome() == GameConstants.BIOME_LAKE || h.getElevation() > 3) continue;
+
+            List<Hex> cluster = new ArrayList<>();
+            ArrayDeque<Hex> queue = new ArrayDeque<>();
+            visitedValleys.add(h);
+            queue.add(h);
+
+            while (!queue.isEmpty()) {
+                Hex curr = queue.poll();
+                cluster.add(curr);
+                if (cluster.size() >= 35) {
+                    break;
+                }
+                for (int d = 0; d < 6; d++) {
+                    Hex n = curr.getNeighbor(d);
+                    if (n != null && !visitedValleys.contains(n) && !isWaterBiome(n.getBiome())
+                            && n.getBiome() != GameConstants.BIOME_LAKE && n.getElevation() <= 3) {
+                        visitedValleys.add(n);
+                        queue.add(n);
+                    }
+                }
+            }
+
+            if (cluster.size() >= 3) {
+                int fid = featureIdCounter++;
+                String key = geographicNamingService.claimNameKey(GeographicFeature.FeatureType.VALLEY, fid);
+                String dispName = geographicNamingService.formatDisplayName(key, fid);
+                GeographicFeature feat = new GeographicFeature(fid, GeographicFeature.FeatureType.VALLEY, dispName, key);
+                for (Hex ch : cluster) {
+                    feat.addHex(ch);
+                }
+                addGeographicFeature(feat);
+            }
+        }
+
+        Set<RiverEdgeKey> visitedEdges = new HashSet<>();
+        List<RiverEdgeKey> allEdges = new ArrayList<>();
+        for (Hex h : this.hexes) {
+            if (h == null) continue;
+            for (int d = 0; d < 6; d++) {
+                if (h.hasRiverEdge(d)) {
+                    Hex n = h.getNeighbor(d);
+                    if (n != null) {
+                        RiverEdgeKey ek = new RiverEdgeKey(h, n);
+                        if (!visitedEdges.contains(ek)) {
+                            visitedEdges.add(ek);
+                            allEdges.add(ek);
+                        }
+                    }
+                }
+            }
+        }
+        visitedEdges.clear();
+
+        Map<Hex, List<RiverEdgeKey>> hexToEdges = new HashMap<>();
+        for (RiverEdgeKey ek : allEdges) {
+            hexToEdges.computeIfAbsent(ek.h1, k -> new ArrayList<>()).add(ek);
+            hexToEdges.computeIfAbsent(ek.h2, k -> new ArrayList<>()).add(ek);
+        }
+
+        for (RiverEdgeKey edge : allEdges) {
+            if (visitedEdges.contains(edge)) continue;
+
+            List<RiverEdgeKey> edgeCluster = new ArrayList<>();
+            Set<Hex> riverHexes = new HashSet<>();
+            ArrayDeque<RiverEdgeKey> queue = new ArrayDeque<>();
+            visitedEdges.add(edge);
+            queue.add(edge);
+
+            while (!queue.isEmpty()) {
+                RiverEdgeKey curr = queue.poll();
+                edgeCluster.add(curr);
+                riverHexes.add(curr.h1);
+                riverHexes.add(curr.h2);
+
+                List<RiverEdgeKey> adj1 = hexToEdges.get(curr.h1);
+                if (adj1 != null) {
+                    for (RiverEdgeKey adj : adj1) {
+                        if (!visitedEdges.contains(adj)) {
+                            visitedEdges.add(adj);
+                            queue.add(adj);
+                        }
+                    }
+                }
+                List<RiverEdgeKey> adj2 = hexToEdges.get(curr.h2);
+                if (adj2 != null) {
+                    for (RiverEdgeKey adj : adj2) {
+                        if (!visitedEdges.contains(adj)) {
+                            visitedEdges.add(adj);
+                            queue.add(adj);
+                        }
+                    }
+                }
+            }
+
+            if (edgeCluster.size() >= 2) {
+                int fid = featureIdCounter++;
+                String key = geographicNamingService.claimNameKey(GeographicFeature.FeatureType.RIVER, fid);
+                String dispName = geographicNamingService.formatDisplayName(key, fid);
+                GeographicFeature feat = new GeographicFeature(fid, GeographicFeature.FeatureType.RIVER, dispName, key);
+                for (Hex rh : riverHexes) {
+                    feat.addHex(rh);
+                }
+                addGeographicFeature(feat);
+            }
+        }
+
+        Set<Hex> visitedPeninsulas = new HashSet<>();
+        for (Hex h : this.hexes) {
+            if (h == null || visitedPeninsulas.contains(h)) continue;
+            if (isWaterBiome(h.getBiome()) || h.getBiome() == GameConstants.BIOME_LAKE) continue;
+
+            int waterCount = 0;
+            for (int d = 0; d < 6; d++) {
+                Hex n = h.getNeighbor(d);
+                if (n == null || isWaterBiome(n.getBiome())) {
+                    waterCount++;
+                }
+            }
+            if (waterCount < 3) continue;
+
+            List<Hex> cluster = new ArrayList<>();
+            ArrayDeque<Hex> queue = new ArrayDeque<>();
+            visitedPeninsulas.add(h);
+            queue.add(h);
+
+            while (!queue.isEmpty()) {
+                Hex curr = queue.poll();
+                cluster.add(curr);
+                for (int d = 0; d < 6; d++) {
+                    Hex n = curr.getNeighbor(d);
+                    if (n != null && !visitedPeninsulas.contains(n) && !isWaterBiome(n.getBiome())
+                            && n.getBiome() != GameConstants.BIOME_LAKE) {
+                        int nWater = 0;
+                        for (int nd = 0; nd < 6; nd++) {
+                            Hex nn = n.getNeighbor(nd);
+                            if (nn == null || isWaterBiome(nn.getBiome())) {
+                                nWater++;
+                            }
+                        }
+                        if (nWater >= 2) {
+                            visitedPeninsulas.add(n);
+                            queue.add(n);
+                        }
+                    }
+                }
+            }
+
+            if (cluster.size() >= 2 && cluster.size() <= 10) {
+                boolean connectsToMainland = false;
+                for (Hex ph : cluster) {
+                    for (int d = 0; d < 6; d++) {
+                        Hex n = ph.getNeighbor(d);
+                        if (n != null && !cluster.contains(n) && !isWaterBiome(n.getBiome())
+                                && n.getBiome() != GameConstants.BIOME_LAKE) {
+                            connectsToMainland = true;
+                            break;
+                        }
+                    }
+                    if (connectsToMainland) break;
+                }
+
+                if (connectsToMainland) {
+                    int fid = featureIdCounter++;
+                    String key = geographicNamingService.claimNameKey(GeographicFeature.FeatureType.PENINSULA, fid);
+                    String dispName = geographicNamingService.formatDisplayName(key, fid);
+                    GeographicFeature feat = new GeographicFeature(fid, GeographicFeature.FeatureType.PENINSULA, dispName, key);
+                    for (Hex pch : cluster) {
+                        feat.addHex(pch);
+                    }
+                    addGeographicFeature(feat);
+                }
+            }
+        }
+
+        Set<Hex> visitedOceans = new HashSet<>();
+        for (Hex h : this.hexes) {
+            if (h == null || visitedOceans.contains(h)) continue;
+            if (!isWaterBiome(h.getBiome())) continue;
+
+            List<Hex> cluster = new ArrayList<>();
+            ArrayDeque<Hex> queue = new ArrayDeque<>();
+            visitedOceans.add(h);
+            queue.add(h);
+
+            while (!queue.isEmpty()) {
+                Hex curr = queue.poll();
+                cluster.add(curr);
+                for (int d = 0; d < 6; d++) {
+                    Hex n = curr.getNeighbor(d);
+                    if (n != null && !visitedOceans.contains(n) && isWaterBiome(n.getBiome())) {
+                        visitedOceans.add(n);
+                        queue.add(n);
+                    }
+                }
+            }
+
+            if (cluster.size() >= 10) {
+                int fid = featureIdCounter++;
+                String key = geographicNamingService.claimNameKey(GeographicFeature.FeatureType.OCEAN, fid);
+                String dispName = geographicNamingService.formatDisplayName(key, fid);
+                GeographicFeature feat = new GeographicFeature(fid, GeographicFeature.FeatureType.OCEAN, dispName, key);
+                for (Hex och : cluster) {
+                    feat.addHex(och);
+                }
+                addGeographicFeature(feat);
+            }
+        }
+
+        Set<Hex> visitedTrenches = new HashSet<>();
+        for (Hex h : this.hexes) {
+            if (h == null || visitedTrenches.contains(h) || h.getBiome() != GameConstants.BIOME_ABYSS) continue;
+
+            List<Hex> cluster = new ArrayList<>();
+            ArrayDeque<Hex> queue = new ArrayDeque<>();
+            visitedTrenches.add(h);
+            queue.add(h);
+
+            while (!queue.isEmpty()) {
+                Hex curr = queue.poll();
+                cluster.add(curr);
+                for (int d = 0; d < 6; d++) {
+                    Hex n = curr.getNeighbor(d);
+                    if (n != null && !visitedTrenches.contains(n) && n.getBiome() == GameConstants.BIOME_ABYSS) {
+                        visitedTrenches.add(n);
+                        queue.add(n);
+                    }
+                }
+            }
+
+            if (!cluster.isEmpty()) {
+                int fid = featureIdCounter++;
+                String key = geographicNamingService.claimNameKey(GeographicFeature.FeatureType.TRENCH, fid);
+                String dispName = geographicNamingService.formatDisplayName(key, fid);
+                GeographicFeature feat = new GeographicFeature(fid, GeographicFeature.FeatureType.TRENCH, dispName, key);
+                for (Hex tch : cluster) {
+                    feat.addHex(tch);
+                }
+                addGeographicFeature(feat);
+            }
+        }
+
+        List<Continent> allLandmasses = getAllLandmasses();
+        if (allLandmasses != null) {
+            for (Continent cont : allLandmasses) {
+                if (cont == null || cont.getHexes().isEmpty()) continue;
+                GeographicFeature.FeatureType ctype;
+                if (cont.isIceCap()) {
+                    ctype = GeographicFeature.FeatureType.ICE_CAP;
+                } else if (cont.isArchipelago()) {
+                    ctype = GeographicFeature.FeatureType.ARCHIPELAGO;
+                } else {
+                    ctype = GeographicFeature.FeatureType.CONTINENT;
+                }
+                int fid = featureIdCounter++;
+                GeographicFeature feat = new GeographicFeature(fid, ctype, cont.getName());
+                for (Hex ch : cont.getHexes()) {
+                    feat.addHex(ch);
+                }
+                addGeographicFeature(feat);
+            }
+        }
+    }
+
+    public void ensureGeographicFeaturesReconstructed() {
+        if (this.geographicFeatures.isEmpty() && this.hexes != null && !this.hexes.isEmpty()) {
+            generateGeographicFeatures();
+        }
+    }
+
     public WorldGenStepListener getWorldGenStepListener() {
         return worldGenStepListener;
     }
@@ -1601,14 +2015,20 @@ public class World {
             int dist = entry.getValue();
             FaultLine.FaultType fType = nearestFaultType.get(h);
             int intensity = nearestFaultIntensity.getOrDefault(h, 1);
+            TectonicPlate plate = getPlateById(h.getPlateId());
+            boolean isOceanPlate = (plate != null && plate.isOceanic());
             if (fType == FaultLine.FaultType.CONVERGENT) {
-                int uplift = switch (dist) {
-                    case 0 -> (int) Math.round(((intensity == 2 ? 5 : 3) + GameRandom.nextInt(3)) * faultUpliftFactor);
-                    case 1 -> (int) Math.round(((intensity == 2 ? 3 : 2) + GameRandom.nextInt(2)) * faultUpliftFactor);
-                    case 2 -> intensity == 2 ? 2 : 1;
-                    default -> 0;
-                };
-                h.setElevation(h.getElevation() + uplift);
+                if (isOceanPlate && dist == 0) {
+                    h.setElevation(-2);
+                } else {
+                    int uplift = switch (dist) {
+                        case 0 -> (int) Math.round(((intensity == 2 ? 5 : 3) + GameRandom.nextInt(3)) * faultUpliftFactor);
+                        case 1 -> (int) Math.round(((intensity == 2 ? 3 : 2) + GameRandom.nextInt(2)) * faultUpliftFactor);
+                        case 2 -> intensity == 2 ? 2 : 1;
+                        default -> 0;
+                    };
+                    h.setElevation(h.getElevation() + uplift);
+                }
             } else if (fType == FaultLine.FaultType.DIVERGENT) {
                 int subsidence = switch (dist) {
                     case 0 -> (intensity == 2 ? 4 : 2) + GameRandom.nextInt(3);
@@ -1617,14 +2037,15 @@ public class World {
                     default -> 0;
                 };
                 h.setElevation(h.getElevation() - subsidence);
+                if (isOceanPlate && dist == 0) {
+                    h.setElevation(Math.min(h.getElevation(), -2));
+                }
             } else if (fType == FaultLine.FaultType.TRANSFORM) {
                 if (intensity == 2) {
                     if (dist == 0) {
-                        TectonicPlate plate = getPlateById(h.getPlateId());
                         int flattened = (plate != null && plate.isOceanic()) ? 2 : 3;
                         h.setElevation(flattened);
                     } else if (dist == 1 && GameRandom.nextInt(100) < 50) {
-                        TectonicPlate plate = getPlateById(h.getPlateId());
                         int flattened = (plate != null && plate.isOceanic()) ? 2 : 3;
                         h.setElevation((h.getElevation() + flattened) / 2);
                     }
@@ -2132,7 +2553,10 @@ public class World {
             if (h == null || allLand.contains(h) || h.getBiome() == GameConstants.BIOME_LAKE || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
                 continue;
             }
-            if (h.getElevation() <= 0) {
+            if (h.getElevation() <= -1) {
+                h.setBiome(GameConstants.BIOME_ABYSS);
+                h.setLocalWeather(getRandomWeather(GameConstants.BIOME_ABYSS));
+            } else if (h.getElevation() == 0) {
                 h.setBiome(GameConstants.BIOME_DEEP_OCEAN);
                 h.setLocalWeather(getRandomWeather(GameConstants.BIOME_DEEP_OCEAN));
             } else if (h.getElevation() == 1) {
@@ -2223,6 +2647,7 @@ public class World {
             }
         }
         rebuildContinentsFromHexes();
+        generateGeographicFeatures();
         notifyStep(14, "Generate Downhill River Networks");
 
         // Step 15: Spawn player dynasty and distribute rival dynasties
@@ -5263,6 +5688,7 @@ public class World {
         return biome == GameConstants.BIOME_OCEAN
                 || biome == GameConstants.BIOME_DEEP_OCEAN
                 || biome == GameConstants.BIOME_SHALLOW_OCEAN
+                || biome == GameConstants.BIOME_ABYSS
                 || biome == GameConstants.BIOME_LAKE;
     }
     
