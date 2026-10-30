@@ -1219,6 +1219,7 @@ DIPLO_MODIFIER_GRANTED_INDEPENDENCE,Granted Independence,Independencia concedida
 DIPLO_MODIFIER_WAS_AT_WAR,Was at War,Estuvieron en guerra,Estiveram em guerra,Étaient en guerre,,,
 DIPLO_MODIFIER_GENETIC_EXCHANGE,Genetic Exchange,Intercambio genético,Intercâmbio genético,Échange génétique,,,
 DIPLO_MODIFIER_WARMONGER,Warmonger,Belicista,Belicista,Belliciste,,,
+DIPLO_MODIFIER_SAME_SPECIES,Same Species,Misma Especie,Mesma Espécie,Même Espèce,,,
 DIPLO_MODIFIER_CAUGHT_SPYING,Caught Spying,Espionaje descubierto,Espionagem descoberta,Espionnage découvert,,,
 DYNASTY_REBELLION_NAME_FMT,%s Rebellion,%s Rebelión,%s Rebelião,%s Rébellion,,,
 REBELLION_WAR_NAME_FMT,%s %s Rebellion,%s Rebelión %s,%s %s Rebelião,%s %s Rébellion,,,
@@ -2673,7 +2674,7 @@ HELP_ANT_AGING_DESC,"Ants age 1 hour every in-game hour. Lifespans vary by caste
 HELP_COMBAT_WATER_CROSSING,Water Crossing & Rafting,Cruce de Agua y Balsas,Travessia de Água e Jangadas,Traversée d'Eau et Radeaux
 HELP_COMBAT_WATER_CROSSING_BODY,"Crossing aquatic hexes (oceans, lakes) during military campaigns requires the Rafting assimilation and upgrades (Rafting 1 and 2). Without rafting adaptations, armies cannot march across open water borders or suffer heavy combat and movement penalties unless utilizing subterranean tunnels.","Cruzar hexágonos acuáticos (océanos, lagos) en campañas militares requiere la asimilación de Balsas y sus mejoras (Balsas 1 y 2). Sin adaptaciones de balsa, los ejércitos no pueden cruzar fronteras acuáticas o sufren graves penalizaciones de combate y velocidad a menos que utilicen túneles subterráneos.","Atravessar hexágonos aquáticos (oceanos, lagos) em campanhas militares requer a assimilação de Jangadas e suas melhorias (Jangada 1 e 2). Sem adaptação, os exércitos não podem cruzar fronteiras aquáticas ou sofrem pesadas penalidades de combate e velocidade, exceto via túneis subterrâneos.","Traverser des hexagones aquatiques (océans, lacs) en campagne militaire nécessite l'assimilation Radeaux et ses améliorations (Radeaux 1 et 2). Sans cette adaptation, les armées ne peuvent franchir les frontières aquatiques ou subissent de lourdes pénalités de combat et de vitesse, sauf via des tunnels souterrains."
 HELP_COMBAT_CARRIER_DESC,"Major Troop-Carriers transport reserve military ants to frontline battle lines. Each carrier increases daily reinforcement rates up to the daily allowance, remaining in reserve and not fighting directly.","Los transportes de tropas (Mayores) transportan hormigas de reserva a las líneas del frente. Cada transporte aumenta la tasa de refuerzo diario hasta el cupo permitido, permaneciendo en reserva sin combatir directamente.","Os transportes de tropas (Majores) levam formigas de reserva para as linhas de combate. Cada transporte aumenta a taxa diária de reforços até ao limite diário, ficando na reserva sem combater diretamente.","Les transporteurs de troupes (Majors) acheminent les fourmis de réserve vers les lignes de front. Chaque transporteur augmente le taux de renfort quotidien jusqu'à la limite autorisée, restant en réserve sans combattre directement."
-MAP_MODE_BUTTON,◈,◈,◈,◈
+MAP_MODE_BUTTON,<>,<>,<>,<>
 MAP_MODE_BUTTON_TT,Toggle map display mode,Cambiar modo de visualización del mapa,Alternar modo de exibição do mapa,Changer le mode d'affichage de la carte
 MAP_MODE_BIOME,Biome,Bioma,Bioma,Biome
 MAP_MODE_HEIGHT,Height,Altura,Altura,Altitude
@@ -2836,3 +2837,8 @@ MAP_LAYER_LABEL_LAKES,Lake basins,Cuencas de lagos,Bacias de lagos,Bassins lacus
 MAP_LAYER_LABEL_RIVERS,River names,Nombres de ríos,Nomes de rios,Noms de rivières
 MAP_LAYER_LABEL_PENINSULAS,Peninsulas,Penínsulas,Penínsulas,Péninsules
 MAP_LAYER_ALL,All layers,Todas las capas,Todas as camadas,Tous les calques
+SAVE_SPECTATOR_MODE,Spectator Mode,Modo Espectador,Modo Espectador,Mode Spectateur
+UI_SPEED_HYPER_TURBO,Hyper Turbo,Híper Turbo,Hiper Turbo,Hyper Turbo
+MAP_WORLD_LOGS_TITLE_FMT,World logs (%s),Registros del mundo (%s),Registos do mundo (%s),Journaux du monde (%s)
+MAP_WORLD_LOGS_SHOW,Show world logs,Mostrar registros del mundo,Mostrar registos do mundo,Afficher les journaux du monde
+MAP_WORLD_LOGS_HIDE,Hide world logs,Ocultar registros del mundo,Ocultar registos do mundo,Masquer les journaux du monde

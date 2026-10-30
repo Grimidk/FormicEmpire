@@ -38,6 +38,7 @@ public final class GameNumbers {
     public static final int EATING_AGGREGATE_ANT_THRESHOLD = SPRITE_MERGE_ANT_THRESHOLD;
     public static final int GUI_HOUR_MINIMAP_REFRESH_INTERVAL = 6;
     public static final int GUI_HOUR_CONTROL_PANEL_REFRESH_INTERVAL = 6;
+    public static final int SPECTATOR_HYPER_TURBO_MINUTES_PER_TICK = 360;
     public static final int NPC_DAILY_STAGGER_DAYS = 7;
 
     public static boolean runsNpcDailyWorkToday(int worldDay, int entityId) {

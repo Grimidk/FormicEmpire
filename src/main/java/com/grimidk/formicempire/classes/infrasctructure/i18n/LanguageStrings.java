@@ -2224,6 +2224,7 @@ public final class LanguageStrings {
     public static final String DIPLO_MODIFIER_WAS_AT_WAR = "DIPLO_MODIFIER_WAS_AT_WAR";
     public static final String DIPLO_MODIFIER_GENETIC_EXCHANGE = "DIPLO_MODIFIER_GENETIC_EXCHANGE";
     public static final String DIPLO_MODIFIER_WARMONGER = "DIPLO_MODIFIER_WARMONGER";
+    public static final String DIPLO_MODIFIER_SAME_SPECIES = "DIPLO_MODIFIER_SAME_SPECIES";
     public static final String DIPLO_MODIFIER_CAUGHT_SPYING = "DIPLO_MODIFIER_CAUGHT_SPYING";
     public static final String DYNASTY_REBELLION_NAME_FMT = "DYNASTY_REBELLION_NAME_FMT";
     public static final String REBELLION_WAR_NAME_FMT = "REBELLION_WAR_NAME_FMT";
@@ -3272,4 +3273,9 @@ public final class LanguageStrings {
     public static final String GEOGRAPHIC_FEATURE_ICE_CAP = "GEOGRAPHIC_FEATURE_ICE_CAP";
     public static final String GEOGRAPHIC_FEATURE_CONTINENT = "GEOGRAPHIC_FEATURE_CONTINENT";
     public static final String GEOGRAPHIC_FEATURE_TRENCH = "GEOGRAPHIC_FEATURE_TRENCH";
+    public static final String SAVE_SPECTATOR_MODE = "SAVE_SPECTATOR_MODE";
+    public static final String UI_SPEED_HYPER_TURBO = "UI_SPEED_HYPER_TURBO";
+    public static final String MAP_WORLD_LOGS_TITLE_FMT = "MAP_WORLD_LOGS_TITLE_FMT";
+    public static final String MAP_WORLD_LOGS_SHOW = "MAP_WORLD_LOGS_SHOW";
+    public static final String MAP_WORLD_LOGS_HIDE = "MAP_WORLD_LOGS_HIDE";
 }

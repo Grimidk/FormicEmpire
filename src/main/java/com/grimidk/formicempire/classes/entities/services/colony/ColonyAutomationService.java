@@ -122,6 +122,7 @@ public class ColonyAutomationService {
                 ? colony.getDynasty().getOwningWorld().getEngine()
                 : null;
         boolean instant = eng != null && eng.isInstantBuildings();
+        if (!instant && !colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) return;
         for (Building b : GameUnlocks.getBuildings()) {
             boolean notOwned = !colony.hasBuilding(b);
             boolean reqMet = (b.getRequirement() == null || colony.hasBuilding(b.getRequirement()));
@@ -275,18 +276,6 @@ public class ColonyAutomationService {
             int scoutTarget = Math.max(1, (int) (totalWorkers * 0.02));
             int toAdd = Math.min(scoutTarget, remaining);
             targets.put(GameConstants.ROLE_SCOUT, toAdd);
-            remaining -= toAdd;
-        }
-
-        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
-            int minerTarget = (int) (totalWorkers * 0.15);
-            int toAdd = Math.min(remaining, minerTarget);
-
-            if (colony.getMinerals() >= colony.getMineralsCapacity()) {
-                toAdd = Math.min(remaining, Math.max(1, (int) (minerTarget * 0.10)));
-            }
-
-            targets.put(GameConstants.ROLE_MINER, toAdd);
             remaining -= toAdd;
         }
 
@@ -453,6 +442,18 @@ public class ColonyAutomationService {
                 targets.put(GameConstants.ROLE_ESCORT, assignedEscorts);
                 remainingSoldiers -= assignedEscorts;
             }
+        }
+
+        if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
+            int minerTarget = Math.max(1, (int) (totalSoldiers * 0.15));
+            int toAdd = Math.min(remainingSoldiers, minerTarget);
+
+            if (colony.getMinerals() >= colony.getMineralsCapacity()) {
+                toAdd = Math.min(remainingSoldiers, Math.max(1, (int) (minerTarget * 0.10)));
+            }
+
+            targets.put(GameConstants.ROLE_MINER, toAdd);
+            remainingSoldiers -= toAdd;
         }
 
         if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
@@ -713,11 +714,16 @@ public class ColonyAutomationService {
             diplomatReserve = Math.min(2, Math.max(0, remainingPrincesses - skyTrans));
         }
         int remaining = Math.max(0, remainingPrincesses - skyTrans - diplomatReserve);
-        int assistantCount = (int) (remaining * 0.80);
+        int assistantCount = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT)) {
+            int minBreeders = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? Math.min(remaining, 2) : 0;
+            assistantCount = Math.min(remaining - minBreeders, (int) (remaining * 0.80));
+        }
+        int breederCount = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? (remaining - assistantCount) : 0;
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
         targets.put(GameConstants.ROLE_DIPLOMAT, diplomatReserve);
-        targets.put(GameConstants.ROLE_BREEDER, remaining - assistantCount);
+        targets.put(GameConstants.ROLE_BREEDER, breederCount);
     }
 
     private void calculateSatellitePrincessQuotas(Colony colony, Map<AntRole, Integer> targets, int totalPrincesses) {
@@ -765,8 +771,19 @@ public class ColonyAutomationService {
 
         int waterCapacity = colony.getStatsService().getWaterCapacity(colony);
         int totalAnts = colony.getAntTotal();
+        int eggsCount = colony.getEggs().size();
+        int eggsCap = colony.getStatsService().getEggsCapacity(colony);
+        boolean hasOtherResearch = colony.hasBuilding(GameUnlocks.PASSIVE_LAB)
+                || (colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT)
+                        && colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT) >= 4);
+        boolean eggChamberFull = eggsCount >= eggsCap;
+        boolean earlyResearchShare = !hasOtherResearch
+                && totalAnts >= GameNumbers.TRIGGER_NPC_RESEARCHER_MIN_ANTS
+                && eggsCount >= Math.min(eggsCap, 36);
 
-        if (totalAnts >= waterCapacity && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER) && colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT) <= 25) {
+        if ((eggChamberFull || earlyResearchShare || totalAnts >= waterCapacity)
+                && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)
+                && colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT) <= 25) {
             if (remainingQueens == 1) {
                 targets.put(GameConstants.ROLE_RESEARCHER, 1);
             } else {

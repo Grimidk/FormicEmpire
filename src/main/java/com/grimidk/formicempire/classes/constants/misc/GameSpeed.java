@@ -13,9 +13,11 @@ public class GameSpeed extends Constant {
     public static final int ID_FAST = 3;
     public static final int ID_VERY_FAST = 4;
     public static final int ID_TURBO = 5;
+    public static final int ID_HYPER_TURBO = 6;
 
     public static final int MIN_PLAYABLE_ID = ID_VERY_SLOW;
     public static final int MAX_PLAYABLE_ID = ID_TURBO;
+    public static final int MAX_SPECTATOR_PLAYABLE_ID = ID_HYPER_TURBO;
     public static final int MAX_PLAYABLE_ID_WITHOUT_TURBO = ID_VERY_FAST;
 
     private final int delayMs;
@@ -39,13 +41,24 @@ public class GameSpeed extends Constant {
     }
 
     public static int maxPlayableId(boolean allowTurbo) {
+        return maxPlayableId(allowTurbo, false);
+    }
+
+    public static int maxPlayableId(boolean allowTurbo, boolean spectatorMode) {
+        if (spectatorMode) {
+            return MAX_SPECTATOR_PLAYABLE_ID;
+        }
         return allowTurbo ? MAX_PLAYABLE_ID : MAX_PLAYABLE_ID_WITHOUT_TURBO;
     }
 
     public static GameSpeed step(GameSpeed current, int delta, boolean allowTurbo) {
+        return step(current, delta, allowTurbo, false);
+    }
+
+    public static GameSpeed step(GameSpeed current, int delta, boolean allowTurbo, boolean spectatorMode) {
         GameSpeed base = current != null ? current : GameConstants.SPEED_NORMAL;
         int minId = MIN_PLAYABLE_ID;
-        int maxId = maxPlayableId(allowTurbo);
+        int maxId = maxPlayableId(allowTurbo, spectatorMode);
         int nextId = Math.max(minId, Math.min(maxId, base.getId() + delta));
         return fromId(nextId);
     }
@@ -54,6 +67,9 @@ public class GameSpeed extends Constant {
         GameSpeed closest = GameConstants.SPEED_NORMAL;
         int minDiff = Integer.MAX_VALUE;
         for (GameSpeed speed : GameConstants.getGameSpeeds()) {
+            if (speed.getId() == ID_HYPER_TURBO) {
+                continue;
+            }
             int diff = Math.abs(speed.delayMs - delayMs);
             if (diff < minDiff) {
                 minDiff = diff;

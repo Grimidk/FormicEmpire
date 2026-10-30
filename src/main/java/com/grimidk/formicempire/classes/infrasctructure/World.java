@@ -105,6 +105,7 @@ public class World {
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
     private boolean allowsAchievements = true;
+    private boolean spectatorMode = false;
     private int worldRadius = GameNumbers.worldRadiusForContinentCore(
             GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
     private int continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
@@ -209,6 +210,14 @@ public class World {
 
     public void disableAchievements() {
         this.allowsAchievements = false;
+    }
+
+    public boolean isSpectatorMode() {
+        return spectatorMode;
+    }
+
+    public void setSpectatorMode(boolean spectatorMode) {
+        this.spectatorMode = spectatorMode;
     }
 
     public int getSaveSlotId() {
@@ -478,6 +487,9 @@ public class World {
     }
 
     public Dynasty findPlayerDynasty() {
+        if (this.spectatorMode) {
+            return null;
+        }
         if (dynastys != null) {
             for (Dynasty dynasty : dynastys) {
                 if (dynasty != null && dynasty.isPlayer()) {
@@ -486,7 +498,7 @@ public class World {
             }
         }
         Hex spawn = getSpawnHex();
-        if (spawn != null && spawn.getColony() != null) {
+        if (spawn != null && spawn.getColony() != null && spawn.getColony().isPlayer()) {
             return spawn.getColony().getDynasty();
         }
         return null;
@@ -923,6 +935,13 @@ public class World {
                 return h;
             }
         }
+        if (this.spectatorMode) {
+            for (Hex h : this.hexes) {
+                if (h.getColony() != null) {
+                    return h;
+                }
+            }
+        }
         for (Hex h : this.hexes) {
             if (h.getQ() == 0 && h.getR() == 0) {
                 return h;
@@ -954,7 +973,7 @@ public class World {
 
         this.activeHex = resolved;
         this.activeHex.setActive(true);
-        if (this.activeHex.getColony() != null) {
+        if (this.activeHex.getColony() != null && !this.spectatorMode && this.activeHex.getColony().isPlayer()) {
             this.activeHex.getColony().setActive(true);
         }
         
@@ -1724,7 +1743,7 @@ public class World {
         if (playerTitleKey == null || playerTitleKey.isEmpty()) {
             playerTitleKey = GameConstants.DYNASTY_TITLE_DYNASTY.getNameKey();
         }
-        if (startColony == null) {
+        if (!this.spectatorMode && startColony == null) {
             startColony = new Colony(1, baseName + " Prime", true);
         }
         // Step 1: Initialize world state and player dynasty
@@ -1736,7 +1755,7 @@ public class World {
         this.continentCount = 0;
         this.islandCount = 0;
         Map<String, Hex> hexMap = new HashMap<>();
-        if (seedDynasties) {
+        if (seedDynasties && !this.spectatorMode) {
             ColonyStarterService starterService = ColonyStarterService.shared();
             if (startColony.getAntTotal() == 0) {
                 starterService.initializeNewColony(startColony);
@@ -2652,7 +2671,22 @@ public class World {
 
         // Step 15: Spawn player dynasty and distribute rival dynasties
         if (seedDynasties) {
-            spawnPlayerOnRandomContinent(startBiome, startColony, continentHexes);
+            continentHexes.clear();
+            for (Hex h : this.hexes) {
+                if (h != null && h.getContinentId() > 0 && isLandHex(h) && !h.isIsland()) {
+                    continentHexes.computeIfAbsent(h.getContinentId(), k -> new HashSet<>()).add(h);
+                }
+            }
+            if (continentHexes.isEmpty()) {
+                for (Hex h : this.hexes) {
+                    if (h != null && isLandHex(h)) {
+                        continentHexes.computeIfAbsent(1, k -> new HashSet<>()).add(h);
+                    }
+                }
+            }
+            if (!this.spectatorMode) {
+                spawnPlayerOnRandomContinent(startBiome, startColony, continentHexes);
+            }
             distributeRivalDynastiesAcrossContinents(continentHexes);
             rebuildColonizedHexIndexIfNeeded();
             notifyStep(15, "Spawn Dynasties");
@@ -3904,57 +3938,70 @@ public class World {
     }
 
     public void populateDynasties(Biome startBiome, Colony startColony, String baseName, String playerTitleKey) {
-        if (startBiome == null) {
-            startBiome = GameConstants.BIOME_PLAINS;
-        }
-        if (baseName == null || baseName.isEmpty()) {
-            baseName = "Player";
-        }
-        if (playerTitleKey == null || playerTitleKey.isEmpty()) {
-            playerTitleKey = GameConstants.DYNASTY_TITLE_DYNASTY.getNameKey();
-        }
-        if (startColony == null) {
-            startColony = new Colony(1, baseName + " Prime", true);
-        }
-        ColonyStarterService starterService = ColonyStarterService.shared();
-        if (startColony.getAntTotal() == 0) {
-            starterService.initializeNewColony(startColony);
-        }
+        if (!this.spectatorMode) {
+            if (startBiome == null) {
+                startBiome = GameConstants.BIOME_PLAINS;
+            }
+            if (baseName == null || baseName.isEmpty()) {
+                baseName = "Player";
+            }
+            if (playerTitleKey == null || playerTitleKey.isEmpty()) {
+                playerTitleKey = GameConstants.DYNASTY_TITLE_DYNASTY.getNameKey();
+            }
+            if (startColony == null) {
+                startColony = new Colony(1, baseName + " Prime", true);
+            }
+            ColonyStarterService starterService = ColonyStarterService.shared();
+            if (startColony.getAntTotal() == 0) {
+                starterService.initializeNewColony(startColony);
+            }
 
-        baseName = formatName(baseName);
-        DynastyTitle playerTitle = GameConstants.getDynastyTitleByKey(playerTitleKey);
-        String dynName = LanguageStrings.formatDynastyName(baseName, playerTitle);
-        namingService.registerUsedName(dynName);
+            baseName = formatName(baseName);
+            DynastyTitle playerTitle = GameConstants.getDynastyTitleByKey(playerTitleKey);
+            String dynName = LanguageStrings.formatDynastyName(baseName, playerTitle);
+            namingService.registerUsedName(dynName);
 
-        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, playerTitle.getNameKey(), true, GameConstants.SPECIES_OMNI);
-        playerDynasty.setThemeBase(baseName);
-        playerDynasty.getStarterService().initializeDynasty(playerDynasty);
+            Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, playerTitle.getNameKey(), true, GameConstants.SPECIES_OMNI);
+            playerDynasty.setThemeBase(baseName);
+            playerDynasty.getStarterService().initializeDynasty(playerDynasty);
 
-        String capName = namingService.generateCapitalName(baseName);
-        startColony.setName(capName);
+            String capName = namingService.generateCapitalName(baseName);
+            startColony.setName(capName);
 
-        playerDynasty.addColony(startColony);
-        playerDynasty.setCapital(startColony);
-        registerDynasty(playerDynasty);
-        historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
-                playerDynasty.getId(), startColony.getId(), -1,
-                WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
-        historyService.record(WorldHistoryEventType.COLONY_FOUNDED, LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
-                playerDynasty.getId(), startColony.getId(), -1,
-                WorldHistoryEvent.colonyArg(startColony.getId()),
-                WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
+            playerDynasty.addColony(startColony);
+            playerDynasty.setCapital(startColony);
+            registerDynasty(playerDynasty);
+            historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
+                    playerDynasty.getId(), startColony.getId(), -1,
+                    WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
+            historyService.record(WorldHistoryEventType.COLONY_FOUNDED, LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                    playerDynasty.getId(), startColony.getId(), -1,
+                    WorldHistoryEvent.colonyArg(startColony.getId()),
+                    WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
 
-        this.colonyIdCounter = startColony.getId() + 1;
+            this.colonyIdCounter = startColony.getId() + 1;
+        }
 
         Map<Integer, Set<Hex>> continentHexes = new HashMap<>();
         for (Hex h : this.hexes) {
-            if (h != null && h.getContinentId() != 0) {
+            if (h != null && h.getContinentId() > 0 && isLandHex(h) && !h.isIsland()) {
                 continentHexes.computeIfAbsent(h.getContinentId(), k -> new HashSet<>()).add(h);
             }
         }
-        spawnPlayerOnRandomContinent(startBiome, startColony, continentHexes);
+        if (continentHexes.isEmpty()) {
+            for (Hex h : this.hexes) {
+                if (h != null && isLandHex(h)) {
+                    continentHexes.computeIfAbsent(1, k -> new HashSet<>()).add(h);
+                }
+            }
+        }
+        if (!this.spectatorMode) {
+            spawnPlayerOnRandomContinent(startBiome, startColony, continentHexes);
+        }
         distributeRivalDynastiesAcrossContinents(continentHexes);
+        markColonizedHexIndexDirty();
         rebuildColonizedHexIndexIfNeeded();
+        bindDynastyTradeServices();
     }
 
     private void spawnPlayerOnRandomContinent(Biome startBiome, Colony startColony, Map<Integer, Set<Hex>> continentHexes) {
@@ -3986,7 +4033,7 @@ public class World {
         }
         if (spawnHex == null) {
             for (Hex h : cSet) {
-                if (!h.isIsland() && h.getColony() == null && h.getBiome() != GameConstants.BIOME_LAKE) {
+                if (!h.isIsland() && h.getColony() == null && h.getBiome() != null && h.getBiome().canStart()) {
                     spawnHex = h;
                     spawnHex.setBiome(startBiome);
                     spawnHex.setLocalWeather(getRandomWeather(startBiome));
@@ -3999,6 +4046,7 @@ public class World {
         }
 
         spawnHex.setColony(startColony);
+        markColonizedHexIndexDirty();
         startColony.setActive(true);
         changeActiveHex(spawnHex);
     }
@@ -4021,63 +4069,106 @@ public class World {
         int dynastyLimit = (this.targetRivalDynastyCount >= 0)
                 ? Math.min(this.targetRivalDynastyCount, speciesList.size())
                 : speciesList.size();
+        Set<AntSpecies> spawnedInFavBiome = new HashSet<>();
         for (int i = 0; i < dynastyLimit; i++) {
             AntSpecies npcSpecies = speciesList.get(i);
-            int cid = continentIds.get(i % continentIds.size());
-            Set<Hex> cSet = continentHexes.get(cid);
+            Biome favBiome = (npcSpecies != null && npcSpecies.getPreferredBiome() != null && npcSpecies.getPreferredBiome().canStart())
+                    ? npcSpecies.getPreferredBiome()
+                    : null;
+            boolean needsFavBiome = (favBiome != null && !spawnedInFavBiome.contains(npcSpecies));
+            int cid = !continentIds.isEmpty() ? continentIds.get(i % continentIds.size()) : 0;
+            Set<Hex> cSet = continentHexes.getOrDefault(cid, Set.of());
 
             Hex bestHex = null;
             int bestScore = Integer.MIN_VALUE;
 
-            for (Hex h : cSet) {
-                if (h.getColony() != null || h.isIsland() || h.getBiome() == GameConstants.BIOME_LAKE) {
-                    continue;
-                }
-
-                int minCapDist = Integer.MAX_VALUE;
-                for (Hex cap : placedCapitals) {
-                    int d = GameNumbers.axialHexDistance(h.getQ(), h.getR(), cap.getQ(), cap.getR());
-                    if (d < minCapDist) {
-                        minCapDist = d;
+            if (needsFavBiome) {
+                for (Hex h : cSet) {
+                    if (h.getColony() != null || h.isIsland() || h.getBiome() != favBiome) {
+                        continue;
+                    }
+                    int score = scoreCapitalCandidate(h, placedCapitals, npcSpecies) + 200;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestHex = h;
                     }
                 }
-
-                int score = 0;
-                if (minCapDist >= 3) {
-                    score += 50;
-                } else if (minCapDist >= 2) {
-                    score += 20;
-                }
-
-                if (npcSpecies.getPreferredBiome() != null) {
-                    if (h.getBiome() == npcSpecies.getPreferredBiome()) {
-                        score += 100;
-                    } else if (h.getBiome().getClimateZone() == npcSpecies.getPreferredBiome().getClimateZone()) {
-                        score += 30;
+                if (bestHex == null) {
+                    for (Set<Hex> otherSet : continentHexes.values()) {
+                        for (Hex h : otherSet) {
+                            if (h.getColony() != null || h.isIsland() || h.getBiome() != favBiome) {
+                                continue;
+                            }
+                            int score = scoreCapitalCandidate(h, placedCapitals, npcSpecies) + 150;
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestHex = h;
+                            }
+                        }
                     }
                 }
+                if (bestHex == null) {
+                    for (Hex h : this.hexes) {
+                        if (h.getColony() == null && isLandHex(h) && !h.isIsland() && h.getBiome() == favBiome) {
+                            int score = scoreCapitalCandidate(h, placedCapitals, npcSpecies) + 100;
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestHex = h;
+                            }
+                        }
+                    }
+                }
+            }
 
-                score += GameRandom.nextInt(15);
+            if (bestHex == null) {
+                for (Hex h : cSet) {
+                    if (h.getColony() != null || h.isIsland() || h.getBiome() == null || !h.getBiome().canStart()) {
+                        continue;
+                    }
+                    int score = scoreCapitalCandidate(h, placedCapitals, npcSpecies);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestHex = h;
+                    }
+                }
+            }
 
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestHex = h;
+            if (favBiome != null && (bestHex == null || bestHex.getBiome() != favBiome)) {
+                int favScore = bestHex != null ? bestScore : Integer.MIN_VALUE;
+                for (Set<Hex> otherSet : continentHexes.values()) {
+                    for (Hex h : otherSet) {
+                        if (h.getColony() != null || h.isIsland() || h.getBiome() != favBiome) {
+                            continue;
+                        }
+                        int score = scoreCapitalCandidate(h, placedCapitals, npcSpecies);
+                        if (score > favScore) {
+                            favScore = score;
+                            bestHex = h;
+                            bestScore = score;
+                        }
+                    }
                 }
             }
 
             if (bestHex == null) {
                 for (Hex h : this.hexes) {
-                    if (h.getColony() == null && isLandHex(h) && !h.isIsland()) {
-                        bestHex = h;
-                        break;
+                    if (h.getColony() == null && isLandHex(h) && !h.isIsland() && h.getBiome() != null && h.getBiome().canStart()) {
+                        int score = scoreCapitalCandidate(h, placedCapitals, npcSpecies);
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestHex = h;
+                        }
                     }
                 }
             }
             if (bestHex == null) {
                 for (Hex h : this.hexes) {
-                    if (h.getColony() == null && isLandHex(h)) {
-                        bestHex = h;
-                        break;
+                    if (h.getColony() == null && isLandHex(h) && h.getBiome() != null && h.getBiome().canStart()) {
+                        int score = scoreCapitalCandidate(h, placedCapitals, npcSpecies);
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestHex = h;
+                        }
                     }
                 }
             }
@@ -4086,14 +4177,20 @@ public class World {
                 continue;
             }
 
-            if (npcSpecies.getPreferredBiome() != null && bestHex.getBiome() != npcSpecies.getPreferredBiome()) {
-                if (countBiomeHexes(bestHex.getBiome()) > 22) {
-                    if (bestHex.getBiome().getClimateZone() == npcSpecies.getPreferredBiome().getClimateZone()
-                            || npcSpecies.getPreferredBiome().getClimateZone() == ClimateZone.ANY) {
-                        bestHex.setBiome(npcSpecies.getPreferredBiome());
-                        bestHex.setLocalWeather(getRandomWeather(npcSpecies.getPreferredBiome()));
+            if (favBiome != null && bestHex.getBiome() != favBiome) {
+                if (needsFavBiome) {
+                    bestHex.setBiome(favBiome);
+                    bestHex.setLocalWeather(getRandomWeather(favBiome));
+                } else if (countBiomeHexes(bestHex.getBiome()) > 22) {
+                    if (bestHex.getBiome().getClimateZone() == favBiome.getClimateZone()
+                            || favBiome.getClimateZone() == ClimateZone.ANY) {
+                        bestHex.setBiome(favBiome);
+                        bestHex.setLocalWeather(getRandomWeather(favBiome));
                     }
                 }
+            }
+            if (favBiome != null && bestHex.getBiome() == favBiome) {
+                spawnedInFavBiome.add(npcSpecies);
             }
 
             int dynastyId = this.dynastyIdCounter++;
@@ -4109,12 +4206,12 @@ public class World {
             Colony aiColony = new Colony(colId, npcCapName, false);
             npcDynasty.addColony(aiColony);
             npcDynasty.setCapital(aiColony);
-
-            starterService.initializeNewColony(aiColony);
-            bestHex.setColony(aiColony);
-            placedCapitals.add(bestHex);
-
             registerDynasty(npcDynasty);
+
+            bestHex.setColony(aiColony);
+            markColonizedHexIndexDirty();
+            starterService.initializeNewColony(aiColony);
+            placedCapitals.add(bestHex);
             historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
                     npcDynasty.getId(), aiColony.getId(), -1,
                     WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
@@ -4123,6 +4220,34 @@ public class World {
                     WorldHistoryEvent.colonyArg(aiColony.getId()),
                     WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
         }
+    }
+
+    private int scoreCapitalCandidate(Hex h, List<Hex> placedCapitals, AntSpecies npcSpecies) {
+        int minCapDist = Integer.MAX_VALUE;
+        for (Hex cap : placedCapitals) {
+            int d = distanceBetweenHexes(h, cap);
+            if (d < minCapDist) {
+                minCapDist = d;
+            }
+        }
+
+        int score = 0;
+        if (minCapDist >= 3) {
+            score += 50;
+        } else if (minCapDist >= 2) {
+            score += 20;
+        }
+
+        if (npcSpecies != null && npcSpecies.getPreferredBiome() != null && h.getBiome() != null) {
+            if (h.getBiome() == npcSpecies.getPreferredBiome()) {
+                score += 100;
+            } else if (h.getBiome().getClimateZone() == npcSpecies.getPreferredBiome().getClimateZone()) {
+                score += 30;
+            }
+        }
+
+        score += GameRandom.nextInt(15);
+        return score;
     }
 
     private int countBiomeHexes(Biome biome) {
@@ -5666,10 +5791,13 @@ public class World {
         }
         int targetCount = Math.max(colonyCount, pool.size() * 4);
         List<AntSpecies> assignment = new ArrayList<>(targetCount);
-        for (int p = 0; p < 4; p++) {
+        for (int p = 0; p < 2; p++) {
             List<AntSpecies> pass = new ArrayList<>(pool);
             Collections.shuffle(pass, GameRandom.getShuffleRandom());
-            assignment.addAll(pass);
+            for (AntSpecies s : pass) {
+                assignment.add(s);
+                assignment.add(s);
+            }
         }
 
         while (assignment.size() < targetCount) {
@@ -5679,6 +5807,9 @@ public class World {
                     break;
                 }
                 assignment.add(species);
+                if (assignment.size() < targetCount) {
+                    assignment.add(species);
+                }
             }
         }
         return assignment;
@@ -5861,6 +5992,7 @@ public class World {
         this.day = savefile.getDay();
         this.month = savefile.getMonth();
         this.year = savefile.getYear();
+        this.spectatorMode = savefile.isSpectatorMode();
         if (!savefile.allowsAchievements()) {
             disableAchievements();
         }
@@ -5997,10 +6129,14 @@ public class World {
             System.out.println("[World] Landmasses: " + this.continentCount + " continent(s), "
                     + this.islandCount + " island(s).");
             if (loadedColonies.isEmpty()) {
-                String playerCapName = namingService.generateCapitalName(baseName);
-                Colony colony = new Colony(1, playerCapName, true);
-                ColonyStarterService starter = ColonyStarterService.shared();
-                starter.initializeNewColony(colony);
+                this.historyService.setRecordingEnabled(true);
+                Colony colony = null;
+                if (!this.spectatorMode) {
+                    String playerCapName = namingService.generateCapitalName(baseName);
+                    colony = new Colony(1, playerCapName, true);
+                    ColonyStarterService starter = ColonyStarterService.shared();
+                    starter.initializeNewColony(colony);
+                }
                 int starterBiomeId = savefile.getStarterBiomeId() > 0 ? savefile.getStarterBiomeId() : GameConstants.BIOME_PLAINS.getId();
                 Biome chosenBiome = getBiomeById(starterBiomeId);
                 if (chosenBiome == null) chosenBiome = GameConstants.BIOME_PLAINS;
@@ -6008,23 +6144,26 @@ public class World {
             }
         } else {
             System.out.println("[World] No map data in save (or old save version). Generating fresh world map for existing colony.");
+            this.historyService.setRecordingEnabled(true);
             
             Colony colony = null;
-            for (Colony c : loadedColonies.values()) {
-                if (c.isPlayer()) {
-                    colony = c;
-                    break;
+            if (!this.spectatorMode) {
+                for (Colony c : loadedColonies.values()) {
+                    if (c.isPlayer()) {
+                        colony = c;
+                        break;
+                    }
                 }
-            }
-             
-            if (colony == null) {
-                String playerCapName = namingService.generateCapitalName(baseName);
-                colony = new Colony(1, playerCapName, true);
-            }
-             
-            if (colony.getAntTotal() == 0) {
-                ColonyStarterService starter = ColonyStarterService.shared();
-                starter.initializeNewColony(colony);
+                 
+                if (colony == null) {
+                    String playerCapName = namingService.generateCapitalName(baseName);
+                    colony = new Colony(1, playerCapName, true);
+                }
+                 
+                if (colony.getAntTotal() == 0) {
+                    ColonyStarterService starter = ColonyStarterService.shared();
+                    starter.initializeNewColony(colony);
+                }
             }
 
             int starterBiomeId = savefile.getStarterBiomeId() > 0 ? savefile.getStarterBiomeId() : GameConstants.BIOME_PLAINS.getId();
@@ -6112,8 +6251,8 @@ public class World {
             }
         }
 
-        this.colonyIdCounter = maxColId + 1;
-        this.dynastyIdCounter = maxDynastyId + 1;
+        this.colonyIdCounter = Math.max(this.colonyIdCounter, maxColId + 1);
+        this.dynastyIdCounter = Math.max(this.dynastyIdCounter, maxDynastyId + 1);
         
         if (savefile.getDynastys() != null) {
             for (Savefile.SavedDynasty sd : savefile.getDynastys()) {
@@ -6144,7 +6283,7 @@ public class World {
             warService.syncFromDynasties();
         }
         warService.pruneInvalidWars();
-        if (savefile.getWorldHistory() != null) {
+        if (savefile.getWorldHistory() != null && savefile.getDynastys() != null && !savefile.getDynastys().isEmpty()) {
             historyService.loadFromSave(savefile.getWorldHistory());
         }
         historyService.setRecordingEnabled(true);
@@ -6296,25 +6435,27 @@ public class World {
         try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.WORLD_MINUTE)) {
             this.minute++;
 
-            int hexCount = colonizedHexesForTicks().size();
-            SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_MINUTE, hexCount);
+            if (!this.spectatorMode) {
+                int hexCount = colonizedHexesForTicks().size();
+                SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_MINUTE, hexCount);
 
-            long colonyNanos = 0L;
-            int colonies = 0;
-            boolean timingColonies = SimulationDiagnostics.isEnabled();
-            for (Hex hex : colonizedHexesForTicks()) {
-                if (hex == null || hex.getColony() == null) {
-                    continue;
+                long colonyNanos = 0L;
+                int colonies = 0;
+                boolean timingColonies = SimulationDiagnostics.isEnabled();
+                for (Hex hex : colonizedHexesForTicks()) {
+                    if (hex == null || hex.getColony() == null) {
+                        continue;
+                    }
+                    colonies++;
+                    long colonyStart = timingColonies ? System.nanoTime() : 0L;
+                    hex.getColony().runMinutelyJobs();
+                    if (timingColonies) {
+                        colonyNanos += System.nanoTime() - colonyStart;
+                    }
                 }
-                colonies++;
-                long colonyStart = timingColonies ? System.nanoTime() : 0L;
-                hex.getColony().runMinutelyJobs();
-                if (timingColonies) {
-                    colonyNanos += System.nanoTime() - colonyStart;
-                }
+                SimulationDiagnostics.addCounter(Counter.COLONIES_MINUTE, colonies);
+                SimulationDiagnostics.record(Scope.COLONY_MINUTELY_TOTAL, colonyNanos);
             }
-            SimulationDiagnostics.addCounter(Counter.COLONIES_MINUTE, colonies);
-            SimulationDiagnostics.record(Scope.COLONY_MINUTELY_TOTAL, colonyNanos);
 
             if (this.minute > 59) {
                 this.minute = 0;

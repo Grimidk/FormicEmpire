@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.ClimateZone;
 import com.grimidk.formicempire.classes.constants.world.HydrologyLevel;
@@ -24,9 +26,11 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.world.Continent;
 import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
+import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleState;
 import com.grimidk.formicempire.classes.entities.services.world.WarCreatureCombatService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -35,7 +39,7 @@ class GlobeWorldGenerationTest {
 
     @Test
     void allBiomesHavePropertiesAssigned() {
-        assertEquals(22, GameConstants.getBiomes().size());
+        assertEquals(23, GameConstants.getBiomes().size());
         for (Biome b : GameConstants.getBiomes()) {
             assertNotNull(b.getRarity(), "Biome " + b.getId() + " has null rarity");
             assertNotNull(b.getClimateZone(), "Biome " + b.getId() + " has null climateZone");
@@ -49,6 +53,7 @@ class GlobeWorldGenerationTest {
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_DEEP_OCEAN));
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_SHALLOW_OCEAN));
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_PEAK));
+        assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_ABYSS));
     }
 
     @Test
@@ -132,16 +137,23 @@ class GlobeWorldGenerationTest {
         assertEquals(GameConstants.BIOME_JUNGLE, playerHex.getBiome());
 
         Map<AntSpecies, Integer> speciesColonyCounts = new HashMap<>();
+        Set<AntSpecies> speciesInFavBiome = new HashSet<>();
         for (Hex h : world.getHexes()) {
             assertTrue(h.getRiverEdgeCount() <= 3, "Hex at (" + h.getQ() + "," + h.getR() + ") has > 3 river edges");
             if (h.getColony() != null && h.getColony().getDynasty() != null) {
                 AntSpecies sp = h.getColony().getDynasty().getSpecies();
                 speciesColonyCounts.put(sp, speciesColonyCounts.getOrDefault(sp, 0) + 1);
+                if (sp != null && sp.getPreferredBiome() != null && h.getBiome() == sp.getPreferredBiome()) {
+                    speciesInFavBiome.add(sp);
+                }
             }
         }
         for (AntSpecies s : GameConstants.getWorldSpawnableNpcSpecies()) {
             int count = speciesColonyCounts.getOrDefault(s, 0);
             assertTrue(count >= 2, "Species " + s.getName() + " must have at least 2 colonies, got " + count);
+            assertTrue(speciesInFavBiome.contains(s),
+                    "Species " + s.getName() + " must have at least 1 dynasty spawned in its preferred biome "
+                            + s.getPreferredBiome().getId());
         }
     }
 
@@ -268,7 +280,7 @@ class GlobeWorldGenerationTest {
             }
         }
 
-        assertEquals(22, counts.size(), "All 22 biomes must be present on the globe");
+        assertEquals(23, counts.size(), "All 23 biomes must be present on the globe");
         for (Biome b : GameConstants.getBiomes()) {
             int count = counts.getOrDefault(b, 0);
             assertTrue(count >= 20, "Biome " + b.getId() + " count (" + count + ") should be at least 20");
@@ -491,6 +503,126 @@ class GlobeWorldGenerationTest {
             assertFalse(cap.isArchipelago());
             assertEquals(cap.getColonies().size(), cap.getPopulatedHexes().size());
             assertEquals(!cap.getColonies().isEmpty(), cap.hasPopulatedHexes());
+        }
+    }
+
+    @Test
+    void burntForestOnlyAllowsMineralsAndResinAndCannotSpawnDynasties() {
+        Biome burnt = GameConstants.BIOME_BURNT_FOREST;
+        assertFalse(burnt.canStart());
+        assertEquals(0f, burnt.getPlantAbundance(), 0.0001f);
+        assertEquals(0f, burnt.getAnimalAbundance(), 0.0001f);
+        assertEquals(0f, burnt.getMushroomAbundance(), 0.0001f);
+        assertEquals(0, burnt.isIsHumid());
+        assertTrue(burnt.getMineralAbundance() > 0f);
+        assertTrue(burnt.getResinAbundance() > 0f);
+
+        World world = new World();
+        Colony playerColony = new Colony(1, "Player Capital", true);
+        world.generateRectangularWorld(
+                GameConstants.BIOME_PLAINS,
+                playerColony,
+                "Player",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        Hex emptyBurntHex = null;
+        for (Hex h : world.getHexes()) {
+            if (h.getColony() != null) {
+                assertTrue(h.getBiome().canStart(),
+                        "Dynasty capital spawned on non-starting biome: " + h.getBiome().getId());
+                assertNotEquals(GameConstants.BIOME_BURNT_FOREST, h.getBiome());
+            } else if (h.getBiome() == GameConstants.BIOME_BURNT_FOREST && emptyBurntHex == null) {
+                emptyBurntHex = h;
+            }
+        }
+        assertNotNull(emptyBurntHex, "Expected at least one uncolonized Burnt Forest hex");
+
+        Dynasty playerDynasty = world.findPlayerDynasty();
+        assertNotNull(playerDynasty);
+        playerDynasty.unlockUpgrade(GameUnlocks.ROLE_SCOUT);
+        playerDynasty.unlockUpgrade(GameUnlocks.ROLE_FORAGER);
+        playerDynasty.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
+        playerDynasty.unlockUpgrade(GameUnlocks.ROLE_MINER);
+        playerDynasty.unlockUpgrade(GameUnlocks.STAT_SCOUTING_2);
+        playerDynasty.unlockUpgrade(GameUnlocks.STAT_SCOUTING_3);
+        playerDynasty.unlockUpgrade(GameUnlocks.ABILITY_RESIN);
+
+        Colony outpost = new Colony(world.getNextColonyId(), "Burnt Outpost", true);
+        outpost.setAge(0);
+        playerDynasty.addColony(outpost);
+        emptyBurntHex.setColony(outpost);
+        outpost.matureColony();
+
+        assertTrue(outpost.getLocationService().getDiscoveredSources().isEmpty(),
+                "Matured Burnt Forest colony must not receive starter plant or water sources");
+
+        outpost.setPeaceAssignedRoleCount(GameConstants.ROLE_SCOUT, 20);
+        for (int i = 0; i < 60; i++) {
+            outpost.runScoutting(GameConstants.BIOME_BURNT_FOREST, emptyBurntHex);
+        }
+        assertFalse(outpost.getLocationService().getDiscoveredSources().isEmpty(),
+                "Scouts in Burnt Forest should find mineral or resin sources");
+        for (var src : outpost.getLocationService().getDiscoveredSources()) {
+            assertTrue(src.getResourceType() == GameConstants.RESOURCE_ROCK
+                            || src.getResourceType() == GameConstants.RESOURCE_RESIN,
+                    "Unexpected resource source in Burnt Forest: " + src.getResourceType().getId());
+        }
+    }
+
+    @Test
+    void spectatorModeWorldHasNoPlayerOmniDynasty() {
+        Savefile save = new Savefile(0, "SpectatorWorld");
+        save.setSpectatorMode(true);
+        save.setWorldWidth(GameNumbers.WORLD_RECT_WIDTH);
+        save.setWorldHeight(GameNumbers.WORLD_RECT_HEIGHT);
+
+        World world = new World();
+        world.loadWorld(save);
+
+        assertTrue(world.isSpectatorMode());
+        assertNull(world.findPlayerDynasty(), "Spectator world must not create a player dynasty");
+        assertFalse(world.getDynastys().isEmpty(), "Spectator world must still populate NPC dynasties");
+        assertFalse(world.getHistoryService().getEvents().isEmpty(),
+                "Spectator world must record world history logs for initial dynasties and colonies");
+        Set<AntSpecies> spectatorFavBiomeSpecies = new HashSet<>();
+        for (Dynasty d : world.getDynastys()) {
+            assertFalse(d.isPlayer(), "All dynasties in spectator world must be AI");
+            assertNotEquals(GameConstants.SPECIES_OMNI, d.getSpecies(), "Spectator world must not spawn an Omni dynasty");
+            for (Colony c : d.getColonies()) {
+                assertFalse(c.runsFullSimulation(), "Spectator colonies must run fast lite simulation");
+                Hex colHex = world.getHexOfColony(c);
+                assertNotNull(colHex);
+                assertFalse(SandboxCheatService.canCheatConquerHex(world, colHex),
+                        "Cheat conquer must be disabled when there is no player dynasty");
+                if (d.getSpecies() != null && colHex.getBiome() == d.getSpecies().getPreferredBiome()) {
+                    spectatorFavBiomeSpecies.add(d.getSpecies());
+                }
+            }
+        }
+        for (AntSpecies s : GameConstants.getWorldSpawnableNpcSpecies()) {
+            assertTrue(spectatorFavBiomeSpecies.contains(s),
+                    "Spectator world must spawn at least 1 dynasty of " + s.getName() + " in its preferred biome");
+        }
+        assertNotNull(world.getActiveHex());
+
+        assertEquals(GameSpeed.ID_TURBO,
+                GameSpeed.maxPlayableId(true, false));
+        assertEquals(GameSpeed.ID_HYPER_TURBO,
+                GameSpeed.maxPlayableId(false, true));
+
+        var mapData = SavedMapService.createSavedMapData(world, "SpecMap");
+        Savefile fromMap = new Savefile(0, "SpectatorFromMap");
+        fromMap.setSpectatorMode(true);
+        SavedMapService.populateSavefileFromMapData(fromMap, mapData);
+
+        World worldFromMap = new World();
+        worldFromMap.loadWorld(fromMap);
+        assertTrue(worldFromMap.isSpectatorMode());
+        assertNull(worldFromMap.findPlayerDynasty(), "Spectator world from saved map must not create a player dynasty");
+        assertFalse(worldFromMap.getDynastys().isEmpty(), "Spectator world from saved map must populate NPC dynasties");
+        for (Dynasty d : worldFromMap.getDynastys()) {
+            assertFalse(d.isPlayer());
+            assertNotEquals(GameConstants.SPECIES_OMNI, d.getSpecies());
         }
     }
 

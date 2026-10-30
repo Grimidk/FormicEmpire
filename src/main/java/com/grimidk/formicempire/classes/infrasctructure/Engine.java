@@ -160,6 +160,18 @@ public class Engine extends Thread {
                 this.world.setWorldGenStepListener(this.worldGenStepListener);
             }
         }
+        clampSpeedToCurrentRules();
+    }
+
+    private boolean isSpectatorWorld() {
+        return this.world != null && this.world.isSpectatorMode();
+    }
+
+    private void clampSpeedToCurrentRules() {
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+        if (speed != null && speed.getId() > maxId) {
+            speed = GameSpeed.fromId(maxId);
+        }
     }
 
     public float getDelay() {
@@ -186,8 +198,9 @@ public class Engine extends Thread {
             return;
         }
         GameSpeed resolved = speed;
-        if (speed.getId() > GameSpeed.maxPlayableId(allowTurboMode)) {
-            resolved = GameSpeed.fromId(GameSpeed.maxPlayableId(allowTurboMode));
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+        if (speed.getId() > maxId) {
+            resolved = GameSpeed.fromId(maxId);
         }
         if (this.speed != resolved) {
             this.speed = resolved;
@@ -227,14 +240,14 @@ public class Engine extends Thread {
                 pauseEngine();
                 return;
             }
-            setSpeed(GameSpeed.step(speed, -1, allowTurboMode));
+            setSpeed(GameSpeed.step(speed, -1, allowTurboMode, isSpectatorWorld()));
             return;
         }
         if (paused) {
             resumeEngine();
             return;
         }
-        setSpeed(GameSpeed.step(speed, 1, allowTurboMode));
+        setSpeed(GameSpeed.step(speed, 1, allowTurboMode, isSpectatorWorld()));
     }
 
     public void togglePause() {
@@ -379,6 +392,7 @@ public class Engine extends Thread {
         this.setWorld(world);
 
         this.loadFile(savefile);
+        clampSpeedToCurrentRules();
         SandboxCheatService.applyEnabledCheats(this);
         
         try {
@@ -403,8 +417,18 @@ public class Engine extends Thread {
                 semaphore.acquireUninterruptibly();
                 try {
                     if (this.world != null) {
-                        this.world.runMinute();
-                        notifyMinuteListeners();
+                        int steps = (this.world.isSpectatorMode() && speed.getId() == GameSpeed.ID_HYPER_TURBO)
+                                ? GameNumbers.SPECTATOR_HYPER_TURBO_MINUTES_PER_TICK
+                                : 1;
+                        for (int i = 0; i < steps; i++) {
+                            if (paused || killSwitch || this.world == null) {
+                                break;
+                            }
+                            this.world.runMinute();
+                        }
+                        if (this.world != null) {
+                            notifyMinuteListeners();
+                        }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -433,9 +457,7 @@ public class Engine extends Thread {
 
     public void setAllowTurboMode(boolean allowTurboMode) {
         this.allowTurboMode = allowTurboMode;
-        if (!allowTurboMode && speed.getId() > GameSpeed.maxPlayableId(false)) {
-            speed = GameSpeed.fromId(GameSpeed.maxPlayableId(false));
-        }
+        clampSpeedToCurrentRules();
     }
 
     public String getScreenSize() {

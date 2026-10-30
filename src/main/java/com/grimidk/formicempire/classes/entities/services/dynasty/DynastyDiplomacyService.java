@@ -554,6 +554,11 @@ public class DynastyDiplomacyService {
             lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_WARMONGER.getName(), warmonger));
         }
 
+        int sameSpecies = getSameSpeciesAdjustment(other);
+        if (sameSpecies != 0) {
+            lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_SAME_SPECIES.getName(), sameSpecies));
+        }
+
         int militaryAdj = getMilitaryReputationAdjustment(other);
         if (militaryAdj != 0) {
             lines.add(new ReputationModifierLine(
@@ -641,6 +646,18 @@ public class DynastyDiplomacyService {
         return 0;
     }
 
+    public int getSameSpeciesAdjustment(Dynasty other) {
+        if (other == null || other == dynasty) {
+            return 0;
+        }
+        if (dynasty.getSpecies() != null
+                && dynasty.getSpecies() != GameConstants.SPECIES_OMNI
+                && dynasty.getSpecies() == other.getSpecies()) {
+            return GameConstants.DIPLO_MODIFIER_SAME_SPECIES.getReputationDelta();
+        }
+        return 0;
+    }
+
     public int getEffectiveDiplomaticReputation(Dynasty other, World world) {
         if (other == null || other == dynasty) {
             return GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION;
@@ -648,6 +665,7 @@ public class DynastyDiplomacyService {
         int score = dynasty.getDiplomaticReputation(other.getId())
                 + getBorderFrictionAdjustment(other, world)
                 + getWarmongerAdjustment(other, world)
+                + getSameSpeciesAdjustment(other)
                 + getMilitaryReputationAdjustment(other)
                 + getDiplomatReputationAdjustment(other)
                 + getAiPersonalityReputationAdjustment(other);

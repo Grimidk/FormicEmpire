@@ -545,7 +545,7 @@ public final class GameConstants {
         "#a3ce27", loadIcon("icons/biomes/Prairie.png"), loadIcon("backgrounds/biomes/PrairieTile.png"),
         BiomeRarity.COMMON, ClimateZone.TEMPERATE, false, HydrologyLevel.DRY, true, 4, 6);
     static { biomes.add(BIOME_PRAIRIE); }
-    public static final Biome BIOME_BURNT_FOREST = new Biome(18, LanguageStrings.BIOME_BURNT_FOREST, 35, 0, 0.1f, 0.1f, 1.0f, 0.3f, 0.4f, 4,
+    public static final Biome BIOME_BURNT_FOREST = new Biome(18, LanguageStrings.BIOME_BURNT_FOREST, 35, 0, 0f, 0f, 1.0f, 0f, 0.4f, 4,
         "#493c2b", loadIcon("icons/biomes/BurntForest.png"), loadIcon("backgrounds/biomes/BurntForestTile.png"),
         BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, false, 4, 6);
     static { biomes.add(BIOME_BURNT_FOREST); }
@@ -1303,6 +1303,10 @@ public final class GameConstants {
             GameSpeed.ID_TURBO, LanguageStrings.UI_SPEED_TURBO, 1,
             loadIcon("icons/speed/Turbo.png"));
     static { gameSpeeds.add(SPEED_TURBO); }
+    public static final GameSpeed SPEED_HYPER_TURBO = new GameSpeed(
+            GameSpeed.ID_HYPER_TURBO, LanguageStrings.UI_SPEED_HYPER_TURBO, 1,
+            loadIcon("icons/speed/HyperTurbo.png"));
+    static { gameSpeeds.add(SPEED_HYPER_TURBO); }
     public static final ImageIcon ICON_SPEED_ZERO = loadIcon("icons/speed/Zero.png");
     public static final ImageIcon ICON_SPEED_UP = loadIcon("icons/speed/SpeedUp.png");
     public static final ImageIcon ICON_SPEED_DOWN = loadIcon("icons/speed/SpeedDown.png");
@@ -1377,6 +1381,9 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_WARMONGER = new DiplomaticReputationModifier(
         12, LanguageStrings.DIPLO_MODIFIER_WARMONGER, -20, 0, null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WARMONGER); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_SAME_SPECIES = new DiplomaticReputationModifier(
+        14, LanguageStrings.DIPLO_MODIFIER_SAME_SPECIES, 15, 0, null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_SAME_SPECIES); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_CAUGHT_SPYING = new DiplomaticReputationModifier(
         13, LanguageStrings.DIPLO_MODIFIER_CAUGHT_SPYING, -15, 0, null, GameNumbers.CAUGHT_SPYING_DURATION_DAYS);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_CAUGHT_SPYING); }

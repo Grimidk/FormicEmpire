@@ -684,6 +684,10 @@ public class ColonyStatsService {
     public int getTotalConsumption(Colony colony){
         int totalConsumption = 0;
         for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntClass antClass = entry.getKey();
+            if (antClass == GameConstants.CLASS_EGG || antClass == GameConstants.CLASS_PUPA) {
+                continue;
+            }
             for (Ant ant : entry.getValue()) {
                 if (ant == null || !ant.isAlive()) {
                     continue;

@@ -20,10 +20,13 @@ public final class DynastyAiPriorities {
         list.add(GameUnlocks.ROLE_BUILDER);
         list.add(GameUnlocks.TYPE_EGG);
         list.add(GameUnlocks.TYPE_SOLDIER);
-        list.add(GameUnlocks.ROLE_RANCHER);
-        list.add(GameUnlocks.STAT_SCOUTING_1);
+        list.add(GameUnlocks.STAT_RESEARCH_1);
         list.add(GameUnlocks.TYPE_PRINCESS);
-        list.add(GameUnlocks.ABILITY_FORCED_FLIGHT);
+        list.add(GameUnlocks.ROLE_ASSISTANT);
+        list.add(GameUnlocks.STAT_LOGISTICS_1);
+        list.add(GameUnlocks.ROLE_RANCHER);
+        list.add(GameUnlocks.STAT_RESEARCH_2);
+        list.add(GameUnlocks.ABILITY_RESIN);
         if (personality == AiPersonality.MILITARIST) {
             list.add(GameUnlocks.STAT_ATTACK_1);
             list.add(GameUnlocks.STAT_HEALTH_1);
@@ -31,13 +34,18 @@ public final class DynastyAiPriorities {
             list.add(GameUnlocks.ROLE_DIPLOMAT);
         } else {
             list.add(GameUnlocks.ROLE_DIPLOMAT);
-            list.add(GameUnlocks.STAT_RESEARCH_1);
+            list.add(GameUnlocks.STAT_FARMING_1);
+            list.add(GameUnlocks.STAT_ATTACK_1);
+            list.add(GameUnlocks.STAT_HEALTH_1);
+            list.add(GameUnlocks.STAT_DEFENSE_1);
         }
-        list.add(GameUnlocks.ABILITY_RESIN);
+        list.add(GameUnlocks.STAT_SCOUTING_1);
+        list.add(GameUnlocks.ABILITY_FORCED_FLIGHT);
         list.add(GameUnlocks.STAT_WORKER_SPEED_2);
         list.add(GameUnlocks.ABILITY_TUNNELS);
         list.add(GameUnlocks.ROLE_TRANSPORT);
         list.add(GameUnlocks.ROLE_ESCORT);
+        list.add(GameUnlocks.STAT_RESEARCH_3);
         list.add(GameUnlocks.STAT_ATTACK_2);
         list.add(GameUnlocks.STAT_HEALTH_2);
         list.add(GameUnlocks.STAT_DEFENSE_2);
@@ -72,7 +80,7 @@ public final class DynastyAiPriorities {
                 continue;
             }
             if (dynasty.getResearchPoints() < cost) {
-                continue;
+                return null;
             }
             dynasty.addResearchPoints(-cost);
             dynasty.unlockUpgrade(upgrade);
@@ -106,20 +114,26 @@ public final class DynastyAiPriorities {
         if (key == null) {
             return 500;
         }
+        if (key.startsWith("RESIN_RESERVOIR_0") || key.startsWith("ROCK_WAREHOUSE_0")) {
+            return 5;
+        }
         if (key.startsWith("MUSHROOM_CHAMBER_") || key.startsWith("PLANT_CHAMBER_")) {
             return 10 + buildingTier(building);
         }
+        if (key.equals("PASSIVE_LAB")) {
+            return 15;
+        }
         if (key.startsWith("WATER_RESERVOIR_") || key.startsWith("MEAT_CHAMBER_")) {
             return 20 + buildingTier(building);
+        }
+        if (key.startsWith("RESIN_RESERVOIR_") || key.startsWith("ROCK_WAREHOUSE_")) {
+            return 30 + buildingTier(building);
         }
         if (key.startsWith("EGG_CHAMBER_")) {
             return 40 + buildingTier(building);
         }
         if (key.startsWith("ROYAL_CHAMBER_")) {
             return 55 + buildingTier(building);
-        }
-        if (key.startsWith("ROCK_WAREHOUSE_") || key.startsWith("RESIN_RESERVOIR_")) {
-            return 70 + buildingTier(building);
         }
         if (key.startsWith("PASSIVE_")) {
             return 80;

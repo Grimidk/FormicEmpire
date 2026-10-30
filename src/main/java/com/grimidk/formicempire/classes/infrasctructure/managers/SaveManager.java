@@ -410,6 +410,7 @@ public class SaveManager {
         } else {
             save.setAllowsAchievements(true);
         }
+        save.setSpectatorMode(w.isSpectatorMode());
 
         if (w.getDynastys() != null) {
             for (Dynasty dynasty : w.getDynastys()) {
@@ -813,6 +814,7 @@ public class SaveManager {
         writeJsonLine(w, "playerDynastyTitleId", s.resolvePlayerDynastyTitleId(), false);
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         writeJsonLine(w, "allowsAchievements", s.allowsAchievements(), false);
+        writeJsonLine(w, "spectatorMode", s.isSpectatorMode(), false);
         
         // - Root Summary Data - 
         writeJsonLine(w, "colonyId", s.getColonyId(), false);
@@ -1071,6 +1073,7 @@ public class SaveManager {
         if (!Boolean.parseBoolean(rootMap.getOrDefault("allowsAchievements", "true"))) {
             s.disableAchievements();
         }
+        s.setSpectatorMode(Boolean.parseBoolean(rootMap.getOrDefault("spectatorMode", "false")));
         
         // --- Populate Root Summary Data ---
         s.setColonyId(Integer.parseInt(rootMap.getOrDefault("colonyId", "0")));

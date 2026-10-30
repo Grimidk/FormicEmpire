@@ -47,11 +47,11 @@ public final class ColonyJobRules {
         applyDailyEating(colony);
         colony.getPopulationService().runHatching(colony);
         colony.getPopulationService().runAging(colony);
+        applyDailyComposting(colony);
+        applyDailyGraveKeeping(colony);
     }
 
     public static void runDailyLiteExtended(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
-        applyDailyComposting(colony);
-        applyDailyGraveKeeping(colony);
         applyDailyPolicing(colony);
         colony.getBugHandlingService().runDaily(colony, biome);
         colony.runScoutting(biome, currentHex);
@@ -88,6 +88,14 @@ public final class ColonyJobRules {
 
         if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0) {
             plantGain = 0;
+        }
+        if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
+            if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
+                double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
+                waterGain = probabilisticRound(((stats.getWaterCapacity(colony) * dailyPct) / 24.0) * parasiticMiteWorkEfficiency(colony));
+            } else {
+                waterGain = 0;
+            }
         }
 
         if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) {
@@ -148,14 +156,22 @@ public final class ColonyJobRules {
 
                 double plantConvert = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, maxConvert);
                 if (plantConvert > 0) {
-                    actualConverted += plantConvert;
+                    double yield = plantConvert;
+                    if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
+                        yield += plantConvert;
+                    }
+                    actualConverted += (int) Math.round(yield);
                     maxConvert -= (int) plantConvert;
                 }
 
                 if (maxConvert > 0) {
                     double meatConvert = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, maxConvert);
                     if (meatConvert > 0) {
-                        actualConverted += (meatConvert * 2);
+                        double yield = meatConvert * 2;
+                        if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
+                            yield += meatConvert;
+                        }
+                        actualConverted += (int) Math.round(yield);
                     }
                 }
 
@@ -208,10 +224,12 @@ public final class ColonyJobRules {
 
     public static void applyDailyNursing(Colony colony) {
         int nurseCount = liteRoleCount(colony, GameConstants.ROLE_NURSE);
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-            nurseCount += 2;
-        } else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
-            nurseCount += 1;
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_NURSE)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                nurseCount += 2;
+            } else {
+                nurseCount += 1;
+            }
         }
 
         float nursingRate = colony.getStatsService().getNursingRate(colony);

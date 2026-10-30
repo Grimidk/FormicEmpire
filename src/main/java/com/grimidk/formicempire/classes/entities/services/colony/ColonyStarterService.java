@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -244,29 +245,7 @@ public class ColonyStarterService {
 
         applyStarterWorkforce(colony);
 
-        if (colony.getLocationService() != null) {
-            if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
-                int range = 300;
-                
-                int centerX = ColonySpatialLayout.ANCHOR_CENTER_X; 
-                int centerY = ColonySpatialLayout.ANCHOR_HEIGHT / 2;
-                
-                int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-                int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-                pX = Math.max(50, pX);
-                pY = Math.max(50, pY);
-                ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
-                
-                int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-                int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-                wX = Math.max(50, wX);
-                wY = Math.max(50, wY);
-                ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
-                
-                colony.getLocationService().addSource(colony, initialPlant);
-                colony.getLocationService().addSource(colony, initialWater);
-            }
-        }
+        ensureStarterResourceSources(colony);
         
         if (colony.getPhysicsService() != null) {
             colony.getPhysicsService().randomizeAllAntPositions(colony);
@@ -439,23 +418,34 @@ public class ColonyStarterService {
                 || !colony.getLocationService().getDiscoveredSources().isEmpty()) {
             return;
         }
+        Dynasty dynasty = colony.getDynasty();
+        World world = dynasty != null ? dynasty.getOwningWorld() : null;
+        Hex hex = world != null ? world.getHexOfColony(colony) : null;
+        Biome biome = hex != null ? hex.getBiome() : null;
+        boolean isBurntForest = biome == GameConstants.BIOME_BURNT_FOREST;
+        boolean allowPlant = !isBurntForest;
+        boolean allowWater = !isBurntForest;
+
         int range = 300;
         int centerX = ColonySpatialLayout.ANCHOR_CENTER_X;
         int centerY = ColonySpatialLayout.ANCHOR_HEIGHT / 2;
 
-        int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-        int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-        pX = Math.max(50, pX);
-        pY = Math.max(50, pY);
-        ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+        if (allowPlant) {
+            int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+            int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
+            pX = Math.max(50, pX);
+            pY = Math.max(50, pY);
+            ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+            colony.getLocationService().addSource(colony, initialPlant);
+        }
 
-        int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-        int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-        wX = Math.max(50, wX);
-        wY = Math.max(50, wY);
-        ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
-
-        colony.getLocationService().addSource(colony, initialPlant);
-        colony.getLocationService().addSource(colony, initialWater);
+        if (allowWater) {
+            int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+            int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
+            wX = Math.max(50, wX);
+            wY = Math.max(50, wY);
+            ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
+            colony.getLocationService().addSource(colony, initialWater);
+        }
     }
 }

@@ -110,7 +110,7 @@ public final class SandboxCheatService {
     }
 
     public static boolean canCheatConquerHex(World world, Hex hex) {
-        if (hex == null) {
+        if (hex == null || world == null || world.isSpectatorMode() || findPlayerDynasty(world) == null) {
             return false;
         }
         return isForeignColony(world, hex.getColony()) || isColonizableEmptyHex(hex);

@@ -24,7 +24,7 @@ class MapHeightAndIceTest {
 
     @Test
     void modeButtonGlyphAndTooltipTranslations() {
-        assertEquals("◈", LanguageStrings.get(LanguageStrings.MAP_MODE_BUTTON));
+        assertEquals("<>", LanguageStrings.get(LanguageStrings.MAP_MODE_BUTTON));
         assertTrue(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_HEIGHT).contains("Height:"));
         assertTrue(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_LAND_SHARE).contains("Cont. Land"));
     }

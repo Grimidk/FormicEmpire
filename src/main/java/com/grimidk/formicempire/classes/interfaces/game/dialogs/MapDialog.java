@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -11,6 +12,7 @@ import com.grimidk.formicempire.classes.entities.world.Continent;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.world.GeographicFeature;
 import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -26,6 +28,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
+import com.grimidk.formicempire.classes.interfaces.ui.util.GameControlKeyBindings;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 
 import javax.swing.*;
@@ -54,10 +57,17 @@ import java.util.Map;
 
 public class MapDialog extends ZeroDialog {
 
+    private static final Dimension SPEED_ICON_SLOT_SIZE = new Dimension(32, 32);
+
     private final Engine engine;
     private World world;
     private final HexMapPanel mapPanel;
     private final LegendPanel legendPanel;
+    private final JLabel dateTimeLabel;
+    private final JButton speedDownButton;
+    private final JButton speedUpButton;
+    private final JLabel tickLabel;
+    private final JButton playPauseButton;
     private final JButton homeButton;
     private final JButton zoomOutButton;
     private final JButton zoomInButton;
@@ -69,6 +79,7 @@ public class MapDialog extends ZeroDialog {
     private final JButton closeButton;
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
+    private final Runnable onBackToMenu;
     private boolean showBorders = true;
     private boolean showRivers = true;
     private boolean showMeridian = true;
@@ -141,10 +152,18 @@ public class MapDialog extends ZeroDialog {
     private int navZoomHoldTicks;
 
     public MapDialog(JFrame owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
-        this((Window) owner, engine, world, onHexChange, onOpenWarDialog);
+        this((Window) owner, engine, world, onHexChange, onOpenWarDialog, null);
+    }
+
+    public MapDialog(JFrame owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog, Runnable onBackToMenu) {
+        this((Window) owner, engine, world, onHexChange, onOpenWarDialog, onBackToMenu);
     }
 
     public MapDialog(Window owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
+        this(owner, engine, world, onHexChange, onOpenWarDialog, null);
+    }
+
+    public MapDialog(Window owner, Engine engine, World world, Runnable onHexChange, Runnable onOpenWarDialog, Runnable onBackToMenu) {
         super(owner, LanguageStrings.DIALOG_MAP_TITLE, owner != null ? owner.getSize() : AssetStyles.MAP_DIALOG_SIZE,
                 owner instanceof JDialog ? ModalityType.DOCUMENT_MODAL : ModalityType.APPLICATION_MODAL);
         this.engine = engine;
@@ -154,10 +173,42 @@ public class MapDialog extends ZeroDialog {
         }
         this.onHexChange = onHexChange;
         this.onOpenWarDialog = onOpenWarDialog;
+        this.onBackToMenu = onBackToMenu;
         loadLayerSettingsFromEngine();
 
         this.mapPanel = new HexMapPanel();
         this.legendPanel = new LegendPanel();
+
+        dateTimeLabel = new JLabel("00:00 01/01/0000");
+        dateTimeLabel.setFont(AssetStyles.FONT_NORMAL);
+        dateTimeLabel.setForeground(AssetStyles.FONT_COLOR);
+        dateTimeLabel.setBorder(new EmptyBorder(0, 0, 0, 8));
+
+        speedDownButton = new JButton();
+        speedDownButton.setFocusable(false);
+        configureIconControlButton(speedDownButton, GameConstants.ICON_SPEED_DOWN);
+        speedDownButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_CONTROL_SPEED_DOWN_TT));
+        speedDownButton.addActionListener(e -> changeSpeedFromMap(-1));
+
+        speedUpButton = new JButton();
+        speedUpButton.setFocusable(false);
+        configureIconControlButton(speedUpButton, GameConstants.ICON_SPEED_UP);
+        speedUpButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_CONTROL_SPEED_UP_TT));
+        speedUpButton.addActionListener(e -> changeSpeedFromMap(1));
+
+        tickLabel = new JLabel();
+        tickLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        tickLabel.setVerticalAlignment(SwingConstants.CENTER);
+        tickLabel.setIconTextGap(0);
+        tickLabel.setText("");
+        tickLabel.setPreferredSize(SPEED_ICON_SLOT_SIZE);
+        tickLabel.setMinimumSize(SPEED_ICON_SLOT_SIZE);
+        tickLabel.setMaximumSize(SPEED_ICON_SLOT_SIZE);
+
+        playPauseButton = new JButton();
+        playPauseButton.setFocusable(false);
+        configureIconControlButton(playPauseButton, GameConstants.ICON_SPEED_PAUSE);
+        playPauseButton.addActionListener(e -> togglePauseFromMap());
 
         homeButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_HOME_BUTTON));
         homeButton.setFocusable(false);
@@ -241,10 +292,15 @@ public class MapDialog extends ZeroDialog {
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
         AssetStyles.styleButton(closeButton);
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> handleCloseButton());
 
         bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        bottomPanel.add(dateTimeLabel);
+        bottomPanel.add(speedDownButton);
+        bottomPanel.add(speedUpButton);
+        bottomPanel.add(tickLabel);
+        bottomPanel.add(playPauseButton);
         bottomPanel.add(homeButton);
         bottomPanel.add(conquerButton);
         bottomPanel.add(closeButton);
@@ -264,6 +320,7 @@ public class MapDialog extends ZeroDialog {
         registerCloseKey(KeyEvent.VK_M);
         registerNavigationKeys();
         updateZoomControls();
+        updateSpeedAndTimeControls();
     }
 
     private void registerNavigationKeys() {
@@ -351,6 +408,114 @@ public class MapDialog extends ZeroDialog {
             holdingZoomOutArrow = false;
             checkStopNavTimer();
         });
+
+        GameControlKeyBindings.register(
+                inputMap,
+                actionMap,
+                this::togglePauseFromMap,
+                () -> changeSpeedFromMap(1),
+                () -> changeSpeedFromMap(-1));
+    }
+
+    private static void configureIconControlButton(JButton button, ImageIcon icon) {
+        AssetStyles.styleIconButton(button);
+        button.setIcon(icon);
+        button.setText("");
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setVerticalAlignment(SwingConstants.CENTER);
+        button.setHorizontalTextPosition(SwingConstants.CENTER);
+        button.setVerticalTextPosition(SwingConstants.CENTER);
+        button.setPreferredSize(SPEED_ICON_SLOT_SIZE);
+        button.setMinimumSize(SPEED_ICON_SLOT_SIZE);
+        button.setMaximumSize(SPEED_ICON_SLOT_SIZE);
+    }
+
+    private boolean isSpectatorMode() {
+        World w = currentWorld();
+        return w != null && w.isSpectatorMode();
+    }
+
+    private boolean hasPlayerDynasty() {
+        return !isSpectatorMode() && findPlayerDynasty() != null;
+    }
+
+    private void handleCloseButton() {
+        dispose();
+    }
+
+    private void togglePauseFromMap() {
+        Engine eng = resolveEngine();
+        if (eng == null) {
+            return;
+        }
+        eng.togglePause();
+        if (getOwner() instanceof MainFrame mf && mf.getGamePanel() != null) {
+            mf.getGamePanel().onGameSpeedChanged();
+            mf.getGamePanel().updateSpeedLabel();
+            mf.getGamePanel().updateStatusIndicator(eng.isPaused());
+        }
+        updateSpeedAndTimeControls();
+    }
+
+    private void changeSpeedFromMap(int direction) {
+        Engine eng = resolveEngine();
+        if (eng == null) {
+            return;
+        }
+        eng.adjustSpeedStep(direction);
+        if (getOwner() instanceof MainFrame mf && mf.getGamePanel() != null) {
+            mf.getGamePanel().onGameSpeedChanged();
+            mf.getGamePanel().updateSpeedLabel();
+            mf.getGamePanel().updateStatusIndicator(eng.isPaused());
+        }
+        updateSpeedAndTimeControls();
+    }
+
+    private void updateSpeedAndTimeControls() {
+        World w = currentWorld();
+        Engine eng = resolveEngine();
+        boolean spectator = w != null && w.isSpectatorMode();
+        if (homeButton != null) {
+            homeButton.setVisible(!spectator);
+        }
+        if (closeButton != null) {
+            closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        }
+        if (dateTimeLabel != null && w != null) {
+            Hex activeHex = w.getActiveHex();
+            int hour = activeHex != null ? w.getLocalHour(activeHex) : w.getHour();
+            int day = activeHex != null ? w.getLocalDay(activeHex) : w.getDay();
+            int month = activeHex != null ? w.getLocalMonth(activeHex) : w.getMonth();
+            int year = activeHex != null ? w.getLocalYear(activeHex) : w.getYear();
+            dateTimeLabel.setText(String.format("%02d:%02d %02d/%02d/%04d",
+                    hour, w.getMinute(), day, month, year));
+        }
+        if (tickLabel != null) {
+            if (eng == null) {
+                tickLabel.setIcon(null);
+                tickLabel.setToolTipText(null);
+            } else if (eng.isPaused()) {
+                tickLabel.setIcon(GameConstants.ICON_SPEED_ZERO);
+                tickLabel.setToolTipText(LanguageStrings.get(LanguageStrings.UI_CONTROL_PAUSED_TT));
+            } else {
+                GameSpeed speed = eng.getSpeed();
+                if (speed != null && speed.getIcon() != null) {
+                    tickLabel.setIcon(speed.getIcon());
+                    tickLabel.setToolTipText(LanguageStrings.format(
+                            LanguageStrings.UI_CONTROL_SPEED_TT, speed.getName(), speed.getDelayMs()));
+                } else {
+                    tickLabel.setIcon(null);
+                    tickLabel.setToolTipText(eng.getSpeedLabel());
+                }
+            }
+        }
+        if (playPauseButton != null && eng != null) {
+            boolean paused = eng.isPaused();
+            playPauseButton.setIcon(paused ? GameConstants.ICON_SPEED_PLAY : GameConstants.ICON_SPEED_PAUSE);
+            playPauseButton.setText("");
+            playPauseButton.setToolTipText(LanguageStrings.get(
+                    paused ? LanguageStrings.UI_CONTROL_PLAY_TT : LanguageStrings.UI_CONTROL_PAUSE_TT));
+        }
     }
 
     private void bindNavKey(
@@ -979,7 +1144,7 @@ public class MapDialog extends ZeroDialog {
 
     private boolean keepMapOpenForSandbox() {
         Engine eng = resolveEngine();
-        return eng != null && eng.isEasyConquering();
+        return eng != null && eng.isEasyConquering() && hasPlayerDynasty();
     }
 
     private Hex selectedHex() {
@@ -992,7 +1157,7 @@ public class MapDialog extends ZeroDialog {
             return;
         }
         Engine eng = resolveEngine();
-        boolean sandbox = eng != null && eng.isEasyConquering();
+        boolean sandbox = eng != null && eng.isEasyConquering() && hasPlayerDynasty();
         boolean canConquer = sandbox && SandboxCheatService.canCheatConquerHex(world, selectedHex());
         conquerButton.setVisible(sandbox);
         conquerButton.setEnabled(sandbox);
@@ -1043,7 +1208,7 @@ public class MapDialog extends ZeroDialog {
     private void conquerActiveHex() {
         Engine eng = resolveEngine();
         syncWorldFromEngine();
-        if (eng == null || !eng.isEasyConquering() || world == null) {
+        if (eng == null || !eng.isEasyConquering() || world == null || !hasPlayerDynasty()) {
             return;
         }
         Hex hex = selectedHex();
@@ -1145,15 +1310,27 @@ public class MapDialog extends ZeroDialog {
             zoomInButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ZOOM_IN_TT));
         }
         updateZoomControls();
+        updateSpeedAndTimeControls();
     }
 
     public void liveUpdate() {
         refreshDialog();
     }
 
+    public void updateTimeDisplay() {
+        syncWorldFromEngine();
+        updateSpeedAndTimeControls();
+    }
+
     @Override
     public void refreshTheme() {
         super.refreshTheme();
+        dateTimeLabel.setForeground(AssetStyles.FONT_COLOR);
+        configureIconControlButton(speedDownButton, GameConstants.ICON_SPEED_DOWN);
+        configureIconControlButton(speedUpButton, GameConstants.ICON_SPEED_UP);
+        Engine eng = resolveEngine();
+        configureIconControlButton(playPauseButton,
+                eng != null && eng.isPaused() ? GameConstants.ICON_SPEED_PLAY : GameConstants.ICON_SPEED_PAUSE);
         AssetStyles.styleButton(homeButton);
         AssetStyles.styleCompactButton(zoomOutButton);
         AssetStyles.styleCompactButton(zoomInButton);
@@ -1212,6 +1389,14 @@ public class MapDialog extends ZeroDialog {
         private final FlatChevronButton activeWarsToggle;
         private final JLabel activeWarsTitle;
         private boolean activeWarsExpanded = true;
+
+        private static final int MAX_WORLD_LOG_ENTRIES = 60;
+        private final JPanel worldLogsSection;
+        private final JPanel worldLogsContent;
+        private final JScrollPane worldLogsScroll;
+        private final FlatChevronButton worldLogsToggle;
+        private final JLabel worldLogsTitle;
+        private boolean worldLogsExpanded = true;
 
         public LegendPanel() {
             setLayout(new BorderLayout());
@@ -1305,6 +1490,52 @@ public class MapDialog extends ZeroDialog {
             activeWarsSection.add(activeWarsHeader);
             activeWarsSection.add(activeWarsContent);
 
+            worldLogsContent = new JPanel();
+            worldLogsContent.setLayout(new BoxLayout(worldLogsContent, BoxLayout.Y_AXIS));
+            worldLogsContent.setOpaque(false);
+            worldLogsContent.setBorder(new EmptyBorder(0, 8, 4, 8));
+
+            worldLogsScroll = new JScrollPane(worldLogsContent);
+            worldLogsScroll.setBorder(null);
+            worldLogsScroll.setOpaque(false);
+            worldLogsScroll.getViewport().setOpaque(false);
+            worldLogsScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            worldLogsScroll.getVerticalScrollBar().setUnitIncrement(16);
+            UiScrollBarStyles.hide(worldLogsScroll);
+            worldLogsScroll.setPreferredSize(new Dimension(0, 130));
+            worldLogsScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+
+            worldLogsToggle = new FlatChevronButton();
+            worldLogsToggle.setChevronDirection(FlatChevronButton.ChevronDirection.UP);
+            worldLogsToggle.setOpaque(false);
+            worldLogsToggle.addActionListener(e -> setWorldLogsExpanded(!worldLogsExpanded));
+
+            worldLogsTitle = new JLabel();
+            worldLogsTitle.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+            worldLogsTitle.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            worldLogsTitle.setIcon(GameConstants.ICON_STAT_INTELLIGENCE);
+            worldLogsTitle.setIconTextGap(4);
+
+            JPanel worldLogsHeader = new JPanel(new BorderLayout(4, 0));
+            worldLogsHeader.setOpaque(false);
+            worldLogsHeader.setBorder(new EmptyBorder(0, 4, 4, 4));
+            worldLogsHeader.add(worldLogsToggle, BorderLayout.WEST);
+            worldLogsHeader.add(worldLogsTitle, BorderLayout.CENTER);
+            AssetStyles.markClickable(worldLogsHeader);
+            worldLogsHeader.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    setWorldLogsExpanded(!worldLogsExpanded);
+                }
+            });
+
+            worldLogsSection = new JPanel();
+            worldLogsSection.setLayout(new BoxLayout(worldLogsSection, BoxLayout.Y_AXIS));
+            worldLogsSection.setOpaque(false);
+            worldLogsSection.setVisible(false);
+            worldLogsSection.add(worldLogsHeader);
+            worldLogsSection.add(worldLogsScroll);
+
             JPanel columnHeader = new JPanel(new BorderLayout(4, 0));
             columnHeader.setOpaque(false);
             columnHeader.setBorder(new EmptyBorder(0, 10, 4, 8));
@@ -1360,6 +1591,7 @@ public class MapDialog extends ZeroDialog {
             centerStack.setLayout(new BoxLayout(centerStack, BoxLayout.Y_AXIS));
             centerStack.setOpaque(false);
             centerStack.add(activeWarsSection);
+            centerStack.add(worldLogsSection);
             centerStack.add(listPanel);
             legendBody.add(centerStack, BorderLayout.CENTER);
 
@@ -1420,6 +1652,56 @@ public class MapDialog extends ZeroDialog {
                     activeWarsExpanded ? LanguageStrings.MAP_ACTIVE_WARS_HIDE : LanguageStrings.MAP_ACTIVE_WARS_SHOW));
             activeWarsSection.revalidate();
             activeWarsSection.repaint();
+        }
+
+        private void setWorldLogsExpanded(boolean expanded) {
+            worldLogsExpanded = expanded;
+            worldLogsScroll.setVisible(expanded);
+            worldLogsToggle.setChevronDirection(expanded
+                    ? FlatChevronButton.ChevronDirection.UP
+                    : FlatChevronButton.ChevronDirection.DOWN);
+            worldLogsToggle.setToolTipText(LanguageStrings.get(
+                    expanded ? LanguageStrings.MAP_WORLD_LOGS_HIDE : LanguageStrings.MAP_WORLD_LOGS_SHOW));
+            worldLogsSection.revalidate();
+            worldLogsSection.repaint();
+        }
+
+        private void updateWorldLogsSection() {
+            boolean showLogs = isSpectatorMode() && world != null && world.getHistoryService() != null;
+            if (!showLogs) {
+                worldLogsSection.setVisible(false);
+                worldLogsContent.removeAll();
+                return;
+            }
+            List<WorldHistoryEvent> events = world.getHistoryService().getEvents();
+            worldLogsSection.setVisible(true);
+            worldLogsTitle.setText(LanguageStrings.format(
+                    LanguageStrings.MAP_WORLD_LOGS_TITLE_FMT, events.size()));
+            worldLogsContent.removeAll();
+            int limit = Math.min(events.size(), MAX_WORLD_LOG_ENTRIES);
+            for (int i = 0; i < limit; i++) {
+                WorldHistoryEvent event = events.get(i);
+                String msg = event.formatMessage(world);
+                if (msg == null || msg.isEmpty()) {
+                    continue;
+                }
+                String line = "[" + event.formatDateTime() + "] " + msg;
+                JLabel logLabel = new JLabel(line);
+                logLabel.setFont(AssetStyles.FONT_SMALL);
+                logLabel.setForeground(AssetStyles.FONT_COLOR);
+                logLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                logLabel.setBorder(new EmptyBorder(0, 4, 2, 0));
+                logLabel.setToolTipText(line);
+                worldLogsContent.add(logLabel);
+            }
+            worldLogsScroll.setVisible(worldLogsExpanded && !events.isEmpty());
+            worldLogsToggle.setChevronDirection(worldLogsExpanded
+                    ? FlatChevronButton.ChevronDirection.UP
+                    : FlatChevronButton.ChevronDirection.DOWN);
+            worldLogsToggle.setToolTipText(LanguageStrings.get(
+                    worldLogsExpanded ? LanguageStrings.MAP_WORLD_LOGS_HIDE : LanguageStrings.MAP_WORLD_LOGS_SHOW));
+            worldLogsSection.revalidate();
+            worldLogsSection.repaint();
         }
 
         private boolean canPlayerManageWars() {
@@ -1524,6 +1806,7 @@ public class MapDialog extends ZeroDialog {
         public void updateLegend() {
             syncWorldFromEngine();
             updateActiveWarsSection();
+            updateWorldLogsSection();
             content.removeAll();
             if (world == null || world.getHexes() == null) return;
 
@@ -1609,7 +1892,12 @@ public class MapDialog extends ZeroDialog {
                         : (d.getColonies() != null && !d.getColonies().isEmpty() ? d.getColonies().get(0) : null);
                 Hex capitalHex = capital != null ? world.getHexOfColony(capital) : null;
                 if (capitalHex != null) {
-                    Runnable goToCapital = () -> changeHex(capitalHex, !keepMapOpenForSandbox());
+                    Runnable goToCapital = () -> {
+                        if (isSpectatorMode() && mapPanel != null) {
+                            mapPanel.centerOn(capitalHex);
+                        }
+                        changeHex(capitalHex, !keepMapOpenForSandbox());
+                    };
                     colorSwatch.setClickAction(goToCapital, clickTooltip);
                 } else {
                     colorSwatch.clearClickAction();
@@ -1625,6 +1913,9 @@ public class MapDialog extends ZeroDialog {
                         @Override
                         public void mouseReleased(MouseEvent e) {
                             if (SwingUtilities.isLeftMouseButton(e)) {
+                                if (isSpectatorMode() && mapPanel != null) {
+                                    mapPanel.centerOn(capitalHex);
+                                }
                                 changeHex(capitalHex, !keepMapOpenForSandbox());
                             }
                         }
@@ -1755,6 +2046,7 @@ public class MapDialog extends ZeroDialog {
         private final Map<Long, Hex> hexLookup = new HashMap<>();
         private final Map<Integer, Image> scaledBiomeIconCache = new HashMap<>();
         private final Map<Integer, Image> scaledRankIconCache = new HashMap<>();
+        private Image scaledCapitalIconCache;
         private int cachedIconSize = -1;
         private final Map<Integer, BakedStepCacheEntry> bakedStepCache = new LinkedHashMap<Integer, BakedStepCacheEntry>(16, 0.75f, true) {
             @Override
@@ -1772,6 +2064,7 @@ public class MapDialog extends ZeroDialog {
         private boolean cachedBakedCapitals;
         private boolean cachedBakedMeridian;
         private boolean cachedBakedEquator;
+        private int cachedBakedColonyStamp;
         private HexGridMesh cachedMesh;
         private World cachedMeshWorld;
         private double cachedMeshHexSize = Double.NaN;
@@ -2027,7 +2320,32 @@ public class MapDialog extends ZeroDialog {
             cachedBakedMapMode = null;
             scaledBiomeIconCache.clear();
             scaledRankIconCache.clear();
+            scaledCapitalIconCache = null;
             cachedIconSize = -1;
+        }
+
+        private int computeColonyBakeStamp() {
+            if (world == null || world.getHexes() == null) {
+                return 0;
+            }
+            int hash = 1;
+            for (Hex h : world.getHexes()) {
+                if (h == null) {
+                    continue;
+                }
+                Colony c = h.getColony();
+                if (c != null) {
+                    int dynId = c.getDynasty() != null ? c.getDynasty().getId() : 0;
+                    int rankId = c.getRank() != null ? c.getRank().getId() : 0;
+                    int cap = c.isCapital() ? 1 : 0;
+                    hash = 31 * hash + h.getQ();
+                    hash = 31 * hash + h.getR();
+                    hash = 31 * hash + dynId;
+                    hash = 31 * hash + rankId;
+                    hash = 31 * hash + cap;
+                }
+            }
+            return hash;
         }
 
         private boolean isBakedImageValid(Hex activeHex) {
@@ -2044,7 +2362,8 @@ public class MapDialog extends ZeroDialog {
                     && cachedBakedColonyRanks == showColonyRanks
                     && cachedBakedCapitals == showCapitals
                     && cachedBakedMeridian == showMeridian
-                    && cachedBakedEquator == showEquator;
+                    && cachedBakedEquator == showEquator
+                    && cachedBakedColonyStamp == computeColonyBakeStamp();
         }
 
         private HexGridMesh ensureMeshCache(List<Hex> hexes) {
@@ -2428,6 +2747,7 @@ public class MapDialog extends ZeroDialog {
             cachedBakedCapitals = showCapitals;
             cachedBakedMeridian = showMeridian;
             cachedBakedEquator = showEquator;
+            cachedBakedColonyStamp = computeColonyBakeStamp();
         }
 
         private Image getScaledBiomeIcon(Biome biome, int size) {
@@ -2437,6 +2757,7 @@ public class MapDialog extends ZeroDialog {
             if (size != cachedIconSize) {
                 scaledBiomeIconCache.clear();
                 scaledRankIconCache.clear();
+                scaledCapitalIconCache = null;
                 cachedIconSize = size;
             }
             Image cached = scaledBiomeIconCache.get(biome.getId());
@@ -2463,6 +2784,7 @@ public class MapDialog extends ZeroDialog {
             if (size != cachedIconSize) {
                 scaledBiomeIconCache.clear();
                 scaledRankIconCache.clear();
+                scaledCapitalIconCache = null;
                 cachedIconSize = size;
             }
             Image cached = scaledRankIconCache.get(rank.getId());
@@ -2479,6 +2801,33 @@ public class MapDialog extends ZeroDialog {
                 return img;
             } catch (Throwable t) {
                 return rank.getIcon().getImage();
+            }
+        }
+
+        private Image getScaledCapitalIcon(int size) {
+            ImageIcon baseIcon = GameConstants.ROLE_COMMANDER != null ? GameConstants.ROLE_COMMANDER.getIcon() : null;
+            if (baseIcon == null || baseIcon.getImage() == null || size <= 0) {
+                return null;
+            }
+            if (size != cachedIconSize) {
+                scaledBiomeIconCache.clear();
+                scaledRankIconCache.clear();
+                scaledCapitalIconCache = null;
+                cachedIconSize = size;
+            }
+            if (scaledCapitalIconCache != null) {
+                return scaledCapitalIconCache;
+            }
+            try {
+                BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D ig = img.createGraphics();
+                ig.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                ig.drawImage(baseIcon.getImage(), 0, 0, size, size, null);
+                ig.dispose();
+                scaledCapitalIconCache = img;
+                return img;
+            } catch (Throwable t) {
+                return baseIcon.getImage();
             }
         }
 
@@ -2986,17 +3335,12 @@ public class MapDialog extends ZeroDialog {
             }
 
             if (showCapitals && hex.getColony() != null && hex.getColony().isCapital()) {
-                Font starFont = AssetStyles.FONT_BOLD.deriveFont((float) Math.max(9, hexSize * 0.7));
-                g2d.setFont(starFont);
-                FontMetrics fm = g2d.getFontMetrics(starFont);
-                String star = "★";
-                int sw = fm.stringWidth(star);
-                int sx = (int) Math.round(face.centerX - sw / 2.0);
-                int sy = (int) Math.round(face.centerY + hexSize * 0.65);
-                g2d.setColor(new Color(25, 20, 10, 200));
-                g2d.drawString(star, sx + 1, sy + 1);
-                g2d.setColor(new Color(255, 215, 0));
-                g2d.drawString(star, sx, sy);
+                Image capImg = getScaledCapitalIcon(iconSize);
+                if (capImg != null) {
+                    int capX = HexMapGeometry.centeredIconOrigin(face.centerX, iconSize);
+                    int capY = HexMapGeometry.centeredIconOrigin(face.centerY + hexSize * 0.78, iconSize);
+                    g2d.drawImage(capImg, capX, capY, null);
+                }
             }
         }
 

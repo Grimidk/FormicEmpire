@@ -104,6 +104,8 @@ public class GamePanel extends ZeroGamePanel {
     private int lastPeaceOfferPromptWarId = -1;
 
     private volatile boolean hourGuiUpdatePending;
+    private volatile boolean dayGuiUpdatePending;
+    private volatile boolean monthGuiUpdatePending;
     private int lastMiniMapRefreshHourKey = Integer.MIN_VALUE;
     private int lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
 
@@ -954,7 +956,7 @@ public class GamePanel extends ZeroGamePanel {
             mapDialog = null;
         }
         if (mapDialog == null) {
-            mapDialog = new MapDialog(frame, engine, world, this::refreshAllGUIData, this::showWarDialog);
+            mapDialog = new MapDialog(frame, engine, world, this::refreshAllGUIData, this::showWarDialog, this::handleBackButton);
         } else {
             mapDialog.bindWorld(world);
         }
@@ -1519,12 +1521,11 @@ public class GamePanel extends ZeroGamePanel {
                 if (isCancelled()) {
                     return null;
                 }
-                Colony colony = null;
                 World world = engine.getWorld();
-                if (world != null && world.getActiveHex() != null) {
-                    colony = world.getActiveHex().getColony();
+                if (world != null && !world.isSpectatorMode()) {
+                    Colony colony = world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
+                    GameSpritePreloader.warmSession(colony, this::isCancelled);
                 }
-                GameSpritePreloader.warmSession(colony, this::isCancelled);
                 return null;
             }
 
@@ -1539,11 +1540,12 @@ public class GamePanel extends ZeroGamePanel {
                     get();
 
                     World world = engine.getWorld();
+                    boolean spectator = world != null && world.isSpectatorMode();
                     Colony colony = null;
-                    if (world != null && world.getActiveHex() != null) {
+                    if (!spectator && world != null && world.getActiveHex() != null) {
                         colony = world.getActiveHex().getColony();
                     }
-                    if (colony == null || !colony.belongsToPlayerDynasty()) {
+                    if (!spectator && (colony == null || !colony.belongsToPlayerDynasty())) {
                         cleanupSession();
                         UiOptionPane.showMessageDialog(frame,
                                 LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING),
@@ -1555,15 +1557,19 @@ public class GamePanel extends ZeroGamePanel {
 
                     registerTickListeners();
 
-                    gameAreaPanel.setColony(colony);
+                    if (spectator) {
+                        gameAreaPanel.setColony(null);
+                    } else {
+                        gameAreaPanel.setColony(colony);
 
-                    alertManager = new AlertManager(colony.getDynasty(), alertPanel);
+                        alertManager = new AlertManager(colony.getDynasty(), alertPanel);
 
-                    triggerManager = new TriggerManager(world, colony, engine);
-                    if (frame instanceof TriggerManager.TriggerListener) {
-                        triggerManager.addListener((TriggerManager.TriggerListener) frame);
+                        triggerManager = new TriggerManager(world, colony, engine);
+                        if (frame instanceof TriggerManager.TriggerListener) {
+                            triggerManager.addListener((TriggerManager.TriggerListener) frame);
+                        }
+                        triggerManager.registerListeners();
                     }
-                    triggerManager.registerListeners();
 
                     updateStaticWorldInfo();
                     if (!engineStarted) {
@@ -1582,11 +1588,15 @@ public class GamePanel extends ZeroGamePanel {
 
                     controlPanel.setPlayPauseButtonText(engine.isPaused());
                     updateStatusIndicator(engine.isPaused());
-                    paintGameAreaWhilePaused();
+                    if (!spectator) {
+                        paintGameAreaWhilePaused();
+                    }
                     if (engine.getMusicService() != null) {
                         engine.getMusicService().enterSession();
                     }
-                    if (isNewWorld) {
+                    if (spectator) {
+                        SwingUtilities.invokeLater(() -> openMapDialog(world));
+                    } else if (isNewWorld) {
                         HelpPanel.showTutorialDialog(frame);
                     }
                 } catch (Exception e) {
@@ -1631,8 +1641,26 @@ public class GamePanel extends ZeroGamePanel {
                 updateHourGUI();
             });
         };
-        dayTickListener = () -> SwingUtilities.invokeLater(this::updateDayGUI);
-        monthTickListener = () -> SwingUtilities.invokeLater(this::updateMonthGUI);
+        dayTickListener = () -> {
+            if (dayGuiUpdatePending) {
+                return;
+            }
+            dayGuiUpdatePending = true;
+            SwingUtilities.invokeLater(() -> {
+                dayGuiUpdatePending = false;
+                updateDayGUI();
+            });
+        };
+        monthTickListener = () -> {
+            if (monthGuiUpdatePending) {
+                return;
+            }
+            monthGuiUpdatePending = true;
+            SwingUtilities.invokeLater(() -> {
+                monthGuiUpdatePending = false;
+                updateMonthGUI();
+            });
+        };
 
         engine.addTickListener(minuteTickListener);
         engine.addHourTickListener(hourTickListener);
@@ -1668,6 +1696,8 @@ public class GamePanel extends ZeroGamePanel {
         dayTickListener = null;
         monthTickListener = null;
         hourGuiUpdatePending = false;
+        dayGuiUpdatePending = false;
+        monthGuiUpdatePending = false;
         lastMiniMapRefreshHourKey = Integer.MIN_VALUE;
         lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
 
@@ -1687,7 +1717,8 @@ public class GamePanel extends ZeroGamePanel {
         if (engine != null && !engine.isPaused()) {
             drainPendingMinuteGuiSteps(false);
         }
-        if (gameAreaPanel != null) {
+        World world = engine != null ? engine.getWorld() : null;
+        if (gameAreaPanel != null && (world == null || !world.isSpectatorMode())) {
             gameAreaPanel.repaint();
         }
         if (visualFrameListener != null) {
@@ -1768,7 +1799,7 @@ public class GamePanel extends ZeroGamePanel {
         if (miniMapPanel != null) {
             miniMapPanel.refreshMap();
         }
-        if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
+        if (!world.isSpectatorMode() && world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
             gameAreaPanel.setBackgroundBiome(world.getActiveHex().getBiome());
         }
     }
@@ -1798,10 +1829,14 @@ public class GamePanel extends ZeroGamePanel {
     private void performMinuteGuiUpdate(int physicsSteps, boolean repaintAfter) {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
-        Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
+        boolean spectator = world != null && world.isSpectatorMode();
+        Colony colony = (world != null && world.getActiveHex() != null)
+                ? world.getActiveHex().getColony()
+                : null;
+        Colony visualColony = spectator ? null : colony;
 
-        gameAreaPanel.setColony(colony);
-        if (colony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
+        gameAreaPanel.setColony(visualColony);
+        if (visualColony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
             updateGameAreaSize();
         }
         Hex activeHex = world != null ? world.getActiveHex() : null;
@@ -1810,6 +1845,15 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         if (world == null) {
+            return;
+        }
+
+        if (spectator) {
+            worldPanel.updateMinuteData(world);
+            colonyPanel.updateMinuteData(colony);
+            if (mapDialog != null && mapDialog.isShowing()) {
+                mapDialog.updateTimeDisplay();
+            }
             return;
         }
 
@@ -1838,7 +1882,7 @@ public class GamePanel extends ZeroGamePanel {
             gameAreaPanel.repaint();
         }
         if (mapDialog != null && mapDialog.isShowing()) {
-            mapDialog.liveUpdate();
+            mapDialog.updateTimeDisplay();
         }
     }
 
@@ -1872,6 +1916,10 @@ public class GamePanel extends ZeroGamePanel {
         boolean controlPanelDue = hourKey - lastControlPanelRefreshHourKey >= GameNumbers.GUI_HOUR_CONTROL_PANEL_REFRESH_INTERVAL
                 || lastControlPanelRefreshHourKey == Integer.MIN_VALUE;
 
+        if (statsDialog != null && statsDialog.isShowing()) {
+            statsDialog.liveUpdate();
+        }
+
         if (colony != null && colony.belongsToPlayerDynasty()) {
             if (upgradeDialog != null && upgradeDialog.isShowing()) {
                 upgradeDialog.liveUpdate();
@@ -1887,9 +1935,6 @@ public class GamePanel extends ZeroGamePanel {
             }
             if (invasionBattleDialog != null && invasionBattleDialog.isShowing()) {
                 invasionBattleDialog.liveUpdate();
-            }
-            if (statsDialog != null && statsDialog.isShowing()) {
-                statsDialog.liveUpdate();
             }
             if (dynastyDialog != null && dynastyDialog.isShowing()) {
                 dynastyDialog.liveUpdate();

@@ -27,7 +27,7 @@ import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
     private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(460, 32);
-    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 260);
+    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 300);
     private static final Dimension SLOT_LABEL_SIZE = new Dimension(AssetStyles.MENU_BUTTON_WIDTH, 28);
     private static final int SLOT_ACTION_GAP = 8;
 
@@ -202,8 +202,18 @@ public class SaveSelectPanel extends JPanel {
                 deleteButtons[i].setEnabled(false);
             } else {
                 int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
-                String displayName = LanguageStrings.formatSaveSlotDisplayName(
-                        s.getName(), s.resolvePlayerDynastyTitleId(), slotId);
+                String displayName;
+                if (s.isSpectatorMode()) {
+                    String raw = s.getName() != null ? s.getName().trim() : "";
+                    if (raw.isEmpty() || "Spectator".equalsIgnoreCase(raw)) {
+                        displayName = LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE);
+                    } else {
+                        displayName = raw + " (" + LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE) + ")";
+                    }
+                } else {
+                    displayName = LanguageStrings.formatSaveSlotDisplayName(
+                            s.getName(), s.resolvePlayerDynastyTitleId(), slotId);
+                }
                 if (!s.allowsAchievements()) {
                     displayName = LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_STAR_PREFIX) + displayName;
                 }
@@ -290,6 +300,7 @@ public class SaveSelectPanel extends JPanel {
             Savefile save = new Savefile(slotId, request.baseName());
             save.setPlayerDynastyTitleId(request.titleId());
             save.setStarterBiomeId(request.starterBiomeId());
+            save.setSpectatorMode(request.spectatorMode());
             save.setVersion(SaveManager.getAppVersion());
             save.setWorldWidth(GameNumbers.WORLD_RECT_WIDTH);
             save.setWorldHeight(GameNumbers.WORLD_RECT_HEIGHT);
@@ -425,17 +436,42 @@ public class SaveSelectPanel extends JPanel {
         c.weightx = 1.0;
         form.add(biomeCombo, c);
 
+        JCheckBox spectatorCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE));
+        AssetStyles.styleCheckBox(spectatorCheck);
+        c.gridx = 1;
+        c.gridy = 3;
+        c.weightx = 1.0;
+        c.insets = new Insets(6, 0, 6, 12);
+        form.add(spectatorCheck, c);
+
         JLabel previewLabel = new JLabel();
         previewLabel.setFont(AssetStyles.FONT_BOLD);
         previewLabel.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         previewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = 4;
         c.gridwidth = 2;
         c.insets = new Insets(14, 0, 0, 0);
         form.add(previewLabel, c);
 
-        Runnable refreshPreview = () -> updateDynastyPreview(previewLabel, nameField, titleCombo);
+        Runnable refreshPreview = () -> {
+            if (spectatorCheck.isSelected()) {
+                String base = formatBaseName(nameField.getText());
+                previewLabel.setText(base.isEmpty()
+                        ? LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE)
+                        : base + " (" + LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE) + ")");
+            } else {
+                updateDynastyPreview(previewLabel, nameField, titleCombo);
+            }
+        };
+        spectatorCheck.addActionListener(e -> {
+            boolean spec = spectatorCheck.isSelected();
+            titleCombo.setEnabled(!spec);
+            biomeCombo.setEnabled(!spec);
+            titleLabel.setEnabled(!spec);
+            biomeLabel.setEnabled(!spec);
+            refreshPreview.run();
+        });
         nameField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -473,6 +509,16 @@ public class SaveSelectPanel extends JPanel {
         }
 
         String rawName = nameField.getText();
+        if (spectatorCheck.isSelected()) {
+            String baseName = (rawName == null || rawName.trim().isEmpty())
+                    ? "Spectator"
+                    : formatBaseName(rawName);
+            return new NewSaveRequest(
+                    baseName,
+                    GameConstants.DYNASTY_TITLE_DYNASTY.getId(),
+                    GameConstants.BIOME_PLAINS.getId(),
+                    true);
+        }
         if (rawName == null || rawName.trim().isEmpty()) {
             return null;
         }
@@ -495,7 +541,7 @@ public class SaveSelectPanel extends JPanel {
 
         Biome selectedBiome = (Biome) biomeCombo.getSelectedItem();
         int starterBiomeId = selectedBiome != null ? selectedBiome.getId() : GameConstants.BIOME_PLAINS.getId();
-        return new NewSaveRequest(baseName, titleId, starterBiomeId);
+        return new NewSaveRequest(baseName, titleId, starterBiomeId, false);
     }
 
     private static void updateDynastyPreview(JLabel previewLabel, JTextField nameField, JComboBox<DynastyTitle> titleCombo) {
@@ -528,5 +574,5 @@ public class SaveSelectPanel extends JPanel {
         refreshSlots();
     }
 
-    private record NewSaveRequest(String baseName, int titleId, int starterBiomeId) {}
+    private record NewSaveRequest(String baseName, int titleId, int starterBiomeId, boolean spectatorMode) {}
 }

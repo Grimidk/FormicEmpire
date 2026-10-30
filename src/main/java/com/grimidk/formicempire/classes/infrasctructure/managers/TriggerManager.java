@@ -192,28 +192,54 @@ public class TriggerManager {
             Colony npc = hex.getColony();
             if (npc == null || npc.isPlayer()) continue;
 
-            checkNPCResearcher(npc);
-            checkNPCGraver(npc);
-            checkNPCScout(npc);
-            checkNPCMiner(npc);
-            checkNPCPolice(npc);
-            checkNPCAirSupport(npc);
-            checkNPCUnitRoles(npc);
-            checkNPCAbilities(npc);
-            checkNPCCloning(npc);
-            checkNPCParasiticMites(npc);
+            evaluateNpcColonyTriggers(npc);
         }
     }
+
+    public static void evaluateNpcColonyTriggers(Colony npc) {
+        if (npc == null || npc.isPlayer()) return;
+
+        checkNPCResearcher(npc);
+        checkNPCGraver(npc);
+        checkNPCScout(npc);
+        checkNPCMiner(npc);
+        checkNPCPolice(npc);
+        checkNPCAirSupport(npc);
+        checkNPCUnitRoles(npc);
+        checkNPCAbilities(npc);
+        checkNPCCloning(npc);
+        checkNPCParasiticMites(npc);
+    }
     
-    private void checkNPCCloning(Colony npc) {
+    private static void checkNPCCloning(Colony npc) {
         applyCloningUnlockIfEligible(npc);
     }
 
-    private void checkNPCParasiticMites(Colony npc) {
-        applyParasiticMiteUnlockIfEligible(npc, false);
+    private static void checkNPCParasiticMites(Colony npc) {
+        if (npc == null || npc.getDynasty() == null) {
+            return;
+        }
+        boolean needsAlert = !npc.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        boolean needsSymbioticMiteCatch = !npc.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        if (!needsAlert && !needsSymbioticMiteCatch) {
+            return;
+        }
+        if (!dynastyHasAnyParasiticMites(npc.getDynasty())) {
+            return;
+        }
+        if (needsAlert) {
+            npc.unlockUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        }
+        if (needsSymbioticMiteCatch) {
+            npc.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        }
+        if (npc.hasUpgrade(GameUnlocks.ROLE_HUNTER)
+                && !npc.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        }
     }
 
-    private void applyCloningUnlockIfEligible(Colony colony) {
+    private static void applyCloningUnlockIfEligible(Colony colony) {
         if (colony.getDynasty() == null || colony.hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
             return;
         }
@@ -260,30 +286,31 @@ public class TriggerManager {
         }
     }
 
-    private void checkNPCResearcher(Colony npc) {
+    private static void checkNPCResearcher(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         if (npc.getAntTotal() > GameNumbers.TRIGGER_NPC_RESEARCHER_MIN_ANTS) {
             npc.unlockUpgrade(GameUnlocks.ROLE_RESEARCHER);
         }
     }
 
-    private void checkNPCGraver(Colony npc) {
+    private static void checkNPCGraver(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.ROLE_GRAVER)) return;
         if (npc.getDeadAnts().size() >= GameNumbers.TRIGGER_NPC_GRAVER_DEAD_ANTS) {
             npc.unlockUpgrade(GameUnlocks.ROLE_GRAVER);
         }
     }
 
-    private void checkNPCScout(Colony npc) {
+    private static void checkNPCScout(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
         boolean lowFood = npc.getPlants() < (npc.getStatsService().getPlantsCapacity(npc) * GameNumbers.TRIGGER_NPC_SCOUT_FOOD_RATIO);
         boolean highPop = npc.getAntTotal() > GameNumbers.TRIGGER_NPC_SCOUT_MIN_ANTS;
         if (lowFood || highPop) {
             npc.unlockUpgrade(GameUnlocks.ROLE_SCOUT);
+            npc.unlockUpgrade(GameUnlocks.ABILITY_HUNTS);
         }
     }
 
-    private void checkNPCMiner(Colony npc) {
+    private static void checkNPCMiner(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.ROLE_MINER)) return;
         if (!npc.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) return;
         Dynasty dynasty = npc.getDynasty();
@@ -293,7 +320,7 @@ public class TriggerManager {
         }
     }
 
-    private void checkNPCPolice(Colony npc) {
+    private static void checkNPCPolice(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
         Rank rank = npc.getRank();
         if (rank != null && rank.meetsOrExceeds(GameConstants.RANK_DUCHY)) {
@@ -301,7 +328,7 @@ public class TriggerManager {
         }
     }
 
-    private void checkNPCAirSupport(Colony npc) {
+    private static void checkNPCAirSupport(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.ROLE_AIR_SUPPORT)) {
             return;
         }
@@ -312,7 +339,7 @@ public class TriggerManager {
         }
     }
 
-    private void checkNPCUnitRoles(Colony npc) {
+    private static void checkNPCUnitRoles(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             if (!npc.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
                 npc.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
@@ -340,18 +367,22 @@ public class TriggerManager {
         }
     }
 
-    private void checkNPCAbilities(Colony npc) {
+    private static void checkNPCAbilities(Colony npc) {
         if (!npc.hasUpgrade(GameUnlocks.ABILITY_RESEARCH) && npc.getResearchPoints() >= GameNumbers.TRIGGER_RESEARCH_MIN_RP) {
             npc.unlockUpgrade(GameUnlocks.ABILITY_RESEARCH);
         }
         if (!npc.hasUpgrade(GameUnlocks.ABILITY_BUILD) && npc.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             npc.unlockUpgrade(GameUnlocks.ABILITY_BUILD);
         }
+        if (!npc.hasUpgrade(GameUnlocks.ABILITY_HUNTS) && npc.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
+            npc.unlockUpgrade(GameUnlocks.ABILITY_HUNTS);
+        }
         if (!npc.hasUpgrade(GameUnlocks.ABILITY_SPREAD) && npc.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
             npc.unlockUpgrade(GameUnlocks.ABILITY_SPREAD);
         }
         if (npc.getDynasty() != null) {
-            int colonies = npc.getDynasty().getColonies().size();
+            Dynasty dynasty = npc.getDynasty();
+            int colonies = dynasty.getColonies().size();
             if (!npc.hasUpgrade(GameUnlocks.ABILITY_DYNASTY) && colonies >= GameNumbers.TRIGGER_DYNASTY_MIN_COLONIES) {
                 npc.unlockUpgrade(GameUnlocks.ABILITY_DYNASTY);
             }
@@ -363,6 +394,14 @@ public class TriggerManager {
             }
             if (!npc.hasUpgrade(GameUnlocks.ABILITY_ABILITY) && npc.getResearchPoints() >= GameNumbers.TRIGGER_NPC_ABILITY_MENU_MIN_RP) {
                 npc.unlockUpgrade(GameUnlocks.ABILITY_ABILITY);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)
+                    && dynasty.getAbsorbedDynastyIds().size() >= GameNumbers.TRIGGER_ASSIMILATION_MIN_ABSORBED) {
+                npc.unlockUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)
+                    && GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3) >= GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS) {
+                npc.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
             }
         }
     }

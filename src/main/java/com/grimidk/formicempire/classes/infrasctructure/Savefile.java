@@ -61,6 +61,7 @@ public class Savefile implements Serializable {
     private List<SavedWar> wars;
     private List<SavedWorldHistoryEvent> worldHistory;
     private boolean allowsAchievements = true;
+    private boolean spectatorMode = false;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -579,6 +580,14 @@ public class Savefile implements Serializable {
 
     public void disableAchievements() {
         this.allowsAchievements = false;
+    }
+
+    public boolean isSpectatorMode() {
+        return spectatorMode;
+    }
+
+    public void setSpectatorMode(boolean spectatorMode) {
+        this.spectatorMode = spectatorMode;
     }
 
     public int getStarterBiomeId() {

@@ -131,7 +131,7 @@ public class ColonyLabourService {
             int actualGathered,
             int foragerCount,
             List<Ant> workers) {
-        if (foragerCount > GameNumbers.COLLECTING_AGGREGATE_RESIN_WORKER_THRESHOLD) {
+        if (foragerCount >= GameNumbers.COLLECTING_AGGREGATE_RESIN_WORKER_THRESHOLD) {
             float avgSlots = 1f;
             if (workers != null && !workers.isEmpty()) {
                 float slotSum = 0f;
@@ -400,10 +400,12 @@ public class ColonyLabourService {
         List<Ant> nurses = getWorkingAnts(colony, GameConstants.ROLE_NURSE);
         int nurseCount = nurses.size();
 
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_NURSE)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 nurseCount += 2;
-        } else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) { 
-            nurseCount += 1; 
+            } else {
+                nurseCount += 1;
+            }
         }
         
         int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
@@ -507,7 +509,11 @@ public class ColonyLabourService {
                 satellite.setActive(false); 
                 satellite.setAutomationEnabled(!colony.isPlayer()); 
                 satellite.setRank(GameConstants.RANK_COLONY);
-                
+                neighbor.setColony(satellite);
+                if (world != null) {
+                    world.markColonizedHexIndexDirty();
+                }
+
                 starter.initializeNewColony(satellite);
 
                 Colony primaryColony = null;
@@ -532,11 +538,6 @@ public class ColonyLabourService {
                     satellite.setHatchRateDrone(colony.getHatchRateDrone());
                     satellite.setHatchRatePrincess(colony.getHatchRatePrincess());
                     AntModService.copyModRates(satellite, colony);
-                }
-                
-                neighbor.setColony(satellite);
-                if (world != null) {
-                    world.markColonizedHexIndexDirty();
                 }
 
                 satellitesSpawned++;
@@ -621,18 +622,19 @@ public class ColonyLabourService {
     private void generateAndAddSource(Colony colony, Biome biome, Hex currentHex) {
         ColonyLocationService locations = colony.getLocationService();
         List<ResourceType> possibleTypes = new ArrayList<>();
-        
-        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_PLANT)) {
+        boolean isBurntForest = biome == GameConstants.BIOME_BURNT_FOREST;
+
+        if (!isBurntForest && colony.hasUpgrade(GameUnlocks.ROLE_FORAGER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_PLANT)) {
             possibleTypes.add(GameConstants.RESOURCE_PLANT);
         }
-        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_MEAT)) {
+        if (!isBurntForest && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_MEAT)) {
             possibleTypes.add(GameConstants.RESOURCE_MEAT);
         }
         if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_ROCK)
                 && biome != null && biome.getMineralAbundance() > 0) {
             possibleTypes.add(GameConstants.RESOURCE_ROCK);
         }
-        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2) && !locations.isSourceFull(colony, GameConstants.RESOURCE_FUNGI)
+        if (!isBurntForest && colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2) && !locations.isSourceFull(colony, GameConstants.RESOURCE_FUNGI)
                 && biome != null && biome.getMushroomAbundance() > 0) {
             possibleTypes.add(GameConstants.RESOURCE_FUNGI);
         }
@@ -640,7 +642,7 @@ public class ColonyLabourService {
                 && biome != null && biome.getResinAbundance() > 0) {
             possibleTypes.add(GameConstants.RESOURCE_RESIN);
         }
-        if (!locations.isSourceFull(colony, GameConstants.RESOURCE_WATER)) {
+        if (!isBurntForest && !locations.isSourceFull(colony, GameConstants.RESOURCE_WATER)) {
             possibleTypes.add(GameConstants.RESOURCE_WATER); 
         }
 
