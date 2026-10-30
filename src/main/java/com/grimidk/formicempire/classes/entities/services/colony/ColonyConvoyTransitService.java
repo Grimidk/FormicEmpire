@@ -4,11 +4,11 @@ import java.awt.Point;
 import java.util.List;
 import java.util.Map;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -61,7 +61,7 @@ public class ColonyConvoyTransitService {
         if (colony == null || !colony.isActive()) {
             return;
         }
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+        for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             List<Ant> antList = entry.getValue();
             synchronized (antList) {
                 for (Ant ant : antList) {
@@ -77,7 +77,9 @@ public class ColonyConvoyTransitService {
                     if (colony.isCreatineDietActive()) {
                         moveSpeed *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
                     }
-                    if (entry.getKey() == GameConstants.TYPE_WORKER
+                    moveSpeed *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
+                    moveSpeed *= colony.getStatsService().getHeatresistSpeedMultiplier(colony);
+                    if (entry.getKey() == GameConstants.CLASS_WORKER
                             && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                         moveSpeed *= 2f;
                     }

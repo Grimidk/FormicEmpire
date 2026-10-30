@@ -1,28 +1,34 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
-import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
-import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.MultiMapGalleryDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
 public class SettingsPanel extends JPanel {
     private static final String SECTION_GENERAL = "general";
     private static final String SECTION_VIDEO = "video";
     private static final String SECTION_AUDIO = "audio";
     private static final String SECTION_ROLES = "roles";
+    private static final String SECTION_SANDBOX = "sandbox";
+    private static final String[] WINDOW_SIZE_PRESETS = {
+            "1000x700", "1280x720", "1366x768", "1440x900", "1600x900", "1920x1080", "2560x1440"
+    };
 
     private final MainFrame frame;
     private final Engine engine;
@@ -35,20 +41,34 @@ public class SettingsPanel extends JPanel {
     private JButton videoTabButton;
     private JButton audioTabButton;
     private JButton rolesTabButton;
+    private JButton sandboxTabButton;
     private String selectedSection = SECTION_GENERAL;
     
     // --- General Tab ---
     private JComboBox<LanguageOption> languageCombo;
     private JComboBox<AutosaveOption> autosaveCombo;
-    private JCheckBox turboCheck;
     private JCheckBox arachnophobiaCheck;
     private JCheckBox pauseFocusCheck;
     private JCheckBox confirmQuitCheck;
     private JCheckBox escapeKeyGameActionsCheck;
     private JCheckBox showTooltipsCheck;
+    private JCheckBox disablePopupsCheck;
     private JCheckBox fuzzParasiteAntsCheck;
-    private JCheckBox showAuditMenuCheck;
     private JCheckBox overworldAutoRecenterCheck;
+
+    // --- Sandbox Tab ---
+    private JCheckBox turboCheck;
+    private JCheckBox showAuditMenuCheck;
+    private JCheckBox showFpsCounterCheck;
+    private JCheckBox freeAbilitiesCheck;
+    private JCheckBox infiniteResearchCheck;
+    private JCheckBox instantBuildingsCheck;
+    private JCheckBox assimilateAllCheck;
+    private JCheckBox mapEditorEnabledCheck;
+    private JCheckBox easyConqueringCheck;
+    private JCheckBox instantIntegrationCheck;
+    private JCheckBox animateWorldGenCheck;
+    private JButton multiMapPreviewButton;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -63,7 +83,8 @@ public class SettingsPanel extends JPanel {
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel, showAuditMenuLabel;
+    private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, disablePopupsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
+    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel, animateWorldGenLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -75,6 +96,7 @@ public class SettingsPanel extends JPanel {
     private JButton resetVideoButton;
     private JButton resetAudioButton;
     private JButton resetRolesButton;
+    private JButton resetSandboxButton;
     private boolean loadedFullScreen;
     private String loadedScreenSize;
 
@@ -122,7 +144,7 @@ public class SettingsPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
-        sectionTabs.setLayout(new java.awt.GridLayout(1, 4, -1, 0));
+        sectionTabs.setLayout(new java.awt.GridLayout(1, 5, -1, 0));
         sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
         sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
 
@@ -132,10 +154,12 @@ public class SettingsPanel extends JPanel {
         videoTabButton = createSectionTab(SECTION_VIDEO);
         audioTabButton = createSectionTab(SECTION_AUDIO);
         rolesTabButton = createSectionTab(SECTION_ROLES);
+        sandboxTabButton = createSectionTab(SECTION_SANDBOX);
         sectionTabs.add(generalTabButton);
         sectionTabs.add(videoTabButton);
         sectionTabs.add(audioTabButton);
         sectionTabs.add(rolesTabButton);
+        sectionTabs.add(sandboxTabButton);
 
         JPanel body = new JPanel(new BorderLayout());
         body.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -192,6 +216,7 @@ public class SettingsPanel extends JPanel {
         sectionCards.add(createVideoTab(), SECTION_VIDEO);
         sectionCards.add(createAudioTab(), SECTION_AUDIO);
         sectionCards.add(createRolesTab(), SECTION_ROLES);
+        sectionCards.add(createSandboxTab(), SECTION_SANDBOX);
     }
 
     private JButton createSectionTab(String sectionId) {
@@ -209,6 +234,7 @@ public class SettingsPanel extends JPanel {
         styleSectionTab(videoTabButton, SECTION_VIDEO.equals(sectionId));
         styleSectionTab(audioTabButton, SECTION_AUDIO.equals(sectionId));
         styleSectionTab(rolesTabButton, SECTION_ROLES.equals(sectionId));
+        styleSectionTab(sandboxTabButton, SECTION_SANDBOX.equals(sectionId));
     }
 
     private void styleSectionTab(JButton button, boolean selected) {
@@ -250,19 +276,8 @@ public class SettingsPanel extends JPanel {
         styleComboBox(autosaveCombo);
         c.gridx = 1; panel.add(autosaveCombo, c);
         
-        // Turbo Mode
-        c.gridy = 2; c.gridx = 0; 
-        turboLabel = new JLabel();
-        turboLabel.setFont(AssetStyles.FONT_NORMAL);
-        turboLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(turboLabel, c);
-        
-        turboCheck = new JCheckBox();
-        styleCheckBox(turboCheck);
-        c.gridx = 1; panel.add(turboCheck, c);
-        
         // Arachnophobia
-        c.gridy = 3; c.gridx = 0;
+        c.gridy = 2; c.gridx = 0;
         arachLabel = new JLabel();
         arachLabel.setFont(AssetStyles.FONT_NORMAL);
         arachLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -273,7 +288,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(arachnophobiaCheck, c);
         
         // Pause on Focus Loss
-        c.gridy = 4; c.gridx = 0;
+        c.gridy = 3; c.gridx = 0;
         pauseFocusLabel = new JLabel();
         pauseFocusLabel.setFont(AssetStyles.FONT_NORMAL);
         pauseFocusLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -284,7 +299,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(pauseFocusCheck, c);
         
         // Confirm on Quit
-        c.gridy = 5; c.gridx = 0;
+        c.gridy = 4; c.gridx = 0;
         confirmQuitLabel = new JLabel();
         confirmQuitLabel.setFont(AssetStyles.FONT_NORMAL);
         confirmQuitLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -295,7 +310,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(confirmQuitCheck, c);
 
         // Escape key: close dialogs / open menu
-        c.gridy = 6; c.gridx = 0;
+        c.gridy = 5; c.gridx = 0;
         escapeKeyGameActionsLabel = new JLabel();
         escapeKeyGameActionsLabel.setFont(AssetStyles.FONT_NORMAL);
         escapeKeyGameActionsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -306,7 +321,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1; panel.add(escapeKeyGameActionsCheck, c);
         
         // Show Tooltips
-        c.gridy = 7; c.gridx = 0;
+        c.gridy = 6; c.gridx = 0;
         tooltipsLabel = new JLabel();
         tooltipsLabel.setFont(AssetStyles.FONT_NORMAL);
         tooltipsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -315,6 +330,17 @@ public class SettingsPanel extends JPanel {
         showTooltipsCheck = new JCheckBox();
         styleCheckBox(showTooltipsCheck);
         c.gridx = 1; panel.add(showTooltipsCheck, c);
+
+        // Disable popups
+        c.gridy = 7; c.gridx = 0;
+        disablePopupsLabel = new JLabel();
+        disablePopupsLabel.setFont(AssetStyles.FONT_NORMAL);
+        disablePopupsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(disablePopupsLabel, c);
+
+        disablePopupsCheck = new JCheckBox();
+        styleCheckBox(disablePopupsCheck);
+        c.gridx = 1; panel.add(disablePopupsCheck, c);
         
         // Overworld auto-recenter
         c.gridy = 8; c.gridx = 0;
@@ -338,17 +364,7 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(fuzzParasiteAntsCheck);
         c.gridx = 1; panel.add(fuzzParasiteAntsCheck, c);
 
-        c.gridy = 10; c.gridx = 0;
-        showAuditMenuLabel = new JLabel();
-        showAuditMenuLabel.setFont(AssetStyles.FONT_NORMAL);
-        showAuditMenuLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(showAuditMenuLabel, c);
-
-        showAuditMenuCheck = new JCheckBox();
-        styleCheckBox(showAuditMenuCheck);
-        c.gridx = 1; panel.add(showAuditMenuCheck, c);
-
-        c.gridy = 11;
+        c.gridy = 10;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -359,6 +375,200 @@ public class SettingsPanel extends JPanel {
         setupNavigation(resetGeneralButton);
         panel.add(resetGeneralButton, c);
         
+        return panel;
+    }
+
+    private JPanel createSandboxTab() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(5, 15, 5, 15);
+        c.anchor = GridBagConstraints.WEST;
+
+        c.gridy = 0;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        sandboxNoteLabel = new JLabel();
+        sandboxNoteLabel.setFont(AssetStyles.FONT_NORMAL);
+        sandboxNoteLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(sandboxNoteLabel, c);
+
+        c.gridwidth = 1;
+        c.gridy = 1;
+        c.gridx = 0;
+        turboLabel = new JLabel();
+        turboLabel.setFont(AssetStyles.FONT_NORMAL);
+        turboLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(turboLabel, c);
+
+        turboCheck = new JCheckBox();
+        styleCheckBox(turboCheck);
+        c.gridx = 1;
+        panel.add(turboCheck, c);
+
+        c.gridy = 2;
+        c.gridx = 0;
+        showAuditMenuLabel = new JLabel();
+        showAuditMenuLabel.setFont(AssetStyles.FONT_NORMAL);
+        showAuditMenuLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(showAuditMenuLabel, c);
+
+        showAuditMenuCheck = new JCheckBox();
+        styleCheckBox(showAuditMenuCheck);
+        c.gridx = 1;
+        panel.add(showAuditMenuCheck, c);
+
+        c.gridy = 3;
+        c.gridx = 0;
+        showFpsCounterLabel = new JLabel();
+        showFpsCounterLabel.setFont(AssetStyles.FONT_NORMAL);
+        showFpsCounterLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(showFpsCounterLabel, c);
+
+        showFpsCounterCheck = new JCheckBox();
+        styleCheckBox(showFpsCounterCheck);
+        c.gridx = 1;
+        panel.add(showFpsCounterCheck, c);
+
+        c.gridy = 4;
+        c.gridx = 0;
+        freeAbilitiesLabel = new JLabel();
+        freeAbilitiesLabel.setFont(AssetStyles.FONT_NORMAL);
+        freeAbilitiesLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(freeAbilitiesLabel, c);
+
+        freeAbilitiesCheck = new JCheckBox();
+        styleCheckBox(freeAbilitiesCheck);
+        c.gridx = 1;
+        panel.add(freeAbilitiesCheck, c);
+
+        c.gridy = 5;
+        c.gridx = 0;
+        infiniteResearchLabel = new JLabel();
+        infiniteResearchLabel.setFont(AssetStyles.FONT_NORMAL);
+        infiniteResearchLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(infiniteResearchLabel, c);
+
+        infiniteResearchCheck = new JCheckBox();
+        styleCheckBox(infiniteResearchCheck);
+        c.gridx = 1;
+        panel.add(infiniteResearchCheck, c);
+
+        c.gridy = 6;
+        c.gridx = 0;
+        instantBuildingsLabel = new JLabel();
+        instantBuildingsLabel.setFont(AssetStyles.FONT_NORMAL);
+        instantBuildingsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(instantBuildingsLabel, c);
+
+        instantBuildingsCheck = new JCheckBox();
+        styleCheckBox(instantBuildingsCheck);
+        c.gridx = 1;
+        panel.add(instantBuildingsCheck, c);
+
+        c.gridy = 7;
+        c.gridx = 0;
+        assimilateAllLabel = new JLabel();
+        assimilateAllLabel.setFont(AssetStyles.FONT_NORMAL);
+        assimilateAllLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(assimilateAllLabel, c);
+
+        assimilateAllCheck = new JCheckBox();
+        styleCheckBox(assimilateAllCheck);
+        c.gridx = 1;
+        panel.add(assimilateAllCheck, c);
+
+        c.gridy = 8;
+        c.gridx = 0;
+        mapEditorEnabledLabel = new JLabel();
+        mapEditorEnabledLabel.setFont(AssetStyles.FONT_NORMAL);
+        mapEditorEnabledLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(mapEditorEnabledLabel, c);
+
+        mapEditorEnabledCheck = new JCheckBox();
+        styleCheckBox(mapEditorEnabledCheck);
+        
+        JButton resetMapButton = new JButton("Reset Setup");
+        AssetStyles.styleCompactButton(resetMapButton);
+        resetMapButton.addActionListener(e -> {
+            for (com.grimidk.formicempire.classes.constants.unlocks.Upgrade u : com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks.getUpgrades()) {
+                u.setGridX(u.getDefaultGridX());
+                u.setGridY(u.getDefaultGridY());
+            }
+            if (frame.getGamePanel() != null) {
+                frame.getGamePanel().refreshAllGUIData();
+            }
+        });
+
+        JPanel editorPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 0));
+        editorPanel.setOpaque(false);
+        editorPanel.add(mapEditorEnabledCheck);
+        editorPanel.add(resetMapButton);
+        
+        c.gridx = 1;
+        panel.add(editorPanel, c);
+
+        c.gridy = 9;
+        c.gridx = 0;
+        easyConqueringLabel = new JLabel();
+        easyConqueringLabel.setFont(AssetStyles.FONT_NORMAL);
+        easyConqueringLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(easyConqueringLabel, c);
+
+        easyConqueringCheck = new JCheckBox();
+        styleCheckBox(easyConqueringCheck);
+        c.gridx = 1;
+        panel.add(easyConqueringCheck, c);
+
+        c.gridy = 10;
+        c.gridx = 0;
+        instantIntegrationLabel = new JLabel();
+        instantIntegrationLabel.setFont(AssetStyles.FONT_NORMAL);
+        instantIntegrationLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(instantIntegrationLabel, c);
+
+        instantIntegrationCheck = new JCheckBox();
+        styleCheckBox(instantIntegrationCheck);
+        c.gridx = 1;
+        panel.add(instantIntegrationCheck, c);
+
+        c.gridy = 11;
+        c.gridx = 0;
+        animateWorldGenLabel = new JLabel();
+        animateWorldGenLabel.setFont(AssetStyles.FONT_NORMAL);
+        animateWorldGenLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(animateWorldGenLabel, c);
+
+        animateWorldGenCheck = new JCheckBox();
+        styleCheckBox(animateWorldGenCheck);
+
+        multiMapPreviewButton = new JButton(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW));
+        AssetStyles.styleCompactButton(multiMapPreviewButton);
+        multiMapPreviewButton.addActionListener(e -> {
+            java.awt.Window parent = javax.swing.SwingUtilities.getWindowAncestor(multiMapPreviewButton);
+            new MultiMapGalleryDialog(parent != null ? parent : frame, engine).setVisible(true);
+        });
+
+        JPanel worldGenPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 0));
+        worldGenPanel.setOpaque(false);
+        worldGenPanel.add(animateWorldGenCheck);
+        worldGenPanel.add(multiMapPreviewButton);
+
+        c.gridx = 1;
+        panel.add(worldGenPanel, c);
+
+        c.gridy = 12;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(16, 15, 5, 15);
+        resetSandboxButton = new JButton();
+        styleButton(resetSandboxButton);
+        resetSandboxButton.addActionListener(e -> resetSandboxTabToDefaults());
+        setupNavigation(resetSandboxButton);
+        panel.add(resetSandboxButton, c);
+
         return panel;
     }
 
@@ -376,7 +586,7 @@ public class SettingsPanel extends JPanel {
         c.gridy = 0;
         c.gridx = 0;
         panel.add(defaultRoleWorkerLabel, c);
-        defaultRoleWorkerCombo = createAntRoleCombo(GameConstants.TYPE_WORKER);
+        defaultRoleWorkerCombo = createAntRoleCombo(GameConstants.CLASS_WORKER);
         c.gridx = 1;
         panel.add(defaultRoleWorkerCombo, c);
 
@@ -386,7 +596,7 @@ public class SettingsPanel extends JPanel {
         c.gridy = 1;
         c.gridx = 0;
         panel.add(defaultRoleSoldierLabel, c);
-        defaultRoleSoldierCombo = createAntRoleCombo(GameConstants.TYPE_SOLDIER);
+        defaultRoleSoldierCombo = createAntRoleCombo(GameConstants.CLASS_SOLDIER);
         c.gridx = 1;
         panel.add(defaultRoleSoldierCombo, c);
 
@@ -396,7 +606,7 @@ public class SettingsPanel extends JPanel {
         c.gridy = 2;
         c.gridx = 0;
         panel.add(defaultRoleMajorLabel, c);
-        defaultRoleMajorCombo = createAntRoleCombo(GameConstants.TYPE_MAJOR);
+        defaultRoleMajorCombo = createAntRoleCombo(GameConstants.CLASS_MAJOR);
         c.gridx = 1;
         panel.add(defaultRoleMajorCombo, c);
 
@@ -406,7 +616,7 @@ public class SettingsPanel extends JPanel {
         c.gridy = 3;
         c.gridx = 0;
         panel.add(defaultRolePrincessLabel, c);
-        defaultRolePrincessCombo = createAntRoleCombo(GameConstants.TYPE_PRINCESS);
+        defaultRolePrincessCombo = createAntRoleCombo(GameConstants.CLASS_PRINCESS);
         c.gridx = 1;
         panel.add(defaultRolePrincessCombo, c);
 
@@ -416,7 +626,7 @@ public class SettingsPanel extends JPanel {
         c.gridy = 4;
         c.gridx = 0;
         panel.add(defaultRoleQueenLabel, c);
-        defaultRoleQueenCombo = createAntRoleCombo(GameConstants.TYPE_QUEEN);
+        defaultRoleQueenCombo = createAntRoleCombo(GameConstants.CLASS_QUEEN);
         c.gridx = 1;
         panel.add(defaultRoleQueenCombo, c);
 
@@ -434,7 +644,7 @@ public class SettingsPanel extends JPanel {
         return panel;
     }
 
-    private JComboBox<AntRole> createAntRoleCombo(AntType type) {
+    private JComboBox<AntRole> createAntRoleCombo(AntClass type) {
         JComboBox<AntRole> combo = new JComboBox<>();
         refillAntRoleCombo(combo, type);
         styleComboBox(combo);
@@ -453,7 +663,7 @@ public class SettingsPanel extends JPanel {
         return combo;
     }
 
-    private void refillAntRoleCombo(JComboBox<AntRole> combo, AntType type) {
+    private void refillAntRoleCombo(JComboBox<AntRole> combo, AntClass type) {
         AntRole selected = (AntRole) combo.getSelectedItem();
         combo.removeAllItems();
         for (AntRole role : GameConstants.eligibleDefaultHatchRoles(type)) {
@@ -464,9 +674,9 @@ public class SettingsPanel extends JPanel {
         }
     }
 
-    private void applyDefaultRoleFromCombo(JComboBox<AntRole> combo, AntType type) {
+    private void applyDefaultRoleFromCombo(JComboBox<AntRole> combo, AntClass type) {
         AntRole selected = (AntRole) combo.getSelectedItem();
-        AntRole builtin = Engine.builtinDefaultRoleForAntType(type);
+        AntRole builtin = Engine.builtinDefaultRoleForAntClass(type);
         int fallbackId = builtin != null ? builtin.getId() : -1;
         if (selected == null) {
             if (builtin == null) {
@@ -475,15 +685,15 @@ public class SettingsPanel extends JPanel {
             selected = builtin;
         }
         int safe = Engine.sanitizeDefaultRoleId(type, selected.getId(), fallbackId);
-        if (type == GameConstants.TYPE_WORKER) {
+        if (type == GameConstants.CLASS_WORKER) {
             engine.setDefaultRoleWorker(safe);
-        } else if (type == GameConstants.TYPE_SOLDIER) {
+        } else if (type == GameConstants.CLASS_SOLDIER) {
             engine.setDefaultRoleSoldier(safe);
-        } else if (type == GameConstants.TYPE_MAJOR) {
+        } else if (type == GameConstants.CLASS_MAJOR) {
             engine.setDefaultRoleMajor(safe);
-        } else if (type == GameConstants.TYPE_PRINCESS) {
+        } else if (type == GameConstants.CLASS_PRINCESS) {
             engine.setDefaultRolePrincess(safe);
-        } else if (type == GameConstants.TYPE_QUEEN) {
+        } else if (type == GameConstants.CLASS_QUEEN) {
             engine.setDefaultRoleQueen(safe);
         }
     }
@@ -525,15 +735,28 @@ public class SettingsPanel extends JPanel {
     private void resetGeneralTabToDefaults() {
         selectLanguageByCode("en");
         selectAutosaveByValue(1);
-        turboCheck.setSelected(false);
         arachnophobiaCheck.setSelected(false);
         pauseFocusCheck.setSelected(true);
         confirmQuitCheck.setSelected(true);
         escapeKeyGameActionsCheck.setSelected(true);
         showTooltipsCheck.setSelected(true);
+        disablePopupsCheck.setSelected(false);
         overworldAutoRecenterCheck.setSelected(true);
         fuzzParasiteAntsCheck.setSelected(true);
+    }
+
+    private void resetSandboxTabToDefaults() {
+        turboCheck.setSelected(false);
         showAuditMenuCheck.setSelected(false);
+        showFpsCounterCheck.setSelected(false);
+        freeAbilitiesCheck.setSelected(false);
+        infiniteResearchCheck.setSelected(false);
+        instantBuildingsCheck.setSelected(false);
+        assimilateAllCheck.setSelected(false);
+        mapEditorEnabledCheck.setSelected(false);
+        easyConqueringCheck.setSelected(false);
+        instantIntegrationCheck.setSelected(false);
+        animateWorldGenCheck.setSelected(false);
     }
 
     private void resetVideoTabToDefaults() {
@@ -544,8 +767,8 @@ public class SettingsPanel extends JPanel {
         fullScreenCheck.setSelected(true);
         daylightColorOverlayCheck.setSelected(true);
         weatherColorOverlayCheck.setSelected(true);
-        darkModeCheck.setSelected(false);
-        selectFrameRateByValue(0);
+        darkModeCheck.setSelected(true);
+        selectFrameRateByValue(60);
     }
 
     private void resetAudioTabToDefaults() {
@@ -555,28 +778,28 @@ public class SettingsPanel extends JPanel {
     }
 
     private void resetRolesTabToDefaults() {
-        selectBuiltinDefaultRole(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
-        selectBuiltinDefaultRole(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
-        selectBuiltinDefaultRole(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
-        selectBuiltinDefaultRole(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
-        selectBuiltinDefaultRole(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
+        selectBuiltinDefaultRole(defaultRoleWorkerCombo, GameConstants.CLASS_WORKER);
+        selectBuiltinDefaultRole(defaultRoleSoldierCombo, GameConstants.CLASS_SOLDIER);
+        selectBuiltinDefaultRole(defaultRoleMajorCombo, GameConstants.CLASS_MAJOR);
+        selectBuiltinDefaultRole(defaultRolePrincessCombo, GameConstants.CLASS_PRINCESS);
+        selectBuiltinDefaultRole(defaultRoleQueenCombo, GameConstants.CLASS_QUEEN);
     }
 
-    private void selectBuiltinDefaultRole(JComboBox<AntRole> combo, AntType type) {
-        AntRole builtin = Engine.builtinDefaultRoleForAntType(type);
+    private void selectBuiltinDefaultRole(JComboBox<AntRole> combo, AntClass type) {
+        AntRole builtin = Engine.builtinDefaultRoleForAntClass(type);
         if (builtin != null) {
             selectRoleCombo(combo, type, builtin.getId());
         }
     }
 
-    private void selectRoleCombo(JComboBox<AntRole> combo, AntType type, int id) {
+    private void selectRoleCombo(JComboBox<AntRole> combo, AntClass type, int id) {
         for (int i = 0; i < combo.getItemCount(); i++) {
             if (combo.getItemAt(i).getId() == id) {
                 combo.setSelectedIndex(i);
                 return;
             }
         }
-        AntRole resolved = Engine.resolveDefaultRoleForAntType(type, engine);
+        AntRole resolved = Engine.resolveDefaultRoleForAntClass(type, engine);
         if (resolved != null) {
             for (int i = 0; i < combo.getItemCount(); i++) {
                 if (combo.getItemAt(i).getId() == resolved.getId()) {
@@ -585,7 +808,7 @@ public class SettingsPanel extends JPanel {
                 }
             }
         }
-        AntRole builtin = Engine.builtinDefaultRoleForAntType(type);
+        AntRole builtin = Engine.builtinDefaultRoleForAntClass(type);
         if (builtin != null) {
             for (int i = 0; i < combo.getItemCount(); i++) {
                 if (combo.getItemAt(i).getId() == builtin.getId()) {
@@ -600,21 +823,21 @@ public class SettingsPanel extends JPanel {
     }
 
     private void loadDefaultRoleCombos() {
-        refillAntRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
-        refillAntRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
-        refillAntRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
-        refillAntRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
-        refillAntRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
+        refillAntRoleCombo(defaultRoleWorkerCombo, GameConstants.CLASS_WORKER);
+        refillAntRoleCombo(defaultRoleSoldierCombo, GameConstants.CLASS_SOLDIER);
+        refillAntRoleCombo(defaultRoleMajorCombo, GameConstants.CLASS_MAJOR);
+        refillAntRoleCombo(defaultRolePrincessCombo, GameConstants.CLASS_PRINCESS);
+        refillAntRoleCombo(defaultRoleQueenCombo, GameConstants.CLASS_QUEEN);
 
-        selectResolvedDefaultRole(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
-        selectResolvedDefaultRole(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
-        selectResolvedDefaultRole(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
-        selectResolvedDefaultRole(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
-        selectResolvedDefaultRole(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
+        selectResolvedDefaultRole(defaultRoleWorkerCombo, GameConstants.CLASS_WORKER);
+        selectResolvedDefaultRole(defaultRoleSoldierCombo, GameConstants.CLASS_SOLDIER);
+        selectResolvedDefaultRole(defaultRoleMajorCombo, GameConstants.CLASS_MAJOR);
+        selectResolvedDefaultRole(defaultRolePrincessCombo, GameConstants.CLASS_PRINCESS);
+        selectResolvedDefaultRole(defaultRoleQueenCombo, GameConstants.CLASS_QUEEN);
     }
 
-    private void selectResolvedDefaultRole(JComboBox<AntRole> combo, AntType type) {
-        AntRole resolved = Engine.resolveDefaultRoleForAntType(type, engine);
+    private void selectResolvedDefaultRole(JComboBox<AntRole> combo, AntClass type) {
+        AntRole resolved = Engine.resolveDefaultRoleForAntClass(type, engine);
         if (resolved != null) {
             selectRoleCombo(combo, type, resolved.getId());
         } else {
@@ -637,10 +860,10 @@ public class SettingsPanel extends JPanel {
         sizeLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(sizeLabel, c);
         
-        String[] commonResolutions = {"1000x700", "1280x720", "1366x768", "1440x900", "1600x900", "1920x1080", "2560x1440"};
-        sizeCombo = new JComboBox<>(commonResolutions);
+        sizeCombo = new JComboBox<>();
         styleComboBox(sizeCombo);
         sizeCombo.setEditable(false);
+        refreshScreenSizeCombo(null);
         c.gridx = 1; panel.add(sizeCombo, c);
 
         // Full Screen
@@ -797,20 +1020,35 @@ public class SettingsPanel extends JPanel {
             videoTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
             audioTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
             rolesTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
+            sandboxTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_SANDBOX));
             showSection(selectedSection);
         }
         
         langLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
         autoLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
-        turboLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
         arachLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ARACHNOPHOBIA));
         pauseFocusLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_PAUSE_FOCUS));
         confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
         escapeKeyGameActionsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ESCAPE_KEY_GAME_ACTIONS));
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
+        disablePopupsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DISABLE_POPUPS));
         overworldAutoRecenterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER));
         fuzzParasiteAntsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS));
+
+        sandboxNoteLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_NOTE));
+        turboLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
         showAuditMenuLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_AUDIT_MENU));
+        showFpsCounterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_FPS_COUNTER));
+        String starPrefix = LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_STAR_PREFIX);
+        freeAbilitiesLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_FREE_ABILITIES));
+        infiniteResearchLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INFINITE_RESEARCH));
+        instantBuildingsLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_BUILDINGS));
+        assimilateAllLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_ASSIMILATE_ALL));
+        mapEditorEnabledLabel.setText(LanguageStrings.get("SETTINGS_MAP_EDITOR_ENABLED") + " " + LanguageStrings.get("SETTINGS_MAP_EDITOR_NOTE"));
+        easyConqueringLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_EASY_CONQUERING));
+        instantIntegrationLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_INTEGRATION));
+        animateWorldGenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN));
+        multiMapPreviewButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -837,8 +1075,8 @@ public class SettingsPanel extends JPanel {
         resetVideoButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetAudioButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetRolesButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
+        resetSandboxButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         
-        // Refresh autosave combo options
         int currentFreq = (autosaveCombo.getSelectedItem() != null) ? ((AutosaveOption)autosaveCombo.getSelectedItem()).value : 0;
         autosaveCombo.setModel(new DefaultComboBoxModel<>(new AutosaveOption[]{
                 new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_MONTH), 1),
@@ -876,15 +1114,26 @@ public class SettingsPanel extends JPanel {
     private void applySettingTooltips() {
         setSettingTooltip(langLabel, languageCombo, LanguageStrings.SETTINGS_LANGUAGE_TT);
         setSettingTooltip(autoLabel, autosaveCombo, LanguageStrings.SETTINGS_AUTOSAVE_TT);
-        setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
         setSettingTooltip(arachLabel, arachnophobiaCheck, LanguageStrings.SETTINGS_ARACHNOPHOBIA_TT);
         setSettingTooltip(pauseFocusLabel, pauseFocusCheck, LanguageStrings.SETTINGS_PAUSE_FOCUS_TT);
         setSettingTooltip(confirmQuitLabel, confirmQuitCheck, LanguageStrings.SETTINGS_CONFIRM_QUIT_TT);
         setSettingTooltip(escapeKeyGameActionsLabel, escapeKeyGameActionsCheck, LanguageStrings.SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT);
         setSettingTooltip(tooltipsLabel, showTooltipsCheck, LanguageStrings.SETTINGS_SHOW_TOOLTIPS_TT);
+        setSettingTooltip(disablePopupsLabel, disablePopupsCheck, LanguageStrings.SETTINGS_DISABLE_POPUPS_TT);
         setSettingTooltip(overworldAutoRecenterLabel, overworldAutoRecenterCheck, LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER_TT);
         setSettingTooltip(fuzzParasiteAntsLabel, fuzzParasiteAntsCheck, LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS_TT);
+        setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
         setSettingTooltip(showAuditMenuLabel, showAuditMenuCheck, LanguageStrings.SETTINGS_SHOW_AUDIT_MENU_TT);
+        setSettingTooltip(showFpsCounterLabel, showFpsCounterCheck, LanguageStrings.SETTINGS_SHOW_FPS_COUNTER_TT);
+        setSettingTooltip(freeAbilitiesLabel, freeAbilitiesCheck, LanguageStrings.SETTINGS_FREE_ABILITIES_TT);
+        setSettingTooltip(infiniteResearchLabel, infiniteResearchCheck, LanguageStrings.SETTINGS_INFINITE_RESEARCH_TT);
+        setSettingTooltip(instantBuildingsLabel, instantBuildingsCheck, LanguageStrings.SETTINGS_INSTANT_BUILDINGS_TT);
+        setSettingTooltip(assimilateAllLabel, assimilateAllCheck, LanguageStrings.SETTINGS_ASSIMILATE_ALL_TT);
+        setSettingTooltip(mapEditorEnabledLabel, mapEditorEnabledCheck, "SETTINGS_MAP_EDITOR_ENABLED_TT");
+        setSettingTooltip(easyConqueringLabel, easyConqueringCheck, LanguageStrings.SETTINGS_EASY_CONQUERING_TT);
+        setSettingTooltip(instantIntegrationLabel, instantIntegrationCheck, LanguageStrings.SETTINGS_INSTANT_INTEGRATION_TT);
+        setSettingTooltip(animateWorldGenLabel, animateWorldGenCheck, LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN_TT);
+        multiMapPreviewButton.setToolTipText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW_TT));
         setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
         setSettingTooltip(fsLabel, fullScreenCheck, LanguageStrings.SETTINGS_FULLSCREEN_TT);
         setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
@@ -923,21 +1172,28 @@ public class SettingsPanel extends JPanel {
         selectLanguageByCode(engine.getLanguage());
         selectAutosaveByValue(engine.getAutosaveFrequency());
         
-        turboCheck.setSelected(engine.isAllowTurboMode());
         arachnophobiaCheck.setSelected(engine.isArachnophobiaMode());
         pauseFocusCheck.setSelected(engine.isPauseOnFocusLoss());
         confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
         escapeKeyGameActionsCheck.setSelected(engine.isEscapeKeyGameActions());
         showTooltipsCheck.setSelected(engine.isShowTooltips());
+        disablePopupsCheck.setSelected(engine.isDisablePopups());
         overworldAutoRecenterCheck.setSelected(engine.isOverworldAutoRecenter());
         fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
+
+        turboCheck.setSelected(engine.isAllowTurboMode());
         showAuditMenuCheck.setSelected(engine.isShowAuditMenu());
+        showFpsCounterCheck.setSelected(engine.isShowFpsCounter());
+        freeAbilitiesCheck.setSelected(engine.isFreeAbilities());
+        infiniteResearchCheck.setSelected(engine.isInfiniteResearch());
+        instantBuildingsCheck.setSelected(engine.isInstantBuildings());
+        assimilateAllCheck.setSelected(engine.isAssimilateAll());
+        mapEditorEnabledCheck.setSelected(engine.isMapEditorEnabled());
+        easyConqueringCheck.setSelected(engine.isEasyConquering());
+        instantIntegrationCheck.setSelected(engine.isInstantIntegration());
+        animateWorldGenCheck.setSelected(engine.isAnimateWorldGen());
         
-        sizeCombo.setSelectedItem(engine.getScreenSize());
-        if (sizeCombo.getSelectedItem() == null) {
-            ensureScreenSizeInCombo(engine.getScreenSize());
-            sizeCombo.setSelectedItem(engine.getScreenSize());
-        }
+        refreshScreenSizeCombo(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
         daylightColorOverlayCheck.setSelected(engine.isDaylightColorOverlayEnabled());
         weatherColorOverlayCheck.setSelected(engine.isWeatherColorOverlayEnabled());
@@ -952,6 +1208,39 @@ public class SettingsPanel extends JPanel {
 
         loadedFullScreen = engine.isFullScreen();
         loadedScreenSize = engine.getScreenSize();
+    }
+
+    private void refreshScreenSizeCombo(String preferredSize) {
+        Rectangle usable = MainFrame.resolveUsableWindowBounds();
+        sizeCombo.removeAllItems();
+        for (String preset : WINDOW_SIZE_PRESETS) {
+            if (fitsUsableBounds(preset, usable)) {
+                sizeCombo.addItem(preset);
+            }
+        }
+        String maxSize = usable.width + "x" + usable.height;
+        ensureScreenSizeInCombo(maxSize);
+        if (preferredSize != null && !preferredSize.isBlank()) {
+            ensureScreenSizeInCombo(preferredSize);
+            sizeCombo.setSelectedItem(preferredSize);
+        }
+        if (sizeCombo.getSelectedItem() == null && sizeCombo.getItemCount() > 0) {
+            sizeCombo.setSelectedIndex(0);
+        }
+    }
+
+    private static boolean fitsUsableBounds(String size, Rectangle usable) {
+        if (size == null || !size.contains("x") || usable == null) {
+            return false;
+        }
+        String[] parts = size.split("x");
+        try {
+            int width = Integer.parseInt(parts[0].trim());
+            int height = Integer.parseInt(parts[1].trim());
+            return width <= usable.width && height <= usable.height;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private void ensureScreenSizeInCombo(String size) {
@@ -992,10 +1281,64 @@ public class SettingsPanel extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE));
     }
 
+    private boolean isActiveGameSession() {
+        return frame.getGamePanel() != null && frame.getGamePanel().isEngineStarted();
+    }
+
+    private boolean wouldEnableNewTaintingSandbox() {
+        return (freeAbilitiesCheck.isSelected() && !engine.isFreeAbilities())
+                || (infiniteResearchCheck.isSelected() && !engine.isInfiniteResearch())
+                || (instantBuildingsCheck.isSelected() && !engine.isInstantBuildings())
+                || (assimilateAllCheck.isSelected() && !engine.isAssimilateAll())
+                || (easyConqueringCheck.isSelected() && !engine.isEasyConquering())
+                || (instantIntegrationCheck.isSelected() && !engine.isInstantIntegration());
+    }
+
+    private void clearNewlySelectedTaintingSandboxChecks() {
+        if (freeAbilitiesCheck.isSelected() && !engine.isFreeAbilities()) {
+            freeAbilitiesCheck.setSelected(false);
+        }
+        if (infiniteResearchCheck.isSelected() && !engine.isInfiniteResearch()) {
+            infiniteResearchCheck.setSelected(false);
+        }
+        if (instantBuildingsCheck.isSelected() && !engine.isInstantBuildings()) {
+            instantBuildingsCheck.setSelected(false);
+        }
+        if (assimilateAllCheck.isSelected() && !engine.isAssimilateAll()) {
+            assimilateAllCheck.setSelected(false);
+        }
+        if (easyConqueringCheck.isSelected() && !engine.isEasyConquering()) {
+            mapEditorEnabledCheck.setSelected(false);
+        easyConqueringCheck.setSelected(false);
+        }
+        if (instantIntegrationCheck.isSelected() && !engine.isInstantIntegration()) {
+            instantIntegrationCheck.setSelected(false);
+        }
+    }
+
+    private boolean confirmSandboxCheatsForActiveSession() {
+        if (!isActiveGameSession() || !wouldEnableNewTaintingSandbox()) {
+            return true;
+        }
+        Component parent = inDialog ? frame : this;
+        int result = UiOptionPane.showConfirmDialog(
+                parent,
+                LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_WARN_IN_GAME),
+                LanguageStrings.get(LanguageStrings.SAVE_ACHIEVEMENTS_WARN_TITLE),
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+            return true;
+        }
+        clearNewlySelectedTaintingSandboxChecks();
+        return false;
+    }
+
     private void saveSettings() {
+        confirmSandboxCheatsForActiveSession();
+
         LanguageOption selectedLang = (LanguageOption) languageCombo.getSelectedItem();
         if (selectedLang != null) {
-            // Engine.setLanguage already updates LanguageStrings and notifies UI once.
             engine.setLanguage(selectedLang.code);
         }
         
@@ -1004,15 +1347,31 @@ public class SettingsPanel extends JPanel {
             engine.setAutosaveFrequency(selectedFreq.value);
         }
         
-        engine.setAllowTurboMode(turboCheck.isSelected());
         engine.setArachnophobiaMode(arachnophobiaCheck.isSelected());
         engine.setPauseOnFocusLoss(pauseFocusCheck.isSelected());
         engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
         engine.setEscapeKeyGameActions(escapeKeyGameActionsCheck.isSelected());
         engine.setShowTooltips(showTooltipsCheck.isSelected());
+        engine.setDisablePopups(disablePopupsCheck.isSelected());
         engine.setOverworldAutoRecenter(overworldAutoRecenterCheck.isSelected());
         engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
+
+        engine.setAllowTurboMode(turboCheck.isSelected());
         engine.setShowAuditMenu(showAuditMenuCheck.isSelected());
+        engine.setShowFpsCounter(showFpsCounterCheck.isSelected());
+        engine.setFreeAbilities(freeAbilitiesCheck.isSelected());
+        engine.setInfiniteResearch(infiniteResearchCheck.isSelected());
+        engine.setInstantBuildings(instantBuildingsCheck.isSelected());
+        engine.setAssimilateAll(assimilateAllCheck.isSelected());
+        engine.setMapEditorEnabled(mapEditorEnabledCheck.isSelected());
+        engine.setEasyConquering(easyConqueringCheck.isSelected());
+        engine.setInstantIntegration(instantIntegrationCheck.isSelected());
+        engine.setAnimateWorldGen(animateWorldGenCheck.isSelected());
+        engine.applySandboxTaintToActiveWorld();
+        SandboxCheatService.applyEnabledCheats(engine);
+        if (frame.getGamePanel() != null) {
+            frame.getGamePanel().refreshAllGUIData();
+        }
         
         engine.setScreenSize(resolveSelectedScreenSize());
         engine.setFullScreen(fullScreenCheck.isSelected());
@@ -1028,11 +1387,11 @@ public class SettingsPanel extends JPanel {
         engine.setMusicVolume(musicVolSlider.getValue());
         engine.setSfxVolume(sfxVolSlider.getValue());
 
-        applyDefaultRoleFromCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
-        applyDefaultRoleFromCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
-        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
-        applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
-        applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
+        applyDefaultRoleFromCombo(defaultRoleWorkerCombo, GameConstants.CLASS_WORKER);
+        applyDefaultRoleFromCombo(defaultRoleSoldierCombo, GameConstants.CLASS_SOLDIER);
+        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.CLASS_MAJOR);
+        applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.CLASS_PRINCESS);
+        applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.CLASS_QUEEN);
 
         engine.saveGlobalSettings();
         boolean chromeChanged = windowChromeChanged();
@@ -1056,9 +1415,6 @@ public class SettingsPanel extends JPanel {
                 return;
             }
         } else if (chromeChanged) {
-            // Only tear down / recreate the window when size or fullscreen actually changed.
-            // Language-only saves used to always dispose the frame, which re-fired IntroPanel
-            // ancestor listeners and could yank the UI into Play → Load.
             frame.applyEngineSettings();
         } else {
             frame.applyRuntimeSettings();
@@ -1083,6 +1439,10 @@ public class SettingsPanel extends JPanel {
         styleButton(resetVideoButton);
         styleButton(resetAudioButton);
         styleButton(resetRolesButton);
+        styleButton(resetSandboxButton);
+        if (multiMapPreviewButton != null) {
+            AssetStyles.styleCompactButton(multiMapPreviewButton);
+        }
         AssetStyles.applyThemeToContainer(this);
     }
 

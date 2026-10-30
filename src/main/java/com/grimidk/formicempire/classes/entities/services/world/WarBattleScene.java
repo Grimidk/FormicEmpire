@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
@@ -21,25 +21,25 @@ public final class WarBattleScene {
     public static final int RESERVE_LINE_OFFSET_PX = 560;
 
     public record Side(int dynastyId, String dynastyName, AntSpecies species,
-            Map<BattleLine, Map<AntType, Integer>> activeByLine,
-            Map<BattleLine, Map<AntType, Integer>> reserveByLine,
+            Map<BattleLine, Map<AntClass, Integer>> activeByLine,
+            Map<BattleLine, Map<AntClass, Integer>> reserveByLine,
             int livingArmy, int livingActive) {
         public Side {
             activeByLine = copyLineMaps(activeByLine);
             reserveByLine = copyLineMaps(reserveByLine);
         }
 
-        public Map<AntType, Integer> activeTypeCounts() {
+        public Map<AntClass, Integer> activeClassCounts() {
             return flatten(activeByLine);
         }
 
-        public Map<AntType, Integer> reserveTypeCounts() {
+        public Map<AntClass, Integer> reserveClassCounts() {
             return flatten(reserveByLine);
         }
 
-        public Map<AntType, Integer> typeCounts() {
-            Map<AntType, Integer> total = new HashMap<>(activeTypeCounts());
-            for (Map.Entry<AntType, Integer> e : reserveTypeCounts().entrySet()) {
+        public Map<AntClass, Integer> classCounts() {
+            Map<AntClass, Integer> total = new HashMap<>(activeClassCounts());
+            for (Map.Entry<AntClass, Integer> e : reserveClassCounts().entrySet()) {
                 total.merge(e.getKey(), e.getValue() != null ? e.getValue() : 0, Integer::sum);
             }
             return Collections.unmodifiableMap(total);
@@ -49,13 +49,13 @@ public final class WarBattleScene {
             return livingArmy;
         }
 
-        private static Map<BattleLine, Map<AntType, Integer>> copyLineMaps(
-                Map<BattleLine, Map<AntType, Integer>> source) {
-            Map<BattleLine, Map<AntType, Integer>> out = new LinkedHashMap<>();
+        private static Map<BattleLine, Map<AntClass, Integer>> copyLineMaps(
+                Map<BattleLine, Map<AntClass, Integer>> source) {
+            Map<BattleLine, Map<AntClass, Integer>> out = new LinkedHashMap<>();
             if (source == null) {
                 return Collections.unmodifiableMap(out);
             }
-            for (Map.Entry<BattleLine, Map<AntType, Integer>> e : source.entrySet()) {
+            for (Map.Entry<BattleLine, Map<AntClass, Integer>> e : source.entrySet()) {
                 if (e.getKey() == null) {
                     continue;
                 }
@@ -66,16 +66,16 @@ public final class WarBattleScene {
             return Collections.unmodifiableMap(out);
         }
 
-        private static Map<AntType, Integer> flatten(Map<BattleLine, Map<AntType, Integer>> byLine) {
-            Map<AntType, Integer> total = new HashMap<>();
+        private static Map<AntClass, Integer> flatten(Map<BattleLine, Map<AntClass, Integer>> byLine) {
+            Map<AntClass, Integer> total = new HashMap<>();
             if (byLine == null) {
                 return total;
             }
-            for (Map<AntType, Integer> counts : byLine.values()) {
+            for (Map<AntClass, Integer> counts : byLine.values()) {
                 if (counts == null) {
                     continue;
                 }
-                for (Map.Entry<AntType, Integer> e : counts.entrySet()) {
+                for (Map.Entry<AntClass, Integer> e : counts.entrySet()) {
                     if (e.getKey() != null && e.getValue() != null && e.getValue() > 0) {
                         total.merge(e.getKey(), e.getValue(), Integer::sum);
                     }

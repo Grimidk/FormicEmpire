@@ -16,13 +16,34 @@ public final class WarBattleSideState {
     private final Map<BattleLine, List<WarBattleParticipant>> reserveByLine = new HashMap<>();
     private int startingArmySize;
     private int deadCount;
+    private int reinforcementWorldDay = Integer.MIN_VALUE;
+    private final Map<BattleLine, Integer> reinforcementPromotionsUsedToday = new HashMap<>();
 
     WarBattleSideState(Dynasty dynasty) {
         this.dynasty = dynasty;
         for (BattleLine line : GameConstants.getBattleLines()) {
             activeByLine.put(line, new ArrayList<>());
             reserveByLine.put(line, new ArrayList<>());
+            reinforcementPromotionsUsedToday.put(line, 0);
         }
+    }
+
+    void resetReinforcementDayIfNeeded(int worldDay) {
+        if (worldDay == reinforcementWorldDay) {
+            return;
+        }
+        reinforcementWorldDay = worldDay;
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            reinforcementPromotionsUsedToday.put(line, 0);
+        }
+    }
+
+    int getReinforcementPromotionsUsed(BattleLine line) {
+        return reinforcementPromotionsUsedToday.getOrDefault(line, 0);
+    }
+
+    void recordReinforcementPromotion(BattleLine line) {
+        reinforcementPromotionsUsedToday.merge(line, 1, Integer::sum);
     }
 
     public Dynasty getDynasty() {
@@ -139,7 +160,7 @@ public final class WarBattleSideState {
         if (ant == null) {
             return GameConstants.BATTLE_LINE_INFANTRY;
         }
-        if (ant.getAntType() == GameConstants.TYPE_QUEEN) {
+        if (ant.getAntClass() == GameConstants.CLASS_QUEEN) {
             return GameConstants.BATTLE_LINE_INFANTRY;
         }
         BattleLine line = GameConstants.getBattleLineForRole(ant.getRole());

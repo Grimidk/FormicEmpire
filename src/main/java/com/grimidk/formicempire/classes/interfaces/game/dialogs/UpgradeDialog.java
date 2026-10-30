@@ -112,7 +112,8 @@ public class UpgradeDialog extends ZeroDialog {
 
         int currentIndex = 0;
 
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)
+                || (engine != null && engine.isInfiniteResearch())) {
             addUpgradeTab(
                     TAB_RESEARCH,
                     LanguageStrings.get(LanguageStrings.TAB_RESEARCH),
@@ -120,7 +121,9 @@ public class UpgradeDialog extends ZeroDialog {
                     currentIndex++);
         }
 
-        if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)
+                || colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)
+                || (engine != null && engine.isInstantBuildings())) {
             addUpgradeTab(
                     TAB_BUILD,
                     LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION),
@@ -128,7 +131,8 @@ public class UpgradeDialog extends ZeroDialog {
                     currentIndex++);
         }
 
-        if (GameUnlocks.shouldShowAssimilationUi(colony.getDynasty())) {
+        if (GameUnlocks.shouldShowAssimilationUi(colony.getDynasty())
+                || (engine != null && engine.isAssimilateAll())) {
             addUpgradeTab(
                     TAB_ASSIMILATION,
                     LanguageStrings.get(LanguageStrings.TAB_ASSIMILATIONS),
@@ -291,9 +295,13 @@ public class UpgradeDialog extends ZeroDialog {
     }
 
     private boolean tabsNeedRebuild() {
-        boolean wantResearch = colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH);
-        boolean wantBuild = colony.hasUpgrade(GameUnlocks.ROLE_BUILDER);
-        boolean wantAssimilation = GameUnlocks.shouldShowAssimilationUi(colony.getDynasty());
+        boolean wantResearch = colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)
+                || (engine != null && engine.isInfiniteResearch());
+        boolean wantBuild = colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)
+                || colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)
+                || (engine != null && engine.isInstantBuildings());
+        boolean wantAssimilation = GameUnlocks.shouldShowAssimilationUi(colony.getDynasty())
+                || (engine != null && engine.isAssimilateAll());
         boolean wantSynergy = colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY);
         return wantResearch != tabIndexMap.containsKey(TAB_RESEARCH)
                 || wantBuild != tabIndexMap.containsKey(TAB_BUILD)
@@ -490,8 +498,10 @@ public class UpgradeDialog extends ZeroDialog {
             east.setOpaque(false);
             east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
             
-            JLabel cost = new JLabel(LanguageStrings.format(LanguageStrings.ASSIMILATION_TARGET,
-                    colony.getDynasty().getAssimilationTargetCost()));
+            JLabel cost = new JLabel(AssetStyles.formatNumber(colony.getDynasty().getAssimilationTargetCost()),
+                    GameConstants.ICON_RESEARCH, SwingConstants.CENTER);
+            cost.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
+            cost.setIconTextGap(4);
             cost.setForeground(AssetStyles.FONT_COLOR_VALUE);
             cost.setFont(AssetStyles.FONT_BOLD);
             cost.setAlignmentX(Component.CENTER_ALIGNMENT);

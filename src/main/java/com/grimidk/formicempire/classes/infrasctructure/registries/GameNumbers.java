@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 
@@ -9,12 +11,39 @@ public final class GameNumbers {
     // --- Movement / gathering ---
     public static final int PARASITIC_MITES_ON_ANT_SPRITE = 5;
     public static final double ANT_JAW_SNAP_CHANCE_PER_HOUR = 0.08;
+    public static final double ANT_ANTENNA_TWITCH_CHANCE_PER_HOUR = 0.10;
     public static final double ANT_WING_FLICK_CHANCE_PER_HOUR = 0.06;
     public static final int ANT_SPRITE_SNAP_MINUTES = 30;
+    public static final int ANT_CARRY_SPRITE_NATIVE_PX = 40;
+    public static final int ANT_CARRY_ICON_PX = 16;
+    public static final int ANT_CARRY_JAW_OFFSET_Y = -17;
+    public static final int ANT_CARRY_DUAL_OFFSET_X = 5;
     public static final int ANT_LEG_FRAME_COUNT = 4;
+    public static final int CRITTER_ENEMY_LEG_FRAME_COUNT = 4;
     public static final int ANT_LEG_FRAME_FLYING = 0;
     public static final float BASE_SPRITE_SPEED = 2.5f;
     public static final int MAX_PHYSICS_STEPS_PER_GUI_DRAIN = 2;
+    public static final int MAX_PENDING_MINUTE_GUI_STEPS = 2;
+    public static final int SPRITE_COMPOSITE_CACHE_MAX_ENTRIES = 2048;
+    public static final int SPRITE_LAYER_CACHE_MAX_ENTRIES = 768;
+    public static final int SPRITE_MERGE_ANT_THRESHOLD = 1000;
+    public static final int SPRITE_MERGE_ANT_LARGE_THRESHOLD = 10000;
+    public static final int SPRITE_MERGE_GROUP_SIZE = 25;
+    public static final int SPRITE_MERGE_LARGE_GROUP_SIZE = 250;
+    public static final int SPRITE_MERGE_POSITION_TOLERANCE_PX = 10;
+    public static final int SPRITE_MERGE_POSITION_CELL_PX = SPRITE_MERGE_POSITION_TOLERANCE_PX * 2;
+    public static final int SPRITE_MERGE_ZONE_THRESHOLD = 100;
+    public static final double SPRITE_MERGE_ZONE_MIN_VISIBLE_FRACTION = 0.10;
+    public static final int COLLECTING_AGGREGATE_RESIN_WORKER_THRESHOLD = 100;
+    public static final int EATING_AGGREGATE_ANT_THRESHOLD = SPRITE_MERGE_ANT_THRESHOLD;
+    public static final int GUI_HOUR_MINIMAP_REFRESH_INTERVAL = 6;
+    public static final int GUI_HOUR_CONTROL_PANEL_REFRESH_INTERVAL = 6;
+    public static final int SPECTATOR_HYPER_TURBO_MINUTES_PER_TICK = 360;
+    public static final int NPC_DAILY_STAGGER_DAYS = 7;
+
+    public static boolean runsNpcDailyWorkToday(int worldDay, int entityId) {
+        return Math.floorMod(worldDay, NPC_DAILY_STAGGER_DAYS) == Math.floorMod(entityId, NPC_DAILY_STAGGER_DAYS);
+    }
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
@@ -26,12 +55,27 @@ public final class GameNumbers {
     public static final int[] WORLD_COASTAL_LAND_CHANCE_PERCENT = { 80, 40, 20, 10, 5 };
     public static final int WORLD_MIN_ISLAND_COUNT = 6;
     public static final int WORLD_MIN_HEXES_PER_BIOME = 2;
+    public static final int WORLD_RECT_WIDTH = 128;
+    public static final int WORLD_RECT_HEIGHT = 64;
+    public static final double WORLD_DEFAULT_CONTINENTAL_LAND_PERCENTAGE = 0.28;
+    public static final boolean WORLD_DEFAULT_HAS_ICE_CAPS = true;
+    public static final double WORLD_DEFAULT_ICECAP_POLAR_LIMIT = 0.82;
 
     public static int worldRadiusForContinentCore(int continentCoreRadius) {
         return Math.max(0, continentCoreRadius)
                 + WORLD_COASTAL_RING_COUNT
                 + WORLD_OUTER_OCEAN_RING_COUNT;
     }
+
+    public static final double MAP_ZOOM_MIN = 0.85;
+    public static final double MAP_ZOOM_MAX = 4.0;
+    public static final double MAP_ZOOM_STEP = 1.25;
+    public static final int MAP_ZOOM_SLIDER_MAX = 7;
+    public static final int MAP_ZOOM_SLIDER_TRACK_HEIGHT = 100;
+    public static final double[] MAP_ZOOM_STEPS = {0.85, 1.00, 1.25, 1.60, 2.00, 2.50, 3.20, 4.00};
+    public static final int MAP_ZOOM_DEFAULT_STEP_INDEX = 1;
+    public static final double MAP_HEX_FIT_MIN = 2.0;
+    public static final double MAP_HEX_FIT_MAX = 55.0;
 
     // --- Hex resources / spawn ---
     public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
@@ -55,11 +99,28 @@ public final class GameNumbers {
     public static final int PET_BREED_DIVISOR = 10;
     public static final int PET_COUNT_SAVE_ABS_MAX = 10_000;
     public static final int MAX_PEN_NON_ANT_SPRITES = 500;
+    public static final float PET_PEN_CRITTER_SPEED_MULT = 0.35f;
+    public static final int PET_PEN_WANDER_RADIUS_PX = 28;
+    public static final double PET_PEN_WANDER_CHANCE = 0.02;
+    public static final float CRITTER_LEG_FRAME_DISTANCE_PX = 3.5f;
     public static final float CATCH_BASE_CHANCE_PER_CATCHER = 0.12f;
 
     // --- Convoy ---
     public static final int CONVOY_TUNNEL_LEG_DISTANCE = 10_000;
     public static final int CONVOY_PORTAL_APPROACH_PX = 36;
+
+    // --- Rafting (Floodplain assimilation) ---
+    public static final int RAFTING_WATER_CROSS_RANGE_1 = 1;
+    public static final int RAFTING_WATER_CROSS_RANGE_2 = 2;
+    public static final int RAFTING_WATER_CROSS_RANGE_3 = 3;
+    public static final float RIVER_BATTLE_NO_RAFTING_ACCURACY_MULT = 0.80f;
+
+    // --- Woodburrow / Silkweave / Hivebuild / Web ---
+    public static final double WOODBURROW_TIME_MULT = 0.8;
+    public static final int SILKWEAVE_PLANT_COST_MULT = 10;
+    public static final double HIVEBUILD_CAPACITY_BONUS_PER_MOUND = 0.10;
+    public static final double HIVEBUILD_STORAGE_BONUS_PER_MOUND = 0.25;
+    public static final double WEB_BUILDING_PROTEIN_DAILY_FRACTION = 0.10;
 
     // --- Mites / parasites ---
     public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
@@ -134,8 +195,28 @@ public final class GameNumbers {
     public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 0.5f;
     public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 3f;
     public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 2f;
+    public static final float ASSIMILATED_JUMPING_MELEE_DAMAGE_MULT = 1.2f;
+    public static final float ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT = 1.5f;
+    public static final float ASSIMILATED_LOCSENSE_SPEED_MULT = 1.5f;
+    public static final double ASSIMILATED_LOCSENSE_CONVOY_SECURITY_FLAT = 20.0;
+    public static final float BASE_EVASION_PERCENT = 0f;
+    public static final float EVASION_PERCENT_MIN = 0f;
+    public static final float EVASION_PERCENT_MAX = 100f;
+    public static final int ASSIMILATED_HEATRESIST_EVASION_BONUS = 15;
+    public static final float BATTLE_HIT_CHANCE_MIN = 0.05f;
+    public static final float ASSIMILATED_HEATRESIST_SPEED_MULT = 1.4f;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
+    public static final int LIFESPAN_BASE_DAYS = 180;
+    public static final int LIFESPAN_NO_UPGRADE_DAYS = 90;
+    public static final int LIFESPAN_UPGRADE_2_DAYS = LIFESPAN_BASE_DAYS * 2;
+    public static final int LIFESPAN_UPGRADE_3_DAYS = LIFESPAN_BASE_DAYS * 4;
+    public static final float LIFESPAN_MULT_WORKER = 1.0f;
+    public static final float LIFESPAN_MULT_SOLDIER = 1.0f;
+    public static final float LIFESPAN_MULT_MAJOR = 1.0f;
+    public static final float LIFESPAN_MULT_DRONE = 1.0f / 3.0f;
+    public static final float LIFESPAN_MULT_PRINCESS = 2.0f;
+    public static final float LIFESPAN_MULT_QUEEN = 20.0f;
 
     // --- Integration / calendar ---
     public static final float INTEGRATION_MILITARY_RATIO_REQUIRED = 5f;
@@ -149,6 +230,7 @@ public final class GameNumbers {
     // --- War ---
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
     public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
+    public static final int DIPLO_PENDING_PACT_REQUEST_QUEUE_MAX = 1;
     public static final int WAS_AT_WAR_MODIFIER_MONTHS = 12;
     public static final int WAR_DECLARATION_MIN_POPULATION = 1000;
     public static final float WAR_STANDING_MILITARY_RATIO = 1.15f;
@@ -177,9 +259,75 @@ public final class GameNumbers {
     public static final float WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT = 1.2f;
     public static final float WAR_AI_HEX_BAIT_MIN_COUNTER_ODDS = 0.9f;
     public static final float WAR_BATTLE_ARMY_DEFEAT_RATIO = 0.9f;
+    public static final float WAR_REINFORCEMENT_RATE_BASE = 0.10f;
+    public static final float WAR_REINFORCEMENT_RATE_MAX = 0.25f;
+    public static final int WAR_REINFORCEMENT_CARRIER_BONUS_MAX_PP = 15;
+    public static final int WAR_REINFORCEMENT_CARRIER_FULL_BONUS_COUNT = 1 << 14;
+
+    public static int warCarrierReinforcementBonusPercent(int carrierCount) {
+        if (carrierCount <= 0) {
+            return 0;
+        }
+        int floorLog2 = 31 - Integer.numberOfLeadingZeros(carrierCount);
+        return Math.min(WAR_REINFORCEMENT_CARRIER_BONUS_MAX_PP, floorLog2 + 1);
+    }
+
+    public static float warDailyReinforcementRate(int carrierCount) {
+        float bonus = warCarrierReinforcementBonusPercent(carrierCount) / 100f;
+        return Math.min(WAR_REINFORCEMENT_RATE_MAX, WAR_REINFORCEMENT_RATE_BASE + bonus);
+    }
+
+    public static int warDailyReinforcementAllowancePerLine(int combatCapacity, int carrierCount) {
+        if (combatCapacity <= 0) {
+            return 0;
+        }
+        return (int) Math.floor(combatCapacity * warDailyReinforcementRate(carrierCount));
+    }
 
     public static final int COMBAT_CAPACITY_BASE = 1000;
-    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;  
+    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;
+
+    public static final float HUNT_SCOUT_DISCOVERY_MULT = 0.06f;
+    public static final int HUNT_BUG_ESCAPE_DAYS = 21;
+    public static final int HUNT_TRAVEL_PX_PER_SPEED_HOUR = 120;
+    public static final int HUNT_COCKROACH_HP = 20000;
+    public static final float HUNT_COCKROACH_ATTACK = 500f;
+    public static final float HUNT_COCKROACH_DEFENSE = 10f;
+    public static final int HUNT_COCKROACH_ATTACK_SPEED = 3;
+    public static final int HUNT_COCKROACH_REWARD_PROTEIN = 250;
+    public static final int HUNT_COCKROACH_REWARD_RP = 120;
+    public static final int HUNT_COCKROACH_REWARD_MUSHROOMS = 80;
+    public static final int HUNT_BOMBARDIER_BEETLE_HP = 22000;
+    public static final float HUNT_BOMBARDIER_BEETLE_ATTACK = 580f;
+    public static final float HUNT_BOMBARDIER_BEETLE_DEFENSE = 14f;
+    public static final int HUNT_BOMBARDIER_BEETLE_ATTACK_SPEED = 3;
+    public static final int HUNT_BOMBARDIER_BEETLE_REWARD_PROTEIN = 220;
+    public static final int HUNT_BOMBARDIER_BEETLE_REWARD_RP = 150;
+    public static final int HUNT_BOMBARDIER_BEETLE_REWARD_MUSHROOMS = 50;
+    public static final int HUNT_SPIDER_HP = 16000;
+    public static final float HUNT_SPIDER_ATTACK = 520f;
+    public static final float HUNT_SPIDER_DEFENSE = 8f;
+    public static final int HUNT_SPIDER_ATTACK_SPEED = 4;
+    public static final int HUNT_SPIDER_REWARD_PROTEIN = 200;
+    public static final int HUNT_SPIDER_REWARD_RP = 110;
+    public static final int HUNT_SPIDER_REWARD_MUSHROOMS = 90;
+    public static final int HUNT_TARANTULA_HP = 26000;
+    public static final float HUNT_TARANTULA_ATTACK = 540f;
+    public static final float HUNT_TARANTULA_DEFENSE = 16f;
+    public static final int HUNT_TARANTULA_ATTACK_SPEED = 3;
+    public static final int HUNT_TARANTULA_REWARD_PROTEIN = 320;
+    public static final int HUNT_TARANTULA_REWARD_RP = 130;
+    public static final int HUNT_TARANTULA_REWARD_MUSHROOMS = 100;
+    public static final int HUNT_MAX_PARTY_FROM_CAPACITY_DIVISOR = 50;
+    public static final float INVASION_RANDOM_CHANCE_PER_HOUR = 0.003f;
+    public static final int INVASION_RESPONSE_HOURS = 72;
+    public static final int INVASION_ANT_LION_HP = 12000;
+    public static final float INVASION_ANT_LION_ATTACK = 600f;
+    public static final float INVASION_ANT_LION_DEFENSE = 12f;
+    public static final int INVASION_ANT_LION_ATTACK_SPEED = 4;
+    public static final float INVASION_RAID_RESOURCE_STEAL_PCT = 0.05f;
+    public static final float INVASION_RAID_UNASSIGNED_KILL_PCT = 0.12f;
+    public static final int EXHAUSTION_UNASSIGNED_WARN_PCT = 10;
     public static final int COMMANDER_MAX_PER_COLONY = 1;
     public static final int TRIGGER_COMMANDER_MIN_WARS = 3;
     public static final int TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY = 2;
@@ -189,6 +337,13 @@ public final class GameNumbers {
 
     // --- AI / trade automation ---
     public static final int AI_EXPANSION_COLONY_TARGET = 6;
+    public static final int AI_MILITARIST_EXPANSION_COLONY_TARGET = 8;
+    public static final int AI_PACIFIST_EXPANSION_COLONY_TARGET = 5;
+    public static final double AI_MILITARIST_WAR_CHANCE_MULT = 2.25;
+    public static final double AI_PACIFIST_WAR_CHANCE_MULT = 0.35;
+    public static final int AI_MILITARIST_REPUTATION_DELTA = -12;
+    public static final int AI_PACIFIST_REPUTATION_DELTA = 10;
+    public static final int AI_MIN_BREEDERS_FOR_FLIGHT = 1;
     public static final double AI_CREATINE_FOOD_STRESS_RATIO = 0.35;
     public static final double TRADE_AUTOMATION_SURPLUS_RATIO = 0.50;
     public static final double TRADE_AUTOMATION_DEFICIT_RATIO = 0.25;
@@ -199,6 +354,7 @@ public final class GameNumbers {
     public static final int DIPLOMAT_MAX_PER_COLONY_MISSION = 3;
     public static final int AUTO_UPGRADE_MIN_COMPLETE_TUNNELS = 5;
     public static final int AUTO_UPGRADE_MIN_DIPLOMATS_SENT = 10;
+    public static final int AUTO_UPGRADE_MIN_RECURRENT_ROUTES = 10;
 
     // --- Triggers ---
     public static final int TRIGGER_GRAVER_DEAD_ANTS = 100;
@@ -225,6 +381,18 @@ public final class GameNumbers {
     public static final int DIPLOMAT_STABILITY_GAIN_BASE = 1;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;
+    public static final int SPY_POWER_BASE = DIPLOMAT_STABILITY_GAIN_BASE;
+    public static final int SPY_POWER_PRESSURE_2 = DIPLOMAT_STABILITY_GAIN_PRESSURE_2;
+    public static final int SPY_POWER_PRESSURE_3 = DIPLOMAT_STABILITY_GAIN_PRESSURE_3;
+    public static final int SPY_MAX_PER_DYNASTY_MISSION = DIPLOMAT_MAX_PER_DYNASTY_MISSION;
+    public static final double SPY_INTEL_POWER_DIVISOR = 10.0;
+    public static final double SPY_CI_REDUCTION_PER_POINT = 0.1;
+    public static final double COUNTER_INTELLIGENCE_START = 5.0;
+    public static final double COUNTER_INTELLIGENCE_MAX = 50.0;
+    public static final double INTELLIGENCE_MAX = 100.0;
+    public static final double SPY_THEFT_FRACTION_MIN = 0.01;
+    public static final double SPY_THEFT_FRACTION_MAX = 0.03;
+    public static final int CAUGHT_SPYING_DURATION_DAYS = DAYS_PER_MONTH * 12;
 
     // --- Construction ---
     public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
@@ -277,6 +445,22 @@ public final class GameNumbers {
             return 0;
         }
         return (days + DAYS_PER_MONTH - 1) / DAYS_PER_MONTH;
+    }
+
+    public static int calculateTimeZoneOffset(int col, int worldWidth) {
+        if (worldWidth <= 0) {
+            return 0;
+        }
+        int minCol = -worldWidth / 2;
+        int maxCol = worldWidth / 2 - 1;
+        int normalizedCol = col;
+        while (normalizedCol < minCol) normalizedCol += worldWidth;
+        while (normalizedCol > maxCol) normalizedCol -= worldWidth;
+        double colsPerZone = (double) worldWidth / 24.0;
+        int offset = (int) Math.round(normalizedCol / colsPerZone);
+        while (offset > 12) offset -= 24;
+        while (offset < -12) offset += 24;
+        return offset;
     }
 
     public static int initialModifierRemainingDays(DiplomaticReputationModifier modifier) {
@@ -384,6 +568,34 @@ public final class GameNumbers {
         return Math.round(clampDefensePercent((float) defensePercent));
     }
 
+    public static float clampEvasionPercent(float evasionPercent) {
+        if (Float.isNaN(evasionPercent) || Float.isInfinite(evasionPercent)) {
+            return EVASION_PERCENT_MIN;
+        }
+        return Math.max(EVASION_PERCENT_MIN, Math.min(EVASION_PERCENT_MAX, evasionPercent));
+    }
+
+    public static int clampEvasionPercent(int evasionPercent) {
+        return Math.round(clampEvasionPercent((float) evasionPercent));
+    }
+
+    public static int calculateLifespan(int baseDays, float casteMultiplier) {
+        if (baseDays <= 0 || casteMultiplier <= 0f) {
+            return 1;
+        }
+        return Math.max(1, Math.round(baseDays * casteMultiplier));
+    }
+
+    public static float applyEvasionToHitChance(float hitChance, float evasionPercent) {
+        if (evasionPercent <= 0f) {
+            return hitChance;
+        }
+        float evasionRate = clampEvasionPercent(evasionPercent) / 100f;
+        float reduced = hitChance - evasionRate;
+        float floor = Math.min(hitChance, BATTLE_HIT_CHANCE_MIN);
+        return Math.min(1f, Math.max(floor, reduced));
+    }
+
     public static float damageAfterDefense(float rawDamage, float defensePercent) {
         if (rawDamage <= 0f) {
             return 0f;
@@ -404,5 +616,158 @@ public final class GameNumbers {
             return INTEGRATION_MONTHS_PER_COLONY_SLOW;
         }
         return INTEGRATION_MONTHS_PER_COLONY_SLOW / Math.sqrt(diplomatsPerColony);
+    }
+
+    public static final class HuntRewards {
+        public static final HuntRewards NONE = new HuntRewards(0, 0, 0);
+
+        public final int protein;
+        public final int mushrooms;
+        public final int research;
+
+        public HuntRewards(int protein, int mushrooms, int research) {
+            this.protein = Math.max(0, protein);
+            this.mushrooms = Math.max(0, mushrooms);
+            this.research = Math.max(0, research);
+        }
+
+        public boolean hasAny() {
+            return protein > 0 || mushrooms > 0 || research > 0;
+        }
+    }
+
+    public static HuntRewards huntRewardsFor(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return HuntRewards.NONE;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return new HuntRewards(
+                    HUNT_COCKROACH_REWARD_PROTEIN,
+                    HUNT_COCKROACH_REWARD_MUSHROOMS,
+                    HUNT_COCKROACH_REWARD_RP);
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER) {
+            return new HuntRewards(
+                    HUNT_BOMBARDIER_BEETLE_REWARD_PROTEIN,
+                    HUNT_BOMBARDIER_BEETLE_REWARD_MUSHROOMS,
+                    HUNT_BOMBARDIER_BEETLE_REWARD_RP);
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return new HuntRewards(
+                    HUNT_SPIDER_REWARD_PROTEIN,
+                    HUNT_SPIDER_REWARD_MUSHROOMS,
+                    HUNT_SPIDER_REWARD_RP);
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return new HuntRewards(
+                    HUNT_TARANTULA_REWARD_PROTEIN,
+                    HUNT_TARANTULA_REWARD_MUSHROOMS,
+                    HUNT_TARANTULA_REWARD_RP);
+        }
+        return HuntRewards.NONE;
+    }
+
+    public static float huntEnemyMaxHealth(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_HEALTH;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_HP;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER) {
+            return HUNT_BOMBARDIER_BEETLE_HP;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_HP;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_HP;
+        }
+        return MILITARY_BASELINE_HEALTH;
+    }
+
+    public static float huntEnemyAttack(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_ATTACK;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_ATTACK;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER) {
+            return HUNT_BOMBARDIER_BEETLE_ATTACK;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_ATTACK;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_ATTACK;
+        }
+        return MILITARY_BASELINE_ATTACK;
+    }
+
+    public static float huntEnemyDefense(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER) {
+            return HUNT_BOMBARDIER_BEETLE_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_DEFENSE;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_DEFENSE;
+        }
+        return MILITARY_BASELINE_DEFENSE;
+    }
+
+    public static int huntEnemyAttackSpeed(Species species) {
+        if (species == null || !species.hasBugRole(BugRole.HUNT)) {
+            return MILITARY_BASELINE_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_COCKROACH) {
+            return HUNT_COCKROACH_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_BOMBARDIER) {
+            return HUNT_BOMBARDIER_BEETLE_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_SPIDER) {
+            return HUNT_SPIDER_ATTACK_SPEED;
+        }
+        if (species == GameConstants.TYPE_TARANTULA) {
+            return HUNT_TARANTULA_ATTACK_SPEED;
+        }
+        return MILITARY_BASELINE_ATTACK_SPEED;
+    }
+
+    public static float invasionEnemyMaxHealth(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_HP;
+        }
+        return MILITARY_BASELINE_HEALTH;
+    }
+
+    public static float invasionEnemyAttack(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_ATTACK;
+        }
+        return MILITARY_BASELINE_ATTACK;
+    }
+
+    public static float invasionEnemyDefense(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_DEFENSE;
+        }
+        return MILITARY_BASELINE_DEFENSE;
+    }
+
+    public static int invasionEnemyAttackSpeed(Species species) {
+        if (species == GameConstants.TYPE_ANT_LION) {
+            return INVASION_ANT_LION_ATTACK_SPEED;
+        }
+        return MILITARY_BASELINE_ATTACK_SPEED;
     }
 }

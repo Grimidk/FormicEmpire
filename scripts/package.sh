@@ -29,7 +29,8 @@ if [ -f "jre/bin/java.exe" ]; then
 elif [ "$HOST_OS" = "Darwin" ]; then
     ./scripts/setup_jre.sh
 fi
-if [ "$HOST_OS" = "Linux" ]; then
+# Native Linux pack, or macOS cross-pack via Docker, both need jre-linux/.
+if [ "$HOST_OS" = "Linux" ] || [ "$HOST_OS" = "Darwin" ]; then
     ./scripts/setup_jre_linux.sh
 fi
 
@@ -38,11 +39,26 @@ java "$ROOT/tools/MusicTracksCodegen.java" \
     "$ROOT/src/main/resources/audio/music" \
     "$ROOT/src/main/java/com/grimidk/formicempire/classes/infrasctructure/registries/MusicTracks.java"
 
-echo "[Build] Building Formic Empire..."
-$MVN_EXEC clean package -DskipTests
+VERSION_FILE="$ROOT/src/main/resources/texts/version.txt"
+if [ -f "$VERSION_FILE" ]; then
+    APP_VERSION_DISPLAY="$(head -n 1 "$VERSION_FILE" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+else
+    APP_VERSION_DISPLAY="v0.6.9 (Beta)"
+fi
+
+APP_VERSION_NUMERIC="$(echo "$APP_VERSION_DISPLAY" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -n 1)"
+[ -z "$APP_VERSION_NUMERIC" ] && APP_VERSION_NUMERIC="0.6.9"
+
+APP_VERSION_QUAD="$(echo "$APP_VERSION_NUMERIC" | awk -F. '{printf "%d.%d.%d.%d\n", $1, $2, $3, $4}')"
+
+echo "[Build] Building Formic Empire ($APP_VERSION_DISPLAY)..."
+$MVN_EXEC clean package -DskipTests \
+    -Dapp.version.display="$APP_VERSION_DISPLAY" \
+    -Dapp.version.numeric="$APP_VERSION_NUMERIC" \
+    -Dapp.version.quad="$APP_VERSION_QUAD"
 
 OUTPUT_DIR="outputs"
-JAR_NAME="FormicEmpire-1.0-SNAPSHOT.jar"
+JAR_NAME="FormicEmpire.jar"
 JAR_ZIP="$OUTPUT_DIR/FormicEmpire.jar.zip"
 JAR_STAGING="$OUTPUT_DIR/.jar-staging"
 WIN_ZIP="$OUTPUT_DIR/FormicEmpire.windows.zip"
@@ -83,7 +99,7 @@ if [ "$HOST_OS" = "Darwin" ] && [ ! -f "$ICON_ICNS" ]; then
     exit 1
 fi
 
-if [ "$HOST_OS" = "Linux" ] && [ ! -f "$ICON_PNG" ]; then
+if { [ "$HOST_OS" = "Linux" ] || [ "$HOST_OS" = "Darwin" ]; } && [ ! -f "$ICON_PNG" ]; then
     echo "Error: $ICON_PNG not found (required for Linux jpackage icon)."
     exit 1
 fi
@@ -120,7 +136,13 @@ else
     echo "Error: Java 17+ is required."
     exit 1
 fi
-exec "\$JAVA_BIN" -jar "$JAR_NAME"
+JAVA_OPTS=()
+case "\$(uname -s)" in
+    Darwin)
+        JAVA_OPTS+=(--add-exports java.desktop/com.apple.eawt=ALL-UNNAMED)
+        ;;
+esac
+exec "\$JAVA_BIN" "\${JAVA_OPTS[@]}" -jar "$JAR_NAME"
 EOF
     chmod +x "$JAR_STAGING/FormicEmpire.sh"
     rm -f "$JAR_ZIP"
@@ -176,6 +198,12 @@ pack_macos_app() {
     mkdir -p "$JPACKAGE_INPUT"
     cp "$BUILD_JAR" "$JPACKAGE_INPUT/$JAR_NAME"
 
+    JPACKAGE_MAC_VERSION="$APP_VERSION_NUMERIC"
+    MAJOR_VER="$(echo "$APP_VERSION_NUMERIC" | cut -d. -f1)"
+    if [ "$MAJOR_VER" -le 0 ] 2>/dev/null; then
+        JPACKAGE_MAC_VERSION="1.0"
+    fi
+
     JPACKAGE_ARGS=(
         --input "$JPACKAGE_INPUT"
         --name FormicEmpire
@@ -184,12 +212,17 @@ pack_macos_app() {
         --type app-image
         --dest "$OUTPUT_DIR"
         --icon "$ICON_ICNS"
-        --app-version 1.0
-        --vendor GrimIDK
-        --description "A game about ants."
+        --app-version "$JPACKAGE_MAC_VERSION"
+        --vendor "GrimIDK"
+        --copyright "Copyright (C) 2026 GrimIDK"
+        --description "An open source strategy and simulation game about ants."
+        --mac-package-identifier "com.grimidk.formicempire"
+        --mac-package-name "FormicEmpire"
+        --mac-app-category "games"
         --java-options "-Dapple.awt.application.name=FormicEmpire"
         --java-options "-Dawt.useSystemAAFontSettings=on"
         --java-options "-Dswing.aatext=true"
+        --java-options "--add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED"
     )
 
     if [ -d "jre-mac" ] && [ -x "jre-mac/bin/java" ]; then
@@ -204,15 +237,40 @@ pack_macos_app() {
 
     jpackage "${JPACKAGE_ARGS[@]}"
     rm -rf "$JPACKAGE_INPUT"
+
+    PLIST="$MAC_APP/Contents/Info.plist"
+    if [ -f "$PLIST" ] && command -v /usr/libexec/PlistBuddy >/dev/null 2>&1; then
+        /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $APP_VERSION_NUMERIC" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $APP_VERSION_NUMERIC" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string 'Formic Empire'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName 'Formic Empire'" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Add :CFBundleGetInfoString string 'Formic Empire $APP_VERSION_DISPLAY, Copyright (C) 2026 GrimIDK'" "$PLIST" 2>/dev/null || \
+            /usr/libexec/PlistBuddy -c "Set :CFBundleGetInfoString 'Formic Empire $APP_VERSION_DISPLAY, Copyright (C) 2026 GrimIDK'" "$PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Delete :NSMicrophoneUsageDescription" "$PLIST" 2>/dev/null || true
+    fi
+
     HAS_APP=1
 }
 
-pack_linux_app() {
-    if [ "$HOST_OS" != "Linux" ]; then
-        echo "[Pack] Skipping Linux app-image (run scripts/package.sh on Linux to build $LINUX_ZIP)."
+find_docker() {
+    if command -v docker >/dev/null 2>&1; then
+        command -v docker
         return 0
     fi
+    for candidate in \
+        /usr/local/bin/docker \
+        /opt/homebrew/bin/docker \
+        "/Applications/Docker.app/Contents/Resources/bin/docker"
+    do
+        if [ -x "$candidate" ]; then
+            echo "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
 
+pack_linux_app_native() {
     if ! command -v jpackage >/dev/null 2>&1; then
         echo "Error: jpackage not found (needs JDK 17+ on Linux to build the Linux app-image)."
         return 1
@@ -238,9 +296,10 @@ pack_linux_app() {
         --dest "$OUTPUT_DIR" \
         --runtime-image "$LINUX_JRE" \
         --icon "$ICON_PNG" \
-        --app-version 1.0 \
-        --vendor GrimIDK \
-        --description "A game about ants." \
+        --app-version "$APP_VERSION_NUMERIC" \
+        --vendor "GrimIDK" \
+        --copyright "Copyright (C) 2026 GrimIDK" \
+        --description "An open source strategy and simulation game about ants." \
         --java-options "-Dawt.useSystemAAFontSettings=on" \
         --java-options "-Dswing.aatext=true"
 
@@ -259,6 +318,102 @@ pack_linux_app() {
     )
     rm -rf "$LINUX_APP_DIR"
     HAS_LINUX_ZIP=1
+}
+
+pack_linux_app_docker() {
+    DOCKER_BIN="$(find_docker)" || {
+        echo "Error: Docker not found (needed on macOS to build $LINUX_ZIP)."
+        echo "Install and start Docker Desktop, then re-run ./scripts/package.sh."
+        return 1
+    }
+    if ! "$DOCKER_BIN" info >/dev/null 2>&1; then
+        echo "Error: Docker is installed but not running (needed to build $LINUX_ZIP)."
+        echo "Start Docker Desktop, then re-run ./scripts/package.sh."
+        return 1
+    fi
+
+    LINUX_JRE="$(resolve_linux_jre_dir)" || {
+        echo "Error: Linux JRE not found (jre-linux/ or jdk-*-jre/)."
+        return 1
+    }
+
+    echo "[Pack] Linux app-image via Docker (linux/amd64) -> $LINUX_ZIP (runtime from $LINUX_JRE/)..."
+    rm -rf "$LINUX_APP_DIR"
+    rm -f "$LINUX_ZIP"
+
+    "$DOCKER_BIN" run --rm --platform linux/amd64 \
+        -v "$ROOT:/work" \
+        -w /work \
+        eclipse-temurin:17-jdk \
+        bash -euo pipefail -c "
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -qq
+            apt-get install -y -qq zip file >/dev/null
+
+            OUTPUT_DIR='$OUTPUT_DIR'
+            JAR_NAME='$JAR_NAME'
+            MAIN_CLASS='$MAIN_CLASS'
+            ICON_PNG='$ICON_PNG'
+            APP_VERSION_NUMERIC='$APP_VERSION_NUMERIC'
+            LINUX_JRE='$LINUX_JRE'
+            LINUX_APP_DIR=\"\$OUTPUT_DIR/FormicEmpire\"
+            LINUX_ZIP=\"\$OUTPUT_DIR/FormicEmpire.linux.zip\"
+            JPACKAGE_INPUT=\"\$OUTPUT_DIR/.jpackage-input\"
+
+            rm -rf \"\$JPACKAGE_INPUT\" \"\$LINUX_APP_DIR\"
+            mkdir -p \"\$JPACKAGE_INPUT\"
+            cp \"target/\$JAR_NAME\" \"\$JPACKAGE_INPUT/\$JAR_NAME\"
+
+            jpackage \\
+                --input \"\$JPACKAGE_INPUT\" \\
+                --name FormicEmpire \\
+                --main-jar \"\$JAR_NAME\" \\
+                --main-class \"\$MAIN_CLASS\" \\
+                --type app-image \\
+                --dest \"\$OUTPUT_DIR\" \\
+                --runtime-image \"\$LINUX_JRE\" \\
+                --icon \"\$ICON_PNG\" \\
+                --app-version \"\$APP_VERSION_NUMERIC\" \\
+                --vendor \"GrimIDK\" \\
+                --copyright \"Copyright (C) 2026 GrimIDK\" \\
+                --description \"An open source strategy and simulation game about ants.\" \\
+                --java-options \"-Dawt.useSystemAAFontSettings=on\" \\
+                --java-options \"-Dswing.aatext=true\"
+
+            rm -rf \"\$JPACKAGE_INPUT\"
+            test -x \"\$LINUX_APP_DIR/bin/FormicEmpire\"
+
+            (
+                cd \"\$OUTPUT_DIR\"
+                zip -r -X FormicEmpire.linux.zip FormicEmpire \\
+                    -x \"*.DS_Store\" \\
+                    -x \"*/.*\"
+            )
+            rm -rf \"\$LINUX_APP_DIR\"
+        "
+
+    if [ ! -f "$LINUX_ZIP" ]; then
+        echo "Error: Docker jpackage did not produce $LINUX_ZIP"
+        return 1
+    fi
+    # Docker may leave root ownership on bind-mounted files; ignore if not permitted.
+    chown "$(id -u):$(id -g)" "$LINUX_ZIP" 2>/dev/null || true
+    HAS_LINUX_ZIP=1
+}
+
+pack_linux_app() {
+    if [ "$HOST_OS" = "Linux" ]; then
+        pack_linux_app_native
+        return $?
+    fi
+
+    if [ "$HOST_OS" = "Darwin" ]; then
+        pack_linux_app_docker
+        return $?
+    fi
+
+    echo "[Pack] Skipping Linux app-image (run on macOS with Docker, or on Linux, to build $LINUX_ZIP)."
+    return 0
 }
 
 pack_jar_zip
@@ -298,6 +453,11 @@ if [ "$HOST_OS" = "Darwin" ]; then
         echo "Error: FormicEmpire.app was not created."
         exit 1
     fi
+    if [ "$HAS_LINUX_ZIP" -ne 1 ]; then
+        echo ""
+        echo "Error: Linux zip is required when packaging on macOS (Docker + jre-linux/)."
+        exit 1
+    fi
 elif [ "$HOST_OS" = "Linux" ]; then
     if [ "$HAS_LINUX_ZIP" -ne 1 ]; then
         echo ""
@@ -315,9 +475,9 @@ if [ "$HAS_APP" -ne 1 ] && [ "$HOST_OS" != "Darwin" ]; then
     echo "Note: Run ./scripts/package.sh on macOS to also produce $MAC_APP."
 fi
 
-if [ "$HAS_LINUX_ZIP" -ne 1 ] && [ "$HOST_OS" != "Linux" ]; then
+if [ "$HAS_LINUX_ZIP" -ne 1 ] && [ "$HOST_OS" != "Linux" ] && [ "$HOST_OS" != "Darwin" ]; then
     echo ""
-    echo "Note: Run ./scripts/package.sh on Linux to also produce $LINUX_ZIP."
+    echo "Note: Run ./scripts/package.sh on macOS (Docker) or Linux to also produce $LINUX_ZIP."
 fi
 
 echo ""

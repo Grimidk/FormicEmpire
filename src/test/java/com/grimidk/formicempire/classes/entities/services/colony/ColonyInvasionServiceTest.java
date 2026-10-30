@@ -1,0 +1,131 @@
+package com.grimidk.formicempire.classes.entities.services.colony;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
+import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+
+class ColonyInvasionServiceTest {
+
+    private Colony colony;
+
+    @BeforeEach
+    void setUp() {
+        Dynasty dynasty = new Dynasty(1, "Player", true, GameConstants.SPECIES_OMNI);
+        colony = new Colony(1, "Prime", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+        dynasty.setCapital(colony);
+    }
+
+    @Test
+    void antLionUsesInvasionRole() {
+        assertTrue(GameConstants.TYPE_ANT_LION.hasBugRole(BugRole.INVASION));
+    }
+
+    @Test
+    void dispatchStartsBattleAndResolvesOnTick() {
+        InvasionAlert alert = new InvasionAlert(
+                1,
+                GameConstants.TYPE_ANT_LION.getId(),
+                InvasionAlert.Scope.COLONY,
+                colony.getId(),
+                InvasionAlert.toAbsoluteHour(0, 0) + 48);
+        colony.getInvasionAlerts().add(alert);
+
+        for (int i = 0; i < 30; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
+        }
+        colony.runRoleAssignment(null);
+
+        Map<AntClass, Integer> counts = new HashMap<>();
+        counts.put(GameConstants.CLASS_WORKER, 30);
+        assertTrue(ColonyInvasionService.dispatchDefense(colony, 1, counts, 0, 0));
+        assertEquals(1, colony.getActiveInvasionDefenses().size());
+        assertNotNull(HuntCreatureCombatService.getInvasionState(colony, 1));
+
+        for (int hour = 0; hour < 5000 && !colony.getActiveInvasionDefenses().isEmpty(); hour++) {
+            ColonyInvasionService.tickInvasions(colony, hour / 24, hour % 24);
+        }
+        assertTrue(colony.getActiveInvasionDefenses().isEmpty());
+        assertTrue(colony.getInvasionAlerts().isEmpty());
+    }
+
+    @Test
+    void expiredAlertRemovedAfterRaidTick() {
+        InvasionAlert alert = new InvasionAlert(
+                1,
+                GameConstants.TYPE_ANT_LION.getId(),
+                InvasionAlert.Scope.COLONY,
+                colony.getId(),
+                InvasionAlert.toAbsoluteHour(1, 0));
+        colony.getInvasionAlerts().add(alert);
+        int mushroomsBefore = 1000;
+        int proteinBefore = 800;
+        int rpBefore = 200;
+        colony.setMushrooms(mushroomsBefore);
+        colony.setProtein(proteinBefore);
+        colony.addResearchPoints(rpBefore);
+        for (int i = 0; i < 10; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
+        }
+        colony.runRoleAssignment(null);
+        int workersBefore = colony.getWorkers().size();
+
+        ColonyInvasionService.tickInvasions(colony, 1, 0);
+
+        assertTrue(colony.getInvasionAlerts().isEmpty());
+        float stealFactor = 1f - GameNumbers.INVASION_RAID_RESOURCE_STEAL_PCT;
+        assertEquals(mushroomsBefore * stealFactor, colony.getMushroomsPrecise(), 0.51);
+        assertEquals(proteinBefore * stealFactor, colony.getProteinPrecise(), 0.51);
+        assertEquals(rpBefore - Math.max(1, (int) (rpBefore * GameNumbers.INVASION_RAID_RESOURCE_STEAL_PCT)),
+                colony.getResearchPoints());
+        int expectedKills = Math.max(1,
+                Math.round(workersBefore * GameNumbers.INVASION_RAID_UNASSIGNED_KILL_PCT));
+        assertEquals(workersBefore - expectedKills, colony.getWorkers().size());
+    }
+
+    @Test
+    void winChanceScalesWithPartySize() {
+        InvasionAlert alert = new InvasionAlert(
+                1,
+                GameConstants.TYPE_ANT_LION.getId(),
+                InvasionAlert.Scope.COLONY,
+                colony.getId(),
+                InvasionAlert.toAbsoluteHour(0, 0) + GameNumbers.INVASION_RESPONSE_HOURS);
+        Map<AntClass, Integer> small = new HashMap<>();
+        small.put(GameConstants.CLASS_SOLDIER, 1);
+        colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
+        colony.runRoleAssignment(null);
+        ColonyInvasionService.InvasionDispatchPreview smallPreview =
+                ColonyInvasionService.previewDefense(colony, alert, small, 0, 0);
+
+        for (int i = 0; i < 40; i++) {
+            colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
+        }
+        colony.runRoleAssignment(null);
+        Map<AntClass, Integer> large = new HashMap<>();
+        large.put(GameConstants.CLASS_SOLDIER, 40);
+        ColonyInvasionService.InvasionDispatchPreview largePreview =
+                ColonyInvasionService.previewDefense(colony, alert, large, 0, 0);
+
+        assertTrue(largePreview.winChance >= smallPreview.winChance);
+        assertFalse(largePreview.winChance <= 0f);
+    }
+}

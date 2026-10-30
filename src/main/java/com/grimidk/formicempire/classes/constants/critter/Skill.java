@@ -3,8 +3,8 @@ package com.grimidk.formicempire.classes.constants.critter;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 
 public class Skill extends Constant {
@@ -15,7 +15,7 @@ public class Skill extends Constant {
     private final boolean passive;
     private final float laneDamageBonus;
     private AntRole requiredRole;
-    private AntSubtype requiredSubtype;
+    private AntMod requiredMod;
     private BattleLine battleLine;
     private boolean sacrificesSelf;
     private Skill replacesSkill;
@@ -74,12 +74,12 @@ public class Skill extends Constant {
         this.requiredRole = requiredRole;
     }
 
-    public AntSubtype getRequiredSubtype() {
-        return requiredSubtype;
+    public AntMod getRequiredMod() {
+        return requiredMod;
     }
 
-    public void setRequiredSubtype(AntSubtype requiredSubtype) {
-        this.requiredSubtype = requiredSubtype;
+    public void setRequiredMod(AntMod requiredMod) {
+        this.requiredMod = requiredMod;
     }
 
     public BattleLine getBattleLine() {

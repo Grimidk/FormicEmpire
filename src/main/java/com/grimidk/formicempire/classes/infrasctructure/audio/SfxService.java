@@ -1,36 +1,48 @@
 package com.grimidk.formicempire.classes.infrasctructure.audio;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public final class SfxService {
-    private static final int BUFFER_SIZE = 4096;
+    private static final int DECODE_READ = 8192;
     private static volatile SfxService active;
 
     private final Engine engine;
-    private final Object playbackLock = new Object();
-    private final AtomicBoolean stopRequested = new AtomicBoolean(false);
     private final AtomicInteger outputGainMillis = new AtomicInteger(1000);
+    private final AtomicLong playGeneration = new AtomicLong();
+    private final ConcurrentHashMap<String, CachedPcm> pcmCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Clip> clipCache = new ConcurrentHashMap<>();
+    private final ExecutorService playbackExecutor;
 
-    private Thread playbackThread;
-    private SourceDataLine activeLine;
+    private volatile Clip activeClip;
 
     public SfxService(Engine engine) {
         this.engine = Objects.requireNonNull(engine, "engine");
+        this.playbackExecutor = Executors.newSingleThreadExecutor(sfxThreadFactory());
         active = this;
         refreshVolume();
+        preloadPlayableEffectsAsync();
     }
 
     public static void play(SoundEffect effect) {
@@ -41,30 +53,45 @@ public final class SfxService {
     }
 
     public void playEffect(SoundEffect effect) {
-        if (effect == null || !effect.isResourcePresent()) {
+        if (effect == null) {
             return;
         }
         float gain = outputGainMillis.get() / 1000f;
         if (gain <= 0.0001f) {
             return;
         }
-        stopPlaybackThread(true);
-        stopRequested.set(false);
-        playbackThread = new Thread(() -> runPlayback(effect), "sfx-player");
-        playbackThread.setDaemon(true);
-        playbackThread.start();
+        long generation = playGeneration.incrementAndGet();
+        try {
+            playbackExecutor.execute(() -> runPlayback(effect, generation));
+        } catch (RejectedExecutionException ignore) {
+        }
     }
 
     public void refreshVolume() {
         float linear = linearGain(engine.getMasterVolume(), engine.getSfxVolume());
         outputGainMillis.set(Math.round(linear * 1000f));
+        try {
+            playbackExecutor.execute(this::applyGainToOpenClips);
+        } catch (RejectedExecutionException ignore) {
+            applyGainToOpenClips();
+        }
     }
 
     public void shutdown() {
-        stopPlaybackThread(true);
+        playGeneration.incrementAndGet();
         if (active == this) {
             active = null;
         }
+        playbackExecutor.execute(this::closeAllClips);
+        playbackExecutor.shutdown();
+        try {
+            playbackExecutor.awaitTermination(500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        playbackExecutor.shutdownNow();
+        closeAllClips();
+        pcmCache.clear();
     }
 
     static float linearGain(int masterVolume, int sfxVolume) {
@@ -73,84 +100,159 @@ public final class SfxService {
         return master * sfx;
     }
 
-    private void runPlayback(SoundEffect effect) {
+    private void preloadPlayableEffectsAsync() {
+        try {
+            playbackExecutor.execute(() -> {
+                for (SoundEffect effect : SoundEffects.getPlayableEffects()) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        return;
+                    }
+                    ensureClip(effect);
+                }
+            });
+        } catch (RejectedExecutionException ignore) {
+        }
+    }
+
+    private void runPlayback(SoundEffect effect, long generation) {
+        if (generation != playGeneration.get()) {
+            return;
+        }
+        Clip clip = ensureClip(effect);
+        if (clip == null || generation != playGeneration.get()) {
+            return;
+        }
+        try {
+            Clip previous = activeClip;
+            if (previous != null && previous != clip && previous.isOpen()) {
+                previous.stop();
+                previous.setFramePosition(0);
+            }
+            if (generation != playGeneration.get()) {
+                return;
+            }
+            applyGain(clip, outputGainMillis.get() / 1000f);
+            if (clip.isRunning()) {
+                clip.stop();
+            }
+            clip.setFramePosition(0);
+            activeClip = clip;
+            clip.start();
+        } catch (IllegalStateException | SecurityException ignore) {
+        }
+    }
+
+    private Clip ensureClip(SoundEffect effect) {
+        if (effect == null) {
+            return null;
+        }
+        Clip existing = clipCache.get(effect.getId());
+        if (existing != null && existing.isOpen()) {
+            return existing;
+        }
+        CachedPcm pcm = getOrDecode(effect);
+        if (pcm == null) {
+            return null;
+        }
+        try {
+            Clip clip = AudioSystem.getClip();
+            clip.open(pcm.format, pcm.pcm, 0, pcm.pcm.length);
+            applyGain(clip, outputGainMillis.get() / 1000f);
+            Clip raced = clipCache.putIfAbsent(effect.getId(), clip);
+            if (raced != null) {
+                try {
+                    clip.close();
+                } catch (Exception ignore) {
+                }
+                return raced.isOpen() ? raced : null;
+            }
+            return clip;
+        } catch (LineUnavailableException | IllegalArgumentException | SecurityException ignore) {
+            return null;
+        }
+    }
+
+    private CachedPcm getOrDecode(SoundEffect effect) {
+        if (effect == null || !effect.isResourcePresent()) {
+            return null;
+        }
+        CachedPcm existing = pcmCache.get(effect.getId());
+        if (existing != null) {
+            return existing;
+        }
+        try {
+            CachedPcm decoded = decodeEffect(effect);
+            if (decoded != null) {
+                CachedPcm raced = pcmCache.putIfAbsent(effect.getId(), decoded);
+                return raced != null ? raced : decoded;
+            }
+        } catch (UnsupportedAudioFileException | IOException ignore) {
+        }
+        return null;
+    }
+
+    private CachedPcm decodeEffect(SoundEffect effect)
+            throws UnsupportedAudioFileException, IOException {
         try (
                 InputStream raw = openEffectStream(effect);
                 AudioInputStream decoded = openDecodedStream(raw)
         ) {
             if (decoded == null) {
-                return;
+                return null;
             }
             AudioFormat format = decoded.getFormat();
-            SourceDataLine line = AudioSystem.getSourceDataLine(format);
-            line.open(format);
-            synchronized (playbackLock) {
-                activeLine = line;
-            }
-            line.start();
-            byte[] buffer = new byte[BUFFER_SIZE];
-            while (!stopRequested.get()) {
-                int read = decoded.read(buffer, 0, buffer.length);
-                if (read < 0) {
-                    break;
-                }
-                if (read == 0) {
-                    continue;
-                }
-                MusicService.applySoftwareGain(buffer, 0, read, outputGainMillis.get() / 1000f);
-                int offset = 0;
-                while (offset < read && !stopRequested.get()) {
-                    int written = line.write(buffer, offset, read - offset);
-                    if (written < 0) {
-                        break;
-                    }
-                    offset += written;
+            ByteArrayOutputStream pcmOut = new ByteArrayOutputStream(DECODE_READ * 8);
+            byte[] buffer = new byte[DECODE_READ];
+            int read;
+            while ((read = decoded.read(buffer, 0, buffer.length)) >= 0) {
+                if (read > 0) {
+                    pcmOut.write(buffer, 0, read);
                 }
             }
-            if (!stopRequested.get()) {
-                line.drain();
+            byte[] pcm = pcmOut.toByteArray();
+            if (pcm.length == 0) {
+                return null;
             }
-        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ignore) {
-        } finally {
-            closeActiveLine();
+            return new CachedPcm(format, pcm);
         }
     }
 
-    private void stopPlaybackThread(boolean join) {
-        stopRequested.set(true);
-        synchronized (playbackLock) {
-            if (activeLine != null) {
-                try {
-                    activeLine.stop();
-                    activeLine.flush();
-                } catch (Exception ignore) {
-                }
+    private void applyGainToOpenClips() {
+        float gain = outputGainMillis.get() / 1000f;
+        for (Clip clip : clipCache.values()) {
+            if (clip != null && clip.isOpen()) {
+                applyGain(clip, gain);
             }
         }
-        Thread thread = playbackThread;
-        if (join && thread != null && thread != Thread.currentThread()) {
+    }
+
+    private static void applyGain(Clip clip, float linearGain) {
+        if (clip == null || !clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+            return;
+        }
+        try {
+            FloatControl control = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float safe = Math.max(0.0001f, Math.min(1f, linearGain));
+            float dB = (float) (20.0 * Math.log10(safe));
+            dB = Math.max(control.getMinimum(), Math.min(control.getMaximum(), dB));
+            control.setValue(dB);
+        } catch (IllegalArgumentException | IllegalStateException ignore) {
+        }
+    }
+
+    private void closeAllClips() {
+        activeClip = null;
+        for (Clip clip : clipCache.values()) {
+            if (clip == null) {
+                continue;
+            }
             try {
-                thread.join(500);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                clip.stop();
+                clip.close();
+            } catch (Exception ignore) {
             }
         }
-        closeActiveLine();
-        playbackThread = null;
-        stopRequested.set(false);
-    }
-
-    private void closeActiveLine() {
-        synchronized (playbackLock) {
-            if (activeLine != null) {
-                try {
-                    activeLine.stop();
-                    activeLine.close();
-                } catch (Exception ignore) {
-                }
-            }
-            activeLine = null;
-        }
+        clipCache.clear();
     }
 
     private InputStream openEffectStream(SoundEffect effect) throws IOException {
@@ -180,6 +282,14 @@ public final class SfxService {
         return source;
     }
 
+    private static ThreadFactory sfxThreadFactory() {
+        return runnable -> {
+            Thread thread = new Thread(runnable, "sfx-player");
+            thread.setDaemon(true);
+            return thread;
+        };
+    }
+
     private static float clamp01(float value) {
         if (value < 0f) {
             return 0f;
@@ -188,5 +298,15 @@ public final class SfxService {
             return 1f;
         }
         return value;
+    }
+
+    private static final class CachedPcm {
+        private final AudioFormat format;
+        private final byte[] pcm;
+
+        private CachedPcm(AudioFormat format, byte[] pcm) {
+            this.format = format;
+            this.pcm = pcm;
+        }
     }
 }

@@ -3,8 +3,8 @@ package com.grimidk.formicempire.classes.entities.spatial;
 import java.awt.Point;
 import java.util.List;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 
 public class Room {
@@ -19,12 +19,12 @@ public class Room {
     private final Point entryPoint; 
     private final Point exitPoint;
     private final List<AntRole> allowedAntRoles;
-    private final List<AntType> allowedAntTypes;
+    private final List<AntClass> allowedAntClasses;
     private final List<Species> allowedBugTypes;
 
     public Room(int id, String name, Dimension dimension, int height, int width, boolean isRightAccess,
                 Point floorPoint, Point centerPoint, Point entryPoint, Point exitPoint,
-                List<AntRole> allowedAntRoles, List<AntType> allowedAntTypes, List<Species> allowedBugTypes) {
+                List<AntRole> allowedAntRoles, List<AntClass> allowedAntClasses, List<Species> allowedBugTypes) {
         this.id = id;
         this.name = name;
         this.dimension = dimension;
@@ -36,7 +36,7 @@ public class Room {
         this.entryPoint = entryPoint;
         this.exitPoint = exitPoint;
         this.allowedAntRoles = allowedAntRoles;
-        this.allowedAntTypes = allowedAntTypes;
+        this.allowedAntClasses = allowedAntClasses;
         this.allowedBugTypes = allowedBugTypes;
     }
 
@@ -51,6 +51,6 @@ public class Room {
     public Point getEntryPoint() { return entryPoint; }
     public Point getExitPoint() { return exitPoint; }
     public List<AntRole> getAllowedAntRoles() { return allowedAntRoles; }
-    public List<AntType> getAllowedAntTypes() { return allowedAntTypes; }
+    public List<AntClass> getAllowedAntClasses() { return allowedAntClasses; }
     public List<Species> getAllowedBugTypes() { return allowedBugTypes; }
 }

@@ -1,9 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
+import com.grimidk.formicempire.classes.interfaces.menu.MenuSideRailPanel;
 import com.grimidk.formicempire.classes.interfaces.menu.VersionLicenseFooter;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
-import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
@@ -11,27 +11,25 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.net.URI;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.HashSet;
 import java.util.Set;
 
 public class InitPanel extends JPanel {
-    private static final String DISCORD_URL = "https://discord.gg/2jF6s7jjTh";
-
     private final MainFrame frame;
     
     private final MenuHeaderPanel menuHeader = new MenuHeaderPanel();
     private final JPanel menuColumn = new JPanel(new GridBagLayout());
+    private final JPanel westBalance = new JPanel();
+    private final MenuSideRailPanel sideRail;
     private final VersionLicenseFooter footer =
             new VersionLicenseFooter(AssetStyles.COLOR_ABSOLUTE_BLACK);
     
     private JButton play;
-    private JButton help;
     private JButton audit;
     private JButton roadmap;
     private JButton credits;
-    private JButton discord;
-    private JButton settings;
     private JButton quit;
 
     public InitPanel(MainFrame frame) {
@@ -40,8 +38,19 @@ public class InitPanel extends JPanel {
         setLayout(new BorderLayout());
 
         menuColumn.setOpaque(false);
+        westBalance.setOpaque(false);
+        sideRail = new MenuSideRailPanel(frame);
+        add(westBalance, BorderLayout.WEST);
         add(menuColumn, BorderLayout.CENTER);
+        add(sideRail, BorderLayout.EAST);
         add(footer, BorderLayout.SOUTH);
+        syncSideRailBalance();
+        sideRail.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                syncSideRailBalance();
+            }
+        });
         
         initComponents();
         
@@ -65,12 +74,9 @@ public class InitPanel extends JPanel {
     
     private void initComponents() {
         play = createMenuButton(LanguageStrings.UI_PLAY, e -> frame.showCard(MainFrame.CARD_SAVE));
-        help = createMenuButton(LanguageStrings.UI_HELP, e -> frame.showCard(MainFrame.CARD_HELP));
         audit = createMenuButton(LanguageStrings.UI_AUDIT, e -> HelpPanel.showAuditDialog(this));
         roadmap = createMenuButton(LanguageStrings.UI_ROADMAP, e -> HelpPanel.showRoadmapDialog(this));
         credits = createMenuButton(LanguageStrings.UI_CREDITS, e -> HelpPanel.showCreditsDialog(this));
-        discord = createMenuButton(LanguageStrings.UI_DISCORD, e -> openDiscord());
-        settings = createMenuButton(LanguageStrings.UI_SETTINGS, e -> frame.showSettingsMenu(MainFrame.CARD_INIT));
         quit = createMenuButton(LanguageStrings.UI_QUIT, e -> frame.requestExit());
 
         refreshMenuOptions();
@@ -84,29 +90,18 @@ public class InitPanel extends JPanel {
         return button;
     }
 
-    private void openDiscord() {
-        try {
-            if (!Desktop.isDesktopSupported()) {
-                throw new UnsupportedOperationException();
-            }
-            Desktop desktop = Desktop.getDesktop();
-            if (!desktop.isSupported(Desktop.Action.BROWSE)) {
-                throw new UnsupportedOperationException();
-            }
-            desktop.browse(URI.create(DISCORD_URL));
-        } catch (Exception ex) {
-            UiOptionPane.showForegroundMessageDialog(
-                    this,
-                    DISCORD_URL,
-                    LanguageStrings.get(LanguageStrings.UI_DISCORD),
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
     public void refreshMenuOptions() {
         boolean showAudit = frame.getEngine().isShowAuditMenu();
         audit.setVisible(showAudit);
         layoutMenuButtons();
+    }
+
+    private void syncSideRailBalance() {
+        int railWidth = sideRail.getPreferredSize().width;
+        Dimension balanceSize = new Dimension(railWidth, 0);
+        westBalance.setPreferredSize(balanceSize);
+        westBalance.setMinimumSize(balanceSize);
+        westBalance.setMaximumSize(new Dimension(railWidth, Integer.MAX_VALUE));
     }
 
     private void layoutMenuButtons() {
@@ -122,8 +117,8 @@ public class InitPanel extends JPanel {
         menuColumn.add(menuHeader, c);
 
         JButton[] buttons = audit.isVisible()
-                ? new JButton[] { play, help, audit, roadmap, credits, discord, settings, quit }
-                : new JButton[] { play, help, roadmap, credits, discord, settings, quit };
+                ? new JButton[] { play, audit, roadmap, credits, quit }
+                : new JButton[] { play, roadmap, credits, quit };
 
         for (int i = 0; i < buttons.length; i++) {
             c.gridy = i + 1;
@@ -136,18 +131,17 @@ public class InitPanel extends JPanel {
     
     public void refreshTranslations() {
         play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
-        help.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
         audit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         roadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
         credits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
-        discord.setText(LanguageStrings.get(LanguageStrings.UI_DISCORD));
-        settings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         quit.setText(LanguageStrings.get(LanguageStrings.UI_QUIT));
+        sideRail.refreshTranslations();
         footer.refreshTranslations();
     }
 
     public void refreshTheme() {
         AssetStyles.applyThemeToContainer(this);
+        sideRail.refreshTheme();
         footer.applyTextColor();
     }
 

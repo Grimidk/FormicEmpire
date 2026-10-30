@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.entities.services.shared;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -216,6 +216,20 @@ public final class TriggerProgressService {
                 automationUnlocked,
                 diplomatsSent,
                 GameNumbers.AUTO_UPGRADE_MIN_DIPLOMATS_SENT));
+
+        int recurrentRoutes = 0;
+        if (dynasty != null && dynasty.getTradeService() != null) {
+            recurrentRoutes = dynasty.getTradeService().countActiveRecurrentRoutes();
+        }
+        entries.add(numeric(
+                GameUnlocks.ABILITY_AUTO_LOGISTICS,
+                LanguageStrings.TRIGGER_AUTO_LOGISTICS_TITLE,
+                LanguageStrings.TRIGGER_PROGRESS_HINT_RECURRENT_ROUTES,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_RECURRENT_ROUTES,
+                colony.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS),
+                automationUnlocked,
+                recurrentRoutes,
+                GameNumbers.AUTO_UPGRADE_MIN_RECURRENT_ROUTES));
 
         int absorbed = dynasty != null ? dynasty.getAbsorbedDynastyIds().size() : 0;
         entries.add(numeric(

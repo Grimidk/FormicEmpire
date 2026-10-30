@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -17,12 +17,16 @@ public final class ColonyMilitaryService {
     private ColonyMilitaryService() {
     }
 
+    public static int computeClassPoints(int workers, int soldiers, int majors, int princesses, int queens) {
+        return workers * GameConstants.CLASS_WORKER.getMilitaryWeight()
+                + soldiers * GameConstants.CLASS_SOLDIER.getMilitaryWeight()
+                + majors * GameConstants.CLASS_MAJOR.getMilitaryWeight()
+                + princesses * GameConstants.CLASS_PRINCESS.getMilitaryWeight()
+                + queens * GameConstants.CLASS_QUEEN.getMilitaryWeight();
+    }
+
     public static int computeTypePoints(int workers, int soldiers, int majors, int princesses, int queens) {
-        return workers * GameConstants.TYPE_WORKER.getMilitaryWeight()
-                + soldiers * GameConstants.TYPE_SOLDIER.getMilitaryWeight()
-                + majors * GameConstants.TYPE_MAJOR.getMilitaryWeight()
-                + princesses * GameConstants.TYPE_PRINCESS.getMilitaryWeight()
-                + queens * GameConstants.TYPE_QUEEN.getMilitaryWeight();
+        return computeClassPoints(workers, soldiers, majors, princesses, queens);
     }
 
     public static float computeStatMultiplier(boolean hasSkeleton, boolean hasAcid) {
@@ -53,7 +57,7 @@ public final class ColonyMilitaryService {
     public static float computeStatMultiplierFromBases(int baseHealth, int baseAttack, int baseDefense, int baseAttackSpeed) {
         float hpFactor = baseHealth / (float) GameNumbers.MILITARY_BASELINE_HEALTH;
         float atkFactor = baseAttack / (float) GameNumbers.MILITARY_BASELINE_ATTACK;
-        float defenseBaseline = GameConstants.TYPE_MAJOR.getDefenseMult();
+        float defenseBaseline = GameConstants.CLASS_MAJOR.getDefenseMult();
         float defFactor = defenseBaseline <= 0f ? 0f : baseDefense / defenseBaseline;
         float spdFactor = baseAttackSpeed / (float) GameNumbers.MILITARY_BASELINE_ATTACK_SPEED;
         return (hpFactor + atkFactor + defFactor + spdFactor) / 4f;
@@ -151,20 +155,20 @@ public final class ColonyMilitaryService {
             return 0;
         }
         int points = 0;
-        points += sumMilitaryPointsForSubtypeCounts(colony, GameConstants.TYPE_WORKER,
-                AntSubtypeService.aggregateSubtypeCounts(colony.getWorkers()));
-        points += sumMilitaryPointsForSubtypeCounts(colony, GameConstants.TYPE_SOLDIER,
-                AntSubtypeService.aggregateSubtypeCounts(colony.getSoldiers()));
-        points += sumMilitaryPointsForSubtypeCounts(colony, GameConstants.TYPE_MAJOR,
-                AntSubtypeService.aggregateSubtypeCounts(colony.getMajors()));
-        points += sumMilitaryPointsForSubtypeCounts(colony, GameConstants.TYPE_PRINCESS,
-                AntSubtypeService.aggregateSubtypeCounts(colony.getPrincesses()));
-        points += sumMilitaryPointsForSubtypeCounts(colony, GameConstants.TYPE_QUEEN,
-                AntSubtypeService.aggregateSubtypeCounts(colony.getQueens()));
+        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_WORKER,
+                AntModService.aggregateModCounts(colony.getWorkers()));
+        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_SOLDIER,
+                AntModService.aggregateModCounts(colony.getSoldiers()));
+        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_MAJOR,
+                AntModService.aggregateModCounts(colony.getMajors()));
+        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_PRINCESS,
+                AntModService.aggregateModCounts(colony.getPrincesses()));
+        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_QUEEN,
+                AntModService.aggregateModCounts(colony.getQueens()));
         if (points > 0) {
             return points;
         }
-        int typePoints = computeTypePoints(
+        int typePoints = computeClassPoints(
                 sizeOf(colony.getWorkers()),
                 sizeOf(colony.getSoldiers()),
                 sizeOf(colony.getMajors()),
@@ -173,8 +177,8 @@ public final class ColonyMilitaryService {
         return Math.round(typePoints * computeStatMultiplier(colony));
     }
 
-    private static int sumMilitaryPointsForSubtypeCounts(Colony colony, AntType type, Map<String, Integer> subtypeCounts) {
-        return AntSubtypeService.sumMilitaryPointsForSubtypeCounts(colony, type, subtypeCounts);
+    private static int sumMilitaryPointsForModCounts(Colony colony, AntClass antClass, Map<String, Integer> modCounts) {
+        return AntModService.sumMilitaryPointsForModCounts(colony, antClass, modCounts);
     }
 
     public static int computeActiveMilitaryPower(Colony colony) {
@@ -257,15 +261,15 @@ public final class ColonyMilitaryService {
         }
         Map<AntRole, Integer> warCounts = colony.getWarAssignedRoleCounts();
         int count = warCounts.getOrDefault(role, 0);
-        if (count <= 0 || role.getAntType() == null) {
+        if (count <= 0 || role.getAntClass() == null) {
             return 0;
         }
         float colonyMult = computeStatMultiplier(colony);
         int roleWeight = GameConstants.getActiveMilitaryRoleWeight(role);
         int typePoints = count * roleWeight;
-        float avgSubtypeFactor = AntSubtypeService.weightedSubtypeCombatFactor(colony,
-                role.getAntType(), AntSubtypeService.aggregateSubtypeCounts(colony.getAntsByType(role.getAntType())));
-        float points = count * roleWeight * colonyMult * avgSubtypeFactor;
+        float avgModFactor = AntModService.weightedModCombatFactor(colony,
+                role.getAntClass(), AntModService.aggregateModCounts(colony.getAntsByClass(role.getAntClass())));
+        float points = count * roleWeight * colonyMult * avgModFactor;
         return withWarStandingFloor(colony, typePoints, Math.round(points));
     }
 
@@ -301,14 +305,14 @@ public final class ColonyMilitaryService {
                 continue;
             }
             int count = warCounts.getOrDefault(role, 0);
-            if (count <= 0 || role.getAntType() == null) {
+            if (count <= 0 || role.getAntClass() == null) {
                 continue;
             }
             int roleWeight = GameConstants.getActiveMilitaryRoleWeight(role);
             typePoints += count * roleWeight;
-            float avgSubtypeFactor = AntSubtypeService.weightedSubtypeCombatFactor(colony,
-                    role.getAntType(), AntSubtypeService.aggregateSubtypeCounts(colony.getAntsByType(role.getAntType())));
-            points += count * roleWeight * colonyMult * avgSubtypeFactor;
+            float avgModFactor = AntModService.weightedModCombatFactor(colony,
+                    role.getAntClass(), AntModService.aggregateModCounts(colony.getAntsByClass(role.getAntClass())));
+            points += count * roleWeight * colonyMult * avgModFactor;
         }
         return withWarStandingFloor(colony, typePoints, Math.round(points));
     }
@@ -336,21 +340,21 @@ public final class ColonyMilitaryService {
         int baseAttackSpeed = ColonyStatsService.resolveBaseAttackSpeed(dynasty);
 
         int points = 0;
-        points += sumSavedMilitaryPoints(savedColony.workerSubtypes, savedColony.workers, GameConstants.TYPE_WORKER,
+        points += sumSavedMilitaryPoints(savedColony.workerMods, savedColony.workers, GameConstants.CLASS_WORKER,
                 baseHealth, baseAttack, baseDefense, baseAttackSpeed);
-        points += sumSavedMilitaryPoints(savedColony.soldierSubtypes, savedColony.soldiers, GameConstants.TYPE_SOLDIER,
+        points += sumSavedMilitaryPoints(savedColony.soldierMods, savedColony.soldiers, GameConstants.CLASS_SOLDIER,
                 baseHealth, baseAttack, baseDefense, baseAttackSpeed);
-        points += sumSavedMilitaryPoints(savedColony.majorSubtypes, savedColony.majors, GameConstants.TYPE_MAJOR,
+        points += sumSavedMilitaryPoints(savedColony.majorMods, savedColony.majors, GameConstants.CLASS_MAJOR,
                 baseHealth, baseAttack, baseDefense, baseAttackSpeed);
-        points += sumSavedMilitaryPoints(savedColony.princessSubtypes, savedColony.princesses, GameConstants.TYPE_PRINCESS,
+        points += sumSavedMilitaryPoints(savedColony.princessMods, savedColony.princesses, GameConstants.CLASS_PRINCESS,
                 baseHealth, baseAttack, baseDefense, baseAttackSpeed);
-        points += sumSavedMilitaryPoints(savedColony.queenSubtypes, savedColony.queens, GameConstants.TYPE_QUEEN,
+        points += sumSavedMilitaryPoints(savedColony.queenMods, savedColony.queens, GameConstants.CLASS_QUEEN,
                 baseHealth, baseAttack, baseDefense, baseAttackSpeed);
         if (points > 0) {
             return points;
         }
 
-        int typePoints = computeTypePoints(
+        int typePoints = computeClassPoints(
                 savedColony.workers,
                 savedColony.soldiers,
                 savedColony.majors,
@@ -359,27 +363,27 @@ public final class ColonyMilitaryService {
         return Math.round(typePoints * computeColonyStatMultiplierFromBases(baseHealth, baseAttack, baseAttackSpeed));
     }
 
-    private static int sumSavedMilitaryPoints(Map<String, Integer> subtypeCounts, int legacyCount, AntType type,
+    private static int sumSavedMilitaryPoints(Map<String, Integer> modCounts, int legacyCount, AntClass antClass,
             int baseHealth, int baseAttack, int baseDefense, int baseAttackSpeed) {
-        int weight = GameConstants.getMilitaryWeightForAntType(type);
+        int weight = GameConstants.getMilitaryWeightForAntClass(antClass);
         if (weight == 0) {
             return 0;
         }
         float colonyMult = computeColonyStatMultiplierFromBases(baseHealth, baseAttack, baseAttackSpeed);
-        if (subtypeCounts != null && !subtypeCounts.isEmpty()) {
+        if (modCounts != null && !modCounts.isEmpty()) {
             int total = 0;
-            for (Map.Entry<String, Integer> entry : subtypeCounts.entrySet()) {
+            for (Map.Entry<String, Integer> entry : modCounts.entrySet()) {
                 int count = entry.getValue();
                 if (count <= 0) {
                     continue;
                 }
-                AntSubtypeProfile profile = AntSubtypeProfile.fromCode(Integer.parseInt(entry.getKey()));
-                float standardMult = AntSubtypeService.computeCombatStatMultiplierFromBases(
-                        type, AntSubtypeProfile.standard(), baseHealth, baseAttack, baseDefense, baseAttackSpeed);
-                float actualMult = AntSubtypeService.computeCombatStatMultiplierFromBases(
-                        type, profile, baseHealth, baseAttack, baseDefense, baseAttackSpeed);
-                float subtypeFactor = standardMult > 0f ? actualMult / standardMult : 1f;
-                total += Math.round(count * weight * colonyMult * subtypeFactor);
+                AntModProfile profile = AntModProfile.fromCode(Integer.parseInt(entry.getKey()));
+                float standardMult = AntModService.computeCombatStatMultiplierFromBases(
+                        antClass, AntModProfile.standard(), baseHealth, baseAttack, baseDefense, baseAttackSpeed);
+                float actualMult = AntModService.computeCombatStatMultiplierFromBases(
+                        antClass, profile, baseHealth, baseAttack, baseDefense, baseAttackSpeed);
+                float modFactor = standardMult > 0f ? actualMult / standardMult : 1f;
+                total += Math.round(count * weight * colonyMult * modFactor);
             }
             return total;
         }

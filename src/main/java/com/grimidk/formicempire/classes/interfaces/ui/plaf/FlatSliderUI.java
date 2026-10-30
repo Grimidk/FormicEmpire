@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
@@ -113,9 +114,8 @@ public final class FlatSliderUI extends BasicSliderUI {
     protected void calculateTrackRect() {
         if (slider.getOrientation() != JSlider.HORIZONTAL) {
             super.calculateTrackRect();
-            int cx = trackRect.x + trackRect.width / 2;
-            trackRect.width = TRACK_BREADTH;
-            trackRect.x = cx - TRACK_BREADTH / 2;
+            trackRect.x = contentRect.x;
+            trackRect.width = Math.max(contentRect.width, getThumbSize().width);
             return;
         }
         int tickSpace = getTickLength();
@@ -148,6 +148,14 @@ public final class FlatSliderUI extends BasicSliderUI {
 
     @Override
     public void paintTrack(Graphics g) {
+        if (slider.getOrientation() == JSlider.VERTICAL) {
+            int cx = trackRect.x + trackRect.width / 2;
+            int x = cx - TRACK_BREADTH / 2;
+            UiControlChrome.paintSliderTrack(
+                    g,
+                    new Rectangle(x, trackRect.y, TRACK_BREADTH, trackRect.height));
+            return;
+        }
         UiControlChrome.paintSliderTrack(g, trackRect);
     }
 

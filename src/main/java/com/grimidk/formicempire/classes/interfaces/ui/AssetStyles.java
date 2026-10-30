@@ -158,6 +158,7 @@ public class AssetStyles {
     public static final Dimension ROLE_DIALOG_SIZE = new Dimension(1320, 820);
     public static final Dimension DYNASTY_DIALOG_SIZE = new Dimension(1400, 860);
     public static final Dimension MAP_DIALOG_SIZE = new Dimension(1280, 820);
+    public static final Dimension HATCH_DIALOG_SIZE = new Dimension(1600, 800);
 
     public static final int BORDER_THICKNESS_EXTERNAL = 2;
     public static final int BORDER_THICKNESS_INTERNAL = 1;
@@ -215,7 +216,7 @@ public class AssetStyles {
     public static final Font FONT_SMALL = UiFonts.FONT_SMALL;
     public static final Font FONT_MONOSPACED = UiFonts.FONT_MONOSPACED;
 
-    private static boolean darkMode = false;
+    private static boolean darkMode = true;
 
     public static boolean isDarkMode() {
         return darkMode;
@@ -361,6 +362,10 @@ public class AssetStyles {
         UiTableStyles.layoutColumnsForViewport(table, viewportWidth, growableColumns);
     }
 
+    public static void layoutTableColumnsForViewport(JTable table, int viewportWidth, boolean[] growableColumns, int[] minColumnWidths) {
+        UiTableStyles.layoutColumnsForViewport(table, viewportWidth, growableColumns, minColumnWidths);
+    }
+
     public static void applyTableColumnAlignment(JTable table, int columnIndex, int alignment) {
         UiTableStyles.applyColumnAlignment(table, columnIndex, alignment);
     }
@@ -375,6 +380,10 @@ public class AssetStyles {
 
     public static void relayoutTableInScrollPane(JScrollPane scrollPane, boolean[] growableColumns) {
         UiTableStyles.relayoutTableInScrollPane(scrollPane, growableColumns);
+    }
+
+    public static void relayoutTableInScrollPane(JScrollPane scrollPane, boolean[] growableColumns, int[] minColumnWidths) {
+        UiTableStyles.relayoutTableInScrollPane(scrollPane, growableColumns, minColumnWidths);
     }
 
     public static void styleTableBooleanColumn(JTable table, int columnIndex) {

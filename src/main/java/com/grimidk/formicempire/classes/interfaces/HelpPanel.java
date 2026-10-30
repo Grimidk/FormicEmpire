@@ -4,9 +4,10 @@ import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
@@ -35,6 +36,7 @@ import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildingTreePane
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchTreePanel;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.HelpAnimatedSpriteLabel;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -315,9 +317,6 @@ public class HelpPanel extends JPanel {
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         for (AntSpecies s : GameConstants.getSpecies()) {
-            if (!GameConstants.hasAssimilatedDroneSprite(s)) {
-                continue;
-            }
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
             entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(),
@@ -326,10 +325,7 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
             entry.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            ImageIcon sprite = GameConstants.getRepresentativeAntSprite(s);
-            JLabel spriteLabel = new JLabel(sprite != null ? sprite : s.getIcon());
-            spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(spriteLabel, BorderLayout.WEST);
+            entry.add(HelpAnimatedSpriteLabel.forRepresentativeAnt(s), BorderLayout.WEST);
 
             JPanel info = new JPanel();
             info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
@@ -452,6 +448,7 @@ public class HelpPanel extends JPanel {
         row.add("P", LanguageStrings.get("HOTKEY_P"));
         row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"), GameUnlocks.ABILITY_RESEARCH.getIcon());
         row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"), GameUnlocks.ABILITY_ABILITY.getIcon());
+        row.add("H", LanguageStrings.get(LanguageStrings.HOTKEY_H), GameConstants.ROLE_SCOUT.getIcon());
         row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"), GameUnlocks.ABILITY_DYNASTY.getIcon());
         row.add("M", LanguageStrings.get("HOTKEY_M"));
         row.add("X", LanguageStrings.get("HOTKEY_X"));
@@ -474,8 +471,28 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        for (AntType type : GameConstants.getAntTypes()) {
-            if (type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_ZOMBIE) continue;
+        JPanel agingEntry = new JPanel(new BorderLayout(10, 0));
+        agingEntry.setBackground(AssetStyles.BACKGROUND_COLOR);
+        agingEntry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(LanguageStrings.HELP_ANT_AGING_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        JTextArea agingArea = new JTextArea(LanguageStrings.get(LanguageStrings.HELP_ANT_AGING_DESC));
+        agingArea.setFont(AssetStyles.FONT_NORMAL);
+        agingArea.setForeground(AssetStyles.FONT_COLOR);
+        agingArea.setWrapStyleWord(true);
+        agingArea.setLineWrap(true);
+        agingArea.setEditable(false);
+        agingArea.setFocusable(false);
+        agingArea.setBackground(panel.getBackground());
+        agingArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        agingEntry.add(agingArea, BorderLayout.CENTER);
+        panel.add(agingEntry);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        for (AntClass type : GameConstants.getAntClasses()) {
+            if (type == GameConstants.CLASS_DEAD || type == GameConstants.CLASS_ZOMBIE) continue;
 
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -484,20 +501,19 @@ public class HelpPanel extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-            JLabel icon = new JLabel(type.getIcon());
-            icon.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(icon, BorderLayout.WEST);
+            entry.add(HelpAnimatedSpriteLabel.forAnt(type, GameConstants.SPECIES_OMNI, AntModProfile.standard()),
+                    BorderLayout.WEST);
 
             String desc = "";
-            if (type == GameConstants.TYPE_EGG) desc = LanguageStrings.get("HELP_TYPE_EGG_DESC");
-            else if (type == GameConstants.TYPE_LARVA) desc = LanguageStrings.get("HELP_TYPE_LARVA_DESC");
-            else if (type == GameConstants.TYPE_PUPA) desc = LanguageStrings.get("HELP_TYPE_PUPA_DESC");
-            else if (type == GameConstants.TYPE_WORKER) desc = LanguageStrings.get("HELP_TYPE_WORKER_DESC");
-            else if (type == GameConstants.TYPE_SOLDIER) desc = LanguageStrings.get("HELP_TYPE_SOLDIER_DESC");
-            else if (type == GameConstants.TYPE_MAJOR) desc = LanguageStrings.get("HELP_TYPE_MAJOR_DESC");
-            else if (type == GameConstants.TYPE_PRINCESS) desc = LanguageStrings.get("HELP_TYPE_PRINCESS_DESC");
-            else if (type == GameConstants.TYPE_DRONE) desc = LanguageStrings.get("HELP_TYPE_DRONE_DESC");
-            else if (type == GameConstants.TYPE_QUEEN) desc = LanguageStrings.get("HELP_TYPE_QUEEN_DESC");
+            if (type == GameConstants.CLASS_EGG) desc = LanguageStrings.get("HELP_TYPE_EGG_DESC");
+            else if (type == GameConstants.CLASS_LARVA) desc = LanguageStrings.get("HELP_TYPE_LARVA_DESC");
+            else if (type == GameConstants.CLASS_PUPA) desc = LanguageStrings.get("HELP_TYPE_PUPA_DESC");
+            else if (type == GameConstants.CLASS_WORKER) desc = LanguageStrings.get("HELP_TYPE_WORKER_DESC");
+            else if (type == GameConstants.CLASS_SOLDIER) desc = LanguageStrings.get("HELP_TYPE_SOLDIER_DESC");
+            else if (type == GameConstants.CLASS_MAJOR) desc = LanguageStrings.get("HELP_TYPE_MAJOR_DESC");
+            else if (type == GameConstants.CLASS_PRINCESS) desc = LanguageStrings.get("HELP_TYPE_PRINCESS_DESC");
+            else if (type == GameConstants.CLASS_DRONE) desc = LanguageStrings.get("HELP_TYPE_DRONE_DESC");
+            else if (type == GameConstants.CLASS_QUEEN) desc = LanguageStrings.get("HELP_TYPE_QUEEN_DESC");
             
             JTextArea descArea = new JTextArea(desc);
             descArea.setFont(AssetStyles.FONT_NORMAL);
@@ -531,10 +547,13 @@ public class HelpPanel extends JPanel {
         intro.setBorder(new EmptyBorder(0, 0, 10, 0));
         panel.add(intro);
 
-        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
-            String sectionKey = slot == AntSubtypeSlot.HEAD
-                    ? LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION
-                    : LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
+        for (AntModSlot slot : GameConstants.getConfigurableModSlots()) {
+            String sectionKey = switch (slot) {
+                case HEAD -> LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION;
+                case TORSO -> LanguageStrings.HATCH_SUBTYPE_TORSO_SECTION;
+                case ABDOMEN -> LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
+                default -> LanguageStrings.HATCH_DESC;
+            };
             JLabel sectionLabel = new JLabel(LanguageStrings.get(sectionKey));
             sectionLabel.setFont(AssetStyles.FONT_BOLD);
             sectionLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
@@ -542,7 +561,7 @@ public class HelpPanel extends JPanel {
             sectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             panel.add(sectionLabel);
 
-            for (AntSubtype subtype : GameConstants.getSubtypesForSlot(slot)) {
+            for (AntMod subtype : GameConstants.getModsForSlot(slot)) {
                 if (subtype.isNone()) {
                     continue;
                 }
@@ -557,7 +576,7 @@ public class HelpPanel extends JPanel {
         return scrollPane;
     }
 
-    private JPanel buildAntSubtypeEntry(JPanel panel, AntSubtype subtype) {
+    private JPanel buildAntSubtypeEntry(JPanel panel, AntMod subtype) {
         JPanel entry = new JPanel(new BorderLayout(10, 0));
         entry.setBackground(AssetStyles.BACKGROUND_COLOR);
         entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, subtype.getName(),
@@ -601,6 +620,12 @@ public class HelpPanel extends JPanel {
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_SKILLS, buildCombatSkillsSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_BATTLE_LINES, buildCombatBattleLinesSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_HEX_DEFENSE, buildCombatHexDefenseSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_REINFORCEMENT, buildCombatReinforcementSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WATER_CROSSING, buildCombatWaterCrossingSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_PHASES, buildCombatWarPhasesSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
@@ -662,6 +687,46 @@ public class HelpPanel extends JPanel {
         return panel;
     }
 
+    private JPanel buildCombatHexDefenseSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_HEX_DEFENSE_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 8, 0));
+        intro.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(intro);
+        for (AntRole role : GameConstants.getHexDefenseOnlyRoles()) {
+            panel.add(buildCombatConstantEntry(panel, role.getName(), role.getIcon(),
+                    LanguageStrings.get(roleDescriptionKey(role))));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatReinforcementSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        JLabel body = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_REINFORCEMENT_BODY)));
+        styleTutorialLabel(body);
+        body.setBorder(new EmptyBorder(0, 0, 8, 0));
+        body.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(body);
+        panel.add(buildCombatConstantEntry(panel, GameConstants.ROLE_CARRIER.getName(), GameConstants.ROLE_CARRIER.getIcon(),
+                LanguageStrings.get(LanguageStrings.HELP_COMBAT_CARRIER_DESC)));
+        return panel;
+    }
+
+    private JPanel buildCombatWaterCrossingSection() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        JLabel body = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_WATER_CROSSING_BODY)));
+        styleTutorialLabel(body);
+        panel.add(body, BorderLayout.CENTER);
+        return panel;
+    }
+
     private JPanel buildCombatWarStandingSection() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -687,6 +752,11 @@ public class HelpPanel extends JPanel {
                 LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE),
                 GameConstants.ICON_DEFENSE,
                 LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE_DESC)));
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(buildCombatConstantEntry(content,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_EVASION),
+                null,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_EVASION_DESC)));
         return buildCombatSection(LanguageStrings.HELP_COMBAT_UNIT_STATS, content);
     }
 
@@ -807,6 +877,21 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(AssetStyles.BACKGROUND_COLOR);
+        header.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(LanguageStrings.CRITTER_TAB_HUNTS) + " & " + LanguageStrings.get(LanguageStrings.CRITTER_TAB_INVASIONS),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        JLabel headerLabel = new JLabel(helpHtml("width:500px;font-size:11pt;",
+                LanguageStrings.get(LanguageStrings.HELP_HUNTS_INVASIONS_INTRO)));
+        headerLabel.setFont(AssetStyles.FONT_NORMAL);
+        headerLabel.setForeground(AssetStyles.FONT_COLOR);
+        header.add(headerLabel, BorderLayout.CENTER);
+        panel.add(header);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
         for (Species type : GameConstants.getCritterSpecies()) {
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -815,27 +900,9 @@ public class HelpPanel extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-            ImageIcon sprite = type.getSprite();
-            JLabel spriteLabel = new JLabel(sprite != null ? sprite : type.getIcon());
-            spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(spriteLabel, BorderLayout.WEST);
+            entry.add(HelpAnimatedSpriteLabel.forCritter(type), BorderLayout.WEST);
 
-            String desc;
-            if (type == GameConstants.TYPE_ANT) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_DESC);
-            } else if (type == GameConstants.TYPE_APHID) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_APHID_DESC);
-            } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_SYMBIOTIC_MITE_DESC);
-            } else if (type == GameConstants.TYPE_DERMESTID) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_DERMESTID_DESC);
-            } else if (type == GameConstants.TYPE_PARASITE_ANT) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_ANT_DESC);
-            } else if (type == GameConstants.TYPE_PARASITIC_MITE) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITIC_MITE_DESC);
-            } else {
-                desc = "";
-            }
+            String desc = bugDescription(type);
 
             String info = helpHtml("width:350px;font-size:11pt;",
                     "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>" + type.getScientificName()
@@ -853,6 +920,43 @@ public class HelpPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private static String bugDescription(Species type) {
+        if (type == GameConstants.TYPE_ANT) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_DESC);
+        }
+        if (type == GameConstants.TYPE_APHID) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_APHID_DESC);
+        }
+        if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_SYMBIOTIC_MITE_DESC);
+        }
+        if (type == GameConstants.TYPE_DERMESTID) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_DERMESTID_DESC);
+        }
+        if (type == GameConstants.TYPE_PARASITE_ANT) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_ANT_DESC);
+        }
+        if (type == GameConstants.TYPE_PARASITIC_MITE) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITIC_MITE_DESC);
+        }
+        if (type == GameConstants.TYPE_COCKROACH) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_COCKROACH_DESC);
+        }
+        if (type == GameConstants.TYPE_BOMBARDIER) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_BOMBARDIER_DESC);
+        }
+        if (type == GameConstants.TYPE_ANT_LION) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_LION_DESC);
+        }
+        if (type == GameConstants.TYPE_SPIDER) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_SPIDER_DESC);
+        }
+        if (type == GameConstants.TYPE_TARANTULA) {
+            return LanguageStrings.get(LanguageStrings.HELP_BUG_TARANTULA_DESC);
+        }
+        return "";
     }
 
     private static String roleDescriptionKey(AntRole role) {
@@ -880,7 +984,7 @@ public class HelpPanel extends JPanel {
             icon.setBorder(new EmptyBorder(5, 5, 5, 5));
             entry.add(icon, BorderLayout.WEST);
 
-            AntType antType = role.getAntType();
+            AntClass antType = role.getAntClass();
             String typeLine = antType != null
                     ? LanguageStrings.format(LanguageStrings.HELP_ROLE_ANT_TYPE, antType.getName())
                     : "";
@@ -916,6 +1020,8 @@ public class HelpPanel extends JPanel {
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_MILITARY_POWER, createMilitaryPowerSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_REPUTATION, createReputationSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_INTELLIGENCE, createIntelligenceSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_RANKS, createRanksSection()));
 
@@ -1093,6 +1199,21 @@ public class HelpPanel extends JPanel {
             list.add(item);
         }
         return list;
+    }
+
+    private JPanel createIntelligenceSection() {
+        JPanel panel = new JPanel(new BorderLayout(8, 0));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(8, 8, 8, 8));
+        JLabel iconLabel = new JLabel(GameConstants.ICON_STAT_INTELLIGENCE);
+        iconLabel.setVerticalAlignment(SwingConstants.TOP);
+        panel.add(iconLabel, BorderLayout.WEST);
+        JLabel body = new JLabel("<html><body style='width:280px'>"
+                + LanguageStrings.get(LanguageStrings.HELP_INTELLIGENCE_BODY) + "</body></html>");
+        body.setFont(AssetStyles.FONT_NORMAL);
+        body.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(body, BorderLayout.CENTER);
+        return panel;
     }
 
     private JPanel createSeasonListPanel(String title, List<Season> constants) {
@@ -1310,7 +1431,9 @@ public class HelpPanel extends JPanel {
                             + LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>"
                             + LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>"
                             + LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>"
-                            + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x");
+                            + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_FUNGI") + ": " + b.getMushroomAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_RESIN") + ": " + b.getResinAbundance() + "x");
             JLabel bLabel = new JLabel(bInfo, b.getIcon(), SwingConstants.LEFT);
             bLabel.setFont(AssetStyles.FONT_SMALL);
             bLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -1354,7 +1477,11 @@ public class HelpPanel extends JPanel {
 
         panel.add(createUiControlBarSection());
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(createMusicControlsSection());
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(createGameSpeedIconsSection());
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(createMapLayersSection());
 
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -1377,6 +1504,30 @@ public class HelpPanel extends JPanel {
         section.add(buildUiControlCell(GameConstants.ICON_SPEED_PAUSE, LanguageStrings.UI_CONTROL_PAUSE_TT));
         section.add(buildUiControlCell(GameConstants.ICON_SPEED_PLAY, LanguageStrings.UI_CONTROL_PLAY_TT));
         section.add(buildUiMenuControlCell());
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(section, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel createMusicControlsSection() {
+        JPanel section = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_MUSIC_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_PREV, LanguageStrings.MUSIC_PREV_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_PLAY, LanguageStrings.MUSIC_PLAY_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_PAUSE, LanguageStrings.MUSIC_PAUSE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_NEXT, LanguageStrings.MUSIC_NEXT_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_SHUFFLE, LanguageStrings.MUSIC_SHUFFLE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_MUTE, LanguageStrings.MUSIC_MUTE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_MUSIC_UNMUTE, LanguageStrings.MUSIC_UNMUTE_TT));
 
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -1408,6 +1559,27 @@ public class HelpPanel extends JPanel {
         wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
         wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
         wrapper.add(grid, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel createMapLayersSection() {
+        JPanel section = new JPanel(new BorderLayout(8, 8));
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_MAP_LAYERS),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel label = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_UI_MAP_LAYERS_DESC)));
+        styleTutorialLabel(label);
+        label.setBorder(new EmptyBorder(4, 8, 6, 8));
+        section.add(label, BorderLayout.CENTER);
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(section, BorderLayout.CENTER);
         return wrapper;
     }
 
@@ -1489,9 +1661,31 @@ public class HelpPanel extends JPanel {
     }
 
     private JComponent createBuildingTreeHelpPanel() {
-        BuildingTreePanel panel = new BuildingTreePanel(resolveHelpColony(), null, true);
-        panel.updateData();
-        return panel;
+        BuildingTreePanel treePanel = new BuildingTreePanel(resolveHelpColony(), null, true);
+        treePanel.updateData();
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JPanel specialInfo = new JPanel(new BorderLayout());
+        specialInfo.setBackground(AssetStyles.BACKGROUND_COLOR);
+        specialInfo.setBorder(BorderFactory.createCompoundBorder(
+                new EmptyBorder(6, 6, 4, 6),
+                BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                        LanguageStrings.get(LanguageStrings.HELP_BUILDINGS_SPECIAL_TITLE),
+                        javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                        javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                        AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER)));
+        JLabel infoLabel = new JLabel(helpHtml("width:650px;font-size:10pt;",
+                LanguageStrings.get(LanguageStrings.HELP_BUILDINGS_SPECIAL_BODY)));
+        infoLabel.setFont(AssetStyles.FONT_NORMAL);
+        infoLabel.setForeground(AssetStyles.FONT_COLOR);
+        infoLabel.setBorder(new EmptyBorder(4, 8, 6, 8));
+        specialInfo.add(infoLabel, BorderLayout.CENTER);
+
+        wrapper.add(specialInfo, BorderLayout.NORTH);
+        wrapper.add(treePanel, BorderLayout.CENTER);
+        return wrapper;
     }
 
     private JComponent createDictionaryPanel(List<Constant> items) {
@@ -1652,6 +1846,9 @@ public class HelpPanel extends JPanel {
                              body.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
                              body.append(AssetStyles.formatNumber(b.getMineralCost())).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
                              body.append(AssetStyles.formatNumber(b.getResinCost())).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
+                             if (b.getPlantCost() > 0) {
+                                 body.append(AssetStyles.formatNumber(b.getPlantCost())).append(" ").append(LanguageStrings.get("RESOURCE_PLANT")).append(", ");
+                             }
                              body.append(AssetStyles.formatNumber(b.getBuildTime())).append(" Hours");
                         }
                     } else if (selected instanceof Assimilation) {
@@ -1741,6 +1938,7 @@ public class HelpPanel extends JPanel {
             {LanguageStrings.get("HOTKEY_UPGRADES_LABEL"), "Y-O"},
             {LanguageStrings.get("HOTKEY_P_LABEL"), "P"},
             {LanguageStrings.get("HOTKEY_ABILITIES_LABEL"), "C"},
+            {LanguageStrings.get("HOTKEY_H_LABEL"), "H"},
             {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "A / S / D / F"},
             {LanguageStrings.get("HOTKEY_M_LABEL"), "M"},
             {LanguageStrings.get("HOTKEY_X_LABEL"), "X"}

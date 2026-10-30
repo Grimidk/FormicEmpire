@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 public class DynastyStarterService {
     
@@ -15,6 +16,7 @@ public class DynastyStarterService {
                 dynasty.unlockUpgrade(upgrade);
             }
         }
+        dynasty.unlockUpgrade(GameUnlocks.STAT_LONGEVITY);
         dynasty.ensureNativeAssimilationCompleted();
     }
 }

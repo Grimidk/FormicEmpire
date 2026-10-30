@@ -9,11 +9,12 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -119,8 +120,22 @@ public class ColonySourceService {
             nest.getX(), nest.getY(), source.getCenterX(), source.getCenterY(), radius);
     }
 
+    public double computeGatherEfficiency(Colony colony, ResourceSource source, float fullEfficiencyRadius) {
+        NeoPoint nest = spatialService.getColonyEntrance(colony);
+        return GatheringMath.gatheringEfficiency(
+                nest.getX(),
+                nest.getY(),
+                source.getCenterX(),
+                source.getCenterY(),
+                fullEfficiencyRadius);
+    }
+
     public float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
         return GatheringMath.computeFullEfficiencyRadius(colony, workers);
+    }
+
+    public float computeFullEfficiencyRadiusForAntClass(Colony colony, AntClass antClass) {
+        return GatheringMath.computeFullEfficiencyRadiusForAntClass(colony, antClass);
     }
 
     public boolean isActiveSource(ResourceSource source) {
@@ -134,6 +149,12 @@ public class ColonySourceService {
         if (role == GameConstants.ROLE_FORAGER) {
             targetTypes.add(GameConstants.RESOURCE_PLANT);
             targetTypes.add(GameConstants.RESOURCE_WATER);
+            if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) {
+                targetTypes.add(GameConstants.RESOURCE_FUNGI);
+            }
+            if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3) && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+                targetTypes.add(GameConstants.RESOURCE_RESIN);
+            }
         } else if (role == GameConstants.ROLE_HUNTER) {
             targetTypes.add(GameConstants.RESOURCE_MEAT);
         } else if (role == GameConstants.ROLE_MINER) {
@@ -229,7 +250,7 @@ public class ColonySourceService {
         }
 
         public static float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
-            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.TYPE_WORKER.getSpeedMult();
+            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.CLASS_WORKER.getSpeedMult();
             if (refTravel <= 1e-6f) {
                 return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
             }
@@ -255,12 +276,39 @@ public class ColonySourceService {
             return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE * (avg / refTravel) * colonyMult;
         }
 
-        private static float effectiveTravelUnits(Colony colony, Ant ant) {
-            float u = GameNumbers.BASE_SPRITE_SPEED * ant.getAntType().getSpeedMult();
+        public static float computeFullEfficiencyRadiusForAntClass(Colony colony, AntClass antClass) {
+            float refTravel = GameNumbers.BASE_SPRITE_SPEED * GameConstants.CLASS_WORKER.getSpeedMult();
+            if (refTravel <= 1e-6f || antClass == null) {
+                return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
+            }
+            float travel = effectiveTravelUnitsForClass(colony, antClass);
+            float colonyMult = colony.hasUpgrade(GameUnlocks.STAT_ACID)
+                    ? GameNumbers.GATHER_COLONY_SPEED_RADIUS_MULT
+                    : 1f;
+            return GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE * (travel / refTravel) * colonyMult;
+        }
+
+        private static float effectiveTravelUnitsForClass(Colony colony, AntClass antClass) {
+            float u = GameNumbers.BASE_SPRITE_SPEED * antClass.getSpeedMult();
             if (colony.isCreatineDietActive()) {
                 u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
             }
-            if (ant.getAntType() == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+            u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
+            u *= colony.getStatsService().getHeatresistSpeedMultiplier(colony);
+            if (antClass == GameConstants.CLASS_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+                u *= 2f;
+            }
+            return u;
+        }
+
+        private static float effectiveTravelUnits(Colony colony, Ant ant) {
+            float u = GameNumbers.BASE_SPRITE_SPEED * ant.getAntClass().getSpeedMult();
+            if (colony.isCreatineDietActive()) {
+                u *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
+            }
+            u *= colony.getStatsService().getLocsenseSpeedMultiplier(colony);
+            u *= colony.getStatsService().getHeatresistSpeedMultiplier(colony);
+            if (ant.getAntClass() == GameConstants.CLASS_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                 u *= 2f;
             }
             return u;

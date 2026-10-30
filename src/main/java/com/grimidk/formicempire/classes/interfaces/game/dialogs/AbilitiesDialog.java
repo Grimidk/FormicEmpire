@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -98,7 +98,24 @@ public class AbilitiesDialog extends ZeroDialog {
                                     }
 
                                     if (targetHex != null) {
-                                        colony.forceNuptialFlight(world, targetHex);
+                                        boolean resumeAfter = !engine.isPaused();
+                                        if (resumeAfter) {
+                                            engine.pauseEngine();
+                                        }
+                                        java.util.concurrent.Semaphore sema = engine.getSema();
+                                        if (sema != null) {
+                                            sema.acquireUninterruptibly();
+                                        }
+                                        try {
+                                            colony.forceNuptialFlight(world, targetHex);
+                                        } finally {
+                                            if (sema != null) {
+                                                sema.release();
+                                            }
+                                            if (resumeAfter) {
+                                                engine.resumeEngine();
+                                            }
+                                        }
                                         refreshDialog();
                                     } else {
                                         UiOptionPane.showMessageDialog(this,
@@ -123,10 +140,30 @@ public class AbilitiesDialog extends ZeroDialog {
                     createCostLabel(GameConstants.ICON_RESEARCH, massCost),
                     e -> {
                         if (getOwner() instanceof MainFrame main) {
-                            if (main.getEngine() != null && main.getEngine().getWorld() != null) {
-                                colony.getDynasty().runMassNuptialFlight(main.getEngine().getWorld());
-                                refreshDialog();
+                            Engine engine = main.getEngine();
+                            if (engine == null || engine.getWorld() == null || colony.getDynasty() == null) {
+                                return;
                             }
+                            World world = engine.getWorld();
+                            boolean resumeAfter = !engine.isPaused();
+                            if (resumeAfter) {
+                                engine.pauseEngine();
+                            }
+                            java.util.concurrent.Semaphore sema = engine.getSema();
+                            if (sema != null) {
+                                sema.acquireUninterruptibly();
+                            }
+                            try {
+                                colony.getDynasty().runMassNuptialFlight(world);
+                            } finally {
+                                if (sema != null) {
+                                    sema.release();
+                                }
+                                if (resumeAfter) {
+                                    engine.resumeEngine();
+                                }
+                            }
+                            refreshDialog();
                         }
                     });
             triggerSyncs.add(() -> syncMassFlight(row, massCost));
@@ -204,7 +241,7 @@ public class AbilitiesDialog extends ZeroDialog {
 
     private void syncMassFlight(AbilityRow row, int cost) {
         row.costLabel().setText(AssetStyles.formatNumber(cost));
-        String fail = colony.getResearchPoints() >= cost
+        String fail = isFreeAbilities() || colony.getResearchPoints() >= cost
                 ? null
                 : LanguageStrings.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, cost);
         applyTriggerState(row.button(), fail);
@@ -216,7 +253,7 @@ public class AbilitiesDialog extends ZeroDialog {
         String fail;
         if (activeCheck.getAsBoolean()) {
             fail = LanguageStrings.get(LanguageStrings.ABILITY_ERROR_ALREADY_ACTIVE);
-        } else if (available >= cost) {
+        } else if (isFreeAbilities() || available >= cost) {
             fail = null;
         } else {
             fail = String.format(
@@ -240,7 +277,7 @@ public class AbilitiesDialog extends ZeroDialog {
     }
 
     private String getNuptialFailureReason(int cost) {
-        if (colony.getResearchPoints() < cost) {
+        if (!isFreeAbilities() && colony.getResearchPoints() < cost) {
             return LanguageStrings.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, cost);
         }
         if (!ColonyLabourService.meetsNuptialRequirements(colony)) {
@@ -253,7 +290,22 @@ public class AbilitiesDialog extends ZeroDialog {
     }
 
     private void updateResearchPointsLabel() {
-        researchPointsLabel.setText(AssetStyles.formatNumber(colony.getResearchPoints()));
+        Engine eng = resolveEngine();
+        researchPointsLabel.setText(eng != null && eng.isInfiniteResearch()
+                ? "\u221E"
+                : AssetStyles.formatNumber(colony.getResearchPoints()));
+    }
+
+    private boolean isFreeAbilities() {
+        Engine eng = resolveEngine();
+        return eng != null && eng.isFreeAbilities();
+    }
+
+    private Engine resolveEngine() {
+        if (colony == null || colony.getDynasty() == null || colony.getDynasty().getOwningWorld() == null) {
+            return null;
+        }
+        return colony.getDynasty().getOwningWorld().getEngine();
     }
 
     private JLabel createCostLabel(Icon icon, int amount) {

@@ -2,8 +2,8 @@ package com.grimidk.formicempire.classes.infrasctructure;
 
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -106,7 +106,7 @@ public class WorldTest {
         Colony colony = new Colony(1, "Test Prime", true);
         world.generateWorld(
                 GameConstants.BIOME_PLAINS,
-                7,
+                16,
                 colony,
                 "Test",
                 LanguageStrings.DYNASTY_TITLE_DYNASTY);
@@ -144,7 +144,7 @@ public class WorldTest {
         Colony colony = new Colony(1, "Test Prime", true);
         world.generateWorld(
                 GameConstants.BIOME_PLAINS,
-                7,
+                16,
                 colony,
                 "Test",
                 LanguageStrings.DYNASTY_TITLE_DYNASTY);
@@ -202,31 +202,25 @@ public class WorldTest {
     }
 
     @Test
-    void generateWorldUsesContinentCorePlusCoastalAndOuterOceanRings() {
+    void generateWorldCreatesSmallGlobeWithHeightNAndWidth2N() {
         World world = new World();
         Colony colony = new Colony(1, "Test Prime", true);
-        int core = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
+        int n = 16;
         world.generateWorld(
                 GameConstants.BIOME_PLAINS,
-                core,
+                n,
                 colony,
                 "Test",
                 LanguageStrings.DYNASTY_TITLE_DYNASTY);
 
-        assertEquals(core, world.getContinentCoreRadius());
-        assertEquals(GameNumbers.worldRadiusForContinentCore(core), world.getWorldRadius());
+        assertEquals(n, world.getWorldHeight());
+        assertEquals(2 * n, world.getWorldWidth());
+        assertEquals(2 * n * n, world.getHexes().size());
         assertTrue(world.getContinentCount() >= 1);
-        assertTrue(world.getIslandCount() >= GameNumbers.WORLD_MIN_ISLAND_COUNT,
-                "Expected at least " + GameNumbers.WORLD_MIN_ISLAND_COUNT + " islands, got " + world.getIslandCount());
-        assertBiomeMinimums(world);
+        assertTrue(world.getIslandCount() >= 1,
+                "Expected at least 1 island, got " + world.getIslandCount());
 
-        int outerDist = world.getWorldRadius();
         for (Hex hex : world.getHexes()) {
-            int dist = (Math.abs(hex.getQ()) + Math.abs(hex.getQ() + hex.getR()) + Math.abs(hex.getR())) / 2;
-            if (dist == outerDist) {
-                assertEquals(GameConstants.BIOME_OCEAN, hex.getBiome(),
-                        "Outer ring must be pure ocean at " + hex.getQ() + "," + hex.getR());
-            }
             if (hex.isIsland()) {
                 assertNull(hex.getColony(), "Islands must not spawn colonies");
                 assertNotEquals(GameConstants.BIOME_OCEAN, hex.getBiome());
@@ -236,18 +230,18 @@ public class WorldTest {
     }
 
     @Test
-    void generateWorldEnsuresMinimumIslandsForSmallCore() {
+    void generateWorldEnsuresMinimumIslandsForSmallGlobe() {
         World world = new World();
         Colony colony = new Colony(1, "Test Prime", true);
         world.generateWorld(
                 GameConstants.BIOME_PLAINS,
-                0,
+                16,
                 colony,
                 "Test",
                 LanguageStrings.DYNASTY_TITLE_DYNASTY);
 
-        assertTrue(world.getIslandCount() >= GameNumbers.WORLD_MIN_ISLAND_COUNT,
-                "Expected at least " + GameNumbers.WORLD_MIN_ISLAND_COUNT + " islands, got " + world.getIslandCount());
+        assertTrue(world.getIslandCount() >= 1,
+                "Expected at least 1 island, got " + world.getIslandCount());
         for (Hex hex : world.getHexes()) {
             if (hex.isIsland()) {
                 assertNull(hex.getColony(), "Islands must not spawn colonies");

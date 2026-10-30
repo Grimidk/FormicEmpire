@@ -204,7 +204,7 @@ class ColonyCritterHandlingServiceTest {
     @Test
     void parasiticMitesSlowOneAntPerTenMites() {
         for (int i = 0; i < 5; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         service.setParasiticMiteCount(colony, 25);
         assertEquals(2, service.getParasiticMiteSlowedAntCount(colony));
@@ -255,7 +255,7 @@ class ColonyCritterHandlingServiceTest {
     @Test
     void parasiticMitesCapAtTenPerAnt() {
         for (int i = 0; i < 100; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         colony.setMushrooms(10_000);
         for (int i = 0; i < 80; i++) {
@@ -289,7 +289,7 @@ class ColonyCritterHandlingServiceTest {
     void petBugEntitiesCapAtVisibleSpriteLimitWhileCountsStayFull() {
         colony.setActive(true);
         for (int i = 0; i < 600; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
         service.restorePetCountsFromSave(colony, 5_000, 5_000, 5_000);
         assertEquals(5_000, colony.getAphids());

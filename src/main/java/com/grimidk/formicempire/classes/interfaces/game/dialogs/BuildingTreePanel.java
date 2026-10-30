@@ -233,6 +233,11 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         private final JTextPane descriptionPane;
         private final JLabel tierLabel;
         private final JLabel requirementLabel;
+        private final JPanel costPanel;
+        private final JLabel rockCostLabel;
+        private final JLabel resinCostLabel;
+        private final JLabel plantCostLabel;
+        private final JLabel buildTimeLabel;
         private final JProgressBar costBar;
         private final JButton actionButton;
         private final JButton closeButton;
@@ -274,6 +279,34 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
             tierLabel = metaLabel();
             requirementLabel = metaLabel();
+            costPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+            costPanel.setOpaque(false);
+            costPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            rockCostLabel = new JLabel("", GameConstants.RESOURCE_ROCK.getIcon(), SwingConstants.LEFT);
+            rockCostLabel.setFont(AssetStyles.FONT_BOLD);
+            rockCostLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+            rockCostLabel.setIconTextGap(4);
+            rockCostLabel.setToolTipText(GameConstants.RESOURCE_ROCK.getName());
+            resinCostLabel = new JLabel("", GameConstants.RESOURCE_RESIN.getIcon(), SwingConstants.LEFT);
+            resinCostLabel.setFont(AssetStyles.FONT_BOLD);
+            resinCostLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+            resinCostLabel.setIconTextGap(4);
+            resinCostLabel.setToolTipText(GameConstants.RESOURCE_RESIN.getName());
+            plantCostLabel = new JLabel("", GameConstants.RESOURCE_PLANT.getIcon(), SwingConstants.LEFT);
+            plantCostLabel.setFont(AssetStyles.FONT_BOLD);
+            plantCostLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+            plantCostLabel.setIconTextGap(4);
+            plantCostLabel.setToolTipText(GameConstants.RESOURCE_PLANT.getName());
+            buildTimeLabel = new JLabel("", GameConstants.ROLE_BUILDER.getIcon(), SwingConstants.LEFT);
+            buildTimeLabel.setFont(AssetStyles.FONT_BOLD);
+            buildTimeLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+            buildTimeLabel.setIconTextGap(4);
+            buildTimeLabel.setToolTipText(LanguageStrings.get(LanguageStrings.HELP_BUILD_BASE_COST));
+            costPanel.add(rockCostLabel);
+            costPanel.add(resinCostLabel);
+            costPanel.add(plantCostLabel);
+            costPanel.add(buildTimeLabel);
+
             costBar = new JProgressBar(0, 100);
             AssetStyles.styleProgressBar(costBar);
             costBar.setStringPainted(true);
@@ -283,6 +316,8 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             meta.add(tierLabel);
             meta.add(Box.createRigidArea(new Dimension(0, 4)));
             meta.add(requirementLabel);
+            meta.add(Box.createRigidArea(new Dimension(0, 4)));
+            meta.add(costPanel);
             meta.add(Box.createRigidArea(new Dimension(0, 4)));
             meta.add(costBar);
             center.add(meta);
@@ -424,7 +459,8 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                         if (builders <= 0 && cranes <= 0) {
                             tip = LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR);
                         } else if (colony.getMinerals() < building.getMineralCost()
-                                || colony.getResins() < building.getResinCost()) {
+                                || colony.getResins() < building.getResinCost()
+                                || colony.getPlants() < building.getPlantCost()) {
                             tip = LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR);
                         }
                     }
@@ -437,13 +473,18 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         }
 
         private void updateCostBar(Building building) {
+            if (selectedState == BuildingTreeGraph.NodeState.OWNED) {
+                setVisibleIfChanged(costPanel, false);
+                setVisibleIfChanged(costBar, false);
+                return;
+            }
             boolean inProgress = colony != null
                     && (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
                     || colony.getCurrentBuildingProject() == building);
             if (inProgress) {
                 double efficiency = colony.getConstructionEfficiency();
                 double requiredHours = efficiency > 0
-                        ? building.getBuildTime() / efficiency
+                        ? colony.getStatsService().getEffectiveBuildTime(colony, building) / efficiency
                         : Double.POSITIVE_INFINITY;
                 double progressHours = colony.getBuildingProgressHours();
                 int max = requiredHours > 0 && Double.isFinite(requiredHours)
@@ -459,31 +500,41 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 if (!barText.equals(costBar.getString())) {
                     costBar.setString(barText);
                 }
+                setVisibleIfChanged(costPanel, false);
                 setVisibleIfChanged(costBar, true);
                 return;
             }
 
-            String costText = GameConstants.RESOURCE_ROCK.getName() + ": "
-                    + AssetStyles.formatNumber(building.getMineralCost()) + "  "
-                    + GameConstants.RESOURCE_RESIN.getName() + ": "
-                    + AssetStyles.formatNumber(building.getResinCost()) + "  "
-                    + LanguageStrings.get(LanguageStrings.HELP_BUILD_BASE_COST) + ": "
-                    + AssetStyles.formatNumber(building.getBuildTime());
+            rockCostLabel.setText(AssetStyles.formatNumber(building.getMineralCost()));
+            resinCostLabel.setText(AssetStyles.formatNumber(building.getResinCost()));
+            if (building.getPlantCost() > 0) {
+                plantCostLabel.setText(AssetStyles.formatNumber(building.getPlantCost()));
+                plantCostLabel.setVisible(true);
+            } else {
+                plantCostLabel.setVisible(false);
+            }
+            buildTimeLabel.setText(AssetStyles.formatNumber(building.getBuildTime()));
+            setVisibleIfChanged(costPanel, true);
+
             int mineralNeed = Math.max(0, building.getMineralCost());
             int resinNeed = Math.max(0, building.getResinCost());
-            int totalNeed = mineralNeed + resinNeed;
+            int plantNeed = Math.max(0, building.getPlantCost());
+            int totalNeed = mineralNeed + resinNeed + plantNeed;
             if (totalNeed <= 0) {
                 costBar.setMaximum(1);
                 costBar.setValue(selectedState == BuildingTreeGraph.NodeState.OWNED ? 1 : 0);
+                costBar.setString("");
             } else {
                 long minerals = colony != null ? Math.max(0L, colony.getMinerals()) : 0L;
                 long resins = colony != null ? Math.max(0L, colony.getResins()) : 0L;
-                long have = Math.min(minerals, mineralNeed) + Math.min(resins, resinNeed);
+                long plants = colony != null ? Math.max(0L, colony.getPlants()) : 0L;
+                long have = Math.min(minerals, mineralNeed) + Math.min(resins, resinNeed) + Math.min(plants, plantNeed);
                 costBar.setMaximum(totalNeed);
                 costBar.setValue((int) Math.min(totalNeed, have));
-            }
-            if (!costText.equals(costBar.getString())) {
-                costBar.setString(costText);
+                String barText = AssetStyles.formatNumber(have) + " / " + AssetStyles.formatNumber(totalNeed);
+                if (!barText.equals(costBar.getString())) {
+                    costBar.setString(barText);
+                }
             }
             setVisibleIfChanged(costBar, true);
         }
@@ -515,6 +566,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             if (colony.getCurrentBuildingProject() == building) {
                 colony.setMinerals(colony.getMinerals() + building.getMineralCost());
                 colony.setResins(colony.getResins() + building.getResinCost());
+                colony.setPlants(colony.getPlants() + building.getPlantCost());
                 colony.setCurrentBuildingProject(null);
                 colony.setBuildingProgressHours(0.0);
                 closeDetail();

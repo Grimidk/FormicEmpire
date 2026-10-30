@@ -1,7 +1,8 @@
 package com.grimidk.formicempire.classes.interfaces.ui.styles;
 
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
-import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatTabbedPaneUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.IconButtonUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.PanelBorderButtonUI;
 
@@ -15,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 
 public final class UiButtonStyles {
     private static final Insets NO_MARGIN = new Insets(0, 0, 0, 0);
+    private static final String MENU_CLICK_SFX_KEY = "formicempire.menuClickSfx";
 
     private UiButtonStyles() {
     }
@@ -35,6 +37,7 @@ public final class UiButtonStyles {
         button.setBorderPainted(false);
         button.setMargin(NO_MARGIN);
         button.setBorder(AssetStyles.buttonPaddingBorder());
+        installMenuClickSound(button);
     }
 
     public static void styleCompact(AbstractButton button) {
@@ -99,6 +102,7 @@ public final class UiButtonStyles {
         button.setBorder(new EmptyBorder(insets.top, insets.left, insets.bottom, Math.max(0, insets.right - 1)));
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, AssetStyles.TAB_STRIP_HEIGHT));
         button.setMinimumSize(new Dimension(AssetStyles.TAB_STRIP_WIDTH, AssetStyles.TAB_STRIP_HEIGHT));
+        installMenuClickSound(button);
     }
 
     public static void applyTabSelection(AbstractButton button, boolean selected) {
@@ -127,5 +131,13 @@ public final class UiButtonStyles {
         Dimension size = new Dimension(width, AssetStyles.TAB_STRIP_HEIGHT);
         button.setPreferredSize(size);
         button.setMinimumSize(new Dimension(Math.min(width, AssetStyles.TAB_STRIP_WIDTH), AssetStyles.TAB_STRIP_HEIGHT));
+    }
+
+    private static void installMenuClickSound(AbstractButton button) {
+        if (button == null || Boolean.TRUE.equals(button.getClientProperty(MENU_CLICK_SFX_KEY))) {
+            return;
+        }
+        button.putClientProperty(MENU_CLICK_SFX_KEY, Boolean.TRUE);
+        button.addActionListener(e -> SfxService.play(SoundEffects.MENU_CLICK));
     }
 }

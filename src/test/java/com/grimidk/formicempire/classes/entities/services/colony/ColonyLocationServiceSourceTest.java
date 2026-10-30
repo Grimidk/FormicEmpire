@@ -11,7 +11,7 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
@@ -50,7 +50,7 @@ class ColonyLocationServiceSourceTest {
         source.decreaseQuantity(ResourceType.SOURCE_QTY_SMALL);
         locationService.removeSource(colony, source);
 
-        Ant forager = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant forager = new Ant(colony, GameConstants.CLASS_WORKER);
         forager.setRole(GameConstants.ROLE_FORAGER);
         assertNull(locationService.findNearestRelevantSource(colony, forager));
     }

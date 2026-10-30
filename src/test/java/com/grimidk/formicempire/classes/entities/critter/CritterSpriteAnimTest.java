@@ -12,9 +12,20 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 class CritterSpriteAnimTest {
 
     @Test
+    void enemyCrittersUseFourLegFrames() {
+        assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_COCKROACH.getLegFrameCount());
+        assertEquals(2, GameConstants.TYPE_COCKROACH.getAntennaFrameCount());
+        assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_BOMBARDIER.getLegFrameCount());
+        assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_ANT_LION.getLegFrameCount());
+        assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_SPIDER.getLegFrameCount());
+        assertEquals(GameNumbers.CRITTER_ENEMY_LEG_FRAME_COUNT, GameConstants.TYPE_TARANTULA.getLegFrameCount());
+        assertEquals(0, GameConstants.TYPE_SPIDER.getAntennaFrameCount());
+    }
+
+    @Test
     void legWalkAdvancesOneFramePerMovementUpdate() {
         Critter critter = new Critter(GameConstants.TYPE_APHID);
-        critter.setSpeed(10f);
+        critter.setSpeed(GameNumbers.CRITTER_LEG_FRAME_DISTANCE_PX);
         critter.setPosition(new Point(0, 0));
         critter.moveTo(new Point(1000, 0));
 
@@ -31,7 +42,7 @@ class CritterSpriteAnimTest {
     @Test
     void idleCritterResetsToLegFrameOne() {
         Critter critter = new Critter(GameConstants.TYPE_DERMESTID);
-        critter.setSpeed(10f);
+        critter.setSpeed(GameNumbers.CRITTER_LEG_FRAME_DISTANCE_PX);
         critter.setPosition(new Point(0, 0));
         critter.moveTo(new Point(1000, 0));
         critter.updatePosition(1f);

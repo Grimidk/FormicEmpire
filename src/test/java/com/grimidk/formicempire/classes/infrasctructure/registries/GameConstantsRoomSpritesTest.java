@@ -12,9 +12,13 @@ class GameConstantsRoomSpritesTest {
         Assertions.assertNotNull(GameConstants.ROOM_ROYAL_L2);
         Assertions.assertNotNull(GameConstants.ROOM_WATER_L0);
         Assertions.assertNotNull(GameConstants.ROOM_PASSIVE_LAB);
+        Assertions.assertNotNull(GameConstants.ROOM_ROYAL_L4);
+        Assertions.assertNotNull(GameConstants.ROOM_ROYAL_L5);
         assertPositiveSize(GameConstants.ROOM_ROYAL_L2);
         assertPositiveSize(GameConstants.ROOM_WATER_L0);
         assertPositiveSize(GameConstants.ROOM_PASSIVE_LAB);
+        assertPositiveSize(GameConstants.ROOM_ROYAL_L4);
+        assertPositiveSize(GameConstants.ROOM_ROYAL_L5);
     }
 
     private static void assertPositiveSize(ImageIcon icon) {

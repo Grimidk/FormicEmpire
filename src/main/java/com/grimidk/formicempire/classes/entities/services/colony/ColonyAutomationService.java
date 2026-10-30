@@ -8,8 +8,10 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiPriorities;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -41,7 +43,7 @@ public class ColonyAutomationService {
             GameConstants.ROLE_WARRIOR, GameConstants.ROLE_DEFENDER, GameConstants.ROLE_BOMBER
     };
     private static final AntRole[] PEACE_EXTRA_MAJOR_ROLES = {
-            GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE
+            GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE, GameConstants.ROLE_CARRIER
     };
     private static final AntRole[] PEACE_EXTRA_PRINCESS_ROLES = {
             GameConstants.ROLE_CAPTAIN, GameConstants.ROLE_AIR_SUPPORT, GameConstants.ROLE_AIR_BOMBER
@@ -53,7 +55,8 @@ public class ColonyAutomationService {
             GameConstants.ROLE_WARRIOR, GameConstants.ROLE_DEFENDER, GameConstants.ROLE_BOMBER
     };
     private static final AntRole[] WAR_MILITARY_MAJOR_ROLES = {
-            GameConstants.ROLE_BRUTE, GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE
+            GameConstants.ROLE_BRUTE, GameConstants.ROLE_ARTILLERY, GameConstants.ROLE_SIEGE,
+            GameConstants.ROLE_CARRIER
     };
     private static final AntRole[] WAR_MILITARY_PRINCESS_ROLES = {
             GameConstants.ROLE_CAPTAIN, GameConstants.ROLE_AIR_SUPPORT, GameConstants.ROLE_AIR_BOMBER
@@ -115,12 +118,20 @@ public class ColonyAutomationService {
         if (colony.getCurrentBuildingProject() != null) return;
 
         List<Building> candidates = new ArrayList<>();
+        Engine eng = colony.getDynasty() != null && colony.getDynasty().getOwningWorld() != null
+                ? colony.getDynasty().getOwningWorld().getEngine()
+                : null;
+        boolean instant = eng != null && eng.isInstantBuildings();
+        if (!instant && !colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) return;
         for (Building b : GameUnlocks.getBuildings()) {
             boolean notOwned = !colony.hasBuilding(b);
             boolean reqMet = (b.getRequirement() == null || colony.hasBuilding(b.getRequirement()));
-            boolean tierMet = b.isAvailableFor(colony.getDynasty());
+            boolean tierMet = instant || b.isAvailableFor(colony.getDynasty());
             boolean unlockMet = GameUnlocks.meetsBuildingUnlockRequirement(colony, b);
-            boolean canAfford = colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost();
+            boolean canAfford = instant
+                    || (colony.getMinerals() >= b.getMineralCost()
+                    && colony.getResins() >= b.getResinCost()
+                    && colony.getPlants() >= b.getPlantCost());
 
             if (notOwned && reqMet && tierMet && unlockMet && canAfford) {
                 candidates.add(b);
@@ -128,7 +139,15 @@ public class ColonyAutomationService {
         }
 
         if (!candidates.isEmpty()) {
-            candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost()));
+            Dynasty dynasty = colony.getDynasty();
+            boolean npcPriority = dynasty != null && !dynasty.isPlayer();
+            if (npcPriority) {
+                candidates.sort(Comparator
+                        .comparingInt(DynastyAiPriorities::buildingPriorityScore)
+                        .thenComparingInt(b -> b.getMineralCost() + b.getResinCost() + b.getPlantCost()));
+            } else {
+                candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost() + b.getPlantCost()));
+            }
             Building target = candidates.get(0);
 
             colony.startBuildingProject(target);
@@ -155,7 +174,7 @@ public class ColonyAutomationService {
         Hex targetHex = findTunnelTarget(dynasty, currentHex);
         if (targetHex == null) return;
 
-        Tunnel tunnel = new Tunnel(currentHex, targetHex, GameNumbers.TUNNEL_WORK_REQUIRED);
+        Tunnel tunnel = new Tunnel(currentHex, targetHex, ColonyStatsService.getTunnelWorkRequired(dynasty));
         dynasty.addTunnel(tunnel);
         colony.setCurrentTunnelProject(tunnel);
         colony.logEvent(ColonyLogPrefixes.AUTOMATION + " "
@@ -257,18 +276,6 @@ public class ColonyAutomationService {
             int scoutTarget = Math.max(1, (int) (totalWorkers * 0.02));
             int toAdd = Math.min(scoutTarget, remaining);
             targets.put(GameConstants.ROLE_SCOUT, toAdd);
-            remaining -= toAdd;
-        }
-
-        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
-            int minerTarget = (int) (totalWorkers * 0.15);
-            int toAdd = Math.min(remaining, minerTarget);
-
-            if (colony.getMinerals() >= colony.getMineralsCapacity()) {
-                toAdd = Math.min(remaining, Math.max(1, (int) (minerTarget * 0.10)));
-            }
-
-            targets.put(GameConstants.ROLE_MINER, toAdd);
             remaining -= toAdd;
         }
 
@@ -435,6 +442,18 @@ public class ColonyAutomationService {
                 targets.put(GameConstants.ROLE_ESCORT, assignedEscorts);
                 remainingSoldiers -= assignedEscorts;
             }
+        }
+
+        if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
+            int minerTarget = Math.max(1, (int) (totalSoldiers * 0.15));
+            int toAdd = Math.min(remainingSoldiers, minerTarget);
+
+            if (colony.getMinerals() >= colony.getMineralsCapacity()) {
+                toAdd = Math.min(remainingSoldiers, Math.max(1, (int) (minerTarget * 0.10)));
+            }
+
+            targets.put(GameConstants.ROLE_MINER, toAdd);
+            remainingSoldiers -= toAdd;
         }
 
         if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
@@ -695,11 +714,16 @@ public class ColonyAutomationService {
             diplomatReserve = Math.min(2, Math.max(0, remainingPrincesses - skyTrans));
         }
         int remaining = Math.max(0, remainingPrincesses - skyTrans - diplomatReserve);
-        int assistantCount = (int) (remaining * 0.80);
+        int assistantCount = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT)) {
+            int minBreeders = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? Math.min(remaining, 2) : 0;
+            assistantCount = Math.min(remaining - minBreeders, (int) (remaining * 0.80));
+        }
+        int breederCount = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? (remaining - assistantCount) : 0;
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
         targets.put(GameConstants.ROLE_DIPLOMAT, diplomatReserve);
-        targets.put(GameConstants.ROLE_BREEDER, remaining - assistantCount);
+        targets.put(GameConstants.ROLE_BREEDER, breederCount);
     }
 
     private void calculateSatellitePrincessQuotas(Colony colony, Map<AntRole, Integer> targets, int totalPrincesses) {
@@ -747,8 +771,19 @@ public class ColonyAutomationService {
 
         int waterCapacity = colony.getStatsService().getWaterCapacity(colony);
         int totalAnts = colony.getAntTotal();
+        int eggsCount = colony.getEggs().size();
+        int eggsCap = colony.getStatsService().getEggsCapacity(colony);
+        boolean hasOtherResearch = colony.hasBuilding(GameUnlocks.PASSIVE_LAB)
+                || (colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT)
+                        && colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT) >= 4);
+        boolean eggChamberFull = eggsCount >= eggsCap;
+        boolean earlyResearchShare = !hasOtherResearch
+                && totalAnts >= GameNumbers.TRIGGER_NPC_RESEARCHER_MIN_ANTS
+                && eggsCount >= Math.min(eggsCap, 36);
 
-        if (totalAnts >= waterCapacity && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER) && colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT) <= 25) {
+        if ((eggChamberFull || earlyResearchShare || totalAnts >= waterCapacity)
+                && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)
+                && colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT) <= 25) {
             if (remainingQueens == 1) {
                 targets.put(GameConstants.ROLE_RESEARCHER, 1);
             } else {

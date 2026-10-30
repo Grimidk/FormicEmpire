@@ -8,13 +8,15 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
@@ -39,15 +41,7 @@ public final class ColonyJobRules {
         applyHourlyRanching(colony);
     }
 
-    public static void runDailyLite(Colony colony, Temperature currentTemp) {
-        runDailyLite(colony, currentTemp, null, null);
-    }
-
-    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome) {
-        runDailyLite(colony, currentTemp, biome, null);
-    }
-
-    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
+    public static void runDailyLiteEssential(Colony colony, Temperature currentTemp) {
         colony.rankUp();
         applyDailyNursing(colony);
         applyDailyEating(colony);
@@ -55,10 +49,26 @@ public final class ColonyJobRules {
         colony.getPopulationService().runAging(colony);
         applyDailyComposting(colony);
         applyDailyGraveKeeping(colony);
+    }
+
+    public static void runDailyLiteExtended(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
         applyDailyPolicing(colony);
         colony.getBugHandlingService().runDaily(colony, biome);
         colony.runScoutting(biome, currentHex);
         colony.getPopulationService().runContamination(colony);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
+        runDailyLiteEssential(colony, currentTemp);
+        runDailyLiteExtended(colony, currentTemp, biome, currentHex);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp) {
+        runDailyLite(colony, currentTemp, null, null);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome) {
+        runDailyLite(colony, currentTemp, biome, null);
     }
 
     public static void runMonthlyLite(Colony colony, Biome biome, Season season) {
@@ -79,6 +89,14 @@ public final class ColonyJobRules {
         if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0) {
             plantGain = 0;
         }
+        if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
+            if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
+                double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
+                waterGain = probabilisticRound(((stats.getWaterCapacity(colony) * dailyPct) / 24.0) * parasiticMiteWorkEfficiency(colony));
+            } else {
+                waterGain = 0;
+            }
+        }
 
         if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) {
             meatGain = 0;
@@ -91,6 +109,32 @@ public final class ColonyJobRules {
         resources.addResource(colony, GameConstants.RESOURCE_WATER, waterGain);
         resources.addResource(colony, GameConstants.RESOURCE_MEAT, meatGain);
         resources.addResource(colony, GameConstants.RESOURCE_ROCK, rockGain);
+
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_PROTEIN)) {
+            double maxProtein = stats.getProteinCapacity(colony);
+            double webGain = (maxProtein * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
+            resources.addResource(colony, GameConstants.RESOURCE_MEAT, webGain);
+        }
+
+        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) {
+            int fungiGain = probabilisticRound(stats.getFungiProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
+            if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_FUNGI) <= 0) {
+                fungiGain = 0;
+            }
+            if (fungiGain > 0) {
+                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, fungiGain);
+            }
+        }
+
+        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3) && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+            int resinSourceGain = probabilisticRound(stats.getResinProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
+            if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_RESIN) <= 0) {
+                resinSourceGain = 0;
+            }
+            if (resinSourceGain > 0 && resources.hasCapacity(colony, GameConstants.RESOURCE_RESIN)) {
+                resources.addResource(colony, GameConstants.RESOURCE_RESIN, resinSourceGain);
+            }
+        }
 
         if (plantGain > 0
                 && colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)
@@ -112,14 +156,22 @@ public final class ColonyJobRules {
 
                 double plantConvert = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, maxConvert);
                 if (plantConvert > 0) {
-                    actualConverted += plantConvert;
+                    double yield = plantConvert;
+                    if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
+                        yield += plantConvert;
+                    }
+                    actualConverted += (int) Math.round(yield);
                     maxConvert -= (int) plantConvert;
                 }
 
                 if (maxConvert > 0) {
                     double meatConvert = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, maxConvert);
                     if (meatConvert > 0) {
-                        actualConverted += (meatConvert * 2);
+                        double yield = meatConvert * 2;
+                        if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
+                            yield += meatConvert;
+                        }
+                        actualConverted += (int) Math.round(yield);
                     }
                 }
 
@@ -163,7 +215,7 @@ public final class ColonyJobRules {
 
         List<Ant> eggs = colony.getEggs();
         for (int i = 0; i < toLay; i++) {
-            Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
+            Ant newEgg = new Ant(colony, GameConstants.CLASS_EGG);
             newEgg.setDimension(WorldSpaces.UNDERWORLD);
             newEgg.setPosition(new Point(0, 0));
             eggs.add(newEgg);
@@ -172,10 +224,12 @@ public final class ColonyJobRules {
 
     public static void applyDailyNursing(Colony colony) {
         int nurseCount = liteRoleCount(colony, GameConstants.ROLE_NURSE);
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-            nurseCount += 2;
-        } else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
-            nurseCount += 1;
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_NURSE)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                nurseCount += 2;
+            } else {
+                nurseCount += 1;
+            }
         }
 
         float nursingRate = colony.getStatsService().getNursingRate(colony);
@@ -363,6 +417,9 @@ public final class ColonyJobRules {
                                 assimilation.getName(), assimilation.getReward().getFlavorName()));
                 dynasty.setCurrentAssimilation(null);
                 dynasty.setAssimilationProgress(0);
+                if (colony.isPlayer()) {
+                    SfxService.play(SoundEffects.ASSIMILATION);
+                }
             }
         } else {
             int queenGain = researcherCount * speed;
@@ -383,9 +440,13 @@ public final class ColonyJobRules {
 
         colony.setBuildingProgressHours(colony.getBuildingProgressHours() + 1.0);
 
-        double required = colony.getCurrentBuildingProject().getBuildTime() / efficiency;
+        double required = colony.getStatsService().getEffectiveBuildTime(colony, colony.getCurrentBuildingProject())
+                / efficiency;
         if (colony.getBuildingProgressHours() >= required) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
+            if (colony.isPlayer()) {
+                SfxService.play(SoundEffects.BUILDING_END);
+            }
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }
@@ -414,7 +475,7 @@ public final class ColonyJobRules {
 
         List<Ant> victims = ColonyResourceDeathSelection.selectVictims(candidates, deaths, null);
         for (Ant victim : victims) {
-            List<Ant> typeList = colony.getAntsByType(victim.getAntType());
+            List<Ant> typeList = colony.getAntsByClass(victim.getAntClass());
             if (typeList != null) {
                 typeList.remove(victim);
             }

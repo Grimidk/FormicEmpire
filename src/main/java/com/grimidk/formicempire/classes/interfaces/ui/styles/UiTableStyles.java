@@ -123,6 +123,10 @@ public final class UiTableStyles {
     }
 
     public static void relayoutTableInScrollPane(JScrollPane scrollPane, boolean[] growableColumns) {
+        relayoutTableInScrollPane(scrollPane, growableColumns, null);
+    }
+
+    public static void relayoutTableInScrollPane(JScrollPane scrollPane, boolean[] growableColumns, int[] minColumnWidths) {
         if (scrollPane == null) {
             return;
         }
@@ -134,7 +138,7 @@ public final class UiTableStyles {
         if (width <= 0) {
             width = AssetStyles.DEFAULT_DIALOG_SIZE.width - 56;
         }
-        layoutColumnsForViewport(table, width, growableColumns);
+        layoutColumnsForViewport(table, width, growableColumns, minColumnWidths);
     }
 
     public static void styleHeader(JTable table) {
@@ -173,6 +177,10 @@ public final class UiTableStyles {
     }
 
     public static void layoutColumnsForViewport(JTable table, int viewportWidth, boolean[] growableColumns) {
+        layoutColumnsForViewport(table, viewportWidth, growableColumns, null);
+    }
+
+    public static void layoutColumnsForViewport(JTable table, int viewportWidth, boolean[] growableColumns, int[] minColumnWidths) {
         if (table == null || table.getColumnCount() == 0 || viewportWidth <= 0) {
             return;
         }
@@ -180,9 +188,11 @@ public final class UiTableStyles {
         int[] widths = new int[columnCount];
         int total = 0;
         for (int col = 0; col < columnCount; col++) {
-            int min = col == 0 && table.getColumnClass(col) == javax.swing.Icon.class ? 40 : 56;
+            int min = minColumnWidths != null && col < minColumnWidths.length && minColumnWidths[col] > 0
+                    ? minColumnWidths[col]
+                    : (col == 0 && table.getColumnClass(col) == javax.swing.Icon.class ? 40 : 56);
             int max = col == columnCount - 1 ? 720 : 280;
-            widths[col] = measureColumnContentWidth(table, col, DEFAULT_PADDING, min, max);
+            widths[col] = Math.max(min, measureColumnContentWidth(table, col, DEFAULT_PADDING, min, Math.max(max, min)));
             total += widths[col];
         }
 
@@ -218,7 +228,9 @@ public final class UiTableStyles {
         }
 
         for (int col = 0; col < columnCount; col++) {
-            int min = col == 0 && table.getColumnClass(col) == javax.swing.Icon.class ? 40 : 56;
+            int min = minColumnWidths != null && col < minColumnWidths.length && minColumnWidths[col] > 0
+                    ? minColumnWidths[col]
+                    : (col == 0 && table.getColumnClass(col) == javax.swing.Icon.class ? 40 : 56);
             applyColumnWidth(table, col, widths[col], min);
         }
     }

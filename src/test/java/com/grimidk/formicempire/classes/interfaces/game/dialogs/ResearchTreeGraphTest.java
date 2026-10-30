@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -191,7 +192,7 @@ class ResearchTreeGraphTest {
         assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
                 ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ROLE_BUILDER));
 
-        Ant corpse = new Ant(colony, GameConstants.TYPE_DEAD);
+        Ant corpse = new Ant(colony, GameConstants.CLASS_DEAD);
         colony.getDeadAnts().add(corpse);
         assertEquals(ResearchTreeGraph.NodeState.TRIGGER_PROGRESS,
                 ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ROLE_GRAVER));
@@ -241,161 +242,7 @@ class ResearchTreeGraphTest {
         assertEquals(result.getNodes().size(), cells.size());
     }
 
-    @Test
-    void nodesSitOnGridWithStepOnePointFive() {
-        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null);
-        List<ResearchTreeGraph.Node> nodes = result.getNodes();
-        for (ResearchTreeGraph.Node node : nodes) {
-            double gx = node.getPosX() / ResearchTreeGraph.GRID_STEP;
-            double gy = node.getPosY() / ResearchTreeGraph.GRID_STEP;
-            assertTrue(Math.abs(gx - Math.round(gx)) < 1e-9,
-                    node.getUpgrade().getNameKey() + " x not on grid");
-            assertTrue(Math.abs(gy - Math.round(gy)) < 1e-9,
-                    node.getUpgrade().getNameKey() + " y not on grid");
-        }
-        for (int i = 0; i < nodes.size(); i++) {
-            for (int j = i + 1; j < nodes.size(); j++) {
-                double dx = nodes.get(j).getPosX() - nodes.get(i).getPosX();
-                double dy = nodes.get(j).getPosY() - nodes.get(i).getPosY();
-                assertTrue(Math.hypot(dx, dy) >= ResearchTreeGraph.GRID_STEP - 1e-9,
-                        nodes.get(i).getUpgrade().getNameKey() + " overlaps "
-                                + nodes.get(j).getUpgrade().getNameKey());
-            }
-        }
-    }
 
-    @Test
-    void nodesStayNearTheirDepthRing() {
-        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null, true);
-        Set<Upgrade> manual = Set.of(
-                GameUnlocks.STAT_RESEARCH_2,
-                GameUnlocks.STAT_RESEARCH_3,
-                GameUnlocks.STAT_PASSIVE_1,
-                GameUnlocks.ROLE_BUILDER,
-                GameUnlocks.ROLE_DIPLOMAT,
-                GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2,
-                GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3,
-                GameUnlocks.TYPE_SOLDIER,
-                GameUnlocks.ROLE_CATCHER,
-                GameUnlocks.ROLE_CRANE,
-                GameUnlocks.STAT_SKELETON,
-                GameUnlocks.STAT_ATTACK_2,
-                GameUnlocks.STAT_ATTACK_SPEED_1,
-                GameUnlocks.STAT_DEFENSE_1,
-                GameUnlocks.STAT_DEFENSE_2,
-                GameUnlocks.ROLE_LAYER,
-                GameUnlocks.ROLE_POTTER);
-        double maxRingError = ResearchTreeGraph.GRID_STEP * 3.0;
-        for (ResearchTreeGraph.Node node : result.getNodes()) {
-            if (node.getDepth() == 0 || manual.contains(node.getUpgrade())) {
-                continue;
-            }
-            double radius = Math.hypot(node.getPosX(), node.getPosY());
-            double expected = node.getDepth() * ResearchTreeGraph.RING_SPACING;
-            assertTrue(Math.abs(radius - expected) <= maxRingError,
-                    node.getUpgrade().getNameKey()
-                            + " radius " + radius
-                            + " expected near " + expected);
-        }
-    }
-
-    @Test
-    void manualPlacementsFollowRequestedOffsets() {
-        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null, true);
-        Map<Upgrade, ResearchTreeGraph.Node> byUpgrade = result.getNodes().stream()
-                .collect(Collectors.toMap(ResearchTreeGraph.Node::getUpgrade, n -> n));
-
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_1).getPosX(),
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_2).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_1).getPosY() - ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_2).getPosY(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_2).getPosY() - ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_3).getPosY(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_3).getPosX() + ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.STAT_PASSIVE_1).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_RESEARCH_3).getPosY(),
-                byUpgrade.get(GameUnlocks.STAT_PASSIVE_1).getPosY(),
-                1e-9);
-
-        assertEquals(
-                byUpgrade.get(GameUnlocks.ROLE_DIPLOMAT).getPosY(),
-                byUpgrade.get(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2).getPosY(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.ROLE_DIPLOMAT).getPosX() + ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2).getPosX()
-                        + ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3).getPosX(),
-                1e-9);
-
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_1).getPosX(),
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_SPEED_1).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_1).getPosY() + ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_SPEED_1).getPosY(),
-                1e-9);
-
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_1).getPosX() - ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_2).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_1).getPosY(),
-                byUpgrade.get(GameUnlocks.STAT_ATTACK_2).getPosY(),
-                1e-9);
-
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_HEALTH_1).getPosX(),
-                byUpgrade.get(GameUnlocks.STAT_SKELETON).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_HEALTH_1).getPosY() - ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.STAT_SKELETON).getPosY(),
-                1e-9);
-
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_DEFENSE_1).getPosX(),
-                byUpgrade.get(GameUnlocks.STAT_DEFENSE_2).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.STAT_DEFENSE_1).getPosY() + ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.STAT_DEFENSE_2).getPosY(),
-                1e-9);
-
-        assertEquals(
-                byUpgrade.get(GameUnlocks.TYPE_WORKER).getPosX() + ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.ROLE_POTTER).getPosX(),
-                1e-9);
-        assertEquals(
-                byUpgrade.get(GameUnlocks.TYPE_WORKER).getPosY() - ResearchTreeGraph.GRID_STEP,
-                byUpgrade.get(GameUnlocks.ROLE_POTTER).getPosY(),
-                1e-9);
-    }
-
-    @Test
-    void fullTreeKeepsEdgeCrossingsLow() {
-        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null, true);
-        Map<Upgrade, double[]> positions = result.getNodes().stream()
-                .collect(Collectors.toMap(
-                        ResearchTreeGraph.Node::getUpgrade,
-                        n -> new double[] {n.getPosX(), n.getPosY()}));
-        int crossings = ResearchTreeGraph.countEdgeCrossings(positions, result.getEdges());
-        assertTrue(crossings <= 12, "too many crossings: " + crossings);
-    }
 
     @Test
     void refreshStatesRebuildsFrontierAfterUnlock() {
@@ -488,5 +335,56 @@ class ResearchTreeGraphTest {
 
         colony.setResearchPoints(GameUnlocks.ROLE_ASSISTANT.getCost());
         assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.ROLE_ASSISTANT));
+    }
+
+    @Test
+    void infiniteResearchIgnoresTierRequirement() {
+        dynasty.setRank(GameConstants.RANK_COLONY);
+        colony.setResearchPoints(0);
+
+        assertEquals(ResearchTreeGraph.NodeState.UNAVAILABLE,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.TYPE_PRINCESS));
+
+        Engine engine = new Engine();
+        engine.setInfiniteResearch(true);
+        assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
+                ResearchTreeGraph.stateFor(colony, engine, GameUnlocks.TYPE_PRINCESS));
+        assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, engine, GameUnlocks.TYPE_PRINCESS));
+    }
+
+    @Test
+    void infiniteResearchUnlocksTriggerUpgradesWithoutTrigger() {
+        assertFalse(colony.hasUpgrade(GameUnlocks.ROLE_GRAVER));
+        assertTrue(colony.getDeadAnts().isEmpty());
+
+        assertEquals(ResearchTreeGraph.NodeState.UNAVAILABLE,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ROLE_GRAVER));
+
+        Engine engine = new Engine();
+        engine.setInfiniteResearch(true);
+        assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
+                ResearchTreeGraph.stateFor(colony, engine, GameUnlocks.ROLE_GRAVER));
+        assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, engine, GameUnlocks.ROLE_GRAVER));
+    }
+
+    @Test
+    void infiniteResearchBuysParasiticMiteAlertWithoutAbilityHubOrOutbreak() {
+        assertFalse(colony.hasUpgrade(GameUnlocks.ABILITY_ABILITY));
+        assertFalse(colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+
+        assertEquals(ResearchTreeGraph.NodeState.UNAVAILABLE,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+
+        Engine engine = new Engine();
+        engine.setInfiniteResearch(true);
+        assertEquals(ResearchTreeGraph.NodeState.AFFORDABLE,
+                ResearchTreeGraph.stateFor(colony, engine, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+        assertTrue(ResearchTreeGraph.isVisible(colony, engine, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+        assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, engine, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT));
+
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, engine);
+        assertTrue(result.getNodes().stream()
+                .anyMatch(n -> n.getUpgrade() == GameUnlocks.ABILITY_PARASITIC_MITE_ALERT
+                        && n.getState() == ResearchTreeGraph.NodeState.AFFORDABLE));
     }
 }

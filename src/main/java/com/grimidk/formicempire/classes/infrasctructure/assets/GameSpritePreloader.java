@@ -7,15 +7,16 @@ import java.awt.Image;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-
 import javax.swing.ImageIcon;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 
 public final class GameSpritePreloader {
 
@@ -46,8 +47,11 @@ public final class GameSpritePreloader {
         Set<Image> images = new LinkedHashSet<>();
         for (Species bugType : GameConstants.getCritterSpecies()) {
             if (bugType.hasComposedSprite()) {
-                for (int leg = 1; leg <= GameNumbers.ANT_LEG_FRAME_COUNT; leg++) {
-                    collectIcon(images, GameConstants.getCritterSprite(bugType, leg));
+                for (int leg = 1; leg <= bugType.getLegFrameCount(); leg++) {
+                    int maxAntenna = Math.max(1, bugType.getAntennaFrameCount());
+                    for (int antenna = 1; antenna <= maxAntenna; antenna++) {
+                        collectIcon(images, GameConstants.getCritterSprite(bugType, leg, antenna));
+                    }
                 }
             } else {
                 collectIcon(images, bugType.getSprite());
@@ -63,8 +67,15 @@ public final class GameSpritePreloader {
         }
         AntSpecies colonySpecies = colony != null ? colony.getSpecies() : GameConstants.SPECIES_OMNI;
         if (colonySpecies != null) {
-            for (AntType antType : GameConstants.getAntTypes()) {
-                collectIcon(images, GameConstants.getAntSprite(antType, colonySpecies));
+            AntModProfile standardProfile = AntModProfile.standard();
+            for (AntClass antClass : GameConstants.getAntClasses()) {
+                collectIcon(images, GameConstants.getAntSprite(antClass, colonySpecies));
+                if (AntSpriteCompositor.canCompose(antClass)) {
+                    collectIcon(images, GameConstants.getAntSprite(
+                            antClass, colonySpecies, standardProfile, 1, 2, 1, 1, false));
+                    collectIcon(images, GameConstants.getAntSprite(
+                            antClass, colonySpecies, standardProfile, 1, 1, 1, 2, false));
+                }
             }
         }
         if (colony != null && colony.getDynasty() != null) {
@@ -85,6 +96,11 @@ public final class GameSpritePreloader {
             for (ResourceSource source : colony.getLocationService().getDiscoveredSources()) {
                 collectIcon(images, source.getIconForDisplay());
             }
+        }
+
+        for (Biome biome : GameConstants.getBiomes()) {
+            collectIcon(images, biome.getIcon());
+            collectIcon(images, biome.getTile());
         }
 
         for (Image image : images) {

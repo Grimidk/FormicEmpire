@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -16,7 +16,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyResourceS
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 
 public class Trade {
 
@@ -24,7 +24,7 @@ public class Trade {
     private final Hex destination;
     private final Map<ResourceType, Double> load;
     private final Map<ResourceType, Double> returnLoad;
-    private final Map<AntType, Integer> transport;
+    private final Map<AntClass, Integer> transport;
     private final List<Ant> antsOnTrip;
     private boolean isRecurrent;
     private boolean isBilateral;
@@ -39,13 +39,13 @@ public class Trade {
 
     private Map<ResourceType, Double> pendingLoad;
     private Map<ResourceType, Double> pendingReturnLoad;
-    private Map<AntType, Integer> pendingTransport;
+    private Map<AntClass, Integer> pendingTransport;
     private Boolean pendingRecurrent;
     private Boolean pendingIsBilateral;
     private TradeMethod pendingMethod;
     private boolean hasPendingUpdate;
 
-    public Trade(Hex origin, Hex destination, Map<ResourceType, Double> load, Map<ResourceType, Double> returnLoad, Map<AntType, Integer> transport, boolean isRecurrent, boolean isBilateral, TradeMethod method) {
+    public Trade(Hex origin, Hex destination, Map<ResourceType, Double> load, Map<ResourceType, Double> returnLoad, Map<AntClass, Integer> transport, boolean isRecurrent, boolean isBilateral, TradeMethod method) {
         this.origin = origin;
         this.destination = destination;
         this.load = new HashMap<>(load);
@@ -66,11 +66,11 @@ public class Trade {
 
         float methodSpeed = method.getSpeedMult();
         
-        float workerSpeed = GameConstants.TYPE_WORKER.getSpeedMult();
+        float workerSpeed = GameConstants.CLASS_WORKER.getSpeedMult();
         float totalAntSpeed = 0;
         int totalAnts = 0;
         
-        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+        for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
             totalAntSpeed += entry.getKey().getSpeedMult() * entry.getValue();
             totalAnts += entry.getValue();
         }
@@ -84,6 +84,8 @@ public class Trade {
             if (tunnel != null && tunnel.isComplete()) {
                 speedFactor *= 1.5f;
             }
+            speedFactor *= originColony.getStatsService().getLocsenseSpeedMultiplier(originColony);
+            speedFactor *= originColony.getStatsService().getHeatresistSpeedMultiplier(originColony);
         }
 
         this.totalHours = Math.max(1, Math.round(baseHours / speedFactor));
@@ -98,8 +100,8 @@ public class Trade {
         }
 
         if (antsOnTrip.isEmpty()) {
-            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
-                List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
+            for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
+                List<Ant> colonyAnts = originColony.getAntsByClass(entry.getKey());
                 long availableCount = colonyAnts.stream().filter(a -> !a.isOnTrade() && a.isAlive()).count();
                 if (availableCount < entry.getValue()) {
                     originColony.logEvent(ColonyLogPrefixes.TRADE + " "
@@ -110,8 +112,8 @@ public class Trade {
                 }
             }
 
-            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
-                List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
+            for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
+                List<Ant> colonyAnts = originColony.getAntsByClass(entry.getKey());
                 int needed = entry.getValue();
                 int found = 0;
                 for (Ant ant : colonyAnts) {
@@ -271,22 +273,20 @@ public class Trade {
         double baseSec = originColony.getStatsService().getBaseTradeSecurity(originColony);
         double totalSec = 0;
         
-        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+        for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
             int count = entry.getValue();
             if (count <= 0) continue;
 
-            AntType type = entry.getKey();
-            if (type == GameConstants.TYPE_WORKER) totalSec += count * baseSec * 1.0;
-            else if (type == GameConstants.TYPE_MAJOR) totalSec += count * baseSec * 2.5;
-            else if (type == GameConstants.TYPE_SOLDIER) totalSec += count * baseSec * 10.0;
-            else if (type == GameConstants.TYPE_PRINCESS) totalSec += count * baseSec * 1.0;
+            AntClass type = entry.getKey();
+            if (type == GameConstants.CLASS_WORKER) totalSec += count * baseSec * 1.0;
+            else if (type == GameConstants.CLASS_MAJOR) totalSec += count * baseSec * 2.5;
+            else if (type == GameConstants.CLASS_SOLDIER) totalSec += count * baseSec * 10.0;
+            else if (type == GameConstants.CLASS_PRINCESS) totalSec += count * baseSec * 1.0;
         }
 
         double dangerFactor = method.getDangerFactor();
-        double mitigationPercent = 100.0;
-        if (dangerFactor > 0) {
-            mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
-        }
+        double mitigationPercent = originColony.getStatsService()
+                .getConvoySecurityMitigationPercent(originColony, totalSec, dangerFactor);
         
         double securityFactor = mitigationPercent / 100.0;
         
@@ -352,10 +352,10 @@ public class Trade {
         if (transport.isEmpty()) {
             return true;
         }
-        Map<AntType, Integer> liveCounts = new HashMap<>();
+        Map<AntClass, Integer> liveCounts = new HashMap<>();
         for (Ant ant : antsOnTrip) {
             if (ant != null && ant.isAlive()) {
-                liveCounts.merge(ant.getAntType(), 1, Integer::sum);
+                liveCounts.merge(ant.getAntClass(), 1, Integer::sum);
             }
         }
         if (antsOnTrip.isEmpty()) {
@@ -363,8 +363,8 @@ public class Trade {
             if (originColony == null) {
                 return false;
             }
-            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
-                long available = originColony.getAntsByType(entry.getKey()).stream()
+            for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
+                long available = originColony.getAntsByClass(entry.getKey()).stream()
                         .filter(a -> a.isAlive() && !a.isOnTrade())
                         .count();
                 if (available < entry.getValue()) {
@@ -373,7 +373,7 @@ public class Trade {
             }
             return true;
         }
-        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+        for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
             if (liveCounts.getOrDefault(entry.getKey(), 0) < entry.getValue()) {
                 return false;
             }
@@ -408,7 +408,7 @@ public class Trade {
         }
     }
 
-    public void setPendingUpdate(Map<ResourceType, Double> load, Map<ResourceType, Double> returnLoad, Map<AntType, Integer> transport, boolean isRecurrent, boolean isBilateral, TradeMethod method) {
+    public void setPendingUpdate(Map<ResourceType, Double> load, Map<ResourceType, Double> returnLoad, Map<AntClass, Integer> transport, boolean isRecurrent, boolean isBilateral, TradeMethod method) {
         this.pendingLoad = new HashMap<>(load);
         this.pendingReturnLoad = returnLoad != null ? new HashMap<>(returnLoad) : new HashMap<>();
         this.pendingTransport = new HashMap<>(transport);
@@ -466,7 +466,7 @@ public class Trade {
         return returnLoad;
     }
 
-    public Map<AntType, Integer> getTransport() {
+    public Map<AntClass, Integer> getTransport() {
         return transport;
     }
 
@@ -518,7 +518,7 @@ public class Trade {
         return pendingReturnLoad;
     }
 
-    public Map<AntType, Integer> getPendingTransport() {
+    public Map<AntClass, Integer> getPendingTransport() {
         return pendingTransport;
     }
 

@@ -3,6 +3,8 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildingTreeGraphTest {
@@ -248,5 +251,35 @@ class BuildingTreeGraphTest {
         assertEquals(BuildingTreeGraph.NodeState.OWNED, owned.getState());
         assertTrue(after.getNodes().stream()
                 .anyMatch(n -> n.getBuilding() == GameUnlocks.ROYAL_CHAMBER_2));
+    }
+
+    @Test
+    void instantBuildingsIgnoresTierRequirement() {
+        dynasty.setRank(GameConstants.RANK_COLONY);
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
+
+        assertEquals(
+                BuildingTreeGraph.NodeState.UNAVAILABLE,
+                BuildingTreeGraph.stateFor(colony, GameUnlocks.ROYAL_CHAMBER_2));
+        assertFalse(colony.startBuildingProject(GameUnlocks.ROYAL_CHAMBER_2));
+
+        Engine engine = new Engine();
+        engine.setInstantBuildings(true);
+        World world = new World();
+        engine.setWorld(world);
+        world.registerDynasty(dynasty);
+
+        assertEquals(
+                BuildingTreeGraph.NodeState.AFFORDABLE,
+                BuildingTreeGraph.stateFor(colony, GameUnlocks.ROYAL_CHAMBER_2));
+        assertTrue(colony.startBuildingProject(GameUnlocks.ROYAL_CHAMBER_2));
+        assertTrue(colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2));
+    }
+
+    @Test
+    void allBuildingsHaveNonNullIcons() {
+        for (Building building : GameUnlocks.getBuildings()) {
+            assertNotNull(building.getIcon(), building.getNameKey() + " icon should not be null");
+        }
     }
 }

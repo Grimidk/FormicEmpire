@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -60,7 +60,7 @@ class DynastyLogisticsAutomationServiceTest {
         colonyA.setAssignedRoleCount(GameConstants.ROLE_COURIER, 2);
 
         for (int i = 0; i < 5; i++) {
-            colonyA.getWorkers().add(new Ant(colonyA, GameConstants.TYPE_WORKER));
+            colonyA.getWorkers().add(new Ant(colonyA, GameConstants.CLASS_WORKER));
         }
 
         int mushCap = colonyA.getStatsService().getMushroomsCapacity(colonyA);
@@ -86,9 +86,18 @@ class DynastyLogisticsAutomationServiceTest {
     }
 
     @Test
-    void playerDynastyDoesNotAutoTrade() {
+    void playerDynastyDoesNotAutoTradeWithoutUpgrade() {
         dynasty.setPlayer(true);
         logisticsService.runDailyLogistics(dynasty, world, tradeManager);
         assertEquals(0, tradeManager.getActiveTrades().size());
+    }
+
+    @Test
+    void playerDynastyAutoTradesWithUpgradeAndToggle() {
+        dynasty.setPlayer(true);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS);
+        colonyA.setAutoLogisticsEnabled(true);
+        logisticsService.runDailyLogistics(dynasty, world, tradeManager);
+        assertEquals(1, tradeManager.getActiveTrades().size());
     }
 }

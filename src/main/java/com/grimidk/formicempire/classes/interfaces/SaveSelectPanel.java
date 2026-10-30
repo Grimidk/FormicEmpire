@@ -1,12 +1,17 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
+import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapData;
+import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapService;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.SavedMapSelectionDialog;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
@@ -22,7 +27,7 @@ import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
     private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(460, 32);
-    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 220);
+    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 300);
     private static final Dimension SLOT_LABEL_SIZE = new Dimension(AssetStyles.MENU_BUTTON_WIDTH, 28);
     private static final int SLOT_ACTION_GAP = 8;
 
@@ -197,9 +202,23 @@ public class SaveSelectPanel extends JPanel {
                 deleteButtons[i].setEnabled(false);
             } else {
                 int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
-                String displayName = LanguageStrings.formatSaveSlotDisplayName(
-                        s.getName(), s.resolvePlayerDynastyTitleId(), slotId);
+                String displayName;
+                if (s.isSpectatorMode()) {
+                    String raw = s.getName() != null ? s.getName().trim() : "";
+                    if (raw.isEmpty() || "Spectator".equalsIgnoreCase(raw)) {
+                        displayName = LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE);
+                    } else {
+                        displayName = raw + " (" + LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE) + ")";
+                    }
+                } else {
+                    displayName = LanguageStrings.formatSaveSlotDisplayName(
+                            s.getName(), s.resolvePlayerDynastyTitleId(), slotId);
+                }
+                if (!s.allowsAchievements()) {
+                    displayName = LanguageStrings.get(LanguageStrings.SETTINGS_SANDBOX_STAR_PREFIX) + displayName;
+                }
                 slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, displayName, totalDays));
+                slotLabels[i].setToolTipText(s.getVersion() != null && !s.getVersion().isEmpty() ? s.getVersion() : null);
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
                 deleteButtons[i].setEnabled(slotActionsEnabled);
@@ -208,15 +227,89 @@ public class SaveSelectPanel extends JPanel {
         }
     }
 
+    private boolean confirmAchievementTaintIfNeeded(boolean creatingNewSave, Savefile existing) {
+        if (!frame.getEngine().hasAchievementTaintingSandbox()) {
+            return true;
+        }
+        if (existing != null && !existing.allowsAchievements()) {
+            return true;
+        }
+        if (!creatingNewSave && existing == null) {
+            return true;
+        }
+        int result = UiOptionPane.showConfirmDialog(
+                frame,
+                LanguageStrings.get(creatingNewSave
+                        ? LanguageStrings.SAVE_ACHIEVEMENTS_WARN_CREATE
+                        : LanguageStrings.SAVE_ACHIEVEMENTS_WARN_LOAD),
+                LanguageStrings.get(LanguageStrings.SAVE_ACHIEVEMENTS_WARN_TITLE),
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        return result == JOptionPane.OK_OPTION;
+    }
+
+    private void taintSavefileIfSandboxActive(Savefile save) {
+        if (save == null || !frame.getEngine().hasAchievementTaintingSandbox()) {
+            return;
+        }
+        if (!save.allowsAchievements()) {
+            return;
+        }
+        save.disableAchievements();
+        saveManager.saveUserSlotAsync(save, ignored -> SwingUtilities.invokeLater(this::refreshSlots));
+    }
+
     private void onCreateOrLoad(int slotId, int idx) {
         Savefile existing = cachedSaves[idx];
         
         if (existing == null) {
+            if (!confirmAchievementTaintIfNeeded(true, null)) {
+                return;
+            }
             NewSaveRequest request = promptNewSave();
             if (request == null) return;
 
+            SavedMapData chosenMapData = null;
+            if (SavedMapService.hasSavedMaps()) {
+                String[] options = {
+                    LanguageStrings.get(LanguageStrings.SAVED_MAP_GENERATE_NEW),
+                    LanguageStrings.get(LanguageStrings.SAVED_MAP_LOAD_SAVED)
+                };
+                int choice = UiOptionPane.showOptionDialog(
+                        frame,
+                        LanguageStrings.get(LanguageStrings.SAVED_MAP_CHOOSE_MODE_MSG),
+                        LanguageStrings.get(LanguageStrings.SAVED_MAP_CHOOSE_MODE_TITLE),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        options,
+                        options[0]);
+                if (choice == 1) {
+                    SavedMapSelectionDialog dialog = new SavedMapSelectionDialog(frame);
+                    Rectangle maxBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+                    dialog.setBounds(maxBounds);
+                    dialog.setVisible(true);
+                    chosenMapData = dialog.getSelectedMapData();
+                    if (chosenMapData == null) {
+                        return;
+                    }
+                } else if (choice != 0) {
+                    return;
+                }
+            }
+
             Savefile save = new Savefile(slotId, request.baseName());
             save.setPlayerDynastyTitleId(request.titleId());
+            save.setStarterBiomeId(request.starterBiomeId());
+            save.setSpectatorMode(request.spectatorMode());
+            save.setVersion(SaveManager.getAppVersion());
+            save.setWorldWidth(GameNumbers.WORLD_RECT_WIDTH);
+            save.setWorldHeight(GameNumbers.WORLD_RECT_HEIGHT);
+            if (chosenMapData != null) {
+                SavedMapService.populateSavefileFromMapData(save, chosenMapData);
+            }
+            if (frame.getEngine().hasAchievementTaintingSandbox()) {
+                save.disableAchievements();
+            }
             saveManager.saveUserSlotAsync(save, success -> {
                 if (!success) {
                     UiOptionPane.showMessageDialog(frame,
@@ -229,7 +322,6 @@ public class SaveSelectPanel extends JPanel {
 
                 Savefile newSave = cachedSaves[idx];
                 if (newSave != null) {
-                    HelpPanel.showTutorialDialog(frame);
                     frame.openGameWithSave(newSave);
                 } else {
                     UiOptionPane.showMessageDialog(frame, LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE), LanguageStrings.get(LanguageStrings.UI_ERROR), JOptionPane.ERROR_MESSAGE);
@@ -244,6 +336,22 @@ public class SaveSelectPanel extends JPanel {
                         LanguageStrings.get(LanguageStrings.UI_ERROR),
                         JOptionPane.ERROR_MESSAGE);
                 return;
+            }
+            if (!confirmAchievementTaintIfNeeded(false, fresh)) {
+                return;
+            }
+            taintSavefileIfSandboxActive(fresh);
+            if (fresh.getVersion() == null || !fresh.getVersion().equals(SaveManager.getAppVersion())) {
+                int choice = UiOptionPane.showConfirmDialog(
+                        frame,
+                        LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_PROMPT),
+                        LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_TITLE),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (choice == JOptionPane.YES_OPTION) {
+                    fresh.setVersion(SaveManager.getAppVersion());
+                    saveManager.saveUserSlotAsync(fresh, null);
+                }
             }
             cachedSaves[idx] = fresh;
             applySlotLabels();
@@ -301,17 +409,69 @@ public class SaveSelectPanel extends JPanel {
         c.weightx = 1.0;
         form.add(titleCombo, c);
 
+        JLabel biomeLabel = new JLabel(LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX).trim());
+        biomeLabel.setFont(AssetStyles.FONT_NORMAL);
+        biomeLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridx = 0;
+        c.gridy = 2;
+        c.weightx = 0;
+        form.add(biomeLabel, c);
+
+        JComboBox<Biome> biomeCombo = new JComboBox<>(
+                GameConstants.getStartingBiomes().toArray(new Biome[0]));
+        biomeCombo.setSelectedItem(GameConstants.BIOME_PLAINS);
+        biomeCombo.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
+        biomeCombo.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
+        biomeCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel(value != null ? value.getName() : "");
+            if (isSelected) {
+                label.setOpaque(true);
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            }
+            return label;
+        });
+        AssetStyles.styleComboBox(biomeCombo);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        form.add(biomeCombo, c);
+
+        JCheckBox spectatorCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE));
+        AssetStyles.styleCheckBox(spectatorCheck);
+        c.gridx = 1;
+        c.gridy = 3;
+        c.weightx = 1.0;
+        c.insets = new Insets(6, 0, 6, 12);
+        form.add(spectatorCheck, c);
+
         JLabel previewLabel = new JLabel();
         previewLabel.setFont(AssetStyles.FONT_BOLD);
         previewLabel.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         previewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 4;
         c.gridwidth = 2;
         c.insets = new Insets(14, 0, 0, 0);
         form.add(previewLabel, c);
 
-        Runnable refreshPreview = () -> updateDynastyPreview(previewLabel, nameField, titleCombo);
+        Runnable refreshPreview = () -> {
+            if (spectatorCheck.isSelected()) {
+                String base = formatBaseName(nameField.getText());
+                previewLabel.setText(base.isEmpty()
+                        ? LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE)
+                        : base + " (" + LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE) + ")");
+            } else {
+                updateDynastyPreview(previewLabel, nameField, titleCombo);
+            }
+        };
+        spectatorCheck.addActionListener(e -> {
+            boolean spec = spectatorCheck.isSelected();
+            titleCombo.setEnabled(!spec);
+            biomeCombo.setEnabled(!spec);
+            titleLabel.setEnabled(!spec);
+            biomeLabel.setEnabled(!spec);
+            refreshPreview.run();
+        });
         nameField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -349,6 +509,16 @@ public class SaveSelectPanel extends JPanel {
         }
 
         String rawName = nameField.getText();
+        if (spectatorCheck.isSelected()) {
+            String baseName = (rawName == null || rawName.trim().isEmpty())
+                    ? "Spectator"
+                    : formatBaseName(rawName);
+            return new NewSaveRequest(
+                    baseName,
+                    GameConstants.DYNASTY_TITLE_DYNASTY.getId(),
+                    GameConstants.BIOME_PLAINS.getId(),
+                    true);
+        }
         if (rawName == null || rawName.trim().isEmpty()) {
             return null;
         }
@@ -369,7 +539,9 @@ public class SaveSelectPanel extends JPanel {
             return null;
         }
 
-        return new NewSaveRequest(baseName, titleId);
+        Biome selectedBiome = (Biome) biomeCombo.getSelectedItem();
+        int starterBiomeId = selectedBiome != null ? selectedBiome.getId() : GameConstants.BIOME_PLAINS.getId();
+        return new NewSaveRequest(baseName, titleId, starterBiomeId, false);
     }
 
     private static void updateDynastyPreview(JLabel previewLabel, JTextField nameField, JComboBox<DynastyTitle> titleCombo) {
@@ -402,5 +574,5 @@ public class SaveSelectPanel extends JPanel {
         refreshSlots();
     }
 
-    private record NewSaveRequest(String baseName, int titleId) {}
+    private record NewSaveRequest(String baseName, int titleId, int starterBiomeId, boolean spectatorMode) {}
 }

@@ -34,7 +34,7 @@ class ColonyNpcSimulationTest {
         npc.setWater(0);
 
         for (int i = 0; i < 50; i++) {
-            npc.getWorkers().add(new Ant(npc, GameConstants.TYPE_WORKER));
+            npc.getWorkers().add(new Ant(npc, GameConstants.CLASS_WORKER));
         }
 
         int workersBefore = npc.getWorkers().size();

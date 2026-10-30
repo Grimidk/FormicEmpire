@@ -15,4 +15,10 @@ public final class ColonyLogPrefixes {
     public static final String AUTOMATION = "AUTOMATION:";
     public static final String PROMOTION = "PROMOTION:";
     public static final String INFO = "INFO:";
+    public static final String HUNT = "HUNT:";
+    public static final String HUNT_SUCCESS = "HUNT_SUCCESS:";
+    public static final String HUNT_FAILURE = "HUNT_FAILURE:";
+    public static final String INVASION = "INVASION:";
+    public static final String INVASION_SUCCESS = "INVASION_SUCCESS:";
+    public static final String INVASION_FAILURE = "INVASION_FAILURE:";
 }

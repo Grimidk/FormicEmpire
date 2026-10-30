@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -41,10 +41,10 @@ class ColonyMilitaryServiceTest {
         colony.setDynasty(dynasty);
 
         for (int i = 0; i < 20; i++) {
-            colony.getWorkers().add(new com.grimidk.formicempire.classes.entities.critter.Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new com.grimidk.formicempire.classes.entities.critter.Ant(colony, GameConstants.CLASS_WORKER));
         }
         for (int i = 0; i < 4; i++) {
-            colony.getSoldiers().add(new com.grimidk.formicempire.classes.entities.critter.Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new com.grimidk.formicempire.classes.entities.critter.Ant(colony, GameConstants.CLASS_SOLDIER));
         }
 
         int expected = Math.round(ColonyMilitaryService.computeTypePoints(20, 4, 0, 0, 0) * 1f);
@@ -78,13 +78,13 @@ class ColonyMilitaryServiceTest {
         colony.setDynasty(dynasty);
 
         com.grimidk.formicempire.classes.entities.critter.Ant standard = new com.grimidk.formicempire.classes.entities.critter.Ant(
-                colony, GameConstants.TYPE_SOLDIER);
+                colony, GameConstants.CLASS_SOLDIER);
         colony.getSoldiers().add(standard);
 
         com.grimidk.formicempire.classes.entities.critter.Ant doorhead = new com.grimidk.formicempire.classes.entities.critter.Ant(
-                colony, GameConstants.TYPE_SOLDIER);
-        doorhead.setSubtypeProfile(AntSubtypeProfile.of(3, 1, 1, 1));
-        AntSubtypeService.applySubtypeStats(doorhead, colony);
+                colony, GameConstants.CLASS_SOLDIER);
+        doorhead.setModProfile(AntModProfile.of(3, 1, 1, 1));
+        AntModService.applyModStats(doorhead, colony);
 
         int standardPower = ColonyMilitaryService.computeMilitaryPowerFromPopulation(colony);
         colony.getSoldiers().clear();
@@ -98,7 +98,7 @@ class ColonyMilitaryServiceTest {
     void savedColonySubtypeCountsAffectMilitaryPower() {
         Savefile.SavedColony saved = new Savefile.SavedColony();
         saved.soldiers = 0;
-        saved.soldierSubtypes = Map.of("3111", 4);
+        saved.soldierMods = Map.of("3111", 4);
 
         Dynasty dynasty = new Dynasty(4, "Rival", false, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.STAT_SKELETON);

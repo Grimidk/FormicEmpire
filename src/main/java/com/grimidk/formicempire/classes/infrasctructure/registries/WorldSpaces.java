@@ -65,7 +65,7 @@ public final class WorldSpaces {
         new Point(REL_X_LEFT + 256, ROOM_SIZE + 128),
         new Point(REL_X_LEFT + 256, ROOM_SIZE + 88),
         List.of(GameConstants.ROLE_NURSE), 
-        List.of(GameConstants.TYPE_EGG, GameConstants.TYPE_LARVA, GameConstants.TYPE_PUPA),
+        List.of(GameConstants.CLASS_EGG, GameConstants.CLASS_LARVA, GameConstants.CLASS_PUPA),
         List.of(GameConstants.TYPE_PARASITE_ANT)
     );
 
@@ -97,7 +97,7 @@ public final class WorldSpaces {
         new Point(REL_X_RIGHT, ROOM_SIZE + 128),
         new Point(REL_X_RIGHT, ROOM_SIZE + 88),
         List.of(GameConstants.ROLE_ASSISTANT),
-        List.of(GameConstants.TYPE_QUEEN),
+        List.of(GameConstants.CLASS_QUEEN),
         List.of()
     );
 
@@ -113,7 +113,7 @@ public final class WorldSpaces {
         new Point(REL_X_LEFT + 256, 512 + 128),
         new Point(REL_X_LEFT + 256, 512 + 88),
         List.of(GameConstants.ROLE_BREEDER), 
-        List.of(GameConstants.TYPE_DRONE),
+        List.of(GameConstants.CLASS_DRONE),
         List.of()
     );
 
@@ -161,7 +161,7 @@ public final class WorldSpaces {
         new Point(2000, 2000), 
         new Point(2000, 1960),
         List.of(GameConstants.ROLE_GRAVER), 
-        List.of(GameConstants.TYPE_DEAD),
+        List.of(GameConstants.CLASS_DEAD),
         List.of(GameConstants.TYPE_DERMESTID)
     );
 

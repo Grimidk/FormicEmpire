@@ -3,8 +3,8 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -44,17 +44,32 @@ public final class DynastyIntegrationService {
     }
 
     public static boolean canStartIntegration(Dynasty overlord, Dynasty target, World world, TradeManager tradeManager) {
+        return canStartIntegration(overlord, target, world, tradeManager, false);
+    }
+
+    public static boolean canStartIntegration(
+            Dynasty overlord,
+            Dynasty target,
+            World world,
+            TradeManager tradeManager,
+            boolean sandboxInstant) {
         if (overlord == null || target == null || world == null || overlord == target) {
-            return false;
-        }
-        if (!DynastyDiplomacyService.isDiplomaticallyContactable(overlord)
-                || !DynastyDiplomacyService.isDiplomaticallyContactable(target)) {
             return false;
         }
         if (overlord.isDefeated() || target.isDefeated()) {
             return false;
         }
         if (overlord.hasActiveIntegration() || findIntegrationOverlord(world, target.getId()) != null) {
+            return false;
+        }
+        if (target.getColonies().isEmpty()) {
+            return false;
+        }
+        if (sandboxInstant) {
+            return true;
+        }
+        if (!DynastyDiplomacyService.isDiplomaticallyContactable(overlord)
+                || !DynastyDiplomacyService.isDiplomaticallyContactable(target)) {
             return false;
         }
         DynastyDiplomacyService diplo = overlord.getDiplomacyService();
@@ -76,7 +91,7 @@ public final class DynastyIntegrationService {
         if (countIntegrationDiplomatCapacity(overlord) < GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
             return false;
         }
-        return !target.getColonies().isEmpty();
+        return true;
     }
 
     public static boolean maintainsIntegration(Dynasty overlord, Dynasty target, World world) {
@@ -109,8 +124,21 @@ public final class DynastyIntegrationService {
     }
 
     public static boolean startIntegration(World world, Dynasty overlord, Dynasty target, TradeManager tradeManager) {
-        if (!canStartIntegration(overlord, target, world, tradeManager)) {
+        return startIntegration(world, overlord, target, tradeManager, false);
+    }
+
+    public static boolean startIntegration(
+            World world,
+            Dynasty overlord,
+            Dynasty target,
+            TradeManager tradeManager,
+            boolean sandboxInstant) {
+        if (!canStartIntegration(overlord, target, world, tradeManager, sandboxInstant)) {
             return false;
+        }
+        if (sandboxInstant) {
+            completeIntegration(world, overlord, target, tradeManager);
+            return true;
         }
         overlord.setIntegrationTargetDynastyId(target.getId());
         overlord.setIntegrationProgressDays(0);

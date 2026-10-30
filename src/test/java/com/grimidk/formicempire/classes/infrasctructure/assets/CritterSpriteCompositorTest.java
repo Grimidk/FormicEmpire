@@ -44,7 +44,34 @@ class CritterSpriteCompositorTest {
     void parasiticAntUsesParasiticAntAssets() {
         ImageIcon icon = CritterSpriteCompositor.getSprite(GameConstants.TYPE_PARASITE_ANT, 1);
         assertNotNull(icon);
-        assertEquals("parasiticAnt", GameConstants.TYPE_PARASITE_ANT.getSpriteFolder());
+        assertEquals("otherAnts", GameConstants.TYPE_PARASITE_ANT.getSpriteFolder());
         assertEquals("ParasiticAnt.png", GameConstants.TYPE_PARASITE_ANT.getBodySpriteFile());
+    }
+
+    @Test
+    void missingCritterSpritesFallbackToUnknownSprite() {
+        ImageIcon bombardier = CritterSpriteCompositor.getSprite(GameConstants.TYPE_BOMBARDIER, 1);
+        assertNotNull(bombardier);
+        assertEquals(GameConstants.SPRITE_UNKNOWN, bombardier);
+        assertEquals(64, bombardier.getIconWidth());
+        assertEquals(64, bombardier.getIconHeight());
+
+        ImageIcon antLion = GameConstants.getCritterSprite(GameConstants.TYPE_ANT_LION);
+        assertNotNull(antLion);
+        assertEquals(GameConstants.SPRITE_UNKNOWN, antLion);
+
+        ImageIcon nullSpecies = GameConstants.getCritterSprite(null);
+        assertNotNull(nullSpecies);
+        assertEquals(GameConstants.SPRITE_UNKNOWN, nullSpecies);
+    }
+
+    @Test
+    void unknownSpriteAndIconDimensions() {
+        assertNotNull(GameConstants.SPRITE_UNKNOWN);
+        assertNotNull(GameConstants.ICON_UNKNOWN);
+        assertEquals(64, GameConstants.SPRITE_UNKNOWN.getIconWidth());
+        assertEquals(64, GameConstants.SPRITE_UNKNOWN.getIconHeight());
+        assertEquals(16, GameConstants.ICON_UNKNOWN.getIconWidth());
+        assertEquals(16, GameConstants.ICON_UNKNOWN.getIconHeight());
     }
 }

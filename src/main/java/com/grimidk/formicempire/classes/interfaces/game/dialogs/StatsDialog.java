@@ -1,16 +1,17 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyCritterHandlingService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLocationService;
@@ -19,15 +20,14 @@ import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEven
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogTexts;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -35,9 +35,10 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
-import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class StatsDialog extends ZeroDialog {
 
@@ -115,6 +116,7 @@ public class StatsDialog extends ZeroDialog {
                 layoutAllTables();
             }
         });
+        tabbedPane.addChangeListener(e -> layoutAllTables());
         SwingUtilities.invokeLater(this::layoutAllTables);
 
         registerCloseKey(KeyEvent.VK_X);
@@ -232,6 +234,7 @@ public class StatsDialog extends ZeroDialog {
                 boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(alignment);
+            setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
             if (value instanceof Number number) {
                 setText(AssetStyles.formatNumber(number));
             } else {
@@ -271,11 +274,35 @@ public class StatsDialog extends ZeroDialog {
                 setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
                 setIconTextGap(6);
                 setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
+            } else if (LanguageStrings.get(LanguageStrings.STAT_ACTIVE_MILITARY_POWER).equals(property) && value instanceof Integer power) {
+                setText(AssetStyles.formatNumber(power));
+                setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+                setIconTextGap(6);
+                setToolTipText(LanguageStrings.get(LanguageStrings.STAT_ACTIVE_MILITARY_POWER_DESC));
+            } else if (LanguageStrings.get(LanguageStrings.STAT_RESERVE_MILITARY_POWER).equals(property) && value instanceof Integer power) {
+                setText(AssetStyles.formatNumber(power));
+                setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+                setIconTextGap(6);
+                setToolTipText(LanguageStrings.get(LanguageStrings.STAT_RESERVE_MILITARY_POWER_DESC));
             } else if (LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY).equals(property) && value instanceof Integer capacity) {
                 setText(AssetStyles.formatNumber(capacity));
                 setIcon(GameConstants.ICON_STAT_COMBAT_CAPACITY);
                 setIconTextGap(6);
                 setToolTipText(LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY_DESC));
+            } else if (LanguageStrings.get(LanguageStrings.STAT_ASSIGNED_CARRIERS).equals(property) && value instanceof Integer count) {
+                setText(AssetStyles.formatNumber(count));
+                setIcon(GameConstants.ROLE_CARRIER.getIcon());
+                setIconTextGap(6);
+                setToolTipText(LanguageStrings.get(LanguageStrings.STAT_ASSIGNED_CARRIERS_DESC));
+            } else if (LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_RATE).equals(property)) {
+                setIcon(null);
+                setText(value != null ? value.toString() : "");
+                setToolTipText(LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_RATE_DESC));
+            } else if (LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_ALLOWANCE).equals(property) && value instanceof Integer allowance) {
+                setText(AssetStyles.formatNumber(allowance));
+                setIcon(GameConstants.ICON_STAT_COMBAT_CAPACITY);
+                setIconTextGap(6);
+                setToolTipText(LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_ALLOWANCE_DESC));
             } else if (value instanceof Number number) {
                 setIcon(null);
                 setText(AssetStyles.formatNumber(number));
@@ -336,7 +363,8 @@ public class StatsDialog extends ZeroDialog {
         AssetStyles.layoutTableColumnsForViewport(resourcesTable, viewportWidth(resourcesScrollPane),
                 new boolean[]{false, true, true, true, true, true, true, true});
         AssetStyles.layoutTableColumnsForViewport(populationTable, viewportWidth(populationScrollPane),
-                new boolean[]{false, true, true, false, false});
+                new boolean[]{false, true, true, true, true, true},
+                new int[]{40, 130, 200, 110, 150, 160});
         AssetStyles.layoutTableColumnsForViewport(localHexTable, viewportWidth(localHexScrollPane),
                 new boolean[]{false, true, true});
         AssetStyles.layoutTableColumnsForViewport(ratesTable, viewportWidth(ratesScrollPane),
@@ -443,6 +471,7 @@ public class StatsDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.COL_TYPE),
                 LanguageStrings.get(LanguageStrings.COL_ROLE),
                 LanguageStrings.get(LanguageStrings.COL_COUNT),
+                LanguageStrings.get(LanguageStrings.COL_AVG_AGE),
                 LanguageStrings.get(LanguageStrings.COL_CAPACITY)
         };
         populationTable = new JTable(createIconModel(columns));
@@ -451,7 +480,8 @@ public class StatsDialog extends ZeroDialog {
         applyTextColumnRenderer(populationTable, 1, SwingConstants.LEFT);
         applyTextColumnRenderer(populationTable, 2, SwingConstants.LEFT);
         applyNumericColumnRenderer(populationTable, 3);
-        applyFormattedValueColumnRenderer(populationTable, 4, SwingConstants.LEFT);
+        applyFormattedValueColumnRenderer(populationTable, 4, SwingConstants.RIGHT);
+        applyFormattedValueColumnRenderer(populationTable, 5, SwingConstants.RIGHT);
 
         populationScrollPane = createTablePane(populationTable);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), populationScrollPane);
@@ -545,7 +575,7 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ABUNDANCES), LanguageStrings.get(LanguageStrings.RESOURCE_ROCK), String.format("%.2f", biome.getMineralAbundance())});
         }
 
-        model.addRow(new Object[]{null, null, sep, sep});
+        model.addRow(new Object[]{sep, sep, sep});
         int maxDepl = colony.hasUpgrade(GameUnlocks.STAT_HEX_SUSTAIN)
                 ? GameNumbers.HEX_SUSTAIN_MAX_DEPLETION_PCT
                 : 100;
@@ -555,7 +585,7 @@ public class StatsDialog extends ZeroDialog {
         List<Ant> sampleWorker = new ArrayList<>();
         if (colony.getWorkers() != null) {
             for (Ant w : colony.getWorkers()) {
-                if (w.getAntType() == GameConstants.TYPE_WORKER) {
+                if (w.getAntClass() == GameConstants.CLASS_WORKER) {
                     sampleWorker.add(w);
                     break;
                 }
@@ -569,7 +599,7 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_MAX_EFFICIENCY_DISTANCE), AssetStyles.formatNumber(maxEffDistance)});
 
         // Neighbors
-        model.addRow(new Object[]{null, null, sep, sep});
+        model.addRow(new Object[]{sep, sep, sep});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH), getHexSummary(hex.getNorth())});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_WEST), getHexSummary(hex.getNorthWest())});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_EAST), getHexSummary(hex.getNorthEast())});
@@ -587,6 +617,58 @@ public class StatsDialog extends ZeroDialog {
         return summary;
     }
 
+    private static void addStatRow(DefaultTableModel model, ImageIcon icon, String category, String property, Object value) {
+        if (model == null) {
+            return;
+        }
+        if (model.getColumnCount() >= 4) {
+            model.addRow(new Object[]{icon, category, property, value});
+        } else {
+            model.addRow(new Object[]{category, property, value});
+        }
+    }
+
+    private void appendDynastyMilitaryRows(DefaultTableModel model, String category, Dynasty dynasty) {
+        World world = engine != null ? engine.getWorld() : null;
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
+                LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
+                dynasty.getMilitaryPower());
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
+                LanguageStrings.get(LanguageStrings.STAT_ACTIVE_MILITARY_POWER),
+                dynastyStatsService.getActiveMilitaryPower(dynasty));
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
+                LanguageStrings.get(LanguageStrings.STAT_RESERVE_MILITARY_POWER),
+                dynastyStatsService.getReserveMilitaryPower(dynasty));
+        addStatRow(model, GameConstants.ICON_STAT_COMBAT_CAPACITY, category,
+                LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY),
+                dynastyStatsService.getCombatCapacity(dynasty));
+        addStatRow(model, GameConstants.ROLE_CARRIER.getIcon(), category,
+                LanguageStrings.get(LanguageStrings.STAT_ASSIGNED_CARRIERS),
+                dynastyStatsService.getTotalAssignedCarriers(dynasty));
+        float reinforcementRate = dynastyStatsService.getDailyReinforcementRate(dynasty, world);
+        addStatRow(model, null, category,
+                LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_RATE),
+                String.format("%.0f%%", reinforcementRate * 100f));
+        addStatRow(model, GameConstants.ICON_STAT_COMBAT_CAPACITY, category,
+                LanguageStrings.get(LanguageStrings.STAT_DAILY_REINFORCEMENT_ALLOWANCE),
+                dynastyStatsService.getDailyReinforcementAllowancePerLine(dynasty, world));
+    }
+
+    private void appendColonyMilitaryRows(DefaultTableModel model, String category, Colony targetColony) {
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
+                LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
+                targetColony.getMilitaryPower());
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
+                LanguageStrings.get(LanguageStrings.STAT_ACTIVE_MILITARY_POWER),
+                targetColony.getActiveMilitaryPower());
+        addStatRow(model, GameConstants.ICON_STAT_MILITARY_POWER, category,
+                LanguageStrings.get(LanguageStrings.STAT_RESERVE_MILITARY_POWER),
+                targetColony.getReserveMilitaryPower());
+        addStatRow(model, GameConstants.ROLE_CARRIER.getIcon(), category,
+                LanguageStrings.get(LanguageStrings.STAT_ASSIGNED_CARRIERS),
+                dynastyStatsService.getAssignedCarriers(targetColony));
+    }
+
     private void updateGeneralData() {
         DefaultTableModel model = (DefaultTableModel) generalTable.getModel();
         model.setRowCount(0);
@@ -600,8 +682,9 @@ public class StatsDialog extends ZeroDialog {
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynasty.getColonies().size()});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), dynastyStatsService.getTotalQueens(dynasty)});
-                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), dynasty.getMilitaryPower()});
-                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY), dynasty.getCombatCapacity()});
+                double avgDynastyAntAge = dynastyStatsService.getAverageAntAge(dynasty);
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_AVG_AGE), String.format(Locale.ROOT, "%.1f", avgDynastyAntAge) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
+                appendDynastyMilitaryRows(model, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), dynasty);
             }
         } else {
             // Colony Info
@@ -611,6 +694,8 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_SPECIES_SCIENTIFIC), colony.getSpecies() != null ? colony.getSpecies().getScientific() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_LABEL_ID), String.valueOf(colony.getId())});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AGE), AssetStyles.formatNumber(colony.getAge()) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
+            double avgColonyAntAge = colony.getAverageAntAge();
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AVG_AGE), String.format(Locale.ROOT, "%.1f", avgColonyAntAge) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
 
             int effectiveLoyalty = colony.getEffectiveLoyalty(engine.getTradeManager(), engine.getWorld());
             model.addRow(new Object[]{
@@ -618,11 +703,7 @@ public class StatsDialog extends ZeroDialog {
                     LanguageStrings.get(LanguageStrings.STAT_LOYALTY),
                     effectiveLoyalty
             });
-            model.addRow(new Object[]{
-                    LanguageStrings.get(LanguageStrings.PANEL_COLONY),
-                    LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
-                    colony.getMilitaryPower()
-            });
+            appendColonyMilitaryRows(model, LanguageStrings.get(LanguageStrings.PANEL_COLONY), colony);
             
             if (colony.getQueens().isEmpty()) {
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_QUEEN_STATUS), LanguageStrings.get(LanguageStrings.UI_MISSING) + " (" + AssetStyles.formatNumber(colony.getDaysWithoutQueen()) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) + ")"});
@@ -637,11 +718,17 @@ public class StatsDialog extends ZeroDialog {
         // World Info
         World world = engine != null ? engine.getWorld() : null;
         if (world != null) {
+            Hex activeHex = world.getActiveHex();
+            int hour = (activeHex != null) ? world.getLocalHour(activeHex) : world.getHour();
+            int day = (activeHex != null) ? world.getLocalDay(activeHex) : world.getDay();
+            int month = (activeHex != null) ? world.getLocalMonth(activeHex) : world.getMonth();
+            int year = (activeHex != null) ? world.getLocalYear(activeHex) : world.getYear();
             String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
-                world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
+                hour, world.getMinute(), day, month, year);
+            TimeOfDay tod = (activeHex != null) ? world.getTimeOfDay(activeHex) : world.getTimeOfDay();
             
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_DATE_TIME), dateTime});
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_TIME_DAY), world.getTimeOfDay().getName()});
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_TIME_DAY), tod != null ? tod.getName() : ""});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_MOON_PHASE), world.getMoonPhase().getName()});
             
             Season season = world.getSeason();
@@ -680,9 +767,10 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{GameConstants.ICON_STAT_POPULATION, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), dynastyStatsService.getTotalQueens(dynasty)});
+        double avgDynastyAntAge = dynastyStatsService.getAverageAntAge(dynasty);
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_AVG_AGE), String.format(Locale.ROOT, "%.1f", avgDynastyAntAge) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_BIRTH_RATE), LanguageStrings.format(LanguageStrings.STAT_RATE_EGGS_DAY, dynastyStatsService.getGlobalBirthRateDaily(dynasty))});
-        model.addRow(new Object[]{GameConstants.ICON_STAT_MILITARY_POWER, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), dynasty.getMilitaryPower()});
-        model.addRow(new Object[]{GameConstants.ICON_STAT_COMBAT_CAPACITY, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY), dynasty.getCombatCapacity()});
+        appendDynastyMilitaryRows(model, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), dynasty);
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_NUPTIAL_FLIGHTS), dynasty.getTotalNuptialFlights()});
         model.addRow(new Object[]{GameConstants.ICON_STAT_GENETIC_INTEGRITY, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
 
@@ -884,7 +972,7 @@ public class StatsDialog extends ZeroDialog {
         int netFood = prodMushrooms - consMushrooms;
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TOTAL_FOOD), "---", "---", "---", prodMushrooms, consMushrooms, AssetStyles.formatSignedNumber(netFood)});
         if (subtypeFoodOverhead > 0) {
-            model.addRow(new Object[]{GameConstants.ICON_STAT_FOOD_CONSUMPTION, LanguageStrings.get(LanguageStrings.STAT_SUBTYPE_FOOD_OVERHEAD),
+            model.addRow(new Object[]{GameConstants.ICON_STAT_FOOD_CONSUMPTION, LanguageStrings.get(LanguageStrings.STAT_MOD_FOOD_OVERHEAD),
                     "---", "---", "---", "---", subtypeFoodOverhead, AssetStyles.formatSignedNumber(subtypeFoodOverhead)});
         }
     }
@@ -916,22 +1004,39 @@ public class StatsDialog extends ZeroDialog {
             coloniesToCount.add(colony);
         }
 
-        Map<AntType, Integer> typeTotals = new HashMap<>();
+        Map<AntClass, Integer> typeTotals = new HashMap<>();
+        Map<AntClass, Long> typeAgeSums = new HashMap<>();
         Map<AntRole, Integer> roleTotals = new HashMap<>();
         int totalJuvenile = 0;
+        long totalJuvenileAgeSum = 0;
         int totalAdult = 0;
+        long totalAdultAgeSum = 0;
         int grandTotal = 0;
+        long grandTotalAgeSum = 0;
 
         for (Colony c : coloniesToCount) {
             grandTotal += c.getAntTotal();
-            for (AntType type : GameConstants.getAntTypes()) {
-                int count = c.getAntsByType(type).size();
+            for (AntClass type : GameConstants.getAntClasses()) {
+                List<Ant> ants = c.getAntsByClass(type);
+                int count = ants != null ? ants.size() : 0;
                 if (count > 0) {
                     typeTotals.merge(type, count, Integer::sum);
-                    if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA) {
+                    long ageSum = 0;
+                    for (Ant a : ants) {
+                        if (a != null && a.isAlive()) {
+                            ageSum += a.getAge();
+                        }
+                    }
+                    typeAgeSums.merge(type, ageSum, Long::sum);
+                    if (type == GameConstants.CLASS_EGG || type == GameConstants.CLASS_LARVA || type == GameConstants.CLASS_PUPA) {
                         totalJuvenile += count;
-                    } else if (type != GameConstants.TYPE_DEAD) {
+                        totalJuvenileAgeSum += ageSum;
+                    } else if (type != GameConstants.CLASS_DEAD) {
                         totalAdult += count;
+                        totalAdultAgeSum += ageSum;
+                    }
+                    if (type != GameConstants.CLASS_DEAD) {
+                        grandTotalAgeSum += ageSum;
                     }
                 }
             }
@@ -943,18 +1048,20 @@ public class StatsDialog extends ZeroDialog {
             }
         }
 
-        for (AntType type : GameConstants.getAntTypes()) {
+        for (AntClass type : GameConstants.getAntClasses()) {
             Integer count = typeTotals.get(type);
             if (count == null || count == 0) continue;
 
-            model.addRow(new Object[]{type.getIcon(), type.getName(), LanguageStrings.get(LanguageStrings.UI_TOTAL), count, "—"});
+            long ageSum = typeAgeSums.getOrDefault(type, 0L);
+            String avgAgeStr = count > 0 ? String.format(Locale.ROOT, "%.1f", (double) ageSum / count) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) : "—";
+            model.addRow(new Object[]{type.getIcon(), type.getName(), LanguageStrings.get(LanguageStrings.UI_TOTAL), count, avgAgeStr, "—"});
 
-            if (type != GameConstants.TYPE_EGG && type != GameConstants.TYPE_LARVA && type != GameConstants.TYPE_PUPA && type != GameConstants.TYPE_DEAD) {
+            if (type != GameConstants.CLASS_EGG && type != GameConstants.CLASS_LARVA && type != GameConstants.CLASS_PUPA && type != GameConstants.CLASS_DEAD) {
                 for (AntRole role : GameConstants.getAntRoles()) {
-                    if (role.getAntType() == type) {
+                    if (role.getAntClass() == type) {
                         Integer rCount = roleTotals.get(role);
                         if (rCount != null && rCount > 0) {
-                            model.addRow(new Object[]{null, "", role.getName(), rCount, "—"});
+                            model.addRow(new Object[]{null, "", role.getName(), rCount, "—", "—"});
                         }
                     }
                 }
@@ -962,10 +1069,14 @@ public class StatsDialog extends ZeroDialog {
         }
         
         String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
-        model.addRow(new Object[]{null, sep, sep, sep, sep});
-        model.addRow(new Object[]{GameConstants.TYPE_WORKER.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult, "—"});
-        model.addRow(new Object[]{GameConstants.TYPE_EGG.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile, "—"});
-        model.addRow(new Object[]{GameConstants.ICON_STAT_POPULATION, LanguageStrings.get(LanguageStrings.UI_SUMMARY), dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), grandTotal, "—"});
+        model.addRow(new Object[]{null, sep, sep, sep, sep, sep});
+        String adultAvgAgeStr = totalAdult > 0 ? String.format(Locale.ROOT, "%.1f", (double) totalAdultAgeSum / totalAdult) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) : "—";
+        model.addRow(new Object[]{GameConstants.CLASS_WORKER.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult, adultAvgAgeStr, "—"});
+        String juvAvgAgeStr = totalJuvenile > 0 ? String.format(Locale.ROOT, "%.1f", (double) totalJuvenileAgeSum / totalJuvenile) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) : "—";
+        model.addRow(new Object[]{GameConstants.CLASS_EGG.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile, juvAvgAgeStr, "—"});
+        int livingTotal = totalAdult + totalJuvenile;
+        String grandAvgAgeStr = livingTotal > 0 ? String.format(Locale.ROOT, "%.1f", (double) grandTotalAgeSum / livingTotal) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) : "—";
+        model.addRow(new Object[]{GameConstants.ICON_STAT_POPULATION, LanguageStrings.get(LanguageStrings.UI_SUMMARY), dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), grandTotal, grandAvgAgeStr, "—"});
 
         int militaryTotal = 0;
         for (Colony c : coloniesToCount) {
@@ -976,6 +1087,7 @@ public class StatsDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.UI_SUMMARY),
                 LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
                 militaryTotal,
+                "—",
                 "—"
         });
 
@@ -998,6 +1110,8 @@ public class StatsDialog extends ZeroDialog {
         boolean showPool = false;
         boolean showParasitic = false;
         boolean showParasiteAnts = false;
+        boolean showHunts = false, showInvasions = false;
+        int knownTargets = 0, activeExpeditions = 0, activeInvasions = 0, huntCapacity = 0;
 
         World world = engine != null ? engine.getWorld() : null;
         Season season = world != null ? world.getSeason() : null;
@@ -1051,19 +1165,31 @@ public class StatsDialog extends ZeroDialog {
                 showParasiteAnts = true;
                 parasiteAnts += c.getParasiteAnts();
             }
+            if (c.hasUpgrade(GameUnlocks.ABILITY_HUNTS) || !c.getKnownHuntTargets().isEmpty()
+                    || !c.getActiveHuntExpeditions().isEmpty()) {
+                showHunts = true;
+                knownTargets += c.getKnownHuntTargets().size();
+                activeExpeditions += c.getActiveHuntExpeditions().size();
+                huntCapacity += c.getSourceCapacity();
+            }
+            if (!c.getInvasionAlerts().isEmpty() || !c.getActiveInvasionDefenses().isEmpty()) {
+                showInvasions = true;
+                activeInvasions += c.getInvasionAlerts().size();
+            }
         }
 
         if (!showAphids && !showSymbioticMites && !showDermestids && !showPool
-                && !showParasitic && !showParasiteAnts) {
+                && !showParasitic && !showParasiteAnts && !showHunts && !showInvasions) {
             return;
         }
 
         String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
-        model.addRow(new Object[]{null, sep, sep, sep, sep});
+        model.addRow(new Object[]{null, sep, sep, sep, sep, sep});
         model.addRow(new Object[]{
                 null,
                 LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS),
                 LanguageStrings.get(LanguageStrings.UI_SUMMARY),
+                "—",
                 "—",
                 "—"
         });
@@ -1074,6 +1200,7 @@ public class StatsDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.BUG_APHID),
                 LanguageStrings.format(LanguageStrings.STAT_RATE_RANCHERS_FMT, ranchers),
                 aphids,
+                "—",
                 aphidCap
             });
         }
@@ -1083,6 +1210,7 @@ public class StatsDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.BUG_SYMBIOTIC_MITE),
                 LanguageStrings.format(LanguageStrings.STAT_INSECT_CATCHERS_FMT, catchers),
                 symbioticMites,
+                "—",
                 symbioticMiteCap
             });
         }
@@ -1092,6 +1220,7 @@ public class StatsDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.BUG_DERMESTID),
                 LanguageStrings.format(LanguageStrings.STAT_RATE_GRAVERS_FMT, gravers),
                 dermestids,
+                "—",
                 dermestidCap
             });
         }
@@ -1101,13 +1230,14 @@ public class StatsDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.STAT_INSECT_POOL),
                 LanguageStrings.format(LanguageStrings.STAT_INSECT_CATCHERS_FMT, catchers),
                 poolUsed,
+                "—",
                 poolMax
             });
         }
 
         if (showParasitic || showParasiteAnts) {
             if (showAphids || showSymbioticMites || showDermestids || showPool) {
-                model.addRow(new Object[]{null, sep, sep, sep, sep});
+                model.addRow(new Object[]{null, sep, sep, sep, sep, sep});
             }
             if (showParasitic) {
                 String rateCol = LanguageStrings.format(
@@ -1127,6 +1257,7 @@ public class StatsDialog extends ZeroDialog {
                     LanguageStrings.get(LanguageStrings.BUG_PARASITIC_MITE),
                     rateCol,
                     parasiticMites,
+                    "—",
                     projectedParasiticMiteSpawn > 0
                             ? LanguageStrings.format(LanguageStrings.STAT_OUTBREAK_PREV_PROJECTED_FMT, projectedParasiticMiteSpawn)
                             : LanguageStrings.format(LanguageStrings.STAT_INSECT_PARASITIC_CAP_FMT,
@@ -1139,7 +1270,37 @@ public class StatsDialog extends ZeroDialog {
                     LanguageStrings.get(LanguageStrings.BUG_PARASITE_ANT),
                     LanguageStrings.get(LanguageStrings.ROLE_POLICE),
                     parasiteAnts,
+                    "—",
                     LanguageStrings.get(LanguageStrings.WORLD_NA)
+                });
+            }
+        }
+
+        if (showHunts || showInvasions) {
+            if (showAphids || showSymbioticMites || showDermestids || showPool || showParasitic || showParasiteAnts) {
+                model.addRow(new Object[]{null, sep, sep, sep, sep, sep});
+            }
+            if (showHunts) {
+                String expStatus = activeExpeditions > 0
+                        ? LanguageStrings.format(LanguageStrings.HUNT_ACTIVE_EXPEDITIONS_FMT, activeExpeditions)
+                        : "—";
+                model.addRow(new Object[]{
+                    GameUnlocks.ABILITY_HUNTS.getIcon(),
+                    LanguageStrings.get(LanguageStrings.DIALOG_HUNTS_TITLE),
+                    expStatus,
+                    knownTargets,
+                    "—",
+                    huntCapacity
+                });
+            }
+            if (showInvasions) {
+                model.addRow(new Object[]{
+                    GameConstants.ROLE_DEFENDER.getIcon(),
+                    LanguageStrings.get(LanguageStrings.INVASION_LABEL_THREAT),
+                    LanguageStrings.get(LanguageStrings.INVASION_SCOPE_COLONY),
+                    activeInvasions,
+                    "—",
+                    "—"
                 });
             }
         }

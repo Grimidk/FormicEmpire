@@ -29,7 +29,7 @@ class ColonyPathfindingServiceTest {
 
     @Test
     void nullDestinationReturnsEmptyRoute() {
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         Queue<NeoPoint> route = pathfinding.calculateRoute(colony, null, null, ant);
         assertNotNull(route);
         assertTrue(route.isEmpty());
@@ -37,7 +37,7 @@ class ColonyPathfindingServiceTest {
 
     @Test
     void underworldRoomRouteEndsAtDestinationCenter() {
-        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant ant = new Ant(colony, GameConstants.CLASS_WORKER);
         ant.setDimension(WorldSpaces.UNDERWORLD);
         Room from = new Room(101, "From", WorldSpaces.UNDERWORLD, 0, 0, false,
                 new java.awt.Point(0, 100), new java.awt.Point(0, 80), new java.awt.Point(0, 120),

@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
@@ -10,14 +10,16 @@ import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegrationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -167,14 +169,17 @@ public class DynastyManagementDialog extends ZeroDialog {
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
         boolean currentAutoTunnels = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
         boolean currentAutoDiplomacy = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY);
+        boolean currentAutoLogistics = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS);
         
         boolean panelAuto = (overviewPanel != null) && overviewPanel.isShowAutomation();
         boolean panelAutoBuild = (overviewPanel != null) && overviewPanel.isShowAutoBuild();
         boolean panelAutoTunnels = (overviewPanel != null) && overviewPanel.isShowAutoTunnels();
         boolean panelAutoDiplomacy = (overviewPanel != null) && overviewPanel.isShowAutoDiplomacy();
+        boolean panelAutoLogistics = (overviewPanel != null) && overviewPanel.isShowAutoLogistics();
 
         if (tabbedPane.getTabCount() != expectedTabs || currentAuto != panelAuto || currentAutoBuild != panelAutoBuild
-                || currentAutoTunnels != panelAutoTunnels || currentAutoDiplomacy != panelAutoDiplomacy) {
+                || currentAutoTunnels != panelAutoTunnels || currentAutoDiplomacy != panelAutoDiplomacy
+                || currentAutoLogistics != panelAutoLogistics) {
             refreshDialog();
         } else {
             Component selected = tabbedPane.getSelectedComponent();
@@ -204,12 +209,14 @@ public class DynastyManagementDialog extends ZeroDialog {
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
         boolean currentAutoTunnels = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
         boolean currentAutoDiplomacy = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY);
+        boolean currentAutoLogistics = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS);
         
         if (overviewPanel == null || overviewPanel.isShowAutomation() != currentAuto
                 || overviewPanel.isShowAutoBuild() != currentAutoBuild
                 || overviewPanel.isShowAutoTunnels() != currentAutoTunnels
-                || overviewPanel.isShowAutoDiplomacy() != currentAutoDiplomacy) {
-            overviewPanel = new OverviewPanel(currentAutoBuild, currentAuto, currentAutoTunnels, currentAutoDiplomacy);
+                || overviewPanel.isShowAutoDiplomacy() != currentAutoDiplomacy
+                || overviewPanel.isShowAutoLogistics() != currentAutoLogistics) {
+            overviewPanel = new OverviewPanel(currentAutoBuild, currentAuto, currentAutoTunnels, currentAutoDiplomacy, currentAutoLogistics);
         }
         overviewPanel.updateData();
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_OVERVIEW), GameUnlocks.ABILITY_DYNASTY.getIcon(), overviewPanel);
@@ -309,6 +316,10 @@ public class DynastyManagementDialog extends ZeroDialog {
         void updateData();
     }
 
+    public Dynasty getDynasty() {
+        return dynasty;
+    }
+
     private Colony getActivePlayerColony() {
         World world = engine.getWorld();
         if (world == null) {
@@ -317,6 +328,15 @@ public class DynastyManagementDialog extends ZeroDialog {
         Hex mapActive = world.getActiveHex();
         if (mapActive != null && mapActive.getColony() != null && mapActive.getColony().isPlayer()) {
             return mapActive.getColony();
+        }
+        if (dynasty != null) {
+            Colony capital = dynasty.getCapital();
+            if (capital != null) {
+                return capital;
+            }
+            if (dynasty.getColonies() != null && !dynasty.getColonies().isEmpty()) {
+                return dynasty.getColonies().get(0);
+            }
         }
         return null;
     }
@@ -338,10 +358,13 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private JPopupMenu buildTradeRowActionsMenu(TradePanel panel, TradePanel.TradeRowData data) {
         JPopupMenu menu = new JPopupMenu();
-        if (data == null || data.neighbor == null || panel.activeColony == null) {
+        if (data == null || data.neighbor == null) {
             return menu;
         }
-        Colony colony = panel.activeColony;
+        Colony colony = data.resolveOrigin(panel);
+        if (colony == null) {
+            return menu;
+        }
         Trade outgoing = data.outgoingTrade;
         Trade incoming = data.incomingTrade;
         boolean labelRoutes = outgoing != null && incoming != null
@@ -359,9 +382,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             menu.add(convoy);
         }
 
+        JMenuItem visit = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
+        visit.addActionListener(e -> performView(data.neighbor));
+        AssetStyles.styleMenuItem(visit);
+        menu.add(visit);
+
         if (outgoing == null) {
             JMenuItem establish = new JMenuItem(LanguageStrings.get(LanguageStrings.UI_ESTABLISH));
-            establish.addActionListener(e -> panel.establishTrade(data.neighbor));
+            establish.addActionListener(e -> panel.establishTrade(colony, data.neighbor));
             AssetStyles.styleMenuItem(establish);
             menu.add(establish);
         }
@@ -450,6 +478,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         private JScrollPane tableScrollPane;
         private Colony activeColony;
         private JLabel activeColonyLabel;
+        private JCheckBox showAllConnectionsCheck;
+        private boolean showAllConnections = false;
         private boolean tunnelsVisible = true;
 
         public TradePanel() {
@@ -535,6 +565,17 @@ public class DynastyManagementDialog extends ZeroDialog {
             activeColonyLabel.setForeground(AssetStyles.FONT_COLOR);
             activeColonyLabel.setFont(AssetStyles.FONT_BOLD);
             topPanel.add(activeColonyLabel);
+
+            showAllConnectionsCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.TRADE_SHOW_ALL_CONNECTIONS), showAllConnections);
+            showAllConnectionsCheck.setToolTipText(LanguageStrings.get(LanguageStrings.TRADE_SHOW_ALL_CONNECTIONS_TIP));
+            AssetStyles.styleCheckBox(showAllConnectionsCheck);
+            showAllConnectionsCheck.setFocusable(false);
+            showAllConnectionsCheck.setOpaque(false);
+            showAllConnectionsCheck.addActionListener(e -> {
+                showAllConnections = showAllConnectionsCheck.isSelected();
+                updateData();
+            });
+            topPanel.add(showAllConnectionsCheck);
             
             add(topPanel, BorderLayout.NORTH);
             revalidate();
@@ -560,18 +601,54 @@ public class DynastyManagementDialog extends ZeroDialog {
                 ? mapActive.getColony() 
                 : null;
 
-            if (activeColony == null) {
+            if (activeColony == null && !showAllConnections) {
                 activeColonyLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_NA));
                 model.setRowCount(0);
                 return;
             }
             
-            activeColonyLabel.setText(activeColony.getName());
+            activeColonyLabel.setText(showAllConnections
+                    ? LanguageStrings.get(LanguageStrings.TRADE_ALL_DYNASTY_CONNECTIONS)
+                    : (activeColony != null ? activeColony.getName() : LanguageStrings.get(LanguageStrings.WORLD_NA)));
 
-            Hex currentHex = world.getHexOfColony(activeColony);
+            Hex currentHex = activeColony != null ? world.getHexOfColony(activeColony) : null;
             int selectedRow = table.getSelectedRow();
             model.setRowCount(0);
 
+            if (showAllConnections) {
+                java.util.Set<String> seenPairs = new java.util.HashSet<>();
+                for (Colony origin : dynasty.getColonies()) {
+                    Hex originHex = world.getHexOfColony(origin);
+                    if (originHex == null) continue;
+                    for (Colony neighbor : dynasty.getTradeService().getNeighborColonies(world, origin)) {
+                        if (neighbor.getDynasty() != dynasty) continue;
+                        int pairA = Math.min(origin.getId(), neighbor.getId());
+                        int pairB = Math.max(origin.getId(), neighbor.getId());
+                        if (!seenPairs.add(pairA + ":" + pairB)) continue;
+                        Hex neighborHex = dynasty.getTradeService().getNeighborHex(world, origin, neighbor);
+                        addTradeRow(origin, neighbor, originHex, neighborHex, origin.getName());
+                    }
+                }
+            } else if (activeColony != null) {
+                populateAdjacentTradeRows(currentHex, activeColony);
+            }
+            
+            if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
+                table.setRowSelectionInterval(selectedRow, selectedRow);
+            }
+            if (tunnelsVisible) {
+                AssetStyles.relayoutTableInScrollPane(tableScrollPane,
+                        new boolean[]{false, true, false, false, false, false});
+            } else {
+                AssetStyles.relayoutTableInScrollPane(tableScrollPane,
+                        new boolean[]{false, true, false, false, false});
+            }
+        }
+
+        private void populateAdjacentTradeRows(Hex currentHex, Colony originColony) {
+            if (currentHex == null || originColony == null) {
+                return;
+            }
             Hex[] adjacent = {
                 currentHex.getNorth(), currentHex.getNorthEast(), currentHex.getSouthEast(),
                 currentHex.getSouth(), currentHex.getSouthWest(), currentHex.getNorthWest()
@@ -588,47 +665,40 @@ public class DynastyManagementDialog extends ZeroDialog {
             for (int i = 0; i < adjacent.length; i++) {
                 Hex neighborHex = adjacent[i];
                 if (neighborHex == null) continue;
-                
+
                 Colony neighborColony = neighborHex.getColony();
                 if (neighborColony == null) continue;
-                if (neighborColony.getDynasty() != activeColony.getDynasty()) continue;
+                if (neighborColony.getDynasty() != originColony.getDynasty()) continue;
 
-                String neighborName = neighborColony.getName();
-                Tunnel tunnel = dynasty.getTunnelBetween(currentHex, neighborHex);
-                
-                Trade outgoing = dynasty.getTradeService().findTrade(activeColony, neighborColony);
-                Trade incoming = dynasty.getTradeService().findTrade(neighborColony, activeColony);
-
-                String bilateralOut = null;
-                String bilateralIn = null;
-                if (outgoing == null && incoming != null && (incoming.hasPendingUpdate() ? incoming.isPendingBilateral() : incoming.isBilateral())) {
-                    bilateralOut = LanguageStrings.get(LanguageStrings.UI_BILATERAL);
-                }
-                if (incoming == null && outgoing != null && (outgoing.hasPendingUpdate() ? outgoing.isPendingBilateral() : outgoing.isBilateral())) {
-                    bilateralIn = LanguageStrings.get(LanguageStrings.UI_BILATERAL);
-                }
-
-                TradeRouteStatus outStatus = tradeRouteStatus(outgoing, bilateralOut);
-                TradeRouteStatus inStatus = tradeRouteStatus(incoming, bilateralIn);
-
-                TradeRowData rowData = new TradeRowData(neighborColony, neighborHex, outgoing, incoming, tunnel);
-
-                if (tunnelsVisible) {
-                    model.addRow(new Object[]{dirNames[i], neighborName, rowData, outStatus, inStatus, rowData});
-                } else {
-                    model.addRow(new Object[]{dirNames[i], neighborName, outStatus, inStatus, rowData});
-                }
+                addTradeRow(originColony, neighborColony, currentHex, neighborHex, dirNames[i]);
             }
-            
-            if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
-                table.setRowSelectionInterval(selectedRow, selectedRow);
+        }
+
+        private void addTradeRow(Colony originColony, Colony neighborColony, Hex originHex, Hex neighborHex,
+                String directionLabel) {
+            Tunnel tunnel = dynasty.getTunnelBetween(originHex, neighborHex);
+
+            Trade outgoing = dynasty.getTradeService().findTrade(originColony, neighborColony);
+            Trade incoming = dynasty.getTradeService().findTrade(neighborColony, originColony);
+
+            String bilateralOut = null;
+            String bilateralIn = null;
+            if (outgoing == null && incoming != null && (incoming.hasPendingUpdate() ? incoming.isPendingBilateral() : incoming.isBilateral())) {
+                bilateralOut = LanguageStrings.get(LanguageStrings.UI_BILATERAL);
             }
+            if (incoming == null && outgoing != null && (outgoing.hasPendingUpdate() ? outgoing.isPendingBilateral() : outgoing.isBilateral())) {
+                bilateralIn = LanguageStrings.get(LanguageStrings.UI_BILATERAL);
+            }
+
+            TradeRouteStatus outStatus = tradeRouteStatus(outgoing, bilateralOut);
+            TradeRouteStatus inStatus = tradeRouteStatus(incoming, bilateralIn);
+
+            TradeRowData rowData = new TradeRowData(originColony, neighborColony, neighborHex, outgoing, incoming, tunnel);
+
             if (tunnelsVisible) {
-                AssetStyles.relayoutTableInScrollPane(tableScrollPane,
-                        new boolean[]{false, true, false, false, false, false});
+                model.addRow(new Object[]{directionLabel, neighborColony.getName(), rowData, outStatus, inStatus, rowData});
             } else {
-                AssetStyles.relayoutTableInScrollPane(tableScrollPane,
-                        new boolean[]{false, true, false, false, false});
+                model.addRow(new Object[]{directionLabel, neighborColony.getName(), outStatus, inStatus, rowData});
             }
         }
 
@@ -644,17 +714,21 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private boolean canMakeTwoWayTrade(TradeRowData data) {
-            if (data == null || data.neighbor == null || activeColony == null) {
+            if (data == null || data.neighbor == null) {
                 return false;
             }
-            if (!activeColony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
+            Colony origin = data.resolveOrigin(this);
+            if (origin == null) {
+                return false;
+            }
+            if (!origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
                 return false;
             }
             Trade outgoing = data.outgoingTrade;
             if (outgoing == null || isTradeBilateral(outgoing)) {
                 return false;
             }
-            Trade incoming = findIncomingTrade(activeColony, data.neighbor);
+            Trade incoming = findIncomingTrade(origin, data.neighbor);
             return incoming != null && !isTradeBilateral(incoming);
         }
 
@@ -663,10 +737,14 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private boolean shouldShowTwoWayButton(TradeRowData data) {
-            if (data == null || data.neighbor == null || activeColony == null) {
+            if (data == null || data.neighbor == null) {
                 return false;
             }
-            if (!activeColony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
+            Colony origin = data.resolveOrigin(this);
+            if (origin == null) {
+                return false;
+            }
+            if (!origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
                 return false;
             }
             Trade outgoing = data.outgoingTrade;
@@ -689,7 +767,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             Map<ResourceType, Double> returnLoad = incoming.hasPendingUpdate() && incoming.getPendingLoad() != null
                     ? new HashMap<>(incoming.getPendingLoad())
                     : new HashMap<>(incoming.getLoad());
-            Map<AntType, Integer> transport = outgoing.hasPendingUpdate() && outgoing.getPendingTransport() != null
+            Map<AntClass, Integer> transport = outgoing.hasPendingUpdate() && outgoing.getPendingTransport() != null
                     ? new HashMap<>(outgoing.getPendingTransport())
                     : new HashMap<>(outgoing.getTransport());
             boolean recurrent = outgoing.hasPendingUpdate() ? outgoing.isPendingRecurrent() : outgoing.isRecurrent();
@@ -704,7 +782,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (data == null || data.neighbor == null || data.outgoingTrade == null) {
                 return;
             }
-            Trade incoming = findIncomingTrade(activeColony, data.neighbor);
+            Colony origin = data.resolveOrigin(this);
+            if (origin == null) {
+                return;
+            }
+            Trade incoming = findIncomingTrade(origin, data.neighbor);
             if (incoming == null) {
                 return;
             }
@@ -894,18 +976,25 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private class TradeRowData {
+            final Colony originColony;
             final Colony neighbor;
             final Hex neighborHex;
             final Trade outgoingTrade;
             final Trade incomingTrade;
             final Tunnel tunnel;
 
-            TradeRowData(Colony neighbor, Hex neighborHex, Trade outgoingTrade, Trade incomingTrade, Tunnel tunnel) {
+            TradeRowData(Colony originColony, Colony neighbor, Hex neighborHex, Trade outgoingTrade,
+                    Trade incomingTrade, Tunnel tunnel) {
+                this.originColony = originColony;
                 this.neighbor = neighbor;
                 this.neighborHex = neighborHex;
                 this.outgoingTrade = outgoingTrade;
                 this.incomingTrade = incomingTrade;
                 this.tunnel = tunnel;
+            }
+
+            Colony resolveOrigin(TradePanel panel) {
+                return originColony != null ? originColony : panel.activeColony;
             }
         }
 
@@ -990,7 +1079,13 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void establishTrade(Colony target) {
-            openTradeDialog(activeColony, target, null);
+            Colony origin = activeColony;
+            openTradeDialog(origin, target, null);
+            updateData();
+        }
+
+        private void establishTrade(Colony origin, Colony target) {
+            openTradeDialog(origin, target, null);
             updateData();
         }
 
@@ -1007,7 +1102,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             Tunnel tunnel = currentHex != null && neighborHex != null
                     ? dynasty.getTunnelBetween(currentHex, neighborHex)
                     : null;
-            TradeRowData data = new TradeRowData(neighbor, neighborHex, outgoing, incoming, tunnel);
+            TradeRowData data = new TradeRowData(activeColony, neighbor, neighborHex, outgoing, incoming, tunnel);
             showTradeRowActionsMenu(data, invoker);
         }
 
@@ -1023,7 +1118,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (activeColony.getCurrentTunnelProject() != null || dynasty.hasIncompleteTunnelAt(originHex)) {
                     return;
                 }
-                Tunnel tunnel = new Tunnel(originHex, targetHex, GameNumbers.TUNNEL_WORK_REQUIRED);
+                Tunnel tunnel = new Tunnel(originHex, targetHex, ColonyStatsService.getTunnelWorkRequired(dynasty));
                 dynasty.addTunnel(tunnel);
                 activeColony.setCurrentTunnelProject(tunnel);
             }
@@ -1039,7 +1134,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final boolean crossDynasty;
         private final Map<ResourceType, JSpinner> resourceSpinners = new HashMap<>();
         private final Map<ResourceType, JSpinner> returnResourceSpinners = new HashMap<>();
-        private final Map<AntType, JSpinner> antSpinners = new HashMap<>();
+        private final Map<AntClass, JSpinner> antSpinners = new HashMap<>();
         private final JComboBox<TradeMethod> methodCombo;
         private final JCheckBox recurrentCheck;
         private final JCheckBox bilateralCheck;
@@ -1181,18 +1276,18 @@ public class DynastyManagementDialog extends ZeroDialog {
             antGrid.setBorder(BorderFactory.createTitledBorder(LanguageStrings.get(LanguageStrings.TRADE_PERSONNEL)));
             antGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
             
-            Map<AntType, Integer> availableRoles = new HashMap<>();
-            availableRoles.put(GameConstants.TYPE_WORKER, origin.getAssignedRoleCount(GameConstants.ROLE_COURIER));
-            availableRoles.put(GameConstants.TYPE_MAJOR, origin.getAssignedRoleCount(GameConstants.ROLE_TRANSPORT));
-            availableRoles.put(GameConstants.TYPE_SOLDIER, origin.getAssignedRoleCount(GameConstants.ROLE_ESCORT));
-            availableRoles.put(GameConstants.TYPE_PRINCESS, origin.getAssignedRoleCount(GameConstants.ROLE_SKYTRANS));
+            Map<AntClass, Integer> availableRoles = new HashMap<>();
+            availableRoles.put(GameConstants.CLASS_WORKER, origin.getAssignedRoleCount(GameConstants.ROLE_COURIER));
+            availableRoles.put(GameConstants.CLASS_MAJOR, origin.getAssignedRoleCount(GameConstants.ROLE_TRANSPORT));
+            availableRoles.put(GameConstants.CLASS_SOLDIER, origin.getAssignedRoleCount(GameConstants.ROLE_ESCORT));
+            availableRoles.put(GameConstants.CLASS_PRINCESS, origin.getAssignedRoleCount(GameConstants.ROLE_SKYTRANS));
 
             if (engine.getTradeManager() != null) {
                 for (Trade t : engine.getTradeManager().getActiveTrades()) {
                     if (t == existingTrade || !t.isActive()) continue;
                     if (t.getOrigin().getColony() == origin) {
-                        Map<AntType, Integer> trans = t.hasPendingUpdate() ? t.getPendingTransport() : t.getTransport();
-                        for (Map.Entry<AntType, Integer> entry : trans.entrySet()) {
+                        Map<AntClass, Integer> trans = t.hasPendingUpdate() ? t.getPendingTransport() : t.getTransport();
+                        for (Map.Entry<AntClass, Integer> entry : trans.entrySet()) {
                             int current = availableRoles.getOrDefault(entry.getKey(), 0);
                             availableRoles.put(entry.getKey(), Math.max(0, current - entry.getValue()));
                         }
@@ -1200,15 +1295,15 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             }
 
-            List<AntType> tradeAnts = List.of(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS);
-            for (AntType at : tradeAnts) {
+            List<AntClass> tradeAnts = List.of(GameConstants.CLASS_WORKER, GameConstants.CLASS_SOLDIER, GameConstants.CLASS_MAJOR, GameConstants.CLASS_PRINCESS);
+            for (AntClass at : tradeAnts) {
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
                 p.setOpaque(false);
                 String labelName = at.getName();
-                if (at == GameConstants.TYPE_WORKER) labelName = LanguageStrings.get(LanguageStrings.TRADE_COURIERS);
-                else if (at == GameConstants.TYPE_MAJOR) labelName = LanguageStrings.get(LanguageStrings.TRADE_TRANSPORTS);
-                else if (at == GameConstants.TYPE_SOLDIER) labelName = LanguageStrings.get(LanguageStrings.TRADE_ESCORTS);
-                else if (at == GameConstants.TYPE_PRINCESS) labelName = LanguageStrings.get(LanguageStrings.TRADE_FLYERS);
+                if (at == GameConstants.CLASS_WORKER) labelName = LanguageStrings.get(LanguageStrings.TRADE_COURIERS);
+                else if (at == GameConstants.CLASS_MAJOR) labelName = LanguageStrings.get(LanguageStrings.TRADE_TRANSPORTS);
+                else if (at == GameConstants.CLASS_SOLDIER) labelName = LanguageStrings.get(LanguageStrings.TRADE_ESCORTS);
+                else if (at == GameConstants.CLASS_PRINCESS) labelName = LanguageStrings.get(LanguageStrings.TRADE_FLYERS);
                 
                 int available = availableRoles.getOrDefault(at, 0);
                 JLabel label = new JLabel(labelName + " (" + available + ")", at.getIcon(), JLabel.LEFT);
@@ -1395,10 +1490,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             boolean princessesOnly = true;
             boolean anyPrincesses = false;
-            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+            for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
                 int count = (Integer) entry.getValue().getValue();
                 if (count > 0) {
-                    if (entry.getKey() != GameConstants.TYPE_PRINCESS) { princessesOnly = false; }
+                    if (entry.getKey() != GameConstants.CLASS_PRINCESS) { princessesOnly = false; }
                     else { anyPrincesses = true; }
                 }
             }
@@ -1446,23 +1541,23 @@ public class DynastyManagementDialog extends ZeroDialog {
             float totalAntSpeed = 0;
             int totalAnts = 0;
             
-            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+            for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
                 int count = (Integer) entry.getValue().getValue();
                 if (count <= 0) continue;
 
-                AntType type = entry.getKey();
+                AntClass type = entry.getKey();
                 totalAnts += count;
                 totalAntSpeed += type.getSpeedMult() * count;
 
-                if (type == GameConstants.TYPE_WORKER) { 
+                if (type == GameConstants.CLASS_WORKER) {
                     totalCap += count * baseCap * 1.0;
                     totalSec += count * baseSec * 1.0;
-                } else if (type == GameConstants.TYPE_MAJOR) { 
+                } else if (type == GameConstants.CLASS_MAJOR) {
                     totalCap += count * baseCap * 5.0;
                     totalSec += count * baseSec * 2.5;
-                } else if (type == GameConstants.TYPE_SOLDIER) { 
+                } else if (type == GameConstants.CLASS_SOLDIER) {
                     totalSec += count * baseSec * 10.0;
-                } else if (type == GameConstants.TYPE_PRINCESS) {
+                } else if (type == GameConstants.CLASS_PRINCESS) {
                     totalCap += count * baseCap * 1.0;
                     totalSec += count * baseSec * 1.0;
                 }
@@ -1472,21 +1567,21 @@ public class DynastyManagementDialog extends ZeroDialog {
             this.totalTransportCapacity = totalCap;
             
             float methodSpeed = method.getSpeedMult();
-            float workerSpeed = GameConstants.TYPE_WORKER.getSpeedMult();
+            float workerSpeed = GameConstants.CLASS_WORKER.getSpeedMult();
             float avgAntSpeed = (totalAnts > 0) ? (totalAntSpeed / totalAnts) : workerSpeed;
             float speedFactor = methodSpeed * (avgAntSpeed / workerSpeed);
             
             World world = engine.getWorld();
             Tunnel tunnel = origin.getDynasty().getTunnelBetween(world.getHexOfColony(origin), world.getHexOfColony(target));
             if (tunnel != null && tunnel.isComplete()) speedFactor *= 1.5f;
+            speedFactor *= origin.getStatsService().getLocsenseSpeedMultiplier(origin);
+            speedFactor *= origin.getStatsService().getHeatresistSpeedMultiplier(origin);
 
             int hours = Math.max(1, Math.round(168f / speedFactor));
             
             double dangerFactor = method.getDangerFactor();
-            double mitigationPercent = 100.0;
-            if (dangerFactor > 0) {
-                mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
-            }
+            double mitigationPercent = origin.getStatsService()
+                    .getConvoySecurityMitigationPercent(origin, totalSec, dangerFactor);
 
             boolean overCap = totalLoad > totalCap || (bilateralCheck.isSelected() && totalReturnLoad > totalCap);
             boolean noLoad = totalLoad <= 0 && (!bilateralCheck.isSelected() || totalReturnLoad <= 0);
@@ -1570,8 +1665,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             }
 
-            Map<AntType, Integer> transport = new HashMap<>();
-            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+            Map<AntClass, Integer> transport = new HashMap<>();
+            for (Map.Entry<AntClass, JSpinner> entry : antSpinners.entrySet()) {
                 int val = (Integer) entry.getValue().getValue();
                 if (val > 0) transport.put(entry.getKey(), val);
             }
@@ -1874,6 +1969,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                         (PactRequestIncomingPolicy) pactIncomingPolicyCombo.getSelectedItem();
                 if (selected != null) {
                     dynasty.setPactRequestIncomingPolicy(selected);
+                    World world = engine.getWorld();
+                    if (world != null && dynasty.getDiplomacyService() != null) {
+                        dynasty.getDiplomacyService().applyIncomingPactPolicyToPendingRequests(world);
+                    }
                 }
             });
 
@@ -2144,9 +2243,17 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return;
             }
             TradeManager tradeManager = engine.getTradeManager();
-            if (DynastyIntegrationService.startIntegration(world, dynasty, other, tradeManager)) {
+            boolean instant = engine.isInstantIntegration();
+            if (DynastyIntegrationService.startIntegration(world, dynasty, other, tradeManager, instant)) {
+                if (instant) {
+                    engine.applySandboxTaintToActiveWorld();
+                }
                 UiOptionPane.showMessageDialog(this,
-                        LanguageStrings.format(LanguageStrings.DIPLO_INTEGRATION_STARTED_FMT, other.getName()),
+                        LanguageStrings.format(
+                                instant
+                                        ? LanguageStrings.DIPLO_INTEGRATION_INSTANT_FMT
+                                        : LanguageStrings.DIPLO_INTEGRATION_STARTED_FMT,
+                                other.getName()),
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE),
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -2460,6 +2567,35 @@ public class DynastyManagementDialog extends ZeroDialog {
             Colony activeColony = getActivePlayerColony();
             DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
 
+            if (other.getColonies() != null && other.getColonies().size() > 1) {
+                JMenu visitMenu = new JMenu(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
+                AssetStyles.styleMenuItem(visitMenu);
+                for (Colony c : other.getColonies()) {
+                    if (c == null) {
+                        continue;
+                    }
+                    String label = c.getName() + (c.isCapital() ? " (" + LanguageStrings.get(LanguageStrings.STAT_CAPITAL) + ")" : "");
+                    JMenuItem cItem = new JMenuItem(label);
+                    cItem.addActionListener(e -> performView(c));
+                    AssetStyles.styleMenuItem(cItem);
+                    visitMenu.add(cItem);
+                }
+                menu.add(visitMenu);
+            } else {
+                JMenuItem visitItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
+                Colony target = (other.getColonies() != null && !other.getColonies().isEmpty())
+                        ? other.getColonies().get(0)
+                        : other.getCapital();
+                if (target != null && world != null && world.getHexOfColony(target) != null) {
+                    visitItem.addActionListener(e -> performView(target));
+                } else {
+                    visitItem.setEnabled(false);
+                    visitItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_COLONY));
+                }
+                AssetStyles.styleMenuItem(visitItem);
+                menu.add(visitItem);
+            }
+
             JMenuItem pactItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_PACT));
             if (diplo.hasNonAggressionPact(other)) {
                 pactItem.setText(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_BREAK_PACT));
@@ -2501,7 +2637,9 @@ public class DynastyManagementDialog extends ZeroDialog {
                 menu.add(manageDiplomatsItem);
             } else if (!diplo.isAtWarWith(other)) {
                 JMenuItem integrateItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE));
-                if (DynastyIntegrationService.canStartIntegration(dynasty, other, world, engine.getTradeManager())) {
+                boolean instant = engine.isInstantIntegration();
+                if (DynastyIntegrationService.canStartIntegration(
+                        dynasty, other, world, engine.getTradeManager(), instant)) {
                     integrateItem.addActionListener(e -> performIntegrateAction(other));
                 } else {
                     integrateItem.setEnabled(false);
@@ -2632,6 +2770,31 @@ public class DynastyManagementDialog extends ZeroDialog {
                 menu.add(geneticExchangeItem);
             }
 
+            DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+            if (intel != null && intel.hasSpyRole()) {
+                JMenuItem spyItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_SPIES));
+                if (intel.canManageSpiesToward(other, world)) {
+                    spyItem.addActionListener(e -> promptManageDynastySpies(DynastyManagementDialog.this, other));
+                } else {
+                    spyItem.setEnabled(false);
+                    if (intel.countDynastyWideAvailableSpies() <= 0
+                            && intel.countSpiesToward(other) <= 0) {
+                        spyItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPIES));
+                    }
+                }
+                AssetStyles.styleMenuItem(spyItem);
+                menu.add(spyItem);
+
+                JMenuItem dossierItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTELLIGENCE));
+                dossierItem.addActionListener(e -> {
+                    IntelligenceDossierDialog dialog =
+                            new IntelligenceDossierDialog(DynastyManagementDialog.this, dynasty, other);
+                    dialog.setVisible(true);
+                });
+                AssetStyles.styleMenuItem(dossierItem);
+                menu.add(dossierItem);
+            }
+
             UiTableStyles.showCellPopupMenu(menu, table, row, column);
         }
     }
@@ -2680,9 +2843,11 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final boolean showAutomation;
         private final boolean showAutoTunnels;
         private final boolean showAutoDiplomacy;
+        private final boolean showAutoLogistics;
         private int autoBuildCol = -1;
         private int automationCol = -1;
         private int autoTunnelsCol = -1;
+        private int autoLogisticsCol = -1;
         private int loyaltyCol = -1;
         private int militaryCol = -1;
         private int actionCol = -1;
@@ -2694,14 +2859,17 @@ public class DynastyManagementDialog extends ZeroDialog {
         private JCheckBox defaultAutoBuildCheck;
         private JCheckBox defaultAutomationCheck;
         private JCheckBox defaultAutoTunnelsCheck;
+        private JCheckBox defaultAutoLogisticsCheck;
         private JCheckBox autoDiplomacyCheck;
 
-        public OverviewPanel(boolean showAutoBuild, boolean showAutomation, boolean showAutoTunnels, boolean showAutoDiplomacy) {
+        public OverviewPanel(boolean showAutoBuild, boolean showAutomation, boolean showAutoTunnels,
+                boolean showAutoDiplomacy, boolean showAutoLogistics) {
             super(new BorderLayout());
             this.showAutoBuild = showAutoBuild;
             this.showAutomation = showAutomation;
             this.showAutoTunnels = showAutoTunnels;
             this.showAutoDiplomacy = showAutoDiplomacy;
+            this.showAutoLogistics = showAutoLogistics;
             this.displayedColonies = new ArrayList<>();
             
             this.currentSorter = Comparator.comparingInt(Colony::getAntTotal).reversed();
@@ -2740,6 +2908,10 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         public boolean isShowAutoDiplomacy() {
             return showAutoDiplomacy;
+        }
+
+        public boolean isShowAutoLogistics() {
+            return showAutoLogistics;
         }
 
         private JPanel wrapCheckWithIcon(ImageIcon icon, JCheckBox check) {
@@ -2821,6 +2993,17 @@ public class DynastyManagementDialog extends ZeroDialog {
                 topPanel.add(wrapCheckWithIcon(GameUnlocks.ABILITY_AUTO_TUNNELS.getIcon(), defaultAutoTunnelsCheck));
             }
 
+            if (showAutoLogistics) {
+                defaultAutoLogisticsCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_LOGISTICS));
+                AssetStyles.styleCheckBox(defaultAutoLogisticsCheck);
+                defaultAutoLogisticsCheck.setFocusable(false);
+                defaultAutoLogisticsCheck.setOpaque(false);
+                defaultAutoLogisticsCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_LOGISTICS_TOOLTIP));
+                defaultAutoLogisticsCheck.setSelected(dynasty.isDefaultAutoLogisticsEnabled());
+                defaultAutoLogisticsCheck.addActionListener(e -> dynasty.setDefaultAutoLogisticsEnabled(defaultAutoLogisticsCheck.isSelected()));
+                topPanel.add(wrapCheckWithIcon(GameUnlocks.ABILITY_AUTO_LOGISTICS.getIcon(), defaultAutoLogisticsCheck));
+            }
+
             if (showAutoDiplomacy) {
                 autoDiplomacyCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_AUTO_DIPLOMACY));
                 AssetStyles.styleCheckBox(autoDiplomacyCheck);
@@ -2852,6 +3035,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 autoTunnelsCol = cols.size();
                 cols.add(LanguageStrings.get(LanguageStrings.STAT_AUTO_TUNNELS));
             }
+            if (showAutoLogistics) {
+                autoLogisticsCol = cols.size();
+                cols.add(LanguageStrings.get(LanguageStrings.STAT_AUTO_LOGISTICS));
+            }
             
             actionCol = cols.size();
             cols.add(LanguageStrings.get(LanguageStrings.DYNASTY_ACTIONS));
@@ -2865,12 +3052,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                     if (autoBuildCol != -1 && columnIndex == autoBuildCol) return Boolean.class;
                     if (automationCol != -1 && columnIndex == automationCol) return Boolean.class;
                     if (autoTunnelsCol != -1 && columnIndex == autoTunnelsCol) return Boolean.class;
+                    if (autoLogisticsCol != -1 && columnIndex == autoLogisticsCol) return Boolean.class;
                     return Object.class;
                 }
 
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return column == autoBuildCol || column == automationCol || column == autoTunnelsCol || column == actionCol;
+                    return column == autoBuildCol || column == automationCol || column == autoTunnelsCol
+                            || column == autoLogisticsCol || column == actionCol;
                 }
             };
 
@@ -2884,6 +3073,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         if (col == autoBuildCol) c.setAutoBuildEnabled((Boolean) model.getValueAt(row, col));
                         else if (col == automationCol) c.setAutomationEnabled((Boolean) model.getValueAt(row, col));
                         else if (col == autoTunnelsCol) c.setAutoTunnelsEnabled((Boolean) model.getValueAt(row, col));
+                        else if (col == autoLogisticsCol) c.setAutoLogisticsEnabled((Boolean) model.getValueAt(row, col));
                     }
                 }
             });
@@ -2953,6 +3143,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 table.getColumnModel().getColumn(autoTunnelsCol).setMaxWidth(100);
                 AssetStyles.styleTableBooleanColumn(table, autoTunnelsCol);
             }
+            if (showAutoLogistics) {
+                table.getColumnModel().getColumn(autoLogisticsCol).setMaxWidth(100);
+                AssetStyles.styleTableBooleanColumn(table, autoLogisticsCol);
+            }
 
             table.getColumnModel().getColumn(actionCol).setCellRenderer(new ActionPanelRenderer());
             table.getColumnModel().getColumn(actionCol).setCellEditor(new ActionPanelEditor());
@@ -3017,6 +3211,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (showAutoBuild) rowData[autoBuildCol] = colony.isAutoBuildEnabled();
                 if (showAutomation) rowData[automationCol] = colony.isAutomationEnabled();
                 if (showAutoTunnels) rowData[autoTunnelsCol] = colony.isAutoTunnelsEnabled();
+                if (showAutoLogistics) rowData[autoLogisticsCol] = colony.isAutoLogisticsEnabled();
                 rowData[actionCol] = colony;
                 model.addRow(rowData);
             }
@@ -3201,7 +3396,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         AssetStyles.styleMenuItem(renameItem);
         menu.add(renameItem);
 
-        JMenuItem viewItem = new JMenuItem(LanguageStrings.get(LanguageStrings.UI_VIEW));
+        JMenuItem viewItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_VISIT));
         viewItem.addActionListener(e -> performView(colony));
         AssetStyles.styleMenuItem(viewItem);
         menu.add(viewItem);
@@ -3275,6 +3470,31 @@ public class DynastyManagementDialog extends ZeroDialog {
             return;
         }
         diplo.assignDynastyMissionDiplomats(other, selected, world);
+        refreshDialog();
+    }
+
+    private void promptManageDynastySpies(Component parent, Dynasty other) {
+        DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+        World world = engine.getWorld();
+        if (intel == null || other == null || world == null) {
+            return;
+        }
+        if (!intel.hasSpyRole()) {
+            UiOptionPane.showMessageDialog(parent,
+                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPY_ROLE),
+                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_SPIES_TITLE),
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int current = intel.countSpiesToward(other);
+        int max = intel.computeMaxSpiesToward(other);
+        int available = intel.countDynastyWideAvailableSpies();
+        int gainPer = intel.getSpyPowerPerAnt();
+        Integer selected = promptManageDiplomatCount(parent, other.getName(), current, max, available, gainPer);
+        if (selected == null) {
+            return;
+        }
+        intel.assignSpiesToward(other, selected, world);
         refreshDialog();
     }
 

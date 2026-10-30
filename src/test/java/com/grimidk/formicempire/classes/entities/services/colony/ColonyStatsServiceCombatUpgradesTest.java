@@ -76,7 +76,7 @@ class ColonyStatsServiceCombatUpgradesTest {
         dynasty.unlockUpgrade(GameUnlocks.STAT_ATTACK_1);
         dynasty.unlockUpgrade(GameUnlocks.STAT_ATTACK_SPEED_1);
 
-        Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
+        Ant worker = new Ant(colony, GameConstants.CLASS_WORKER);
         assertEquals(5f, worker.getDefense(), 0.0001f);
         assertEquals(2, worker.getAttackSpeed(), 0.0001f);
         assertEquals(150, worker.getMaxHealth());

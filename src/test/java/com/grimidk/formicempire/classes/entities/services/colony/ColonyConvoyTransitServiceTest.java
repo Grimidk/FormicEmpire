@@ -1,10 +1,10 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
@@ -52,11 +52,11 @@ class ColonyConvoyTransitServiceTest {
         origin.setRoomBounds(null, null, null, null, null, null, null, null, new Rectangle(400, 512, 512, 256));
         origin.setActive(true);
 
-        origin.addAnts(GameConstants.TYPE_WORKER, 5);
+        origin.addAnts(GameConstants.CLASS_WORKER, 5);
         transitService = origin.getConvoyTransitService();
 
-        Map<AntType, Integer> transport = new HashMap<>();
-        transport.put(GameConstants.TYPE_WORKER, 2);
+        Map<AntClass, Integer> transport = new HashMap<>();
+        transport.put(GameConstants.CLASS_WORKER, 2);
         trade = new Trade(originHex, destHex, new HashMap<>(), null, transport, false, false, GameConstants.METHOD_LAND);
         tradeManager.addTrade(trade);
     }

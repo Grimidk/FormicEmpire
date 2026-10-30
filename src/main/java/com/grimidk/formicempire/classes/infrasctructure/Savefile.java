@@ -1,9 +1,11 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class Savefile implements Serializable {
     // --- Global Save Data ---
     private final int id; 
     private final String name; 
+    private String version;
     private long timestamp;
     private int playTime;
     private int minute;
@@ -27,8 +30,11 @@ public class Savefile implements Serializable {
     private int year;
     private int worldRadius;
     private int continentCoreRadius;
+    private int worldWidth = GameNumbers.WORLD_RECT_WIDTH;
+    private int worldHeight = GameNumbers.WORLD_RECT_HEIGHT;
     private String playerDynastyTitleKey;
     private int playerDynastyTitleId;
+    private int starterBiomeId = 1;
     
     // --- Root Summary Data ---
     private int colonyId;
@@ -54,10 +60,13 @@ public class Savefile implements Serializable {
     private List<SavedTrade> trades;
     private List<SavedWar> wars;
     private List<SavedWorldHistoryEvent> worldHistory;
+    private boolean allowsAchievements = true;
+    private boolean spectatorMode = false;
 
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
+        this.version = ClasspathTextFiles.load(AssetStyles.META_VERSION, LanguageStrings.VERSION_UNAVAILABLE).trim();
         this.timestamp = System.currentTimeMillis();
         this.worldHexes = new ArrayList<>();
         this.colonies = new ArrayList<>();
@@ -70,8 +79,8 @@ public class Savefile implements Serializable {
         this.day = 1;
         this.month = 1;
         this.year = 0; 
-        this.worldRadius = GameNumbers.worldRadiusForContinentCore(GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
-        this.continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
+        this.worldRadius = 32;
+        this.continentCoreRadius = 0;
         this.playerDynastyTitleKey = LanguageStrings.DYNASTY_TITLE_DYNASTY;
     }
 
@@ -84,6 +93,7 @@ public class Savefile implements Serializable {
         public String titleKey;
         public boolean isPlayer;
         public boolean wildDynasty;
+        public String aiPersonality;
         public boolean isDefeated;
         public String rankName;
         public int speciesId;
@@ -94,9 +104,12 @@ public class Savefile implements Serializable {
         public boolean defaultAutoBuildEnabled;
         public boolean autoDiplomacyEnabled;
         public boolean defaultAutoTunnelsEnabled;
+        public boolean defaultAutoLogisticsEnabled;
         public String pactRequestIncomingPolicy = "MANUAL";
         public int lastIncomingPactRequestWorldDay = -1;
         public Map<String, Integer> diplomatSupportToDynasty = new HashMap<>();
+        public Map<String, Integer> spySupportToDynasty = new HashMap<>();
+        public Map<String, Double> intelligenceToward = new HashMap<>();
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> unlockedSkillIds;
         public List<Integer> announcedRankIds;
@@ -156,9 +169,11 @@ public class Savefile implements Serializable {
         public boolean isAutomated;
         public boolean autoBuildEnabled;
         public boolean autoTunnelsEnabled;
+        public boolean autoLogisticsEnabled;
         public Map<String, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
         public Map<String, Integer> incomingColonyDiplomatSupport = new HashMap<>();
         public Map<String, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
+        public Map<String, Integer> outgoingDynastySpyMissions = new HashMap<>();
         public int age;
         public int daysWithoutQueen;
         public int q; 
@@ -169,12 +184,21 @@ public class Savefile implements Serializable {
         public int eggs, pupae, larvae, workers, soldiers, majors, drones, princesses, queens;        
         public int plants, mushrooms, protein, water, syrups, resins, minerals;        
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
-        public Map<String, Double> subtypeHatchRatesFlat = new HashMap<>();
-        public Map<String, Integer> workerSubtypes = new HashMap<>();
-        public Map<String, Integer> soldierSubtypes = new HashMap<>();
-        public Map<String, Integer> majorSubtypes = new HashMap<>();
-        public Map<String, Integer> princessSubtypes = new HashMap<>();
-        public Map<String, Integer> queenSubtypes = new HashMap<>();
+        public Map<String, Double> modHatchRatesFlat = new HashMap<>();
+        public Map<String, Integer> workerMods = new HashMap<>();
+        public Map<String, Integer> soldierMods = new HashMap<>();
+        public Map<String, Integer> majorMods = new HashMap<>();
+        public Map<String, Integer> princessMods = new HashMap<>();
+        public Map<String, Integer> queenMods = new HashMap<>();
+        public Map<String, Integer> eggAges = new HashMap<>();
+        public Map<String, Integer> larvaAges = new HashMap<>();
+        public Map<String, Integer> pupaAges = new HashMap<>();
+        public Map<String, Integer> workerAges = new HashMap<>();
+        public Map<String, Integer> soldierAges = new HashMap<>();
+        public Map<String, Integer> majorAges = new HashMap<>();
+        public Map<String, Integer> droneAges = new HashMap<>();
+        public Map<String, Integer> princessAges = new HashMap<>();
+        public Map<String, Integer> queenAges = new HashMap<>();
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
         public int pheromoneStormMonthsRemaining;
         public int recentlyConqueredMonthsRemaining;
@@ -188,11 +212,119 @@ public class Savefile implements Serializable {
         public int militaryPower;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> warAssignedRoleCounts = new HashMap<>();
-        public Map<String, Integer> roleDisallowedSubtypesFlat = new HashMap<>();
-        public Map<String, Integer> warRoleDisallowedSubtypesFlat = new HashMap<>();
+        public Map<String, Integer> roleDisallowedModsFlat = new HashMap<>();
+        public Map<String, Integer> warRoleDisallowedModsFlat = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();
         public List<SavedResourceSource> savedResourceSources = new ArrayList<>();
+        public int nextHuntTargetId = 1;
+        public List<SavedHuntTarget> knownHuntTargets = new ArrayList<>();
+        public List<SavedHuntExpedition> activeHuntExpeditions = new ArrayList<>();
+        public SavedHuntExpedition activeHuntExpedition;
+        public int nextInvasionAlertId = 1;
+        public List<SavedInvasionAlert> invasionAlerts = new ArrayList<>();
+        public List<SavedInvasionDefense> activeInvasionDefenses = new ArrayList<>();
+    }
+
+    public static class SavedInvasionDefense implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int alertId;
+        public float bugHealth;
+        public int tickIndex;
+        public int focusTargetIndex;
+        public List<SavedHuntPartyMember> party = new ArrayList<>();
+
+        public SavedInvasionDefense(int alertId, float bugHealth, int tickIndex, int focusTargetIndex) {
+            this.alertId = alertId;
+            this.bugHealth = bugHealth;
+            this.tickIndex = tickIndex;
+            this.focusTargetIndex = focusTargetIndex;
+        }
+    }
+
+    public static class SavedInvasionAlert implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int id;
+        public int speciesId;
+        public String scope;
+        public int targetColonyId;
+        public int deadlineAbsoluteHour;
+        public boolean defenseDispatched;
+
+        public SavedInvasionAlert(int id, int speciesId, String scope, int targetColonyId,
+                int deadlineAbsoluteHour, boolean defenseDispatched) {
+            this.id = id;
+            this.speciesId = speciesId;
+            this.scope = scope;
+            this.targetColonyId = targetColonyId;
+            this.deadlineAbsoluteHour = deadlineAbsoluteHour;
+            this.defenseDispatched = defenseDispatched;
+        }
+    }
+
+    public static class SavedHuntPartyMember implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int classId;
+        public int modProfileCode;
+        public int roleId;
+        public int slotIndex;
+        public int health;
+        public float battleHealth;
+        public float battleMaxHealth;
+
+        public SavedHuntPartyMember(int classId, int modProfileCode, int roleId, int slotIndex, int health,
+                float battleHealth, float battleMaxHealth) {
+            this.classId = classId;
+            this.modProfileCode = modProfileCode;
+            this.roleId = roleId;
+            this.slotIndex = slotIndex;
+            this.health = health;
+            this.battleHealth = battleHealth;
+            this.battleMaxHealth = battleMaxHealth;
+        }
+    }
+
+    public static class SavedHuntExpedition implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int targetId;
+        public String phase;
+        public float travelHoursRemaining;
+        public float travelHoursTotal;
+        public float bugHealth;
+        public int tickIndex;
+        public int focusTargetIndex;
+        public List<SavedHuntPartyMember> party = new ArrayList<>();
+
+        public SavedHuntExpedition(int targetId, String phase, float travelHoursRemaining, float travelHoursTotal,
+                float bugHealth, int tickIndex, int focusTargetIndex) {
+            this.targetId = targetId;
+            this.phase = phase;
+            this.travelHoursRemaining = travelHoursRemaining;
+            this.travelHoursTotal = travelHoursTotal;
+            this.bugHealth = bugHealth;
+            this.tickIndex = tickIndex;
+            this.focusTargetIndex = focusTargetIndex;
+        }
+    }
+
+    public static class SavedHuntTarget implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int id;
+        public int speciesId;
+        public int overworldX;
+        public int overworldY;
+        public int discoveredWorldDay;
+        public int escapeWorldDay;
+
+        public SavedHuntTarget(int id, int speciesId, int overworldX, int overworldY, int discoveredWorldDay,
+                int escapeWorldDay) {
+            this.id = id;
+            this.speciesId = speciesId;
+            this.overworldX = overworldX;
+            this.overworldY = overworldY;
+            this.discoveredWorldDay = discoveredWorldDay;
+            this.escapeWorldDay = escapeWorldDay;
+        }
     }
 
     public static class SavedResourceSource implements Serializable {
@@ -221,6 +353,14 @@ public class Savefile implements Serializable {
         public int timeOffset;
         public int weatherId;
         public int nonWaterResourceSourcesGenerated;
+        public boolean[] riverEdges = new boolean[6];
+        public int continentId;
+        public int waterDistance;
+        public boolean coastal;
+        public int elevation;
+        public int hydrology;
+        public boolean island;
+        public int plateId;
 
         public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
             this.q = q;
@@ -348,6 +488,10 @@ public class Savefile implements Serializable {
     public void setWorldRadius(int worldRadius) { this.worldRadius = worldRadius; }
     public int getContinentCoreRadius() { return continentCoreRadius; }
     public void setContinentCoreRadius(int continentCoreRadius) { this.continentCoreRadius = continentCoreRadius; }
+    public int getWorldWidth() { return worldWidth; }
+    public void setWorldWidth(int worldWidth) { this.worldWidth = worldWidth; }
+    public int getWorldHeight() { return worldHeight; }
+    public void setWorldHeight(int worldHeight) { this.worldHeight = worldHeight; }
 
     public String getPlayerDynastyTitleKey() { return playerDynastyTitleKey; }
     public void setPlayerDynastyTitleKey(String playerDynastyTitleKey) {
@@ -424,4 +568,41 @@ public class Savefile implements Serializable {
 
     public List<SavedWorldHistoryEvent> getWorldHistory() { return worldHistory; }
     public void setWorldHistory(List<SavedWorldHistoryEvent> worldHistory) { this.worldHistory = worldHistory; }
+
+    public boolean allowsAchievements() { return allowsAchievements; }
+
+    public void setAllowsAchievements(boolean allowsAchievements) {
+        if (!this.allowsAchievements) {
+            return;
+        }
+        this.allowsAchievements = allowsAchievements;
+    }
+
+    public void disableAchievements() {
+        this.allowsAchievements = false;
+    }
+
+    public boolean isSpectatorMode() {
+        return spectatorMode;
+    }
+
+    public void setSpectatorMode(boolean spectatorMode) {
+        this.spectatorMode = spectatorMode;
+    }
+
+    public int getStarterBiomeId() {
+        return starterBiomeId > 0 ? starterBiomeId : 1;
+    }
+
+    public void setStarterBiomeId(int starterBiomeId) {
+        this.starterBiomeId = starterBiomeId;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 }

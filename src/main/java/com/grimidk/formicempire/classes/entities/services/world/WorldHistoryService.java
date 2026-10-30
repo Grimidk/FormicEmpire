@@ -24,7 +24,7 @@ public class WorldHistoryService {
         this.recordingEnabled = recordingEnabled;
     }
 
-    public void clear() {
+    public synchronized void clear() {
         events.clear();
     }
 
@@ -32,7 +32,7 @@ public class WorldHistoryService {
         record(type, messageKey, -1, -1, -1, args);
     }
 
-    public void record(WorldHistoryEventType type, String messageKey,
+    public synchronized void record(WorldHistoryEventType type, String messageKey,
             int relatedDynastyId, int relatedColonyId, int relatedWarId, String... args) {
         if (!recordingEnabled || type == null || messageKey == null || messageKey.isEmpty()) {
             return;
@@ -55,13 +55,13 @@ public class WorldHistoryService {
         trimToCap();
     }
 
-    public List<WorldHistoryEvent> getEvents() {
+    public synchronized List<WorldHistoryEvent> getEvents() {
         List<WorldHistoryEvent> copy = new ArrayList<>(events);
         Collections.reverse(copy);
         return copy;
     }
 
-    public List<WorldHistoryEvent> getEvents(WorldHistoryEventType.WorldHistoryCategory category) {
+    public synchronized List<WorldHistoryEvent> getEvents(WorldHistoryEventType.WorldHistoryCategory category) {
         if (category == null) {
             return getEvents();
         }
@@ -75,11 +75,11 @@ public class WorldHistoryService {
         return filtered;
     }
 
-    public int size() {
+    public synchronized int size() {
         return events.size();
     }
 
-    public List<Savefile.SavedWorldHistoryEvent> toSaved() {
+    public synchronized List<Savefile.SavedWorldHistoryEvent> toSaved() {
         List<Savefile.SavedWorldHistoryEvent> saved = new ArrayList<>(events.size());
         for (WorldHistoryEvent event : events) {
             Savefile.SavedWorldHistoryEvent row = new Savefile.SavedWorldHistoryEvent();
@@ -99,7 +99,7 @@ public class WorldHistoryService {
         return saved;
     }
 
-    public void loadFromSave(List<Savefile.SavedWorldHistoryEvent> savedEvents) {
+    public synchronized void loadFromSave(List<Savefile.SavedWorldHistoryEvent> savedEvents) {
         events.clear();
         if (savedEvents == null) {
             return;

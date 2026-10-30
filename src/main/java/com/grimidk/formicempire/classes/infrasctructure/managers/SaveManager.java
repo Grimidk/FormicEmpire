@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
@@ -19,19 +19,28 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
+import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyHuntService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyInvasionService;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
-import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyPopulationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchTreeGraph;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,7 +87,14 @@ public class SaveManager {
         return new File(savesDir, "settings.json");
     }
 
+    public static String getAppVersion() {
+        return ClasspathTextFiles.load(AssetStyles.META_VERSION, LanguageStrings.VERSION_UNAVAILABLE).trim();
+    }
+
     private void writeSaveToFile(Savefile save, File targetFile) throws IOException {
+        if (save != null) {
+            save.setVersion(getAppVersion());
+        }
         File tmp = new File(targetFile.getAbsolutePath() + ".tmp");
         try (BufferedWriter bw = Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
             writeSaveToWriter(save, bw);
@@ -111,6 +127,10 @@ public class SaveManager {
 
     public void saveAutosave(World w, Engine e) {
         if (w == null) return;
+        if (isPlayerDynastyAboutToDieWithoutQueen(w)) {
+            System.out.println("[SaveManager] Skipping autosave: player dynasty is about to die without a queen.");
+            return;
+        }
         int slotId = 0;
         try {
             slotId = w.getSaveSlotId();
@@ -160,8 +180,49 @@ public class SaveManager {
         return removed;
     }
 
+    public static boolean isPlayerDynastyAboutToDieWithoutQueen(World w) {
+        if (w == null || w.getDynastys() == null) {
+            return false;
+        }
+        for (Dynasty d : w.getDynastys()) {
+            if (d == null || d.isDefeated() || !d.isPlayer()) {
+                continue;
+            }
+            if (isDynastyAboutToDieWithoutQueen(d)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isDynastyAboutToDieWithoutQueen(Dynasty dynasty) {
+        if (dynasty == null || dynasty.isDefeated() || dynasty.getColonies() == null) {
+            return false;
+        }
+        boolean anyQueenInDynasty = false;
+        for (Colony c : dynasty.getColonies()) {
+            if (c != null && !c.getQueens().isEmpty()) {
+                anyQueenInDynasty = true;
+                break;
+            }
+        }
+        if (!anyQueenInDynasty) {
+            return true;
+        }
+        for (Colony c : dynasty.getColonies()) {
+            if (c != null && c.getQueens().isEmpty() && c.getDaysWithoutQueen() >= 5) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void saveWorldToSlot(World w, int slotId) {
         if (w == null) return;
+        if (isPlayerDynastyAboutToDieWithoutQueen(w)) {
+            System.out.println("[SaveManager] Skipping save: player dynasty is about to die without a queen.");
+            return;
+        }
         
         if (slotId == 0) {
             System.out.println("[SaveManager] Skipping autosave for new game (Slot ID 0).");
@@ -282,6 +343,10 @@ public class SaveManager {
     
     public void saveWorldToSlotUser(World w, int slotId, String name) throws IOException {
         if (w == null) return;
+        if (isPlayerDynastyAboutToDieWithoutQueen(w)) {
+            System.out.println("[SaveManager] Skipping manual save: player dynasty is about to die without a queen.");
+            return;
+        }
         
         String saveName = (name != null && !name.isEmpty()) ? name : String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotId);
         Savefile save = new Savefile(slotId, saveName);
@@ -325,6 +390,7 @@ public class SaveManager {
     }
 
     private void populateSavefileFromGame(Savefile save, World w, Engine engine) {
+        save.setVersion(getAppVersion());
         save.setTimestamp(System.currentTimeMillis());
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
@@ -334,6 +400,17 @@ public class SaveManager {
         save.setPlayTime(computePlayTime(w));
         save.setWorldRadius(w.getWorldRadius());
         save.setContinentCoreRadius(w.getContinentCoreRadius());
+        save.setWorldWidth(w.getWorldWidth());
+        save.setWorldHeight(w.getWorldHeight());
+        if (engine != null && engine.hasAchievementTaintingSandbox()) {
+            w.disableAchievements();
+        }
+        if (!w.allowsAchievements()) {
+            save.disableAchievements();
+        } else {
+            save.setAllowsAchievements(true);
+        }
+        save.setSpectatorMode(w.isSpectatorMode());
 
         if (w.getDynastys() != null) {
             for (Dynasty dynasty : w.getDynastys()) {
@@ -348,6 +425,8 @@ public class SaveManager {
         List<Savefile.SavedHex> hexList = new ArrayList<>();
         List<Savefile.SavedColony> colonyList = new ArrayList<>();
         List<Savefile.SavedDynasty> dynastyList = new ArrayList<>();
+        Colony playerSummaryColony = null;
+        Colony playerCapitalColony = null;
 
         // Save Dynastys
         if (w.getDynastys() != null) {
@@ -364,6 +443,9 @@ public class SaveManager {
                 }
                 sc.isPlayer = dynasty.isPlayer();
                 sc.wildDynasty = dynasty.isWildDynasty();
+                sc.aiPersonality = dynasty.getAiPersonality() != null
+                        ? dynasty.getAiPersonality().toPersistenceKey()
+                        : null;
                 sc.isDefeated = dynasty.isDefeated();
                 sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getNameKey() : LanguageStrings.RANK_ANT;
                 sc.researchPoints = dynasty.getResearchPoints();
@@ -374,11 +456,20 @@ public class SaveManager {
                 sc.defaultAutoBuildEnabled = dynasty.isDefaultAutoBuildEnabled();
                 sc.autoDiplomacyEnabled = dynasty.isAutoDiplomacyEnabled();
                 sc.defaultAutoTunnelsEnabled = dynasty.isDefaultAutoTunnelsEnabled();
+                sc.defaultAutoLogisticsEnabled = dynasty.isDefaultAutoLogisticsEnabled();
                 sc.pactRequestIncomingPolicy = dynasty.getPactRequestIncomingPolicy().name();
                 sc.lastIncomingPactRequestWorldDay = dynasty.getLastIncomingPactRequestWorldDay();
                 sc.diplomatSupportToDynasty = new HashMap<>();
                 for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomatSupportToDynasty().entrySet()) {
                     sc.diplomatSupportToDynasty.put(String.valueOf(entry.getKey()), entry.getValue());
+                }
+                sc.spySupportToDynasty = new HashMap<>();
+                for (Map.Entry<Integer, Integer> entry : dynasty.copySpySupportToDynasty().entrySet()) {
+                    sc.spySupportToDynasty.put(String.valueOf(entry.getKey()), entry.getValue());
+                }
+                sc.intelligenceToward = new HashMap<>();
+                for (Map.Entry<Integer, Double> entry : dynasty.copyIntelligenceToward().entrySet()) {
+                    sc.intelligenceToward.put(String.valueOf(entry.getKey()), entry.getValue());
                 }
                 sc.defeatedSpeciesIds = (dynasty.getDefeatedSpeciesIds() != null) ? new ArrayList<>(dynasty.getDefeatedSpeciesIds()) : new ArrayList<>();
                 sc.completedAssimilationIds = new ArrayList<>();
@@ -478,7 +569,7 @@ public class SaveManager {
                 for (Map.Entry<ResourceType, Double> e : t.getReturnLoad().entrySet()) {
                     st.returnLoad.put(e.getKey().getId(), e.getValue());
                 }
-                for (Map.Entry<AntType, Integer> e : t.getTransport().entrySet()) {
+                for (Map.Entry<AntClass, Integer> e : t.getTransport().entrySet()) {
                     st.transport.put(e.getKey().getId(), e.getValue());
                 }
 
@@ -499,7 +590,7 @@ public class SaveManager {
                         }
                     }
                     if (t.getPendingTransport() != null) {
-                        for (Map.Entry<AntType, Integer> e : t.getPendingTransport().entrySet()) {
+                        for (Map.Entry<AntClass, Integer> e : t.getPendingTransport().entrySet()) {
                             st.pendingTransport.put(e.getKey().getId(), e.getValue());
                         }
                     }
@@ -520,6 +611,16 @@ public class SaveManager {
                 int weatherId = (h.getLocalWeather() != null) ? h.getLocalWeather().getId() : 1;
                 Savefile.SavedHex sh = new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId);
                 sh.nonWaterResourceSourcesGenerated = h.getNonWaterResourceSourcesGenerated();
+                if (h.getRiverEdges() != null) {
+                    System.arraycopy(h.getRiverEdges(), 0, sh.riverEdges, 0, Math.min(6, h.getRiverEdges().length));
+                }
+                sh.continentId = h.getContinentId();
+                sh.waterDistance = h.getWaterDistance();
+                sh.coastal = h.isCoastal();
+                sh.elevation = h.getElevation();
+                sh.hydrology = h.getHydrology();
+                sh.island = h.isIsland();
+                sh.plateId = h.getPlateId();
                 hexList.add(sh);
                 
                 if (hasColony) {
@@ -536,6 +637,7 @@ public class SaveManager {
                     sc.isAutomated = c.isAutomationEnabled();
                     sc.autoBuildEnabled = c.isAutoBuildEnabled();
                     sc.autoTunnelsEnabled = c.isAutoTunnelsEnabled();
+                    sc.autoLogisticsEnabled = c.isAutoLogisticsEnabled();
                     sc.age = c.getAge();
                     sc.daysWithoutQueen = c.getDaysWithoutQueen();
                     sc.loyalty = c.getLoyalty();
@@ -570,12 +672,21 @@ public class SaveManager {
                     sc.hatchRateMajor = c.getHatchRateMajor();
                     sc.hatchRateDrone = c.getHatchRateDrone();
                     sc.hatchRatePrincess = c.getHatchRatePrincess();
-                    sc.subtypeHatchRatesFlat = AntSubtypeService.flattenSubtypeRates(c.getSubtypeHatchRates());
-                    sc.workerSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getWorkers());
-                    sc.soldierSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getSoldiers());
-                    sc.majorSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getMajors());
-                    sc.princessSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getPrincesses());
-                    sc.queenSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getQueens());
+                    sc.modHatchRatesFlat = AntModService.flattenModRates(c.getModHatchRates());
+                    sc.workerMods = AntModService.aggregateModCounts(c.getWorkers());
+                    sc.soldierMods = AntModService.aggregateModCounts(c.getSoldiers());
+                    sc.majorMods = AntModService.aggregateModCounts(c.getMajors());
+                    sc.princessMods = AntModService.aggregateModCounts(c.getPrincesses());
+                    sc.queenMods = AntModService.aggregateModCounts(c.getQueens());
+                    sc.eggAges = ColonyPopulationService.aggregateAgeCounts(c.getEggs());
+                    sc.larvaAges = ColonyPopulationService.aggregateAgeCounts(c.getLarvae());
+                    sc.pupaAges = ColonyPopulationService.aggregateAgeCounts(c.getPupae());
+                    sc.workerAges = ColonyPopulationService.aggregateAgeCounts(c.getWorkers());
+                    sc.soldierAges = ColonyPopulationService.aggregateAgeCounts(c.getSoldiers());
+                    sc.majorAges = ColonyPopulationService.aggregateAgeCounts(c.getMajors());
+                    sc.droneAges = ColonyPopulationService.aggregateAgeCounts(c.getDrones());
+                    sc.princessAges = ColonyPopulationService.aggregateAgeCounts(c.getPrincesses());
+                    sc.queenAges = ColonyPopulationService.aggregateAgeCounts(c.getQueens());
                     
                     // Stats
                     sc.aphids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_APHID);
@@ -597,8 +708,8 @@ public class SaveManager {
                     for (Map.Entry<AntRole, Integer> entry : c.getWarAssignedRoleCounts().entrySet()) {
                         sc.warAssignedRoleCounts.put(String.valueOf(entry.getKey().getId()), entry.getValue());
                     }
-                    sc.roleDisallowedSubtypesFlat = c.flattenPeaceRoleDisallowedSubtypes();
-                    sc.warRoleDisallowedSubtypesFlat = c.flattenWarRoleDisallowedSubtypes();
+                    sc.roleDisallowedModsFlat = c.flattenPeaceRoleDisallowedMods();
+                    sc.warRoleDisallowedModsFlat = c.flattenWarRoleDisallowedMods();
                     for (Map.Entry<Integer, Integer> entry : c.getOutgoingColonyDiplomatMissions().entrySet()) {
                         sc.outgoingColonyDiplomatMissions.put(String.valueOf(entry.getKey()), entry.getValue());
                     }
@@ -607,6 +718,9 @@ public class SaveManager {
                     }
                     for (Map.Entry<Integer, Integer> entry : c.getOutgoingDynastyDiplomatMissions().entrySet()) {
                         sc.outgoingDynastyDiplomatMissions.put(String.valueOf(entry.getKey()), entry.getValue());
+                    }
+                    for (Map.Entry<Integer, Integer> entry : c.getOutgoingDynastySpyMissions().entrySet()) {
+                        sc.outgoingDynastySpyMissions.put(String.valueOf(entry.getKey()), entry.getValue());
                     }
                     
                     if (c.getPopulationService() != null) {
@@ -622,30 +736,60 @@ public class SaveManager {
                              ));
                         }
                     }
+                    sc.nextHuntTargetId = c.getNextHuntTargetIdSeed();
+                    for (KnownHuntTarget target : c.getKnownHuntTargets()) {
+                        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                                target.getId(),
+                                target.getSpeciesId(),
+                                target.getOverworldX(),
+                                target.getOverworldY(),
+                                target.getDiscoveredWorldDay(),
+                                target.getEscapeWorldDay()));
+                    }
+                    sc.activeHuntExpeditions = ColonyHuntService.toSavedExpeditions(c);
+                    sc.activeHuntExpedition = sc.activeHuntExpeditions.size() == 1
+                            ? sc.activeHuntExpeditions.get(0)
+                            : null;
+                    sc.nextInvasionAlertId = c.getNextInvasionAlertIdSeed();
+                    sc.invasionAlerts = ColonyInvasionService.toSavedAlerts(c);
+                    sc.activeInvasionDefenses = ColonyInvasionService.toSavedDefenses(c);
                     colonyList.add(sc);
                     
                     if (c.isPlayer()) {
-                        save.setColonyId(c.getId());
-                        save.setColonyName(c.getName());
-                        save.setTotalAnts(c.getAntTotal());
-                        save.setWorkers(c.getWorkers().size());
-                        save.setQueens(c.getQueens().size());
-                        save.setDeadAnts(c.getDeadAnts().size());
-                        
-                        save.setMushrooms(c.getMushrooms());
-                        save.setPlants(c.getPlants());
-                        save.setProtein(c.getProtein());
-                        save.setWater(c.getWater());
-                        save.setSyrups(c.getSyrups());
-                        save.setResins(c.getResins());
-                        save.setMinerals(c.getMinerals());
+                        if (c.isActive()) {
+                            playerSummaryColony = c;
+                        } else if (c.isCapital()) {
+                            playerCapitalColony = c;
+                        }
                     }
                 }
             }
         }
+
+        Colony summaryColony = playerSummaryColony != null ? playerSummaryColony : playerCapitalColony;
+        if (summaryColony != null) {
+            applyPlayerColonySummary(save, summaryColony);
+        }
         
         save.setWorldHexes(hexList);
         save.setColonies(colonyList);
+    }
+
+    private static void applyPlayerColonySummary(Savefile save, Colony c) {
+        save.setColonyId(c.getId());
+        save.setColonyName(c.getName());
+        save.setTotalAnts(c.getAntTotal());
+        save.setWorkers(c.getWorkers().size());
+        save.setQueens(c.getQueens().size());
+        save.setDeadAnts(c.getDeadAnts().size());
+
+        save.setMushrooms(c.getMushrooms());
+        save.setPlants(c.getPlants());
+        save.setProtein(c.getProtein());
+        save.setWater(c.getWater());
+        save.setSyrups(c.getSyrups());
+        save.setResins(c.getResins());
+        save.setMinerals(c.getMinerals());
     }
 
     private void writeSaveToWriter(Savefile s, BufferedWriter w) throws IOException {
@@ -654,6 +798,7 @@ public class SaveManager {
 
         // - Global -
         writeJsonLine(w, "id", s.getId(), false);
+        writeJsonLine(w, "version", s.getVersion() != null && !s.getVersion().isEmpty() ? s.getVersion() : getAppVersion(), false);
         writeJsonLine(w, "name", s.getName() != null ? s.getName() : "", false);
         writeJsonLine(w, "timestamp", s.getTimestamp(), false);
         writeJsonLine(w, "playTime", s.getPlayTime(), false);
@@ -664,8 +809,12 @@ public class SaveManager {
         writeJsonLine(w, "year", s.getYear(), false);
         writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
         writeJsonLine(w, "continentCoreRadius", s.getContinentCoreRadius(), false);
+        writeJsonLine(w, "worldWidth", s.getWorldWidth(), false);
+        writeJsonLine(w, "worldHeight", s.getWorldHeight(), false);
         writeJsonLine(w, "playerDynastyTitleId", s.resolvePlayerDynastyTitleId(), false);
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
+        writeJsonLine(w, "allowsAchievements", s.allowsAchievements(), false);
+        writeJsonLine(w, "spectatorMode", s.isSpectatorMode(), false);
         
         // - Root Summary Data - 
         writeJsonLine(w, "colonyId", s.getColonyId(), false);
@@ -728,6 +877,7 @@ public class SaveManager {
         writeJsonLine(w, "titleKey", sc.titleKey != null ? sc.titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
         writeJsonLine(w, "wildDynasty", sc.wildDynasty, false);
+        writeJsonLine(w, "aiPersonality", sc.aiPersonality != null ? sc.aiPersonality : "", false);
         writeJsonLine(w, "isDefeated", sc.isDefeated, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "speciesId", sc.speciesId, false);
@@ -738,6 +888,7 @@ public class SaveManager {
         writeJsonLine(w, "defaultAutoBuildEnabled", sc.defaultAutoBuildEnabled, false);
         writeJsonLine(w, "autoDiplomacyEnabled", sc.autoDiplomacyEnabled, false);
         writeJsonLine(w, "defaultAutoTunnelsEnabled", sc.defaultAutoTunnelsEnabled, false);
+        writeJsonLine(w, "defaultAutoLogisticsEnabled", sc.defaultAutoLogisticsEnabled, false);
         writeJsonLine(w, "pactRequestIncomingPolicy", sc.pactRequestIncomingPolicy, false);
         writeJsonLine(w, "lastIncomingPactRequestWorldDay", sc.lastIncomingPactRequestWorldDay, false);
         writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
@@ -746,6 +897,8 @@ public class SaveManager {
         writeJsonLine(w, "geneticIntegrity", sc.geneticIntegrity, false);
         writeJsonLine(w, "militaryPower", sc.militaryPower, false);
         w.write("      \"diplomatSupportToDynasty\": " + serializeMapToJson(sc.diplomatSupportToDynasty) + ","); w.newLine();
+        w.write("      \"spySupportToDynasty\": " + serializeMapToJson(sc.spySupportToDynasty) + ","); w.newLine();
+        w.write("      \"intelligenceToward\": " + serializeDoubleMapToJson(sc.intelligenceToward) + ","); w.newLine();
         w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
         w.write("      \"diplomaticModifierRemainingDays\": " + serializeNestedIntegerMapToJson(sc.diplomaticModifierRemainingDays) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
@@ -787,6 +940,7 @@ public class SaveManager {
         writeJsonLine(w, "isAutomated", sc.isAutomated, false);
         writeJsonLine(w, "autoBuildEnabled", sc.autoBuildEnabled, false);
         writeJsonLine(w, "autoTunnelsEnabled", sc.autoTunnelsEnabled, false);
+        writeJsonLine(w, "autoLogisticsEnabled", sc.autoLogisticsEnabled, false);
         writeJsonLine(w, "age", sc.age, false);
         writeJsonLine(w, "daysWithoutQueen", sc.daysWithoutQueen, false);
         writeJsonLine(w, "loyalty", sc.loyalty, false);
@@ -822,12 +976,21 @@ public class SaveManager {
         writeJsonLine(w, "hatchRateDrone", sc.hatchRateDrone, false);
         writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
         
-        w.write("      \"subtypeHatchRatesFlat\": " + serializeDoubleMapToJson(sc.subtypeHatchRatesFlat) + ","); w.newLine();
-        w.write("      \"workerSubtypes\": " + serializeMapToJson(sc.workerSubtypes) + ","); w.newLine();
-        w.write("      \"soldierSubtypes\": " + serializeMapToJson(sc.soldierSubtypes) + ","); w.newLine();
-        w.write("      \"majorSubtypes\": " + serializeMapToJson(sc.majorSubtypes) + ","); w.newLine();
-        w.write("      \"princessSubtypes\": " + serializeMapToJson(sc.princessSubtypes) + ","); w.newLine();
-        w.write("      \"queenSubtypes\": " + serializeMapToJson(sc.queenSubtypes) + ","); w.newLine();
+        w.write("      \"modHatchRatesFlat\": " + serializeDoubleMapToJson(sc.modHatchRatesFlat) + ","); w.newLine();
+        w.write("      \"workerMods\": " + serializeMapToJson(sc.workerMods) + ","); w.newLine();
+        w.write("      \"soldierMods\": " + serializeMapToJson(sc.soldierMods) + ","); w.newLine();
+        w.write("      \"majorMods\": " + serializeMapToJson(sc.majorMods) + ","); w.newLine();
+        w.write("      \"princessMods\": " + serializeMapToJson(sc.princessMods) + ","); w.newLine();
+        w.write("      \"queenMods\": " + serializeMapToJson(sc.queenMods) + ","); w.newLine();
+        w.write("      \"eggAges\": " + serializeMapToJson(sc.eggAges) + ","); w.newLine();
+        w.write("      \"larvaAges\": " + serializeMapToJson(sc.larvaAges) + ","); w.newLine();
+        w.write("      \"pupaAges\": " + serializeMapToJson(sc.pupaAges) + ","); w.newLine();
+        w.write("      \"workerAges\": " + serializeMapToJson(sc.workerAges) + ","); w.newLine();
+        w.write("      \"soldierAges\": " + serializeMapToJson(sc.soldierAges) + ","); w.newLine();
+        w.write("      \"majorAges\": " + serializeMapToJson(sc.majorAges) + ","); w.newLine();
+        w.write("      \"droneAges\": " + serializeMapToJson(sc.droneAges) + ","); w.newLine();
+        w.write("      \"princessAges\": " + serializeMapToJson(sc.princessAges) + ","); w.newLine();
+        w.write("      \"queenAges\": " + serializeMapToJson(sc.queenAges) + ","); w.newLine();
         
         writeJsonLine(w, "aphids", sc.aphids, false);
         writeJsonLine(w, "symbioticMites", sc.symbioticMites, false);
@@ -843,13 +1006,21 @@ public class SaveManager {
         // Serialized Lists within Colony
         w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
         w.write("      \"warAssignedRoleCounts\": " + serializeMapToJson(sc.warAssignedRoleCounts) + ","); w.newLine();
-        w.write("      \"roleDisallowedSubtypesFlat\": " + serializeMapToJson(sc.roleDisallowedSubtypesFlat) + ","); w.newLine();
-        w.write("      \"warRoleDisallowedSubtypesFlat\": " + serializeMapToJson(sc.warRoleDisallowedSubtypesFlat) + ","); w.newLine();
+        w.write("      \"roleDisallowedModsFlat\": " + serializeMapToJson(sc.roleDisallowedModsFlat) + ","); w.newLine();
+        w.write("      \"warRoleDisallowedModsFlat\": " + serializeMapToJson(sc.warRoleDisallowedModsFlat) + ","); w.newLine();
         w.write("      \"outgoingColonyDiplomatMissions\": " + serializeMapToJson(sc.outgoingColonyDiplomatMissions) + ","); w.newLine();
         w.write("      \"incomingColonyDiplomatSupport\": " + serializeMapToJson(sc.incomingColonyDiplomatSupport) + ","); w.newLine();
         w.write("      \"outgoingDynastyDiplomatMissions\": " + serializeMapToJson(sc.outgoingDynastyDiplomatMissions) + ","); w.newLine();
+        w.write("      \"outgoingDynastySpyMissions\": " + serializeMapToJson(sc.outgoingDynastySpyMissions) + ","); w.newLine();
         w.write("      \"localDeathStatistics\": " + serializeMapToJson(sc.localDeathStatistics) + ","); w.newLine();
         w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
+        w.write("      \"nextHuntTargetId\": " + sc.nextHuntTargetId + ","); w.newLine();
+        w.write("      \"knownHuntTargets\": " + serializeHuntTargetsToJson(sc.knownHuntTargets) + ","); w.newLine();
+        w.write("      \"activeHuntExpeditions\": " + serializeHuntExpeditionsToJson(sc.activeHuntExpeditions) + ","); w.newLine();
+        w.write("      \"activeHuntExpedition\": " + serializeHuntExpeditionToJson(sc.activeHuntExpedition) + ","); w.newLine();
+        w.write("      \"nextInvasionAlertId\": " + sc.nextInvasionAlertId + ","); w.newLine();
+        w.write("      \"invasionAlerts\": " + serializeInvasionAlertsToJson(sc.invasionAlerts) + ","); w.newLine();
+        w.write("      \"activeInvasionDefenses\": " + serializeInvasionDefensesToJson(sc.activeInvasionDefenses) + ","); w.newLine();
         w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); 
         
         w.write("    }");
@@ -881,6 +1052,8 @@ public class SaveManager {
         int id = Integer.parseInt(rootMap.getOrDefault("id", "0"));
         String name = rootMap.getOrDefault("name", "");
         Savefile s = new Savefile(id, name);
+        String version = rootMap.getOrDefault("version", getAppVersion());
+        s.setVersion(version);
         
         s.setTimestamp(Long.parseLong(rootMap.getOrDefault("timestamp", "0")));
         s.setPlayTime(Integer.parseInt(rootMap.getOrDefault("playTime", "0")));
@@ -891,8 +1064,16 @@ public class SaveManager {
         s.setYear(Integer.parseInt(rootMap.getOrDefault("year", "0")));
         s.setWorldRadius(Integer.parseInt(rootMap.getOrDefault("worldRadius", "8")));
         s.setContinentCoreRadius(Integer.parseInt(rootMap.getOrDefault("continentCoreRadius", "0")));
+        int defaultW = (rootMap.containsKey("continentCoreRadius") && Integer.parseInt(rootMap.get("continentCoreRadius")) > 0 && !rootMap.containsKey("worldWidth")) ? 0 : GameNumbers.WORLD_RECT_WIDTH;
+        int defaultH = (rootMap.containsKey("continentCoreRadius") && Integer.parseInt(rootMap.get("continentCoreRadius")) > 0 && !rootMap.containsKey("worldHeight")) ? 0 : GameNumbers.WORLD_RECT_HEIGHT;
+        s.setWorldWidth(Integer.parseInt(rootMap.getOrDefault("worldWidth", String.valueOf(defaultW))));
+        s.setWorldHeight(Integer.parseInt(rootMap.getOrDefault("worldHeight", String.valueOf(defaultH))));
         s.setPlayerDynastyTitleId(Integer.parseInt(rootMap.getOrDefault("playerDynastyTitleId", "0")));
         s.setPlayerDynastyTitleKey(rootMap.getOrDefault("playerDynastyTitleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY));
+        if (!Boolean.parseBoolean(rootMap.getOrDefault("allowsAchievements", "true"))) {
+            s.disableAchievements();
+        }
+        s.setSpectatorMode(Boolean.parseBoolean(rootMap.getOrDefault("spectatorMode", "false")));
         
         // --- Populate Root Summary Data ---
         s.setColonyId(Integer.parseInt(rootMap.getOrDefault("colonyId", "0")));
@@ -1002,6 +1183,7 @@ public class SaveManager {
         }
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
         sc.wildDynasty = Boolean.parseBoolean(map.getOrDefault("wildDynasty", "false"));
+        sc.aiPersonality = map.getOrDefault("aiPersonality", "");
         sc.isDefeated = Boolean.parseBoolean(map.getOrDefault("isDefeated", "false"));
         sc.rankName = map.getOrDefault("rank", LanguageStrings.RANK_ANT);
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
@@ -1012,6 +1194,7 @@ public class SaveManager {
         sc.defaultAutoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoBuildEnabled", "false"));
         sc.autoDiplomacyEnabled = Boolean.parseBoolean(map.getOrDefault("autoDiplomacyEnabled", "false"));
         sc.defaultAutoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoTunnelsEnabled", "false"));
+        sc.defaultAutoLogisticsEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoLogisticsEnabled", "false"));
         sc.pactRequestIncomingPolicy = map.getOrDefault("pactRequestIncomingPolicy", "MANUAL");
         sc.lastIncomingPactRequestWorldDay = Integer.parseInt(
                 map.getOrDefault("lastIncomingPactRequestWorldDay", "-1"));
@@ -1021,6 +1204,8 @@ public class SaveManager {
         sc.geneticIntegrity = Double.parseDouble(map.getOrDefault("geneticIntegrity", "100.0"));
         sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
         sc.diplomatSupportToDynasty = deserializeJsonToMap(map.get("diplomatSupportToDynasty"));
+        sc.spySupportToDynasty = deserializeJsonToMap(map.get("spySupportToDynasty"));
+        sc.intelligenceToward = deserializeJsonToDoubleMap(map.get("intelligenceToward"));
         sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
         sc.diplomaticModifierRemainingDays = deserializeJsonToNestedIntegerMap(map.get("diplomaticModifierRemainingDays"));
         if (sc.diplomaticModifierRemainingDays.isEmpty()) {
@@ -1111,6 +1296,7 @@ public class SaveManager {
         sc.isAutomated = Boolean.parseBoolean(map.getOrDefault("isAutomated", "false"));
         sc.autoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("autoBuildEnabled", "false"));
         sc.autoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("autoTunnelsEnabled", "false"));
+        sc.autoLogisticsEnabled = Boolean.parseBoolean(map.getOrDefault("autoLogisticsEnabled", "false"));
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
         sc.daysWithoutQueen = Integer.parseInt(map.getOrDefault("daysWithoutQueen", "0"));
         sc.loyalty = Integer.parseInt(map.getOrDefault("loyalty", String.valueOf(GameNumbers.DEFAULT_COLONY_LOYALTY)));
@@ -1143,12 +1329,21 @@ public class SaveManager {
         sc.hatchRateMajor = Float.parseFloat(map.getOrDefault("hatchRateMajor", "0.0"));
         sc.hatchRateDrone = Float.parseFloat(map.getOrDefault("hatchRateDrone", "0.0"));
         sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
-        sc.subtypeHatchRatesFlat = deserializeJsonToDoubleMap(map.get("subtypeHatchRatesFlat"));
-        sc.workerSubtypes = deserializeJsonToMap(map.get("workerSubtypes"));
-        sc.soldierSubtypes = deserializeJsonToMap(map.get("soldierSubtypes"));
-        sc.majorSubtypes = deserializeJsonToMap(map.get("majorSubtypes"));
-        sc.princessSubtypes = deserializeJsonToMap(map.get("princessSubtypes"));
-        sc.queenSubtypes = deserializeJsonToMap(map.get("queenSubtypes"));
+        sc.modHatchRatesFlat = deserializeJsonToDoubleMap(map.get("modHatchRatesFlat"));
+        sc.workerMods = deserializeJsonToMap(map.get("workerMods"));
+        sc.soldierMods = deserializeJsonToMap(map.get("soldierMods"));
+        sc.majorMods = deserializeJsonToMap(map.get("majorMods"));
+        sc.princessMods = deserializeJsonToMap(map.get("princessMods"));
+        sc.queenMods = deserializeJsonToMap(map.get("queenMods"));
+        sc.eggAges = deserializeJsonToMap(map.get("eggAges"));
+        sc.larvaAges = deserializeJsonToMap(map.get("larvaAges"));
+        sc.pupaAges = deserializeJsonToMap(map.get("pupaAges"));
+        sc.workerAges = deserializeJsonToMap(map.get("workerAges"));
+        sc.soldierAges = deserializeJsonToMap(map.get("soldierAges"));
+        sc.majorAges = deserializeJsonToMap(map.get("majorAges"));
+        sc.droneAges = deserializeJsonToMap(map.get("droneAges"));
+        sc.princessAges = deserializeJsonToMap(map.get("princessAges"));
+        sc.queenAges = deserializeJsonToMap(map.get("queenAges"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
         sc.symbioticMites = Integer.parseInt(map.getOrDefault("symbioticMites",
@@ -1171,13 +1366,27 @@ public class SaveManager {
         // Nested structures
         sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
         sc.warAssignedRoleCounts = deserializeJsonToMap(map.get("warAssignedRoleCounts"));
-        sc.roleDisallowedSubtypesFlat = deserializeJsonToMap(map.get("roleDisallowedSubtypesFlat"));
-        sc.warRoleDisallowedSubtypesFlat = deserializeJsonToMap(map.get("warRoleDisallowedSubtypesFlat"));
+        sc.roleDisallowedModsFlat = deserializeJsonToMap(map.get("roleDisallowedModsFlat"));
+        sc.warRoleDisallowedModsFlat = deserializeJsonToMap(map.get("warRoleDisallowedModsFlat"));
         sc.outgoingColonyDiplomatMissions = deserializeJsonToMap(map.get("outgoingColonyDiplomatMissions"));
         sc.incomingColonyDiplomatSupport = deserializeJsonToMap(map.get("incomingColonyDiplomatSupport"));
         sc.outgoingDynastyDiplomatMissions = deserializeJsonToMap(map.get("outgoingDynastyDiplomatMissions"));
+        sc.outgoingDynastySpyMissions = deserializeJsonToMap(map.get("outgoingDynastySpyMissions"));
         sc.localDeathStatistics = deserializeJsonToMap(map.get("localDeathStatistics"));
         sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
+        sc.nextHuntTargetId = Integer.parseInt(map.getOrDefault("nextHuntTargetId", "1"));
+        sc.knownHuntTargets = deserializeJsonToHuntTargets(map.get("knownHuntTargets"));
+        sc.activeHuntExpeditions = deserializeJsonToHuntExpeditions(map.get("activeHuntExpeditions"));
+        if (sc.activeHuntExpeditions.isEmpty()) {
+            Savefile.SavedHuntExpedition legacy = deserializeJsonToHuntExpedition(map.get("activeHuntExpedition"));
+            if (legacy != null) {
+                sc.activeHuntExpeditions.add(legacy);
+            }
+        }
+        sc.activeHuntExpedition = sc.activeHuntExpeditions.size() == 1 ? sc.activeHuntExpeditions.get(0) : null;
+        sc.nextInvasionAlertId = Integer.parseInt(map.getOrDefault("nextInvasionAlertId", "1"));
+        sc.invasionAlerts = deserializeJsonToInvasionAlerts(map.get("invasionAlerts"));
+        sc.activeInvasionDefenses = deserializeJsonToInvasionDefenses(map.get("activeInvasionDefenses"));
         sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));
         
         return sc;
@@ -1362,6 +1571,251 @@ public class SaveManager {
         sb.append("]");
         return sb.toString();
     }
+
+    private String serializeHuntTargetsToJson(List<Savefile.SavedHuntTarget> targets) {
+        if (targets == null || targets.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < targets.size(); i++) {
+            Savefile.SavedHuntTarget target = targets.get(i);
+            sb.append("{");
+            sb.append("\"id\":").append(target.id).append(",");
+            sb.append("\"speciesId\":").append(target.speciesId).append(",");
+            sb.append("\"x\":").append(target.overworldX).append(",");
+            sb.append("\"y\":").append(target.overworldY).append(",");
+            sb.append("\"discoveredDay\":").append(target.discoveredWorldDay).append(",");
+            sb.append("\"escapeDay\":").append(target.escapeWorldDay);
+            sb.append("}");
+            if (i < targets.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeInvasionAlertsToJson(List<Savefile.SavedInvasionAlert> alerts) {
+        if (alerts == null || alerts.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < alerts.size(); i++) {
+            Savefile.SavedInvasionAlert alert = alerts.get(i);
+            sb.append("{");
+            sb.append("\"id\":").append(alert.id).append(",");
+            sb.append("\"speciesId\":").append(alert.speciesId).append(",");
+            sb.append("\"scope\":\"").append(escapeJsonString(alert.scope)).append("\",");
+            sb.append("\"targetColonyId\":").append(alert.targetColonyId).append(",");
+            sb.append("\"deadlineAbsoluteHour\":").append(alert.deadlineAbsoluteHour).append(",");
+            sb.append("\"defenseDispatched\":").append(alert.defenseDispatched);
+            sb.append("}");
+            if (i < alerts.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeHuntExpeditionsToJson(List<Savefile.SavedHuntExpedition> expeditions) {
+        if (expeditions == null || expeditions.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < expeditions.size(); i++) {
+            sb.append(serializeHuntExpeditionToJson(expeditions.get(i)));
+            if (i < expeditions.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private List<Savefile.SavedHuntExpedition> deserializeJsonToHuntExpeditions(String json) {
+        List<Savefile.SavedHuntExpedition> list = new ArrayList<>();
+        if (json == null || json.isBlank() || json.trim().equals("[]") || json.trim().equals("null")) {
+            return list;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
+            return list;
+        }
+        String inner = trimmed.substring(1, trimmed.length() - 1).trim();
+        if (inner.isEmpty()) {
+            return list;
+        }
+        List<String> objects = splitTopLevelJsonObjects(inner);
+        for (String objectJson : objects) {
+            Savefile.SavedHuntExpedition expedition = deserializeJsonToHuntExpedition(objectJson);
+            if (expedition != null) {
+                list.add(expedition);
+            }
+        }
+        return list;
+    }
+
+    private List<String> splitTopLevelJsonObjects(String inner) {
+        List<String> objects = new ArrayList<>();
+        int depth = 0;
+        int start = -1;
+        for (int i = 0; i < inner.length(); i++) {
+            char c = inner.charAt(i);
+            if (c == '{') {
+                if (depth == 0) {
+                    start = i;
+                }
+                depth++;
+            } else if (c == '}') {
+                depth--;
+                if (depth == 0 && start >= 0) {
+                    objects.add(inner.substring(start, i + 1));
+                    start = -1;
+                }
+            }
+        }
+        return objects;
+    }
+
+    private String serializeHuntExpeditionToJson(Savefile.SavedHuntExpedition expedition) {
+        if (expedition == null) {
+            return "null";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("\"targetId\":").append(expedition.targetId).append(",");
+        sb.append("\"phase\":\"").append(escapeJsonString(expedition.phase)).append("\",");
+        sb.append("\"travelHoursRemaining\":").append(expedition.travelHoursRemaining).append(",");
+        sb.append("\"travelHoursTotal\":").append(expedition.travelHoursTotal).append(",");
+        sb.append("\"bugHealth\":").append(expedition.bugHealth).append(",");
+        sb.append("\"tickIndex\":").append(expedition.tickIndex).append(",");
+        sb.append("\"focusTargetIndex\":").append(expedition.focusTargetIndex).append(",");
+        sb.append("\"party\":").append(serializeHuntPartyToJson(expedition.party));
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private String serializeHuntPartyToJson(List<Savefile.SavedHuntPartyMember> party) {
+        if (party == null || party.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < party.size(); i++) {
+            Savefile.SavedHuntPartyMember member = party.get(i);
+            sb.append("{");
+            sb.append("\"classId\":").append(member.classId).append(",");
+            sb.append("\"modProfileCode\":").append(member.modProfileCode).append(",");
+            sb.append("\"roleId\":").append(member.roleId).append(",");
+            sb.append("\"slotIndex\":").append(member.slotIndex).append(",");
+            sb.append("\"health\":").append(member.health).append(",");
+            sb.append("\"battleHealth\":").append(member.battleHealth).append(",");
+            sb.append("\"battleMaxHealth\":").append(member.battleMaxHealth);
+            sb.append("}");
+            if (i < party.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeInvasionDefensesToJson(List<Savefile.SavedInvasionDefense> defenses) {
+        if (defenses == null || defenses.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < defenses.size(); i++) {
+            Savefile.SavedInvasionDefense defense = defenses.get(i);
+            sb.append("{");
+            sb.append("\"alertId\":").append(defense.alertId).append(",");
+            sb.append("\"bugHealth\":").append(defense.bugHealth).append(",");
+            sb.append("\"tickIndex\":").append(defense.tickIndex).append(",");
+            sb.append("\"focusTargetIndex\":").append(defense.focusTargetIndex).append(",");
+            sb.append("\"party\":").append(serializeHuntPartyToJson(defense.party));
+            sb.append("}");
+            if (i < defenses.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private List<Savefile.SavedInvasionDefense> deserializeJsonToInvasionDefenses(String json) {
+        List<Savefile.SavedInvasionDefense> list = new ArrayList<>();
+        if (json == null || json.isBlank() || json.trim().equals("[]") || json.trim().equals("null")) {
+            return list;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
+            return list;
+        }
+        String inner = trimmed.substring(1, trimmed.length() - 1).trim();
+        if (inner.isEmpty()) {
+            return list;
+        }
+        for (String objectJson : splitTopLevelJsonObjects(inner)) {
+            Savefile.SavedInvasionDefense defense = deserializeJsonToInvasionDefense(objectJson);
+            if (defense != null) {
+                list.add(defense);
+            }
+        }
+        return list;
+    }
+
+    private Savefile.SavedInvasionDefense deserializeJsonToInvasionDefense(String json) {
+        if (json == null || json.equals("null") || json.isBlank()) {
+            return null;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+            return null;
+        }
+        int alertId = 0;
+        float bugHealth = 0f;
+        int tickIndex = 0;
+        int focusTargetIndex = 0;
+        List<Savefile.SavedHuntPartyMember> party = new ArrayList<>();
+        try {
+            String inner = trimmed.substring(1, trimmed.length() - 1);
+            int partyStart = inner.indexOf("\"party\":");
+            String header = partyStart >= 0 ? inner.substring(0, partyStart) : inner;
+            String partyJson = partyStart >= 0
+                    ? extractJsonArray(inner.substring(partyStart + "\"party\":".length()))
+                    : "[]";
+            String[] headerFields = header.split(",");
+            for (String field : headerFields) {
+                String[] kv = field.split(":", 2);
+                if (kv.length != 2) {
+                    continue;
+                }
+                String key = kv[0].replace("\"", "").trim();
+                String value = kv[1].replace("\"", "").trim();
+                switch (key) {
+                    case "alertId" -> alertId = Integer.parseInt(value);
+                    case "bugHealth" -> bugHealth = Float.parseFloat(value);
+                    case "tickIndex" -> tickIndex = Integer.parseInt(value);
+                    case "focusTargetIndex" -> focusTargetIndex = Integer.parseInt(value);
+                    default -> {
+                    }
+                }
+            }
+            party = deserializeJsonToHuntParty(partyJson.trim());
+            Savefile.SavedInvasionDefense defense = new Savefile.SavedInvasionDefense(
+                    alertId, bugHealth, tickIndex, focusTargetIndex);
+            defense.party = party;
+            return defense;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     
     private String serializeHexesToJson(List<Savefile.SavedHex> hexes) {
         if (hexes == null || hexes.isEmpty()) {
@@ -1379,6 +1833,20 @@ public class SaveManager {
             sb.append("\"t\":").append(h.timeOffset).append(","); 
             sb.append("\"w\":").append(h.weatherId).append(",");
             sb.append("\"nw\":").append(h.nonWaterResourceSourcesGenerated);
+            int rv = 0;
+            if (h.riverEdges != null) {
+                for (int j = 0; j < 6 && j < h.riverEdges.length; j++) {
+                    if (h.riverEdges[j]) rv |= (1 << j);
+                }
+            }
+            if (rv > 0) sb.append(",\"rv\":").append(rv);
+            if (h.continentId != 0) sb.append(",\"cid\":").append(h.continentId);
+            if (h.waterDistance != 0) sb.append(",\"wd\":").append(h.waterDistance);
+            if (h.coastal) sb.append(",\"co\":true");
+            if (h.elevation != 0) sb.append(",\"el\":").append(h.elevation);
+            if (h.hydrology != 0) sb.append(",\"hy\":").append(h.hydrology);
+            if (h.island) sb.append(",\"isl\":true");
+            if (h.plateId != 0) sb.append(",\"pl\":").append(h.plateId);
             sb.append("}");
             if (i < hexes.size() - 1) {
                 sb.append(",");
@@ -1608,6 +2076,269 @@ public class SaveManager {
         
         return list;
     }
+
+    private List<Savefile.SavedHuntTarget> deserializeJsonToHuntTargets(String json) {
+        List<Savefile.SavedHuntTarget> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) {
+            return list;
+        }
+
+        String[] objects = inner.split("\\},");
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) {
+                objStr += "}";
+            }
+
+            int id = 0;
+            int speciesId = 0;
+            int x = 0;
+            int y = 0;
+            int discoveredDay = 0;
+            int escapeDay = 0;
+
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+
+                        if (k.equals("id")) {
+                            id = Integer.parseInt(v);
+                        } else if (k.equals("speciesId")) {
+                            speciesId = Integer.parseInt(v);
+                        } else if (k.equals("x")) {
+                            x = Integer.parseInt(v);
+                        } else if (k.equals("y")) {
+                            y = Integer.parseInt(v);
+                        } else if (k.equals("discoveredDay")) {
+                            discoveredDay = Integer.parseInt(v);
+                        } else if (k.equals("escapeDay")) {
+                            escapeDay = Integer.parseInt(v);
+                        }
+                    }
+                }
+                list.add(new Savefile.SavedHuntTarget(id, speciesId, x, y, discoveredDay, escapeDay));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }
+
+    private List<Savefile.SavedInvasionAlert> deserializeJsonToInvasionAlerts(String json) {
+        List<Savefile.SavedInvasionAlert> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) {
+            return list;
+        }
+
+        String[] objects = inner.split("\\},");
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) {
+                objStr += "}";
+            }
+
+            int id = 0;
+            int speciesId = 0;
+            String scope = InvasionAlert.Scope.COLONY.name();
+            int targetColonyId = 0;
+            int deadlineAbsoluteHour = 0;
+            boolean defenseDispatched = false;
+
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+
+                        if (k.equals("id")) {
+                            id = Integer.parseInt(v);
+                        } else if (k.equals("speciesId")) {
+                            speciesId = Integer.parseInt(v);
+                        } else if (k.equals("scope")) {
+                            scope = v;
+                        } else if (k.equals("targetColonyId")) {
+                            targetColonyId = Integer.parseInt(v);
+                        } else if (k.equals("deadlineAbsoluteHour")) {
+                            deadlineAbsoluteHour = Integer.parseInt(v);
+                        } else if (k.equals("defenseDispatched")) {
+                            defenseDispatched = Boolean.parseBoolean(v);
+                        }
+                    }
+                }
+                list.add(new Savefile.SavedInvasionAlert(
+                        id, speciesId, scope, targetColonyId, deadlineAbsoluteHour, defenseDispatched));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }
+
+    private Savefile.SavedHuntExpedition deserializeJsonToHuntExpedition(String json) {
+        if (json == null || json.equals("null") || json.isBlank()) {
+            return null;
+        }
+        String trimmed = json.trim();
+        if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+            return null;
+        }
+
+        int targetId = 0;
+        String phase = "TRAVELING";
+        float travelHoursRemaining = 0f;
+        float travelHoursTotal = 1f;
+        float bugHealth = 0f;
+        int tickIndex = 0;
+        int focusTargetIndex = 0;
+        List<Savefile.SavedHuntPartyMember> party = new ArrayList<>();
+
+        try {
+            String inner = trimmed.substring(1, trimmed.length() - 1);
+            int partyStart = inner.indexOf("\"party\":");
+            String header = partyStart >= 0 ? inner.substring(0, partyStart) : inner;
+            String partyJson = partyStart >= 0 ? extractJsonArray(inner.substring(partyStart + "\"party\":".length())) : "[]";
+
+            String[] headerFields = header.split(",");
+            for (String field : headerFields) {
+                String[] kv = field.split(":", 2);
+                if (kv.length != 2) {
+                    continue;
+                }
+                String key = kv[0].replace("\"", "").trim();
+                String value = kv[1].replace("\"", "").trim();
+                switch (key) {
+                    case "targetId" -> targetId = Integer.parseInt(value);
+                    case "phase" -> phase = value;
+                    case "travelHoursRemaining" -> travelHoursRemaining = Float.parseFloat(value);
+                    case "travelHoursTotal" -> travelHoursTotal = Float.parseFloat(value);
+                    case "bugHealth" -> bugHealth = Float.parseFloat(value);
+                    case "tickIndex" -> tickIndex = Integer.parseInt(value);
+                    case "focusTargetIndex" -> focusTargetIndex = Integer.parseInt(value);
+                    default -> {
+                    }
+                }
+            }
+
+            party = deserializeJsonToHuntParty(partyJson.trim());
+            Savefile.SavedHuntExpedition expedition = new Savefile.SavedHuntExpedition(
+                    targetId,
+                    phase,
+                    travelHoursRemaining,
+                    travelHoursTotal,
+                    bugHealth,
+                    tickIndex,
+                    focusTargetIndex);
+            expedition.party = party;
+            return expedition;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<Savefile.SavedHuntPartyMember> deserializeJsonToHuntParty(String json) {
+        List<Savefile.SavedHuntPartyMember> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) {
+            return list;
+        }
+
+        String[] objects = inner.split("\\},");
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) {
+                objStr += "}";
+            }
+
+            int classId = 0;
+            int modProfileCode = 0;
+            int roleId = 0;
+            int slotIndex = 0;
+            int health = 0;
+            float battleHealth = -1f;
+            float battleMaxHealth = -1f;
+
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+                        switch (k) {
+                            case "classId" -> classId = Integer.parseInt(v);
+                            case "modProfileCode" -> modProfileCode = Integer.parseInt(v);
+                            case "roleId" -> roleId = Integer.parseInt(v);
+                            case "slotIndex" -> slotIndex = Integer.parseInt(v);
+                            case "health" -> health = Integer.parseInt(v);
+                            case "battleHealth" -> battleHealth = Float.parseFloat(v);
+                            case "battleMaxHealth" -> battleMaxHealth = Float.parseFloat(v);
+                            default -> {
+                            }
+                        }
+                    }
+                }
+                list.add(new Savefile.SavedHuntPartyMember(
+                        classId, modProfileCode, roleId, slotIndex, health, battleHealth, battleMaxHealth));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }
+
+    private String extractJsonArray(String jsonTail) {
+        if (jsonTail == null) {
+            return "[]";
+        }
+        String trimmed = jsonTail.trim();
+        int start = trimmed.indexOf('[');
+        if (start < 0) {
+            return "[]";
+        }
+        int depth = 0;
+        boolean inQuote = false;
+        for (int i = start; i < trimmed.length(); i++) {
+            char c = trimmed.charAt(i);
+            if (c == '"' && (i == 0 || trimmed.charAt(i - 1) != '\\')) {
+                inQuote = !inQuote;
+            }
+            if (!inQuote) {
+                if (c == '[') {
+                    depth++;
+                } else if (c == ']') {
+                    depth--;
+                    if (depth == 0) {
+                        return trimmed.substring(start, i + 1);
+                    }
+                }
+            }
+        }
+        return "[]";
+    }
     
     private List<Savefile.SavedHex> deserializeJsonToHexes(String json) {
         List<Savefile.SavedHex> list = new ArrayList<>();
@@ -1628,6 +2359,14 @@ public class SaveManager {
             int t = 0; 
             int w = 1;
             int nw = 0;
+            int rv = 0;
+            int cid = 0;
+            int wd = 0;
+            boolean co = false;
+            int el = 0;
+            int hy = 0;
+            boolean isl = false;
+            int pl = 0;
             
             try {
                 String clean = objStr.replace("{", "").replace("}", "");
@@ -1645,10 +2384,28 @@ public class SaveManager {
                         else if (k.equals("t")) t = Integer.parseInt(v);
                         else if (k.equals("w")) w = Integer.parseInt(v);
                         else if (k.equals("nw")) nw = Integer.parseInt(v);
+                        else if (k.equals("rv")) rv = Integer.parseInt(v);
+                        else if (k.equals("cid")) cid = Integer.parseInt(v);
+                        else if (k.equals("wd")) wd = Integer.parseInt(v);
+                        else if (k.equals("co")) co = Boolean.parseBoolean(v);
+                        else if (k.equals("el")) el = Integer.parseInt(v);
+                        else if (k.equals("hy")) hy = Integer.parseInt(v);
+                        else if (k.equals("isl")) isl = Boolean.parseBoolean(v);
+                        else if (k.equals("pl")) pl = Integer.parseInt(v);
                     }
                 }
                 Savefile.SavedHex saved = new Savefile.SavedHex(q, r, b, c, t, w);
                 saved.nonWaterResourceSourcesGenerated = nw;
+                for (int j = 0; j < 6; j++) {
+                    saved.riverEdges[j] = (rv & (1 << j)) != 0;
+                }
+                saved.continentId = cid;
+                saved.waterDistance = wd;
+                saved.coastal = co;
+                saved.elevation = el;
+                saved.hydrology = hy;
+                saved.island = isl;
+                saved.plateId = pl;
                 list.add(saved);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1849,16 +2606,62 @@ public class SaveManager {
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
             writeJsonLine(w, "escapeKeyGameActions", engine.isEscapeKeyGameActions(), false);
             writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
+            writeJsonLine(w, "disablePopups", engine.isDisablePopups(), false);
             writeJsonLine(w, "fuzzParasiteAnts", engine.isFuzzParasiteAnts(), false);
             writeJsonLine(w, "showAuditMenu", engine.isShowAuditMenu(), false);
+            writeJsonLine(w, "showFpsCounter", engine.isShowFpsCounter(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
             writeJsonLine(w, "darkMode", engine.isDarkMode(), false);
             writeJsonLine(w, "frameRateCap", engine.getFrameRateCap(), false);
+            writeJsonLine(w, "freeAbilities", engine.isFreeAbilities(), false);
+            writeJsonLine(w, "infiniteResearch", engine.isInfiniteResearch(), false);
+            writeJsonLine(w, "instantBuildings", engine.isInstantBuildings(), false);
+            writeJsonLine(w, "assimilateAll", engine.isAssimilateAll(), false);
+            writeJsonLine(w, "mapEditorEnabled", engine.isMapEditorEnabled(), false);
+            writeJsonLine(w, "easyConquering", engine.isEasyConquering(), false);
+            writeJsonLine(w, "instantIntegration", engine.isInstantIntegration(), false);
+            writeJsonLine(w, "animateWorldGen", engine.isAnimateWorldGen(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
             writeJsonLine(w, "defaultRolePrincess", engine.getDefaultRolePrincess(), false);
-            writeJsonLine(w, "defaultRoleQueen", engine.getDefaultRoleQueen(), true);
+            writeJsonLine(w, "defaultRoleQueen", engine.getDefaultRoleQueen(), false);
+            writeJsonLine(w, "mapLayerBorders", engine.isMapLayerBorders(), false);
+            writeJsonLine(w, "mapLayerRivers", engine.isMapLayerRivers(), false);
+            writeJsonLine(w, "mapLayerMeridian", engine.isMapLayerMeridian(), false);
+            writeJsonLine(w, "mapLayerEquator", engine.isMapLayerEquator(), false);
+            writeJsonLine(w, "mapLayerBiomeIcons", engine.isMapLayerBiomeIcons(), false);
+            writeJsonLine(w, "mapLayerColonyRanks", engine.isMapLayerColonyRanks(), false);
+            writeJsonLine(w, "mapLayerTrades", engine.isMapLayerTrades(), false);
+            writeJsonLine(w, "mapLayerTunnels", engine.isMapLayerTunnels(), false);
+            writeJsonLine(w, "mapLayerBattles", engine.isMapLayerBattles(), false);
+            writeJsonLine(w, "mapLayerGeographicNames", engine.isMapLayerGeographicNames(), false);
+            writeJsonLine(w, "mapLayerCapitals", engine.isMapLayerCapitals(), false);
+            writeJsonLine(w, "mapLayerLabelContinents", engine.isMapLayerLabelContinents(), false);
+            writeJsonLine(w, "mapLayerLabelIceCaps", engine.isMapLayerLabelIceCaps(), false);
+            writeJsonLine(w, "mapLayerLabelArchipelagos", engine.isMapLayerLabelArchipelagos(), false);
+            writeJsonLine(w, "mapLayerLabelOceans", engine.isMapLayerLabelOceans(), false);
+            writeJsonLine(w, "mapLayerLabelTrenches", engine.isMapLayerLabelTrenches(), false);
+            writeJsonLine(w, "mapLayerLabelMountains", engine.isMapLayerLabelMountains(), false);
+            writeJsonLine(w, "mapLayerLabelValleys", engine.isMapLayerLabelValleys(), false);
+            writeJsonLine(w, "mapLayerLabelLakes", engine.isMapLayerLabelLakes(), false);
+            writeJsonLine(w, "mapLayerLabelRivers", engine.isMapLayerLabelRivers(), false);
+            writeJsonLine(w, "mapLayerLabelPeninsulas", engine.isMapLayerLabelPeninsulas(), false);
+            
+            // Serialize Upgrade Coordinates
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            boolean first = true;
+            for (com.grimidk.formicempire.classes.constants.unlocks.Upgrade u : com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks.getUpgrades()) {
+                if (u.getGridX() != u.getDefaultGridX() || u.getGridY() != u.getDefaultGridY()) {
+                    if (!first) sb.append(",");
+                    sb.append("\"").append(u.getId()).append("\":\"").append(u.getGridX()).append(",").append(u.getGridY()).append("\"");
+                    first = false;
+                }
+            }
+            sb.append("}");
+            writeJsonLine(w, "upgradePositions", sb.toString(), true);
+
             w.write("}");
             w.newLine();
             w.flush();
@@ -1880,6 +2683,7 @@ public class SaveManager {
             try { if (tmp.exists()) tmp.delete(); } catch (Exception ignore) {}
             e.printStackTrace();
         }
+        writeUpgradePositionsFile();
         System.out.println("[SaveManager] Saved global settings.");
     }
 
@@ -1949,39 +2753,197 @@ public class SaveManager {
             engine.setEscapeKeyGameActions(Boolean.parseBoolean(m.getOrDefault("escapeKeyGameActions",
                     String.valueOf(engine.isEscapeKeyGameActions()))));
             engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
+            engine.setDisablePopups(Boolean.parseBoolean(m.getOrDefault("disablePopups", String.valueOf(engine.isDisablePopups()))));
             engine.setFuzzParasiteAnts(Boolean.parseBoolean(m.getOrDefault("fuzzParasiteAnts",
                     m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasiteAnts())))));
             engine.setShowAuditMenu(Boolean.parseBoolean(m.getOrDefault("showAuditMenu",
                     String.valueOf(engine.isShowAuditMenu()))));
+            engine.setShowFpsCounter(Boolean.parseBoolean(m.getOrDefault("showFpsCounter",
+                    String.valueOf(engine.isShowFpsCounter()))));
             engine.setOverworldAutoRecenter(Boolean.parseBoolean(m.getOrDefault("overworldAutoRecenter",
                     String.valueOf(engine.isOverworldAutoRecenter()))));
             engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));
             engine.setFrameRateCap(Integer.parseInt(m.getOrDefault("frameRateCap", String.valueOf(engine.getFrameRateCap()))));
+            engine.setFreeAbilities(Boolean.parseBoolean(m.getOrDefault("freeAbilities", "false")));
+            engine.setInfiniteResearch(Boolean.parseBoolean(m.getOrDefault("infiniteResearch", "false")));
+            engine.setInstantBuildings(Boolean.parseBoolean(m.getOrDefault("instantBuildings", "false")));
+            engine.setAssimilateAll(Boolean.parseBoolean(m.getOrDefault("assimilateAll", "false")));
+            engine.setMapEditorEnabled(Boolean.parseBoolean(m.getOrDefault("mapEditorEnabled", "false")));
+            engine.setEasyConquering(Boolean.parseBoolean(m.getOrDefault("easyConquering", "false")));
+            engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
+            engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "false")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_WORKER,
+                    GameConstants.CLASS_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_WORKER).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_WORKER).getId()));
             engine.setDefaultRoleSoldier(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_SOLDIER,
+                    GameConstants.CLASS_SOLDIER,
                     Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_SOLDIER).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_SOLDIER).getId()));
             engine.setDefaultRoleMajor(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_MAJOR,
+                    GameConstants.CLASS_MAJOR,
                     Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_MAJOR).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_MAJOR).getId()));
             engine.setDefaultRolePrincess(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_PRINCESS,
+                    GameConstants.CLASS_PRINCESS,
                     Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_PRINCESS).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_PRINCESS).getId()));
             engine.setDefaultRoleQueen(Engine.sanitizeDefaultRoleId(
-                    GameConstants.TYPE_QUEEN,
+                    GameConstants.CLASS_QUEEN,
                     Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))),
-                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_QUEEN).getId()));
+                    Engine.builtinDefaultRoleForAntClass(GameConstants.CLASS_QUEEN).getId()));
+            engine.setMapLayerBorders(Boolean.parseBoolean(m.getOrDefault("mapLayerBorders",
+                    String.valueOf(engine.isMapLayerBorders()))));
+            engine.setMapLayerRivers(Boolean.parseBoolean(m.getOrDefault("mapLayerRivers",
+                    String.valueOf(engine.isMapLayerRivers()))));
+            engine.setMapLayerMeridian(Boolean.parseBoolean(m.getOrDefault("mapLayerMeridian",
+                    String.valueOf(engine.isMapLayerMeridian()))));
+            engine.setMapLayerEquator(Boolean.parseBoolean(m.getOrDefault("mapLayerEquator",
+                    String.valueOf(engine.isMapLayerEquator()))));
+            engine.setMapLayerBiomeIcons(Boolean.parseBoolean(m.getOrDefault("mapLayerBiomeIcons",
+                    String.valueOf(engine.isMapLayerBiomeIcons()))));
+            engine.setMapLayerColonyRanks(Boolean.parseBoolean(m.getOrDefault("mapLayerColonyRanks",
+                    String.valueOf(engine.isMapLayerColonyRanks()))));
+            engine.setMapLayerTrades(Boolean.parseBoolean(m.getOrDefault("mapLayerTrades",
+                    String.valueOf(engine.isMapLayerTrades()))));
+            engine.setMapLayerTunnels(Boolean.parseBoolean(m.getOrDefault("mapLayerTunnels",
+                    String.valueOf(engine.isMapLayerTunnels()))));
+            engine.setMapLayerBattles(Boolean.parseBoolean(m.getOrDefault("mapLayerBattles",
+                    String.valueOf(engine.isMapLayerBattles()))));
+            engine.setMapLayerGeographicNames(Boolean.parseBoolean(m.getOrDefault("mapLayerGeographicNames",
+                    String.valueOf(engine.isMapLayerGeographicNames()))));
+            engine.setMapLayerCapitals(Boolean.parseBoolean(m.getOrDefault("mapLayerCapitals",
+                    String.valueOf(engine.isMapLayerCapitals()))));
+            engine.setMapLayerLabelContinents(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelContinents",
+                    String.valueOf(engine.isMapLayerLabelContinents()))));
+            engine.setMapLayerLabelIceCaps(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelIceCaps",
+                    String.valueOf(engine.isMapLayerLabelIceCaps()))));
+            engine.setMapLayerLabelArchipelagos(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelArchipelagos",
+                    String.valueOf(engine.isMapLayerLabelArchipelagos()))));
+            engine.setMapLayerLabelOceans(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelOceans",
+                    String.valueOf(engine.isMapLayerLabelOceans()))));
+            engine.setMapLayerLabelTrenches(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelTrenches",
+                    String.valueOf(engine.isMapLayerLabelTrenches()))));
+            engine.setMapLayerLabelMountains(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelMountains",
+                    String.valueOf(engine.isMapLayerLabelMountains()))));
+            engine.setMapLayerLabelValleys(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelValleys",
+                    String.valueOf(engine.isMapLayerLabelValleys()))));
+            engine.setMapLayerLabelLakes(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelLakes",
+                    String.valueOf(engine.isMapLayerLabelLakes()))));
+            engine.setMapLayerLabelRivers(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelRivers",
+                    String.valueOf(engine.isMapLayerLabelRivers()))));
+            engine.setMapLayerLabelPeninsulas(Boolean.parseBoolean(m.getOrDefault("mapLayerLabelPeninsulas",
+                    String.valueOf(engine.isMapLayerLabelPeninsulas()))));
+
+            loadUpgradePositionsFromFile();
+            if (m.containsKey("upgradePositions")) {
+                loadUpgradePositionsFromSettings(m.get("upgradePositions"));
+            }
 
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("[SaveManager] Error parsing settings.json, using defaults.");
+        }
+    }
+
+    private void writeUpgradePositionsFile() {
+        try {
+            File dest = new File(GamePaths.resolveSavesDirectory(), "upgrade_positions.json");
+            try (BufferedWriter pw = Files.newBufferedWriter(dest.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                pw.write("{\n");
+                boolean first = true;
+                for (Upgrade u : GameUnlocks.getUpgrades()) {
+                    if (!first) pw.write(",\n");
+                    pw.write("  \"" + escapeJsonString(u.getNameKey()) + "\": { ");
+                    pw.write("\"defaultX\": " + u.getDefaultGridX() + ", ");
+                    pw.write("\"defaultY\": " + u.getDefaultGridY() + ", ");
+                    pw.write("\"setX\": " + u.getGridX() + ", ");
+                    pw.write("\"setY\": " + u.getGridY());
+                    pw.write(" }");
+                    first = false;
+                }
+                pw.write("\n}\n");
+            }
+        } catch (Exception ignore) {}
+    }
+
+    private void loadUpgradePositionsFromFile() {
+        File file = new File(GamePaths.resolveSavesDirectory(), "upgrade_positions.json");
+        if (!file.exists()) {
+            return;
+        }
+        boolean loadedAny = false;
+        try (BufferedReader r = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                line = line.trim();
+                int nameKeyEnd = line.indexOf("\":");
+                if (nameKeyEnd <= 0) continue;
+                String nameKey = line.substring(0, nameKeyEnd).trim();
+                if (nameKey.startsWith("\"")) nameKey = nameKey.substring(1);
+
+                int setXIdx = line.indexOf("\"setX\":");
+                int setYIdx = line.indexOf("\"setY\":");
+                if (setXIdx < 0 || setYIdx < 0) continue;
+
+                int commaAfterX = line.indexOf(',', setXIdx);
+                int braceAfterY = line.indexOf('}', setYIdx);
+                if (commaAfterX < 0 || braceAfterY < 0) continue;
+
+                String strX = line.substring(setXIdx + 7, commaAfterX).trim();
+                String strY = line.substring(setYIdx + 7, braceAfterY).trim();
+
+                try {
+                    int gx = Integer.parseInt(strX);
+                    int gy = Integer.parseInt(strY);
+                    Upgrade u = GameUnlocks.getUpgradeByNameKey(nameKey);
+                    if (u != null) {
+                        u.setGridX(gx);
+                        u.setGridY(gy);
+                        loadedAny = true;
+                    }
+                } catch (NumberFormatException ignore) {}
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (loadedAny) {
+            ResearchTreeGraph.invalidateLayoutCache();
+        }
+    }
+
+    private void loadUpgradePositionsFromSettings(String serialized) {
+        if (serialized == null || serialized.isBlank() || serialized.equals("{}")) {
+            return;
+        }
+        boolean loadedAny = false;
+        String unescaped = unescapeJsonString(serialized);
+        if (unescaped.startsWith("{")) unescaped = unescaped.substring(1);
+        if (unescaped.endsWith("}")) unescaped = unescaped.substring(0, unescaped.length() - 1);
+        String[] pairs = unescaped.split(",");
+        for (String pair : pairs) {
+            int col = pair.indexOf(':');
+            if (col <= 0) continue;
+            String key = pair.substring(0, col).trim().replace("\"", "");
+            String val = pair.substring(col + 1).trim().replace("\"", "");
+            String[] coords = val.split(",");
+            if (coords.length == 2) {
+                try {
+                    int id = Integer.parseInt(key);
+                    int gx = Integer.parseInt(coords[0].trim());
+                    int gy = Integer.parseInt(coords[1].trim());
+                    Upgrade u = GameUnlocks.getUpgradeById(id);
+                    if (u != null) {
+                        u.setGridX(gx);
+                        u.setGridY(gy);
+                        loadedAny = true;
+                    }
+                } catch (NumberFormatException ignore) {}
+            }
+        }
+        if (loadedAny) {
+            ResearchTreeGraph.invalidateLayoutCache();
         }
     }
 

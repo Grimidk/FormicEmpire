@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -87,7 +87,7 @@ class WarConquestStabilizationTest {
 
         Colony captured = new Colony(11, "Captured", false);
         captured.setAge(10);
-        captured.getQueens().add(new Ant(captured, GameConstants.TYPE_QUEEN));
+        captured.getQueens().add(new Ant(captured, GameConstants.CLASS_QUEEN));
         ColonyStarterService.shared().matureColony(captured);
         captured.getWorkers().clear();
         captured.getSoldiers().clear();

@@ -13,7 +13,8 @@ import java.util.Set;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
@@ -22,8 +23,9 @@ import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -217,7 +219,7 @@ public class DynastyDiplomacyService {
         if (dynasty.isPactRequestPromptOpen()) {
             return false;
         }
-        if (!dynasty.copyPendingPactRequestFromIds().isEmpty()) {
+        if (dynasty.copyPendingPactRequestFromIds().size() >= GameNumbers.DIPLO_PENDING_PACT_REQUEST_QUEUE_MAX) {
             return false;
         }
         int today = DynastyIntegrationService.worldDayIndex(world);
@@ -239,6 +241,29 @@ public class DynastyDiplomacyService {
             declineNonAggressionPact(requester, world);
         } else {
             dynasty.addPendingPactRequest(requester.getId());
+        }
+    }
+
+    public void applyIncomingPactPolicyToPendingRequests(World world) {
+        if (world == null) {
+            return;
+        }
+        PactRequestIncomingPolicy policy = dynasty.getPactRequestIncomingPolicy();
+        if (policy == PactRequestIncomingPolicy.MANUAL) {
+            return;
+        }
+        List<Integer> pending = dynasty.copyPendingPactRequestFromIds();
+        for (int fromId : pending) {
+            Dynasty requester = world.findDynastyById(fromId);
+            if (requester == null || requester.isDefeated()) {
+                dynasty.removePendingPactRequest(fromId);
+                continue;
+            }
+            if (policy == PactRequestIncomingPolicy.AUTO_ACCEPT) {
+                acceptNonAggressionPact(requester, world);
+            } else if (policy == PactRequestIncomingPolicy.AUTO_DECLINE) {
+                declineNonAggressionPact(requester, world);
+            }
         }
     }
 
@@ -529,6 +554,11 @@ public class DynastyDiplomacyService {
             lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_WARMONGER.getName(), warmonger));
         }
 
+        int sameSpecies = getSameSpeciesAdjustment(other);
+        if (sameSpecies != 0) {
+            lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_SAME_SPECIES.getName(), sameSpecies));
+        }
+
         int militaryAdj = getMilitaryReputationAdjustment(other);
         if (militaryAdj != 0) {
             lines.add(new ReputationModifierLine(
@@ -616,6 +646,18 @@ public class DynastyDiplomacyService {
         return 0;
     }
 
+    public int getSameSpeciesAdjustment(Dynasty other) {
+        if (other == null || other == dynasty) {
+            return 0;
+        }
+        if (dynasty.getSpecies() != null
+                && dynasty.getSpecies() != GameConstants.SPECIES_OMNI
+                && dynasty.getSpecies() == other.getSpecies()) {
+            return GameConstants.DIPLO_MODIFIER_SAME_SPECIES.getReputationDelta();
+        }
+        return 0;
+    }
+
     public int getEffectiveDiplomaticReputation(Dynasty other, World world) {
         if (other == null || other == dynasty) {
             return GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION;
@@ -623,9 +665,25 @@ public class DynastyDiplomacyService {
         int score = dynasty.getDiplomaticReputation(other.getId())
                 + getBorderFrictionAdjustment(other, world)
                 + getWarmongerAdjustment(other, world)
+                + getSameSpeciesAdjustment(other)
                 + getMilitaryReputationAdjustment(other)
-                + getDiplomatReputationAdjustment(other);
+                + getDiplomatReputationAdjustment(other)
+                + getAiPersonalityReputationAdjustment(other);
         return GameNumbers.clampDiplomaticReputation(score);
+    }
+
+    public int getAiPersonalityReputationAdjustment(Dynasty other) {
+        if (other == null || other == dynasty) {
+            return 0;
+        }
+        AiPersonality personality = other.getAiPersonality();
+        if (personality == AiPersonality.MILITARIST) {
+            return GameNumbers.AI_MILITARIST_REPUTATION_DELTA;
+        }
+        if (personality == AiPersonality.PACIFIST) {
+            return GameNumbers.AI_PACIFIST_REPUTATION_DELTA;
+        }
+        return 0;
     }
 
     public int getDiplomatReputationAdjustment(Dynasty other) {
@@ -778,8 +836,9 @@ public class DynastyDiplomacyService {
         if (playerHex == null) {
             return null;
         }
-        for (Hex neighborHex : playerHex.getAdjacentNeighbors()) {
-            if (neighborHex == null || neighborHex.getColony() == null) {
+        int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
+        for (Hex neighborHex : HexWaterCrossing.tradeReachableLandHexes(playerHex, waterRange)) {
+            if (neighborHex.getColony() == null) {
                 continue;
             }
             Colony neighborColony = neighborHex.getColony();
@@ -929,7 +988,7 @@ public class DynastyDiplomacyService {
             return false;
         }
 
-        Map<AntType, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
+        Map<AntClass, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
         if (transport.isEmpty()) {
             dynasty.removePendingTradeProposal(proposal);
             return false;
@@ -1174,10 +1233,10 @@ public class DynastyDiplomacyService {
     }
 
     public int getDiplomatStabilityGainPerAnt() {
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_3)) {
             return GameNumbers.DIPLOMAT_STABILITY_GAIN_PRESSURE_3;
         }
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2)) {
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_2)) {
             return GameNumbers.DIPLOMAT_STABILITY_GAIN_PRESSURE_2;
         }
         return GameNumbers.DIPLOMAT_STABILITY_GAIN_BASE;

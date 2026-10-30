@@ -33,7 +33,7 @@ class ColonyWarEconomyRolesTest {
         Colony colony = new Colony(2, "Test", true);
         dynasty.addColony(colony);
         colony.setDynasty(dynasty);
-        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
 
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_HUNTER, 5);
         colony.setWarAssignedRoleCount(GameConstants.ROLE_WARRIOR, 7);
@@ -44,7 +44,7 @@ class ColonyWarEconomyRolesTest {
 
         Dynasty enemy = new Dynasty(3, "Enemy", false, GameConstants.SPECIES_OMNI);
         Colony enemyColony = new Colony(3, "Enemy Capital", false);
-        enemyColony.getWorkers().add(new Ant(enemyColony, GameConstants.TYPE_WORKER));
+        enemyColony.getWorkers().add(new Ant(enemyColony, GameConstants.CLASS_WORKER));
         enemy.addColony(enemyColony);
         dynasty.getDiplomacyService().applyWar(enemy);
 

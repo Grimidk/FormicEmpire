@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.ui.util;
 
 import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
@@ -9,12 +10,20 @@ import java.awt.Window;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 public final class UiOptionPane {
     private static final int DIALOG_ICON_SIZE_PX = 32;
     private static Icon dialogIcon;
 
     private UiOptionPane() {
+    }
+
+    public static void applyLocalizedButtonTexts() {
+        UIManager.put("OptionPane.yesButtonText", LanguageStrings.get(LanguageStrings.UI_YES));
+        UIManager.put("OptionPane.noButtonText", LanguageStrings.get(LanguageStrings.UI_NO));
+        UIManager.put("OptionPane.okButtonText", LanguageStrings.get(LanguageStrings.UI_OK));
+        UIManager.put("OptionPane.cancelButtonText", LanguageStrings.get(LanguageStrings.UI_CANCEL));
     }
 
     public static void showMessageDialog(Component parent, Object message) {
@@ -117,6 +126,7 @@ public final class UiOptionPane {
             Icon icon,
             Object[] options,
             Object initialValue) {
+        applyLocalizedButtonTexts();
         Icon resolvedIcon = resolveIcon(messageType, icon);
         if (options == null && initialValue == null) {
             return new JOptionPane(message, messageType, optionType, resolvedIcon);

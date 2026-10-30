@@ -1,12 +1,15 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,18 +21,22 @@ public class DynastyStatService {
         if (dynasty == null) return 0;
         int total = 0;
         for (Colony c : dynasty.getColonies()) {
-            total += c.getAntTotal();
+            if (c != null) {
+                total += c.getAntTotal();
+            }
         }
         return total;
     }
 
-    public Map<AntType, Integer> getGlobalPopulationByType(Dynasty dynasty) {
-        Map<AntType, Integer> totals = new HashMap<>();
+    public Map<AntClass, Integer> getGlobalPopulationByClass(Dynasty dynasty) {
+        Map<AntClass, Integer> totals = new HashMap<>();
         if (dynasty == null) return totals;
 
         for (Colony c : dynasty.getColonies()) {
-            for (Map.Entry<AntType, List<Ant>> entry : c.getAntGroups().entrySet()) {
-                totals.merge(entry.getKey(), entry.getValue().size(), Integer::sum);
+            if (c != null && c.getAntGroups() != null) {
+                for (Map.Entry<AntClass, List<Ant>> entry : c.getAntGroups().entrySet()) {
+                    totals.merge(entry.getKey(), entry.getValue().size(), Integer::sum);
+                }
             }
         }
         return totals;
@@ -99,10 +106,19 @@ public class DynastyStatService {
         if (dynasty == null) {
             return GameNumbers.COMBAT_CAPACITY_BASE;
         }
-        if (hasAssignedCommanders(dynasty)) {
-            return GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER;
+        int capacity = hasAssignedCommanders(dynasty)
+                ? GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER
+                : GameNumbers.COMBAT_CAPACITY_BASE;
+        if (hasSwarmingAbility(dynasty)) {
+            capacity = Math.round(capacity * GameNumbers.ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT);
         }
-        return GameNumbers.COMBAT_CAPACITY_BASE;
+        return capacity;
+    }
+
+    public boolean hasSwarmingAbility(Dynasty dynasty) {
+        return dynasty != null
+                && (dynasty.hasUpgrade(GameUnlocks.ABILITY_SWARMING)
+                        || dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_SWARMING));
     }
 
     public boolean hasAssignedCommanders(Dynasty dynasty) {
@@ -128,5 +144,126 @@ public class DynastyStatService {
             }
         }
         return false;
+    }
+
+    public int getActiveMilitaryPower(Dynasty dynasty) {
+        return dynasty != null ? dynasty.getActiveMilitaryPower() : 0;
+    }
+
+    public int getReserveMilitaryPower(Dynasty dynasty) {
+        return dynasty != null ? dynasty.getReserveMilitaryPower() : 0;
+    }
+
+    public int getTotalAssignedCarriers(Dynasty dynasty) {
+        if (dynasty == null || dynasty.getColonies() == null) {
+            return 0;
+        }
+        boolean atWar = dynasty.isAtWar();
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == null) {
+                continue;
+            }
+            total += atWar
+                    ? colony.getWarAssignedRoleCount(GameConstants.ROLE_CARRIER)
+                    : colony.getAssignedRoleCount(GameConstants.ROLE_CARRIER);
+        }
+        return total;
+    }
+
+    public int getAssignedCarriers(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        boolean atWar = dynasty != null && dynasty.isAtWar();
+        return atWar
+                ? colony.getWarAssignedRoleCount(GameConstants.ROLE_CARRIER)
+                : colony.getAssignedRoleCount(GameConstants.ROLE_CARRIER);
+    }
+
+    public int getWarFrontCount(Dynasty dynasty, World world) {
+        if (dynasty == null || world == null || !dynasty.isAtWar()) {
+            return 1;
+        }
+        int count = 0;
+        for (War war : world.getWarService().getActiveWars()) {
+            if (war.involves(dynasty.getId())) {
+                count++;
+            }
+        }
+        return Math.max(1, count);
+    }
+
+    public int getCarrierSharePerFront(Dynasty dynasty, World world) {
+        return fairShare(getTotalAssignedCarriers(dynasty), getWarFrontCount(dynasty, world));
+    }
+
+    public float getDailyReinforcementRate(Dynasty dynasty, World world) {
+        return GameNumbers.warDailyReinforcementRate(getCarrierSharePerFront(dynasty, world));
+    }
+
+    public int getDailyReinforcementAllowancePerLine(Dynasty dynasty, World world) {
+        return GameNumbers.warDailyReinforcementAllowancePerLine(
+                getCombatCapacity(dynasty),
+                getCarrierSharePerFront(dynasty, world));
+    }
+
+    private static int fairShare(int totalQuota, int frontCount) {
+        int fronts = Math.max(1, frontCount);
+        if (totalQuota <= 0) {
+            return 0;
+        }
+        return (totalQuota + fronts - 1) / fronts;
+    }
+
+    public double getAverageAntAge(Dynasty dynasty, AntClass antClass) {
+        if (dynasty == null || antClass == null) {
+            return 0.0;
+        }
+        long sum = 0;
+        int count = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == null) {
+                continue;
+            }
+            List<Ant> ants = colony.getAntsByClass(antClass);
+            if (ants == null) {
+                continue;
+            }
+            for (Ant ant : ants) {
+                if (ant != null && ant.isAlive()) {
+                    sum += ant.getAge();
+                    count++;
+                }
+            }
+        }
+        return count > 0 ? (double) sum / count : 0.0;
+    }
+
+    public double getAverageAntAge(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0.0;
+        }
+        long sum = 0;
+        int count = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == null || colony.getAntGroups() == null) {
+                continue;
+            }
+            for (Map.Entry<AntClass, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+                List<Ant> ants = entry.getValue();
+                if (ants == null) {
+                    continue;
+                }
+                for (Ant ant : ants) {
+                    if (ant != null && ant.isAlive()) {
+                        sum += ant.getAge();
+                        count++;
+                    }
+                }
+            }
+        }
+        return count > 0 ? (double) sum / count : 0.0;
     }
 }

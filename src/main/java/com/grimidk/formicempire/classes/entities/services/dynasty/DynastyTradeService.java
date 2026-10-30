@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 
@@ -29,6 +30,12 @@ public class DynastyTradeService {
         return tradeManager.getActiveTrades().stream()
             .filter(this::isTradeInDynasty)
             .collect(Collectors.toList());
+    }
+
+    public int countActiveRecurrentRoutes() {
+        return (int) tradeManager.getActiveTrades().stream()
+                .filter(t -> t.isActive() && t.isRecurrent() && isTradeInDynasty(t))
+                .count();
     }
 
     private boolean isTradeInDynasty(Trade trade) {
@@ -69,8 +76,9 @@ public class DynastyTradeService {
         if (center == null) {
             return neighbors;
         }
-        for (Hex hex : center.getAdjacentNeighbors()) {
-            if (hex != null && hex.getColony() != null && hex.getColony() != colony) {
+        int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
+        for (Hex hex : HexWaterCrossing.tradeReachableLandHexes(center, waterRange)) {
+            if (hex.getColony() != null && hex.getColony() != colony) {
                 neighbors.add(hex.getColony());
             }
         }
@@ -79,11 +87,12 @@ public class DynastyTradeService {
 
     public Hex getNeighborHex(World world, Colony colony, Colony neighbor) {
         Hex center = world.getHexOfColony(colony);
-        if (center == null) {
+        if (center == null || neighbor == null) {
             return null;
         }
-        for (Hex hex : center.getAdjacentNeighbors()) {
-            if (hex != null && hex.getColony() == neighbor) {
+        int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
+        for (Hex hex : HexWaterCrossing.tradeReachableLandHexes(center, waterRange)) {
+            if (hex.getColony() == neighbor) {
                 return hex;
             }
         }

@@ -10,6 +10,8 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 
 class DynastyAutoUpgradePrerequisitesTest {
 
@@ -48,5 +50,11 @@ class DynastyAutoUpgradePrerequisitesTest {
         assertTrue(GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, GameUnlocks.ABILITY_AUTO_DIPLOMACY));
         assertFalse(dynasty.meetsAutoTunnelsPrerequisites());
         assertFalse(GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, GameUnlocks.ABILITY_AUTO_TUNNELS));
+    }
+
+    @Test
+    void autoLogisticsRequiresRecurrentRoutes() {
+        assertFalse(dynasty.meetsAutoLogisticsPrerequisites());
+        assertFalse(GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, GameUnlocks.ABILITY_AUTO_LOGISTICS));
     }
 }

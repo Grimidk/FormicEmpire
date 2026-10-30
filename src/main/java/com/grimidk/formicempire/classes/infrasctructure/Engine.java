@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.audio.MusicService;
 import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
@@ -16,6 +17,8 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics;
+import com.grimidk.formicempire.classes.infrasctructure.diagnostics.SimulationDiagnostics.Scope;
 
 public class Engine extends Thread {
     private World world;
@@ -58,21 +61,56 @@ public class Engine extends Thread {
     private boolean confirmOnQuit = true;
     private boolean escapeKeyGameActions = true;
     private boolean showTooltips = true;
+    private boolean disablePopups = false;
     
     private boolean fuzzParasiteAnts = true;
     private boolean showAuditMenu = false;
+    private boolean showFpsCounter = false;
     private boolean overworldAutoRecenter = true;
-    private boolean darkMode = false;
-    private int frameRateCap = 0;
+    private boolean darkMode = true;
+    private int frameRateCap = 60;
+    private boolean freeAbilities = false;
+    private boolean infiniteResearch = false;
+    private boolean instantBuildings = false;
+    private boolean assimilateAll = false;
+    private boolean mapEditorEnabled = false;
+    private boolean easyConquering = false;
+    private boolean instantIntegration = false;
+    private boolean animateWorldGen = false;
+    private WorldGenStepListener worldGenStepListener;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
     private int defaultRoleSoldier = GameConstants.ROLE_HUNTER.getId();
     private int defaultRoleMajor = GameConstants.ROLE_CRANE.getId();
     private int defaultRolePrincess = GameConstants.ROLE_BREEDER.getId();
     private int defaultRoleQueen = GameConstants.ROLE_LAYER.getId();
+    private boolean mapLayerBorders = true;
+    private boolean mapLayerRivers = true;
+    private boolean mapLayerMeridian = true;
+    private boolean mapLayerEquator = true;
+    private double mapViewportCenterCol = 0.0;
+    private double mapViewportSpanCols = 0.0;
+    private boolean mapViewportActive = false;
+    private boolean mapLayerBiomeIcons = true;
+    private boolean mapLayerColonyRanks = true;
+    private boolean mapLayerTrades = true;
+    private boolean mapLayerTunnels = true;
+    private boolean mapLayerBattles = true;
+    private boolean mapLayerGeographicNames = true;
+    private boolean mapLayerCapitals = true;
+    private boolean mapLayerLabelContinents = true;
+    private boolean mapLayerLabelIceCaps = true;
+    private boolean mapLayerLabelArchipelagos = true;
+    private boolean mapLayerLabelOceans = true;
+    private boolean mapLayerLabelTrenches = true;
+    private boolean mapLayerLabelMountains = true;
+    private boolean mapLayerLabelValleys = true;
+    private boolean mapLayerLabelLakes = true;
+    private boolean mapLayerLabelRivers = true;
+    private boolean mapLayerLabelPeninsulas = true;
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
-    private static final long SPEED_STEP_COALESCE_MS = 120;
+    private static final long SPEED_STEP_COALESCE_MS = 40;
 
     public Engine() {
         this.semaphore = new Semaphore(1);
@@ -118,6 +156,21 @@ public class Engine extends Thread {
         this.world = world;
         if (this.world != null) {
             this.world.setEngine(this);
+            if (this.worldGenStepListener != null) {
+                this.world.setWorldGenStepListener(this.worldGenStepListener);
+            }
+        }
+        clampSpeedToCurrentRules();
+    }
+
+    private boolean isSpectatorWorld() {
+        return this.world != null && this.world.isSpectatorMode();
+    }
+
+    private void clampSpeedToCurrentRules() {
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+        if (speed != null && speed.getId() > maxId) {
+            speed = GameSpeed.fromId(maxId);
         }
     }
 
@@ -145,8 +198,9 @@ public class Engine extends Thread {
             return;
         }
         GameSpeed resolved = speed;
-        if (speed.getId() > GameSpeed.maxPlayableId(allowTurboMode)) {
-            resolved = GameSpeed.fromId(GameSpeed.maxPlayableId(allowTurboMode));
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+        if (speed.getId() > maxId) {
+            resolved = GameSpeed.fromId(maxId);
         }
         if (this.speed != resolved) {
             this.speed = resolved;
@@ -186,14 +240,14 @@ public class Engine extends Thread {
                 pauseEngine();
                 return;
             }
-            setSpeed(GameSpeed.step(speed, -1, allowTurboMode));
+            setSpeed(GameSpeed.step(speed, -1, allowTurboMode, isSpectatorWorld()));
             return;
         }
         if (paused) {
             resumeEngine();
             return;
         }
-        setSpeed(GameSpeed.step(speed, 1, allowTurboMode));
+        setSpeed(GameSpeed.step(speed, 1, allowTurboMode, isSpectatorWorld()));
     }
 
     public void togglePause() {
@@ -236,13 +290,31 @@ public class Engine extends Thread {
         if (r != null) minuteTickListeners.remove(r);
     }
     public void notifyMinuteListeners() {
-        for (Runnable r : minuteTickListeners) {
-            try {
-                r.run();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.ENGINE_MINUTE_NOTIFY)) {
+            for (Runnable r : minuteTickListeners) {
+                try {
+                    r.run();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
+    }
+
+    public int getMinuteTickListenerCount() {
+        return minuteTickListeners.size();
+    }
+
+    public int getHourTickListenerCount() {
+        return hourTickListeners.size();
+    }
+
+    public int getDayTickListenerCount() {
+        return dayTickListeners.size();
+    }
+
+    public int getMonthTickListenerCount() {
+        return monthTickListeners.size();
     }
 
     // --- Hour Listeners ---
@@ -320,6 +392,8 @@ public class Engine extends Thread {
         this.setWorld(world);
 
         this.loadFile(savefile);
+        clampSpeedToCurrentRules();
+        SandboxCheatService.applyEnabledCheats(this);
         
         try {
             if (savefile != null && this.world != null) {
@@ -343,9 +417,21 @@ public class Engine extends Thread {
                 semaphore.acquireUninterruptibly();
                 try {
                     if (this.world != null) {
-                        this.world.runMinute();
-                        notifyMinuteListeners();
+                        int steps = (this.world.isSpectatorMode() && speed.getId() == GameSpeed.ID_HYPER_TURBO)
+                                ? GameNumbers.SPECTATOR_HYPER_TURBO_MINUTES_PER_TICK
+                                : 1;
+                        for (int i = 0; i < steps; i++) {
+                            if (paused || killSwitch || this.world == null) {
+                                break;
+                            }
+                            this.world.runMinute();
+                        }
+                        if (this.world != null) {
+                            notifyMinuteListeners();
+                        }
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 } finally {
                     semaphore.release();
                 }
@@ -371,9 +457,7 @@ public class Engine extends Thread {
 
     public void setAllowTurboMode(boolean allowTurboMode) {
         this.allowTurboMode = allowTurboMode;
-        if (!allowTurboMode && speed.getId() > GameSpeed.maxPlayableId(false)) {
-            speed = GameSpeed.fromId(GameSpeed.maxPlayableId(false));
-        }
+        clampSpeedToCurrentRules();
     }
 
     public String getScreenSize() {
@@ -511,6 +595,14 @@ public class Engine extends Thread {
         this.showTooltips = showTooltips;
     }
 
+    public boolean isDisablePopups() {
+        return disablePopups;
+    }
+
+    public void setDisablePopups(boolean disablePopups) {
+        this.disablePopups = disablePopups;
+    }
+
     public boolean isFuzzParasiteAnts() {
         return fuzzParasiteAnts;
     }
@@ -525,6 +617,104 @@ public class Engine extends Thread {
 
     public void setShowAuditMenu(boolean showAuditMenu) {
         this.showAuditMenu = showAuditMenu;
+    }
+
+    public boolean isShowFpsCounter() {
+        return showFpsCounter;
+    }
+
+    public void setShowFpsCounter(boolean showFpsCounter) {
+        this.showFpsCounter = showFpsCounter;
+    }
+
+    public boolean isFreeAbilities() {
+        return freeAbilities;
+    }
+
+    public void setFreeAbilities(boolean freeAbilities) {
+        this.freeAbilities = freeAbilities;
+    }
+
+    public boolean isInfiniteResearch() {
+        return infiniteResearch;
+    }
+
+    public void setInfiniteResearch(boolean infiniteResearch) {
+        this.infiniteResearch = infiniteResearch;
+    }
+
+    public boolean isInstantBuildings() {
+        return instantBuildings;
+    }
+
+    public void setInstantBuildings(boolean instantBuildings) {
+        this.instantBuildings = instantBuildings;
+    }
+
+    public boolean isAssimilateAll() {
+        return assimilateAll;
+    }
+
+    public void setAssimilateAll(boolean assimilateAll) {
+        this.assimilateAll = assimilateAll;
+    }
+
+    public boolean isEasyConquering() {
+        return easyConquering;
+    }
+
+    public void setEasyConquering(boolean easyConquering) {
+        this.easyConquering = easyConquering;
+    }
+
+    public boolean isMapEditorEnabled() {
+        return mapEditorEnabled;
+    }
+
+    public void setMapEditorEnabled(boolean mapEditorEnabled) {
+        this.mapEditorEnabled = mapEditorEnabled;
+    }
+
+    public boolean isInstantIntegration() {
+        return instantIntegration;
+    }
+
+    public void setInstantIntegration(boolean instantIntegration) {
+        this.instantIntegration = instantIntegration;
+    }
+
+    public boolean isAnimateWorldGen() {
+        return animateWorldGen;
+    }
+
+    public void setAnimateWorldGen(boolean animateWorldGen) {
+        this.animateWorldGen = animateWorldGen;
+    }
+
+    public WorldGenStepListener getWorldGenStepListener() {
+        return worldGenStepListener;
+    }
+
+    public void setWorldGenStepListener(WorldGenStepListener worldGenStepListener) {
+        this.worldGenStepListener = worldGenStepListener;
+        if (this.world != null) {
+            this.world.setWorldGenStepListener(worldGenStepListener);
+        }
+    }
+
+    public boolean hasAchievementTaintingSandbox() {
+        return freeAbilities
+                || infiniteResearch
+                || instantBuildings
+                || assimilateAll
+                || easyConquering
+                || instantIntegration;
+    }
+
+    public void applySandboxTaintToActiveWorld() {
+        if (world != null && hasAchievementTaintingSandbox()) {
+            world.disableAchievements();
+        }
     }
 
     public boolean isOverworldAutoRecenter() {
@@ -612,79 +802,264 @@ public class Engine extends Thread {
         this.defaultRoleQueen = defaultRoleQueen;
     }
 
-    public static List<AntRole> antRolesForAntType(AntType type) {
+    public boolean isMapLayerBorders() {
+        return mapLayerBorders;
+    }
+
+    public void setMapLayerBorders(boolean mapLayerBorders) {
+        this.mapLayerBorders = mapLayerBorders;
+    }
+
+    public boolean isMapLayerRivers() {
+        return mapLayerRivers;
+    }
+
+    public void setMapLayerRivers(boolean mapLayerRivers) {
+        this.mapLayerRivers = mapLayerRivers;
+    }
+
+    public boolean isMapLayerMeridian() {
+        return mapLayerMeridian;
+    }
+
+    public void setMapLayerMeridian(boolean mapLayerMeridian) {
+        this.mapLayerMeridian = mapLayerMeridian;
+    }
+
+    public boolean isMapLayerEquator() {
+        return mapLayerEquator;
+    }
+
+    public void setMapLayerEquator(boolean mapLayerEquator) {
+        this.mapLayerEquator = mapLayerEquator;
+    }
+
+    public double getMapViewportCenterCol() {
+        return mapViewportCenterCol;
+    }
+
+    public double getMapViewportSpanCols() {
+        return mapViewportSpanCols;
+    }
+
+    public boolean isMapViewportActive() {
+        return mapViewportActive;
+    }
+
+    public void setMapViewport(double centerCol, double spanCols, boolean active) {
+        this.mapViewportCenterCol = centerCol;
+        this.mapViewportSpanCols = spanCols;
+        this.mapViewportActive = active;
+    }
+
+    public boolean isMapLayerBiomeIcons() {
+        return mapLayerBiomeIcons;
+    }
+
+    public void setMapLayerBiomeIcons(boolean mapLayerBiomeIcons) {
+        this.mapLayerBiomeIcons = mapLayerBiomeIcons;
+    }
+
+    public boolean isMapLayerColonyRanks() {
+        return mapLayerColonyRanks;
+    }
+
+    public void setMapLayerColonyRanks(boolean mapLayerColonyRanks) {
+        this.mapLayerColonyRanks = mapLayerColonyRanks;
+    }
+
+    public boolean isMapLayerTrades() {
+        return mapLayerTrades;
+    }
+
+    public void setMapLayerTrades(boolean mapLayerTrades) {
+        this.mapLayerTrades = mapLayerTrades;
+    }
+
+    public boolean isMapLayerTunnels() {
+        return mapLayerTunnels;
+    }
+
+    public void setMapLayerTunnels(boolean mapLayerTunnels) {
+        this.mapLayerTunnels = mapLayerTunnels;
+    }
+
+    public boolean isMapLayerBattles() {
+        return mapLayerBattles;
+    }
+
+    public void setMapLayerBattles(boolean mapLayerBattles) {
+        this.mapLayerBattles = mapLayerBattles;
+    }
+
+    public boolean isMapLayerGeographicNames() {
+        return mapLayerGeographicNames;
+    }
+
+    public void setMapLayerGeographicNames(boolean mapLayerGeographicNames) {
+        this.mapLayerGeographicNames = mapLayerGeographicNames;
+    }
+
+    public boolean isMapLayerCapitals() {
+        return mapLayerCapitals;
+    }
+
+    public void setMapLayerCapitals(boolean mapLayerCapitals) {
+        this.mapLayerCapitals = mapLayerCapitals;
+    }
+
+    public boolean isMapLayerLabelContinents() {
+        return mapLayerLabelContinents;
+    }
+
+    public void setMapLayerLabelContinents(boolean mapLayerLabelContinents) {
+        this.mapLayerLabelContinents = mapLayerLabelContinents;
+    }
+
+    public boolean isMapLayerLabelIceCaps() {
+        return mapLayerLabelIceCaps;
+    }
+
+    public void setMapLayerLabelIceCaps(boolean mapLayerLabelIceCaps) {
+        this.mapLayerLabelIceCaps = mapLayerLabelIceCaps;
+    }
+
+    public boolean isMapLayerLabelArchipelagos() {
+        return mapLayerLabelArchipelagos;
+    }
+
+    public void setMapLayerLabelArchipelagos(boolean mapLayerLabelArchipelagos) {
+        this.mapLayerLabelArchipelagos = mapLayerLabelArchipelagos;
+    }
+
+    public boolean isMapLayerLabelOceans() {
+        return mapLayerLabelOceans;
+    }
+
+    public void setMapLayerLabelOceans(boolean mapLayerLabelOceans) {
+        this.mapLayerLabelOceans = mapLayerLabelOceans;
+    }
+
+    public boolean isMapLayerLabelTrenches() {
+        return mapLayerLabelTrenches;
+    }
+
+    public void setMapLayerLabelTrenches(boolean mapLayerLabelTrenches) {
+        this.mapLayerLabelTrenches = mapLayerLabelTrenches;
+    }
+
+    public boolean isMapLayerLabelMountains() {
+        return mapLayerLabelMountains;
+    }
+
+    public void setMapLayerLabelMountains(boolean mapLayerLabelMountains) {
+        this.mapLayerLabelMountains = mapLayerLabelMountains;
+    }
+
+    public boolean isMapLayerLabelValleys() {
+        return mapLayerLabelValleys;
+    }
+
+    public void setMapLayerLabelValleys(boolean mapLayerLabelValleys) {
+        this.mapLayerLabelValleys = mapLayerLabelValleys;
+    }
+
+    public boolean isMapLayerLabelLakes() {
+        return mapLayerLabelLakes;
+    }
+
+    public void setMapLayerLabelLakes(boolean mapLayerLabelLakes) {
+        this.mapLayerLabelLakes = mapLayerLabelLakes;
+    }
+
+    public boolean isMapLayerLabelRivers() {
+        return mapLayerLabelRivers;
+    }
+
+    public void setMapLayerLabelRivers(boolean mapLayerLabelRivers) {
+        this.mapLayerLabelRivers = mapLayerLabelRivers;
+    }
+
+    public boolean isMapLayerLabelPeninsulas() {
+        return mapLayerLabelPeninsulas;
+    }
+
+    public void setMapLayerLabelPeninsulas(boolean mapLayerLabelPeninsulas) {
+        this.mapLayerLabelPeninsulas = mapLayerLabelPeninsulas;
+    }
+
+    public static List<AntRole> antRolesForAntClass(AntClass type) {
         List<AntRole> out = new ArrayList<>();
         for (AntRole r : GameConstants.getAntRoles()) {
-            if (r.getAntType() == type) {
+            if (r.getAntClass() == type) {
                 out.add(r);
             }
         }
         return out;
     }
-
-    public static AntRole resolveDefaultRoleForAntType(AntType type, Engine engine) {
+    public static AntRole resolveDefaultRoleForAntClass(AntClass type, Engine engine) {
         if (engine != null) {
             int roleId;
-            if (type == GameConstants.TYPE_WORKER) {
+            if (type == GameConstants.CLASS_WORKER) {
                 roleId = engine.getDefaultRoleWorker();
-            } else if (type == GameConstants.TYPE_SOLDIER) {
+            } else if (type == GameConstants.CLASS_SOLDIER) {
                 roleId = engine.getDefaultRoleSoldier();
-            } else if (type == GameConstants.TYPE_MAJOR) {
+            } else if (type == GameConstants.CLASS_MAJOR) {
                 roleId = engine.getDefaultRoleMajor();
-            } else if (type == GameConstants.TYPE_PRINCESS) {
+            } else if (type == GameConstants.CLASS_PRINCESS) {
                 roleId = engine.getDefaultRolePrincess();
-            } else if (type == GameConstants.TYPE_QUEEN) {
+            } else if (type == GameConstants.CLASS_QUEEN) {
                 roleId = engine.getDefaultRoleQueen();
             } else {
-                return builtinDefaultRoleForAntType(type);
+                return builtinDefaultRoleForAntClass(type);
             }
             AntRole chosen = GameConstants.getAntRoleById(roleId);
-            if (chosen != null && chosen.getAntType() == type
+            if (chosen != null && chosen.getAntClass() == type
                     && GameConstants.isEligibleDefaultHatchRole(chosen)) {
                 return chosen;
             }
         }
-        return builtinDefaultRoleForAntType(type);
+        return builtinDefaultRoleForAntClass(type);
     }
 
-    public static AntRole builtinDefaultRoleForAntType(AntType type) {
-        if (type == GameConstants.TYPE_WORKER) {
+    public static AntRole builtinDefaultRoleForAntClass(AntClass type) {
+        if (type == GameConstants.CLASS_WORKER) {
             return GameConstants.ROLE_FORAGER;
         }
-        if (type == GameConstants.TYPE_SOLDIER) {
+        if (type == GameConstants.CLASS_SOLDIER) {
             return GameConstants.ROLE_HUNTER;
         }
-        if (type == GameConstants.TYPE_MAJOR) {
+        if (type == GameConstants.CLASS_MAJOR) {
             return GameConstants.ROLE_CRANE;
         }
-        if (type == GameConstants.TYPE_PRINCESS) {
+        if (type == GameConstants.CLASS_PRINCESS) {
             return GameConstants.ROLE_BREEDER;
         }
-        if (type == GameConstants.TYPE_DRONE) {
+        if (type == GameConstants.CLASS_DRONE) {
             return GameConstants.ROLE_DRONE;
         }
-        if (type == GameConstants.TYPE_QUEEN) {
+        if (type == GameConstants.CLASS_QUEEN) {
             return GameConstants.ROLE_LAYER;
         }
         return null;
     }
 
-    public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
+    public static int sanitizeDefaultRoleId(AntClass type, int desiredRoleId, int fallbackRoleId) {
         AntRole r = GameConstants.getAntRoleById(desiredRoleId);
-        if (r != null && r.getAntType() == type && GameConstants.isEligibleDefaultHatchRole(r)) {
+        if (r != null && r.getAntClass() == type && GameConstants.isEligibleDefaultHatchRole(r)) {
             return desiredRoleId;
         }
         AntRole fallback = GameConstants.getAntRoleById(fallbackRoleId);
-        if (fallback != null && fallback.getAntType() == type
+        if (fallback != null && fallback.getAntClass() == type
                 && GameConstants.isEligibleDefaultHatchRole(fallback)) {
             return fallbackRoleId;
         }
-        AntRole builtin = builtinDefaultRoleForAntType(type);
+        AntRole builtin = builtinDefaultRoleForAntClass(type);
         return builtin != null ? builtin.getId() : fallbackRoleId;
     }
 
-    public static int defaultRoleIdForAntType(AntType type, Engine engine) {
-        AntRole r = resolveDefaultRoleForAntType(type, engine);
+    public static int defaultRoleIdForAntClass(AntClass type, Engine engine) {
+        AntRole r = resolveDefaultRoleForAntClass(type, engine);
         return r != null ? r.getId() : -1;
     }
 }

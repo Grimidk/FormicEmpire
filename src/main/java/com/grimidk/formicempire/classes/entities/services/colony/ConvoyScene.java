@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -27,7 +27,7 @@ public final class ConvoyScene {
     private final BackgroundKind backgroundKind;
     private final Biome landBiome;
     private final AntSpecies species;
-    private final Map<AntType, Integer> typeCounts;
+    private final Map<AntClass, Integer> classCounts;
     private final boolean returning;
     private final float legProgress;
     private final int remainingHours;
@@ -35,7 +35,7 @@ public final class ConvoyScene {
     private final boolean available;
 
     public ConvoyScene(String originName, String destinationName, TradeMethod method, BackgroundKind backgroundKind,
-            Biome landBiome, AntSpecies species, Map<AntType, Integer> typeCounts, boolean returning, float legProgress,
+            Biome landBiome, AntSpecies species, Map<AntClass, Integer> classCounts, boolean returning, float legProgress,
             int remainingHours, int totalHours, boolean available) {
         this.originName = originName != null ? originName : "";
         this.destinationName = destinationName != null ? destinationName : "";
@@ -43,9 +43,9 @@ public final class ConvoyScene {
         this.backgroundKind = backgroundKind != null ? backgroundKind : BackgroundKind.LAND_BIOME;
         this.landBiome = landBiome;
         this.species = species != null ? species : GameConstants.SPECIES_OMNI;
-        this.typeCounts = typeCounts == null
+        this.classCounts = classCounts == null
                 ? Map.of()
-                : Collections.unmodifiableMap(new HashMap<>(typeCounts));
+                : Collections.unmodifiableMap(new HashMap<>(classCounts));
         this.returning = returning;
         this.legProgress = Math.max(0f, Math.min(1f, legProgress));
         this.remainingHours = Math.max(0, remainingHours);
@@ -77,8 +77,8 @@ public final class ConvoyScene {
         return species;
     }
 
-    public Map<AntType, Integer> typeCounts() {
-        return typeCounts;
+    public Map<AntClass, Integer> classCounts() {
+        return classCounts;
     }
 
     public boolean isReturning() {

@@ -75,7 +75,7 @@ final class WarBattleParticipant {
     }
 
     boolean isQueen() {
-        return ant != null && ant.getAntType() == GameConstants.TYPE_QUEEN;
+        return ant != null && ant.getAntClass() == GameConstants.CLASS_QUEEN;
     }
 
     boolean isDefenderRole() {

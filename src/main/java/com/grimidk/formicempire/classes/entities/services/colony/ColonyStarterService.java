@@ -2,11 +2,16 @@ package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -67,7 +72,7 @@ public class ColonyStarterService {
                     colony.setHatchRateMajor(capitalColony.getHatchRateMajor());
                     colony.setHatchRateDrone(capitalColony.getHatchRateDrone());
                     colony.setHatchRatePrincess(capitalColony.getHatchRatePrincess());
-                    AntSubtypeService.copySubtypeRates(colony, capitalColony);
+                    AntModService.copyModRates(colony, capitalColony);
                 }
                 if (d.isDefaultAutomationEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
                     colony.setAutomationEnabled(true);
@@ -77,6 +82,9 @@ public class ColonyStarterService {
                 }
                 if (d.isDefaultAutoTunnelsEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
                     colony.setAutoTunnelsEnabled(true);
+                }
+                if (d.isDefaultAutoLogisticsEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS)) {
+                    colony.setAutoLogisticsEnabled(true);
                 }
             }
         } else {
@@ -91,14 +99,14 @@ public class ColonyStarterService {
             System.out.println("[ColonyStarterService] Automation ENABLED for NPC colony.");
             AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : null;
             if (species != null) {
-                AntSubtypeService.applyNaturalSpeciesSubtypeRates(colony, species);
+                AntModService.applyNaturalSpeciesModRates(colony, species);
             }
         }
         
         clearColonyLists(colony);
 
         try {
-            Ant queen = new Ant(colony, GameConstants.TYPE_QUEEN);
+            Ant queen = new Ant(colony, GameConstants.CLASS_QUEEN);
             queen.setDimension(WorldSpaces.UNDERWORLD); 
             queen.setRole(GameConstants.ROLE_LAYER);
             colony.getQueens().add(queen);
@@ -112,7 +120,7 @@ public class ColonyStarterService {
         }
 
         if (!colony.isPlayer()) {
-            AntSubtypeService.assignNaturalSubtypesToPopulation(colony);
+            AntModService.assignNaturalModsToPopulation(colony);
         }
         
         System.out.println("[ColonyStarterService] Initialization complete for " + colony.getName() + " (ID: " + colony.getId() + "). Current Age: " + colony.getAge());
@@ -143,7 +151,11 @@ public class ColonyStarterService {
         if (colony.getDeadAnts() != null) colony.getDeadAnts().clear();
         if (colony.getCritters() != null) colony.getCritters().clear();
 
+        World world = colony.getDynasty() != null ? colony.getDynasty().getOwningWorld() : null;
         hex.setColony(null);
+        if (world != null) {
+            world.markColonizedHexIndexDirty();
+        }
     }
 
     public static boolean isReclaimableDeadColony(Colony colony) {
@@ -158,6 +170,41 @@ public class ColonyStarterService {
             return true;
         }
         return colony.getDynasty() == null;
+    }
+
+    public Colony foundColonyOnEmptyHex(World world, Dynasty dynasty, Hex hex) {
+        if (world == null || dynasty == null || hex == null) {
+            return null;
+        }
+        if (HexWaterCrossing.isWaterBiome(hex.getBiome())) {
+            return null;
+        }
+        Colony existing = hex.getColony();
+        if (existing != null && !isReclaimableDeadColony(existing)) {
+            return null;
+        }
+        if (isReclaimableDeadColony(existing)) {
+            reclaimDeadColonyForSpread(hex, dynasty, dynasty.getCapital());
+        }
+
+        Colony colony = new Colony(world.getNextColonyId(), "", dynasty.isPlayer());
+        colony.setDynasty(dynasty);
+        colony.setActive(false);
+        colony.setRank(GameConstants.RANK_COLONY);
+        initializeNewColony(colony);
+        hex.setColony(colony);
+        world.markColonizedHexIndexDirty();
+        if (world.getHistoryService() != null) {
+            world.getHistoryService().record(
+                    WorldHistoryEventType.COLONY_FOUNDED,
+                    LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                    dynasty.getId(),
+                    colony.getId(),
+                    -1,
+                    WorldHistoryEvent.colonyArg(colony.getId()),
+                    WorldHistoryEvent.dynastyArg(dynasty.getId()));
+        }
+        return colony;
     }
 
     public void finalizeDeadRemnant(Colony colony) {
@@ -198,29 +245,7 @@ public class ColonyStarterService {
 
         applyStarterWorkforce(colony);
 
-        if (colony.getLocationService() != null) {
-            if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
-                int range = 300;
-                
-                int centerX = ColonySpatialLayout.ANCHOR_CENTER_X; 
-                int centerY = ColonySpatialLayout.ANCHOR_HEIGHT / 2;
-                
-                int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-                int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-                pX = Math.max(50, pX);
-                pY = Math.max(50, pY);
-                ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
-                
-                int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-                int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-                wX = Math.max(50, wX);
-                wY = Math.max(50, wY);
-                ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
-                
-                colony.getLocationService().addSource(colony, initialPlant);
-                colony.getLocationService().addSource(colony, initialWater);
-            }
-        }
+        ensureStarterResourceSources(colony);
         
         if (colony.getPhysicsService() != null) {
             colony.getPhysicsService().randomizeAllAntPositions(colony);
@@ -251,7 +276,7 @@ public class ColonyStarterService {
     }
 
     private void spawnOccupationQueen(Colony colony) {
-        Ant queen = new Ant(colony, GameConstants.TYPE_QUEEN);
+        Ant queen = new Ant(colony, GameConstants.CLASS_QUEEN);
         queen.setDimension(WorldSpaces.UNDERWORLD);
         queen.setRole(GameConstants.ROLE_LAYER);
         if (colony.getPhysicsService() != null) {
@@ -282,7 +307,7 @@ public class ColonyStarterService {
             colony.setHatchRateMajor(capital.getHatchRateMajor());
             colony.setHatchRateDrone(capital.getHatchRateDrone());
             colony.setHatchRatePrincess(capital.getHatchRatePrincess());
-            AntSubtypeService.copySubtypeRates(colony, capital);
+            AntModService.copyModRates(colony, capital);
         }
         if (colony.isAutomationEnabled()) {
             if (overlord.isDefaultAutomationEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
@@ -293,6 +318,9 @@ public class ColonyStarterService {
             }
             if (overlord.isDefaultAutoTunnelsEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
                 colony.setAutoTunnelsEnabled(true);
+            }
+            if (overlord.isDefaultAutoLogisticsEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS)) {
+                colony.setAutoLogisticsEnabled(true);
             }
             colony.invalidateActiveRoleCountCache();
             colony.runRoleAssignment(null);
@@ -315,7 +343,7 @@ public class ColonyStarterService {
         target.setHatchRateMajor(capital.getHatchRateMajor());
         target.setHatchRateDrone(capital.getHatchRateDrone());
         target.setHatchRatePrincess(capital.getHatchRatePrincess());
-        AntSubtypeService.copySubtypeRates(target, capital);
+        AntModService.copyModRates(target, capital);
 
         Dynasty dynasty = target.getDynasty();
         if (dynasty != null) {
@@ -328,11 +356,14 @@ public class ColonyStarterService {
             if (dynasty.isDefaultAutoTunnelsEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
                 target.setAutoTunnelsEnabled(true);
             }
+            if (dynasty.isDefaultAutoLogisticsEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_LOGISTICS)) {
+                target.setAutoLogisticsEnabled(true);
+            }
         }
 
         int workerDeficit = MIN_SUSTAIN_WORKERS - target.getWorkers().size();
         for (int i = 0; i < workerDeficit; i++) {
-            target.getWorkers().add(new Ant(target, GameConstants.TYPE_WORKER));
+            target.getWorkers().add(new Ant(target, GameConstants.CLASS_WORKER));
         }
 
         ensurePeaceEconomyRoles(target);
@@ -358,7 +389,7 @@ public class ColonyStarterService {
     private void applyStarterWorkforce(Colony colony) {
         List<Ant> workers = colony.getWorkers();
         while (workers.size() < STARTING_WORKERS) {
-            workers.add(new Ant(colony, GameConstants.TYPE_WORKER));
+            workers.add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
         int index = 0;
@@ -387,23 +418,34 @@ public class ColonyStarterService {
                 || !colony.getLocationService().getDiscoveredSources().isEmpty()) {
             return;
         }
+        Dynasty dynasty = colony.getDynasty();
+        World world = dynasty != null ? dynasty.getOwningWorld() : null;
+        Hex hex = world != null ? world.getHexOfColony(colony) : null;
+        Biome biome = hex != null ? hex.getBiome() : null;
+        boolean isBurntForest = biome == GameConstants.BIOME_BURNT_FOREST;
+        boolean allowPlant = !isBurntForest;
+        boolean allowWater = !isBurntForest;
+
         int range = 300;
         int centerX = ColonySpatialLayout.ANCHOR_CENTER_X;
         int centerY = ColonySpatialLayout.ANCHOR_HEIGHT / 2;
 
-        int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-        int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-        pX = Math.max(50, pX);
-        pY = Math.max(50, pY);
-        ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+        if (allowPlant) {
+            int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+            int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
+            pX = Math.max(50, pX);
+            pY = Math.max(50, pY);
+            ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+            colony.getLocationService().addSource(colony, initialPlant);
+        }
 
-        int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
-        int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
-        wX = Math.max(50, wX);
-        wY = Math.max(50, wY);
-        ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
-
-        colony.getLocationService().addSource(colony, initialPlant);
-        colony.getLocationService().addSource(colony, initialWater);
+        if (allowWater) {
+            int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+            int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
+            wX = Math.max(50, wX);
+            wY = Math.max(50, wY);
+            ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
+            colony.getLocationService().addSource(colony, initialWater);
+        }
     }
 }

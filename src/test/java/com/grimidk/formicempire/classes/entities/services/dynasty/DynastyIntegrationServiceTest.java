@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
@@ -33,6 +33,7 @@ class DynastyIntegrationServiceTest {
         tradeManager = new TradeManager();
         overlord = new Dynasty(1, "Overlord", true, GameConstants.SPECIES_OMNI);
         target = new Dynasty(2, "Target", false, GameConstants.SPECIES_LEAFCUTTER);
+        target.setAiPersonality(null);
         world.getDynastys().add(overlord);
         world.getDynastys().add(target);
 
@@ -41,8 +42,8 @@ class DynastyIntegrationServiceTest {
         overlord.addColony(overlordColony);
         target.addColony(targetColony);
         overlord.setCapital(overlordColony);
-        overlordColony.getWorkers().add(new Ant(overlordColony, GameConstants.TYPE_WORKER));
-        targetColony.getWorkers().add(new Ant(targetColony, GameConstants.TYPE_WORKER));
+        overlordColony.getWorkers().add(new Ant(overlordColony, GameConstants.CLASS_WORKER));
+        targetColony.getWorkers().add(new Ant(targetColony, GameConstants.CLASS_WORKER));
 
         overlordColony.setAge(7);
         overlord.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
@@ -305,9 +306,9 @@ class DynastyIntegrationServiceTest {
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
-            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
-        colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 5);
     }

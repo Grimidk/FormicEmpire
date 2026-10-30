@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
+import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -70,14 +71,16 @@ class DynastyAiServiceTest {
 
     @Test
     void formsPactWhenCordial() {
+        npc.setAiPersonality(AiPersonality.PACIFIST);
+        neighbor.setAiPersonality(AiPersonality.PACIFIST);
         npc.setDiplomaticReputation(neighbor.getId(), 100);
         neighbor.setDiplomaticReputation(npc.getId(), 100);
         Colony colony = new Colony(10, "Capital", false);
         colony.setAge(10);
-        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
         npc.addColony(colony);
         Colony neighborColony = new Colony(20, "Neighbor Capital", false);
-        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
+        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.CLASS_WORKER));
         neighbor.addColony(neighborColony);
 
         aiService.runDailyAi(npc, world, tradeManager);
@@ -88,25 +91,29 @@ class DynastyAiServiceTest {
     @Test
     void sendsDiplomatsToImproveNeighborReputation() {
         npc.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        npc.setAiPersonality(AiPersonality.MILITARIST);
+        neighbor.setAiPersonality(AiPersonality.MILITARIST);
         npc.setDiplomaticReputation(neighbor.getId(), 50);
         neighbor.setDiplomaticReputation(npc.getId(), 50);
 
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
-        Ant diplomat = new Ant(capital, GameConstants.TYPE_PRINCESS);
+        Ant diplomat = new Ant(capital, GameConstants.CLASS_PRINCESS);
         diplomat.setRole(GameConstants.ROLE_DIPLOMAT);
         capital.getPrincesses().add(diplomat);
         capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 1);
-        capital.getWorkers().add(new Ant(capital, GameConstants.TYPE_WORKER));
+        capital.getWorkers().add(new Ant(capital, GameConstants.CLASS_WORKER));
         npc.addColony(capital);
         npc.setCapital(capital);
         Colony neighborColony = new Colony(20, "Neighbor Capital", false);
-        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
+        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.CLASS_WORKER));
         neighbor.addColony(neighborColony);
 
+        int before = npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world);
         aiService.runDailyAi(npc, world, tradeManager);
 
-        assertTrue(npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world) > 50);
+        int after = npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world);
+        assertTrue(after > before);
         assertFalse(npc.getDiplomacyService().hasNonAggressionPact(neighbor));
     }
 
@@ -115,8 +122,8 @@ class DynastyAiServiceTest {
         npc.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
-        capital.getPrincesses().add(new Ant(capital, GameConstants.TYPE_PRINCESS));
-        capital.getPrincesses().add(new Ant(capital, GameConstants.TYPE_PRINCESS));
+        capital.getPrincesses().add(new Ant(capital, GameConstants.CLASS_PRINCESS));
+        capital.getPrincesses().add(new Ant(capital, GameConstants.CLASS_PRINCESS));
         npc.addColony(capital);
 
         aiService.runDailyAi(npc, world, tradeManager);

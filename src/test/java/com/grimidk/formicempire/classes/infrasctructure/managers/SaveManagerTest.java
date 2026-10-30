@@ -1,11 +1,19 @@
 package com.grimidk.formicempire.classes.infrasctructure.managers;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
-import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.hunt.HuntExpedition;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyHuntService;
+import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
@@ -34,7 +42,7 @@ public class SaveManagerTest {
 
         st.load.put(GameConstants.RESOURCE_PLANT.getId(), 10.0);
         st.returnLoad.put(GameConstants.RESOURCE_MEAT.getId(), 20.0);
-        st.transport.put(GameConstants.TYPE_WORKER.getId(), 5);
+        st.transport.put(GameConstants.CLASS_WORKER.getId(), 5);
 
         // Pending fields
         st.hasPendingUpdate = true;
@@ -43,7 +51,7 @@ public class SaveManagerTest {
         st.pendingMethodId = GameConstants.METHOD_LAND.getId();
         st.pendingLoad.put(GameConstants.RESOURCE_WATER.getId(), 30.0);
         st.pendingReturnLoad.put(GameConstants.RESOURCE_FUNGI.getId(), 40.0); 
-        st.pendingTransport.put(GameConstants.TYPE_SOLDIER.getId(), 10);
+        st.pendingTransport.put(GameConstants.CLASS_SOLDIER.getId(), 10);
 
         List<Savefile.SavedTrade> list = new ArrayList<>();
         list.add(st);
@@ -80,16 +88,16 @@ public class SaveManagerTest {
     }
 
     @Test
-    void subtypeHatchRatesFlatRoundTripThroughColonyJson() throws Exception {
+    void modHatchRatesFlatRoundTripThroughColonyJson() throws Exception {
         Savefile.SavedColony sc = new Savefile.SavedColony();
         sc.id = 1;
-        sc.name = "SubtypeRates";
-        Colony live = new Colony(1, "SubtypeRates", true);
-        live.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2, 25f);
-        live.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, AntSubtype.DIGIT_NONE, 75f);
-        live.setSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 3, 40f);
-        live.setSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, AntSubtype.DIGIT_NONE, 60f);
-        sc.subtypeHatchRatesFlat = AntSubtypeService.flattenSubtypeRates(live.getSubtypeHatchRates());
+        sc.name = "ModRates";
+        Colony live = new Colony(1, "ModRates", true);
+        live.setModHatchRate(GameConstants.CLASS_WORKER, AntModSlot.HEAD, 2, 25f);
+        live.setModHatchRate(GameConstants.CLASS_WORKER, AntModSlot.HEAD, AntMod.DIGIT_NONE, 75f);
+        live.setModHatchRate(GameConstants.CLASS_SOLDIER, AntModSlot.ABDOMEN, 3, 40f);
+        live.setModHatchRate(GameConstants.CLASS_SOLDIER, AntModSlot.ABDOMEN, AntMod.DIGIT_NONE, 60f);
+        sc.modHatchRatesFlat = AntModService.flattenModRates(live.getModHatchRates());
 
         SaveManager saveManager = new SaveManager();
         StringWriter writer = new StringWriter();
@@ -101,24 +109,24 @@ public class SaveManagerTest {
         }
 
         String json = writer.toString();
-        String workerHeadKey = GameConstants.TYPE_WORKER.getNameKey() + "|HEAD|2";
+        String workerHeadKey = GameConstants.CLASS_WORKER.getNameKey() + "|HEAD|2";
         assertTrue(json.contains("\"" + workerHeadKey + "\":"),
-                "serialized colony should keep pipe keys in subtypeHatchRatesFlat");
+                "serialized colony should keep pipe keys in modHatchRatesFlat");
 
         Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
         parseColony.setAccessible(true);
         Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
-        assertEquals(25.0, loaded.subtypeHatchRatesFlat.get(workerHeadKey));
-        assertEquals(40.0, loaded.subtypeHatchRatesFlat.get(
-                GameConstants.TYPE_SOLDIER.getNameKey() + "|ABDOMEN|3"));
+        assertEquals(25.0, loaded.modHatchRatesFlat.get(workerHeadKey));
+        assertEquals(40.0, loaded.modHatchRatesFlat.get(
+                GameConstants.CLASS_SOLDIER.getNameKey() + "|ABDOMEN|3"));
 
         Colony colony = new Colony(loaded);
-        assertEquals(25f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2));
-        assertEquals(75f, colony.getSubtypeHatchRate(
-                GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, AntSubtype.DIGIT_NONE));
-        assertEquals(40f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 3));
-        assertEquals(60f, colony.getSubtypeHatchRate(
-                GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, AntSubtype.DIGIT_NONE));
+        assertEquals(25f, colony.getModHatchRate(GameConstants.CLASS_WORKER, AntModSlot.HEAD, 2));
+        assertEquals(75f, colony.getModHatchRate(
+                GameConstants.CLASS_WORKER, AntModSlot.HEAD, AntMod.DIGIT_NONE));
+        assertEquals(40f, colony.getModHatchRate(GameConstants.CLASS_SOLDIER, AntModSlot.ABDOMEN, 3));
+        assertEquals(60f, colony.getModHatchRate(
+                GameConstants.CLASS_SOLDIER, AntModSlot.ABDOMEN, AntMod.DIGIT_NONE));
     }
 
     @Test
@@ -152,6 +160,136 @@ public class SaveManagerTest {
         Colony colony = new Colony(loaded);
         dynasty.addColony(colony);
         assertEquals(7, colony.getSymbioticMites());
+    }
+
+    @Test
+    void colonyKnownHuntTargetsRoundTripThroughJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "HuntColony";
+        sc.nextHuntTargetId = 4;
+        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                2,
+                GameConstants.TYPE_COCKROACH.getId(),
+                120,
+                80,
+                15,
+                0));
+        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                3,
+                GameConstants.TYPE_COCKROACH.getId(),
+                140,
+                90,
+                18,
+                22));
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        assertTrue(json.contains("\"nextHuntTargetId\": 4"));
+        assertTrue(json.contains("\"knownHuntTargets\":"));
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(4, loaded.nextHuntTargetId);
+        assertEquals(2, loaded.knownHuntTargets.size());
+        assertEquals(120, loaded.knownHuntTargets.get(0).overworldX);
+        assertEquals(22, loaded.knownHuntTargets.get(1).escapeWorldDay);
+
+        Colony colony = new Colony(loaded);
+        assertEquals(4, colony.getNextHuntTargetIdSeed());
+        assertEquals(2, colony.getKnownHuntTargets().size());
+        assertEquals(GameConstants.TYPE_COCKROACH, colony.getKnownHuntTargets().get(0).getSpecies());
+        assertEquals(140, colony.getKnownHuntTargets().get(1).getOverworldX());
+    }
+
+    @Test
+    void colonyActiveHuntExpeditionRoundTripThroughJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "HuntExpeditionColony";
+        sc.nextHuntTargetId = 3;
+        sc.knownHuntTargets.add(new Savefile.SavedHuntTarget(
+                2,
+                GameConstants.TYPE_COCKROACH.getId(),
+                120,
+                80,
+                15,
+                0));
+        Savefile.SavedHuntExpedition expedition = new Savefile.SavedHuntExpedition(
+                2,
+                "FIGHTING",
+                0f,
+                6f,
+                420f,
+                9,
+                1);
+        expedition.party.add(new Savefile.SavedHuntPartyMember(
+                GameConstants.CLASS_SOLDIER.getId(),
+                AntModProfile.STANDARD_CODE,
+                GameConstants.ROLE_HUNTER.getId(),
+                0,
+                100,
+                75f,
+                100f));
+        sc.activeHuntExpeditions.add(expedition);
+        sc.activeHuntExpedition = expedition;
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        assertTrue(json.contains("\"activeHuntExpeditions\":"));
+        assertTrue(json.contains("\"activeHuntExpedition\":"));
+        assertTrue(json.contains("\"phase\":\"FIGHTING\""));
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(1, loaded.activeHuntExpeditions.size());
+        assertEquals(2, loaded.activeHuntExpeditions.get(0).targetId);
+        assertEquals("FIGHTING", loaded.activeHuntExpeditions.get(0).phase);
+        assertEquals(420f, loaded.activeHuntExpeditions.get(0).bugHealth, 0.01f);
+        assertEquals(1, loaded.activeHuntExpeditions.get(0).party.size());
+        assertNotNull(loaded.activeHuntExpedition);
+        assertEquals(2, loaded.activeHuntExpedition.targetId);
+
+        Colony colony = new Colony(1, "HuntExpeditionColony", true);
+        colony.setNextHuntTargetIdSeed(loaded.nextHuntTargetId);
+        colony.getKnownHuntTargets().addAll(
+                loaded.knownHuntTargets.stream()
+                        .map(target -> new com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget(
+                                target.id,
+                                target.speciesId,
+                                target.overworldX,
+                                target.overworldY,
+                                target.discoveredWorldDay,
+                                target.escapeWorldDay))
+                        .toList());
+        Ant soldier = AntModService.createAnt(colony, GameConstants.CLASS_SOLDIER, AntModProfile.standard());
+        soldier.setRole(GameConstants.ROLE_HUNTER);
+        colony.getSoldiers().add(soldier);
+        ColonyHuntService.restoreExpeditionsFromSave(colony, loaded);
+        assertEquals(1, colony.getActiveHuntExpeditions().size());
+        assertEquals(HuntExpedition.Phase.FIGHTING, colony.getHuntExpeditionForTarget(2).getPhase());
+        assertEquals(1, colony.getHuntExpeditionForTarget(2).getParty().size());
+        assertNotNull(HuntCreatureCombatService.getState(colony, 2));
+        assertEquals(420f, HuntCreatureCombatService.getState(colony, 2).getBugHealth(), 0.01f);
+        assertEquals(1, HuntCreatureCombatService.getState(colony, 2).livingHunters().size());
     }
 
     @Test
@@ -305,13 +443,13 @@ public class SaveManagerTest {
         colony.setWater(2500);
         colony.getPopulationService().runHatching(colony);
 
-        assertTrue(colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3) > 0f,
+        assertTrue(colony.getModHatchRate(GameConstants.CLASS_WORKER, AntModSlot.ABDOMEN, 3) > 0f,
                 "automation should set honeypot worker rate before save");
 
         Savefile.SavedColony sc = new Savefile.SavedColony();
         sc.id = 1;
         sc.name = "C";
-        sc.subtypeHatchRatesFlat = AntSubtypeService.flattenSubtypeRates(colony.getSubtypeHatchRates());
+        sc.modHatchRatesFlat = AntModService.flattenModRates(colony.getModHatchRates());
 
         SaveManager saveManager = new SaveManager();
         StringWriter writer = new StringWriter();
@@ -322,13 +460,143 @@ public class SaveManagerTest {
             writeColony.invoke(saveManager, w, sc, true);
         }
         String json = writer.toString();
-        String honeypotKey = GameConstants.TYPE_WORKER.getNameKey() + "|ABDOMEN|3";
+        String honeypotKey = GameConstants.CLASS_WORKER.getNameKey() + "|ABDOMEN|3";
         assertTrue(json.contains("\"" + honeypotKey + "\":"), json);
 
         Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
         parseColony.setAccessible(true);
         Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
         Colony restored = new Colony(loaded);
-        assertEquals(50f, restored.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3));
+        assertEquals(50f, restored.getModHatchRate(GameConstants.CLASS_WORKER, AntModSlot.ABDOMEN, 3));
+    }
+
+    @Test
+    void playerSaveSummaryUsesActiveOrCapitalNotLastSatellite() throws Exception {
+        World world = new World();
+        Engine engine = new Engine();
+        world.setEngine(engine);
+
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.getStarterService().initializeDynasty(dynasty);
+
+        Colony capital = new Colony(1, "Capital", true);
+        capital.setCapital(true);
+        dynasty.setCapital(capital);
+        dynasty.addColony(capital);
+        capital.setDynasty(dynasty);
+        capital.setActive(true);
+        for (int i = 0; i < 50; i++) {
+            capital.getWorkers().add(new Ant(capital, GameConstants.CLASS_WORKER));
+        }
+
+        Colony satellite = new Colony(2, "Satellite", true);
+        dynasty.addColony(satellite);
+        satellite.setDynasty(dynasty);
+        satellite.setActive(false);
+        satellite.getQueens().add(new Ant(satellite, GameConstants.CLASS_QUEEN));
+
+        Hex capitalHex = new Hex();
+        capitalHex.setQ(0);
+        capitalHex.setR(0);
+        capitalHex.setColony(capital);
+        Hex satelliteHex = new Hex();
+        satelliteHex.setQ(1);
+        satelliteHex.setR(0);
+        satelliteHex.setColony(satellite);
+
+        world.registerDynasty(dynasty);
+        world.getHexes().add(capitalHex);
+        world.getHexes().add(satelliteHex);
+
+        Savefile save = new Savefile(1, "test");
+        SaveManager saveManager = new SaveManager();
+        Method populate = SaveManager.class.getDeclaredMethod(
+                "populateSavefileFromGame", Savefile.class, World.class, Engine.class);
+        populate.setAccessible(true);
+        populate.invoke(saveManager, save, world, engine);
+
+        assertEquals(capital.getId(), save.getColonyId());
+        assertEquals(capital.getName(), save.getColonyName());
+        assertTrue(save.getTotalAnts() > satellite.getAntTotal());
+        assertTrue(save.getWorkers() > 0);
+    }
+
+    @Test
+    void antAgeCountsRoundTripThroughColonyJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "AgeColony";
+        sc.workers = 3;
+        sc.soldiers = 2;
+        sc.workerAges.put("15", 2);
+        sc.workerAges.put("30", 1);
+        sc.soldierAges.put("50", 2);
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        assertTrue(json.contains("\"workerAges\":"));
+        assertTrue(json.contains("\"soldierAges\":"));
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+
+        assertEquals(2, loaded.workerAges.get("15"));
+        assertEquals(1, loaded.workerAges.get("30"));
+        assertEquals(2, loaded.soldierAges.get("50"));
+
+        Colony colony = new Colony(loaded);
+        assertEquals(3, colony.getWorkers().size());
+        assertEquals(2, colony.getSoldiers().size());
+        assertEquals(15, colony.getWorkers().get(0).getAge());
+        assertEquals(15, colony.getWorkers().get(1).getAge());
+        assertEquals(30, colony.getWorkers().get(2).getAge());
+        assertEquals(50, colony.getSoldiers().get(0).getAge());
+        assertEquals(50, colony.getSoldiers().get(1).getAge());
+        assertEquals(20.0, colony.getAverageAntAge(GameConstants.CLASS_WORKER), 0.0001);
+        assertEquals(50.0, colony.getAverageAntAge(GameConstants.CLASS_SOLDIER), 0.0001);
+    }
+
+    @Test
+    void colonyWithoutQueenOnLoadGetsFreeQueenAndZeroDays() {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "QueenlessColony";
+        sc.queens = 0;
+        sc.daysWithoutQueen = 6;
+        sc.workers = 10;
+
+        Colony colony = new Colony(sc);
+        assertEquals(1, colony.getQueens().size());
+        assertEquals(0, colony.getDaysWithoutQueen());
+        assertEquals(GameConstants.CLASS_QUEEN, colony.getQueens().get(0).getAntClass());
+    }
+
+    @Test
+    void isPlayerDynastyAboutToDieWithoutQueenDetection() {
+        Dynasty playerDynasty = new Dynasty(1, "PlayerDynasty", true, GameConstants.SPECIES_OMNI);
+        Colony colony = new Colony(1, "PlayerCapital", true);
+        playerDynasty.addColony(colony);
+        colony.setDynasty(playerDynasty);
+
+        colony.getQueens().clear();
+        colony.setDaysWithoutQueen(0);
+        assertTrue(SaveManager.isDynastyAboutToDieWithoutQueen(playerDynasty));
+
+        Ant queen = new Ant(colony, GameConstants.CLASS_QUEEN);
+        colony.getQueens().add(queen);
+        assertFalse(SaveManager.isDynastyAboutToDieWithoutQueen(playerDynasty));
+
+        colony.getQueens().clear();
+        colony.setDaysWithoutQueen(6);
+        assertTrue(SaveManager.isDynastyAboutToDieWithoutQueen(playerDynasty));
     }
 }
