@@ -1425,10 +1425,14 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
         
         for (Biome b : GameConstants.getBiomes()) {
+            String heightRange = b.getMinElevation() == b.getMaxElevation()
+                    ? String.valueOf(b.getMinElevation())
+                    : b.getMinElevation() + "-" + b.getMaxElevation();
             String bInfo = helpHtml("width:120px;",
                     "<b>" + b.getName() + "</b><br>"
-                            + LanguageStrings.get("HELP_BIOME_TEMP") + b.getTemperature() + "°C<br>"
-                            + LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>"
+                            + LanguageStrings.get(LanguageStrings.HELP_BIOME_TEMP) + b.getTemperature() + "°C<br>"
+                            + LanguageStrings.get(LanguageStrings.HELP_BIOME_HUMID) + b.isIsHumid() + "/5<br>"
+                            + LanguageStrings.get(LanguageStrings.HELP_BIOME_HEIGHT) + heightRange + "<br>"
                             + LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>"
                             + LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>"
                             + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x<br>"

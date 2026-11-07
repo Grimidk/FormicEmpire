@@ -440,7 +440,12 @@ public class MapDialog extends ZeroDialog {
     }
 
     private void handleCloseButton() {
-        dispose();
+        if (isSpectatorMode() && onBackToMenu != null) {
+            dispose();
+            onBackToMenu.run();
+        } else {
+            dispose();
+        }
     }
 
     private void togglePauseFromMap() {
@@ -479,7 +484,7 @@ public class MapDialog extends ZeroDialog {
             homeButton.setVisible(!spectator);
         }
         if (closeButton != null) {
-            closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+            closeButton.setText(LanguageStrings.get(spectator ? LanguageStrings.UI_BACK_TO_MENU : LanguageStrings.UI_CLOSE));
         }
         if (dateTimeLabel != null && w != null) {
             Hex activeHex = w.getActiveHex();
@@ -1252,6 +1257,21 @@ public class MapDialog extends ZeroDialog {
         } else {
             updateConquerButton();
         }
+    }
+
+    @Override
+    public void requestClose() {
+        if (isSpectatorMode() && onBackToMenu != null) {
+            dispose();
+            onBackToMenu.run();
+        } else {
+            super.requestClose();
+        }
+    }
+
+    @Override
+    protected boolean shouldDelegateEscapeToGamePanel() {
+        return !isSpectatorMode();
     }
 
     @Override

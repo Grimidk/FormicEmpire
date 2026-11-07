@@ -3118,6 +3118,7 @@ public final class LanguageStrings {
     public static final String HELP_BIOMES_TITLE = "HELP_BIOMES_TITLE";
     public static final String HELP_BIOME_TEMP = "HELP_BIOME_TEMP";
     public static final String HELP_BIOME_HUMID = "HELP_BIOME_HUMID";
+    public static final String HELP_BIOME_HEIGHT = "HELP_BIOME_HEIGHT";
     public static final String HELP_WORLD_INFO_TITLE = "HELP_WORLD_INFO_TITLE";
     public static final String HELP_SEASONS = "HELP_SEASONS";
     public static final String HELP_WEATHER = "HELP_WEATHER";

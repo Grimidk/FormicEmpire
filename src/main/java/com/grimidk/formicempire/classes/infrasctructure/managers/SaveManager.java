@@ -411,6 +411,10 @@ public class SaveManager {
             save.setAllowsAchievements(true);
         }
         save.setSpectatorMode(w.isSpectatorMode());
+        Hex spawnHex = w.getSpawnHex();
+        if (spawnHex != null && spawnHex.getBiome() != null) {
+            save.setStarterBiomeId(spawnHex.getBiome().getId());
+        }
 
         if (w.getDynastys() != null) {
             for (Dynasty dynasty : w.getDynastys()) {
@@ -815,6 +819,7 @@ public class SaveManager {
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         writeJsonLine(w, "allowsAchievements", s.allowsAchievements(), false);
         writeJsonLine(w, "spectatorMode", s.isSpectatorMode(), false);
+        writeJsonLine(w, "starterBiomeId", s.getStarterBiomeId(), false);
         
         // - Root Summary Data - 
         writeJsonLine(w, "colonyId", s.getColonyId(), false);
@@ -1074,6 +1079,7 @@ public class SaveManager {
             s.disableAchievements();
         }
         s.setSpectatorMode(Boolean.parseBoolean(rootMap.getOrDefault("spectatorMode", "false")));
+        s.setStarterBiomeId(Integer.parseInt(rootMap.getOrDefault("starterBiomeId", "1")));
         
         // --- Populate Root Summary Data ---
         s.setColonyId(Integer.parseInt(rootMap.getOrDefault("colonyId", "0")));

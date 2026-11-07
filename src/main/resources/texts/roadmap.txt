@@ -4,10 +4,9 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		crashed and cant exit in spectator mode
-		there is no sprites in the colonies for spectator
+		(none right now)
 	Mid:
-		(none right now)	
+		(none right now)
 	Low:
 		checbox look odd in win os
 		font is different in win os

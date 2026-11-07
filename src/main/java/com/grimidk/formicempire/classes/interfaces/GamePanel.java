@@ -1522,7 +1522,7 @@ public class GamePanel extends ZeroGamePanel {
                     return null;
                 }
                 World world = engine.getWorld();
-                if (world != null && !world.isSpectatorMode()) {
+                if (world != null) {
                     Colony colony = world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
                     GameSpritePreloader.warmSession(colony, this::isCancelled);
                 }
@@ -1542,7 +1542,7 @@ public class GamePanel extends ZeroGamePanel {
                     World world = engine.getWorld();
                     boolean spectator = world != null && world.isSpectatorMode();
                     Colony colony = null;
-                    if (!spectator && world != null && world.getActiveHex() != null) {
+                    if (world != null && world.getActiveHex() != null) {
                         colony = world.getActiveHex().getColony();
                     }
                     if (!spectator && (colony == null || !colony.belongsToPlayerDynasty())) {
@@ -1557,11 +1557,8 @@ public class GamePanel extends ZeroGamePanel {
 
                     registerTickListeners();
 
-                    if (spectator) {
-                        gameAreaPanel.setColony(null);
-                    } else {
-                        gameAreaPanel.setColony(colony);
-
+                    gameAreaPanel.setColony(colony);
+                    if (!spectator) {
                         alertManager = new AlertManager(colony.getDynasty(), alertPanel);
 
                         triggerManager = new TriggerManager(world, colony, engine);
@@ -1588,9 +1585,7 @@ public class GamePanel extends ZeroGamePanel {
 
                     controlPanel.setPlayPauseButtonText(engine.isPaused());
                     updateStatusIndicator(engine.isPaused());
-                    if (!spectator) {
-                        paintGameAreaWhilePaused();
-                    }
+                    paintGameAreaWhilePaused();
                     if (engine.getMusicService() != null) {
                         engine.getMusicService().enterSession();
                     }
@@ -1718,7 +1713,7 @@ public class GamePanel extends ZeroGamePanel {
             drainPendingMinuteGuiSteps(false);
         }
         World world = engine != null ? engine.getWorld() : null;
-        if (gameAreaPanel != null && (world == null || !world.isSpectatorMode())) {
+        if (gameAreaPanel != null) {
             gameAreaPanel.repaint();
         }
         if (visualFrameListener != null) {
@@ -1799,7 +1794,7 @@ public class GamePanel extends ZeroGamePanel {
         if (miniMapPanel != null) {
             miniMapPanel.refreshMap();
         }
-        if (!world.isSpectatorMode() && world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
+        if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
             gameAreaPanel.setBackgroundBiome(world.getActiveHex().getBiome());
         }
     }
@@ -1833,10 +1828,9 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = (world != null && world.getActiveHex() != null)
                 ? world.getActiveHex().getColony()
                 : null;
-        Colony visualColony = spectator ? null : colony;
 
-        gameAreaPanel.setColony(visualColony);
-        if (visualColony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
+        gameAreaPanel.setColony(colony);
+        if (colony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
             updateGameAreaSize();
         }
         Hex activeHex = world != null ? world.getActiveHex() : null;
@@ -1845,15 +1839,6 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         if (world == null) {
-            return;
-        }
-
-        if (spectator) {
-            worldPanel.updateMinuteData(world);
-            colonyPanel.updateMinuteData(colony);
-            if (mapDialog != null && mapDialog.isShowing()) {
-                mapDialog.updateTimeDisplay();
-            }
             return;
         }
 

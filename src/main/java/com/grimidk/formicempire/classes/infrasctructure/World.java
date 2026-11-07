@@ -4043,6 +4043,8 @@ public class World {
         }
         if (spawnHex == null) {
             spawnHex = this.hexes.get(0);
+            spawnHex.setBiome(startBiome);
+            spawnHex.setLocalWeather(getRandomWeather(startBiome));
         }
 
         spawnHex.setColony(startColony);
