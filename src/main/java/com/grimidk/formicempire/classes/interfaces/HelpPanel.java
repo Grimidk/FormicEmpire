@@ -340,6 +340,16 @@ public class HelpPanel extends JPanel {
             scientificLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             info.add(scientificLabel);
 
+            if (s.getDiet() != null) {
+                JLabel dietLabel = new JLabel(helpHtml("width:350px;font-size:11pt;",
+                        "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET) + "</b> "
+                                + s.getDiet().getName()));
+                dietLabel.setFont(AssetStyles.FONT_NORMAL);
+                dietLabel.setForeground(AssetStyles.FONT_COLOR);
+                dietLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                info.add(dietLabel);
+            }
+
             Assimilation assimilation = s.getAssimilation();
             if (assimilation != null) {
                 info.add(Box.createRigidArea(new Dimension(0, 6)));

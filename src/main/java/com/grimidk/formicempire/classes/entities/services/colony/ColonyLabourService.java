@@ -103,7 +103,9 @@ public class ColonyLabourService {
 
             int gatherAmount = Math.min(powerAvailable, (int) Math.ceil(space));
             double efficiency = locations.computeGatherEfficiency(colony, source, efficiencyRadius);
-            int cappedRequest = (int) Math.floor(gatherAmount * efficiency);
+            int cappedRequest = gatherAmount > 0 && efficiency > 0
+                    ? Math.max(1, (int) Math.round(gatherAmount * efficiency))
+                    : 0;
             if (cappedRequest <= 0) {
                 continue;
             }
@@ -265,7 +267,7 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             int hunterCount = colony.getActiveRoleCount(GameConstants.ROLE_HUNTER);
             if (hunterCount > 0) {
-                int totalPower = (int) (hunterCount * stats.getCollectingRate(colony));
+                int totalPower = (int) (hunterCount * stats.getHuntingRate(colony));
                 List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_MEAT);
                 processGathering(
                         colony,
@@ -312,6 +314,7 @@ public class ColonyLabourService {
     }
 
     public void runConverting(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) return;
         ColonyStatsService stats = colony.getStatsService();
         ColonyResourceService resources = colony.getResourceService();
         
@@ -339,13 +342,15 @@ public class ColonyLabourService {
                 resources.addResource(colony, GameConstants.RESOURCE_FUNGI, yield);
             }
             
-            double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, amount);
-            if (consumedMeat > 0) {
-                double yield = consumedMeat * 2;
-                if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
-                    yield += consumedMeat;
+            if (!colony.canEatMeat()) {
+                double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, amount);
+                if (consumedMeat > 0) {
+                    double yield = consumedMeat * 2;
+                    if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
+                        yield += consumedMeat;
+                    }
+                    resources.addResource(colony, GameConstants.RESOURCE_FUNGI, yield);
                 }
-                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, yield);
             }
         }
     }
@@ -647,7 +652,21 @@ public class ColonyLabourService {
         }
 
         if (possibleTypes.isEmpty()) return;
-        ResourceType selectedType = possibleTypes.get(GameRandom.nextInt(possibleTypes.size()));
+        List<ResourceType> missingCritical = new ArrayList<>();
+        if (possibleTypes.contains(GameConstants.RESOURCE_WATER)
+                && locations.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
+            missingCritical.add(GameConstants.RESOURCE_WATER);
+        }
+        if (colony.canEatFungi() && possibleTypes.contains(GameConstants.RESOURCE_PLANT)
+                && locations.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0) {
+            missingCritical.add(GameConstants.RESOURCE_PLANT);
+        }
+        if (colony.canEatMeat() && possibleTypes.contains(GameConstants.RESOURCE_MEAT)
+                && locations.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) {
+            missingCritical.add(GameConstants.RESOURCE_MEAT);
+        }
+        List<ResourceType> pool = missingCritical.isEmpty() ? possibleTypes : missingCritical;
+        ResourceType selectedType = pool.get(GameRandom.nextInt(pool.size()));
         
         float abundance = 0f;
         
@@ -944,8 +963,12 @@ public class ColonyLabourService {
         }
         deadAnts.removeAll(compostedAnts);
 
-        int mushroomGain = actualToCompost * 4; 
-        colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, mushroomGain);
+        int foodGain = actualToCompost * 4; 
+        if (!colony.canEatFungi() && colony.canEatMeat()) {
+            colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, foodGain);
+        } else {
+            colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, foodGain);
+        }
         
         if (actualToCompost > 0) {
             colony.logEvent(ColonyLogPrefixes.COMPOST + " "

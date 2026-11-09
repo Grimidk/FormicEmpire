@@ -2745,6 +2745,15 @@ public final class LanguageStrings {
     public static final String STAT_FARMING_2_DESC = "STAT_FARMING_2_DESC";
     public static final String STAT_FARMING_3_FLAVOR = "STAT_FARMING_3_FLAVOR";
     public static final String STAT_FARMING_3_DESC = "STAT_FARMING_3_DESC";
+    public static final String STAT_CARNIVORY_1 = "STAT_CARNIVORY_1";
+    public static final String STAT_CARNIVORY_1_FLAVOR = "STAT_CARNIVORY_1_FLAVOR";
+    public static final String STAT_CARNIVORY_1_DESC = "STAT_CARNIVORY_1_DESC";
+    public static final String STAT_CARNIVORY_2 = "STAT_CARNIVORY_2";
+    public static final String STAT_CARNIVORY_2_FLAVOR = "STAT_CARNIVORY_2_FLAVOR";
+    public static final String STAT_CARNIVORY_2_DESC = "STAT_CARNIVORY_2_DESC";
+    public static final String STAT_CARNIVORY_3 = "STAT_CARNIVORY_3";
+    public static final String STAT_CARNIVORY_3_FLAVOR = "STAT_CARNIVORY_3_FLAVOR";
+    public static final String STAT_CARNIVORY_3_DESC = "STAT_CARNIVORY_3_DESC";
     public static final String STAT_CONTAMINATION_1_FLAVOR = "STAT_CONTAMINATION_1_FLAVOR";
     public static final String STAT_CONTAMINATION_1_DESC = "STAT_CONTAMINATION_1_DESC";
     public static final String STAT_CONTAMINATION_2_FLAVOR = "STAT_CONTAMINATION_2_FLAVOR";
@@ -3279,4 +3288,14 @@ public final class LanguageStrings {
     public static final String MAP_WORLD_LOGS_TITLE_FMT = "MAP_WORLD_LOGS_TITLE_FMT";
     public static final String MAP_WORLD_LOGS_SHOW = "MAP_WORLD_LOGS_SHOW";
     public static final String MAP_WORLD_LOGS_HIDE = "MAP_WORLD_LOGS_HIDE";
+    public static final String DIET_FUNGIVOROUS = "DIET_FUNGIVOROUS";
+    public static final String DIET_CARNIVOROUS = "DIET_CARNIVOROUS";
+    public static final String DIET_OMNIVOROUS = "DIET_OMNIVOROUS";
+    public static final String SAVE_ENTER_DIET = "SAVE_ENTER_DIET";
+    public static final String ABILITY_OMNIVORE = "ABILITY_OMNIVORE";
+    public static final String ABILITY_OMNIVORE_FLAVOR = "ABILITY_OMNIVORE_FLAVOR";
+    public static final String ABILITY_OMNIVORE_DESC = "ABILITY_OMNIVORE_DESC";
+    public static final String TRIGGER_OMNIVORE_TITLE = "TRIGGER_OMNIVORE_TITLE";
+    public static final String TRIGGER_OMNIVORE_MSG = "TRIGGER_OMNIVORE_MSG";
+    public static final String HELP_SPECIES_DIET = "HELP_SPECIES_DIET";
 }

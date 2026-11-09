@@ -115,6 +115,10 @@ public class ColonyStarterService {
             e.printStackTrace();
         }
 
+        if (colony.canEatMeat()) {
+            colony.unlockBuilding(GameUnlocks.MEAT_CHAMBER_0);
+        }
+
         if (colony.getAge() >= 7) {
             matureColony(colony);
         }
@@ -243,9 +247,21 @@ public class ColonyStarterService {
     public void matureColony(Colony colony) {
         System.out.println("[ColonyStarterService] Maturation complete. Spawning workforce for " + colony.getName());
 
+        if (colony.canEatMeat()) {
+            colony.unlockBuilding(GameUnlocks.MEAT_CHAMBER_0);
+        }
+
         applyStarterWorkforce(colony);
 
         ensureStarterResourceSources(colony);
+
+        if (!colony.canEatFungi()) {
+            int consumption = Math.max(1, colony.getTotalConsumption());
+            int starterMeat = Math.max(500, consumption * 48);
+            if (colony.getProtein() < starterMeat) {
+                colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, starterMeat);
+            }
+        }
         
         if (colony.getPhysicsService() != null) {
             colony.getPhysicsService().randomizeAllAntPositions(colony);
@@ -361,7 +377,14 @@ public class ColonyStarterService {
             }
         }
 
-        int workerDeficit = MIN_SUSTAIN_WORKERS - target.getWorkers().size();
+        if (target.canEatMeat()) {
+            target.unlockBuilding(GameUnlocks.MEAT_CHAMBER_0);
+        }
+
+        int targetMinWorkers = (target.canEatFungi() || target.hasUpgrade(GameUnlocks.ROLE_FARMER))
+                ? MIN_SUSTAIN_WORKERS
+                : (STARTING_NURSES + STARTING_FORAGERS);
+        int workerDeficit = targetMinWorkers - target.getWorkers().size();
         for (int i = 0; i < workerDeficit; i++) {
             target.getWorkers().add(new Ant(target, GameConstants.CLASS_WORKER));
         }
@@ -370,8 +393,11 @@ public class ColonyStarterService {
         ensureStarterResourceSources(target);
 
         int consumption = Math.max(1, target.getTotalConsumption());
-        if (target.getMushrooms() < consumption * 48) {
+        if (target.canEatFungi() && target.getMushrooms() < consumption * 48) {
             target.getResourceService().addResource(target, GameConstants.RESOURCE_FUNGI, consumption * 48);
+        }
+        if (target.canEatMeat() && !target.canEatFungi() && target.getProtein() < consumption * 48) {
+            target.getResourceService().addResource(target, GameConstants.RESOURCE_MEAT, Math.max(500, consumption * 48));
         }
 
         if (target.getPhysicsService() != null) {
@@ -387,8 +413,10 @@ public class ColonyStarterService {
     }
 
     private void applyStarterWorkforce(Colony colony) {
+        boolean hasFarmerRole = colony.canEatFungi() || colony.hasUpgrade(GameUnlocks.ROLE_FARMER);
+        int startingWorkers = hasFarmerRole ? STARTING_WORKERS : (STARTING_NURSES + STARTING_FORAGERS);
         List<Ant> workers = colony.getWorkers();
-        while (workers.size() < STARTING_WORKERS) {
+        while (workers.size() < startingWorkers) {
             workers.add(new Ant(colony, GameConstants.CLASS_WORKER));
         }
 
@@ -396,8 +424,10 @@ public class ColonyStarterService {
         for (int i = 0; i < STARTING_NURSES; i++) {
             colony.configureWorker(index++, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
         }
-        for (int i = 0; i < STARTING_FARMERS; i++) {
-            colony.configureWorker(index++, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
+        if (hasFarmerRole) {
+            for (int i = 0; i < STARTING_FARMERS; i++) {
+                colony.configureWorker(index++, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
+            }
         }
         for (int i = 0; i < STARTING_FORAGERS; i++) {
             colony.configureWorker(index++, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
@@ -407,8 +437,30 @@ public class ColonyStarterService {
                 Math.max(colony.getQueens().size(), Math.max(1, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER))));
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_NURSE,
                 Math.max(STARTING_NURSES, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_NURSE)));
-        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER,
-                Math.max(STARTING_FARMERS, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FARMER)));
+        if (hasFarmerRole) {
+            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER,
+                    Math.max(STARTING_FARMERS, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FARMER)));
+        } else {
+            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER, 0);
+            List<Ant> soldiers = colony.getSoldiers();
+            while (soldiers.size() < STARTING_FARMERS) {
+                Ant soldier = new Ant(colony, GameConstants.CLASS_SOLDIER);
+                soldier.setRole(GameConstants.ROLE_HUNTER);
+                soldier.setDimension(WorldSpaces.OVERWORLD);
+                soldiers.add(soldier);
+            }
+            for (int i = 0; i < STARTING_FARMERS && i < soldiers.size(); i++) {
+                Ant soldier = soldiers.get(i);
+                soldier.setRole(GameConstants.ROLE_HUNTER);
+                soldier.setDimension(WorldSpaces.OVERWORLD);
+            }
+            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_HUNTER,
+                    Math.max(STARTING_FARMERS, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_HUNTER)));
+            if (colony.getHatchRateSoldier() <= 0f) {
+                colony.setHatchRateWorker(85.0f);
+                colony.setHatchRateSoldier(15.0f);
+            }
+        }
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER,
                 Math.max(STARTING_FORAGERS, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER)));
     }
@@ -425,6 +477,7 @@ public class ColonyStarterService {
         boolean isBurntForest = biome == GameConstants.BIOME_BURNT_FOREST;
         boolean allowPlant = !isBurntForest;
         boolean allowWater = !isBurntForest;
+        boolean allowMeat = !isBurntForest && colony.canEatMeat();
 
         int range = 300;
         int centerX = ColonySpatialLayout.ANCHOR_CENTER_X;
@@ -446,6 +499,15 @@ public class ColonyStarterService {
             wY = Math.max(50, wY);
             ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
             colony.getLocationService().addSource(colony, initialWater);
+        }
+
+        if (allowMeat) {
+            int mX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+            int mY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
+            mX = Math.max(50, mX);
+            mY = Math.max(50, mY);
+            ResourceSource initialMeat = new ResourceSource(GameConstants.RESOURCE_MEAT, 10000, mX, mY);
+            colony.getLocationService().addSource(colony, initialMeat);
         }
     }
 }

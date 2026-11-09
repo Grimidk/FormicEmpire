@@ -24,6 +24,7 @@ import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
@@ -63,6 +64,7 @@ public class Dynasty {
     private boolean wildDynasty;
     private AiPersonality aiPersonality;
     private AntSpecies species;
+    private SpeciesDiet startingDiet;
     private int researchPoints;
     private int totalNuptialFlights;
     private int diplomatsSentTotal;
@@ -145,6 +147,9 @@ public class Dynasty {
         this.titleKey = titleKey != null ? titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY;
         this.isPlayer = isPlayer;
         this.species = species;
+        this.startingDiet = species != null && species.getDiet() != null
+                ? species.getDiet()
+                : GameConstants.DIET_FUNGIVOROUS;
         this.aiPersonality = isPlayer ? null : AiPersonality.random();
         this.colonies = new CopyOnWriteArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
@@ -248,6 +253,13 @@ public class Dynasty {
                 break;
             }
         }
+        SpeciesDiet resolvedDiet = GameConstants.getSpeciesDietById(savedDynasty.startingDietId);
+        if (resolvedDiet == null || resolvedDiet == GameConstants.DIET_OMNIVOROUS) {
+            resolvedDiet = this.species != null && this.species.getDiet() != null
+                    ? this.species.getDiet()
+                    : GameConstants.DIET_FUNGIVOROUS;
+        }
+        this.startingDiet = resolvedDiet;
 
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
@@ -1706,7 +1718,66 @@ public class Dynasty {
         initializeColor(); 
     }
     public AntSpecies getSpecies() { return species; }
-    public void setSpecies(AntSpecies species) { this.species = species; }
+    public void setSpecies(AntSpecies species) {
+        this.species = species;
+        if (species != null && species.getDiet() != null && !isPlayer) {
+            this.startingDiet = species.getDiet();
+        }
+    }
+
+    public SpeciesDiet getStartingDiet() {
+        return startingDiet != null ? startingDiet : GameConstants.DIET_FUNGIVOROUS;
+    }
+
+    public void setStartingDiet(SpeciesDiet startingDiet) {
+        if (startingDiet != null && startingDiet != GameConstants.DIET_OMNIVOROUS) {
+            this.startingDiet = startingDiet;
+        }
+    }
+
+    public SpeciesDiet getDiet() {
+        if (hasUpgrade(GameUnlocks.ABILITY_OMNIVORE)) {
+            return GameConstants.DIET_OMNIVOROUS;
+        }
+        return getStartingDiet();
+    }
+
+    public boolean canEatFungi() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_FUNGIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public boolean canEatMeat() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_CARNIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public int countOppositeDietAssimilations() {
+        SpeciesDiet baseDiet = getStartingDiet();
+        int count = 0;
+        for (AntSpecies candidate : GameConstants.getSpecies()) {
+            if (candidate == null || candidate == this.species) {
+                continue;
+            }
+            SpeciesDiet candidateDiet = candidate.getDiet();
+            if (candidateDiet == null || candidateDiet == baseDiet) {
+                continue;
+            }
+            Assimilation assimilation = candidate.getAssimilation();
+            if (assimilation == null) {
+                continue;
+            }
+            if (completedAssimilations.contains(assimilation)
+                    || (assimilation.getReward() != null && unlockedUpgrades.contains(assimilation.getReward()))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean meetsOmnivorePrerequisites() {
+        return countOppositeDietAssimilations() >= GameNumbers.TRIGGER_OMNIVORE_MIN_OPPOSITE_ASSIMILATIONS;
+    }
     
     public Color getColor() { return color; }
     public void setColor(Color color) { this.color = color; }
@@ -2002,6 +2073,16 @@ public class Dynasty {
         } else if (upgrade == GameUnlocks.ASSIMILATED_STEALTH) {
             if (!hasUpgrade(GameUnlocks.ROLE_SPY)) {
                 unlockedUpgrades.add(GameUnlocks.ROLE_SPY);
+            }
+        } else if (upgrade == GameUnlocks.ABILITY_OMNIVORE) {
+            if (!hasUpgrade(GameUnlocks.ROLE_FARMER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_FARMER);
+            }
+            if (!hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+                unlockedUpgrades.add(GameUnlocks.TYPE_SOLDIER);
+            }
+            if (!hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_HUNTER);
             }
         }
     }

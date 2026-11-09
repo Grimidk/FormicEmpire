@@ -34,7 +34,12 @@ public final class DynastyAiPriorities {
             list.add(GameUnlocks.ROLE_DIPLOMAT);
         } else {
             list.add(GameUnlocks.ROLE_DIPLOMAT);
-            list.add(GameUnlocks.STAT_FARMING_1);
+            if (dynasty == null || dynasty.hasUpgrade(GameUnlocks.ROLE_FARMER)) {
+                list.add(GameUnlocks.STAT_FARMING_1);
+            }
+            if (dynasty != null && dynasty.canEatMeat()) {
+                list.add(GameUnlocks.STAT_CARNIVORY_1);
+            }
             list.add(GameUnlocks.STAT_ATTACK_1);
             list.add(GameUnlocks.STAT_HEALTH_1);
             list.add(GameUnlocks.STAT_DEFENSE_1);
@@ -66,7 +71,7 @@ public final class DynastyAiPriorities {
             if (upgrade == null || dynasty.hasUpgrade(upgrade)) {
                 continue;
             }
-            if (upgrade.getRequirement() != null && !dynasty.hasUpgrade(upgrade.getRequirement())) {
+            if (!GameUnlocks.isUpgradeRequirementMet(dynasty, upgrade)) {
                 continue;
             }
             if (!GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade)) {
@@ -91,7 +96,8 @@ public final class DynastyAiPriorities {
     }
 
     private static void unlockFreeCompanions(Dynasty dynasty, Upgrade purchased) {
-        if (purchased == GameUnlocks.TYPE_SOLDIER) {
+        if (purchased == GameUnlocks.TYPE_SOLDIER
+                || (dynasty.hasUpgrade(GameUnlocks.TYPE_SOLDIER) && !dynasty.hasUpgrade(GameUnlocks.TYPE_MAJOR))) {
             dynasty.unlockUpgrade(GameUnlocks.TYPE_MAJOR);
         }
         if (purchased == GameUnlocks.TYPE_PRINCESS) {
@@ -117,13 +123,13 @@ public final class DynastyAiPriorities {
         if (key.startsWith("RESIN_RESERVOIR_0") || key.startsWith("ROCK_WAREHOUSE_0")) {
             return 5;
         }
-        if (key.startsWith("MUSHROOM_CHAMBER_") || key.startsWith("PLANT_CHAMBER_")) {
+        if (key.startsWith("MUSHROOM_CHAMBER_") || key.startsWith("PLANT_CHAMBER_") || key.startsWith("MEAT_CHAMBER_")) {
             return 10 + buildingTier(building);
         }
         if (key.equals("PASSIVE_LAB")) {
             return 15;
         }
-        if (key.startsWith("WATER_RESERVOIR_") || key.startsWith("MEAT_CHAMBER_")) {
+        if (key.startsWith("WATER_RESERVOIR_")) {
             return 20 + buildingTier(building);
         }
         if (key.startsWith("RESIN_RESERVOIR_") || key.startsWith("ROCK_WAREHOUSE_")) {

@@ -410,7 +410,13 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 reqDetail = LanguageStrings.format(
                         LanguageStrings.UPGRADE_REQUIRES_ASSIMILATION_FMT, subtypeAssimilation.getName());
             } else if (requirement != null) {
-                reqDetail = requirement.getDisplayName();
+                Upgrade displayedReq = (upgrade == GameUnlocks.STAT_HEX_SUSTAIN
+                        && colony != null
+                        && !colony.canEatFungi()
+                        && colony.canEatMeat())
+                        ? GameUnlocks.STAT_CARNIVORY_3
+                        : requirement;
+                reqDetail = displayedReq.getDisplayName();
             }
             if (reqDetail != null) {
                 String reqText = LanguageStrings.format(LanguageStrings.UPGRADE_REQUIRES_FMT, reqDetail);

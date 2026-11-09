@@ -35,6 +35,7 @@ public class Savefile implements Serializable {
     private String playerDynastyTitleKey;
     private int playerDynastyTitleId;
     private int starterBiomeId = 1;
+    private int starterDietId = 1;
     
     // --- Root Summary Data ---
     private int colonyId;
@@ -97,6 +98,7 @@ public class Savefile implements Serializable {
         public boolean isDefeated;
         public String rankName;
         public int speciesId;
+        public int startingDietId;
         public int researchPoints;
         public int totalNuptialFlights;
         public int diplomatsSentTotal;
@@ -596,6 +598,14 @@ public class Savefile implements Serializable {
 
     public void setStarterBiomeId(int starterBiomeId) {
         this.starterBiomeId = starterBiomeId;
+    }
+
+    public int getStarterDietId() {
+        return starterDietId > 0 ? starterDietId : 1;
+    }
+
+    public void setStarterDietId(int starterDietId) {
+        this.starterDietId = starterDietId;
     }
 
     public String getVersion() {

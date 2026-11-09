@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -27,7 +28,7 @@ import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
     private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(460, 32);
-    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 300);
+    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 340);
     private static final Dimension SLOT_LABEL_SIZE = new Dimension(AssetStyles.MENU_BUTTON_WIDTH, 28);
     private static final int SLOT_ACTION_GAP = 8;
 
@@ -300,6 +301,7 @@ public class SaveSelectPanel extends JPanel {
             Savefile save = new Savefile(slotId, request.baseName());
             save.setPlayerDynastyTitleId(request.titleId());
             save.setStarterBiomeId(request.starterBiomeId());
+            save.setStarterDietId(request.starterDietId());
             save.setSpectatorMode(request.spectatorMode());
             save.setVersion(SaveManager.getAppVersion());
             save.setWorldWidth(GameNumbers.WORLD_RECT_WIDTH);
@@ -436,10 +438,37 @@ public class SaveSelectPanel extends JPanel {
         c.weightx = 1.0;
         form.add(biomeCombo, c);
 
+        JLabel dietLabel = new JLabel(LanguageStrings.get(LanguageStrings.SAVE_ENTER_DIET));
+        dietLabel.setFont(AssetStyles.FONT_NORMAL);
+        dietLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridx = 0;
+        c.gridy = 3;
+        c.weightx = 0;
+        form.add(dietLabel, c);
+
+        JComboBox<SpeciesDiet> dietCombo = new JComboBox<>(
+                GameConstants.getStartingSpeciesDiets().toArray(new SpeciesDiet[0]));
+        dietCombo.setSelectedItem(GameConstants.DIET_FUNGIVOROUS);
+        dietCombo.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
+        dietCombo.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
+        dietCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel(value != null ? value.getName() : "");
+            if (isSelected) {
+                label.setOpaque(true);
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            }
+            return label;
+        });
+        AssetStyles.styleComboBox(dietCombo);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        form.add(dietCombo, c);
+
         JCheckBox spectatorCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE));
         AssetStyles.styleCheckBox(spectatorCheck);
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = 4;
         c.weightx = 1.0;
         c.insets = new Insets(6, 0, 6, 12);
         form.add(spectatorCheck, c);
@@ -449,7 +478,7 @@ public class SaveSelectPanel extends JPanel {
         previewLabel.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         previewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridx = 0;
-        c.gridy = 4;
+        c.gridy = 5;
         c.gridwidth = 2;
         c.insets = new Insets(14, 0, 0, 0);
         form.add(previewLabel, c);
@@ -468,8 +497,10 @@ public class SaveSelectPanel extends JPanel {
             boolean spec = spectatorCheck.isSelected();
             titleCombo.setEnabled(!spec);
             biomeCombo.setEnabled(!spec);
+            dietCombo.setEnabled(!spec);
             titleLabel.setEnabled(!spec);
             biomeLabel.setEnabled(!spec);
+            dietLabel.setEnabled(!spec);
             refreshPreview.run();
         });
         nameField.getDocument().addDocumentListener(new DocumentListener() {
@@ -517,6 +548,7 @@ public class SaveSelectPanel extends JPanel {
                     baseName,
                     GameConstants.DYNASTY_TITLE_DYNASTY.getId(),
                     GameConstants.BIOME_PLAINS.getId(),
+                    GameConstants.DIET_FUNGIVOROUS.getId(),
                     true);
         }
         if (rawName == null || rawName.trim().isEmpty()) {
@@ -541,7 +573,9 @@ public class SaveSelectPanel extends JPanel {
 
         Biome selectedBiome = (Biome) biomeCombo.getSelectedItem();
         int starterBiomeId = selectedBiome != null ? selectedBiome.getId() : GameConstants.BIOME_PLAINS.getId();
-        return new NewSaveRequest(baseName, titleId, starterBiomeId, false);
+        SpeciesDiet selectedDiet = (SpeciesDiet) dietCombo.getSelectedItem();
+        int starterDietId = selectedDiet != null ? selectedDiet.getId() : GameConstants.DIET_FUNGIVOROUS.getId();
+        return new NewSaveRequest(baseName, titleId, starterBiomeId, starterDietId, false);
     }
 
     private static void updateDynastyPreview(JLabel previewLabel, JTextField nameField, JComboBox<DynastyTitle> titleCombo) {
@@ -574,5 +608,5 @@ public class SaveSelectPanel extends JPanel {
         refreshSlots();
     }
 
-    private record NewSaveRequest(String baseName, int titleId, int starterBiomeId, boolean spectatorMode) {}
+    private record NewSaveRequest(String baseName, int titleId, int starterBiomeId, int starterDietId, boolean spectatorMode) {}
 }

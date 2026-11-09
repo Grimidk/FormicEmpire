@@ -1782,6 +1782,15 @@ STAT_FARMING_2_DESC,Increases farming conversion rate by another 0.2 per minute.
 STAT_FARMING_3,Farming III,Agricultura III,Cultivo III,Culture III,,,
 STAT_FARMING_3_FLAVOR,Genetic Modification,Modificación Genética,Modificação genética,Modification génétique,,,
 STAT_FARMING_3_DESC,Increases farming conversion rate by another 0.4 per minute.,Aumenta la tasa de conversión agrícola en otros 0.4 por minuto.,"Aumenta conversão agrícola em mais 0,4 por minuto.","+0,4 par minute en plus.",,,
+STAT_CARNIVORY_1,Carnivory I,Carnivoría I,Carnivoria I,Carnivorie I,,,
+STAT_CARNIVORY_1_FLAVOR,Prey Butchery,Despiece de Presas,Desmanche de presas,Découpe des proies,,,
+STAT_CARNIVORY_1_DESC,Doubles the nutritional efficiency of consumed protein (each unit of protein feeds 2 ants).,Duplica la eficiencia nutricional de la proteína consumida (cada unidad de proteína alimenta a 2 hormigas).,Dobra a eficiência nutricional da proteína consumida (cada unidade de proteína alimenta 2 formigas).,Double l'efficacité nutritionnelle des protéines consommées (chaque unité de protéine nourrit 2 fourmis).,,,
+STAT_CARNIVORY_2,Carnivory II,Carnivoría II,Carnivoria II,Carnivorie II,,,
+STAT_CARNIVORY_2_FLAVOR,Enzymatic Digestion,Digestión Enzimática,Digestão enzimática,Digestion enzymatique,,,
+STAT_CARNIVORY_2_DESC,Further doubles the nutritional efficiency of consumed protein (each unit of protein feeds 4 ants).,Duplica aún más la eficiencia nutricional de la proteína consumida (cada unidad de proteína alimenta a 4 hormigas).,Dobra ainda mais a eficiência nutricional da proteína consumida (cada unidade de proteína alimenta 4 formigas).,Double à nouveau l'efficacité nutritionnelle des protéines consommées (chaque unité de protéine nourrit 4 fourmis).,,,
+STAT_CARNIVORY_3,Carnivory III,Carnivoría III,Carnivoria III,Carnivorie III,,,
+STAT_CARNIVORY_3_FLAVOR,Hyper-Metabolic Assimilation,Asimilación Hipermetabólica,Assimilação hipermetabólica,Assimilation hypermétabolique,,,
+STAT_CARNIVORY_3_DESC,Further doubles the nutritional efficiency of consumed protein (each unit of protein feeds 8 ants).,Duplica aún más la eficiencia nutricional de la proteína consumida (cada unidad de proteína alimenta a 8 hormigas).,Dobra ainda mais a eficiência nutricional da proteína consumida (cada unidade de proteína alimenta 8 formigas).,Double à nouveau l'efficacité nutritionnelle des protéines consommées (chaque unité de protéine nourrit 8 fourmis).,,,
 STAT_CONTAMINATION_1,Contamination I,Contaminación I,Contaminação I,Contamination I,,,
 STAT_CONTAMINATION_1_FLAVOR,Body Disposal,Eliminación de Cuerpos,Remoção de corpos,Élimination des corps,,,
 STAT_CONTAMINATION_1_DESC,Reduces contamination death rate by 20%.,Reduce la tasa de mortalidad por contaminación en un 20%.,Reduz mortes por contaminação em 20%.,Réduit la mortalité par contamination de 20%.,,,
@@ -1979,7 +1988,7 @@ PASSIVE_FARM_DESC,"Enables passive farming even if there are no ants assigned, s
 PASSIVE_GRAVE,Passive Graveyard,Cementerio Pasivo,Cemitério passivo,Cimetière passif,,,
 PASSIVE_GRAVE_DESC,"Enables passive grave keeping even if there are no ants assigned, simulates 1 graver.",Limpieza pasiva de tumbas sin necesidad de sepultureras.,Limpeza passiva de túmulos sem coveiras.,Nettoyage passif des tombes sans fossoyeuses.,,,
 BUILDING_COMPOSTER,Composter,Compostador,Composteira,Composteur,,,
-BUILDING_COMPOSTER_DESC,Turns dead bodies into mushrooms daily. 1 body to 4 mushrooms matter.,Convierte cuerpos en hongo diariamente (1 cuerpo = 4 hongos).,Converte corpos em cogumelo diariamente (1 corpo = 4 cogumelos).,Transforme les corps en champignon chaque jour (1 corps = 4 champignons).,,,
+BUILDING_COMPOSTER_DESC,Turns dead bodies into mushrooms (or protein for carnivorous colonies) daily. 1 body to 4 food matter.,Convierte cuerpos en hongo (o proteína para colonias carnívoras) diariamente (1 cuerpo = 4 de alimento).,Converte corpos em cogumelo (ou proteína para colônias carnívoras) diariamente (1 corpo = 4 de alimento).,Transforme les corps en champignon (ou protéine pour les colonies carnivores) chaque jour (1 corps = 4 de nourriture).,,,
 ASSIMILATION_LEAFCUTTER,Farming,Agricultura,Cultivo,Culture,,,
 ASSIMILATION_LEAFCUTTER_DESC,After assimilating the leafcutter ant genome:,Tras asimilar el genoma de la hormiga cortadora de hojas:,Após assimilar o genoma da cortadeira de folhas:,Après assimilation du génome de la fourmi coupe-feuille :,,,
 ASSIMILATION_PHARAOH,Multiqueen,Multireina,Multirainha,Multi-reines,,,
@@ -2843,3 +2852,13 @@ UI_SPEED_HYPER_TURBO,Hyper Turbo,Híper Turbo,Hiper Turbo,Hyper Turbo
 MAP_WORLD_LOGS_TITLE_FMT,World logs (%s),Registros del mundo (%s),Registos do mundo (%s),Journaux du monde (%s)
 MAP_WORLD_LOGS_SHOW,Show world logs,Mostrar registros del mundo,Mostrar registos do mundo,Afficher les journaux du monde
 MAP_WORLD_LOGS_HIDE,Hide world logs,Ocultar registros del mundo,Ocultar registos do mundo,Masquer les journaux du monde
+DIET_FUNGIVOROUS,Fungivorous,Fungívora,Fungívora,Fongivore
+DIET_CARNIVOROUS,Carnivorous,Carnívora,Carnívora,Carnivore
+DIET_OMNIVOROUS,Omnivorous,Omnívora,Onívora,Omnivore
+SAVE_ENTER_DIET,Diet:,Dieta:,Dieta:,Régime :
+ABILITY_OMNIVORE,Omnivorous Diet,Dieta Omnívora,Dieta Onívora,Régime Omnivore
+ABILITY_OMNIVORE_FLAVOR,Adaptive Metabolism,Metabolismo Adaptativo,Metabolismo Adaptativo,Métabolisme Adaptatif
+ABILITY_OMNIVORE_DESC,"Unlocked after assimilating 3 species of the opposite diet. Your ants can consume both mushrooms and meat alongside syrups, and unlock both the Farmer and Hunter roles.","Se desbloquea tras asimilar 3 especies de la dieta opuesta. Tus hormigas pueden consumir tanto hongos como carne junto a los jarabes, y desbloquean los roles Granjera y Cazadora.","Desbloqueada após assimilar 3 espécies da dieta oposta. Suas formigas podem consumir tanto cogumelos quanto carne além de xaropes, e desbloqueiam as funções Agricultora e Caçadora.","Débloqué après avoir assimilé 3 espèces du régime opposé. Vos fourmis peuvent consommer à la fois des champignons et de la viande en plus des sirops, et débloquent les rôles Agricultrice et Chasseuse."
+TRIGGER_OMNIVORE_TITLE,Omnivorous Diet Unlocked!,¡Dieta Omnívora Desbloqueada!,Dieta Onívora Desbloqueada!,Régime Omnivore Débloqué !
+TRIGGER_OMNIVORE_MSG,"By assimilating %s species of the opposite diet, your dynasty has evolved an Omnivorous Diet! Your ants can now eat both mushrooms and meat, and can use both Farmers and Hunters.","Al asimilar %s especies de la dieta opuesta, ¡tu dinastía ha evolucionado una Dieta Omnívora! Tus hormigas ahora pueden comer tanto hongos como carne, y usar tanto Granjeras como Cazadoras.","Ao assimilar %s espécies da dieta oposta, sua dinastia evoluiu uma Dieta Onívora! Suas formigas agora podem comer tanto cogumelos quanto carne, e usar tanto Agricultoras quanto Caçadoras.","En assimilant %s espèces du régime opposé, votre dynastie a développé un Régime Omnivore ! Vos fourmis peuvent désormais manger des champignons et de la viande, et utiliser à la fois des Agricultrices et des Chasseuses."
+HELP_SPECIES_DIET,Diet,Dieta,Dieta,Régime

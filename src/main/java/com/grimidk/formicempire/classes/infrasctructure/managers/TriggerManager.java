@@ -170,6 +170,7 @@ public class TriggerManager {
         checkDynastyTriggers();
         checkTunnelRoleUnlock();
         checkAssimilationAbilityUnlock();
+        checkOmnivoreUnlock();
         checkSubtypeHatchUnlock();
         checkSynergyUnlocks();
         checkAbilityMenuHint();
@@ -302,7 +303,8 @@ public class TriggerManager {
 
     private static void checkNPCScout(Colony npc) {
         if (npc.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
-        boolean lowFood = npc.getPlants() < (npc.getStatsService().getPlantsCapacity(npc) * GameNumbers.TRIGGER_NPC_SCOUT_FOOD_RATIO);
+        boolean lowFood = npc.getPlants() < (npc.getStatsService().getPlantsCapacity(npc) * GameNumbers.TRIGGER_NPC_SCOUT_FOOD_RATIO)
+                || (npc.canEatMeat() && npc.getProtein() < (npc.getStatsService().getProteinCapacity(npc) * GameNumbers.TRIGGER_NPC_SCOUT_FOOD_RATIO));
         boolean highPop = npc.getAntTotal() > GameNumbers.TRIGGER_NPC_SCOUT_MIN_ANTS;
         if (lowFood || highPop) {
             npc.unlockUpgrade(GameUnlocks.ROLE_SCOUT);
@@ -398,6 +400,16 @@ public class TriggerManager {
             if (!npc.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)
                     && dynasty.getAbsorbedDynastyIds().size() >= GameNumbers.TRIGGER_ASSIMILATION_MIN_ABSORBED) {
                 npc.unlockUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+            }
+            if (npc.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)
+                    && !npc.hasUpgrade(GameUnlocks.ABILITY_OMNIVORE)
+                    && dynasty.meetsOmnivorePrerequisites()) {
+                npc.unlockUpgrade(GameUnlocks.ABILITY_OMNIVORE);
+                for (Colony member : dynasty.getColonies()) {
+                    if (member != null && !member.hasBuilding(GameUnlocks.MEAT_CHAMBER_0)) {
+                        member.unlockBuilding(GameUnlocks.MEAT_CHAMBER_0);
+                    }
+                }
             }
             if (!npc.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)
                     && GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3) >= GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS) {
@@ -581,7 +593,8 @@ public class TriggerManager {
         }
         int best = 0;
         for (ResourceSource source : colony.getLocationService().getDiscoveredSources()) {
-            if (source.getResourceType() != GameConstants.RESOURCE_PLANT) {
+            if (source.getResourceType() != GameConstants.RESOURCE_PLANT
+                    && source.getResourceType() != GameConstants.RESOURCE_MEAT) {
                 continue;
             }
             int collected = Math.max(0, source.getInitialQuantity() - source.getQuantity());
@@ -776,6 +789,24 @@ public class TriggerManager {
                 LanguageStrings.TRIGGER_ASSIMILATION_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_ASSIMILATION_ABILITY_MSG);
         }
+    }
+
+    private void checkOmnivoreUnlock() {
+        Dynasty dynasty = playerColony.getDynasty();
+        if (dynasty == null) return;
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_OMNIVORE)) return;
+        if (!dynasty.meetsOmnivorePrerequisites()) return;
+
+        for (Colony member : dynasty.getColonies()) {
+            if (member != null && !member.hasBuilding(GameUnlocks.MEAT_CHAMBER_0)) {
+                member.unlockBuilding(GameUnlocks.MEAT_CHAMBER_0);
+            }
+        }
+        fireLocalizedTrigger(GameUnlocks.ABILITY_OMNIVORE,
+                LanguageStrings.TRIGGER_OMNIVORE_TITLE,
+                LanguageStrings.TRIGGER_OMNIVORE_MSG,
+                GameNumbers.TRIGGER_OMNIVORE_MIN_OPPOSITE_ASSIMILATIONS);
     }
 
     private void checkSubtypeHatchUnlock() {

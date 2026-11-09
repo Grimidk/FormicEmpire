@@ -145,7 +145,7 @@ public final class ColonyJobRules {
             }
         }
 
-        if (resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER) && resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) {
             int farmerCount = stats.getEffectiveFarmerCount(colony);
             float convertRate = stats.getConversionRate(colony);
 
@@ -164,7 +164,7 @@ public final class ColonyJobRules {
                     maxConvert -= (int) plantConvert;
                 }
 
-                if (maxConvert > 0) {
+                if (maxConvert > 0 && !colony.canEatMeat()) {
                     double meatConvert = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, maxConvert);
                     if (meatConvert > 0) {
                         double yield = meatConvert * 2;
@@ -261,8 +261,17 @@ public final class ColonyJobRules {
         int totalConsumption = stats.getTotalConsumption(colony);
         totalConsumption += colony.getParasiteAnts();
 
-        double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, totalConsumption);
-        double foodDeficit = totalConsumption - consumedFood;
+        double foodDeficit = totalConsumption;
+        if (colony.canEatFungi()) {
+            double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodDeficit);
+            foodDeficit -= consumedFood;
+        }
+        if (foodDeficit > 0 && colony.canEatMeat()) {
+            float meatEff = Math.max(1f, stats.getMeatEatingEfficiency(colony));
+            double meatNeeded = Math.ceil(foodDeficit / meatEff);
+            double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, meatNeeded);
+            foodDeficit = Math.max(0.0, foodDeficit - (consumedMeat * meatEff));
+        }
 
         if (foodDeficit > 0) {
             double consumedSyrup = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
@@ -306,8 +315,12 @@ public final class ColonyJobRules {
             deadAnts.remove(deadAnts.size() - 1);
         }
 
-        int mushroomGain = actualToCompost * 4;
-        colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, mushroomGain);
+        int foodGain = actualToCompost * 4;
+        if (!colony.canEatFungi() && colony.canEatMeat()) {
+            colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, foodGain);
+        } else {
+            colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, foodGain);
+        }
     }
 
     public static void applyDailyGraveKeeping(Colony colony) {

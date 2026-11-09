@@ -30,8 +30,8 @@ To Draw (PascalCase filenames; under src/main/resources):
 		overworld mound sprites (path TBD)
 	Room sprites (sprites/buildings/rooms/ — 48x48 blank placeholders):
 		L0–L5 and L3S for Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin
-		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter
-
+		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter, PassiveWater, PassiveWeb
+		
 To Compose (.mp3 in resources/audio)
 	Songs:
 		Main menu
@@ -47,7 +47,6 @@ Needed for launch (v1.0) (Launch Version):
 		launch creatures (single battle or swarm; needs battle system):
 			Bugs: Bombardier(B), Ant lion(I), CommonFly(H)
 			Arachnids: Spider(I), Tarantula(H)
-		carnivore ant
 
 	Everything else :
 		swarm vs swarm system

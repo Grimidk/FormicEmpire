@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
@@ -993,6 +994,36 @@ public class Colony {
         }
     }
 
+    public SpeciesDiet getDiet() {
+        if (dynasty != null) {
+            return dynasty.getDiet();
+        }
+        AntSpecies s = getSpecies();
+        return s != null && s.getDiet() != null ? s.getDiet() : GameConstants.DIET_FUNGIVOROUS;
+    }
+
+    public boolean isCarnivorous() {
+        return getDiet() == GameConstants.DIET_CARNIVOROUS;
+    }
+
+    public boolean isFungivorous() {
+        return getDiet() == GameConstants.DIET_FUNGIVOROUS;
+    }
+
+    public boolean isOmnivorous() {
+        return getDiet() == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public boolean canEatFungi() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_FUNGIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public boolean canEatMeat() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_CARNIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
     public int getNativeSpeciesId() {
         return nativeSpeciesId;
     }
@@ -1646,7 +1677,7 @@ public class Colony {
         int researchPoints = getResearchPoints();
         for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
             if (!hasUpgrade(upgrade) && upgrade.getCost() > 0
-                    && (upgrade.getRequirement() == null || hasUpgrade(upgrade.getRequirement()))
+                    && GameUnlocks.isUpgradeRequirementMet(this, upgrade)
                     && GameUnlocks.meetsExtraAutomationPrerequisites(getDynasty(), upgrade)
                     && upgrade.isAvailableFor(getDynasty())
                     && researchPoints >= upgrade.getCost()) {

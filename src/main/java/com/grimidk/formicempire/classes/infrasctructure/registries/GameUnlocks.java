@@ -127,7 +127,7 @@ public final class GameUnlocks {
                 static { upgrades.add(ROLE_SPY); }
         public static final Upgrade ROLE_MILITIA = new Upgrade(32, "ROLE_MILITIA_UPGRADE", "ROLE_MILITIA_FLAVOR", "ROLE_MILITIA_DESC", TYPE_WORKER, 0, loadIcon("icons/upgrades/RoleMilitia.png"), 0, -1, 3);
                 static { upgrades.add(ROLE_MILITIA); }
-        public static final Upgrade ROLE_CATCHER = new Upgrade(33, "ROLE_CATCHER_UPGRADE", "ROLE_CATCHER_FLAVOR", "ROLE_CATCHER_DESC", ROLE_HUNTER, 500, loadIcon("icons/upgrades/RoleCatcher.png"), 1, -2, 4);
+        public static final Upgrade ROLE_CATCHER = new Upgrade(33, "ROLE_CATCHER_UPGRADE", "ROLE_CATCHER_FLAVOR", "ROLE_CATCHER_DESC", ROLE_HUNTER, 500, loadIcon("icons/upgrades/RoleCatcher.png"), 1, -2, 2);
                 static { upgrades.add(ROLE_CATCHER); }
         public static final Upgrade ROLE_CRANE = new Upgrade(34, "ROLE_CRANE_UPGRADE", "ROLE_CRANE_FLAVOR", "ROLE_CRANE_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleCrane.png"), 0, -5, 5);
                 static { upgrades.add(ROLE_CRANE); }
@@ -194,6 +194,42 @@ public final class GameUnlocks {
 
         public static final Upgrade ABILITY_SUBTYPE_HATCH = new Upgrade(524, "ABILITY_SUBTYPE_HATCH", "ABILITY_SUBTYPE_HATCH_FLAVOR", "ABILITY_SUBTYPE_HATCH_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AbilitySubtypeHatch.png"), 0, -7, -2);
                 static { upgrades.add(ABILITY_SUBTYPE_HATCH); }
+        public static final Upgrade ABILITY_OMNIVORE = new Upgrade(531, "ABILITY_OMNIVORE", "ABILITY_OMNIVORE_FLAVOR", "ABILITY_OMNIVORE_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AbilityOmnivore.png"), 0, -7, -4);
+                static { upgrades.add(ABILITY_OMNIVORE); }
+
+        public static boolean isUpgradeRequirementMet(Colony colony, Upgrade upgrade) {
+            if (upgrade == null) {
+                return true;
+            }
+            Upgrade req = upgrade.getRequirement();
+            if (req == null) {
+                return true;
+            }
+            if (colony != null && colony.hasUpgrade(req)) {
+                return true;
+            }
+            if (upgrade == STAT_HEX_SUSTAIN && colony != null && colony.hasUpgrade(STAT_CARNIVORY_3)) {
+                return true;
+            }
+            return false;
+        }
+
+        public static boolean isUpgradeRequirementMet(Dynasty dynasty, Upgrade upgrade) {
+            if (upgrade == null) {
+                return true;
+            }
+            Upgrade req = upgrade.getRequirement();
+            if (req == null) {
+                return true;
+            }
+            if (dynasty != null && dynasty.hasUpgrade(req)) {
+                return true;
+            }
+            if (upgrade == STAT_HEX_SUSTAIN && dynasty != null && dynasty.hasUpgrade(STAT_CARNIVORY_3)) {
+                return true;
+            }
+            return false;
+        }
 
         public static boolean meetsExtraAutomationPrerequisites(Dynasty dynasty, Upgrade upgrade) {
             if (upgrade == ABILITY_AUTO_TUNNELS) {
@@ -204,6 +240,15 @@ public final class GameUnlocks {
             }
             if (upgrade == ABILITY_AUTO_LOGISTICS) {
                 return dynasty != null && dynasty.meetsAutoLogisticsPrerequisites();
+            }
+            if (upgrade == ABILITY_OMNIVORE) {
+                return dynasty != null && dynasty.meetsOmnivorePrerequisites();
+            }
+            if (upgrade == STAT_FARMING_1 || upgrade == STAT_FARMING_2 || upgrade == STAT_FARMING_3) {
+                return dynasty == null || dynasty.canEatFungi();
+            }
+            if (upgrade == STAT_CARNIVORY_1 || upgrade == STAT_CARNIVORY_2 || upgrade == STAT_CARNIVORY_3) {
+                return dynasty != null && dynasty.canEatMeat();
             }
             return true;
         }
@@ -271,6 +316,12 @@ public final class GameUnlocks {
                 static { upgrades.add(STAT_FARMING_2); }
         public static final Upgrade STAT_FARMING_3 = new Upgrade(123, "STAT_FARMING_3", "STAT_FARMING_3_FLAVOR", "STAT_FARMING_3_DESC", STAT_FARMING_2, 60000, loadIcon("icons/upgrades/StatFarming3.png"), 4, 5, 6);
                 static { upgrades.add(STAT_FARMING_3); }
+        public static final Upgrade STAT_CARNIVORY_1 = new Upgrade(146, "STAT_CARNIVORY_1", "STAT_CARNIVORY_1_FLAVOR", "STAT_CARNIVORY_1_DESC", ROLE_HUNTER, 4500, loadIcon("icons/upgrades/StatCarnivory1.png"), 2, -2, 4);
+                static { upgrades.add(STAT_CARNIVORY_1); }
+        public static final Upgrade STAT_CARNIVORY_2 = new Upgrade(147, "STAT_CARNIVORY_2", "STAT_CARNIVORY_2_FLAVOR", "STAT_CARNIVORY_2_DESC", STAT_CARNIVORY_1, 16000, loadIcon("icons/upgrades/StatCarnivory2.png"), 3, -2, 5);
+                static { upgrades.add(STAT_CARNIVORY_2); }
+        public static final Upgrade STAT_CARNIVORY_3 = new Upgrade(148, "STAT_CARNIVORY_3", "STAT_CARNIVORY_3_FLAVOR", "STAT_CARNIVORY_3_DESC", STAT_CARNIVORY_2, 60000, loadIcon("icons/upgrades/StatCarnivory3.png"), 4, -2, 6);
+                static { upgrades.add(STAT_CARNIVORY_3); }
         public static final Upgrade STAT_CONTAMINATION_1 = new Upgrade(124, "STAT_CONTAMINATION_1", "STAT_CONTAMINATION_1_FLAVOR", "STAT_CONTAMINATION_1_DESC", ROLE_GRAVER, 2000, loadIcon("icons/upgrades/StatContamination1.png"), 2, 2, 5);
                 static { upgrades.add(STAT_CONTAMINATION_1); }
         public static final Upgrade STAT_CONTAMINATION_2 = new Upgrade(125, "STAT_CONTAMINATION_2", "STAT_CONTAMINATION_2_FLAVOR", "STAT_CONTAMINATION_2_DESC", STAT_CONTAMINATION_1, 8000, loadIcon("icons/upgrades/StatContamination2.png"), 3, 2, 6);

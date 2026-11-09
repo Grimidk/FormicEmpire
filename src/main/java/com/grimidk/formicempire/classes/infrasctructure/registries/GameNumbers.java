@@ -372,6 +372,8 @@ public final class GameNumbers {
     public static final int TRIGGER_AUTOMATION_MIN_COLONIES = 7;
     public static final int TRIGGER_RESEARCHER_MIN_MONTHS = 2;
     public static final int TRIGGER_ASSIMILATION_MIN_ABSORBED = 1;
+    public static final int TRIGGER_OMNIVORE_MIN_OPPOSITE_ASSIMILATIONS = 3;
+    public static final float HUNTER_MEAT_COLLECTING_MULT = 6.0f;
     public static final int TRIGGER_NPC_RESEARCHER_MIN_ANTS = 20;
     public static final int TRIGGER_NPC_GRAVER_DEAD_ANTS = 20;
     public static final int TRIGGER_NPC_SCOUT_MIN_ANTS = 50;

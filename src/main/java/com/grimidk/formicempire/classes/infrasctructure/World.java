@@ -17,6 +17,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
@@ -106,6 +107,7 @@ public class World {
     private Engine engine;
     private boolean allowsAchievements = true;
     private boolean spectatorMode = false;
+    private SpeciesDiet starterDiet = GameConstants.DIET_FUNGIVOROUS;
     private int worldRadius = GameNumbers.worldRadiusForContinentCore(
             GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
     private int continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
@@ -1756,11 +1758,6 @@ public class World {
         this.islandCount = 0;
         Map<String, Hex> hexMap = new HashMap<>();
         if (seedDynasties && !this.spectatorMode) {
-            ColonyStarterService starterService = ColonyStarterService.shared();
-            if (startColony.getAntTotal() == 0) {
-                starterService.initializeNewColony(startColony);
-            }
-            
             baseName = formatName(baseName);
             DynastyTitle playerTitle = GameConstants.getDynastyTitleByKey(playerTitleKey);
             String dynName = LanguageStrings.formatDynastyName(baseName, playerTitle);
@@ -1768,6 +1765,7 @@ public class World {
             
             Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, playerTitle.getNameKey(), true, GameConstants.SPECIES_OMNI);
             playerDynasty.setThemeBase(baseName);
+            playerDynasty.setStartingDiet(this.starterDiet != null ? this.starterDiet : GameConstants.DIET_FUNGIVOROUS);
             playerDynasty.getStarterService().initializeDynasty(playerDynasty);
             
             String capName = namingService.generateCapitalName(baseName);
@@ -1776,6 +1774,11 @@ public class World {
             playerDynasty.addColony(startColony);
             playerDynasty.setCapital(startColony);
             registerDynasty(playerDynasty);
+
+            ColonyStarterService starterService = ColonyStarterService.shared();
+            if (startColony.getAntTotal() == 0) {
+                starterService.initializeNewColony(startColony);
+            }
             historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
                     playerDynasty.getId(), startColony.getId(), -1,
                     WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
@@ -3951,10 +3954,6 @@ public class World {
             if (startColony == null) {
                 startColony = new Colony(1, baseName + " Prime", true);
             }
-            ColonyStarterService starterService = ColonyStarterService.shared();
-            if (startColony.getAntTotal() == 0) {
-                starterService.initializeNewColony(startColony);
-            }
 
             baseName = formatName(baseName);
             DynastyTitle playerTitle = GameConstants.getDynastyTitleByKey(playerTitleKey);
@@ -3963,6 +3962,7 @@ public class World {
 
             Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, playerTitle.getNameKey(), true, GameConstants.SPECIES_OMNI);
             playerDynasty.setThemeBase(baseName);
+            playerDynasty.setStartingDiet(this.starterDiet != null ? this.starterDiet : GameConstants.DIET_FUNGIVOROUS);
             playerDynasty.getStarterService().initializeDynasty(playerDynasty);
 
             String capName = namingService.generateCapitalName(baseName);
@@ -3971,6 +3971,11 @@ public class World {
             playerDynasty.addColony(startColony);
             playerDynasty.setCapital(startColony);
             registerDynasty(playerDynasty);
+
+            ColonyStarterService starterService = ColonyStarterService.shared();
+            if (startColony.getAntTotal() == 0) {
+                starterService.initializeNewColony(startColony);
+            }
             historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
                     playerDynasty.getId(), startColony.getId(), -1,
                     WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
@@ -4034,6 +4039,16 @@ public class World {
         if (spawnHex == null) {
             for (Hex h : cSet) {
                 if (!h.isIsland() && h.getColony() == null && h.getBiome() != null && h.getBiome().canStart()) {
+                    spawnHex = h;
+                    spawnHex.setBiome(startBiome);
+                    spawnHex.setLocalWeather(getRandomWeather(startBiome));
+                    break;
+                }
+            }
+        }
+        if (spawnHex == null) {
+            for (Hex h : cSet) {
+                if (!h.isIsland() && h.getColony() == null) {
                     spawnHex = h;
                     spawnHex.setBiome(startBiome);
                     spawnHex.setLocalWeather(getRandomWeather(startBiome));
@@ -5966,17 +5981,19 @@ public class World {
     public void startWorld(Biome biome, Colony colony, String baseName, String playerTitleKey) {
         System.out.println("[World] startWorld called. Colony ants before init: " + colony.getAntTotal());
 
-        if (colony.getAntTotal() == 0) {
-            ColonyStarterService starterService = ColonyStarterService.shared();
-            starterService.initializeNewColony(colony);
-        }
-        
-        System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
-
         baseName = formatName(baseName);
         generateRectangularWorld(biome, colony, baseName, playerTitleKey);
+        System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
+    }
+
+    public SpeciesDiet getStarterDiet() {
+        return starterDiet;
+    }
+
+    public void setStarterDiet(SpeciesDiet starterDiet) {
+        this.starterDiet = starterDiet != null ? starterDiet : GameConstants.DIET_FUNGIVOROUS;
     }
 
     public void relocalizeDynastyNames() {
@@ -6015,6 +6032,7 @@ public class World {
                 : (savefile.getContinentCoreRadius() > 0 ? savefile.getContinentCoreRadius() : this.worldRadius);
         
         String playerTitleKey = GameConstants.getDynastyTitleById(savefile.resolvePlayerDynastyTitleId()).getNameKey();
+        this.starterDiet = GameConstants.getSpeciesDietById(savefile.getStarterDietId());
 
         String baseName = "Player";
         if (savefile.getName() != null && !savefile.getName().trim().isEmpty()) {
@@ -6136,8 +6154,6 @@ public class World {
                 if (!this.spectatorMode) {
                     String playerCapName = namingService.generateCapitalName(baseName);
                     colony = new Colony(1, playerCapName, true);
-                    ColonyStarterService starter = ColonyStarterService.shared();
-                    starter.initializeNewColony(colony);
                 }
                 int starterBiomeId = savefile.getStarterBiomeId() > 0 ? savefile.getStarterBiomeId() : GameConstants.BIOME_PLAINS.getId();
                 Biome chosenBiome = getBiomeById(starterBiomeId);
@@ -6160,11 +6176,6 @@ public class World {
                 if (colony == null) {
                     String playerCapName = namingService.generateCapitalName(baseName);
                     colony = new Colony(1, playerCapName, true);
-                }
-                 
-                if (colony.getAntTotal() == 0) {
-                    ColonyStarterService starter = ColonyStarterService.shared();
-                    starter.initializeNewColony(colony);
                 }
             }
 

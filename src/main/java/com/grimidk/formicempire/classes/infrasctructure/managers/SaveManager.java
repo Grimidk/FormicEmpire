@@ -421,6 +421,9 @@ public class SaveManager {
                 if (dynasty.isPlayer()) {
                     save.setPlayerDynastyTitleId(dynasty.getTitleId());
                     save.setPlayerDynastyTitleKey(dynasty.getTitleKey());
+                    if (dynasty.getStartingDiet() != null) {
+                        save.setStarterDietId(dynasty.getStartingDiet().getId());
+                    }
                     break;
                 }
             }
@@ -456,6 +459,7 @@ public class SaveManager {
                 sc.totalNuptialFlights = dynasty.getTotalNuptialFlights();
                 sc.diplomatsSentTotal = dynasty.getDiplomatsSentTotal();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
+                sc.startingDietId = dynasty.getStartingDiet() != null ? dynasty.getStartingDiet().getId() : 1;
                 sc.defaultAutomationEnabled = dynasty.isDefaultAutomationEnabled();
                 sc.defaultAutoBuildEnabled = dynasty.isDefaultAutoBuildEnabled();
                 sc.autoDiplomacyEnabled = dynasty.isAutoDiplomacyEnabled();
@@ -820,6 +824,7 @@ public class SaveManager {
         writeJsonLine(w, "allowsAchievements", s.allowsAchievements(), false);
         writeJsonLine(w, "spectatorMode", s.isSpectatorMode(), false);
         writeJsonLine(w, "starterBiomeId", s.getStarterBiomeId(), false);
+        writeJsonLine(w, "starterDietId", s.getStarterDietId(), false);
         
         // - Root Summary Data - 
         writeJsonLine(w, "colonyId", s.getColonyId(), false);
@@ -886,6 +891,7 @@ public class SaveManager {
         writeJsonLine(w, "isDefeated", sc.isDefeated, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "speciesId", sc.speciesId, false);
+        writeJsonLine(w, "startingDietId", sc.startingDietId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         writeJsonLine(w, "totalNuptialFlights", sc.totalNuptialFlights, false);
         writeJsonLine(w, "diplomatsSentTotal", sc.diplomatsSentTotal, false);
@@ -1080,6 +1086,7 @@ public class SaveManager {
         }
         s.setSpectatorMode(Boolean.parseBoolean(rootMap.getOrDefault("spectatorMode", "false")));
         s.setStarterBiomeId(Integer.parseInt(rootMap.getOrDefault("starterBiomeId", "1")));
+        s.setStarterDietId(Integer.parseInt(rootMap.getOrDefault("starterDietId", "1")));
         
         // --- Populate Root Summary Data ---
         s.setColonyId(Integer.parseInt(rootMap.getOrDefault("colonyId", "0")));
@@ -1193,6 +1200,7 @@ public class SaveManager {
         sc.isDefeated = Boolean.parseBoolean(map.getOrDefault("isDefeated", "false"));
         sc.rankName = map.getOrDefault("rank", LanguageStrings.RANK_ANT);
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
+        sc.startingDietId = Integer.parseInt(map.getOrDefault("startingDietId", "0"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.totalNuptialFlights = Integer.parseInt(map.getOrDefault("totalNuptialFlights", "0"));
         sc.diplomatsSentTotal = Integer.parseInt(map.getOrDefault("diplomatsSentTotal", "0"));
