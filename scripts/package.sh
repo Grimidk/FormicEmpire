@@ -341,15 +341,14 @@ pack_linux_app_docker() {
     rm -rf "$LINUX_APP_DIR"
     rm -f "$LINUX_ZIP"
 
+    "$DOCKER_BIN" builder prune -a -f --keep-storage 2GB >/dev/null 2>&1 || \
+        "$DOCKER_BIN" builder prune -f >/dev/null 2>&1 || true
+
     "$DOCKER_BIN" run --rm --platform linux/amd64 \
         -v "$ROOT:/work" \
         -w /work \
         eclipse-temurin:17-jdk \
         bash -euo pipefail -c "
-            export DEBIAN_FRONTEND=noninteractive
-            apt-get update -qq
-            apt-get install -y -qq zip file >/dev/null
-
             OUTPUT_DIR='$OUTPUT_DIR'
             JAR_NAME='$JAR_NAME'
             MAIN_CLASS='$MAIN_CLASS'
@@ -357,7 +356,6 @@ pack_linux_app_docker() {
             APP_VERSION_NUMERIC='$APP_VERSION_NUMERIC'
             LINUX_JRE='$LINUX_JRE'
             LINUX_APP_DIR=\"\$OUTPUT_DIR/FormicEmpire\"
-            LINUX_ZIP=\"\$OUTPUT_DIR/FormicEmpire.linux.zip\"
             JPACKAGE_INPUT=\"\$OUTPUT_DIR/.jpackage-input\"
 
             rm -rf \"\$JPACKAGE_INPUT\" \"\$LINUX_APP_DIR\"
@@ -382,15 +380,21 @@ pack_linux_app_docker() {
 
             rm -rf \"\$JPACKAGE_INPUT\"
             test -x \"\$LINUX_APP_DIR/bin/FormicEmpire\"
-
-            (
-                cd \"\$OUTPUT_DIR\"
-                zip -r -X FormicEmpire.linux.zip FormicEmpire \\
-                    -x \"*.DS_Store\" \\
-                    -x \"*/.*\"
-            )
-            rm -rf \"\$LINUX_APP_DIR\"
         "
+
+    if [ ! -x "$LINUX_APP_DIR/bin/FormicEmpire" ]; then
+        echo "Error: Docker jpackage did not produce $LINUX_APP_DIR/bin/FormicEmpire"
+        return 1
+    fi
+
+    rm -f "$LINUX_ZIP"
+    (
+        cd "$OUTPUT_DIR"
+        zip -r -X "FormicEmpire.linux.zip" FormicEmpire \
+            -x "*.DS_Store" \
+            -x "*/.*"
+    )
+    rm -rf "$LINUX_APP_DIR"
 
     if [ ! -f "$LINUX_ZIP" ]; then
         echo "Error: Docker jpackage did not produce $LINUX_ZIP"

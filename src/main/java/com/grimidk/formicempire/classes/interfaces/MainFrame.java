@@ -394,6 +394,16 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     public void syncDisplayModeAfterShown() {
         if (!MacOsNativeFullscreen.isMac()) {
+            if (engine.isFullScreen()) {
+                SwingUtilities.invokeLater(() -> {
+                    GraphicsConfiguration gc = getGraphicsConfiguration();
+                    if (gc != null) {
+                        setBounds(gc.getBounds());
+                    }
+                    setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    notifyGeometryChanged();
+                });
+            }
             return;
         }
         macFullscreenEnsurePending = engine.isFullScreen();
@@ -647,14 +657,14 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
 
         if (wantFullscreen) {
-            setResizable(false);
+            setResizable(true);
             setExtendedState(JFrame.NORMAL);
             GraphicsConfiguration gc = getGraphicsConfiguration();
             if (gc != null) {
                 setBounds(gc.getBounds());
             } else {
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                setSize(screenSize);
+                setBounds(0, 0, screenSize.width, screenSize.height);
             }
             setExtendedState(JFrame.MAXIMIZED_BOTH);
         } else {

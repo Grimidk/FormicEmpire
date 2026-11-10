@@ -8,9 +8,7 @@ To Fix (By decreasing priority):
 	Mid:
 		(none right now)
 	Low:
-		checbox look odd in win os
-		font is different in win os
-		performance is worse in win os
+		(none right now)
 	Important not Urgent:
 		(none right now)
 	Can't reproduce:
@@ -31,7 +29,7 @@ To Draw (PascalCase filenames; under src/main/resources):
 	Room sprites (sprites/buildings/rooms/ — 48x48 blank placeholders):
 		L0–L5 and L3S for Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin
 		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter, PassiveWater, PassiveWeb
-		
+
 To Compose (.mp3 in resources/audio)
 	Songs:
 		Main menu

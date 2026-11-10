@@ -2,17 +2,17 @@ package com.grimidk.formicempire.classes.interfaces.ui.icons;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import javax.swing.Icon;
 
 public final class SquareCheckIcons {
     public static final int ICON_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
-    private static final String CHECK_MARK = "\u2716";
 
     public static final Icon UNCHECKED = new SquareIcon(false);
     public static final Icon CHECKED = new SquareIcon(true);
@@ -45,11 +45,12 @@ public final class SquareCheckIcons {
 
     private static void paintMark(Graphics2D g2, int x, int y, int size, Color color) {
         g2.setColor(color);
-        g2.setFont(AssetStyles.FONT_BOLD.deriveFont(14f));
-        FontMetrics fm = g2.getFontMetrics();
-        int textX = x + (size - fm.stringWidth(CHECK_MARK)) / 2;
-        int textY = y + ((size - fm.getHeight()) / 2) + fm.getAscent();
-        g2.drawString(CHECK_MARK, textX, textY);
+        Stroke oldStroke = g2.getStroke();
+        g2.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        int pad = 5;
+        g2.drawLine(x + pad, y + pad, x + size - pad - 1, y + size - pad - 1);
+        g2.drawLine(x + size - pad - 1, y + pad, x + pad, y + size - pad - 1);
+        g2.setStroke(oldStroke);
     }
 
     private static final class SquareIcon implements Icon {

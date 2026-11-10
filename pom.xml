@@ -157,7 +157,7 @@
                             <outfile>${project.build.directory}/FormicEmpire.exe</outfile>
                             <icon>${project.basedir}/src/main/resources/meta/icon.ico</icon>
                             <downloadUrl>http://java.com/download</downloadUrl>
-                            <jvmArgs>-XX:+UseG1GC -Dsun.java2d.d3d=false -Dsun.java2d.opengl=false -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true</jvmArgs>
+                            <jvmArgs>-XX:+UseG1GC -Dsun.java2d.d3d=true -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true</jvmArgs>
                             <initialHeapSize>256</initialHeapSize>
                             <maxHeapSize>1536</maxHeapSize>
                             <classPath>

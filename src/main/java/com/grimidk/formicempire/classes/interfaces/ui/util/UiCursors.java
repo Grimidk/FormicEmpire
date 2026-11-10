@@ -1,9 +1,13 @@
 package com.grimidk.formicempire.classes.interfaces.ui.util;
 
 import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -87,6 +91,40 @@ public final class UiCursors {
         component.setCursor(null);
     }
 
+    public static Cursor createBestCursor(Image img, int width, int height, int hotX, int hotY, String name) {
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension best = tk.getBestCursorSize(width, height);
+        if (best.width <= 0 || best.height <= 0) {
+            return Cursor.getDefaultCursor();
+        }
+        if (best.width == width && best.height == height) {
+            return tk.createCustomCursor(img, new Point(hotX, hotY), name);
+        }
+        BufferedImage canvas = new BufferedImage(best.width, best.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = canvas.createGraphics();
+        int targetHotX;
+        int targetHotY;
+        try {
+            if (best.width >= width && best.height >= height) {
+                int dx = (best.width - width) / 2;
+                int dy = (best.height - height) / 2;
+                g2.drawImage(img, dx, dy, null);
+                targetHotX = dx + hotX;
+                targetHotY = dy + hotY;
+            } else {
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                g2.drawImage(img, 0, 0, best.width, best.height, null);
+                targetHotX = Math.round((float) hotX * best.width / width);
+                targetHotY = Math.round((float) hotY * best.height / height);
+            }
+        } finally {
+            g2.dispose();
+        }
+        targetHotX = Math.max(0, Math.min(best.width - 1, targetHotX));
+        targetHotY = Math.max(0, Math.min(best.height - 1, targetHotY));
+        return tk.createCustomCursor(canvas, new Point(targetHotX, targetHotY), name);
+    }
+
     private static CursorLoaded load(Class<?> anchor, String path, String name) {
         try {
             URL url = anchor.getResource(path);
@@ -96,8 +134,7 @@ public final class UiCursors {
                 int height = Math.max(1, img.getHeight(null));
                 int size = Math.max(width, height);
                 int hotspot = Math.max(0, Math.min(width, height) / 2);
-                Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(
-                        img, new Point(hotspot, hotspot), name);
+                Cursor cursor = createBestCursor(img, width, height, hotspot, hotspot, name);
                 return new CursorLoaded(cursor, size);
             }
         } catch (Exception e) {
