@@ -1880,7 +1880,15 @@ public class MapDialog extends ZeroDialog {
                 badges.add(colorSwatch);
 
                 if (d.getSpecies() != null && d.getSpecies().getIcon() != null) {
-                    badges.add(new JLabel(d.getSpecies().getIcon()));
+                    JLabel speciesBadge = new JLabel(d.getSpecies().getIcon());
+                    speciesBadge.setToolTipText(d.getSpecies().getName());
+                    badges.add(speciesBadge);
+                }
+
+                if (d.getDiet() != null && d.getDiet().getIcon() != null) {
+                    JLabel dietBadge = new JLabel(d.getDiet().getIcon());
+                    dietBadge.setToolTipText(d.getDiet().getName());
+                    badges.add(dietBadge);
                 }
 
                 boolean defeated = d.isDefeated();
@@ -1979,6 +1987,9 @@ public class MapDialog extends ZeroDialog {
             }
             if (dynasty.getSpecies() != null) {
                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(dynasty.getSpecies().getName());
+            }
+            if (dynasty.getDiet() != null) {
+                sb.append("<br><b>").append(LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET)).append(":</b> ").append(dynasty.getDiet().getName());
             }
             if (dynasty.getRank() != null) {
                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
@@ -2624,6 +2635,9 @@ public class MapDialog extends ZeroDialog {
                     sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(c.getSpecies().getName());
                 } else {
                     sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+                }
+                if (c.getDiet() != null) {
+                    sb.append("<br><b>").append(LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET)).append(":</b> ").append(c.getDiet().getName());
                 }
 
                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_MILITARY_POWER))

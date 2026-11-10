@@ -391,7 +391,11 @@ public final class GameNumbers {
     public static final double SPY_CI_REDUCTION_PER_POINT = 0.1;
     public static final double COUNTER_INTELLIGENCE_START = 5.0;
     public static final double COUNTER_INTELLIGENCE_MAX = 50.0;
+    public static final double INTELLIGENCE_BASE_CAP = 20.0;
     public static final double INTELLIGENCE_MAX = 100.0;
+    public static final double SPY_STEALTH_DETECTION_MULTIPLIER = 0.5;
+    public static final int SPY_STEALTH_POWER_MULTIPLIER = 2;
+    public static final int ROLE_SPY_RESEARCH_COST = 1500;
     public static final double SPY_THEFT_FRACTION_MIN = 0.01;
     public static final double SPY_THEFT_FRACTION_MAX = 0.03;
     public static final int CAUGHT_SPYING_DURATION_DAYS = DAYS_PER_MONTH * 12;

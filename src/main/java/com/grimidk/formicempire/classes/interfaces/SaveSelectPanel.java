@@ -422,10 +422,16 @@ public class SaveSelectPanel extends JPanel {
         JComboBox<Biome> biomeCombo = new JComboBox<>(
                 GameConstants.getStartingBiomes().toArray(new Biome[0]));
         biomeCombo.setSelectedItem(GameConstants.BIOME_PLAINS);
+        biomeCombo.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX).trim());
         biomeCombo.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
         biomeCombo.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
         biomeCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
             JLabel label = new JLabel(value != null ? value.getName() : "");
+            if (value != null) {
+                label.setIcon(value.getIcon());
+                label.setIconTextGap(8);
+                label.setToolTipText(value.getName());
+            }
             if (isSelected) {
                 label.setOpaque(true);
                 label.setBackground(list.getSelectionBackground());
@@ -449,10 +455,16 @@ public class SaveSelectPanel extends JPanel {
         JComboBox<SpeciesDiet> dietCombo = new JComboBox<>(
                 GameConstants.getStartingSpeciesDiets().toArray(new SpeciesDiet[0]));
         dietCombo.setSelectedItem(GameConstants.DIET_FUNGIVOROUS);
+        dietCombo.setToolTipText(LanguageStrings.get(LanguageStrings.SAVE_ENTER_DIET).replace(":", "").trim());
         dietCombo.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
         dietCombo.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
         dietCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
             JLabel label = new JLabel(value != null ? value.getName() : "");
+            if (value != null) {
+                label.setIcon(value.getIcon());
+                label.setIconTextGap(8);
+                label.setToolTipText(value.getName());
+            }
             if (isSelected) {
                 label.setOpaque(true);
                 label.setBackground(list.getSelectionBackground());

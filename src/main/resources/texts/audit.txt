@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 75% (61/81 checked)
+Completion: 95% (77/81 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -39,7 +39,7 @@ Roles (default hatch roles):
 
 Sandbox:
 [X] Turbo speed, show mechanics audit
-[ ] Show FPS counter (top-right overlay)
+[X] Show FPS counter (top-right overlay)
 [X] ★ Free abilities, infinite research, instant buildings, assimilate all, easy conquering, instant integration (each taints achievements when used)
 [X] Save & Apply with new ★ options — Yes taints save; No clears ★ then applies
 [X] Reset tab to defaults
@@ -132,20 +132,20 @@ Sandbox:
 ================================================================================
 [X] Colony list sort/search; Actions — rename, view/switch colony, send diplomats
 [X] Dynasty automation toggles — auto-build, automation (peace/war role rules), Auto-Tunnels, Auto-Diplomacy
-[ ] Default Auto-Logistics and per-colony column (when unlocked)
+[X] Default Auto-Logistics and per-colony column (when unlocked)
 [X] Title progression
 
 ================================================================================
 16. DYNASTY — TRADE / LOGISTICS (S)
 ================================================================================
 [X] Neighbor rows — amounts, tunnels, create/edit one-way/two-way/bilateral routes, trade methods, max buttons, bilateral optimization, convoy view, make two-way, excess cargo return
-[ ] Convoy jaw cargo icons per leg; show-all-dynasty-connections toggle; recurrent route surplus refresh
+[X] Convoy jaw cargo icons per leg; show-all-dynasty-connections toggle; recurrent route surplus refresh
 
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)
 ================================================================================
 [X] Sort/search; pact propose/accept/break; declare war; trade request/negotiation; send diplomats; genetic exchange; reputation modifiers; integration flow; convoy/diplomat auto-cancel alerts
-[ ] Pact request policy (Ask / auto accept / auto decline); Send spies, intelligence dossier, caught-spying penalty
+[X] Pact request policy (Ask / auto accept / auto decline); Send spies, intelligence dossier, caught-spying penalty
 
 ================================================================================
 18. DYNASTY — WARS (F)
@@ -168,7 +168,7 @@ Sandbox:
 ================================================================================
 [X] In-game tutorial — multi-page Back/Next/Skip/Finish
 [X] Help encyclopedia — Ant Species/Types/Subtypes, Critter Species (animated sprites + hunt/invasion text), Upgrades/Buildings trees, Synergies, Combat, World/biomes
-[ ] Help — Tutorials pages, Ant roles (Spy), Dynasty tab (spies/intel), UI Controls tab
+[X] Help — Tutorials pages, Ant roles (Spy), Dynasty tab (spies/intel), UI Controls tab
 
 ================================================================================
 22. AUTOMATIC TRIGGERS (play until popup fires)
@@ -183,7 +183,7 @@ Sandbox:
 ================================================================================
 [X] Colony labour, resources, pets/parasites, NPC lite behaviour, construction, room passives
 [X] World ticks, weather, biomes, generation rules, resource tooltips, nuptial flight, spread inheritance
-[ ] AI dynasties — research/build priority, personality war/trade bias
+[X] AI dynasties — research/build priority, personality war/trade bias
 [X] War — military power, hex vs border rules, redeploy/heal, Shielding, battle lines, honeypot/doorhead role gates, stat multipliers
 [ ] Troop-Carrier reserve promotions; concurrent-war ant splitting; daily reserve promotion caps
 

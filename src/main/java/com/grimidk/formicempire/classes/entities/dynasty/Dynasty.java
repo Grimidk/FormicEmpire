@@ -1952,6 +1952,12 @@ public class Dynasty {
         }
     }
 
+    public double getMaxIntelligenceCap() {
+        return hasUpgrade(GameUnlocks.ASSIMILATED_STEALTH)
+                ? GameNumbers.INTELLIGENCE_MAX
+                : GameNumbers.INTELLIGENCE_BASE_CAP;
+    }
+
     public double getIntelligenceToward(int otherDynastyId) {
         return intelligenceToward.getOrDefault(otherDynastyId, 0.0);
     }
@@ -1960,7 +1966,8 @@ public class Dynasty {
         if (otherDynastyId == id) {
             return;
         }
-        double clamped = Math.max(0.0, Math.min(GameNumbers.INTELLIGENCE_MAX, value));
+        double cap = getMaxIntelligenceCap();
+        double clamped = Math.max(0.0, Math.min(cap, value));
         if (clamped <= 0.0) {
             intelligenceToward.remove(otherDynastyId);
         } else {

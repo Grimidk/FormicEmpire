@@ -4,7 +4,7 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		(none right now)
+		(none right now) 
 	Mid:
 		(none right now)
 	Low:

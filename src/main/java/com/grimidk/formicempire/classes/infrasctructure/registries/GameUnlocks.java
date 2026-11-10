@@ -123,7 +123,7 @@ public final class GameUnlocks {
                 static { upgrades.add(ROLE_BREEDER); }
         public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "ROLE_DIPLOMAT_UPGRADE", "ROLE_DIPLOMAT_FLAVOR", "ROLE_DIPLOMAT_DESC", TYPE_PRINCESS, 1500, loadIcon("icons/upgrades/RoleDiplomat.png"), 3, 0, -3);
                 static { upgrades.add(ROLE_DIPLOMAT); }
-        public static final Upgrade ROLE_SPY = new Upgrade(44, "ROLE_SPY_UPGRADE", "ROLE_SPY_FLAVOR", "ROLE_SPY_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleSpy.png"), 0, -1, -3);
+        public static final Upgrade ROLE_SPY = new Upgrade(44, "ROLE_SPY_UPGRADE", "ROLE_SPY_FLAVOR", "ROLE_SPY_DESC", TYPE_PRINCESS, GameNumbers.ROLE_SPY_RESEARCH_COST, loadIcon("icons/upgrades/RoleSpy.png"), 3, -1, -3);
                 static { upgrades.add(ROLE_SPY); }
         public static final Upgrade ROLE_MILITIA = new Upgrade(32, "ROLE_MILITIA_UPGRADE", "ROLE_MILITIA_FLAVOR", "ROLE_MILITIA_DESC", TYPE_WORKER, 0, loadIcon("icons/upgrades/RoleMilitia.png"), 0, -1, 3);
                 static { upgrades.add(ROLE_MILITIA); }
@@ -806,9 +806,6 @@ public final class GameUnlocks {
                 }
                 if (upgrade == ROLE_DEFENDER) {
                         return ASSIMILATION_DOORHEAD;
-                }
-                if (upgrade == ROLE_SPY) {
-                        return ASSIMILATION_STEALTH;
                 }
                 return null;
         }

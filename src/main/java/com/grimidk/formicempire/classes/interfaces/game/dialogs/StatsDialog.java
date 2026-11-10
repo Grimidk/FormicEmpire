@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -269,6 +270,11 @@ public class StatsDialog extends ZeroDialog {
                         tier.getName()));
                 setIcon(tier.getIcon());
                 setIconTextGap(6);
+            } else if (LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET).equals(property) && value instanceof SpeciesDiet diet) {
+                setText(diet.getName());
+                setIcon(diet.getIcon());
+                setIconTextGap(6);
+                setToolTipText(diet.getName());
             } else if (LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER).equals(property) && value instanceof Integer power) {
                 setText(AssetStyles.formatNumber(power));
                 setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
@@ -679,6 +685,9 @@ public class StatsDialog extends ZeroDialog {
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COL_VALUE), dynasty.getName()});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COL_VALUE), dynasty.getRank().getName()});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COL_VALUE), dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
+                if (dynasty.getDiet() != null) {
+                    model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET), dynasty.getDiet()});
+                }
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynasty.getColonies().size()});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), dynastyStatsService.getTotalQueens(dynasty)});
@@ -692,6 +701,9 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.COL_VALUE), colony.getRank().getName()});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.COL_VALUE), colony.getSpecies() != null ? colony.getSpecies().getName() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_SPECIES_SCIENTIFIC), colony.getSpecies() != null ? colony.getSpecies().getScientific() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
+            if (colony.getDiet() != null) {
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET), colony.getDiet()});
+            }
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_LABEL_ID), String.valueOf(colony.getId())});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AGE), AssetStyles.formatNumber(colony.getAge()) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
             double avgColonyAntAge = colony.getAverageAntAge();
@@ -759,7 +771,10 @@ public class StatsDialog extends ZeroDialog {
         // Basic Info
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COL_VALUE), dynasty.getName()});
         model.addRow(new Object[]{dynasty.getRank().getIcon(), LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COLONY_RANK), dynasty.getRank().getName()}); 
-        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COL_VALUE), dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : LanguageStrings.get(LanguageStrings.SPECIES_OMNI)});
+        model.addRow(new Object[]{dynasty.getSpecies() != null ? dynasty.getSpecies().getIcon() : null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COL_VALUE), dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : LanguageStrings.get(LanguageStrings.SPECIES_OMNI)});
+        if (dynasty.getDiet() != null) {
+            model.addRow(new Object[]{dynasty.getDiet().getIcon(), LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET), dynasty.getDiet().getName()});
+        }
         
         Colony capital = dynasty.getCapital();
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_CAPITAL), (capital != null ? capital.getName() : LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE))});

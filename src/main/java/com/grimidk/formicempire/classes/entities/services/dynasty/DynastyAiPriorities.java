@@ -45,6 +45,7 @@ public final class DynastyAiPriorities {
             list.add(GameUnlocks.STAT_DEFENSE_1);
         }
         list.add(GameUnlocks.STAT_SCOUTING_1);
+        list.add(GameUnlocks.ROLE_SPY);
         list.add(GameUnlocks.ABILITY_FORCED_FLIGHT);
         list.add(GameUnlocks.STAT_WORKER_SPEED_2);
         list.add(GameUnlocks.ABILITY_TUNNELS);

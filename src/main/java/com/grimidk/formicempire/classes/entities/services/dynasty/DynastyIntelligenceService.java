@@ -29,13 +29,18 @@ public class DynastyIntelligenceService {
     }
 
     public int getSpyPowerPerAnt() {
+        int base;
         if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_3)) {
-            return GameNumbers.SPY_POWER_PRESSURE_3;
+            base = GameNumbers.SPY_POWER_PRESSURE_3;
+        } else if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_2)) {
+            base = GameNumbers.SPY_POWER_PRESSURE_2;
+        } else {
+            base = GameNumbers.SPY_POWER_BASE;
         }
-        if (dynasty.hasUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_2)) {
-            return GameNumbers.SPY_POWER_PRESSURE_2;
+        if (dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_STEALTH)) {
+            return base * GameNumbers.SPY_STEALTH_POWER_MULTIPLIER;
         }
-        return GameNumbers.SPY_POWER_BASE;
+        return base;
     }
 
     public int getMaxSpiesPerTarget() {
@@ -265,7 +270,11 @@ public class DynastyIntelligenceService {
             if (spies <= 0) {
                 continue;
             }
-            if (GameRandom.nextDouble() * 100.0 < catchChancePercent) {
+            double catchChance = catchChancePercent;
+            if (attacker.hasUpgrade(GameUnlocks.ASSIMILATED_STEALTH)) {
+                catchChance *= GameNumbers.SPY_STEALTH_DETECTION_MULTIPLIER;
+            }
+            if (GameRandom.nextDouble() * 100.0 < catchChance) {
                 catchSpiesFrom(attacker);
             }
         }

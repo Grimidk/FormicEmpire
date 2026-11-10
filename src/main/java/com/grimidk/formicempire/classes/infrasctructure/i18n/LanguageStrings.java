@@ -2281,6 +2281,9 @@ public final class LanguageStrings {
     public static final String DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT = "DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT";
     public static final String DIPLO_ERROR_WAR_NO_BORDER = "DIPLO_ERROR_WAR_NO_BORDER";
     public static final String DIPLO_ACTION_TRADE = "DIPLO_ACTION_TRADE";
+    public static final String DIPLO_CATEGORY_DIPLOMATIC = "DIPLO_CATEGORY_DIPLOMATIC";
+    public static final String DIPLO_CATEGORY_AGGRESSIVE = "DIPLO_CATEGORY_AGGRESSIVE";
+    public static final String DIPLO_CATEGORY_SUBVERSIVE = "DIPLO_CATEGORY_SUBVERSIVE";
     public static final String DIPLO_ACTION_REQUEST_TRADE = "DIPLO_ACTION_REQUEST_TRADE";
     public static final String DIPLO_ACTION_SEND_DIPLOMATS = "DIPLO_ACTION_SEND_DIPLOMATS";
     public static final String DIPLO_ACTION_VISIT = "DIPLO_ACTION_VISIT";
@@ -2290,6 +2293,7 @@ public final class LanguageStrings {
     public static final String DIPLO_ERROR_NO_SPIES = "DIPLO_ERROR_NO_SPIES";
     public static final String DIPLO_ERROR_NO_SPY_ROLE = "DIPLO_ERROR_NO_SPY_ROLE";
     public static final String INTEL_DOSSIER_TITLE = "INTEL_DOSSIER_TITLE";
+    public static final String INTEL_CAP_NO_STEALTH_FMT = "INTEL_CAP_NO_STEALTH_FMT";
     public static final String INTEL_REDACTED = "INTEL_REDACTED";
     public static final String INTEL_LEVEL_FMT = "INTEL_LEVEL_FMT";
     public static final String INTEL_CI_FMT = "INTEL_CI_FMT";

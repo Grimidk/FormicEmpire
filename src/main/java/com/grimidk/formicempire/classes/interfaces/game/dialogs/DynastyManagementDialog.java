@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
@@ -2596,6 +2598,11 @@ public class DynastyManagementDialog extends ZeroDialog {
                 menu.add(visitItem);
             }
 
+            JMenu diplomaticMenu = new JMenu(LanguageStrings.get(LanguageStrings.DIPLO_CATEGORY_DIPLOMATIC));
+            diplomaticMenu.setIcon(GameConstants.ICON_STAT_REPUTATION);
+            diplomaticMenu.setIconTextGap(8);
+            AssetStyles.styleMenuItem(diplomaticMenu);
+
             JMenuItem pactItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_PACT));
             if (diplo.hasNonAggressionPact(other)) {
                 pactItem.setText(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_BREAK_PACT));
@@ -2613,69 +2620,26 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             }
             AssetStyles.styleMenuItem(pactItem);
-            menu.add(pactItem);
+            diplomaticMenu.add(pactItem);
 
-            if (dynasty.isIntegratingDynasty(other)) {
-                JMenuItem cancelIntegrationItem = new JMenuItem(
-                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_CANCEL_INTEGRATION));
-                cancelIntegrationItem.addActionListener(e -> performCancelIntegrationAction(other));
-                AssetStyles.styleMenuItem(cancelIntegrationItem);
-                menu.add(cancelIntegrationItem);
-
-                JMenuItem manageDiplomatsItem = new JMenuItem(
-                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS));
-                int maxDiplomats = DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
-                        dynasty, world, engine.getTradeManager());
-                if (maxDiplomats >= GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
-                    manageDiplomatsItem.addActionListener(e -> performManageIntegrationDiplomatsAction(other));
-                } else {
-                    manageDiplomatsItem.setEnabled(false);
-                    manageDiplomatsItem.setToolTipText(
-                            LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS));
+            JMenuItem diplomatItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_DIPLOMATS));
+            if (diplo.canManageDynastyMissionDiplomats(other, world)) {
+                diplomatItem.addActionListener(e -> promptManageDynastyDiplomats(DynastyManagementDialog.this, other));
+            } else {
+                diplomatItem.setEnabled(false);
+                if (!dynasty.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
+                    diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE));
+                } else if (diplo.isAtWarWith(other)) {
+                    diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_DIPLOMATS_AT_WAR));
+                } else if (diplo.countDynastyWideAvailableDiplomats() <= 0
+                        && diplo.countDynastyMissionDiplomatsToward(other) <= 0) {
+                    diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS));
+                } else if (!diplo.needsDiplomatMissionToDynasty(other, world)) {
+                    diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_REPUTATION_STABLE));
                 }
-                AssetStyles.styleMenuItem(manageDiplomatsItem);
-                menu.add(manageDiplomatsItem);
-            } else if (!diplo.isAtWarWith(other)) {
-                JMenuItem integrateItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE));
-                boolean instant = engine.isInstantIntegration();
-                if (DynastyIntegrationService.canStartIntegration(
-                        dynasty, other, world, engine.getTradeManager(), instant)) {
-                    integrateItem.addActionListener(e -> performIntegrateAction(other));
-                } else {
-                    integrateItem.setEnabled(false);
-                    integrateItem.setToolTipText(resolveIntegrationErrorMessage(other, world, engine.getTradeManager()));
-                }
-                AssetStyles.styleMenuItem(integrateItem);
-                menu.add(integrateItem);
             }
-
-            if (!diplo.isAtWarWith(other)) {
-                JMenuItem warItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_DECLARE_WAR));
-                if (diplo.canDeclareWar(other, world)) {
-                    warItem.addActionListener(e -> performDeclareWarAction(other));
-                } else {
-                    warItem.setEnabled(false);
-                    if (!DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(dynasty)) {
-                        warItem.setToolTipText(LanguageStrings.format(
-                                LanguageStrings.DIPLO_ERROR_WAR_POPULATION_FMT,
-                                GameNumbers.WAR_DECLARATION_MIN_POPULATION));
-                    } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
-                        warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY));
-                    } else if (diplo.hasNonAggressionPact(other)) {
-                        warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_PACT_BLOCKS_WAR));
-                    } else {
-                        int remaining = diplo.getWarDeclarationCooldownMonthsRemaining(other, world);
-                        if (remaining > 0) {
-                            warItem.setToolTipText(LanguageStrings.format(
-                                    LanguageStrings.DIPLO_ERROR_WAR_COOLDOWN_FMT, remaining));
-                        } else {
-                            warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_NO_BORDER));
-                        }
-                    }
-                }
-                AssetStyles.styleMenuItem(warItem);
-                menu.add(warItem);
-            }
+            AssetStyles.styleMenuItem(diplomatItem);
+            diplomaticMenu.add(diplomatItem);
 
             if (!diplo.isAtWarWith(other)) {
                 JMenuItem requestItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_TRADE));
@@ -2692,7 +2656,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                 }
                 AssetStyles.styleMenuItem(requestItem);
-                menu.add(requestItem);
+                diplomaticMenu.add(requestItem);
 
                 JMenuItem tradeItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_TRADE));
                 if (activeColony == null) {
@@ -2727,26 +2691,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                 }
                 AssetStyles.styleMenuItem(tradeItem);
-                menu.add(tradeItem);
-
-                JMenuItem diplomatItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_DIPLOMATS));
-                if (diplo.canManageDynastyMissionDiplomats(other, world)) {
-                    diplomatItem.addActionListener(e -> promptManageDynastyDiplomats(DynastyManagementDialog.this, other));
-                } else {
-                    diplomatItem.setEnabled(false);
-                    if (!dynasty.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
-                        diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE));
-                    } else if (diplo.isAtWarWith(other)) {
-                        diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_DIPLOMATS_AT_WAR));
-                    } else if (diplo.countDynastyWideAvailableDiplomats() <= 0
-                            && diplo.countDynastyMissionDiplomatsToward(other) <= 0) {
-                        diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS));
-                    } else if (!diplo.needsDiplomatMissionToDynasty(other, world)) {
-                        diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_REPUTATION_STABLE));
-                    }
-                }
-                AssetStyles.styleMenuItem(diplomatItem);
-                menu.add(diplomatItem);
+                diplomaticMenu.add(tradeItem);
 
                 JMenuItem geneticExchangeItem = new JMenuItem(
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_GENETIC_EXCHANGE));
@@ -2767,12 +2712,91 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                 }
                 AssetStyles.styleMenuItem(geneticExchangeItem);
-                menu.add(geneticExchangeItem);
+                diplomaticMenu.add(geneticExchangeItem);
+
+                if (dynasty.isIntegratingDynasty(other)) {
+                    JMenuItem cancelIntegrationItem = new JMenuItem(
+                            LanguageStrings.get(LanguageStrings.DIPLO_ACTION_CANCEL_INTEGRATION));
+                    cancelIntegrationItem.addActionListener(e -> performCancelIntegrationAction(other));
+                    AssetStyles.styleMenuItem(cancelIntegrationItem);
+                    diplomaticMenu.add(cancelIntegrationItem);
+
+                    JMenuItem manageDiplomatsItem = new JMenuItem(
+                            LanguageStrings.get(LanguageStrings.DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS));
+                    int maxDiplomats = DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
+                            dynasty, world, engine.getTradeManager());
+                    if (maxDiplomats >= GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
+                        manageDiplomatsItem.addActionListener(e -> performManageIntegrationDiplomatsAction(other));
+                    } else {
+                        manageDiplomatsItem.setEnabled(false);
+                        manageDiplomatsItem.setToolTipText(
+                                LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS));
+                    }
+                    AssetStyles.styleMenuItem(manageDiplomatsItem);
+                    diplomaticMenu.add(manageDiplomatsItem);
+                } else {
+                    JMenuItem integrateItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE));
+                    boolean instant = engine.isInstantIntegration();
+                    if (DynastyIntegrationService.canStartIntegration(
+                            dynasty, other, world, engine.getTradeManager(), instant)) {
+                        integrateItem.addActionListener(e -> performIntegrateAction(other));
+                    } else {
+                        integrateItem.setEnabled(false);
+                        integrateItem.setToolTipText(resolveIntegrationErrorMessage(other, world, engine.getTradeManager()));
+                    }
+                    AssetStyles.styleMenuItem(integrateItem);
+                    diplomaticMenu.add(integrateItem);
+                }
             }
+            menu.add(diplomaticMenu);
+
+            JMenu aggressiveMenu = new JMenu(LanguageStrings.get(LanguageStrings.DIPLO_CATEGORY_AGGRESSIVE));
+            aggressiveMenu.setIcon(GameConstants.ICON_ATTACK);
+            aggressiveMenu.setIconTextGap(8);
+            AssetStyles.styleMenuItem(aggressiveMenu);
+
+            if (!diplo.isAtWarWith(other)) {
+                JMenuItem warItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_DECLARE_WAR));
+                if (diplo.canDeclareWar(other, world)) {
+                    warItem.addActionListener(e -> performDeclareWarAction(other));
+                } else {
+                    warItem.setEnabled(false);
+                    if (!DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(dynasty)) {
+                        warItem.setToolTipText(LanguageStrings.format(
+                                LanguageStrings.DIPLO_ERROR_WAR_POPULATION_FMT,
+                                GameNumbers.WAR_DECLARATION_MIN_POPULATION));
+                    } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
+                        warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY));
+                    } else if (diplo.hasNonAggressionPact(other)) {
+                        warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_PACT_BLOCKS_WAR));
+                    } else {
+                        int remaining = diplo.getWarDeclarationCooldownMonthsRemaining(other, world);
+                        if (remaining > 0) {
+                            warItem.setToolTipText(LanguageStrings.format(
+                                    LanguageStrings.DIPLO_ERROR_WAR_COOLDOWN_FMT, remaining));
+                        } else {
+                            warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_NO_BORDER));
+                        }
+                    }
+                }
+                AssetStyles.styleMenuItem(warItem);
+                aggressiveMenu.add(warItem);
+            } else {
+                JMenuItem warsItem = new JMenuItem(LanguageStrings.get(LanguageStrings.MENU_WARS));
+                warsItem.addActionListener(e -> DynastyManagementDialog.this.setTab(TAB_WARS));
+                AssetStyles.styleMenuItem(warsItem);
+                aggressiveMenu.add(warsItem);
+            }
+            menu.add(aggressiveMenu);
+
+            JMenu subversiveMenu = new JMenu(LanguageStrings.get(LanguageStrings.DIPLO_CATEGORY_SUBVERSIVE));
+            subversiveMenu.setIcon(GameConstants.ICON_STAT_INTELLIGENCE);
+            subversiveMenu.setIconTextGap(8);
+            AssetStyles.styleMenuItem(subversiveMenu);
 
             DynastyIntelligenceService intel = dynasty.getIntelligenceService();
+            JMenuItem spyItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_SPIES));
             if (intel != null && intel.hasSpyRole()) {
-                JMenuItem spyItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_SPIES));
                 if (intel.canManageSpiesToward(other, world)) {
                     spyItem.addActionListener(e -> promptManageDynastySpies(DynastyManagementDialog.this, other));
                 } else {
@@ -2782,18 +2806,28 @@ public class DynastyManagementDialog extends ZeroDialog {
                         spyItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPIES));
                     }
                 }
-                AssetStyles.styleMenuItem(spyItem);
-                menu.add(spyItem);
+            } else {
+                spyItem.setEnabled(false);
+                spyItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPY_ROLE));
+            }
+            AssetStyles.styleMenuItem(spyItem);
+            subversiveMenu.add(spyItem);
 
-                JMenuItem dossierItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTELLIGENCE));
+            JMenuItem dossierItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTELLIGENCE));
+            if (intel != null && intel.hasSpyRole()) {
                 dossierItem.addActionListener(e -> {
                     IntelligenceDossierDialog dialog =
                             new IntelligenceDossierDialog(DynastyManagementDialog.this, dynasty, other);
                     dialog.setVisible(true);
                 });
-                AssetStyles.styleMenuItem(dossierItem);
-                menu.add(dossierItem);
+            } else {
+                dossierItem.setEnabled(false);
+                dossierItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPY_ROLE));
             }
+            AssetStyles.styleMenuItem(dossierItem);
+            subversiveMenu.add(dossierItem);
+
+            menu.add(subversiveMenu);
 
             UiTableStyles.showCellPopupMenu(menu, table, row, column);
         }
@@ -2807,6 +2841,9 @@ public class DynastyManagementDialog extends ZeroDialog {
                 setText(species.getName());
                 setIcon(species.getIcon());
                 setIconTextGap(8);
+                SpeciesDiet diet = (species == GameConstants.SPECIES_OMNI) ? GameConstants.DIET_OMNIVOROUS : species.getDiet();
+                String dietStr = diet != null ? " — " + LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET) + ": " + diet.getName() : "";
+                setToolTipText(species.getName() + " (" + species.getScientific() + ")" + dietStr);
             } else {
                 setText(LanguageStrings.get(LanguageStrings.WORLD_NA));
                 setIcon(null);
@@ -3274,6 +3311,9 @@ public class DynastyManagementDialog extends ZeroDialog {
                         if (hex != null && hex.getBiome() != null) {
                             setIcon(hex.getBiome().getIcon());
                             setIconTextGap(8);
+                            SpeciesDiet d = colony.getDiet();
+                            setToolTipText(hex.getBiome().getName()
+                                    + (d != null ? " — " + LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET) + ": " + d.getName() : ""));
                         }
                     }
                 }

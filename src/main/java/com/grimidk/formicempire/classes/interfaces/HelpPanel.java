@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
@@ -340,14 +341,30 @@ public class HelpPanel extends JPanel {
             scientificLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             info.add(scientificLabel);
 
-            if (s.getDiet() != null) {
+            SpeciesDiet diet = (s == GameConstants.SPECIES_OMNI) ? GameConstants.DIET_OMNIVOROUS : s.getDiet();
+            if (diet != null) {
                 JLabel dietLabel = new JLabel(helpHtml("width:350px;font-size:11pt;",
                         "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET) + "</b> "
-                                + s.getDiet().getName()));
+                                + diet.getName()), diet.getIcon(), SwingConstants.LEFT);
+                dietLabel.setIconTextGap(6);
+                dietLabel.setToolTipText(diet.getName());
                 dietLabel.setFont(AssetStyles.FONT_NORMAL);
                 dietLabel.setForeground(AssetStyles.FONT_COLOR);
                 dietLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
                 info.add(dietLabel);
+            }
+
+            if (s.getPreferredBiome() != null) {
+                Biome pb = s.getPreferredBiome();
+                JLabel biomeLabel = new JLabel(helpHtml("width:350px;font-size:11pt;",
+                        "<b>" + LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX).trim() + "</b> "
+                                + pb.getName()), pb.getIcon(), SwingConstants.LEFT);
+                biomeLabel.setIconTextGap(6);
+                biomeLabel.setToolTipText(pb.getName());
+                biomeLabel.setFont(AssetStyles.FONT_NORMAL);
+                biomeLabel.setForeground(AssetStyles.FONT_COLOR);
+                biomeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                info.add(biomeLabel);
             }
 
             Assimilation assimilation = s.getAssimilation();
@@ -1025,6 +1042,8 @@ public class HelpPanel extends JPanel {
 
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_TRADE, createTradeMethodSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_SPECIES_DIET, createDietsSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_LOYALTY, createLoyaltySection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_MILITARY_POWER, createMilitaryPowerSection()));
@@ -1101,6 +1120,32 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_COLOR_HEADER));
         section.add(content, BorderLayout.CENTER);
         return section;
+    }
+
+    private JPanel createDietsSection() {
+        JPanel grid = new JPanel(new GridLayout(0, 1, 0, 8));
+        grid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        grid.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (SpeciesDiet diet : GameConstants.getSpeciesDiets()) {
+            String desc;
+            if (diet == GameConstants.DIET_FUNGIVOROUS) {
+                desc = LanguageStrings.get(LanguageStrings.RESOURCE_FUNGI) + " & " + LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP);
+            } else if (diet == GameConstants.DIET_CARNIVOROUS) {
+                desc = LanguageStrings.get(LanguageStrings.RESOURCE_MEAT) + " & " + LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP);
+            } else {
+                desc = LanguageStrings.get(LanguageStrings.RESOURCE_FUNGI) + ", " + LanguageStrings.get(LanguageStrings.RESOURCE_MEAT) + " & " + LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP);
+            }
+            String info = helpHtml("width:420px;font-size:11pt;",
+                    "<b>" + diet.getName() + "</b> — " + desc);
+            JLabel row = new JLabel(info, diet.getIcon(), SwingConstants.LEFT);
+            row.setFont(AssetStyles.FONT_NORMAL);
+            row.setForeground(AssetStyles.FONT_COLOR);
+            row.setIconTextGap(10);
+            row.setToolTipText(diet.getName() + ": " + desc);
+            grid.add(row);
+        }
+        return grid;
     }
 
     private JPanel createTradeMethodSection() {

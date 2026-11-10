@@ -65,5 +65,35 @@ class DynastyIntelligenceServiceTest {
 
         dynasty.unlockUpgrade(GameUnlocks.STAT_DIPLOMAT_PRESSURE_3);
         assertEquals(GameNumbers.SPY_POWER_PRESSURE_3, intel.getSpyPowerPerAnt());
+
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STEALTH);
+        assertEquals(GameNumbers.SPY_POWER_PRESSURE_3 * GameNumbers.SPY_STEALTH_POWER_MULTIPLIER, intel.getSpyPowerPerAnt());
+    }
+
+    @Test
+    void nonStealthDynastyIsCappedAtBaseIntelligence() {
+        Dynasty viewer = new Dynasty(1, "Viewer", true, GameConstants.SPECIES_LEAFCUTTER);
+        Dynasty target = new Dynasty(2, "Target", false, GameConstants.SPECIES_OMNI);
+        viewer.unlockUpgrade(GameUnlocks.ROLE_SPY);
+        DynastyIntelligenceService intel = viewer.getIntelligenceService();
+
+        viewer.addIntelligenceToward(target.getId(), 50);
+        assertEquals(GameNumbers.INTELLIGENCE_BASE_CAP, viewer.getIntelligenceToward(target.getId()), 0.001);
+        assertTrue(intel.canSee(target, IntelFact.RANK_COLONIES));
+        assertTrue(intel.canSee(target, IntelFact.SPECIES_ASSIMILATIONS));
+        assertFalse(intel.canSee(target, IntelFact.POPULATION));
+        assertFalse(intel.canSee(target, IntelFact.THEFT));
+
+        viewer.unlockUpgrade(GameUnlocks.ASSIMILATED_STEALTH);
+        viewer.addIntelligenceToward(target.getId(), 50);
+        assertEquals(70.0, viewer.getIntelligenceToward(target.getId()), 0.001);
+        assertTrue(intel.canSee(target, IntelFact.POPULATION));
+    }
+
+    @Test
+    void spyRoleDoesNotRequireAssimilationUpgrade() {
+        assertEquals(1500, GameUnlocks.ROLE_SPY.getCost());
+        assertEquals(GameConstants.TIER_3, GameUnlocks.ROLE_SPY.getTier());
+        assertTrue(GameUnlocks.meetsSubtypeRoleAssimilationRequirement(null, GameUnlocks.ROLE_SPY));
     }
 }
