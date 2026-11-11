@@ -76,7 +76,9 @@ public class Engine extends Thread {
     private boolean mapEditorEnabled = false;
     private boolean easyConquering = false;
     private boolean instantIntegration = false;
-    private boolean animateWorldGen = false;
+    private boolean cheatFogOfWarToggle = false;
+    private boolean cheatRevealMap = false;
+    private boolean animateWorldGen = true;
     private WorldGenStepListener worldGenStepListener;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
     private int defaultRoleSoldier = GameConstants.ROLE_HUNTER.getId();
@@ -683,6 +685,22 @@ public class Engine extends Thread {
         this.instantIntegration = instantIntegration;
     }
 
+    public boolean isCheatFogOfWarToggle() {
+        return cheatFogOfWarToggle;
+    }
+
+    public void setCheatFogOfWarToggle(boolean cheatFogOfWarToggle) {
+        this.cheatFogOfWarToggle = cheatFogOfWarToggle;
+    }
+
+    public boolean isCheatRevealMap() {
+        return cheatRevealMap;
+    }
+
+    public void setCheatRevealMap(boolean cheatRevealMap) {
+        this.cheatRevealMap = cheatRevealMap;
+    }
+
     public boolean isAnimateWorldGen() {
         return animateWorldGen;
     }
@@ -708,7 +726,8 @@ public class Engine extends Thread {
                 || instantBuildings
                 || assimilateAll
                 || easyConquering
-                || instantIntegration;
+                || instantIntegration
+                || cheatRevealMap;
     }
 
     public void applySandboxTaintToActiveWorld() {

@@ -27,12 +27,35 @@ public final class HexWaterCrossing {
                 || biome == GameConstants.BIOME_LAKE;
     }
 
+    public static boolean isOceanBiome(Biome biome) {
+        return biome == GameConstants.BIOME_OCEAN
+                || biome == GameConstants.BIOME_DEEP_OCEAN
+                || biome == GameConstants.BIOME_SHALLOW_OCEAN
+                || biome == GameConstants.BIOME_ABYSS;
+    }
+
+    public static boolean isOceanHex(Hex hex) {
+        return hex != null && isOceanBiome(hex.getBiome());
+    }
+
     public static boolean isWaterHex(Hex hex) {
         return hex != null && isWaterBiome(hex.getBiome());
     }
 
     public static boolean isLandHex(Hex hex) {
         return hex != null && !isWaterBiome(hex.getBiome());
+    }
+
+    public static boolean touchesLand(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Hex n : hex.getAdjacentNeighbors()) {
+            if (n != null && isLandHex(n)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static int waterCrossRange(Dynasty dynasty) {

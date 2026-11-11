@@ -363,6 +363,7 @@ public final class GameNumbers {
     public static final int TRIGGER_BILATERAL_MIN_TRADES = 5;
     public static final int TRIGGER_SCOUT_PLANT_COLLECTED = 6000;
     public static final int TRIGGER_MINER_TIER3_BUILDINGS = 10;
+    public static final int TRIGGER_EXPLORER_MIN_HEXES = 10;
     public static final double MINING_GATHER_SUCCESS_CHANCE = 0.10;
     public static final double RESIN_FORAGE_BONUS_CHANCE = 0.01;
     public static final int TRIGGER_DYNASTY_MIN_COLONIES = 2;
@@ -396,6 +397,7 @@ public final class GameNumbers {
     public static final double SPY_STEALTH_DETECTION_MULTIPLIER = 0.5;
     public static final int SPY_STEALTH_POWER_MULTIPLIER = 2;
     public static final int ROLE_SPY_RESEARCH_COST = 1500;
+    public static final int ROLE_EXPLORER_RESEARCH_COST = 0;
     public static final double SPY_THEFT_FRACTION_MIN = 0.01;
     public static final double SPY_THEFT_FRACTION_MAX = 0.03;
     public static final int CAUGHT_SPYING_DURATION_DAYS = DAYS_PER_MONTH * 12;
@@ -440,6 +442,18 @@ public final class GameNumbers {
         int dq = q1 - q2;
         int dr = r1 - r2;
         return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+    }
+
+    public static long packHexKey(int q, int r) {
+        return (((long) q) << 32) ^ (r & 0xffffffffL);
+    }
+
+    public static int unpackHexQ(long key) {
+        return (int) (key >> 32);
+    }
+
+    public static int unpackHexR(long key) {
+        return (int) key;
     }
 
     public static int monthsToDays(int months) {

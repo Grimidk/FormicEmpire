@@ -312,7 +312,7 @@ public class ColonyPhysicsService {
             ant.clearRoute();
             if (ant.getDimension() == WorldSpaces.OVERWORLD) {
                  if (GameRandom.nextDouble() < 0.01) {
-                    if (ant.getRole() == GameConstants.ROLE_SCOUT || ant.getRole() == GameConstants.ROLE_CATCHER) {
+                    if (ant.getRole() == GameConstants.ROLE_SCOUT || ant.getRole() == GameConstants.ROLE_CATCHER || ant.getRole() == GameConstants.ROLE_EXPLORER) {
                          ant.moveTo(getRandomScoutPosition(colony));
                     } else {
                          ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntClass(), colony.getSpecies())));
@@ -426,7 +426,7 @@ public class ColonyPhysicsService {
                 }
             } else {
                 if (GameRandom.nextDouble() < 0.01) {
-                    if (ant.getRole() == GameConstants.ROLE_SCOUT) {
+                    if (ant.getRole() == GameConstants.ROLE_SCOUT || ant.getRole() == GameConstants.ROLE_EXPLORER) {
                         ant.moveTo(getRandomScoutPosition(colony));
                     } else {
                         ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntClass(), colony.getSpecies())));

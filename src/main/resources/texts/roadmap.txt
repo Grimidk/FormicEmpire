@@ -42,29 +42,29 @@ Other assets:
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		launch creatures (single battle or swarm; needs battle system):
-			Bugs: Bombardier(B), Ant lion(I), CommonFly(H)
-			Arachnids: Spider(I), Tarantula(H)
+		World Generation Overhaul Phases:
+			Phase 4: Dynamic Cloud Shadows and Natural Disasters (drifting cloud noise layer, earthquakes, tsunamis, tornadoes, meteors), other weater effects and day/night filter over map hexes in dialog like a date line or hurricane pathc
+			Phase 5: World Generation Setup UI and Debug Map Editor (world parameters configuration dialog, brush paint tool for biomes/altitude/rivers)
+			Phase 6: preloaded accurate earth 
+		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
+		bridges (needs rafting)
+		Battle numeric animation with dice(?) and numbers
 
 	Everything else :
-		swarm vs swarm system
-		more enemies (single battle or swarm battles):
-			Bugs (soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, goliath beetle, cricket moles, locust swarms, scalopendra, giant cockroach)
-			Arachnids (catapult ants, vinegaroons, horsehoecrabs)
+		critter system:
+			swarm vs swarm system
+			launch creatures (single battle or swarm; needs battle system):
+				Bugs: Bombardier(B), Ant lion(I), CommonFly(H)
+				Arachnids: Spider(I), Tarantula(H)
+			(other bugs (soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, goliath beetle, cricket moles, locust swarms, scalopendra, giant cockroach))
+			(other arachnids (catapult ants, vinegaroons, horsehoecrabs))
 			Anphibians (Salamander, frog, toad)
 			Reptiles (Gecko, Snake, Tortiose)
 			Birds (Crow, Finch, Chicken)
 			Mammals (Rats, Possum, Anteater)
 			Zombie ant colonies (Cordiceps)
-		uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
-		World Generation Overhaul Phases:
-			Phase 3: Hex Fog of War and Exploration System (sight radius, scout exploration, colonization/diplomacy fog gating, intel trade)
-			Phase 4: Dynamic Cloud Shadows and Natural Disasters (drifting cloud noise layer, earthquakes, tsunamis, tornadoes, meteors), other weater effects and day/night filter over map hexes 
-			Phase 5: World Generation Setup UI and Debug Map Editor (world parameters configuration dialog, brush paint tool for biomes/altitude/rivers)
-		fog of war, range of 1 at the start, cant interact with dynasties outside the fog, scouts (or explorer princess role with exploring range) have a small chance to venture to adjacent hexes to explore, cant colonize into fog, cheat to remove fog, action to exchange intel for trade (and rep)
-		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
-		bridges (needs rafting)
-		rethink hatching to other types taking more time so its balanced to not just spam a type
+			uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
+		rethink hatching to other types taking more time so its balanced to not just spam a type (and class methamorphosis diagram)
 		reserve ants to ant exauhstion and punishing 100% worker capacity
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events)) disasters penalie overworked colonies
 		more stats (kills, historic productions, graphs?)

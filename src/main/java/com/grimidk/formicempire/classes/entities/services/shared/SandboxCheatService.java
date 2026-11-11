@@ -139,6 +139,7 @@ public final class SandboxCheatService {
         if (founded == null || founded.getDynasty() == null || founded.getDynasty().getId() != player.getId()) {
             return false;
         }
+        player.discoverHexAndAdjacent(hex);
         engine.applySandboxTaintToActiveWorld();
         return true;
     }
@@ -171,6 +172,10 @@ public final class SandboxCheatService {
             ColonyMilitaryService.refreshDynastyMilitaryPower(loser);
         }
         ColonyStarterService.shared().stabilizeConqueredColony(player, target);
+        Hex conqueredHex = world.getHexOfColony(target);
+        if (conqueredHex != null) {
+            player.discoverHexAndAdjacent(conqueredHex);
+        }
         engine.applySandboxTaintToActiveWorld();
         return target.getDynasty() == player;
     }

@@ -531,6 +531,8 @@ public class SaveManager {
                 sc.unlockedSkillIds = dynasty.copyUnlockedSkillIds();
                 sc.announcedRankIds = dynasty.copyAnnouncedRankIds();
                 sc.absorbedDynastyIds = (dynasty.getAbsorbedDynastyIds() != null) ? new ArrayList<>(dynasty.getAbsorbedDynastyIds()) : new ArrayList<>();
+                sc.knownHexKeys = new ArrayList<>(dynasty.getKnownHexKeys());
+                sc.exploredHexCount = dynasty.getExploredHexCount();
                 
                 sc.deathStatistics = (dynasty.getGlobalDeathStatistics() != null) ? new HashMap<>(dynasty.getGlobalDeathStatistics()) : new HashMap<>();
                 
@@ -932,6 +934,8 @@ public class SaveManager {
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
         w.write("      \"completedAssimilationIds\": " + serializeListToJson(sc.completedAssimilationIds) + ","); w.newLine();
         w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics) + ","); w.newLine();
+        w.write("      \"knownHexKeys\": " + serializeLongListToJson(sc.knownHexKeys) + ","); w.newLine();
+        w.write("      \"exploredHexCount\": " + sc.exploredHexCount + ","); w.newLine();
         w.write("      \"tunnels\": " + serializeTunnelsToJson(sc.tunnels)); w.newLine();
         w.write("    }");
         if (!isLast) w.write(",");
@@ -1265,6 +1269,8 @@ public class SaveManager {
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
         sc.completedAssimilationIds = deserializeJsonToList(map.get("completedAssimilationIds"));
         sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
+        sc.knownHexKeys = deserializeJsonToLongList(map.get("knownHexKeys"));
+        sc.exploredHexCount = Integer.parseInt(map.getOrDefault("exploredHexCount", "0"));
         sc.tunnels = deserializeJsonToTunnels(map.get("tunnels"));
         return sc;
     }
@@ -1407,6 +1413,22 @@ public class SaveManager {
     }
 
     private String serializeListToJson(List<Integer> list) {
+        if (list == null || list.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i));
+            if (i < list.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeLongListToJson(List<Long> list) {
         if (list == null || list.isEmpty()) {
             return "[]";
         }
@@ -2634,6 +2656,8 @@ public class SaveManager {
             writeJsonLine(w, "mapEditorEnabled", engine.isMapEditorEnabled(), false);
             writeJsonLine(w, "easyConquering", engine.isEasyConquering(), false);
             writeJsonLine(w, "instantIntegration", engine.isInstantIntegration(), false);
+            writeJsonLine(w, "cheatFogOfWarToggle", engine.isCheatFogOfWarToggle(), false);
+            writeJsonLine(w, "cheatRevealMap", engine.isCheatRevealMap(), false);
             writeJsonLine(w, "animateWorldGen", engine.isAnimateWorldGen(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
@@ -2785,7 +2809,9 @@ public class SaveManager {
             engine.setMapEditorEnabled(Boolean.parseBoolean(m.getOrDefault("mapEditorEnabled", "false")));
             engine.setEasyConquering(Boolean.parseBoolean(m.getOrDefault("easyConquering", "false")));
             engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
-            engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "false")));
+            engine.setCheatFogOfWarToggle(Boolean.parseBoolean(m.getOrDefault("cheatFogOfWarToggle", "false")));
+            engine.setCheatRevealMap(Boolean.parseBoolean(m.getOrDefault("cheatRevealMap", "false")));
+            engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "true")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.CLASS_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),
@@ -3189,6 +3215,25 @@ public class SaveManager {
         Matcher keyMatcher = Pattern.compile("\"([^\"]*)\"").matcher(json);
         while (keyMatcher.find()) {
             list.add(unescapeJsonString(keyMatcher.group(1)));
+        }
+        return list;
+    }
+
+    private List<Long> deserializeJsonToLongList(String json) {
+        List<Long> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+        String content = json.substring(1, json.length() - 1);
+        if (content.isEmpty()) {
+            return list;
+        }
+        String[] parts = content.split(",");
+        for (String part : parts) {
+            try {
+                list.add(Long.parseLong(part.trim()));
+            } catch (NumberFormatException ignored) {
+            }
         }
         return list;
     }

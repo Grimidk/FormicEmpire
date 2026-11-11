@@ -76,6 +76,7 @@ public class MapDialog extends ZeroDialog {
     private final JButton layersButton;
     private final JButton modesButton;
     private final JButton conquerButton;
+    private final JButton fogCheatButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
@@ -282,6 +283,19 @@ public class MapDialog extends ZeroDialog {
         zoomRail.add(Box.createVerticalStrut(4));
         zoomRail.add(modesButton);
 
+        fogCheatButton = new JButton("F");
+        fogCheatButton.setFocusable(false);
+        fogCheatButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        AssetStyles.styleCompactButton(fogCheatButton);
+        fogCheatButton.setPreferredSize(layersBtnSize);
+        fogCheatButton.setMinimumSize(layersBtnSize);
+        fogCheatButton.setMaximumSize(layersBtnSize);
+        fogCheatButton.setMargin(new Insets(0, 0, 0, 0));
+        fogCheatButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_FOG_CHEAT_TOOLTIP));
+        fogCheatButton.addActionListener(e -> toggleCheatFog());
+        zoomRail.add(Box.createVerticalStrut(4));
+        zoomRail.add(fogCheatButton);
+
         conquerButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY));
         conquerButton.setFocusable(false);
         AssetStyles.styleButton(conquerButton);
@@ -294,7 +308,7 @@ public class MapDialog extends ZeroDialog {
         AssetStyles.styleButton(closeButton);
         closeButton.addActionListener(e -> handleCloseButton());
 
-        bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(dateTimeLabel);
         bottomPanel.add(speedDownButton);
@@ -691,6 +705,7 @@ public class MapDialog extends ZeroDialog {
         if (current != null) {
             this.world = current;
             this.world.ensureGeographicFeaturesReconstructed();
+            this.cachedPlayerDynasty = findPlayerDynasty();
         }
     }
 
@@ -1171,10 +1186,64 @@ public class MapDialog extends ZeroDialog {
                     ? LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_TT)
                     : LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_SELECT_TT));
         }
+
+        if (fogCheatButton != null) {
+            boolean cheatFog = eng != null && eng.isCheatFogOfWarToggle();
+            fogCheatButton.setVisible(cheatFog);
+            fogCheatButton.setEnabled(cheatFog);
+            if (cheatFog) {
+                fogCheatButton.setText("F");
+                fogCheatButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_FOG_CHEAT_TOOLTIP));
+            }
+        }
+
+        if (zoomRail != null) {
+            zoomRail.revalidate();
+            zoomRail.repaint();
+        }
         if (bottomPanel != null) {
             bottomPanel.revalidate();
             bottomPanel.repaint();
         }
+    }
+
+    private void toggleCheatFog() {
+        Engine eng = resolveEngine();
+        if (eng == null) return;
+        eng.setCheatRevealMap(!eng.isCheatRevealMap());
+        if (eng.isCheatRevealMap()) {
+            eng.applySandboxTaintToActiveWorld();
+        }
+        updateConquerButton();
+        if (mapPanel != null) {
+            mapPanel.invalidateBakedImage();
+            mapPanel.repaint();
+        }
+        if (legendPanel != null) {
+            legendPanel.updateLegend();
+            legendPanel.repaint();
+        }
+        if (onHexChange != null) {
+            onHexChange.run();
+        }
+    }
+
+    private Dynasty cachedPlayerDynasty;
+
+    private boolean isHexDiscovered(Hex hex) {
+        if (hex == null) return false;
+        Engine eng = resolveEngine();
+        if (eng != null && eng.isCheatRevealMap()) {
+            return true;
+        }
+        if (isSpectatorMode()) {
+            return true;
+        }
+        Dynasty playerDynasty = cachedPlayerDynasty != null ? cachedPlayerDynasty : (cachedPlayerDynasty = findPlayerDynasty());
+        if (playerDynasty == null) {
+            return true;
+        }
+        return playerDynasty.isHexKnown(hex);
     }
 
     private void updateZoomControls() {
@@ -1375,6 +1444,13 @@ public class MapDialog extends ZeroDialog {
         modesButton.setMaximumSize(layersBtnSize);
         modesButton.setMargin(new Insets(0, 0, 0, 0));
         AssetStyles.styleButton(conquerButton);
+        if (fogCheatButton != null) {
+            AssetStyles.styleCompactButton(fogCheatButton);
+            fogCheatButton.setPreferredSize(layersBtnSize);
+            fogCheatButton.setMinimumSize(layersBtnSize);
+            fogCheatButton.setMaximumSize(layersBtnSize);
+            fogCheatButton.setMargin(new Insets(0, 0, 0, 0));
+        }
         AssetStyles.styleButton(closeButton);
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         if (mapPanel != null) {
@@ -1876,40 +1952,47 @@ public class MapDialog extends ZeroDialog {
                 JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 badges.setOpaque(false);
 
-                DynastyColorSwatch colorSwatch = new DynastyColorSwatch(d.getColor());
+                boolean isDiscovered = playerDynasty == null || playerDynasty.hasDiscoveredDynasty(d, world) || (resolveEngine() != null && resolveEngine().isCheatRevealMap());
+                Color swatchColor = isDiscovered ? d.getColor() : AssetStyles.COLOR_FOG;
+                DynastyColorSwatch colorSwatch = new DynastyColorSwatch(swatchColor);
                 badges.add(colorSwatch);
 
-                if (d.getSpecies() != null && d.getSpecies().getIcon() != null) {
-                    JLabel speciesBadge = new JLabel(d.getSpecies().getIcon());
-                    speciesBadge.setToolTipText(d.getSpecies().getName());
-                    badges.add(speciesBadge);
-                }
-
-                if (d.getDiet() != null && d.getDiet().getIcon() != null) {
-                    JLabel dietBadge = new JLabel(d.getDiet().getIcon());
-                    dietBadge.setToolTipText(d.getDiet().getName());
-                    badges.add(dietBadge);
-                }
-
                 boolean defeated = d.isDefeated();
-                if (defeated && GameConstants.CLASS_DEAD.getIcon() != null) {
-                    badges.add(new JLabel(GameConstants.CLASS_DEAD.getIcon()));
-                }
+                if (isDiscovered) {
+                    if (d.getSpecies() != null && d.getSpecies().getIcon() != null) {
+                        JLabel speciesBadge = new JLabel(d.getSpecies().getIcon());
+                        speciesBadge.setToolTipText(d.getSpecies().getName());
+                        badges.add(speciesBadge);
+                    }
 
-                JLabel stanceIcon = null;
-                if (!defeated && !d.isPlayer() && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
-                    int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world);
-                    DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
-                    if (stance.getIcon() != null) {
-                        stanceIcon = new JLabel(stance.getIcon());
-                        stanceIcon.setToolTipText(playerDynasty.getDiplomacyService().buildStanceIconTooltip(d, world));
-                        badges.add(stanceIcon);
+                    if (d.getDiet() != null && d.getDiet().getIcon() != null) {
+                        JLabel dietBadge = new JLabel(d.getDiet().getIcon());
+                        dietBadge.setToolTipText(d.getDiet().getName());
+                        badges.add(dietBadge);
+                    }
+
+                    if (defeated && GameConstants.CLASS_DEAD.getIcon() != null) {
+                        badges.add(new JLabel(GameConstants.CLASS_DEAD.getIcon()));
+                    }
+
+                    JLabel stanceIcon = null;
+                    if (!defeated && !d.isPlayer() && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
+                        int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world);
+                        DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
+                        if (stance.getIcon() != null) {
+                            stanceIcon = new JLabel(stance.getIcon());
+                            stanceIcon.setToolTipText(playerDynasty.getDiplomacyService().buildStanceIconTooltip(d, world));
+                            badges.add(stanceIcon);
+                        }
                     }
                 }
 
                 String nameStr = d.getName();
                 String clickTooltip = LanguageStrings.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName());
-                if (defeated) {
+                if (!isDiscovered) {
+                    nameStr = LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY);
+                    clickTooltip = null;
+                } else if (defeated) {
                     nameStr += " (" + GameConstants.CLASS_DEAD.getName() + ")";
                     clickTooltip = clickTooltip + " — " + GameConstants.CLASS_DEAD.getName();
                 } else if (d.isPlayer()) {
@@ -1918,7 +2001,7 @@ public class MapDialog extends ZeroDialog {
 
                 Colony capital = d.getCapital() != null ? d.getCapital()
                         : (d.getColonies() != null && !d.getColonies().isEmpty() ? d.getColonies().get(0) : null);
-                Hex capitalHex = capital != null ? world.getHexOfColony(capital) : null;
+                Hex capitalHex = isDiscovered && capital != null ? world.getHexOfColony(capital) : null;
                 if (capitalHex != null) {
                     Runnable goToCapital = () -> {
                         if (isSpectatorMode() && mapPanel != null) {
@@ -1955,14 +2038,17 @@ public class MapDialog extends ZeroDialog {
 
                 JPanel metricsPanel = new JPanel(new GridLayout(1, 2, 6, 0));
                 metricsPanel.setOpaque(false);
-                JLabel popLabel = new JLabel(AssetStyles.formatNumber(pop), SwingConstants.RIGHT);
+                JLabel popLabel = new JLabel(isDiscovered ? AssetStyles.formatNumber(pop) : "---", SwingConstants.RIGHT);
                 popLabel.setFont(AssetStyles.FONT_SMALL);
                 popLabel.setForeground(AssetStyles.FONT_COLOR);
                 popLabel.setPreferredSize(new Dimension(metricsColumnWidth, popLabel.getPreferredSize().height));
-                JLabel militaryLabel = new JLabel(AssetStyles.formatNumber(military), SwingConstants.RIGHT);
+                JLabel militaryLabel = new JLabel(isDiscovered ? AssetStyles.formatNumber(military) : "---", SwingConstants.RIGHT);
                 militaryLabel.setFont(AssetStyles.FONT_SMALL);
                 militaryLabel.setForeground(AssetStyles.FONT_COLOR);
                 militaryLabel.setPreferredSize(new Dimension(metricsColumnWidth, militaryLabel.getPreferredSize().height));
+                if (!isDiscovered) {
+                    name.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED));
+                }
                 metricsPanel.add(popLabel);
                 metricsPanel.add(militaryLabel);
                 metricsPanel.setPreferredSize(new Dimension(metricsColumnWidth * 2 + 6, metricsPanel.getPreferredSize().height));
@@ -2067,6 +2153,30 @@ public class MapDialog extends ZeroDialog {
             }
         }
 
+        private static final class CachedLabelBox {
+            final String name;
+            final Font font;
+            final Color textColor;
+            final Color borderColor;
+            final float strokeWidth;
+            final int arc;
+            final Rectangle rect;
+            final int textX;
+            final int textY;
+
+            CachedLabelBox(String name, Font font, Color textColor, Color borderColor, float strokeWidth, int arc, Rectangle rect, int textX, int textY) {
+                this.name = name;
+                this.font = font;
+                this.textColor = textColor;
+                this.borderColor = borderColor;
+                this.strokeWidth = strokeWidth;
+                this.arc = arc;
+                this.rect = rect;
+                this.textX = textX;
+                this.textY = textY;
+            }
+        }
+
         private double hexSize = 26;
         private int zoomStepIndex = GameNumbers.MAP_ZOOM_DEFAULT_STEP_INDEX;
         private double zoom = GameNumbers.MAP_ZOOM_STEPS[GameNumbers.MAP_ZOOM_DEFAULT_STEP_INDEX];
@@ -2075,14 +2185,14 @@ public class MapDialog extends ZeroDialog {
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
         private final Map<Integer, Color> biomeFadedColorCache = new HashMap<>();
         private final Map<Long, Hex> hexLookup = new HashMap<>();
-        private final Map<Integer, Image> scaledBiomeIconCache = new HashMap<>();
-        private final Map<Integer, Image> scaledRankIconCache = new HashMap<>();
-        private Image scaledCapitalIconCache;
-        private int cachedIconSize = -1;
+        private final Map<Long, Image> scaledBiomeIconCache = new HashMap<>();
+        private final Map<Long, Image> scaledRankIconCache = new HashMap<>();
+        private final Map<Integer, Image> scaledCapitalIconCache = new HashMap<>();
+        private final Map<Integer, HexGridMesh> meshStepCache = new HashMap<>();
         private final Map<Integer, BakedStepCacheEntry> bakedStepCache = new LinkedHashMap<Integer, BakedStepCacheEntry>(16, 0.75f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<Integer, BakedStepCacheEntry> eldest) {
-                return size() > 5;
+                return size() > 8;
             }
         };
         private World cachedBakedWorld;
@@ -2096,6 +2206,14 @@ public class MapDialog extends ZeroDialog {
         private boolean cachedBakedMeridian;
         private boolean cachedBakedEquator;
         private int cachedBakedColonyStamp;
+        private boolean cachedBakedCheatReveal;
+        private int cachedBakedKnownHexCount;
+        private int lastColonyStampMinute = -1;
+        private int cachedColonyStampValue = 0;
+        private List<CachedLabelBox> cachedLabelBoxes;
+        private int cachedLabelsZoomStep = -1;
+        private int cachedLabelsDiscoveryStamp = -1;
+        private int cachedLabelsSettingsStamp = -1;
         private HexGridMesh cachedMesh;
         private World cachedMeshWorld;
         private double cachedMeshHexSize = Double.NaN;
@@ -2336,6 +2454,7 @@ public class MapDialog extends ZeroDialog {
         }
 
         private void invalidateMeshCache() {
+            meshStepCache.clear();
             cachedMesh = null;
             cachedMeshWorld = null;
             cachedMeshHexSize = Double.NaN;
@@ -2351,13 +2470,18 @@ public class MapDialog extends ZeroDialog {
             cachedBakedMapMode = null;
             scaledBiomeIconCache.clear();
             scaledRankIconCache.clear();
-            scaledCapitalIconCache = null;
-            cachedIconSize = -1;
+            scaledCapitalIconCache.clear();
+            lastColonyStampMinute = -1;
+            cachedLabelBoxes = null;
         }
 
         private int computeColonyBakeStamp() {
             if (world == null || world.getHexes() == null) {
                 return 0;
+            }
+            int currentMinute = world.getMinute() + world.getHour() * 60 + world.getDay() * 1440;
+            if (currentMinute == lastColonyStampMinute) {
+                return cachedColonyStampValue;
             }
             int hash = 1;
             for (Hex h : world.getHexes()) {
@@ -2376,16 +2500,18 @@ public class MapDialog extends ZeroDialog {
                     hash = 31 * hash + cap;
                 }
             }
+            lastColonyStampMinute = currentMinute;
+            cachedColonyStampValue = hash;
             return hash;
         }
 
         private boolean isBakedImageValid(Hex activeHex) {
             BakedStepCacheEntry entry = bakedStepCache.get(zoomStepIndex);
+            boolean cheatReveal = resolveEngine() != null && resolveEngine().isCheatRevealMap();
             return entry != null
                     && entry.image != null
                     && cachedBakedWorld == world
                     && Math.abs(entry.hexSize - hexSize) < 1e-6
-                    && cachedBakedActiveHex == activeHex
                     && cachedBakedMapMode == mapMode
                     && cachedBakedBorders == showBorders
                     && cachedBakedRivers == showRivers
@@ -2394,33 +2520,50 @@ public class MapDialog extends ZeroDialog {
                     && cachedBakedCapitals == showCapitals
                     && cachedBakedMeridian == showMeridian
                     && cachedBakedEquator == showEquator
-                    && cachedBakedColonyStamp == computeColonyBakeStamp();
+                    && cachedBakedColonyStamp == computeColonyBakeStamp()
+                    && cachedBakedCheatReveal == cheatReveal
+                    && cachedBakedKnownHexCount == computeKnownHexCount();
+        }
+
+        private int computeKnownHexCount() {
+            Dynasty player = findPlayerDynasty();
+            return player != null ? player.getKnownHexCount() : 0;
+        }
+
+        private boolean isHexDiscovered(Hex hex) {
+            return MapDialog.this.isHexDiscovered(hex);
         }
 
         private HexGridMesh ensureMeshCache(List<Hex> hexes) {
             int hexCount = hexes != null ? hexes.size() : 0;
-            if (cachedMesh != null && cachedMeshWorld == world && cachedMeshHexSize == hexSize
-                    && cachedHexCount == hexCount) {
-                return cachedMesh;
+            if (cachedMeshWorld != world || cachedHexCount != hexCount) {
+                meshStepCache.clear();
+                cachedMeshWorld = world;
+                cachedHexCount = hexCount;
             }
-            hexLookup.clear();
-            if (hexes != null) {
+            HexGridMesh mesh = meshStepCache.get(zoomStepIndex);
+            if (mesh != null && Math.abs(mesh.layoutSize() - hexSize) < 1e-6) {
+                cachedMesh = mesh;
+                cachedMeshHexSize = hexSize;
+                return mesh;
+            }
+            if (hexLookup.isEmpty() && hexes != null) {
                 for (Hex hex : hexes) {
                     if (hex != null) {
                         hexLookup.put(hexKey(hex.getQ(), hex.getR()), hex);
                     }
                 }
             }
-            cachedMesh = HexGridMesh.build(
+            mesh = HexGridMesh.build(
                     hexes,
                     0,
                     0,
                     hexSize,
                     (q, r) -> hexLookup.get(hexKey(q, r)));
-            cachedMeshWorld = world;
+            meshStepCache.put(zoomStepIndex, mesh);
+            cachedMesh = mesh;
             cachedMeshHexSize = hexSize;
-            cachedHexCount = hexCount;
-            return cachedMesh;
+            return mesh;
         }
 
         private double getWorldWidthPx() {
@@ -2567,6 +2710,9 @@ public class MapDialog extends ZeroDialog {
 
             Hex hex = findHexAtLocal(relX, relY);
             if (hex == null) return null;
+            if (!isHexDiscovered(hex)) {
+                return "<html>" + LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_FOG_OF_WAR) + "</html>";
+            }
 
             StringBuilder sb = new StringBuilder("<html>");
 
@@ -2701,7 +2847,7 @@ public class MapDialog extends ZeroDialog {
             double relY = p.y - centerOffset.y;
 
             Hex hex = findHexAtLocal(relX, relY);
-            if (hex != null) {
+            if (hex != null && isHexDiscovered(hex)) {
                 changeHex(hex, !keepMapOpenForSandbox());
             }
         }
@@ -2717,7 +2863,7 @@ public class MapDialog extends ZeroDialog {
             int maxY = mesh.boundsMaxY() + pad;
             int imgW = maxX - minX + 1;
             int imgH = maxY - minY + 1;
-            if (imgW <= 0 || imgH <= 0 || (long) imgW * imgH > 30_000_000L) {
+            if (imgW <= 0 || imgH <= 0 || (long) imgW * imgH > 5_000_000L) {
                 return;
             }
             BufferedImage image;
@@ -2731,21 +2877,25 @@ public class MapDialog extends ZeroDialog {
             bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             bg.translate(-minX, -minY);
 
-            mesh.paintFills(bg, face -> resolveFillColor(face.hex));
+            mesh.paintFills(bg, face -> isHexDiscovered(face.hex) ? resolveFillColor(face.hex) : null);
+            mesh.paintFog(bg, AssetStyles.getFogTexturePaint(), this::isHexDiscovered);
             mesh.paintDividers(
                     bg,
                     showBorders,
                     face -> resolveFillColor(face.hex),
-                    AssetStyles.BORDER_COLOR);
+                    AssetStyles.BORDER_COLOR,
+                    face -> isHexDiscovered(face.hex));
             if (mapMode == MapMode.TECTONIC_PLATES) {
                 mesh.paintFaultBoundariesWithStyles(bg, this::resolveFaultStyle);
             }
             if (showRivers) {
-                mesh.paintRivers(bg);
+                mesh.paintRivers(bg, 1.0f, edge -> isHexDiscovered(edge.faceA != null ? edge.faceA.hex : null) || isHexDiscovered(edge.faceB != null ? edge.faceB.hex : null));
             }
             if (showBiomeIcons || showColonyRanks || showCapitals) {
                 for (HexGridMesh.Face face : mesh.faces()) {
-                    drawHexIcons(bg, face);
+                    if (isHexDiscovered(face.hex)) {
+                        drawHexIcons(bg, face);
+                    }
                 }
             }
             if (world.getWorldWidth() > 0) {
@@ -2782,19 +2932,16 @@ public class MapDialog extends ZeroDialog {
             cachedBakedMeridian = showMeridian;
             cachedBakedEquator = showEquator;
             cachedBakedColonyStamp = computeColonyBakeStamp();
+            cachedBakedCheatReveal = resolveEngine() != null && resolveEngine().isCheatRevealMap();
+            cachedBakedKnownHexCount = computeKnownHexCount();
         }
 
         private Image getScaledBiomeIcon(Biome biome, int size) {
             if (biome == null || biome.getIcon() == null || biome.getIcon().getImage() == null || size <= 0) {
                 return null;
             }
-            if (size != cachedIconSize) {
-                scaledBiomeIconCache.clear();
-                scaledRankIconCache.clear();
-                scaledCapitalIconCache = null;
-                cachedIconSize = size;
-            }
-            Image cached = scaledBiomeIconCache.get(biome.getId());
+            long key = (((long) size) << 32) | (biome.getId() & 0xffffffffL);
+            Image cached = scaledBiomeIconCache.get(key);
             if (cached != null) {
                 return cached;
             }
@@ -2804,7 +2951,7 @@ public class MapDialog extends ZeroDialog {
                 ig.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 ig.drawImage(biome.getIcon().getImage(), 0, 0, size, size, null);
                 ig.dispose();
-                scaledBiomeIconCache.put(biome.getId(), img);
+                scaledBiomeIconCache.put(key, img);
                 return img;
             } catch (Throwable t) {
                 return biome.getIcon().getImage();
@@ -2815,13 +2962,8 @@ public class MapDialog extends ZeroDialog {
             if (rank == null || rank.getIcon() == null || rank.getIcon().getImage() == null || size <= 0) {
                 return null;
             }
-            if (size != cachedIconSize) {
-                scaledBiomeIconCache.clear();
-                scaledRankIconCache.clear();
-                scaledCapitalIconCache = null;
-                cachedIconSize = size;
-            }
-            Image cached = scaledRankIconCache.get(rank.getId());
+            long key = (((long) size) << 32) | (rank.getId() & 0xffffffffL);
+            Image cached = scaledRankIconCache.get(key);
             if (cached != null) {
                 return cached;
             }
@@ -2831,7 +2973,7 @@ public class MapDialog extends ZeroDialog {
                 ig.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 ig.drawImage(rank.getIcon().getImage(), 0, 0, size, size, null);
                 ig.dispose();
-                scaledRankIconCache.put(rank.getId(), img);
+                scaledRankIconCache.put(key, img);
                 return img;
             } catch (Throwable t) {
                 return rank.getIcon().getImage();
@@ -2843,14 +2985,9 @@ public class MapDialog extends ZeroDialog {
             if (baseIcon == null || baseIcon.getImage() == null || size <= 0) {
                 return null;
             }
-            if (size != cachedIconSize) {
-                scaledBiomeIconCache.clear();
-                scaledRankIconCache.clear();
-                scaledCapitalIconCache = null;
-                cachedIconSize = size;
-            }
-            if (scaledCapitalIconCache != null) {
-                return scaledCapitalIconCache;
+            Image cached = scaledCapitalIconCache.get(size);
+            if (cached != null) {
+                return cached;
             }
             try {
                 BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
@@ -2858,7 +2995,7 @@ public class MapDialog extends ZeroDialog {
                 ig.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 ig.drawImage(baseIcon.getImage(), 0, 0, size, size, null);
                 ig.dispose();
-                scaledCapitalIconCache = img;
+                scaledCapitalIconCache.put(size, img);
                 return img;
             } catch (Throwable t) {
                 return baseIcon.getImage();
@@ -2883,6 +3020,16 @@ public class MapDialog extends ZeroDialog {
 
             HexGridMesh mesh = ensureMeshCache(hexes);
             if (!isBakedImageValid(activeHex)) {
+                boolean cheatReveal = resolveEngine() != null && resolveEngine().isCheatRevealMap();
+                int knownCount = computeKnownHexCount();
+                if (cachedBakedCheatReveal != cheatReveal || cachedBakedKnownHexCount != knownCount
+                        || cachedBakedWorld != world || cachedBakedMapMode != mapMode
+                        || cachedBakedBorders != showBorders || cachedBakedRivers != showRivers
+                        || cachedBakedBiomeIcons != showBiomeIcons || cachedBakedColonyRanks != showColonyRanks
+                        || cachedBakedCapitals != showCapitals || cachedBakedMeridian != showMeridian
+                        || cachedBakedEquator != showEquator) {
+                    bakedStepCache.clear();
+                }
                 bakeBaseImage(mesh, activeHex);
             }
 
@@ -2916,22 +3063,24 @@ public class MapDialog extends ZeroDialog {
                 if (bakedEntry != null && bakedEntry.image != null) {
                     sg.drawImage(bakedEntry.image, bakedEntry.minX, bakedEntry.minY, null);
                 } else {
-                    mesh.paintFills(sg, face -> resolveFillColor(face.hex));
+                    mesh.paintFills(sg, face -> isHexDiscovered(face.hex) ? resolveFillColor(face.hex) : null);
+                    mesh.paintFog(sg, AssetStyles.getFogTexturePaint(), this::isHexDiscovered);
                     mesh.paintDividers(
                             sg,
                             showBorders,
                             face -> resolveFillColor(face.hex),
-                            AssetStyles.BORDER_COLOR);
+                            AssetStyles.BORDER_COLOR,
+                            face -> isHexDiscovered(face.hex));
                     if (mapMode == MapMode.TECTONIC_PLATES) {
                         mesh.paintFaultBoundariesWithStyles(sg, this::resolveFaultStyle);
                     }
                     if (showRivers) {
-                        mesh.paintRivers(sg);
+                        mesh.paintRivers(sg, 1.0f, edge -> isHexDiscovered(edge.faceA != null ? edge.faceA.hex : null) || isHexDiscovered(edge.faceB != null ? edge.faceB.hex : null));
                     }
                     if (showBiomeIcons || showColonyRanks || showCapitals) {
                         Rectangle localClip = sg.getClipBounds();
                         for (HexGridMesh.Face face : mesh.faces()) {
-                            if (localClip == null || face.intersects(localClip)) {
+                            if (isHexDiscovered(face.hex) && (localClip == null || face.intersects(localClip))) {
                                 drawHexIcons(sg, face);
                             }
                         }
@@ -2957,17 +3106,25 @@ public class MapDialog extends ZeroDialog {
                     }
                 }
                 if (showTunnels) {
-                    HexMapOverlays.paintTunnels(sg, world, mesh);
+                    HexMapOverlays.paintTunnels(sg, world, mesh, this::isHexDiscovered);
                 }
                 if (showTrades) {
-                    HexMapOverlays.paintTrades(sg, world, mesh);
+                    HexMapOverlays.paintTrades(sg, world, mesh, this::isHexDiscovered);
                 }
                 if (showBattles) {
-                    HexMapOverlays.paintBattles(sg, world, mesh);
+                    HexMapOverlays.paintBattles(sg, world, mesh, this::isHexDiscovered);
                 }
-                if (activeHex != null) {
+                if (activeHex != null && isHexDiscovered(activeHex)) {
                     HexGridMesh.Face activeFace = mesh.faceAt(activeHex.getQ(), activeHex.getR());
                     if (activeFace != null) {
+                        Color activeFill = resolveUnfadedFillColor(activeHex);
+                        if (activeFill != null) {
+                            sg.setColor(activeFill);
+                            sg.fillPolygon(activeFace.toPolygon());
+                        }
+                        if (showBiomeIcons || showColonyRanks || showCapitals) {
+                            drawHexIcons(sg, activeFace);
+                        }
                         sg.setColor(AssetStyles.FONT_COLOR_ERROR);
                         sg.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
                         sg.drawPolygon(activeFace.toPolygon());
@@ -3017,12 +3174,37 @@ public class MapDialog extends ZeroDialog {
             };
         }
 
-        private void paintGeographicNames(Graphics2D g2, World world, HexGridMesh mesh) {
-            if (world == null || mesh == null) return;
+        private int computeLabelsSettingsStamp() {
+            int stamp = 1;
+            stamp = 31 * stamp + (showGeographicNames ? 1 : 0);
+            stamp = 31 * stamp + (showLabelContinents ? 1 : 0);
+            stamp = 31 * stamp + (showLabelIceCaps ? 1 : 0);
+            stamp = 31 * stamp + (showLabelOceans ? 1 : 0);
+            stamp = 31 * stamp + (showLabelArchipelagos ? 1 : 0);
+            stamp = 31 * stamp + (showLabelTrenches ? 1 : 0);
+            stamp = 31 * stamp + (showLabelMountains ? 1 : 0);
+            stamp = 31 * stamp + (showLabelValleys ? 1 : 0);
+            stamp = 31 * stamp + (showLabelLakes ? 1 : 0);
+            stamp = 31 * stamp + (showLabelRivers ? 1 : 0);
+            stamp = 31 * stamp + (showLabelPeninsulas ? 1 : 0);
+            return stamp;
+        }
+
+        private void ensureLabelBoxes(Graphics2D g2, World world, HexGridMesh mesh) {
+            int settingsStamp = computeLabelsSettingsStamp();
+            boolean cheatReveal = resolveEngine() != null && resolveEngine().isCheatRevealMap();
+            int discStamp = computeKnownHexCount() ^ (cheatReveal ? 0x55555555 : 0);
+            if (cachedLabelBoxes != null && cachedLabelsZoomStep == zoomStepIndex
+                    && cachedLabelsDiscoveryStamp == discStamp && cachedLabelsSettingsStamp == settingsStamp) {
+                return;
+            }
+            cachedLabelBoxes = new ArrayList<>();
+            cachedLabelsZoomStep = zoomStepIndex;
+            cachedLabelsDiscoveryStamp = discStamp;
+            cachedLabelsSettingsStamp = settingsStamp;
+
             List<GeographicFeature> features = world.getGeographicFeatures();
             if (features == null || features.isEmpty()) return;
-
-            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
             List<GeographicFeature> sortedFeatures = new ArrayList<>(features);
             sortedFeatures.sort((a, b) -> {
@@ -3049,6 +3231,16 @@ public class MapDialog extends ZeroDialog {
             for (GeographicFeature feature : sortedFeatures) {
                 if (feature == null) continue;
                 if (!isFeatureLabelVisible(feature.getType())) continue;
+                if (feature.getHexes() != null && !feature.getHexes().isEmpty()) {
+                    boolean anyDiscovered = false;
+                    for (Hex h : feature.getHexes()) {
+                        if (isHexDiscovered(h)) {
+                            anyDiscovered = true;
+                            break;
+                        }
+                    }
+                    if (!anyDiscovered) continue;
+                }
                 String name = feature.getName();
                 if (name == null || name.isEmpty()) continue;
 
@@ -3240,19 +3432,35 @@ public class MapDialog extends ZeroDialog {
                 }
 
                 placedBoxes.add(chosenRect);
-
-                g2.setFont(font);
-                g2.setColor(new Color(18, 22, 28, 215));
-                g2.fillRoundRect(chosenRect.x, chosenRect.y, chosenRect.width, chosenRect.height, arc, arc);
-
-                g2.setColor(borderColor);
-                g2.setStroke(new BasicStroke(strokeWidth));
-                g2.drawRoundRect(chosenRect.x, chosenRect.y, chosenRect.width, chosenRect.height, arc, arc);
-
-                g2.setColor(textColor);
                 int textX = chosenRect.x + (chosenRect.width - tw) / 2;
                 int textY = chosenRect.y + (chosenRect.height - th) / 2 + fm.getAscent();
-                g2.drawString(name, textX, textY);
+                cachedLabelBoxes.add(new CachedLabelBox(name, font, textColor, borderColor, strokeWidth, arc, chosenRect, textX, textY));
+            }
+        }
+
+        private void paintGeographicNames(Graphics2D g2, World world, HexGridMesh mesh) {
+            if (world == null || mesh == null) return;
+            ensureLabelBoxes(g2, world, mesh);
+            if (cachedLabelBoxes == null || cachedLabelBoxes.isEmpty()) return;
+
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            Rectangle clip = g2.getClipBounds();
+            Color bgBox = new Color(18, 22, 28, 215);
+
+            for (CachedLabelBox box : cachedLabelBoxes) {
+                if (clip != null && !clip.intersects(box.rect)) {
+                    continue;
+                }
+                g2.setFont(box.font);
+                g2.setColor(bgBox);
+                g2.fillRoundRect(box.rect.x, box.rect.y, box.rect.width, box.rect.height, box.arc, box.arc);
+
+                g2.setColor(box.borderColor);
+                g2.setStroke(new BasicStroke(box.strokeWidth));
+                g2.drawRoundRect(box.rect.x, box.rect.y, box.rect.width, box.rect.height, box.arc, box.arc);
+
+                g2.setColor(box.textColor);
+                g2.drawString(box.name, box.textX, box.textY);
             }
         }
 
@@ -3302,9 +3510,6 @@ public class MapDialog extends ZeroDialog {
             if (mapMode == MapMode.HEIGHT) {
                 int elev = Math.max(0, Math.min(10, hex.getElevation()));
                 Color base = HEIGHT_COLORS[elev];
-                if (hex == world.getActiveHex()) {
-                    return base;
-                }
                 float fade = AssetStyles.mapInactiveHexFade();
                 return AssetStyles.fadeTowardBackground(base, fade);
             }
@@ -3312,17 +3517,11 @@ public class MapDialog extends ZeroDialog {
                 int plateId = hex.getPlateId();
                 if (plateId > 0) {
                     Color base = PLATE_COLORS[(plateId - 1) % PLATE_COLORS.length];
-                    if (hex == world.getActiveHex()) {
-                        return base;
-                    }
                     float fade = AssetStyles.mapInactiveHexFade();
                     return AssetStyles.fadeTowardBackground(base, fade);
                 }
             }
             Biome biome = hex.getBiome();
-            if (hex == world.getActiveHex()) {
-                return biome != null ? getBiomeColor(biome) : AssetStyles.BACKGROUND_COLOR;
-            }
             if (biome == null) {
                 return AssetStyles.BACKGROUND_COLOR;
             }
@@ -3334,6 +3533,22 @@ public class MapDialog extends ZeroDialog {
                 biomeFadedColorCache.put(biome.getId(), faded);
             }
             return faded;
+        }
+
+        private Color resolveUnfadedFillColor(Hex hex) {
+            if (hex == null) {
+                return null;
+            }
+            if (mapMode == MapMode.HEIGHT) {
+                int elev = Math.max(0, Math.min(10, hex.getElevation()));
+                return HEIGHT_COLORS[elev];
+            }
+            if (mapMode == MapMode.TECTONIC_PLATES) {
+                int plateId = hex.getPlateId();
+                return plateId > 0 ? PLATE_COLORS[(plateId - 1) % PLATE_COLORS.length] : null;
+            }
+            Biome biome = hex.getBiome();
+            return biome != null ? getBiomeColor(biome) : AssetStyles.BACKGROUND_COLOR;
         }
 
         private void drawHexIcons(Graphics2D g2d, HexGridMesh.Face face) {

@@ -352,7 +352,7 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3)) return 0.8f;
         if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) return 0.4f;
         if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_1)) return 0.2f;
-        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return 0.1f;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT) || colony.hasUpgrade(GameUnlocks.ROLE_EXPLORER)) return 0.1f;
         return 0f;
     }
 

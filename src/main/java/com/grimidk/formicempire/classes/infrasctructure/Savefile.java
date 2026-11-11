@@ -123,6 +123,8 @@ public class Savefile implements Serializable {
         public int capitalColonyId = -1;
         public double geneticIntegrity = 100.0;
         public int militaryPower;
+        public List<Long> knownHexKeys = new ArrayList<>();
+        public int exploredHexCount = 0;
         public Map<String, Integer> deathStatistics = new HashMap<>();
         public Map<String, Integer> diplomaticReputations = new HashMap<>();
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();

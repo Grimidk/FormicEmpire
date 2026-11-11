@@ -89,7 +89,7 @@ public final class GameUnlocks {
                 static { upgrades.add(ROLE_RESEARCHER); }
         public static final Upgrade ROLE_COMMANDER = new Upgrade(40, "ROLE_COMMANDER_UPGRADE", "ROLE_COMMANDER_FLAVOR", "ROLE_COMMANDER_DESC", TYPE_QUEEN, 0, loadIcon("icons/upgrades/RoleCommander.png"), 0, -3, -3);
                 static { upgrades.add(ROLE_COMMANDER); }
-        public static final Upgrade ROLE_CAPTAIN = new Upgrade(41, "ROLE_CAPTAIN_UPGRADE", "ROLE_CAPTAIN_FLAVOR", "ROLE_CAPTAIN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleCaptain.png"), 1, 1, -2);
+        public static final Upgrade ROLE_CAPTAIN = new Upgrade(41, "ROLE_CAPTAIN_UPGRADE", "ROLE_CAPTAIN_FLAVOR", "ROLE_CAPTAIN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleCaptain.png"), 1, 2, -1);
                 static { upgrades.add(ROLE_CAPTAIN); }
         public static final Upgrade ROLE_AIR_SUPPORT = new Upgrade(42, "ROLE_AIR_SUPPORT_UPGRADE", "ROLE_AIR_SUPPORT_FLAVOR", "ROLE_AIR_SUPPORT_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirSupport.png"), 1, -1, -1);
                 static { upgrades.add(ROLE_AIR_SUPPORT); }
@@ -266,6 +266,8 @@ public final class GameUnlocks {
                 static { upgrades.add(ROLE_ENGINEER); }
         public static final Upgrade ROLE_SKYTRANS = new Upgrade(39, "ROLE_SKYTRANS_UPGRADE", "ROLE_SKYTRANS_FLAVOR", "ROLE_SKYTRANS_DESC", ROLE_COURIER, 150000, loadIcon("icons/upgrades/RoleSkytrans.png"), 4, 2, -9);
                 static { upgrades.add(ROLE_SKYTRANS); }
+        public static final Upgrade ROLE_EXPLORER = new Upgrade(45, "ROLE_EXPLORER_UPGRADE", "ROLE_EXPLORER_FLAVOR", "ROLE_EXPLORER_DESC", TYPE_PRINCESS, GameNumbers.ROLE_EXPLORER_RESEARCH_COST, loadIcon("icons/upgrades/RoleExplorer.png"), 0, 2, -2);
+                static { upgrades.add(ROLE_EXPLORER); }
 
         // -- Stats -- 
         public static final Upgrade STAT_SKELETON = new Upgrade(101, "STAT_SKELETON", "STAT_SKELETON_FLAVOR", "STAT_SKELETON_DESC", TYPE_EGG, 0, loadIcon("icons/upgrades/StatSkeleton.png"), 0, 4, 0);

@@ -11,6 +11,7 @@ import java.awt.geom.Line2D;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.swing.ImageIcon;
 
@@ -38,6 +39,10 @@ public final class HexMapOverlays {
     }
 
     public static void paintTrades(Graphics2D g2d, World world, HexGridMesh mesh) {
+        paintTrades(g2d, world, mesh, null);
+    }
+
+    public static void paintTrades(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
         if (g2d == null || world == null || mesh == null) {
             return;
         }
@@ -60,6 +65,9 @@ public final class HexMapOverlays {
             Hex origin = trade.getOrigin();
             Hex destination = trade.getDestination();
             if (origin == null || destination == null || !areNeighbors(origin, destination)) {
+                continue;
+            }
+            if (isHexDiscovered != null && (!isHexDiscovered.test(origin) && !isHexDiscovered.test(destination))) {
                 continue;
             }
             HexGridMesh.Face originFace = mesh.faceAt(origin.getQ(), origin.getR());
@@ -131,6 +139,10 @@ public final class HexMapOverlays {
     }
 
     public static void paintTunnels(Graphics2D g2d, World world, HexGridMesh mesh) {
+        paintTunnels(g2d, world, mesh, null);
+    }
+
+    public static void paintTunnels(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
         if (g2d == null || world == null || mesh == null || world.getDynastys() == null) {
             return;
         }
@@ -154,6 +166,9 @@ public final class HexMapOverlays {
                 if (hexA == null || hexB == null || !areNeighbors(hexA, hexB)) {
                     continue;
                 }
+                if (isHexDiscovered != null && (!isHexDiscovered.test(hexA) && !isHexDiscovered.test(hexB))) {
+                    continue;
+                }
                 long key = edgeKey(hexA.getQ(), hexA.getR(), hexB.getQ(), hexB.getR());
                 if (!drawn.add(key)) {
                     continue;
@@ -173,6 +188,10 @@ public final class HexMapOverlays {
     }
 
     public static void paintBattles(Graphics2D g2d, World world, HexGridMesh mesh) {
+        paintBattles(g2d, world, mesh, null);
+    }
+
+    public static void paintBattles(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
         if (g2d == null || world == null || mesh == null || world.getWarService() == null) {
             return;
         }
@@ -194,6 +213,9 @@ public final class HexMapOverlays {
             int idB = war.getDynastyIdB();
             for (HexGridMesh.Edge edge : mesh.edges()) {
                 if (edge.faceA == null || edge.faceB == null) {
+                    continue;
+                }
+                if (isHexDiscovered != null && (!isHexDiscovered.test(edge.faceA.hex) && !isHexDiscovered.test(edge.faceB.hex))) {
                     continue;
                 }
                 Dynasty dynA = HexMapGeometry.dynastyOf(edge.faceA.hex);

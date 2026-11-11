@@ -687,6 +687,7 @@ public final class LanguageStrings {
     public static final String TRIGGER_PROGRESS_METRIC_PLANTS = "TRIGGER_PROGRESS_METRIC_PLANTS";
     public static final String TRIGGER_PROGRESS_METRIC_TIER3_BUILDINGS = "TRIGGER_PROGRESS_METRIC_TIER3_BUILDINGS";
     public static final String TRIGGER_PROGRESS_METRIC_RESOURCES = "TRIGGER_PROGRESS_METRIC_RESOURCES";
+    public static final String TRIGGER_PROGRESS_METRIC_HEXES = "TRIGGER_PROGRESS_METRIC_HEXES";
     public static final String TRIGGER_PROGRESS_HINT_RESEARCHER = "TRIGGER_PROGRESS_HINT_RESEARCHER";
     public static final String TRIGGER_PROGRESS_HINT_GRAVER = "TRIGGER_PROGRESS_HINT_GRAVER";
     public static final String TRIGGER_PROGRESS_HINT_RESEARCH = "TRIGGER_PROGRESS_HINT_RESEARCH";
@@ -702,6 +703,7 @@ public final class LanguageStrings {
     public static final String TRIGGER_PROGRESS_HINT_SCOUT = "TRIGGER_PROGRESS_HINT_SCOUT";
     public static final String TRIGGER_PROGRESS_HINT_MINER = "TRIGGER_PROGRESS_HINT_MINER";
     public static final String TRIGGER_PROGRESS_HINT_PARASITIC_MITE = "TRIGGER_PROGRESS_HINT_PARASITIC_MITE";
+    public static final String TRIGGER_PROGRESS_HINT_EXPLORER = "TRIGGER_PROGRESS_HINT_EXPLORER";
 
     public static final String DIALOG_HATCH_RATES_TITLE = "DIALOG_HATCH_RATES_TITLE";
     public static final String HATCH_DESC = "HATCH_DESC";
@@ -2172,6 +2174,7 @@ public final class LanguageStrings {
     public static final String ROLE_ESCORT = "ROLE_ESCORT";
     public static final String ROLE_ENGINEER = "ROLE_ENGINEER";
     public static final String ROLE_SKYTRANS = "ROLE_SKYTRANS";
+    public static final String ROLE_EXPLORER = "ROLE_EXPLORER";
 
     public static final String RANK_ANT = "RANK_ANT";
     public static final String RANK_COLONY = "RANK_COLONY";
@@ -2647,6 +2650,9 @@ public final class LanguageStrings {
     public static final String ROLE_SKYTRANS_UPGRADE = "ROLE_SKYTRANS_UPGRADE";
     public static final String ROLE_SKYTRANS_FLAVOR = "ROLE_SKYTRANS_FLAVOR";
     public static final String ROLE_SKYTRANS_DESC = "ROLE_SKYTRANS_DESC";
+    public static final String ROLE_EXPLORER_UPGRADE = "ROLE_EXPLORER_UPGRADE";
+    public static final String ROLE_EXPLORER_FLAVOR = "ROLE_EXPLORER_FLAVOR";
+    public static final String ROLE_EXPLORER_DESC = "ROLE_EXPLORER_DESC";
 
     public static final String ABILITY_RESEARCH_FLAVOR = "ABILITY_RESEARCH_FLAVOR";
     public static final String ABILITY_RESEARCH_DESC = "ABILITY_RESEARCH_DESC";
@@ -3209,6 +3215,8 @@ public final class LanguageStrings {
     public static final String TRIGGER_HUNTS_ABILITY_MSG = "TRIGGER_HUNTS_ABILITY_MSG";
     public static final String TRIGGER_MINER_ROLE_TITLE = "TRIGGER_MINER_ROLE_TITLE";
     public static final String TRIGGER_MINER_ROLE_MSG = "TRIGGER_MINER_ROLE_MSG";
+    public static final String TRIGGER_EXPLORER_ROLE_TITLE = "TRIGGER_EXPLORER_ROLE_TITLE";
+    public static final String TRIGGER_EXPLORER_ROLE_MSG = "TRIGGER_EXPLORER_ROLE_MSG";
     public static final String TRIGGER_POLICE_ROLE_TITLE = "TRIGGER_POLICE_ROLE_TITLE";
     public static final String TRIGGER_POLICE_ROLE_MSG = "TRIGGER_POLICE_ROLE_MSG";
     public static final String TRIGGER_PARASITIC_MITE_TITLE = "TRIGGER_PARASITIC_MITE_TITLE";
@@ -3302,4 +3310,24 @@ public final class LanguageStrings {
     public static final String TRIGGER_OMNIVORE_TITLE = "TRIGGER_OMNIVORE_TITLE";
     public static final String TRIGGER_OMNIVORE_MSG = "TRIGGER_OMNIVORE_MSG";
     public static final String HELP_SPECIES_DIET = "HELP_SPECIES_DIET";
+    public static final String MAP_FOG_OF_WAR_TITLE = "MAP_FOG_OF_WAR_TITLE";
+    public static final String MAP_FOG_OF_WAR_DESC = "MAP_FOG_OF_WAR_DESC";
+    public static final String MAP_TOOLTIP_FOG_OF_WAR = "MAP_TOOLTIP_FOG_OF_WAR";
+    public static final String DIPLO_ACTION_SHARE_KNOWLEDGE = "DIPLO_ACTION_SHARE_KNOWLEDGE";
+    public static final String DIPLO_ACTION_SHARE_KNOWLEDGE_CONFIRM = "DIPLO_ACTION_SHARE_KNOWLEDGE_CONFIRM";
+    public static final String DIPLO_ACTION_SHARE_KNOWLEDGE_SUCCESS = "DIPLO_ACTION_SHARE_KNOWLEDGE_SUCCESS";
+    public static final String DIPLO_ACTION_SHARE_KNOWLEDGE_ALREADY = "DIPLO_ACTION_SHARE_KNOWLEDGE_ALREADY";
+    public static final String DIPLO_ACTION_STEAL_INTELLIGENCE = "DIPLO_ACTION_STEAL_INTELLIGENCE";
+    public static final String DIPLO_ACTION_STEAL_INTELLIGENCE_CONFIRM = "DIPLO_ACTION_STEAL_INTELLIGENCE_CONFIRM";
+    public static final String DIPLO_ACTION_STEAL_INTELLIGENCE_SUCCESS = "DIPLO_ACTION_STEAL_INTELLIGENCE_SUCCESS";
+    public static final String DIPLO_ACTION_STEAL_INTELLIGENCE_DETECTED = "DIPLO_ACTION_STEAL_INTELLIGENCE_DETECTED";
+    public static final String DIPLO_ACTION_STEAL_INTELLIGENCE_NO_SPIES = "DIPLO_ACTION_STEAL_INTELLIGENCE_NO_SPIES";
+    public static final String DIPLO_UNKNOWN_DYNASTY = "DIPLO_UNKNOWN_DYNASTY";
+    public static final String DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED = "DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED";
+    public static final String ALERT_SCOUT_DISCOVERED_HEX = "ALERT_SCOUT_DISCOVERED_HEX";
+    public static final String SETTINGS_CHEAT_FOG_OF_WAR = "SETTINGS_CHEAT_FOG_OF_WAR";
+    public static final String SETTINGS_CHEAT_FOG_OF_WAR_TT = "SETTINGS_CHEAT_FOG_OF_WAR_TT";
+    public static final String MAP_FOG_CHEAT_REVEALED = "MAP_FOG_CHEAT_REVEALED";
+    public static final String MAP_FOG_CHEAT_HIDDEN = "MAP_FOG_CHEAT_HIDDEN";
+    public static final String MAP_FOG_CHEAT_TOOLTIP = "MAP_FOG_CHEAT_TOOLTIP";
 }

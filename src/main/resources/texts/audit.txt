@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 95% (77/81 checked)
+Completion: 95% (82/86 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -77,6 +77,7 @@ Sandbox:
 7. ROLE MANAGEMENT (Q/W/E/R/T)
 ================================================================================
 [X] Per-type tabs — role counts, unlock gates, war economy view, active military roles, copy peace→war, default roles from settings
+[X] Explorer princess role (up to 10-hex range, 2× discovery efficiency, open ocean exploration)
 
 ================================================================================
 8. HATCH RATES (P)
@@ -146,6 +147,7 @@ Sandbox:
 ================================================================================
 [X] Sort/search; pact propose/accept/break; declare war; trade request/negotiation; send diplomats; genetic exchange; reputation modifiers; integration flow; convoy/diplomat auto-cancel alerts
 [X] Pact request policy (Ask / auto accept / auto decline); Send spies, intelligence dossier, caught-spying penalty
+[X] Share knowledge, Steal cartography subversive action, unknown dynasty interaction mask
 
 ================================================================================
 18. DYNASTY — WARS (F)
@@ -157,6 +159,8 @@ Sandbox:
 ================================================================================
 [X] Hex select; dynasty legend (collapse, color jump, hover tooltip); war sidebar focus; tunnel/battle layers; Easy conquering; Go Home; randomized city titles
 [X] Mouse wheel zoom + pan when zoomed; trade route layer animation on map
+[X] Fog of war layer on map and minimap (baked together), undiscovered hex mask, scout wandering discovery, cheat fog toggle
+[X] Ocean exploration limits — coastal waters only for standard scouts, open ocean reachable by Explorer princesses
 
 ================================================================================
 20. STATISTICS (X)
@@ -176,13 +180,14 @@ Sandbox:
 [X] Monthly — Researcher; parasitic mite outbreak (+ Catch Symbiotic Mite)
 [X] Daily — Graver; Queendom Air Support; Commander (+ capacity bump); Research/Build; Bilateral Trade; Borer; Assimilation ability; subtype hatch UI; Colony Operations; Mass Flight; rank-ups (Police/Cloning fused); Auto-Tunnels/Auto-Diplomacy; colony death; NPC triggers
 [X] Daily — Scout→Hunts; Hunts backfill popup; Miner gate; Hunter/Warrior/Militia; Breeder+Spread; Brute+Crane+Carrier; Dynasty/Trade/Courier/Management/Spread 2/Automation chain
-[X] Hourly trigger checks; popup pauses game and grants unlock
+[X] Hourly — trigger checks; Explorer role (requires Princess unlocked + 10 explored hexes); popup pauses game and grants unlock
 
 ================================================================================
 23. SIMULATION (observe while playing — no separate UI)
 ================================================================================
 [X] Colony labour, resources, pets/parasites, NPC lite behaviour, construction, room passives
 [X] World ticks, weather, biomes, generation rules, resource tooltips, nuptial flight, spread inheritance
+[X] Ant aging, natural lifespans, queen mortality, and princess succession
 [X] AI dynasties — research/build priority, personality war/trade bias
 [X] War — military power, hex vs border rules, redeploy/heal, Shielding, battle lines, honeypot/doorhead role gates, stat multipliers
 [ ] Troop-Carrier reserve promotions; concurrent-war ant splitting; daily reserve promotion caps

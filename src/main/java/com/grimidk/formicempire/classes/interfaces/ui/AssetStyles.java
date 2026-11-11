@@ -7,7 +7,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -60,6 +63,7 @@ public class AssetStyles {
     public static final String META_AUDIT = "/texts/audit.txt";
     public static final String META_VERSION = "/texts/version.txt";
     public static final String META_LICENSE = "/texts/license.txt";
+    public static final String META_FOG_TILE = "/backgrounds/FogTile.png";
 
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
     public static final String MENU_BUTTON_CLIENT_KEY = "formicempire.menuButton";
@@ -126,6 +130,7 @@ public class AssetStyles {
     public static Color BACKGROUND_SECONDARY = COLOR_VERY_LIGHT_GRAY;
     public static Color BACKGROUND_DARK = COLOR_LIGHTER_GRAY;
     public static Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
+    public static Color COLOR_FOG = new Color(240, 234, 214);
     public static float MAP_HEX_INACTIVE_FADE = 0.4f;
 
     public static Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
@@ -472,6 +477,52 @@ public class AssetStyles {
 
     public static void setDarkMode(boolean dark) {
         darkMode = dark;
+    }
+
+    private static TexturePaint fogTexturePaint;
+    private static int cachedFogPaintRgb = -1;
+
+    public static TexturePaint getFogTexturePaint() {
+        Color base = COLOR_FOG != null ? COLOR_FOG : new Color(240, 234, 214);
+        int rgb = base.getRGB();
+        if (fogTexturePaint != null && cachedFogPaintRgb == rgb) {
+            return fogTexturePaint;
+        }
+        try {
+            java.net.URL url = AssetStyles.class.getResource(META_FOG_TILE);
+            if (url != null) {
+                BufferedImage loaded = javax.imageio.ImageIO.read(url);
+                if (loaded != null && loaded.getWidth() > 0 && loaded.getHeight() > 0) {
+                    fogTexturePaint = new TexturePaint(loaded, new Rectangle(0, 0, loaded.getWidth(), loaded.getHeight()));
+                    cachedFogPaintRgb = rgb;
+                    return fogTexturePaint;
+                }
+            }
+        } catch (Throwable ignore) {
+        }
+        int size = 32;
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+        int baseR = base.getRed();
+        int baseG = base.getGreen();
+        int baseB = base.getBlue();
+        for (int y = 0; y < size; y++) {
+            double v1 = Math.cos(2 * Math.PI * y / (double) size);
+            for (int x = 0; x < size; x++) {
+                double u1 = Math.sin(2 * Math.PI * x / (double) size);
+                double diag1 = Math.sin(4 * Math.PI * (x + y) / (double) size);
+                double diag2 = Math.cos(4 * Math.PI * (x - y) / (double) size);
+                double grain = Math.sin(8 * Math.PI * (2 * x + y) / (double) size);
+                double val = (u1 * 0.35 + v1 * 0.35 + diag1 * 0.15 + diag2 * 0.15 + grain * 0.1);
+                int delta = (int) Math.round(val * 4.0);
+                int r = Math.min(255, Math.max(0, baseR + delta));
+                int g = Math.min(255, Math.max(0, baseG + delta));
+                int b = Math.min(255, Math.max(0, baseB + delta));
+                img.setRGB(x, y, (r << 16) | (g << 8) | b);
+            }
+        }
+        fogTexturePaint = new TexturePaint(img, new Rectangle(0, 0, size, size));
+        cachedFogPaintRgb = rgb;
+        return fogTexturePaint;
     }
 
     static boolean isThemeExempt(Component component) {

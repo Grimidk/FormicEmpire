@@ -515,6 +515,9 @@ public class ColonyLabourService {
                 satellite.setAutomationEnabled(!colony.isPlayer()); 
                 satellite.setRank(GameConstants.RANK_COLONY);
                 neighbor.setColony(satellite);
+                if (dynasty != null) {
+                    dynasty.discoverHexAndAdjacent(neighbor);
+                }
                 if (world != null) {
                     world.markColonizedHexIndexDirty();
                 }
@@ -595,11 +598,20 @@ public class ColonyLabourService {
     }
 
     public void runScoutting(Colony colony, Biome biome, Hex currentHex) {
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT) && !colony.hasUpgrade(GameUnlocks.ROLE_EXPLORER)) return;
 
         int scoutCount = colony.runsFullSimulation()
                 ? colony.getActiveRoleCount(GameConstants.ROLE_SCOUT)
                 : colony.getAssignedRoleCount(GameConstants.ROLE_SCOUT);
+        int explorerCount = colony.runsFullSimulation()
+                ? colony.getActiveRoleCount(GameConstants.ROLE_EXPLORER)
+                : colony.getAssignedRoleCount(GameConstants.ROLE_EXPLORER);
+        if (scoutCount == 0 && explorerCount == 0) return;
+
+        if (explorerCount > 0) {
+            wanderAndScoutHexes(colony, currentHex);
+        }
+
         if (scoutCount == 0) return;
 
         float chancePerScout = colony.getStatsService().getScoutingRate(colony); 
@@ -651,7 +663,15 @@ public class ColonyLabourService {
             possibleTypes.add(GameConstants.RESOURCE_WATER); 
         }
 
-        if (possibleTypes.isEmpty()) return;
+        if (possibleTypes.isEmpty()) {
+            boolean hasExplorer = (colony.runsFullSimulation()
+                    ? colony.getActiveRoleCount(GameConstants.ROLE_EXPLORER)
+                    : colony.getAssignedRoleCount(GameConstants.ROLE_EXPLORER)) > 0;
+            if (!hasExplorer) {
+                wanderAndScoutHexes(colony, currentHex);
+            }
+            return;
+        }
         List<ResourceType> missingCritical = new ArrayList<>();
         if (possibleTypes.contains(GameConstants.RESOURCE_WATER)
                 && locations.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
@@ -735,6 +755,68 @@ public class ColonyLabourService {
         ResourceSource source = new ResourceSource(selectedType, quantity, topLeft.x, topLeft.y);
         if (colony.getLocationService().addSource(colony, source) && currentHex != null) {
             currentHex.recordGeneratedResourceSource(selectedType);
+        }
+    }
+
+    private long scoutWanderStep = 0L;
+
+    private void wanderAndScoutHexes(Colony colony, Hex currentHex) {
+        if (colony == null || currentHex == null) {
+            return;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) {
+            return;
+        }
+        World world = dynasty.getOwningWorld();
+        if (world == null || world.getHexes() == null || world.getHexes().isEmpty()) {
+            return;
+        }
+        boolean hasExplorer = (colony.runsFullSimulation()
+                ? colony.getActiveRoleCount(GameConstants.ROLE_EXPLORER)
+                : colony.getAssignedRoleCount(GameConstants.ROLE_EXPLORER)) > 0;
+        int maxDist = hasExplorer ? 10 : 5;
+        int curQ = currentHex.getQ();
+        int curR = currentHex.getR();
+        int closestDist = Integer.MAX_VALUE;
+        List<Hex> candidates = new ArrayList<>();
+        for (Hex h : world.getHexes()) {
+            if (h == null || dynasty.isHexKnown(h.getQ(), h.getR())) {
+                continue;
+            }
+            if (!hasExplorer && HexWaterCrossing.isOceanHex(h) && !HexWaterCrossing.touchesLand(h)) {
+                continue;
+            }
+            int dist = GameNumbers.axialHexDistance(curQ, curR, h.getQ(), h.getR());
+            if (dist <= 0 || dist > maxDist) {
+                continue;
+            }
+            if (dist < closestDist) {
+                closestDist = dist;
+                candidates.clear();
+                candidates.add(h);
+            } else if (dist == closestDist) {
+                candidates.add(h);
+            }
+        }
+        if (candidates.isEmpty()) {
+            return;
+        }
+        float scoutingRate = colony.getStatsService() != null ? colony.getStatsService().getScoutingRate(colony) : 0.05f;
+        if (scoutingRate <= 0f && hasExplorer) {
+            scoutingRate = 0.1f;
+        }
+        float baseMult = hasExplorer ? 5.0f : 2.5f;
+        float chance = Math.max(0.05f, Math.min(hasExplorer ? 0.95f : 0.85f, (scoutingRate * baseMult) / (closestDist + 1)));
+        long seed = (long) colony.getId() * 1000003L + (++scoutWanderStep) * 37L + (world != null ? (long) world.getYear() * 100000L + world.getDay() * 24L + world.getHour() : 0L);
+        float roll = (GameRandom.seededNextInt(seed, 10000)) / 10000.0f;
+        if (roll < chance) {
+            int idx = GameRandom.seededNextInt(seed ^ 0x5DEECE66DL, candidates.size());
+            Hex target = candidates.get(idx);
+            dynasty.discoverHex(target);
+            dynasty.incrementExploredHexCount();
+            colony.logEvent(ColonyLogPrefixes.SUCCESS + " "
+                    + LanguageStrings.format(LanguageStrings.ALERT_SCOUT_DISCOVERED_HEX, colony.getName(), target.getQ(), target.getR()));
         }
     }
 

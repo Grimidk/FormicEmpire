@@ -2692,6 +2692,7 @@ public class World {
             }
             distributeRivalDynastiesAcrossContinents(continentHexes);
             rebuildColonizedHexIndexIfNeeded();
+            ensureDynastiesKnownHexesInitialized();
             notifyStep(15, "Spawn Dynasties");
         } else {
             notifyStep(15, "Generate World Complete");
@@ -4006,6 +4007,7 @@ public class World {
         distributeRivalDynastiesAcrossContinents(continentHexes);
         markColonizedHexIndexDirty();
         rebuildColonizedHexIndexIfNeeded();
+        ensureDynastiesKnownHexesInitialized();
         bindDynastyTradeServices();
     }
 
@@ -4063,6 +4065,9 @@ public class World {
         }
 
         spawnHex.setColony(startColony);
+        if (startColony.getDynasty() != null) {
+            startColony.getDynasty().discoverHexAndAdjacent(spawnHex);
+        }
         markColonizedHexIndexDirty();
         startColony.setActive(true);
         changeActiveHex(spawnHex);
@@ -4226,6 +4231,9 @@ public class World {
             registerDynasty(npcDynasty);
 
             bestHex.setColony(aiColony);
+            if (aiColony.getDynasty() != null) {
+                aiColony.getDynasty().discoverHexAndAdjacent(bestHex);
+            }
             markColonizedHexIndexDirty();
             starterService.initializeNewColony(aiColony);
             placedCapitals.add(bestHex);
@@ -6303,8 +6311,18 @@ public class World {
 
         ensurePlayerDynastyHasQueenAfterLoad();
         relocalizeDynastyNames();
+        ensureDynastiesKnownHexesInitialized();
         changeActiveHex(getSpawnHex());
         updateEnvironmentalConditions();
+    }
+
+    public void ensureDynastiesKnownHexesInitialized() {
+        if (dynastys == null) return;
+        for (Dynasty dynasty : dynastys) {
+            if (dynasty != null) {
+                dynasty.initKnownHexes(this);
+            }
+        }
     }
 
     private void ensurePlayerDynastyHasQueenAfterLoad() {

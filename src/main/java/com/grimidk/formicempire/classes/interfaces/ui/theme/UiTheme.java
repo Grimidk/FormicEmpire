@@ -47,6 +47,7 @@ public final class UiTheme {
             AssetStyles.TEXT_ERROR = COLOR_LIGHT_RED;
             AssetStyles.TEXT_WARNING = COLOR_LIGHT_YELLOW;
             AssetStyles.SELECTION_BACKGROUND = COLOR_DARK_GRAY;
+            AssetStyles.COLOR_FOG = COLOR_FOG_DARK;
         } else {
             AssetStyles.BACKGROUND_COLOR = COLOR_LIGHTEST_GRAY;
             AssetStyles.BACKGROUND_SECONDARY = COLOR_VERY_LIGHT_GRAY;
@@ -67,6 +68,7 @@ public final class UiTheme {
             AssetStyles.TEXT_ERROR = COLOR_ABSOLUTE_BLACK;
             AssetStyles.TEXT_WARNING = COLOR_ABSOLUTE_BLACK;
             AssetStyles.SELECTION_BACKGROUND = COLOR_LIGHTER_GRAY;
+            AssetStyles.COLOR_FOG = COLOR_FOG_LIGHT;
         }
         AssetStyles.UI_BG_PRIMARY = AssetStyles.BACKGROUND_COLOR;
         AssetStyles.UI_BG_SECONDARY = AssetStyles.BACKGROUND_SECONDARY;

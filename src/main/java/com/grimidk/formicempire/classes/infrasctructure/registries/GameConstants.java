@@ -1205,6 +1205,8 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ENGINEER); }
     public static final AntRole ROLE_SKYTRANS = new AntRole(34, CLASS_PRINCESS, LanguageStrings.ROLE_SKYTRANS, loadIcon("icons/roles/Skytrans.png"));
     static { antRoles.add(ROLE_SKYTRANS); }
+    public static final AntRole ROLE_EXPLORER = new AntRole(40, CLASS_PRINCESS, LanguageStrings.ROLE_EXPLORER, loadIcon("icons/roles/Explorer.png"));
+    static { antRoles.add(ROLE_EXPLORER); }
 
     // --- Colony Ranks ---
     public static final Rank RANK_ANT = new Rank(1, LanguageStrings.RANK_ANT, 1L,

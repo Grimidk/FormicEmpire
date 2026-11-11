@@ -167,6 +167,7 @@ public class TriggerManager {
         checkScoutRoleUnlock();
         checkHuntsAbilityUnlock();
         checkMinerRoleUnlock();
+        checkExplorerRoleUnlock();
         checkDynastyTriggers();
         checkTunnelRoleUnlock();
         checkAssimilationAbilityUnlock();
@@ -204,6 +205,7 @@ public class TriggerManager {
         checkNPCGraver(npc);
         checkNPCScout(npc);
         checkNPCMiner(npc);
+        checkNPCExplorer(npc);
         checkNPCPolice(npc);
         checkNPCAirSupport(npc);
         checkNPCUnitRoles(npc);
@@ -319,6 +321,19 @@ public class TriggerManager {
         if (GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3)
                 >= GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS) {
             npc.unlockUpgrade(GameUnlocks.ROLE_MINER);
+        }
+    }
+
+    private static void checkNPCExplorer(Colony npc) {
+        if (npc == null || !npc.hasUpgrade(GameUnlocks.TYPE_PRINCESS) || npc.hasUpgrade(GameUnlocks.ROLE_EXPLORER)) {
+            return;
+        }
+        Dynasty dynasty = npc.getDynasty();
+        if (dynasty != null) {
+            int explored = Math.max(dynasty.getExploredHexCount(), Math.max(0, dynasty.getKnownHexCount() - 7));
+            if (explored >= GameNumbers.TRIGGER_EXPLORER_MIN_HEXES) {
+                npc.unlockUpgrade(GameUnlocks.ROLE_EXPLORER);
+            }
         }
     }
 
@@ -584,6 +599,25 @@ public class TriggerManager {
             fireLocalizedTrigger(GameUnlocks.ROLE_MINER,
                 LanguageStrings.TRIGGER_MINER_ROLE_TITLE,
                 LanguageStrings.TRIGGER_MINER_ROLE_MSG);
+        }
+    }
+
+    private void checkExplorerRoleUnlock() {
+        if (!playerColony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            return;
+        }
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_EXPLORER)) {
+            return;
+        }
+        Dynasty dynasty = playerColony.getDynasty();
+        if (dynasty == null) {
+            return;
+        }
+        int explored = Math.max(dynasty.getExploredHexCount(), Math.max(0, dynasty.getKnownHexCount() - 7));
+        if (explored >= GameNumbers.TRIGGER_EXPLORER_MIN_HEXES) {
+            fireLocalizedTrigger(GameUnlocks.ROLE_EXPLORER,
+                LanguageStrings.TRIGGER_EXPLORER_ROLE_TITLE,
+                LanguageStrings.TRIGGER_EXPLORER_ROLE_MSG);
         }
     }
 

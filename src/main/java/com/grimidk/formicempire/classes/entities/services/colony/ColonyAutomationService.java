@@ -757,15 +757,19 @@ public class ColonyAutomationService {
                 skyTrans = Math.min(remainingPrincesses, 1);
             }
         }
+        int explorerQuota = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_EXPLORER)) {
+            explorerQuota = Math.min(remainingPrincesses - skyTrans, 1);
+        }
 
         int diplomatReserve = 0;
         Dynasty dynasty = colony.getDynasty();
         if (dynasty != null
                 && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY)
                 && colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
-            diplomatReserve = Math.min(2, Math.max(0, remainingPrincesses - skyTrans));
+            diplomatReserve = Math.min(2, Math.max(0, remainingPrincesses - skyTrans - explorerQuota));
         }
-        int remaining = Math.max(0, remainingPrincesses - skyTrans - diplomatReserve);
+        int remaining = Math.max(0, remainingPrincesses - skyTrans - explorerQuota - diplomatReserve);
         int assistantCount = 0;
         if (colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT)) {
             int minBreeders = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? Math.min(remaining, 2) : 0;
@@ -774,6 +778,7 @@ public class ColonyAutomationService {
         int breederCount = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? (remaining - assistantCount) : 0;
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
+        targets.put(GameConstants.ROLE_EXPLORER, explorerQuota);
         targets.put(GameConstants.ROLE_DIPLOMAT, diplomatReserve);
         targets.put(GameConstants.ROLE_BREEDER, breederCount);
     }
@@ -791,6 +796,7 @@ public class ColonyAutomationService {
         targets.put(GameConstants.ROLE_BREEDER, breeders);
         targets.put(GameConstants.ROLE_DIPLOMAT, diplomats);
         targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
+        targets.put(GameConstants.ROLE_EXPLORER, 0);
         targets.put(GameConstants.ROLE_ASSISTANT, assistants);
     }
 
@@ -961,6 +967,7 @@ public class ColonyAutomationService {
         if (role == GameConstants.ROLE_TRANSPORT) return GameUnlocks.ROLE_TRANSPORT;
         if (role == GameConstants.ROLE_DIPLOMAT) return GameUnlocks.ROLE_DIPLOMAT;
         if (role == GameConstants.ROLE_SKYTRANS) return GameUnlocks.ROLE_SKYTRANS;
+        if (role == GameConstants.ROLE_EXPLORER) return GameUnlocks.ROLE_EXPLORER;
         if (role == GameConstants.ROLE_COMMANDER) return GameUnlocks.ROLE_COMMANDER;
         if (role == GameConstants.ROLE_CAPTAIN) return GameUnlocks.ROLE_CAPTAIN;
         if (role == GameConstants.ROLE_AIR_SUPPORT) return GameUnlocks.ROLE_AIR_SUPPORT;

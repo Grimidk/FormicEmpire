@@ -26,6 +26,7 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegra
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
@@ -2016,8 +2017,15 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.setCursor(null);
         }
 
+        private boolean isDynastyDiscovered(Dynasty other) {
+            if (other == null) return false;
+            if (engine != null && engine.isCheatRevealMap()) return true;
+            World world = engine.getWorld();
+            return dynasty.hasDiscoveredDynasty(other, world);
+        }
+
         private boolean canNavigateToDynastyCapital(Dynasty other) {
-            if (other == null || engine.getWorld() == null) {
+            if (other == null || engine.getWorld() == null || !isDynastyDiscovered(other)) {
                 return false;
             }
             Colony capital = other.getCapital();
@@ -2054,9 +2062,10 @@ public class DynastyManagementDialog extends ZeroDialog {
 
                 if (row >= 0 && row < displayedDynasties.size()) {
                     Dynasty other = displayedDynasties.get(row);
-                    swatch.setDynastyColor(other.getColor());
-                    nameLabel.setText(other.getName());
-                    if (canNavigateToDynastyCapital(other)) {
+                    boolean discovered = isDynastyDiscovered(other);
+                    swatch.setDynastyColor(discovered ? other.getColor() : AssetStyles.COLOR_FOG);
+                    nameLabel.setText(discovered ? other.getName() : LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY));
+                    if (discovered && canNavigateToDynastyCapital(other)) {
                         setToolTipText(LanguageStrings.format(
                                 LanguageStrings.MAP_CLICK_VIEW_CAPITAL, other.getName()));
                     } else {
@@ -2078,6 +2087,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                     boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(JLabel.CENTER);
+                if (row >= 0 && row < displayedDynasties.size()) {
+                    Dynasty other = displayedDynasties.get(row);
+                    if (!isDynastyDiscovered(other)) {
+                        setText("---");
+                        setIcon(null);
+                        return this;
+                    }
+                }
                 int power = value instanceof Number number ? number.intValue() : 0;
                 setText(AssetStyles.formatNumber(power));
                 setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
@@ -2104,6 +2121,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                 removeAll();
                 if (row >= 0 && row < displayedDynasties.size()) {
                     Dynasty other = displayedDynasties.get(row);
+                    if (!isDynastyDiscovered(other)) {
+                        scoreLabel.setText("---");
+                        scoreLabel.setIcon(null);
+                        add(scoreLabel, BorderLayout.CENTER);
+                        return this;
+                    }
                     if (dynasty.isIntegratingDynasty(other)) {
                         World world = engine.getWorld();
                         int pct = (int) Math.round(DynastyIntegrationService.getIntegrationProgressPercent(dynasty, other));
@@ -2177,19 +2200,31 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             displayedDynasties.addAll(others);
             for (Dynasty other : displayedDynasties) {
-                int score = dynasty.getDiplomacyService().getEffectiveDiplomaticReputation(other, world);
-                DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(score);
-                Object stanceValue = dynasty.isIntegratingDynasty(other)
-                        ? LanguageStrings.get(LanguageStrings.DIPLO_INTEGRATION_STANCE)
-                        : stance;
-                model.addRow(new Object[]{
-                        other.getName(),
-                        other.getSpecies(),
-                        String.valueOf(score),
-                        stanceValue,
-                        other.getMilitaryPower(),
-                        new DiplomacyRowData(other)
-                });
+                boolean discovered = isDynastyDiscovered(other);
+                if (discovered) {
+                    int score = dynasty.getDiplomacyService().getEffectiveDiplomaticReputation(other, world);
+                    DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(score);
+                    Object stanceValue = dynasty.isIntegratingDynasty(other)
+                            ? LanguageStrings.get(LanguageStrings.DIPLO_INTEGRATION_STANCE)
+                            : stance;
+                    model.addRow(new Object[]{
+                            other.getName(),
+                            other.getSpecies(),
+                            String.valueOf(score),
+                            stanceValue,
+                            other.getMilitaryPower(),
+                            new DiplomacyRowData(other)
+                    });
+                } else {
+                    model.addRow(new Object[]{
+                            LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY),
+                            null,
+                            "---",
+                            null,
+                            0,
+                            new DiplomacyRowData(other)
+                    });
+                }
             }
 
             if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
@@ -2494,6 +2529,70 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
         }
 
+        private void performShareKnowledgeAction(Dynasty other) {
+            if (other == null) return;
+            int confirm = UiOptionPane.showConfirmDialog(
+                    this,
+                    LanguageStrings.format(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE_CONFIRM, other.getName()),
+                    LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE),
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+            int learnedByPlayer = dynasty.learnHexesFrom(other);
+            other.learnHexesFrom(dynasty);
+            if (learnedByPlayer == 0) {
+                UiOptionPane.showMessageDialog(
+                        this,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE_ALREADY),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE),
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                dynasty.adjustDiplomaticReputation(other.getId(), 5);
+                other.adjustDiplomaticReputation(dynasty.getId(), 5);
+                UiOptionPane.showMessageDialog(
+                        this,
+                        LanguageStrings.format(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE_SUCCESS, other.getName(), learnedByPlayer),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            refreshDialog();
+        }
+
+        private void performStealIntelligenceAction(Dynasty other) {
+            if (other == null) return;
+            int confirm = UiOptionPane.showConfirmDialog(
+                    this,
+                    LanguageStrings.format(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE_CONFIRM, other.getName()),
+                    LanguageStrings.get(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE),
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+            double catchChance = other.getCounterIntelligence();
+            if (dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_STEALTH)) {
+                catchChance *= GameNumbers.SPY_STEALTH_DETECTION_MULTIPLIER;
+            }
+            boolean detected = GameRandom.nextDouble() * 100.0 < catchChance;
+            if (detected) {
+                dynasty.adjustDiplomaticReputation(other.getId(), -20);
+                other.adjustDiplomaticReputation(dynasty.getId(), -20);
+                UiOptionPane.showMessageDialog(
+                        this,
+                        LanguageStrings.format(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE_DETECTED, other.getName(), 20),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE),
+                        JOptionPane.WARNING_MESSAGE);
+            } else {
+                int learned = dynasty.learnHexesFrom(other);
+                UiOptionPane.showMessageDialog(
+                        this,
+                        LanguageStrings.format(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE_SUCCESS, other.getName(), learned),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            refreshDialog();
+        }
+
         private class DiplomacyRowData {
             final Dynasty other;
 
@@ -2565,6 +2664,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return;
             }
             JPopupMenu menu = new JPopupMenu();
+            if (!isDynastyDiscovered(other)) {
+                JMenuItem disabledItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED));
+                disabledItem.setEnabled(false);
+                AssetStyles.styleMenuItem(disabledItem);
+                menu.add(disabledItem);
+                UiTableStyles.showCellPopupMenu(menu, table, row, column);
+                return;
+            }
             World world = engine.getWorld();
             Colony activeColony = getActivePlayerColony();
             DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
@@ -2747,6 +2854,19 @@ public class DynastyManagementDialog extends ZeroDialog {
                     AssetStyles.styleMenuItem(integrateItem);
                     diplomaticMenu.add(integrateItem);
                 }
+
+                JMenuItem shareKnowledgeItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE));
+                if (diplo.isAtWarWith(other)) {
+                    shareKnowledgeItem.setEnabled(false);
+                    shareKnowledgeItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_DIPLOMATS_AT_WAR));
+                } else if (diplo.getEffectiveDiplomaticReputation(other, world) < GameConstants.REPUTATION_WARY.getMinScore()) {
+                    shareKnowledgeItem.setEnabled(false);
+                    shareKnowledgeItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WARY_REQUIRED_OFFER));
+                } else {
+                    shareKnowledgeItem.addActionListener(e -> performShareKnowledgeAction(other));
+                }
+                AssetStyles.styleMenuItem(shareKnowledgeItem);
+                diplomaticMenu.add(shareKnowledgeItem);
             }
             menu.add(diplomaticMenu);
 
@@ -2826,6 +2946,21 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             AssetStyles.styleMenuItem(dossierItem);
             subversiveMenu.add(dossierItem);
+
+            JMenuItem stealIntelItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE));
+            if (intel != null && intel.hasSpyRole()) {
+                if (intel.countSpiesToward(other) > 0) {
+                    stealIntelItem.addActionListener(e -> performStealIntelligenceAction(other));
+                } else {
+                    stealIntelItem.setEnabled(false);
+                    stealIntelItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE_NO_SPIES));
+                }
+            } else {
+                stealIntelItem.setEnabled(false);
+                stealIntelItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_SPY_ROLE));
+            }
+            AssetStyles.styleMenuItem(stealIntelItem);
+            subversiveMenu.add(stealIntelItem);
 
             menu.add(subversiveMenu);
 

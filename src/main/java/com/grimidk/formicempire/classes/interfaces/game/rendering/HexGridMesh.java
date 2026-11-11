@@ -8,11 +8,13 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public final class HexGridMesh {
     public static final float DIVIDER_STROKE = 2f;
@@ -344,7 +347,58 @@ public final class HexGridMesh {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, previousAa);
     }
 
+    public void paintFog(Graphics2D g2d, Color fogColor, Predicate<Hex> isHexDiscovered) {
+        if (fogColor == null) {
+            return;
+        }
+        paintFog(g2d, (Paint) fogColor, isHexDiscovered);
+    }
+
+    public void paintFog(Graphics2D g2d, Paint fogPaint, Predicate<Hex> isHexDiscovered) {
+        if (g2d == null || fogPaint == null || isHexDiscovered == null) {
+            return;
+        }
+        Rectangle clip = g2d.getClipBounds();
+        Path2D.Double fogShape = new Path2D.Double();
+        boolean hasAny = false;
+        for (Face face : faces) {
+            if (face == null || face.hex == null) {
+                continue;
+            }
+            if (isHexDiscovered.test(face.hex)) {
+                continue;
+            }
+            if (clip != null && !face.intersects(clip)) {
+                continue;
+            }
+            appendFacePath(fogShape, face);
+            hasAny = true;
+        }
+        if (!hasAny) {
+            return;
+        }
+        Paint oldPaint = g2d.getPaint();
+        g2d.setPaint(fogPaint);
+        g2d.fill(fogShape);
+        g2d.setPaint(oldPaint);
+    }
+
+    private static void appendFacePath(Path2D.Double path, Face face) {
+        if (face == null || face.corners == null || face.corners.length < 6) {
+            return;
+        }
+        path.moveTo(face.corners[0].x, face.corners[0].y);
+        for (int i = 1; i < 6; i++) {
+            path.lineTo(face.corners[i].x, face.corners[i].y);
+        }
+        path.closePath();
+    }
+
     public void paintDividers(Graphics2D g2d, boolean dynastyBorderMode, Function<Face, Color> plainEdgeColor, Color dynastyFallback) {
+        paintDividers(g2d, dynastyBorderMode, plainEdgeColor, dynastyFallback, null);
+    }
+
+    public void paintDividers(Graphics2D g2d, boolean dynastyBorderMode, Function<Face, Color> plainEdgeColor, Color dynastyFallback, Predicate<Face> faceVisible) {
         Objects.requireNonNull(g2d, "g2d");
         Objects.requireNonNull(plainEdgeColor, "plainEdgeColor");
         float dividerStroke = (float) Math.max(1.0, Math.min(2.0, layoutSize * 0.08));
@@ -354,6 +408,10 @@ public final class HexGridMesh {
         Rectangle clip = g2d.getClipBounds();
         for (Edge edge : edges) {
             if (clip != null && !edgeIntersects(edge, clip)) {
+                continue;
+            }
+            if (faceVisible != null && edge.faceA != null && edge.faceB != null
+                    && !faceVisible.test(edge.faceA) && !faceVisible.test(edge.faceB)) {
                 continue;
             }
             Color color = null;
@@ -376,21 +434,32 @@ public final class HexGridMesh {
             g2d.draw(edgeLine);
         }
 
-        if (dividerStroke >= 1.5f) {
-            double nodeRadius = dividerStroke * 0.5;
-            Ellipse2D.Double nodeEllipse = new Ellipse2D.Double();
-            for (Vertex vertex : vertices) {
-                if (clip != null && !clip.intersects(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0)) {
-                    continue;
-                }
-                Color nodeColor = nodeColor(vertex, dynastyBorderMode, plainEdgeColor, dynastyFallback);
-                if (nodeColor == null) {
-                    continue;
-                }
-                g2d.setColor(nodeColor);
-                nodeEllipse.setFrame(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0);
-                g2d.fill(nodeEllipse);
+        double nodeRadius = Math.max(1.0, dividerStroke * 0.55);
+        Ellipse2D.Double nodeEllipse = new Ellipse2D.Double();
+        for (Vertex vertex : vertices) {
+            if (clip != null && !clip.intersects(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0)) {
+                continue;
             }
+            if (faceVisible != null) {
+                boolean anyVisible = false;
+                for (Edge edge : vertex.edges) {
+                    if ((edge.faceA != null && faceVisible.test(edge.faceA))
+                            || (edge.faceB != null && faceVisible.test(edge.faceB))) {
+                        anyVisible = true;
+                        break;
+                    }
+                }
+                if (!anyVisible) {
+                    continue;
+                }
+            }
+            Color nodeColor = nodeColor(vertex, dynastyBorderMode, plainEdgeColor, dynastyFallback);
+            if (nodeColor == null) {
+                continue;
+            }
+            g2d.setColor(nodeColor);
+            nodeEllipse.setFrame(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0);
+            g2d.fill(nodeEllipse);
         }
     }
 
@@ -451,10 +520,14 @@ public final class HexGridMesh {
     }
 
     public void paintRivers(Graphics2D g2d) {
-        paintRivers(g2d, 1.0f);
+        paintRivers(g2d, 1.0f, null);
     }
 
     public void paintRivers(Graphics2D g2d, float strokeMultiplier) {
+        paintRivers(g2d, strokeMultiplier, null);
+    }
+
+    public void paintRivers(Graphics2D g2d, float strokeMultiplier, Predicate<Edge> edgeFilter) {
         Objects.requireNonNull(g2d, "g2d");
         Object previousAa = g2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -468,6 +541,9 @@ public final class HexGridMesh {
             g2d.setColor(new Color(0, 180, 240, 230));
             for (Edge edge : riverEdges) {
                 if (clip != null && !edgeIntersects(edge, clip)) {
+                    continue;
+                }
+                if (edgeFilter != null && !edgeFilter.test(edge)) {
                     continue;
                 }
                 line.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
@@ -484,6 +560,9 @@ public final class HexGridMesh {
                 if (clip != null && !edgeIntersects(edge, clip)) {
                     continue;
                 }
+                if (edgeFilter != null && !edgeFilter.test(edge)) {
+                    continue;
+                }
                 line.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
                 g2d.draw(line);
             }
@@ -493,6 +572,9 @@ public final class HexGridMesh {
             g2d.setColor(new Color(0, 225, 255, 255));
             for (Edge edge : riverEdges) {
                 if (clip != null && !edgeIntersects(edge, clip)) {
+                    continue;
+                }
+                if (edgeFilter != null && !edgeFilter.test(edge)) {
                     continue;
                 }
                 line.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);

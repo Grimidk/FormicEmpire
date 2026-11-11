@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.dynasty;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -125,6 +126,8 @@ public class Dynasty {
     private int integrationTargetDynastyId;
     private double integrationProgressDays;
     private boolean integrationDiplomatsManual;
+    private final Set<Long> knownHexKeys = Collections.synchronizedSet(new HashSet<>());
+    private int exploredHexCount = 0;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -539,6 +542,11 @@ public class Dynasty {
         } else {
             seedAnnouncedRanksThrough(GameConstants.getColonyRankByKey(savedDynasty.rankName));
         }
+
+        if (savedDynasty.knownHexKeys != null) {
+            this.knownHexKeys.addAll(savedDynasty.knownHexKeys);
+        }
+        this.exploredHexCount = savedDynasty.exploredHexCount;
         
         initializeColor();
         initializeServices();
@@ -2410,5 +2418,125 @@ public class Dynasty {
 
     public double getAverageAntAge() {
         return statService != null ? statService.getAverageAntAge(this) : 0.0;
+    }
+
+    public boolean isHexKnown(Hex hex) {
+        if (hex == null) return false;
+        return isHexKnown(hex.getQ(), hex.getR());
+    }
+
+    public boolean isHexKnown(int q, int r) {
+        return knownHexKeys.contains(GameNumbers.packHexKey(q, r));
+    }
+
+    public void discoverHex(Hex hex) {
+        if (hex == null) return;
+        discoverHex(hex.getQ(), hex.getR());
+    }
+
+    public void discoverHex(int q, int r) {
+        knownHexKeys.add(GameNumbers.packHexKey(q, r));
+    }
+
+    public void discoverHexAndAdjacent(Hex hex) {
+        if (hex == null) return;
+        discoverHex(hex);
+        boolean hasPointerNeighbors = false;
+        for (Hex n : hex.getAdjacentNeighbors()) {
+            if (n != null) {
+                discoverHex(n);
+                hasPointerNeighbors = true;
+            }
+        }
+        if (!hasPointerNeighbors) {
+            int[][] offsets = {{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}};
+            for (int[] off : offsets) {
+                discoverHex(hex.getQ() + off[0], hex.getR() + off[1]);
+            }
+        }
+    }
+
+    public Set<Long> getKnownHexKeys() {
+        synchronized (knownHexKeys) {
+            return new HashSet<>(knownHexKeys);
+        }
+    }
+
+    public void setKnownHexKeys(Collection<Long> keys) {
+        synchronized (knownHexKeys) {
+            knownHexKeys.clear();
+            if (keys != null) {
+                knownHexKeys.addAll(keys);
+            }
+        }
+    }
+
+    public int getKnownHexCount() {
+        return knownHexKeys.size();
+    }
+
+    public int getExploredHexCount() {
+        return exploredHexCount;
+    }
+
+    public void setExploredHexCount(int exploredHexCount) {
+        this.exploredHexCount = exploredHexCount;
+    }
+
+    public void incrementExploredHexCount() {
+        this.exploredHexCount++;
+    }
+
+    public void discoverHexKeys(Collection<Long> keys) {
+        if (keys == null || keys.isEmpty()) return;
+        synchronized (knownHexKeys) {
+            knownHexKeys.addAll(keys);
+        }
+    }
+
+    public int learnHexesFrom(Dynasty other) {
+        if (other == null || other == this) return 0;
+        Set<Long> otherKeys = other.getKnownHexKeys();
+        int added = 0;
+        synchronized (knownHexKeys) {
+            for (Long key : otherKeys) {
+                if (key != null && knownHexKeys.add(key)) {
+                    added++;
+                }
+            }
+        }
+        return added;
+    }
+
+    public void initKnownHexes(World world) {
+        if (world == null) return;
+        List<Colony> colonyList = getColonies();
+        if (colonyList == null) return;
+        for (Colony c : colonyList) {
+            if (c == null) continue;
+            Hex h = world.getHexOfColony(c);
+            if (h != null) {
+                discoverHexAndAdjacent(h);
+            }
+        }
+    }
+
+    public boolean hasDiscoveredDynasty(Dynasty other, World world) {
+        if (other == null) return false;
+        if (other == this) return true;
+        if (isAtWarWith(other.getId())) return true;
+        if (world == null) return true;
+        List<Colony> otherColonies = other.getColonies();
+        if (otherColonies == null || otherColonies.isEmpty()) {
+            return false;
+        }
+        for (Colony c : otherColonies) {
+            if (c == null) continue;
+            Hex h = world.getHexOfColony(c);
+            if (h != null && isHexKnown(h)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

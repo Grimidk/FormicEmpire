@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
@@ -251,11 +252,15 @@ public final class ColonyInvasionService {
         if (scope == InvasionAlert.Scope.DYNASTY && !colony.isCapital()) {
             return;
         }
+        List<Species> invasionSpecies = GameConstants.getCritterSpeciesByBugRole(BugRole.INVASION);
+        Species chosen = (invasionSpecies != null && !invasionSpecies.isEmpty())
+                ? invasionSpecies.get(GameRandom.nextInt(invasionSpecies.size()))
+                : GameConstants.TYPE_ANT_LION;
         int targetColonyId = colony.getId();
         int deadline = InvasionAlert.toAbsoluteHour(worldDay, worldHour) + GameNumbers.INVASION_RESPONSE_HOURS;
         InvasionAlert alert = new InvasionAlert(
                 colony.nextInvasionAlertId(),
-                GameConstants.TYPE_ANT_LION.getId(),
+                chosen.getId(),
                 scope,
                 targetColonyId,
                 deadline);
@@ -265,7 +270,7 @@ public final class ColonyInvasionService {
                 : LanguageStrings.get(LanguageStrings.INVASION_SCOPE_COLONY);
         colony.logEvent(ColonyLogPrefixes.INVASION + " "
                 + LanguageStrings.format(LanguageStrings.LOG_INVASION_ALERT_FMT,
-                        GameConstants.TYPE_ANT_LION.getName(),
+                        chosen.getName(),
                         scopeLabel,
                         GameNumbers.INVASION_RESPONSE_HOURS));
     }

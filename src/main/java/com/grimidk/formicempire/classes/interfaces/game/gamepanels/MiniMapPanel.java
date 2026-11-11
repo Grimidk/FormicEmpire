@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -35,6 +36,8 @@ public class MiniMapPanel extends ZeroGamePanel {
     private BufferedImage cachedBakedBaseImage;
     private int cachedBakedW = -1;
     private int cachedBakedH = -1;
+    private int cachedBakedKnownCount = -1;
+    private boolean cachedBakedCheatReveal = false;
     private double cachedHexRadius;
     private double cachedOriginX;
     private double cachedOriginY;
@@ -116,6 +119,7 @@ public class MiniMapPanel extends ZeroGamePanel {
         cachedBakedBaseImage = null;
         cachedBakedW = -1;
         cachedBakedH = -1;
+        cachedBakedKnownCount = -1;
     }
 
     @Override
@@ -154,8 +158,12 @@ public class MiniMapPanel extends ZeroGamePanel {
 
         int panelW = getWidth();
         int panelH = getHeight();
+        Dynasty playerDynasty = world.findPlayerDynasty();
+        int knownCount = playerDynasty != null ? playerDynasty.getKnownHexCount() : 0;
+        boolean cheatReveal = engine != null && engine.isCheatRevealMap();
 
-        if (cachedBakedBaseImage == null || cachedBakedW != panelW || cachedBakedH != panelH) {
+        if (cachedBakedBaseImage == null || cachedBakedW != panelW || cachedBakedH != panelH
+                || cachedBakedKnownCount != knownCount || cachedBakedCheatReveal != cheatReveal) {
             double hexRadius;
             double originX;
             double originY;
@@ -235,7 +243,7 @@ public class MiniMapPanel extends ZeroGamePanel {
                     }
                 } else {
                     Hex active = world.getActiveHex();
-                    if (active != null) {
+                    if (active != null && isHexDiscovered(active)) {
                         int r = active.getR();
                         int col = active.getQ() + (r >> 1);
                         double hx = originX + col * Math.sqrt(3.0) * hexRadius + ((r & 1) != 0 ? (Math.sqrt(3.0) / 2.0) * hexRadius : 0.0);
@@ -301,13 +309,15 @@ public class MiniMapPanel extends ZeroGamePanel {
                     originY,
                     hexRadius,
                     (q, r) -> hexLookup.get(packKey(q, r)));
-            mesh.paintFills(bg2d, face -> getBiomeColor(face.hex.getBiome()));
+            mesh.paintFills(bg2d, face -> isHexDiscovered(face.hex) ? getBiomeColor(face.hex.getBiome()) : null);
+            mesh.paintFog(bg2d, AssetStyles.getFogTexturePaint(), this::isHexDiscovered);
             mesh.paintDividers(
                     bg2d,
                     false,
                     face -> getBiomeColor(face.hex.getBiome()),
-                    AssetStyles.BORDER_COLOR);
-            mesh.paintRivers(bg2d);
+                    AssetStyles.BORDER_COLOR,
+                    face -> isHexDiscovered(face.hex));
+            mesh.paintRivers(bg2d, 1.0f, edge -> isHexDiscovered(edge.faceA != null ? edge.faceA.hex : null) || isHexDiscovered(edge.faceB != null ? edge.faceB.hex : null));
         } finally {
             bg2d.dispose();
         }
@@ -315,6 +325,9 @@ public class MiniMapPanel extends ZeroGamePanel {
         cachedBakedBaseImage = baked;
         cachedBakedW = panelW;
         cachedBakedH = panelH;
+        Dynasty player = world.findPlayerDynasty();
+        cachedBakedKnownCount = player != null ? player.getKnownHexCount() : 0;
+        cachedBakedCheatReveal = engine != null && engine.isCheatRevealMap();
         cachedOriginX = originX;
         cachedOriginY = originY;
         cachedHexRadius = hexRadius;
@@ -340,6 +353,16 @@ public class MiniMapPanel extends ZeroGamePanel {
         Color faded = AssetStyles.fadeTowardBackground(mapColor, fade);
         biomeColorCache.put(biome.getId(), faded);
         return faded;
+    }
+
+    private boolean isHexDiscovered(Hex hex) {
+        if (hex == null) return false;
+        if (engine != null && engine.isCheatRevealMap()) return true;
+        World world = getWorld();
+        if (world == null) return true;
+        Dynasty playerDynasty = world.findPlayerDynasty();
+        if (playerDynasty == null) return true;
+        return playerDynasty.isHexKnown(hex);
     }
 
     private static double axialX(int q, int r) {
