@@ -2859,6 +2859,8 @@ MAP_LAYER_LABEL_LAKES,Lake basins,Cuencas de lagos,Bacias de lagos,Bassins lacus
 MAP_LAYER_LABEL_RIVERS,River names,Nombres de ríos,Nomes de rios,Noms de rivières
 MAP_LAYER_LABEL_PENINSULAS,Peninsulas,Penínsulas,Penínsulas,Péninsules
 MAP_LAYER_ALL,All layers,Todas las capas,Todas as camadas,Tous les calques
+MAP_LAYER_DAY_NIGHT,Daylight cycle,Ciclo de luz diurna,Ciclo de luz diurna,Cycle de lumière du jour
+MAP_LAYER_WEATHER,Weather systems,Sistemas climáticos,Sistemas climáticos,Systèmes météorologiques
 SAVE_SPECTATOR_MODE,Spectator Mode,Modo Espectador,Modo Espectador,Mode Spectateur
 UI_SPEED_HYPER_TURBO,Hyper Turbo,Híper Turbo,Hiper Turbo,Hyper Turbo
 MAP_WORLD_LOGS_TITLE_FMT,World logs (%s),Registros del mundo (%s),Registos do mundo (%s),Journaux du monde (%s)

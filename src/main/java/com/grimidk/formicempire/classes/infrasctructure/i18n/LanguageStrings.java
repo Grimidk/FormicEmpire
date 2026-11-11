@@ -1118,6 +1118,8 @@ public final class LanguageStrings {
     public static final String MAP_LAYER_LABEL_RIVERS = "MAP_LAYER_LABEL_RIVERS";
     public static final String MAP_LAYER_LABEL_PENINSULAS = "MAP_LAYER_LABEL_PENINSULAS";
     public static final String MAP_LAYER_ALL = "MAP_LAYER_ALL";
+    public static final String MAP_LAYER_DAY_NIGHT = "MAP_LAYER_DAY_NIGHT";
+    public static final String MAP_LAYER_WEATHER = "MAP_LAYER_WEATHER";
     public static final String MAP_CONQUER_COLONY = "MAP_CONQUER_COLONY";
     public static final String MAP_CONQUER_COLONY_TT = "MAP_CONQUER_COLONY_TT";
     public static final String MAP_CONQUER_COLONY_SELECT_TT = "MAP_CONQUER_COLONY_SELECT_TT";

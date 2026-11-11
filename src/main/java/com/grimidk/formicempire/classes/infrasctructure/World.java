@@ -59,6 +59,7 @@ import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldWeatherService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -5993,6 +5994,7 @@ public class World {
         generateRectangularWorld(biome, colony, baseName, playerTitleKey);
         System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
         changeActiveHex(getSpawnHex()); 
+        WorldWeatherService.applyCoherentWeatherPatches(this);
         updateEnvironmentalConditions();
     }
 
@@ -6313,6 +6315,18 @@ public class World {
         relocalizeDynastyNames();
         ensureDynastiesKnownHexesInitialized();
         changeActiveHex(getSpawnHex());
+        boolean hasPrecipitation = false;
+        if (hexes != null) {
+            for (Hex h : hexes) {
+                if (h != null && WorldWeatherService.isPrecipitation(h.getLocalWeather())) {
+                    hasPrecipitation = true;
+                    break;
+                }
+            }
+        }
+        if (!hasPrecipitation) {
+            WorldWeatherService.applyCoherentWeatherPatches(this);
+        }
         updateEnvironmentalConditions();
     }
 
@@ -6445,21 +6459,7 @@ public class World {
             }
         }
         
-        for (Hex h : colonizedHexesForTicks()) {
-            maybeRandomizeHexWeather(h);
-            maybeRandomizeHexWeather(h.getNorth());
-            maybeRandomizeHexWeather(h.getNorthEast());
-            maybeRandomizeHexWeather(h.getSouthEast());
-            maybeRandomizeHexWeather(h.getSouth());
-            maybeRandomizeHexWeather(h.getSouthWest());
-            maybeRandomizeHexWeather(h.getNorthWest());
-        }
-    }
-
-    private void maybeRandomizeHexWeather(Hex hex) {
-        if (hex != null && GameRandom.nextInt(100) < 5) {
-            hex.setLocalWeather(getRandomWeather(hex.getBiome()));
-        }
+        WorldWeatherService.applyCoherentWeatherPatches(this);
     }
 
     public void runMinute() {
@@ -6513,6 +6513,7 @@ public class World {
             }
 
             updateEnvironmentalConditions();
+            WorldWeatherService.tickWeatherDrift(this);
 
             if (engine != null) {
                 engine.notifyHourListeners();

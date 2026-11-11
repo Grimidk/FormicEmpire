@@ -109,6 +109,8 @@ public class Engine extends Thread {
     private boolean mapLayerLabelLakes = true;
     private boolean mapLayerLabelRivers = true;
     private boolean mapLayerLabelPeninsulas = true;
+    private boolean mapLayerDayNight = true;
+    private boolean mapLayerWeather = true;
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
@@ -1005,6 +1007,22 @@ public class Engine extends Thread {
 
     public void setMapLayerLabelPeninsulas(boolean mapLayerLabelPeninsulas) {
         this.mapLayerLabelPeninsulas = mapLayerLabelPeninsulas;
+    }
+
+    public boolean isMapLayerDayNight() {
+        return mapLayerDayNight;
+    }
+
+    public void setMapLayerDayNight(boolean mapLayerDayNight) {
+        this.mapLayerDayNight = mapLayerDayNight;
+    }
+
+    public boolean isMapLayerWeather() {
+        return mapLayerWeather;
+    }
+
+    public void setMapLayerWeather(boolean mapLayerWeather) {
+        this.mapLayerWeather = mapLayerWeather;
     }
 
     public static List<AntRole> antRolesForAntClass(AntClass type) {

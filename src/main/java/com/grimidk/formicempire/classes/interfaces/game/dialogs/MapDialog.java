@@ -89,6 +89,8 @@ public class MapDialog extends ZeroDialog {
     private boolean showColonyRanks = true;
     private boolean showTrades = true;
     private boolean showTunnels = true;
+    private boolean showDayNight = true;
+    private boolean showWeather = true;
     public enum MapMode {
         BIOME, HEIGHT, TECTONIC_PLATES
     }
@@ -735,6 +737,8 @@ public class MapDialog extends ZeroDialog {
         showLabelLakes = eng.isMapLayerLabelLakes();
         showLabelRivers = eng.isMapLayerLabelRivers();
         showLabelPeninsulas = eng.isMapLayerLabelPeninsulas();
+        showDayNight = eng.isMapLayerDayNight();
+        showWeather = eng.isMapLayerWeather();
     }
 
     private void persistLayerSettings() {
@@ -763,6 +767,8 @@ public class MapDialog extends ZeroDialog {
         eng.setMapLayerLabelLakes(showLabelLakes);
         eng.setMapLayerLabelRivers(showLabelRivers);
         eng.setMapLayerLabelPeninsulas(showLabelPeninsulas);
+        eng.setMapLayerDayNight(showDayNight);
+        eng.setMapLayerWeather(showWeather);
         eng.saveGlobalSettings();
     }
 
@@ -826,7 +832,9 @@ public class MapDialog extends ZeroDialog {
                 new LayerItemEntry(Layer.MERIDIAN, LanguageStrings.get(LanguageStrings.MAP_LAYER_MERIDIAN), showMeridian),
                 new LayerItemEntry(Layer.EQUATOR, LanguageStrings.get(LanguageStrings.MAP_LAYER_EQUATOR), showEquator),
                 new LayerItemEntry(Layer.RIVERS, LanguageStrings.get(LanguageStrings.MAP_LAYER_RIVERS), showRivers),
-                new LayerItemEntry(Layer.BIOME_ICONS, LanguageStrings.get(LanguageStrings.MAP_LAYER_BIOME_ICONS), showBiomeIcons)
+                new LayerItemEntry(Layer.BIOME_ICONS, LanguageStrings.get(LanguageStrings.MAP_LAYER_BIOME_ICONS), showBiomeIcons),
+                new LayerItemEntry(Layer.DAY_NIGHT, LanguageStrings.get(LanguageStrings.MAP_LAYER_DAY_NIGHT), showDayNight),
+                new LayerItemEntry(Layer.WEATHER, LanguageStrings.get(LanguageStrings.MAP_LAYER_WEATHER), showWeather)
         );
 
         List<LayerItemEntry> labelItems = List.of(
@@ -1071,7 +1079,8 @@ public class MapDialog extends ZeroDialog {
     private enum Layer {
         BORDERS, RIVERS, MERIDIAN, EQUATOR, BIOME_ICONS, COLONY_RANKS, TRADES, TUNNELS, BATTLES, GEOGRAPHIC_NAMES,
         CAPITALS, LABEL_CONTINENTS, LABEL_ICE_CAPS, LABEL_ARCHIPELAGOS, LABEL_OCEANS, LABEL_TRENCHES,
-        LABEL_MOUNTAINS, LABEL_VALLEYS, LABEL_LAKES, LABEL_RIVERS, LABEL_PENINSULAS
+        LABEL_MOUNTAINS, LABEL_VALLEYS, LABEL_LAKES, LABEL_RIVERS, LABEL_PENINSULAS,
+        DAY_NIGHT, WEATHER
     }
 
     private boolean isOverlayLayer(Layer layer) {
@@ -1081,7 +1090,8 @@ public class MapDialog extends ZeroDialog {
                 || layer == Layer.LABEL_OCEANS || layer == Layer.LABEL_TRENCHES
                 || layer == Layer.LABEL_MOUNTAINS || layer == Layer.LABEL_VALLEYS
                 || layer == Layer.LABEL_LAKES || layer == Layer.LABEL_RIVERS
-                || layer == Layer.LABEL_PENINSULAS;
+                || layer == Layer.LABEL_PENINSULAS || layer == Layer.DAY_NIGHT
+                || layer == Layer.WEATHER;
     }
 
     private void applyLayerState(Layer layer, boolean visible) {
@@ -1096,6 +1106,8 @@ public class MapDialog extends ZeroDialog {
             case TRADES -> showTrades = visible;
             case TUNNELS -> showTunnels = visible;
             case BATTLES -> showBattles = visible;
+            case DAY_NIGHT -> showDayNight = visible;
+            case WEATHER -> showWeather = visible;
             case GEOGRAPHIC_NAMES -> {
                 showGeographicNames = visible;
                 showLabelContinents = visible;
@@ -3113,6 +3125,14 @@ public class MapDialog extends ZeroDialog {
                 }
                 if (showBattles) {
                     HexMapOverlays.paintBattles(sg, world, mesh, this::isHexDiscovered);
+                }
+                Engine mapEng = resolveEngine();
+                if (showDayNight) {
+                    HexMapOverlays.paintDayNightFilter(sg, world, mesh, this::isHexDiscovered);
+                }
+                if (showWeather) {
+                    boolean isPaused = mapEng != null && mapEng.isPaused();
+                    HexMapOverlays.paintWeatherClouds(sg, world, mesh, this::isHexDiscovered, isPaused);
                 }
                 if (activeHex != null && isHexDiscovered(activeHex)) {
                     HexGridMesh.Face activeFace = mesh.faceAt(activeHex.getQ(), activeHex.getR());

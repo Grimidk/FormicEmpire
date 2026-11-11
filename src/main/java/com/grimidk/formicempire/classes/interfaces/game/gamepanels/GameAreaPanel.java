@@ -28,6 +28,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.CoastalTideRenderer;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.ColonySpriteMergeLod;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.OverworldAtmosphereRenderer;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
@@ -660,6 +661,9 @@ public class GameAreaPanel extends ZeroGamePanel {
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         }
+
+        boolean isPaused = engine.isPaused();
+        OverworldAtmosphereRenderer.render(g2d, getWidth(), getHeight(), world, world.getActiveHex(), dayOn, weatherOn, isPaused);
     }
     
     private void drawOverworldStructure(Graphics2D g2d) {
