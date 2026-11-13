@@ -89,6 +89,15 @@ public class ColonySourceService {
         }
     }
 
+    public void clearAllSources(Colony colony) {
+        this.discoveredSources.clear();
+        invalidateCache();
+        if (colony != null) {
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                    + LanguageStrings.get(LanguageStrings.LOG_SOURCES_LOST_DISASTER));
+        }
+    }
+
     private void invalidateCache() {
         synchronized (rankedSourcesCache) {
             rankedSourcesCache.clear();

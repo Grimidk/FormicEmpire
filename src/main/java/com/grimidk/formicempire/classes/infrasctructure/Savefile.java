@@ -365,6 +365,8 @@ public class Savefile implements Serializable {
         public int hydrology;
         public boolean island;
         public int plateId;
+        public int disasterTypeId;
+        public int disasterAgeHours;
 
         public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
             this.q = q;

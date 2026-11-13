@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;
@@ -1516,6 +1517,35 @@ public class HelpPanel extends JPanel {
         worldInfoPanel.add(createHumidityListPanel(LanguageStrings.get("HELP_HUMID"), GameConstants.getHumidity()));
 
         panel.add(worldInfoPanel);
+
+        JPanel disastersPanel = new JPanel(new BorderLayout(8, 8));
+        disastersPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        disastersPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(LanguageStrings.HELP_DISASTERS_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+
+        JLabel disastersSummary = new JLabel(helpHtml("width:650px;",
+                LanguageStrings.get(LanguageStrings.HELP_DISASTERS_BODY)));
+        disastersSummary.setFont(AssetStyles.FONT_SMALL);
+        disastersSummary.setForeground(AssetStyles.FONT_COLOR);
+        disastersSummary.setBorder(new EmptyBorder(4, 6, 8, 6));
+        disastersPanel.add(disastersSummary, BorderLayout.NORTH);
+
+        JPanel disastersGrid = new JPanel(new GridLayout(0, 2, 10, 8));
+        disastersGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (DisasterType d : GameConstants.getDisasterTypes()) {
+            String dInfo = helpHtml("width:240px;",
+                    "<b>" + d.getName() + "</b><br>" + d.getDescription());
+            ImageIcon dIcon = d.getIcon() != GameConstants.ICON_UNKNOWN ? d.getIcon() : null;
+            JLabel dLabel = new JLabel(dInfo, dIcon, SwingConstants.LEFT);
+            dLabel.setFont(AssetStyles.FONT_SMALL);
+            dLabel.setForeground(AssetStyles.FONT_COLOR);
+            disastersGrid.add(dLabel);
+        }
+        disastersPanel.add(disastersGrid, BorderLayout.CENTER);
+        panel.add(disastersPanel);
         
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);

@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.entities.world;
 
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -29,6 +30,8 @@ public class Hex {
     private int elevation = 3;
     private int hydrology = 0;
     private int plateId = 0;
+    private DisasterType disasterType;
+    private int disasterAgeHours = 0;
 
     private int nonWaterResourceSourcesGenerated;
 
@@ -256,5 +259,37 @@ public class Hex {
 
     public void setHydrology(int hydrology) {
         this.hydrology = hydrology;
+    }
+
+    public DisasterType getDisasterType() {
+        return disasterType;
+    }
+
+    public void setDisasterType(DisasterType disasterType) {
+        this.disasterType = disasterType;
+    }
+
+    public int getDisasterAgeHours() {
+        return disasterAgeHours;
+    }
+
+    public void setDisasterAgeHours(int disasterAgeHours) {
+        this.disasterAgeHours = Math.max(0, disasterAgeHours);
+    }
+
+    public void recordDisaster(DisasterType type) {
+        this.disasterType = type;
+        this.disasterAgeHours = 0;
+    }
+
+    public void tickDisasterHour() {
+        if (disasterType == null) {
+            return;
+        }
+        disasterAgeHours++;
+        if (disasterAgeHours >= GameNumbers.DISASTER_HEX_ICON_DURATION_HOURS) {
+            disasterType = null;
+            disasterAgeHours = 0;
+        }
     }
 }

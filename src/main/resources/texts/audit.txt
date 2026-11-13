@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 95% (82/86 checked)
+Completion: 92% (82/89 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -41,6 +41,7 @@ Sandbox:
 [X] Turbo speed, show mechanics audit
 [X] Show FPS counter (top-right overlay)
 [X] ★ Free abilities, infinite research, instant buildings, assimilate all, easy conquering, instant integration (each taints achievements when used)
+[X] ★ Random disaster cheat button sandbox option & spectator mode trigger
 [X] Save & Apply with new ★ options — Yes taints save; No clears ★ then applies
 [X] Reset tab to defaults
 [X] Save & Apply persists to settings.json and applies live
@@ -161,6 +162,7 @@ Sandbox:
 [X] Mouse wheel zoom + pan when zoomed; trade route layer animation on map
 [X] Fog of war layer on map and minimap (baked together), undiscovered hex mask, scout wandering discovery, cheat fog toggle
 [X] Ocean exploration limits — coastal waters only for standard scouts, open ocean reachable by Explorer princesses
+[X] Day/night filter, weather cloud layer, disaster icons & tooltips on map; disaster overlay art and burnt/ice biome refresh in game area
 
 ================================================================================
 20. STATISTICS (X)
@@ -191,6 +193,7 @@ Sandbox:
 [X] AI dynasties — research/build priority, personality war/trade bias
 [X] War — military power, hex vs border rules, redeploy/heal, Shielding, battle lines, honeypot/doorhead role gates, stat multipliers
 [ ] Troop-Carrier reserve promotions; concurrent-war ant splitting; daily reserve promotion caps
+[X] Natural disasters (earthquake fault rooms/tunnels, tsunami, tornado, meteor, volcano, wildfire, glacial collapse/freeze); idle-ant immunity; global eclipses; disaster history & alerts
 
 ================================================================================
 24. EDGE CASES & LIFECYCLE

@@ -13,10 +13,11 @@ public final class DeathCause {
     public static final String CONFLICT = "death_conflict";
     public static final String ILLNESS = "death_illness";
     public static final String LACK_OF_CARE = "death_lack_of_care";
+    public static final String DISASTER = "death_disaster";
     public static final String OTHER = "death_other";
 
     private static final Set<String> KNOWN = Set.of(
-            OLD_AGE, STARVATION, DEHYDRATION, CONTAMINATION, CONFLICT, ILLNESS, LACK_OF_CARE, OTHER);
+            OLD_AGE, STARVATION, DEHYDRATION, CONTAMINATION, CONFLICT, ILLNESS, LACK_OF_CARE, DISASTER, OTHER);
 
     private static final Map<String, String> LEGACY = Map.ofEntries(
             Map.entry("Old Age", OLD_AGE),
@@ -26,6 +27,7 @@ public final class DeathCause {
             Map.entry("Conflict", CONFLICT),
             Map.entry("Illness", ILLNESS),
             Map.entry("Lack of Care", LACK_OF_CARE),
+            Map.entry("Disaster", DISASTER),
             Map.entry("Other", OTHER),
             Map.entry("Combat", CONFLICT),
             Map.entry("Unknown", OTHER));

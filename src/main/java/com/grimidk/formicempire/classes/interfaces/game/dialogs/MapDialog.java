@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.world.Hex;
@@ -77,6 +78,7 @@ public class MapDialog extends ZeroDialog {
     private final JButton modesButton;
     private final JButton conquerButton;
     private final JButton fogCheatButton;
+    private final JButton disasterCheatButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
@@ -303,6 +305,12 @@ public class MapDialog extends ZeroDialog {
         AssetStyles.styleButton(conquerButton);
         conquerButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_TT));
         conquerButton.addActionListener(e -> conquerActiveHex());
+
+        disasterCheatButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_DISASTER_CHEAT));
+        disasterCheatButton.setFocusable(false);
+        AssetStyles.styleButton(disasterCheatButton);
+        disasterCheatButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_DISASTER_CHEAT_TT));
+        disasterCheatButton.addActionListener(e -> triggerRandomDisasterCheat());
         updateConquerButton();
 
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
@@ -319,6 +327,7 @@ public class MapDialog extends ZeroDialog {
         bottomPanel.add(playPauseButton);
         bottomPanel.add(homeButton);
         bottomPanel.add(conquerButton);
+        bottomPanel.add(disasterCheatButton);
         bottomPanel.add(closeButton);
 
         add(legendPanel, BorderLayout.WEST);
@@ -1072,6 +1081,10 @@ public class MapDialog extends ZeroDialog {
         return showCapitals;
     }
 
+    JButton getDisasterCheatButton() {
+        return disasterCheatButton;
+    }
+
     public void setShowCapitals(boolean showCapitals) {
         setLayerVisible(Layer.CAPITALS, showCapitals);
     }
@@ -1209,6 +1222,16 @@ public class MapDialog extends ZeroDialog {
             }
         }
 
+        if (disasterCheatButton != null) {
+            boolean cheatDisaster = eng != null && eng.isCheatRandomDisaster();
+            disasterCheatButton.setVisible(cheatDisaster);
+            disasterCheatButton.setEnabled(cheatDisaster);
+            if (cheatDisaster) {
+                disasterCheatButton.setText(LanguageStrings.get(LanguageStrings.MAP_DISASTER_CHEAT));
+                disasterCheatButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_DISASTER_CHEAT_TT));
+            }
+        }
+
         if (zoomRail != null) {
             zoomRail.revalidate();
             zoomRail.repaint();
@@ -1237,6 +1260,30 @@ public class MapDialog extends ZeroDialog {
         }
         if (onHexChange != null) {
             onHexChange.run();
+        }
+    }
+
+    private void triggerRandomDisasterCheat() {
+        World w = currentWorld();
+        if (w == null || w.getDisasterService() == null) {
+            return;
+        }
+        DisasterType triggered = w.getDisasterService().triggerRandomDisaster(w);
+        if (triggered != null) {
+            if (!isSpectatorMode()) {
+                w.disableAchievements();
+            }
+            if (mapPanel != null) {
+                mapPanel.invalidateBakedImage();
+                mapPanel.repaint();
+            }
+            if (legendPanel != null) {
+                legendPanel.updateLegend();
+                legendPanel.repaint();
+            }
+            if (onHexChange != null) {
+                onHexChange.run();
+            }
         }
     }
 
@@ -1456,6 +1503,9 @@ public class MapDialog extends ZeroDialog {
         modesButton.setMaximumSize(layersBtnSize);
         modesButton.setMargin(new Insets(0, 0, 0, 0));
         AssetStyles.styleButton(conquerButton);
+        if (disasterCheatButton != null) {
+            AssetStyles.styleButton(disasterCheatButton);
+        }
         if (fogCheatButton != null) {
             AssetStyles.styleCompactButton(fogCheatButton);
             fogCheatButton.setPreferredSize(layersBtnSize);
@@ -2500,6 +2550,7 @@ public class MapDialog extends ZeroDialog {
                 if (h == null) {
                     continue;
                 }
+                hash = 31 * hash + (h.getBiome() != null ? h.getBiome().getId() : 0);
                 Colony c = h.getColony();
                 if (c != null) {
                     int dynId = c.getDynasty() != null ? c.getDynasty().getId() : 0;
@@ -2782,6 +2833,13 @@ public class MapDialog extends ZeroDialog {
                         .append(LanguageStrings.get(rf.getType().getLabelKey()))
                         .append(": ")
                         .append(rf.getName());
+            }
+
+            if (hex.getDisasterType() != null) {
+                sb.append("<br>")
+                        .append(LanguageStrings.get(LanguageStrings.ALERT_DETAIL_DISASTER))
+                        .append(": ")
+                        .append(hex.getDisasterType().getName());
             }
 
             if (c != null) {
@@ -3126,6 +3184,7 @@ public class MapDialog extends ZeroDialog {
                 if (showBattles) {
                     HexMapOverlays.paintBattles(sg, world, mesh, this::isHexDiscovered);
                 }
+                HexMapOverlays.paintDisasters(sg, world, mesh, this::isHexDiscovered);
                 Engine mapEng = resolveEngine();
                 if (showDayNight) {
                     HexMapOverlays.paintDayNightFilter(sg, world, mesh, this::isHexDiscovered);
@@ -3144,6 +3203,10 @@ public class MapDialog extends ZeroDialog {
                         }
                         if (showBiomeIcons || showColonyRanks || showCapitals) {
                             drawHexIcons(sg, activeFace);
+                        }
+                        if (activeHex.getDisasterType() != null) {
+                            int disasterIconSize = Math.max(12, (int) Math.round(hexSize * 0.72));
+                            HexMapOverlays.paintDisasterBadge(sg, activeHex.getDisasterType(), activeFace.centerX, activeFace.centerY, disasterIconSize);
                         }
                         sg.setColor(AssetStyles.FONT_COLOR_ERROR);
                         sg.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));

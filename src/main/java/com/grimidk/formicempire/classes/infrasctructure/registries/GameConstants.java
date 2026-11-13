@@ -41,6 +41,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.BiomeRarity;
 import com.grimidk.formicempire.classes.constants.world.ClimateZone;
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.HydrologyLevel;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
@@ -84,6 +85,18 @@ public final class GameConstants {
             GameSpritePreloader.ensureLoaded(todo);
             iconCache.put(path, todo);
             return todo;
+        }
+        ImageIcon icon = new ImageIcon(resourceUrl);
+        GameSpritePreloader.ensureLoaded(icon);
+        iconCache.put(path, icon);
+        return icon;
+    }
+
+    private static ImageIcon loadOptionalIcon(String path) {
+        if (iconCache.containsKey(path)) return iconCache.get(path);
+        URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(path);
+        if (resourceUrl == null) {
+            return null;
         }
         ImageIcon icon = new ImageIcon(resourceUrl);
         GameSpritePreloader.ensureLoaded(icon);
@@ -365,6 +378,7 @@ public final class GameConstants {
     private static final List<MoonPhase> moonPhases = new ArrayList<>();
     private static final List<Season> seasons = new ArrayList<>();
     private static final List<Weather> weathers = new ArrayList<>();
+    private static final List<DisasterType> disasterTypes = new ArrayList<>();
     private static final List<AntStatus> antStatuses = new ArrayList<>();
     private static final List<MoveStatus> moveStatuses = new ArrayList<>();
     private static final List<CritterClass> critterClasses = new ArrayList<>();
@@ -582,6 +596,10 @@ public final class GameConstants {
         "#090f1a", loadIcon("icons/biomes/Abyss.png"), loadIcon("backgrounds/biomes/AbyssTile.png"),
         BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.AQUATIC, false, 0, 0);
     static { biomes.add(BIOME_ABYSS); }
+    public static final Biome BIOME_BARREN = new Biome(24, LanguageStrings.BIOME_BARREN, 32, 0, 0.02f, 0.02f, 0.25f, 0f, 0.04f, 4,
+        "#736253", loadIcon("icons/biomes/Barren.png"), loadIcon("backgrounds/biomes/BarrenTile.png"),
+        BiomeRarity.RARE, ClimateZone.ANY, false, HydrologyLevel.ARID, false, 2, 6);
+    static { biomes.add(BIOME_BARREN); }
 
     // --- Resources ---
     public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false,
@@ -737,6 +755,54 @@ public final class GameConstants {
     public static final Weather WEATHER_ACID_RAIN = new Weather(14, LanguageStrings.WEATHER_ACID_RAIN, 1, 0.75f, AssetStyles.OVERLAY_ACID_RAIN,
         loadIcon("icons/weather/AcidRain.png"));
     static { weathers.add(WEATHER_ACID_RAIN); }
+
+    // --- Disasters ---
+    public static final DisasterType DISASTER_EARTHQUAKE = new DisasterType(1, LanguageStrings.DISASTER_EARTHQUAKE, LanguageStrings.DISASTER_EARTHQUAKE_DESC,
+        loadIcon("icons/disasters/Earthquake.png"),
+        "/sprites/environment/DisasterEarthquake.png",
+        "/sprites/environment/DisasterEarthquake2.png");
+    static { disasterTypes.add(DISASTER_EARTHQUAKE); }
+    public static final DisasterType DISASTER_TSUNAMI = new DisasterType(2, LanguageStrings.DISASTER_TSUNAMI, LanguageStrings.DISASTER_TSUNAMI_DESC,
+        loadIcon("icons/disasters/Tsunami.png"),
+        "/sprites/environment/DisasterTsunami.png",
+        "/sprites/environment/DisasterTsunami2.png");
+    static { disasterTypes.add(DISASTER_TSUNAMI); }
+    public static final DisasterType DISASTER_TORNADO = new DisasterType(3, LanguageStrings.DISASTER_TORNADO, LanguageStrings.DISASTER_TORNADO_DESC,
+        loadIcon("icons/disasters/Tornado.png"),
+        "/sprites/environment/DisasterTornado.png",
+        "/sprites/environment/DisasterTornado2.png",
+        "/sprites/environment/DisasterTornado3.png",
+        "/sprites/environment/DisasterTornado4.png");
+    static { disasterTypes.add(DISASTER_TORNADO); }
+    public static final DisasterType DISASTER_METEOR = new DisasterType(4, LanguageStrings.DISASTER_METEOR, LanguageStrings.DISASTER_METEOR_DESC,
+        loadIcon("icons/disasters/Meteor.png"),
+        "/sprites/environment/DisasterMeteor.png",
+        "/sprites/environment/DisasterMeteorSmoke1.png",
+        "/sprites/environment/DisasterMeteorSmoke2.png");
+    static { disasterTypes.add(DISASTER_METEOR); }
+    public static final DisasterType DISASTER_VOLCANO = new DisasterType(5, LanguageStrings.DISASTER_VOLCANO, LanguageStrings.DISASTER_VOLCANO_DESC,
+        loadIcon("icons/disasters/Volcano.png"),
+        "/sprites/environment/DisasterVolcano.png",
+        "/sprites/environment/DisasterVolcanoEruption1.png",
+        "/sprites/environment/DisasterVolcanoEruption2.png");
+    static { disasterTypes.add(DISASTER_VOLCANO); }
+    public static final DisasterType DISASTER_WILDFIRE = new DisasterType(6, LanguageStrings.DISASTER_WILDFIRE, LanguageStrings.DISASTER_WILDFIRE_DESC,
+        loadIcon("icons/disasters/Wildfire.png"),
+        "/sprites/environment/DisasterWildfire.png",
+        "/sprites/environment/DisasterWildfire2.png",
+        "/sprites/environment/DisasterWildfire3.png",
+        "/sprites/environment/DisasterWildfire4.png");
+    static { disasterTypes.add(DISASTER_WILDFIRE); }
+    public static final DisasterType DISASTER_ICE_COLLAPSE = new DisasterType(7, LanguageStrings.DISASTER_ICE_COLLAPSE, LanguageStrings.DISASTER_ICE_COLLAPSE_DESC,
+        loadIcon("icons/disasters/IceCollapse.png"),
+        "/sprites/environment/DisasterIceCollapse.png",
+        "/sprites/environment/DisasterIceCollapse2.png");
+    static { disasterTypes.add(DISASTER_ICE_COLLAPSE); }
+    public static final DisasterType DISASTER_OCEAN_FREEZE = new DisasterType(8, LanguageStrings.DISASTER_OCEAN_FREEZE, LanguageStrings.DISASTER_OCEAN_FREEZE_DESC,
+        loadIcon("icons/disasters/OceanFreeze.png"),
+        "/sprites/environment/DisasterOceanFreeze.png",
+        "/sprites/environment/DisasterOceanFreeze2.png");
+    static { disasterTypes.add(DISASTER_OCEAN_FREEZE); }
 
     // --- Ant Status ---
     public static final AntStatus STATUS_ALIVE = new AntStatus(1, LanguageStrings.STATUS_ALIVE, 
@@ -2541,6 +2607,20 @@ public final class GameConstants {
     }
 
     public static List<CritterClass> getCritterClasses() { return Collections.unmodifiableList(critterClasses); }
+
+    public static List<DisasterType> getDisasterTypes() { return Collections.unmodifiableList(disasterTypes); }
+
+    public static DisasterType getDisasterTypeById(int id) {
+        if (id <= 0) {
+            return null;
+        }
+        for (DisasterType d : disasterTypes) {
+            if (d.getId() == id) {
+                return d;
+            }
+        }
+        return null;
+    }
 
     public static List<ImageIcon> getMisc() { return Collections.unmodifiableList(misc); }
 }

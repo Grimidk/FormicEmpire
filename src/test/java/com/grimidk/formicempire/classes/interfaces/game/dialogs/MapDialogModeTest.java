@@ -1,8 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -190,6 +192,41 @@ class MapDialogModeTest {
                 assertFalse(dialog.isShowCapitals());
                 dialog.setShowCapitals(true);
                 assertTrue(dialog.isShowCapitals());
+            } finally {
+                dialog.dispose();
+            }
+        });
+    }
+
+    @Test
+    void spectatorRandomDisasterCheatButtonRespectsSandboxSettingAndTriggersDisaster() throws Exception {
+        World world = new World();
+        world.setSpectatorMode(true);
+        world.generateRectangularWorld(GameConstants.BIOME_PLAINS, null, "Spectator", LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        Engine engine = new Engine();
+        engine.setWorld(world);
+        engine.setCheatRandomDisaster(false);
+
+        SwingUtilities.invokeAndWait(() -> {
+            MapDialog dialog = new MapDialog(null, engine, world, null, null);
+            try {
+                assertFalse(dialog.getDisasterCheatButton().isVisible());
+                assertFalse(dialog.getDisasterCheatButton().isEnabled());
+
+                engine.setCheatRandomDisaster(true);
+                dialog.liveUpdate();
+
+                assertTrue(dialog.getDisasterCheatButton().isVisible());
+                assertTrue(dialog.getDisasterCheatButton().isEnabled());
+
+                dialog.getDisasterCheatButton().doClick();
+
+                boolean anyHexMarked = world.getHexes().stream().anyMatch(h -> h != null && h.getDisasterType() != null);
+                boolean anyHistory = world.getHistoryService().getEvents().stream()
+                        .anyMatch(e -> e.getType() == WorldHistoryEventType.DISASTER);
+                assertTrue(anyHexMarked);
+                assertTrue(anyHistory);
             } finally {
                 dialog.dispose();
             }

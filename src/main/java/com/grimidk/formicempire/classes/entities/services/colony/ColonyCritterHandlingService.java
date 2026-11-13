@@ -301,6 +301,23 @@ public class ColonyCritterHandlingService {
         }
     }
 
+    public int killPetsOutside(Colony colony, double lossFraction) {
+        if (colony == null || lossFraction <= 0) {
+            return 0;
+        }
+        int totalKilled = 0;
+        for (Species type : getPetTypes()) {
+            int count = getCount(colony, type);
+            if (count <= 0) {
+                continue;
+            }
+            int killed = Math.min(count, Math.max(1, (int) Math.round(count * lossFraction)));
+            applyPetCountUnchecked(colony, type, count - killed);
+            totalKilled += killed;
+        }
+        return totalKilled;
+    }
+
     private void runCatching(Colony colony, Biome biome) {
         if (biome == null || biome.getNativeBugs().isEmpty()) {
             return;

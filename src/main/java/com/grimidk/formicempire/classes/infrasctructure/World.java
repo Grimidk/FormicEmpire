@@ -56,6 +56,8 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegra
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldBiomeTransformationService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldDisasterService;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryService;
@@ -141,6 +143,8 @@ public class World {
     private final DynastyNamingService namingService;
     private final WarService warService;
     private final WorldHistoryService historyService;
+    private final WorldDisasterService disasterService;
+    private final WorldBiomeTransformationService biomeTransformationService = new WorldBiomeTransformationService();
 
     public World() {
         this.minute = 0;
@@ -161,6 +165,7 @@ public class World {
         this.namingService = new DynastyNamingService();
         this.warService = new WarService(this);
         this.historyService = new WorldHistoryService(this);
+        this.disasterService = new WorldDisasterService();
     }
     
     public void registerDynasty(Dynasty dynasty) {
@@ -179,6 +184,14 @@ public class World {
 
     public WorldHistoryService getHistoryService() {
         return historyService;
+    }
+
+    public WorldDisasterService getDisasterService() {
+        return disasterService;
+    }
+
+    public WorldBiomeTransformationService getBiomeTransformationService() {
+        return biomeTransformationService;
     }
     
     public Engine getEngine() {
@@ -3933,7 +3946,7 @@ public class World {
         if (b == GameConstants.BIOME_CLIFFS) {
             return isCoastal || hasRiver || absLat >= 0.60;
         }
-        if (b == GameConstants.BIOME_BURNT_FOREST) {
+        if (b == GameConstants.BIOME_BURNT_FOREST || b == GameConstants.BIOME_BARREN) {
             return absLat <= 0.75;
         }
         if (b == GameConstants.BIOME_MOUNTAIN || b == GameConstants.BIOME_VOLCANIC || b == GameConstants.BIOME_URBAN || b == GameConstants.BIOME_PEAK) {
@@ -6148,6 +6161,8 @@ public class World {
                 hex.setHydrology(sh.hydrology);
                 hex.setIsland(sh.island);
                 hex.setPlateId(sh.plateId);
+                hex.setDisasterType(GameConstants.getDisasterTypeById(sh.disasterTypeId));
+                hex.setDisasterAgeHours(sh.disasterAgeHours);
                 
                 hexMap.put(sh.q + "," + sh.r, hex);
                 this.hexes.add(hex);
@@ -6514,6 +6529,7 @@ public class World {
 
             updateEnvironmentalConditions();
             WorldWeatherService.tickWeatherDrift(this);
+            disasterService.processHourly(this);
 
             if (engine != null) {
                 engine.notifyHourListeners();
@@ -6655,25 +6671,7 @@ public class World {
 
             randomizeWeather();
 
-            if (GameRandom.nextInt(1000) == 0) {
-                if (GameRandom.nextBoolean()) {
-                    this.setTimeOfDay(GameConstants.TIME_SOLAR_ECLIPSE);
-                } else {
-                    this.setTimeOfDay(GameConstants.TIME_LUNAR_ECLIPSE);
-                }
-
-                for (Hex hex : colonizedHexesForTicks()) {
-                    Colony colony = hex.getColony();
-                    if (colonyHasActiveDynasty(colony)) {
-                        colony.getLabourService().runNuptial(colony, this, hex);
-                        colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
-                            + LanguageStrings.get(LanguageStrings.EVENT_ECLIPSE_NUPTIAL));
-                    }
-                }
-
-            } else {
-                this.setTimeOfDay(GameConstants.TIME_NIGHT);
-            }
+            this.setTimeOfDay(GameConstants.TIME_NIGHT);
 
             if (this.day >= 1 && this.day < 2) {
                 this.moonPhase = GameConstants.PHASE_NEW_MOON;
@@ -6694,6 +6692,9 @@ public class World {
             } else {
                 this.moonPhase = GameConstants.PHASE_NEW_MOON;
             }
+
+            disasterService.processDaily(this);
+            biomeTransformationService.processDaily(this);
 
             if (engine != null) {
                 engine.notifyDayListeners();

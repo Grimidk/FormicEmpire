@@ -1196,6 +1196,47 @@ public class Colony {
         invalidateAffordableAlertCache();
     }
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
+
+    public List<Building> downgradeEligibleBuildings(int maxRooms) {
+        List<Building> downgraded = new ArrayList<>();
+        if (maxRooms <= 0 || buildings.isEmpty()) {
+            return downgraded;
+        }
+        List<Building> candidates = new ArrayList<>();
+        for (Building b : buildings) {
+            if (b == null || b.getRequirement() == null) {
+                continue;
+            }
+            if (b.getTierIndex() < 1 || b.getTierIndex() >= 3) {
+                continue;
+            }
+            boolean hasChildUnlocked = false;
+            for (Building other : buildings) {
+                if (other != b && other.getRequirement() == b) {
+                    hasChildUnlocked = true;
+                    break;
+                }
+            }
+            if (!hasChildUnlocked) {
+                candidates.add(b);
+            }
+        }
+        if (candidates.isEmpty()) {
+            return downgraded;
+        }
+        Collections.shuffle(candidates, new java.util.Random(GameRandom.nextInt(Integer.MAX_VALUE)));
+        int toDamage = Math.min(maxRooms, candidates.size());
+        for (int i = 0; i < toDamage; i++) {
+            Building target = candidates.get(i);
+            if (this.buildings.remove(target)) {
+                downgraded.add(target);
+            }
+        }
+        if (!downgraded.isEmpty()) {
+            invalidateAffordableAlertCache();
+        }
+        return downgraded;
+    }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
     public void setCurrentBuildingProject(Building b) {
         this.currentBuildingProject = b;

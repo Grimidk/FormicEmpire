@@ -755,6 +755,10 @@ public class ColonyLabourService {
         ResourceSource source = new ResourceSource(selectedType, quantity, topLeft.x, topLeft.y);
         if (colony.getLocationService().addSource(colony, source) && currentHex != null) {
             currentHex.recordGeneratedResourceSource(selectedType);
+            if (colony.getDynasty() != null && colony.getDynasty().getOwningWorld() != null) {
+                World world = colony.getDynasty().getOwningWorld();
+                world.getBiomeTransformationService().checkOverharvestDepletion(world, colony, currentHex);
+            }
         }
     }
 

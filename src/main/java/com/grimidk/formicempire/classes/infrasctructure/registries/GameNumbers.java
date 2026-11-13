@@ -790,4 +790,15 @@ public final class GameNumbers {
         }
         return MILITARY_BASELINE_ATTACK_SPEED;
     }
+
+    public static final int DISASTER_DAILY_CHANCE_DENOMINATOR = 360;
+    public static final int ECLIPSE_DAILY_CHANCE_DENOMINATOR = 500;
+    public static final int DISASTER_HEX_ICON_DURATION_HOURS = 720;
+    public static final int DISASTER_GAME_AREA_EFFECT_HOURS = 72;
+    public static final double DISASTER_ANT_CASUALTY_MIN_FRACTION = 0.25;
+    public static final double DISASTER_ANT_CASUALTY_MAX_FRACTION = 0.50;
+    public static final double DISASTER_PET_LOSS_FRACTION = 0.40;
+    public static final int DISASTER_METEOR_MINERALS = 5000;
+    public static final int DISASTER_VOLCANO_MINERALS = 2500;
+    public static final int DISASTER_EARTHQUAKE_MAX_DOWNGRADES = 2;
 }

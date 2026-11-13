@@ -133,7 +133,8 @@ class EngineDefaultRolesTest {
                         GameConstants.ROLE_DIPLOMAT,
                         GameConstants.ROLE_SPY,
                         GameConstants.ROLE_ASSISTANT,
-                        GameConstants.ROLE_SKYTRANS),
+                        GameConstants.ROLE_SKYTRANS,
+                        GameConstants.ROLE_EXPLORER),
                 GameConstants.eligibleDefaultHatchRoles(GameConstants.CLASS_PRINCESS));
         assertEquals(
                 List.of(

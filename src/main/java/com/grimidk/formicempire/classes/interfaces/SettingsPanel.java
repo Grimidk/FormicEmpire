@@ -68,6 +68,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox easyConqueringCheck;
     private JCheckBox instantIntegrationCheck;
     private JCheckBox cheatFogOfWarCheck;
+    private JCheckBox cheatRandomDisasterCheck;
     private JCheckBox animateWorldGenCheck;
     private JButton multiMapPreviewButton;
     
@@ -85,7 +86,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, disablePopupsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
-    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel, cheatFogOfWarLabel, animateWorldGenLabel;
+    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel, cheatFogOfWarLabel, cheatRandomDisasterLabel, animateWorldGenLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -548,6 +549,18 @@ public class SettingsPanel extends JPanel {
 
         c.gridy = 12;
         c.gridx = 0;
+        cheatRandomDisasterLabel = new JLabel();
+        cheatRandomDisasterLabel.setFont(AssetStyles.FONT_NORMAL);
+        cheatRandomDisasterLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(cheatRandomDisasterLabel, c);
+
+        cheatRandomDisasterCheck = new JCheckBox();
+        styleCheckBox(cheatRandomDisasterCheck);
+        c.gridx = 1;
+        panel.add(cheatRandomDisasterCheck, c);
+
+        c.gridy = 13;
+        c.gridx = 0;
         animateWorldGenLabel = new JLabel();
         animateWorldGenLabel.setFont(AssetStyles.FONT_NORMAL);
         animateWorldGenLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -571,7 +584,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(worldGenPanel, c);
 
-        c.gridy = 13;
+        c.gridy = 14;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -770,6 +783,7 @@ public class SettingsPanel extends JPanel {
         easyConqueringCheck.setSelected(false);
         instantIntegrationCheck.setSelected(false);
         cheatFogOfWarCheck.setSelected(false);
+        cheatRandomDisasterCheck.setSelected(false);
         animateWorldGenCheck.setSelected(true);
     }
 
@@ -1062,6 +1076,7 @@ public class SettingsPanel extends JPanel {
         easyConqueringLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_EASY_CONQUERING));
         instantIntegrationLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_INSTANT_INTEGRATION));
         cheatFogOfWarLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_CHEAT_FOG_OF_WAR));
+        cheatRandomDisasterLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_CHEAT_RANDOM_DISASTER));
         animateWorldGenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN));
         multiMapPreviewButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW));
         
@@ -1148,6 +1163,7 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(easyConqueringLabel, easyConqueringCheck, LanguageStrings.SETTINGS_EASY_CONQUERING_TT);
         setSettingTooltip(instantIntegrationLabel, instantIntegrationCheck, LanguageStrings.SETTINGS_INSTANT_INTEGRATION_TT);
         setSettingTooltip(cheatFogOfWarLabel, cheatFogOfWarCheck, LanguageStrings.SETTINGS_CHEAT_FOG_OF_WAR_TT);
+        setSettingTooltip(cheatRandomDisasterLabel, cheatRandomDisasterCheck, LanguageStrings.SETTINGS_CHEAT_RANDOM_DISASTER_TT);
         setSettingTooltip(animateWorldGenLabel, animateWorldGenCheck, LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN_TT);
         multiMapPreviewButton.setToolTipText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW_TT));
         setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
@@ -1208,6 +1224,7 @@ public class SettingsPanel extends JPanel {
         easyConqueringCheck.setSelected(engine.isEasyConquering());
         instantIntegrationCheck.setSelected(engine.isInstantIntegration());
         cheatFogOfWarCheck.setSelected(engine.isCheatFogOfWarToggle());
+        cheatRandomDisasterCheck.setSelected(engine.isCheatRandomDisaster());
         animateWorldGenCheck.setSelected(engine.isAnimateWorldGen());
         
         refreshScreenSizeCombo(engine.getScreenSize());
@@ -1384,6 +1401,7 @@ public class SettingsPanel extends JPanel {
         engine.setEasyConquering(easyConqueringCheck.isSelected());
         engine.setInstantIntegration(instantIntegrationCheck.isSelected());
         engine.setCheatFogOfWarToggle(cheatFogOfWarCheck.isSelected());
+        engine.setCheatRandomDisaster(cheatRandomDisasterCheck.isSelected());
         engine.setAnimateWorldGen(animateWorldGenCheck.isSelected());
         engine.applySandboxTaintToActiveWorld();
         SandboxCheatService.applyEnabledCheats(engine);

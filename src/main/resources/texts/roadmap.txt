@@ -4,7 +4,7 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		(none right now) 
+		(none right now)
 	Mid:
 		(none right now)
 	Low:
@@ -29,6 +29,27 @@ To Draw (PascalCase filenames; under src/main/resources):
 	Room sprites (sprites/buildings/rooms/ — 48x48 blank placeholders):
 		L0–L5 and L3S for Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin
 		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter, PassiveWater, PassiveWeb
+	Disaster environment sprites (sprites/environment/ — 1:1 native pixel art placeholders; transparent background; top-down colony view):
+		Earthquake (128x64):
+			DisasterEarthquake.png — Primary jagged ground fissure / fault-line crack decal stamped on soil with depth shadow.
+			DisasterEarthquake2.png — Secondary branching ground crack decal variant for visual variation around the colony yard.
+		Tsunami (128x128):
+			DisasterTsunami.png — Frame 1 of incoming sea-water surge / wave crest with white churning foam. Sweeps horizontally across the overworld.
+			DisasterTsunami2.png — Frame 2 of crashing wave surge (alternating foam spray and water churn).
+		Tornado (128x128):
+			DisasterTornado.png, DisasterTornado2.png, DisasterTornado3.png, DisasterTornado4.png — 4-frame rotating funnel vortex with swirling dust and debris at base. Roams along a smooth path across the playfield.
+		Meteor (128x128):
+			DisasterMeteor.png — Static charred impact crater with scorched earth rim and glowing rock fragments.
+			DisasterMeteorSmoke1.png, DisasterMeteorSmoke2.png — 2-frame plume of billowy dark smoke, heat distortion, and rising sparks layered directly on top of the crater.
+		Volcano (128x128):
+			DisasterVolcano.png — Static magma fissure / caldera vent with cooled black crust and molten glow.
+			DisasterVolcanoEruption1.png, DisasterVolcanoEruption2.png — 2-frame eruption plume with spewing molten lava, dark volcanic ash, and embers layered over the fissure.
+		Wildfire (64x64):
+			DisasterWildfire.png, DisasterWildfire2.png, DisasterWildfire3.png, DisasterWildfire4.png — 4-frame looping ground flame animation with flickering orange/yellow fire tongues and smoke wisps. Stamped at scattered spots across the burning biome.
+		Ice Collapse (128x128):
+			DisasterIceCollapse.png, DisasterIceCollapse2.png — Fractured, shattered ice-shelf chasm decals showing deep dark water beneath broken ice slabs.
+		Ocean Freeze (128x128):
+			DisasterOceanFreeze.png, DisasterOceanFreeze2.png — Creeping jagged frost crystal sheets and ice crust spreading over the surface.
 
 To Compose (.mp3 in resources/audio)
 	Songs:
@@ -43,12 +64,12 @@ To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 		World Generation Overhaul Phases:
-			Phase 4: Dynamic Cloud Shadows and Natural Disasters (drifting cloud noise layer, earthquakes, tsunamis, tornadoes, meteors), other weater effects and day/night filter over map hexes in dialog like a date line or hurricane pathc
 			Phase 5: World Generation Setup UI and Debug Map Editor (world parameters configuration dialog, brush paint tool for biomes/altitude/rivers)
 			Phase 6: preloaded accurate earth 
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		bridges (needs rafting)
 		Battle numeric animation with dice(?) and numbers
+		spectator player possesion
 
 	Everything else :
 		critter system:
@@ -66,8 +87,6 @@ Needed for launch (v1.0) (Launch Version):
 			uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
 		rethink hatching to other types taking more time so its balanced to not just spam a type (and class methamorphosis diagram)
 		reserve ants to ant exauhstion and punishing 100% worker capacity
-		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events)) disasters penalie overworked colonies
-		more stats (kills, historic productions, graphs?)
 		intra dynasty ai auto logisitcs with non esential resources 
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 		revamp story and lore and maybe intro screen
@@ -81,7 +100,7 @@ Needed for launch (v1.0) (Launch Version):
 		rework saves to be cleaner and efficient
 		rework manager and aux files
 		promo video and images 
-		langs (GER, RUS, CHN, JAP) and translate credits and roadmap and recheck known languages
+		recheck langs
 		more proper start animation and roadmap and credits design
 		register Grim Games or Grimidk in steam as dev team
 		steam upload and demo version and make sure saves are not overwritten by updates
@@ -93,7 +112,6 @@ Needed for launch (v1.0) (Launch Version):
 
 Post launch (v1.1) (Improvements Update):
 	animated tile textures
-	tectonic plates to determine mountain ranges, volcanic chains, valleys, give altitude to hexes (and restrictions) so rivers go from high to low forking on tie and making lakes where they surrond, need mountain, peak. shallow and deep ocean biome (make sure world gen is: 1 tectonic plates and faults (going up, going down or sliding), 2 determine oceans vs continental shelfs by height ( from (abyss)0 to 3 (sea level) to 10 (peak) determine ice caps and set lakes, 4 make rivers by going down 5 determing land biomes by latitude, humidity and height)
 	better crash detection and reporting
 	spawn ant cheat and spawn bug
     engine clean up for reusability (Core Engine Package) with addiontal codegen tools for saves and repositories etc
@@ -103,18 +121,17 @@ Post launch (v1.1) (Improvements Update):
 		deeper air battle resolution (not just passive air support)
 		paratroopers — attacker skips border clash → hex siege (paid drop, landing debuff; not instant capture)
 	editable stat panel 
-	world editing (size, islands, dynasty amounts and size) and further dynasty editing like color species and starting upgrades, starting biome and species assimilation
+	more stats (kills, historic productions, graphs?)
+	further dynasty editing like color species and starting upgrades and species assimilation
 	console and commands for debugging (to include in core)
 	native universal modding support (to include in core)
 	custom key bind settings for all keys (to include in core)
 	ant menus (detailed per ant)
 	theme modificacions (colors, text scale, font) (to include in core)
 	global stats from all players (needs api and consent) (to include in core)
-	socials screen with discord server, bluesky, itch, steam and instagram (to include in core) and feedback button
-	more langs as petitioned
+	socials screen with bluesky and instagram (to include in core)
 	link to IRL documentation for ant facts  and bug facts
 	achievements (to include in core)
-	map loading and manual editing with debug
 	click and react minigame
 	discord integration
 	sound board

@@ -1,5 +1,14 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
+import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
+import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,13 +18,13 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.ImageIcon;
-
-import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.entities.world.Hex;
-import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 public final class OverworldAtmosphereRenderer {
 
@@ -24,11 +33,63 @@ public final class OverworldAtmosphereRenderer {
     private static final int SNOW_COUNT = 75;
     private static final int SAND_COUNT = 85;
 
+    private static final int[][] EARTHQUAKE_OFFSETS = {
+        { 50, 95 },
+        { 365, 115 },
+        { 75, 365 },
+        { 350, 345 }
+    };
+
+    private static final int[][] VOLCANO_OFFSETS = {
+        { 90, 145 },
+        { 330, 235 }
+    };
+
+    private static final int[][] WILDFIRE_OFFSETS = {
+        { 70, 85 },
+        { 400, 75 },
+        { 130, 265 },
+        { 360, 285 },
+        { 230, 390 },
+        { 430, 200 }
+    };
+
+    private static final int[][] ICE_COLLAPSE_OFFSETS = {
+        { 45, 75 },
+        { 370, 65 },
+        { 60, 315 },
+        { 360, 320 }
+    };
+
+    private static final int[][] OCEAN_FREEZE_OFFSETS = {
+        { 55, 85 },
+        { 365, 80 },
+        { 70, 305 },
+        { 355, 315 }
+    };
+
     private static Image overworldCloudSprite;
+    private static Image helpPlaceholderSprite;
+    private static final Map<String, Image> disasterSprites = new ConcurrentHashMap<>();
+    private static final Map<Image, Boolean> visiblePixelsCache = new ConcurrentHashMap<>();
     private static long accumulatedAnimTimeMs = 0L;
     private static long lastRealTimeMs = 0L;
 
     private OverworldAtmosphereRenderer() {
+    }
+
+    public static Image getHelpPlaceholderSprite() {
+        if (helpPlaceholderSprite == null) {
+            try {
+                URL url = OverworldAtmosphereRenderer.class.getResource("/icons/social/Help.png");
+                if (url != null) {
+                    helpPlaceholderSprite = new ImageIcon(url).getImage();
+                    GameSpritePreloader.ensureLoaded(helpPlaceholderSprite);
+                }
+            } catch (Throwable ignore) {
+            }
+        }
+        return helpPlaceholderSprite;
     }
 
     private static Image getOverworldCloudSprite() {
@@ -62,6 +123,22 @@ public final class OverworldAtmosphereRenderer {
     }
 
     public static void render(Graphics2D g2d, int viewWidth, int viewHeight, World world, Hex activeHex, boolean daylightEnabled, boolean weatherEnabled, boolean isPaused) {
+        int defaultAnchorX = Math.max(0, (viewWidth - ColonySpatialLayout.ANCHOR_WIDTH) / 2);
+        int defaultAnchorY = Math.max(0, (viewHeight - ColonySpatialLayout.ANCHOR_HEIGHT) / 2);
+        render(g2d, viewWidth, viewHeight, defaultAnchorX, defaultAnchorY, world, activeHex, daylightEnabled, weatherEnabled, isPaused);
+    }
+
+    public static void render(
+            Graphics2D g2d,
+            int viewWidth,
+            int viewHeight,
+            int anchorOffsetX,
+            int anchorOffsetY,
+            World world,
+            Hex activeHex,
+            boolean daylightEnabled,
+            boolean weatherEnabled,
+            boolean isPaused) {
         if (g2d == null || viewWidth <= 0 || viewHeight <= 0 || world == null) {
             return;
         }
@@ -78,6 +155,257 @@ public final class OverworldAtmosphereRenderer {
 
         if (weatherEnabled && weather != null) {
             renderPrecipitation(g2d, viewWidth, viewHeight, timeMs, weather);
+        }
+
+        if (activeHex != null && activeHex.getDisasterType() != null
+                && activeHex.getDisasterAgeHours() < GameNumbers.DISASTER_GAME_AREA_EFFECT_HOURS) {
+            renderDisasterAtmosphere(g2d, viewWidth, viewHeight, anchorOffsetX, anchorOffsetY, timeMs, activeHex.getDisasterType());
+        }
+    }
+
+    public static boolean hasVisiblePixels(Image image) {
+        if (image == null) {
+            return false;
+        }
+        Boolean cached = visiblePixelsCache.get(image);
+        if (cached != null) {
+            return cached;
+        }
+        GameSpritePreloader.ensureLoaded(image);
+        int iw = image.getWidth(null);
+        int ih = image.getHeight(null);
+        if (iw <= 0 || ih <= 0) {
+            return false;
+        }
+        BufferedImage buf = new BufferedImage(iw, ih, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = buf.createGraphics();
+        try {
+            g.drawImage(image, 0, 0, null);
+        } finally {
+            g.dispose();
+        }
+        boolean visible = false;
+        for (int y = 0; y < ih && !visible; y++) {
+            for (int x = 0; x < iw; x++) {
+                if (((buf.getRGB(x, y) >>> 24) & 0xFF) != 0) {
+                    visible = true;
+                    break;
+                }
+            }
+        }
+        visiblePixelsCache.put(image, visible);
+        return visible;
+    }
+
+    static Image loadDisasterSprite(String path) {
+        if (path == null) {
+            return null;
+        }
+        Image cached = disasterSprites.get(path);
+        if (cached != null) {
+            return cached;
+        }
+        URL url = OverworldAtmosphereRenderer.class.getResource(path);
+        if (url == null) {
+            return null;
+        }
+        Image img = new ImageIcon(url).getImage();
+        if (img == null) {
+            return null;
+        }
+        GameSpritePreloader.ensureLoaded(img);
+        disasterSprites.put(path, img);
+        return img;
+    }
+
+    private static List<Image> collectVisibleSprites(List<String> paths, int fromIndex, int toIndex) {
+        if (paths == null || paths.isEmpty()) {
+            Image placeholder = getHelpPlaceholderSprite();
+            return placeholder != null ? List.of(placeholder) : List.of();
+        }
+        int end = Math.min(paths.size(), toIndex);
+        List<Image> result = new ArrayList<>();
+        for (int i = Math.max(0, fromIndex); i < end; i++) {
+            Image img = loadDisasterSprite(paths.get(i));
+            if (img != null && hasVisiblePixels(img)) {
+                result.add(img);
+            }
+        }
+        if (result.isEmpty()) {
+            Image placeholder = getHelpPlaceholderSprite();
+            if (placeholder != null) {
+                result.add(placeholder);
+            }
+        }
+        return result;
+    }
+
+    private static void drawUnscaledSprite(Graphics2D g, Image img, int x, int y) {
+        if (img == null) {
+            return;
+        }
+        g.drawImage(img, x, y, null);
+    }
+
+    private static void renderDisasterAtmosphere(
+            Graphics2D g2d,
+            int w,
+            int h,
+            int anchorX,
+            int anchorY,
+            long timeMs,
+            DisasterType disaster) {
+        Graphics2D g = (Graphics2D) g2d.create();
+        try {
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            List<String> paths = disaster.getSpritePaths();
+            int playW = ColonySpatialLayout.ANCHOR_WIDTH;
+            int playH = ColonySpatialLayout.ANCHOR_HEIGHT;
+
+            if (disaster == GameConstants.DISASTER_EARTHQUAKE) {
+                int shake = (int) Math.round(Math.sin(timeMs * 0.04) * 3.0);
+                List<Image> cracks = collectVisibleSprites(paths, 0, paths.size());
+                if (!cracks.isEmpty()) {
+                    for (int i = 0; i < EARTHQUAKE_OFFSETS.length; i++) {
+                        Image spr = cracks.get(i % cracks.size());
+                        drawUnscaledSprite(g, spr, anchorX + EARTHQUAKE_OFFSETS[i][0] + shake, anchorY + EARTHQUAKE_OFFSETS[i][1]);
+                    }
+                } else {
+                    g.setColor(new Color(110, 85, 55, 110));
+                    g.setStroke(new BasicStroke(2.2f));
+                    double proceduralShake = Math.sin(timeMs * 0.03) * 6.0;
+                    for (int i = 0; i < 12; i++) {
+                        double sx = ((i * 173) % w) + proceduralShake;
+                        double sy = ((i * 119) % h);
+                        g.draw(new Line2D.Double(sx, sy, sx + 35, sy + 12));
+                        g.draw(new Line2D.Double(sx + 35, sy + 12, sx + 60, sy - 6));
+                    }
+                }
+            } else if (disaster == GameConstants.DISASTER_TSUNAMI) {
+                g.setColor(new Color(35, 145, 225, 65));
+                g.fillRect(0, 0, w, h);
+                List<Image> waves = collectVisibleSprites(paths, 0, paths.size());
+                if (!waves.isEmpty()) {
+                    Image wave = waves.get((int) ((timeMs / 250L) % waves.size()));
+                    int waveW = Math.max(1, wave.getWidth(null));
+                    int waveH = Math.max(1, wave.getHeight(null));
+                    int sweepSpan = playW + waveW * 2;
+                    int waveX = anchorX - waveW + (int) Math.round((timeMs * 0.14) % sweepSpan);
+                    for (int wy = anchorY - waveH / 2; wy < anchorY + playH + waveH / 2; wy += waveH) {
+                        drawUnscaledSprite(g, wave, waveX, wy);
+                    }
+                } else {
+                    g.setColor(new Color(35, 145, 225, 90));
+                    double waveX = (timeMs * 0.12) % (w + 260) - 260;
+                    for (int i = 0; i < 4; i++) {
+                        g.fill(new Ellipse2D.Double(waveX + i * 90, h * 0.55 - i * 40, 260, 110));
+                    }
+                }
+            } else if (disaster == GameConstants.DISASTER_TORNADO) {
+                List<Image> frames = collectVisibleSprites(paths, 0, paths.size());
+                double normX = 0.5 + Math.sin(timeMs * 0.0014) * 0.36;
+                double normY = 0.5 + Math.sin(timeMs * 0.0023) * 0.28;
+                if (!frames.isEmpty()) {
+                    Image frame = frames.get((int) ((timeMs / 110L) % frames.size()));
+                    int fw = Math.max(1, frame.getWidth(null));
+                    int fh = Math.max(1, frame.getHeight(null));
+                    int tx = anchorX + (int) Math.round(normX * Math.max(0, playW - fw));
+                    int ty = anchorY + (int) Math.round(normY * Math.max(0, playH - fh));
+                    drawUnscaledSprite(g, frame, tx, ty);
+                } else {
+                    g.setColor(new Color(145, 150, 160, 120));
+                    double cx = anchorX + normX * playW;
+                    double cy = anchorY + normY * playH;
+                    for (int i = 0; i < 6; i++) {
+                        double radius = 18 + i * 16;
+                        double offset = Math.sin((timeMs * 0.01) + i) * 12;
+                        g.fill(new Ellipse2D.Double(cx - radius + offset, cy - i * 18, radius * 2, radius * 0.7));
+                    }
+                }
+            } else if (disaster == GameConstants.DISASTER_METEOR) {
+                g.setColor(new Color(210, 75, 30, 60));
+                g.fillRect(0, 0, w, h);
+                Image crater = paths.isEmpty() ? null : loadDisasterSprite(paths.get(0));
+                List<Image> smokeFrames = collectVisibleSprites(paths, 1, paths.size());
+                int craterX = anchorX + 350;
+                int craterY = anchorY + 130;
+                if (crater != null && hasVisiblePixels(crater)) {
+                    drawUnscaledSprite(g, crater, craterX, craterY);
+                }
+                if (!smokeFrames.isEmpty()) {
+                    Image smoke = smokeFrames.get((int) ((timeMs / 240L) % smokeFrames.size()));
+                    drawUnscaledSprite(g, smoke, craterX, craterY);
+                }
+                g.setColor(new Color(255, 165, 50, 170));
+                for (int i = 0; i < 45; i++) {
+                    double ex = (i * 97 + timeMs * 0.02) % w;
+                    double ey = (i * 61 - timeMs * 0.03 + h * 10) % h;
+                    g.fill(new Ellipse2D.Double(ex, ey, 3.5, 3.5));
+                }
+            } else if (disaster == GameConstants.DISASTER_VOLCANO) {
+                g.setColor(new Color(240, 95, 25, 65));
+                g.fillRect(0, 0, w, h);
+                Image fissure = paths.isEmpty() ? null : loadDisasterSprite(paths.get(0));
+                boolean showFissure = fissure != null && hasVisiblePixels(fissure);
+                List<Image> eruptionFrames = collectVisibleSprites(paths, 1, paths.size());
+                for (int i = 0; i < VOLCANO_OFFSETS.length; i++) {
+                    int vx = anchorX + VOLCANO_OFFSETS[i][0];
+                    int vy = anchorY + VOLCANO_OFFSETS[i][1];
+                    if (showFissure) {
+                        drawUnscaledSprite(g, fissure, vx, vy);
+                    }
+                    if (!eruptionFrames.isEmpty()) {
+                        Image plume = eruptionFrames.get((int) (((timeMs / 220L) + i) % eruptionFrames.size()));
+                        drawUnscaledSprite(g, plume, vx, vy);
+                    }
+                }
+                g.setColor(new Color(255, 175, 45, 190));
+                for (int i = 0; i < 65; i++) {
+                    double ex = (i * 83 + Math.sin(timeMs * 0.004 + i) * 20) % w;
+                    double ey = (h - ((i * 59 + timeMs * 0.06) % h));
+                    g.fill(new Ellipse2D.Double(ex, ey, 4, 4));
+                }
+            } else if (disaster == GameConstants.DISASTER_WILDFIRE) {
+                g.setColor(new Color(240, 95, 25, 65));
+                g.fillRect(0, 0, w, h);
+                List<Image> flameFrames = collectVisibleSprites(paths, 0, paths.size());
+                if (!flameFrames.isEmpty()) {
+                    for (int i = 0; i < WILDFIRE_OFFSETS.length; i++) {
+                        Image flame = flameFrames.get((int) (((timeMs / 130L) + i) % flameFrames.size()));
+                        drawUnscaledSprite(g, flame, anchorX + WILDFIRE_OFFSETS[i][0], anchorY + WILDFIRE_OFFSETS[i][1]);
+                    }
+                }
+                g.setColor(new Color(255, 175, 45, 190));
+                for (int i = 0; i < 65; i++) {
+                    double ex = (i * 83 + Math.sin(timeMs * 0.004 + i) * 20) % w;
+                    double ey = (h - ((i * 59 + timeMs * 0.06) % h));
+                    g.fill(new Ellipse2D.Double(ex, ey, 4, 4));
+                }
+            } else if (disaster == GameConstants.DISASTER_ICE_COLLAPSE) {
+                g.setColor(new Color(175, 225, 255, 75));
+                g.fillRect(0, 0, w, h);
+                List<Image> decals = collectVisibleSprites(paths, 0, paths.size());
+                if (!decals.isEmpty()) {
+                    for (int i = 0; i < ICE_COLLAPSE_OFFSETS.length; i++) {
+                        Image spr = decals.get(i % decals.size());
+                        drawUnscaledSprite(g, spr, anchorX + ICE_COLLAPSE_OFFSETS[i][0], anchorY + ICE_COLLAPSE_OFFSETS[i][1]);
+                    }
+                }
+            } else {
+                g.setColor(new Color(195, 235, 255, 80));
+                g.fillRect(0, 0, w, h);
+                List<Image> decals = collectVisibleSprites(paths, 0, paths.size());
+                if (!decals.isEmpty()) {
+                    for (int i = 0; i < OCEAN_FREEZE_OFFSETS.length; i++) {
+                        Image spr = decals.get(i % decals.size());
+                        drawUnscaledSprite(g, spr, anchorX + OCEAN_FREEZE_OFFSETS[i][0], anchorY + OCEAN_FREEZE_OFFSETS[i][1]);
+                    }
+                }
+            }
+        } finally {
+            g.dispose();
         }
     }
 

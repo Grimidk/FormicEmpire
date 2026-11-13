@@ -516,6 +516,11 @@ public class GameAreaPanel extends ZeroGamePanel {
         int panelW = getWidth();
         int panelH = getHeight();
         Hex currentHex = resolveCurrentHex();
+        if (currentHex != null && currentHex.getBiome() != null && currentHex.getBiome().getId() != currentBiomeId) {
+            currentBiomeId = currentHex.getBiome().getId();
+            backgroundImage = resolveBackgroundImage();
+            invalidateBackgroundLayerCache();
+        }
         int bordersKey = CoastalTideRenderer.getWaterBordersKey(currentHex, currentBiomeId);
         if (cachedBackgroundLayer != null && cachedBackgroundW == panelW && cachedBackgroundH == panelH
                 && cachedBackgroundBiomeId == currentBiomeId
@@ -639,21 +644,28 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (engine == null) return;
         boolean dayOn = engine.isDaylightColorOverlayEnabled();
         boolean weatherOn = engine.isWeatherColorOverlayEnabled();
-        if (!dayOn && !weatherOn) return;
 
         World world = engine.getWorld();
         if (world == null) return;
 
-        TimeOfDay tod = (world.getActiveHex() != null) ? world.getTimeOfDay(world.getActiveHex()) : world.getTimeOfDay();
-        if (dayOn && tod != null && tod.getOverlayColor() != null) {
-            g2d.setColor(tod.getOverlayColor());
-            g2d.fillRect(0, 0, getWidth(), getHeight());
+        Hex activeHex = world.getActiveHex();
+        boolean hasDisaster = activeHex != null && activeHex.getDisasterType() != null
+                && activeHex.getDisasterAgeHours() < GameNumbers.DISASTER_GAME_AREA_EFFECT_HOURS;
+
+        if (!dayOn && !weatherOn && !hasDisaster) return;
+
+        if (dayOn) {
+            TimeOfDay tod = (activeHex != null) ? world.getTimeOfDay(activeHex) : world.getTimeOfDay();
+            if (tod != null && tod.getOverlayColor() != null) {
+                g2d.setColor(tod.getOverlayColor());
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
         }
 
         if (weatherOn) {
             Weather w = world.getWeather();
-            if (world.getActiveHex() != null && world.getActiveHex().getLocalWeather() != null) {
-                w = world.getActiveHex().getLocalWeather();
+            if (activeHex != null && activeHex.getLocalWeather() != null) {
+                w = activeHex.getLocalWeather();
             }
 
             if (w != null && w.getOverlayColor() != null) {
@@ -662,8 +674,20 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
         }
 
+        int anchorX;
+        int anchorY;
+        if (colony != null) {
+            anchorX = overworldLayoutOffsetX;
+            anchorY = overworldLayoutOffsetY;
+        } else if (paintViewportRect != null) {
+            anchorX = Math.max(0, (getWidth() - paintViewportRect.width) / 2);
+            anchorY = Math.max(0, (getHeight() - paintViewportRect.height) / 2);
+        } else {
+            anchorX = Math.max(0, (getWidth() - ColonySpatialLayout.ANCHOR_WIDTH) / 2);
+            anchorY = Math.max(0, (getHeight() - ColonySpatialLayout.ANCHOR_HEIGHT) / 2);
+        }
         boolean isPaused = engine.isPaused();
-        OverworldAtmosphereRenderer.render(g2d, getWidth(), getHeight(), world, world.getActiveHex(), dayOn, weatherOn, isPaused);
+        OverworldAtmosphereRenderer.render(g2d, getWidth(), getHeight(), anchorX, anchorY, world, activeHex, dayOn, weatherOn, isPaused);
     }
     
     private void drawOverworldStructure(Graphics2D g2d) {

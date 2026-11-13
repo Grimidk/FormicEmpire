@@ -117,4 +117,27 @@ class HexMapOverlaysTest {
 
         g2d.dispose();
     }
+
+    @Test
+    void paintDisastersExecutesSafelyAndMarksDisasterHexes() {
+        World world = new World();
+        Hex h1 = new Hex();
+        h1.setQ(0);
+        h1.setR(0);
+        h1.setBiome(GameConstants.BIOME_PLAINS);
+        h1.recordDisaster(GameConstants.DISASTER_EARTHQUAKE);
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(h1);
+        world.setHexes(hexes);
+
+        HexGridMesh mesh = HexGridMesh.build(hexes, 0.0, 0.0, 24.0, (q, r) -> h1.getQ() == q && h1.getR() == r ? h1 : null);
+        BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
+
+        assertDoesNotThrow(() -> HexMapOverlays.paintDisasters(g2d, world, mesh, hex -> true));
+        assertDoesNotThrow(() -> HexMapOverlays.paintDisasterBadge(g2d, GameConstants.DISASTER_VOLCANO, 50, 50, 18));
+        assertDoesNotThrow(() -> HexMapOverlays.paintDisasters(null, null, null, null));
+
+        g2d.dispose();
+    }
 }

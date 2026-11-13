@@ -474,7 +474,7 @@ public class ColonyStarterService {
         World world = dynasty != null ? dynasty.getOwningWorld() : null;
         Hex hex = world != null ? world.getHexOfColony(colony) : null;
         Biome biome = hex != null ? hex.getBiome() : null;
-        boolean isBurntForest = biome == GameConstants.BIOME_BURNT_FOREST;
+        boolean isBurntForest = biome == GameConstants.BIOME_BURNT_FOREST || biome == GameConstants.BIOME_BARREN;
         boolean allowPlant = !isBurntForest;
         boolean allowWater = !isBurntForest;
         boolean allowMeat = !isBurntForest && colony.canEatMeat();

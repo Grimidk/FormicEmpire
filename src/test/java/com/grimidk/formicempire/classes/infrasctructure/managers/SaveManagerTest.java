@@ -599,4 +599,31 @@ public class SaveManagerTest {
         colony.setDaysWithoutQueen(6);
         assertTrue(SaveManager.isDynastyAboutToDieWithoutQueen(playerDynasty));
     }
+
+    @Test
+    void savedHexDisasterFieldsRoundTripThroughHexJson() throws Exception {
+        Savefile.SavedHex sh = new Savefile.SavedHex(2, -1, GameConstants.BIOME_BURNT_FOREST.getId(), false, 1, 1);
+        sh.disasterTypeId = GameConstants.DISASTER_WILDFIRE.getId();
+        sh.disasterAgeHours = 7;
+
+        List<Savefile.SavedHex> input = new ArrayList<>();
+        input.add(sh);
+
+        SaveManager saveManager = new SaveManager();
+        Method serializeHexes = SaveManager.class.getDeclaredMethod("serializeHexesToJson", List.class);
+        serializeHexes.setAccessible(true);
+        String json = (String) serializeHexes.invoke(saveManager, input);
+
+        assertTrue(json.contains("\"dt\":" + GameConstants.DISASTER_WILDFIRE.getId()));
+        assertTrue(json.contains("\"dth\":7"));
+
+        Method deserializeHexes = SaveManager.class.getDeclaredMethod("deserializeJsonToHexes", String.class);
+        deserializeHexes.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<Savefile.SavedHex> loaded = (List<Savefile.SavedHex>) deserializeHexes.invoke(saveManager, json);
+
+        assertEquals(1, loaded.size());
+        assertEquals(GameConstants.DISASTER_WILDFIRE.getId(), loaded.get(0).disasterTypeId);
+        assertEquals(7, loaded.get(0).disasterAgeHours);
+    }
 }

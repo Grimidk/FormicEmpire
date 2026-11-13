@@ -64,6 +64,10 @@ public class ColonyLocationService {
         sourceService.removeSource(colony, source);
     }
 
+    public void clearAllSources(Colony colony) {
+        sourceService.clearAllSources(colony);
+    }
+
     public int gatherFromSource(Colony colony, ResourceSource source, int amountWanted) {
         return sourceService.gatherFromSource(colony, source, amountWanted);
     }

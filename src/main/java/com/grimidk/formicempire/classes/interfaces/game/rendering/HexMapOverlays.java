@@ -21,6 +21,7 @@ import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.services.world.WorldWeatherService;
@@ -501,6 +502,61 @@ public final class HexMapOverlays {
                 g2d.fillPolygon(face.toPolygon());
             }
         }
+    }
+
+    public static void paintDisasters(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
+        if (g2d == null || world == null || mesh == null) {
+            return;
+        }
+        double layoutSize = mesh.layoutSize();
+        int iconSize = Math.max(12, (int) Math.round(layoutSize * 0.72));
+        Rectangle clip = g2d.getClipBounds();
+
+        for (HexGridMesh.Face face : mesh.faces()) {
+            if (face == null || face.hex == null || face.hex.getDisasterType() == null) {
+                continue;
+            }
+            if (isHexDiscovered != null && !isHexDiscovered.test(face.hex)) {
+                continue;
+            }
+            if (clip != null && !face.intersects(clip)) {
+                continue;
+            }
+            paintDisasterBadge(g2d, face.hex.getDisasterType(), face.centerX, face.centerY, iconSize);
+        }
+    }
+
+    public static void paintDisasterBadge(Graphics2D g2d, DisasterType disaster, double centerX, double centerY, int iconSize) {
+        if (g2d == null || disaster == null || iconSize <= 0) {
+            return;
+        }
+        ImageIcon icon = disaster.getIcon();
+        if (icon != null && icon.getImage() != null && icon != GameConstants.ICON_UNKNOWN
+                && OverworldAtmosphereRenderer.hasVisiblePixels(icon.getImage())) {
+            drawCenteredIcon(g2d, icon, centerX, centerY, iconSize);
+            return;
+        }
+        int r = Math.max(5, iconSize / 2);
+        int x = (int) Math.round(centerX - r);
+        int y = (int) Math.round(centerY - r);
+        Color badgeColor;
+        if (disaster == GameConstants.DISASTER_TSUNAMI || disaster == GameConstants.DISASTER_ICE_COLLAPSE || disaster == GameConstants.DISASTER_OCEAN_FREEZE) {
+            badgeColor = new Color(40, 150, 230, 220);
+        } else if (disaster == GameConstants.DISASTER_VOLCANO || disaster == GameConstants.DISASTER_WILDFIRE || disaster == GameConstants.DISASTER_METEOR) {
+            badgeColor = new Color(225, 75, 35, 225);
+        } else {
+            badgeColor = new Color(210, 165, 45, 225);
+        }
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(badgeColor);
+        g.fill(new Ellipse2D.Double(x, y, r * 2.0, r * 2.0));
+        g.setColor(new Color(255, 255, 255, 230));
+        g.setStroke(new BasicStroke(Math.max(1.2f, iconSize * 0.10f)));
+        g.draw(new Ellipse2D.Double(x, y, r * 2.0, r * 2.0));
+        g.draw(new Line2D.Double(centerX, centerY - r * 0.45, centerX, centerY + r * 0.15));
+        g.fill(new Ellipse2D.Double(centerX - r * 0.12, centerY + r * 0.30, r * 0.24, r * 0.24));
+        g.dispose();
     }
 
     private static Color resolveTimeOfDayColor(TimeOfDay tod) {

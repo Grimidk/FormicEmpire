@@ -897,7 +897,8 @@ public class StatsDialog extends ZeroDialog {
         BATTLE(WorldHistoryEventType.WorldHistoryCategory.BATTLE, LanguageStrings.HISTORY_FILTER_BATTLE),
         REBELLION(WorldHistoryEventType.WorldHistoryCategory.REBELLION, LanguageStrings.HISTORY_FILTER_REBELLION),
         NUPTIAL(WorldHistoryEventType.WorldHistoryCategory.NUPTIAL, LanguageStrings.HISTORY_FILTER_NUPTIAL),
-        ASSIMILATION(WorldHistoryEventType.WorldHistoryCategory.ASSIMILATION, LanguageStrings.HISTORY_FILTER_ASSIMILATION);
+        ASSIMILATION(WorldHistoryEventType.WorldHistoryCategory.ASSIMILATION, LanguageStrings.HISTORY_FILTER_ASSIMILATION),
+        DISASTER(WorldHistoryEventType.WorldHistoryCategory.DISASTER, LanguageStrings.HISTORY_FILTER_DISASTER);
 
         private final WorldHistoryEventType.WorldHistoryCategory category;
         private final String labelKey;

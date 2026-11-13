@@ -631,6 +631,8 @@ public class SaveManager {
                 sh.hydrology = h.getHydrology();
                 sh.island = h.isIsland();
                 sh.plateId = h.getPlateId();
+                sh.disasterTypeId = h.getDisasterType() != null ? h.getDisasterType().getId() : 0;
+                sh.disasterAgeHours = h.getDisasterAgeHours();
                 hexList.add(sh);
                 
                 if (hasColony) {
@@ -1883,6 +1885,8 @@ public class SaveManager {
             if (h.hydrology != 0) sb.append(",\"hy\":").append(h.hydrology);
             if (h.island) sb.append(",\"isl\":true");
             if (h.plateId != 0) sb.append(",\"pl\":").append(h.plateId);
+            if (h.disasterTypeId != 0) sb.append(",\"dt\":").append(h.disasterTypeId);
+            if (h.disasterAgeHours != 0) sb.append(",\"dth\":").append(h.disasterAgeHours);
             sb.append("}");
             if (i < hexes.size() - 1) {
                 sb.append(",");
@@ -2403,6 +2407,8 @@ public class SaveManager {
             int hy = 0;
             boolean isl = false;
             int pl = 0;
+            int dt = 0;
+            int dth = 0;
             
             try {
                 String clean = objStr.replace("{", "").replace("}", "");
@@ -2428,6 +2434,8 @@ public class SaveManager {
                         else if (k.equals("hy")) hy = Integer.parseInt(v);
                         else if (k.equals("isl")) isl = Boolean.parseBoolean(v);
                         else if (k.equals("pl")) pl = Integer.parseInt(v);
+                        else if (k.equals("dt")) dt = Integer.parseInt(v);
+                        else if (k.equals("dth")) dth = Integer.parseInt(v);
                     }
                 }
                 Savefile.SavedHex saved = new Savefile.SavedHex(q, r, b, c, t, w);
@@ -2442,6 +2450,8 @@ public class SaveManager {
                 saved.hydrology = hy;
                 saved.island = isl;
                 saved.plateId = pl;
+                saved.disasterTypeId = dt;
+                saved.disasterAgeHours = dth;
                 list.add(saved);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -2658,6 +2668,7 @@ public class SaveManager {
             writeJsonLine(w, "instantIntegration", engine.isInstantIntegration(), false);
             writeJsonLine(w, "cheatFogOfWarToggle", engine.isCheatFogOfWarToggle(), false);
             writeJsonLine(w, "cheatRevealMap", engine.isCheatRevealMap(), false);
+            writeJsonLine(w, "cheatRandomDisaster", engine.isCheatRandomDisaster(), false);
             writeJsonLine(w, "animateWorldGen", engine.isAnimateWorldGen(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
@@ -2813,6 +2824,7 @@ public class SaveManager {
             engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
             engine.setCheatFogOfWarToggle(Boolean.parseBoolean(m.getOrDefault("cheatFogOfWarToggle", "false")));
             engine.setCheatRevealMap(Boolean.parseBoolean(m.getOrDefault("cheatRevealMap", "false")));
+            engine.setCheatRandomDisaster(Boolean.parseBoolean(m.getOrDefault("cheatRandomDisaster", "false")));
             engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "true")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.CLASS_WORKER,

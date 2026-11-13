@@ -78,6 +78,7 @@ public class Engine extends Thread {
     private boolean instantIntegration = false;
     private boolean cheatFogOfWarToggle = false;
     private boolean cheatRevealMap = false;
+    private boolean cheatRandomDisaster = false;
     private boolean animateWorldGen = true;
     private WorldGenStepListener worldGenStepListener;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
@@ -701,6 +702,14 @@ public class Engine extends Thread {
 
     public void setCheatRevealMap(boolean cheatRevealMap) {
         this.cheatRevealMap = cheatRevealMap;
+    }
+
+    public boolean isCheatRandomDisaster() {
+        return cheatRandomDisaster;
+    }
+
+    public void setCheatRandomDisaster(boolean cheatRandomDisaster) {
+        this.cheatRandomDisaster = cheatRandomDisaster;
     }
 
     public boolean isAnimateWorldGen() {
