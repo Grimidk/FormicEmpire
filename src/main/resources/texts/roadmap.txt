@@ -4,8 +4,7 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		rivers not generating in manual making maps, shoudl generate after biomes and before dynasties, can refresh rivers only with button
-		re make earth with rivers 
+		(none right now)
 	Mid:
 		(none right now)
 	Low:

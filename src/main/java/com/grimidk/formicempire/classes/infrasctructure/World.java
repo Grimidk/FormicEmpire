@@ -2405,6 +2405,25 @@ public class World {
         classifyLandmasses();
     }
 
+    public void generateAlgorithmicRiversAndFeatures() {
+        if (this.hexes == null || this.hexes.isEmpty()) {
+            return;
+        }
+        for (Hex h : this.hexes) {
+            if (h != null) {
+                for (int d = 0; d < 6; d++) {
+                    h.setRiverEdge(d, false);
+                }
+            }
+        }
+        generateAllDownhillRivers();
+        clearRiversOnIce();
+        cleanupOrphanRivers();
+        ensureAllLakesHaveRivers();
+        rebuildContinentsFromHexes();
+        generateGeographicFeatures();
+    }
+
     public void generateAlgorithmicBiomesAndFeatures() {
         if (this.hexes == null || this.hexes.isEmpty()) {
             return;

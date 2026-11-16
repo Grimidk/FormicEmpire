@@ -1095,6 +1095,18 @@ public class WorldBuilderDialog extends JDialog {
             biomesGridWrap.setAlignmentX(Component.LEFT_ALIGNMENT);
             biomesGridWrap.add(biomesGrid);
             biomeContainer.add(biomesGridWrap);
+
+            JPanel riverRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
+            riverRow.setOpaque(false);
+            riverRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+            JButton refreshRiversBtn = new JButton("Refresh Rivers");
+            AssetStyles.styleCompactButton(refreshRiversBtn);
+            applyUniformTextButtonHeight(refreshRiversBtn);
+            refreshRiversBtn.setToolTipText("Generate or refresh algorithmic rivers and geographic features from current biomes");
+            refreshRiversBtn.addActionListener(e -> refreshRiversAndFeatures());
+            riverRow.add(refreshRiversBtn);
+            biomeContainer.add(riverRow);
+
             dynamicPalettePanel.add(biomeContainer);
 
         } else if (currentStage == STAGE_DYNASTIES) {
@@ -1467,6 +1479,17 @@ public class WorldBuilderDialog extends JDialog {
             world.populateDynasties(GameConstants.BIOME_PLAINS, null, "Player", GameConstants.DYNASTY_TITLE_DYNASTY.getNameKey());
             statusMessageLabel.setText("Auto-generated dynasties on landmasses.");
         }
+        canvas.invalidateStageImages();
+        canvas.repaint();
+    }
+
+    private void refreshRiversAndFeatures() {
+        if (world == null || world.getHexes() == null || world.getHexes().isEmpty()) {
+            return;
+        }
+        pushUndoSnapshot();
+        world.generateAlgorithmicRiversAndFeatures();
+        statusMessageLabel.setText("Generated / refreshed rivers & geographic features.");
         canvas.invalidateStageImages();
         canvas.repaint();
     }
@@ -2002,6 +2025,7 @@ public class WorldBuilderDialog extends JDialog {
         }
 
         void invalidateStageImages() {
+            cachedMesh = null;
             cachedMapImage = null;
             cachedMinimap = null;
         }
@@ -2263,6 +2287,29 @@ public class WorldBuilderDialog extends JDialog {
                 }
                 hg.dispose();
             }
+
+            Graphics2D og = (Graphics2D) g2d.create();
+            og.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            og.translate(originX, originY);
+            if (mesh != null) {
+                double scale = hexSize / BASE_BAKE_HEX_SIZE;
+                Graphics2D rg = (Graphics2D) og.create();
+                rg.scale(scale, scale);
+                mesh.paintRivers(rg);
+                rg.dispose();
+            }
+            if (world.getWorldWidth() > 0) {
+                double worldW = world.getWorldWidth() * 1.5 * hexSize;
+                double topY = -(world.getWorldHeight() * 1.5 * hexSize) / 2.0 - 0.75 * hexSize;
+                double botY = +(world.getWorldHeight() * 1.5 * hexSize) / 2.0 - 0.75 * hexSize;
+                double eqY = -0.75 * hexSize;
+                float[] dash = {6f, 4f};
+                og.setColor(new Color(255, 255, 255, 130));
+                og.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash, 0f));
+                og.drawLine(0, (int) Math.round(topY), 0, (int) Math.round(botY));
+                og.drawLine((int) Math.round(-worldW / 2.0), (int) Math.round(eqY), (int) Math.round(worldW / 2.0), (int) Math.round(eqY));
+            }
+            og.dispose();
 
             if (currentTool == Tool.LINE && lineStartHex != null && lineEndHex != null) {
                 Graphics2D lg = (Graphics2D) g2d.create();
