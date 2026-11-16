@@ -173,7 +173,7 @@ public class Engine extends Thread {
         return this.world != null && this.world.isSpectatorMode();
     }
 
-    private void clampSpeedToCurrentRules() {
+    public void clampSpeedToCurrentRules() {
         int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
         if (speed != null && speed.getId() > maxId) {
             speed = GameSpeed.fromId(maxId);

@@ -4,7 +4,8 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		(none right now)
+		rivers not generating in manual making maps, shoudl generate after biomes and before dynasties, can refresh rivers only with button
+		re make earth with rivers 
 	Mid:
 		(none right now)
 	Low:
@@ -66,7 +67,6 @@ Needed for launch (v1.0) (Launch Version):
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		bridges (needs rafting)
 		Battle numeric animation with dice(?) and numbers
-		spectator player possesion
 		intra dynasty ai auto logisitcs with non esential resources 
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
 		rework abilities and alerts and triggers to be cleaner

@@ -1123,6 +1123,15 @@ public final class LanguageStrings {
     public static final String MAP_CONQUER_COLONY = "MAP_CONQUER_COLONY";
     public static final String MAP_CONQUER_COLONY_TT = "MAP_CONQUER_COLONY_TT";
     public static final String MAP_CONQUER_COLONY_SELECT_TT = "MAP_CONQUER_COLONY_SELECT_TT";
+    public static final String MAP_POSSESS_COLONY = "MAP_POSSESS_COLONY";
+    public static final String MAP_POSSESS_COLONY_TT = "MAP_POSSESS_COLONY_TT";
+    public static final String MAP_POSSESS_COLONY_SELECT_TT = "MAP_POSSESS_COLONY_SELECT_TT";
+    public static final String MAP_POSSESS_COLONY_CONFIRM_TITLE = "MAP_POSSESS_COLONY_CONFIRM_TITLE";
+    public static final String MAP_POSSESS_COLONY_CONFIRM_MSG = "MAP_POSSESS_COLONY_CONFIRM_MSG";
+    public static final String MAP_DEPOSSESS_COLONY = "MAP_DEPOSSESS_COLONY";
+    public static final String MAP_DEPOSSESS_COLONY_TT = "MAP_DEPOSSESS_COLONY_TT";
+    public static final String MAP_DEPOSSESS_COLONY_CONFIRM_TITLE = "MAP_DEPOSSESS_COLONY_CONFIRM_TITLE";
+    public static final String MAP_DEPOSSESS_COLONY_CONFIRM_MSG = "MAP_DEPOSSESS_COLONY_CONFIRM_MSG";
     public static final String MAP_ZOOM_IN_TT = "MAP_ZOOM_IN_TT";
     public static final String MAP_ZOOM_OUT_TT = "MAP_ZOOM_OUT_TT";
 

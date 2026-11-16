@@ -179,4 +179,105 @@ public final class SandboxCheatService {
         engine.applySandboxTaintToActiveWorld();
         return target.getDynasty() == player;
     }
+
+    public static boolean canPossessHex(World world, Hex hex) {
+        if (world == null || !world.isSpectatorMode() || hex == null) {
+            return false;
+        }
+        Colony colony = hex.getColony();
+        if (colony == null || ColonyStarterService.isReclaimableDeadColony(colony)) {
+            return false;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        return dynasty != null && !dynasty.isDefeated();
+    }
+
+    public static boolean possessHex(Engine engine, World world, Hex hex) {
+        if (!canPossessHex(world, hex)) {
+            return false;
+        }
+        Colony target = hex.getColony();
+        Dynasty dynasty = target.getDynasty();
+        if (world.getDynastys() != null) {
+            for (Dynasty other : world.getDynastys()) {
+                if (other == null || other == dynasty) {
+                    continue;
+                }
+                other.setPlayer(false);
+                if (other.getColonies() != null) {
+                    for (Colony otherColony : other.getColonies()) {
+                        if (otherColony != null) {
+                            otherColony.setIsPlayer(false);
+                        }
+                    }
+                }
+            }
+        }
+        world.setSpectatorMode(false);
+        dynasty.setPlayer(true);
+        if (dynasty.getColonies() != null) {
+            for (Colony colony : dynasty.getColonies()) {
+                if (colony == null) {
+                    continue;
+                }
+                colony.setIsPlayer(true);
+                Hex colonyHex = world.getHexOfColony(colony);
+                if (colonyHex != null) {
+                    dynasty.discoverHexAndAdjacent(colonyHex);
+                }
+            }
+        }
+        target.setIsPlayer(true);
+        dynasty.discoverHexAndAdjacent(hex);
+        world.changeActiveHex(hex);
+        if (engine != null) {
+            engine.clampSpeedToCurrentRules();
+        }
+        return true;
+    }
+
+    public static boolean canDepossessToSpectator(World world) {
+        return world != null && !world.isSpectatorMode() && findPlayerDynasty(world) != null;
+    }
+
+    public static boolean depossessToSpectator(Engine engine, World world) {
+        if (!canDepossessToSpectator(world)) {
+            return false;
+        }
+        Dynasty player = findPlayerDynasty(world);
+        if (player != null) {
+            player.setPlayer(false);
+            if (player.getColonies() != null) {
+                for (Colony colony : player.getColonies()) {
+                    if (colony == null) {
+                        continue;
+                    }
+                    colony.setIsPlayer(false);
+                    colony.setAutomationEnabled(true);
+                }
+            }
+        }
+        if (world.getDynastys() != null) {
+            for (Dynasty dynasty : world.getDynastys()) {
+                if (dynasty == null) {
+                    continue;
+                }
+                dynasty.setPlayer(false);
+                if (dynasty.getColonies() != null) {
+                    for (Colony colony : dynasty.getColonies()) {
+                        if (colony != null) {
+                            colony.setIsPlayer(false);
+                        }
+                    }
+                }
+            }
+        }
+        world.setSpectatorMode(true);
+        if (world.getActiveHex() != null && world.getActiveHex().getColony() != null) {
+            Colony activeColony = world.getActiveHex().getColony();
+            activeColony.invalidateActiveRoleCountCache();
+            activeColony.runRoleAssignment(engine);
+        }
+        return true;
+    }
 }

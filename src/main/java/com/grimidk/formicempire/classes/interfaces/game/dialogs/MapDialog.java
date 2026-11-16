@@ -79,6 +79,8 @@ public class MapDialog extends ZeroDialog {
     private final JButton layersButton;
     private final JButton modesButton;
     private final JButton conquerButton;
+    private final JButton possessButton;
+    private final JButton depossessButton;
     private final JButton fogCheatButton;
     private final JButton disasterCheatButton;
     private final JButton closeButton;
@@ -318,6 +320,16 @@ public class MapDialog extends ZeroDialog {
         conquerButton.setFocusable(false);
         configureMapActionIconButton(conquerButton, "/icons/ui/Conquer.png", LanguageStrings.MAP_CONQUER_COLONY, LanguageStrings.MAP_CONQUER_COLONY_TT, false);
         conquerButton.addActionListener(e -> conquerActiveHex());
+
+        possessButton = new JButton();
+        possessButton.setFocusable(false);
+        configureMapActionIconButton(possessButton, "/icons/ui/Conquer.png", LanguageStrings.MAP_POSSESS_COLONY, LanguageStrings.MAP_POSSESS_COLONY_TT, false);
+        possessButton.addActionListener(e -> possessSelectedHex());
+
+        depossessButton = new JButton();
+        depossessButton.setFocusable(false);
+        configureMapActionIconButton(depossessButton, "/icons/ui/Layers.png", LanguageStrings.MAP_DEPOSSESS_COLONY, LanguageStrings.MAP_DEPOSSESS_COLONY_TT, false);
+        depossessButton.addActionListener(e -> depossessToSpectator());
         updateConquerButton();
 
         closeButton = new JButton();
@@ -334,6 +346,8 @@ public class MapDialog extends ZeroDialog {
         bottomPanel.add(playPauseButton);
         bottomPanel.add(homeButton);
         bottomPanel.add(conquerButton);
+        bottomPanel.add(possessButton);
+        bottomPanel.add(depossessButton);
         bottomPanel.add(closeButton);
 
         add(legendPanel, BorderLayout.WEST);
@@ -1327,6 +1341,27 @@ public class MapDialog extends ZeroDialog {
                     : LanguageStrings.get(LanguageStrings.MAP_CONQUER_COLONY_SELECT_TT));
         }
 
+        if (possessButton != null) {
+            boolean spectator = isSpectatorMode();
+            boolean canPossess = spectator && SandboxCheatService.canPossessHex(world, selectedHex());
+            possessButton.setVisible(spectator);
+            possessButton.setEnabled(spectator);
+            if (spectator) {
+                possessButton.setToolTipText(canPossess
+                        ? LanguageStrings.get(LanguageStrings.MAP_POSSESS_COLONY_TT)
+                        : LanguageStrings.get(LanguageStrings.MAP_POSSESS_COLONY_SELECT_TT));
+            }
+        }
+
+        if (depossessButton != null) {
+            boolean canDepossess = SandboxCheatService.canDepossessToSpectator(world);
+            depossessButton.setVisible(canDepossess);
+            depossessButton.setEnabled(canDepossess);
+            if (canDepossess) {
+                depossessButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_DEPOSSESS_COLONY_TT));
+            }
+        }
+
         if (fogCheatButton != null) {
             boolean cheatFog = eng != null && eng.isCheatFogOfWarToggle();
             fogCheatButton.setVisible(cheatFog);
@@ -1487,6 +1522,73 @@ public class MapDialog extends ZeroDialog {
         }
     }
 
+    private void possessSelectedHex() {
+        Engine eng = resolveEngine();
+        Hex hex = selectedHex();
+        if (!SandboxCheatService.canPossessHex(world, hex)) {
+            UiOptionPane.showMessageDialog(
+                    this,
+                    LanguageStrings.get(LanguageStrings.MAP_POSSESS_COLONY_SELECT_TT));
+            return;
+        }
+        Colony target = hex.getColony();
+        Dynasty dynasty = target.getDynasty();
+        int res = UiOptionPane.showConfirmDialog(
+                this,
+                LanguageStrings.format(LanguageStrings.MAP_POSSESS_COLONY_CONFIRM_MSG, target.getName(), dynasty.getName()),
+                LanguageStrings.get(LanguageStrings.MAP_POSSESS_COLONY_CONFIRM_TITLE),
+                JOptionPane.YES_NO_OPTION);
+        if (res != JOptionPane.YES_OPTION) {
+            return;
+        }
+        if (SandboxCheatService.possessHex(eng, world, hex)) {
+            cachedPlayerDynasty = null;
+            cachedPlayerDynastyWorld = null;
+            if (getOwner() instanceof MainFrame mf && mf.getGamePanel() != null) {
+                mf.getGamePanel().onSpectatorPossessed();
+            } else if (onHexChange != null) {
+                onHexChange.run();
+            }
+            dispose();
+        }
+    }
+
+    private void depossessToSpectator() {
+        syncWorldFromEngine();
+        Engine eng = resolveEngine();
+        if (!SandboxCheatService.canDepossessToSpectator(world)) {
+            return;
+        }
+        Dynasty player = findPlayerDynasty();
+        String dynastyName = player != null ? player.getName() : "";
+        int res = UiOptionPane.showConfirmDialog(
+                this,
+                LanguageStrings.format(LanguageStrings.MAP_DEPOSSESS_COLONY_CONFIRM_MSG, dynastyName),
+                LanguageStrings.get(LanguageStrings.MAP_DEPOSSESS_COLONY_CONFIRM_TITLE),
+                JOptionPane.YES_NO_OPTION);
+        if (res != JOptionPane.YES_OPTION) {
+            return;
+        }
+        if (SandboxCheatService.depossessToSpectator(eng, world)) {
+            cachedPlayerDynasty = null;
+            cachedPlayerDynastyWorld = null;
+            if (getOwner() instanceof MainFrame mf && mf.getGamePanel() != null) {
+                mf.getGamePanel().onEnteredSpectatorMode();
+            } else if (onHexChange != null) {
+                onHexChange.run();
+            }
+            updateConquerButton();
+            updateSpeedAndTimeControls();
+            if (mapPanel != null) {
+                mapPanel.invalidateBakedImage();
+                mapPanel.repaint();
+            }
+            if (legendPanel != null) {
+                legendPanel.updateLegend();
+            }
+        }
+    }
+
     private void changeHex(Hex newHex, boolean closeDialog) {
         syncWorldFromEngine();
         if (newHex == null || world == null) {
@@ -1623,6 +1725,8 @@ public class MapDialog extends ZeroDialog {
         configureMapActionIconButton(layersButton, "/icons/ui/Layers.png", LanguageStrings.MAP_LAYERS, LanguageStrings.MAP_LAYERS_TT, true);
         configureMapActionIconButton(modesButton, "/icons/tools/MinimapOverview.png", LanguageStrings.MAP_MODE_BUTTON, LanguageStrings.MAP_MODE_BUTTON_TT, true);
         configureMapActionIconButton(conquerButton, "/icons/ui/Conquer.png", LanguageStrings.MAP_CONQUER_COLONY, LanguageStrings.MAP_CONQUER_COLONY_TT, false);
+        configureMapActionIconButton(possessButton, "/icons/ui/Conquer.png", LanguageStrings.MAP_POSSESS_COLONY, LanguageStrings.MAP_POSSESS_COLONY_TT, false);
+        configureMapActionIconButton(depossessButton, "/icons/ui/Layers.png", LanguageStrings.MAP_DEPOSSESS_COLONY, LanguageStrings.MAP_DEPOSSESS_COLONY_TT, false);
         configureMapActionIconButton(disasterCheatButton, "/icons/disasters/Meteor.png", LanguageStrings.MAP_DISASTER_CHEAT, LanguageStrings.MAP_DISASTER_CHEAT_TT, true);
         if (disasterCheatButton != null && disasterCheatButton.getIcon() == null) {
             disasterCheatButton.setText("D");

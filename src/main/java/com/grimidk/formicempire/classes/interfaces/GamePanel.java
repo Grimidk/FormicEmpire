@@ -1805,6 +1805,59 @@ public class GamePanel extends ZeroGamePanel {
         lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
     }
 
+    public void onSpectatorPossessed() {
+        Engine engine = frame.getEngine();
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null || world.isSpectatorMode()) {
+            return;
+        }
+        Colony colony = world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
+        if (colony == null || !colony.belongsToPlayerDynasty()) {
+            return;
+        }
+        alertManager = new AlertManager(colony.getDynasty(), alertPanel);
+        if (triggerManager != null) {
+            triggerManager.unregisterListeners();
+        }
+        triggerManager = new TriggerManager(world, colony, engine);
+        if (frame instanceof TriggerManager.TriggerListener) {
+            triggerManager.addListener((TriggerManager.TriggerListener) frame);
+        }
+        triggerManager.registerListeners();
+        gameAreaPanel.setColony(colony);
+        updateStaticWorldInfo();
+        forceControlPanelMenuRefresh();
+        onGameSpeedChanged();
+        updateSpeedLabel();
+        refreshAllGUIData();
+        updateGameAreaSize();
+        centerOverworldScroll();
+        paintGameAreaWhilePaused();
+    }
+
+    public void onEnteredSpectatorMode() {
+        Engine engine = frame.getEngine();
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null || !world.isSpectatorMode()) {
+            return;
+        }
+        if (triggerManager != null) {
+            triggerManager.unregisterListeners();
+            triggerManager = null;
+        }
+        alertManager = null;
+        if (alertPanel != null) {
+            alertPanel.updateAlerts(new ArrayList<>());
+        }
+        updateStaticWorldInfo();
+        forceControlPanelMenuRefresh();
+        onGameSpeedChanged();
+        updateSpeedLabel();
+        refreshAllGUIData();
+        updateGameAreaSize();
+        paintGameAreaWhilePaused();
+    }
+
     private void updateStaticWorldInfo() {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
