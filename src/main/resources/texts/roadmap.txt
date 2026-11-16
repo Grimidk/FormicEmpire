@@ -63,7 +63,6 @@ Other assets:
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		Phase 6: preloaded accurate earth 
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		bridges (needs rafting)
 		Battle numeric animation with dice(?) and numbers

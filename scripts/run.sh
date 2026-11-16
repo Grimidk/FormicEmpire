@@ -25,6 +25,13 @@ java "$ROOT/tools/MusicTracksCodegen.java" \
     "$ROOT/src/main/resources/audio/music" \
     "$ROOT/src/main/java/com/grimidk/formicempire/classes/infrasctructure/registries/MusicTracks.java"
 
+mkdir -p "$ROOT/src/main/resources/maps" "$ROOT/saves/saved_maps"
+if [ -f "$ROOT/saves/saved_maps/Earth.json" ] && { [ ! -f "$ROOT/src/main/resources/maps/Earth.json" ] || [ "$ROOT/saves/saved_maps/Earth.json" -nt "$ROOT/src/main/resources/maps/Earth.json" ]; }; then
+    cp "$ROOT/saves/saved_maps/Earth.json" "$ROOT/src/main/resources/maps/Earth.json"
+elif [ -f "$ROOT/src/main/resources/maps/Earth.json" ] && [ ! -f "$ROOT/saves/saved_maps/Earth.json" ]; then
+    cp "$ROOT/src/main/resources/maps/Earth.json" "$ROOT/saves/saved_maps/Earth.json"
+fi
+
 echo "[Build] Building Formic Empire..."
 $MVN_EXEC clean install
 

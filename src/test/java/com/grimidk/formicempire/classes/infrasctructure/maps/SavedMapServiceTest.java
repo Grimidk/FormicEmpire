@@ -217,4 +217,43 @@ class SavedMapServiceTest {
         assertEquals(Integer.valueOf(2), loaded.builderStage);
         assertEquals(2, SavedMapService.inferLastStage(loaded, SavedMapService.buildWorldFromMapData(loaded)));
     }
+
+    @Test
+    void bundledEarthMapLoadsValidStandardWorldWithoutDynasties() throws IOException {
+        SavedMapService.ensureBundledMapsInstalled();
+        File installed = new File(SavedMapService.getSavedMapsDirectory(), "Earth.json");
+        assertTrue(installed.isFile());
+
+        SavedMapData data = SavedMapService.loadMapData(installed);
+        assertNotNull(data);
+        assertEquals(128, data.worldWidth);
+        assertEquals(64, data.worldHeight);
+
+        World world = SavedMapService.buildWorldFromMapData(data);
+        assertEquals(8192, world.getHexes().size());
+        assertEquals(3, SavedMapService.inferLastStage(data, world));
+        assertTrue(world.getDynastys().isEmpty());
+        assertTrue(world.getContinentCount() >= 4);
+        assertTrue(world.getIslandCount() >= 15);
+        assertFalse(world.getFaultLines().isEmpty());
+
+        boolean hasPeak = false;
+        boolean hasRiver = false;
+        boolean hasCoastal = false;
+        for (Hex h : world.getHexes()) {
+            if (h == null) continue;
+            if (h.getBiome() == GameConstants.BIOME_PEAK) {
+                hasPeak = true;
+            }
+            if (h.getRiverEdgeCount() > 0) {
+                hasRiver = true;
+            }
+            if (h.isCoastal()) {
+                hasCoastal = true;
+            }
+        }
+        assertTrue(hasPeak);
+        assertTrue(hasRiver);
+        assertTrue(hasCoastal);
+    }
 }

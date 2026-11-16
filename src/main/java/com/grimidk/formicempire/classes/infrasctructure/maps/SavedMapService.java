@@ -21,9 +21,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +35,23 @@ import java.util.Map;
 public class SavedMapService {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final String[] BUNDLED_MAP_FILES = { "Earth.json" };
+
+    public static void ensureBundledMapsInstalled() {
+        File dir = getSavedMapsDirectory();
+        for (String fileName : BUNDLED_MAP_FILES) {
+            File target = new File(dir, fileName);
+            if (!target.exists()) {
+                try (InputStream in = SavedMapService.class.getResourceAsStream("/maps/" + fileName)) {
+                    if (in != null) {
+                        Files.copy(in, target.toPath());
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
 
     public static File getSavedMapsDirectory() {
         File dir = new File(GamePaths.resolveSavesDirectory(), "saved_maps");
@@ -48,6 +67,7 @@ public class SavedMapService {
     }
 
     public static File[] getSavedMapFiles() {
+        ensureBundledMapsInstalled();
         File dir = getSavedMapsDirectory();
         File[] files = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".json"));
         if (files == null) {
@@ -170,6 +190,14 @@ public class SavedMapService {
         File targetFile = new File(dir, safeName + ".json");
         try (Writer writer = new FileWriter(targetFile, StandardCharsets.UTF_8)) {
             GSON.toJson(data, writer);
+        }
+        if ("Earth".equalsIgnoreCase(safeName)) {
+            File resourceFile = new File("src/main/resources/maps/Earth.json");
+            if (resourceFile.getParentFile() != null && resourceFile.getParentFile().isDirectory()) {
+                try (Writer writer = new FileWriter(resourceFile, StandardCharsets.UTF_8)) {
+                    GSON.toJson(data, writer);
+                }
+            }
         }
         return targetFile;
     }
