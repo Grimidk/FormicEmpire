@@ -956,7 +956,7 @@ public class GamePanel extends ZeroGamePanel {
             mapDialog = null;
         }
         if (mapDialog == null) {
-            mapDialog = new MapDialog(frame, engine, world, this::refreshAllGUIData, this::showWarDialog, this::handleBackButton);
+            mapDialog = new MapDialog(frame, engine, world, this::refreshAllGUIData, this::showWarDialog, this::handleBackButtonFromMap);
         } else {
             mapDialog.bindWorld(world);
         }
@@ -1414,7 +1414,26 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void handleBackButton() {
+        handleBackButton(false);
+    }
+
+    private void handleBackButtonFromMap() {
+        handleBackButton(true);
+    }
+
+    private void handleBackButton(boolean confirmedFromMap) {
         Engine engine = frame.getEngine();
+        if (!confirmedFromMap && engine != null && engine.getWorld() != null && engine.getWorld().isSpectatorMode()
+                && (mapDialog == null || !mapDialog.isShowing())) {
+            int res = UiOptionPane.showConfirmDialog(
+                    frame,
+                    LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_MSG),
+                    LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_TITLE),
+                    JOptionPane.YES_NO_OPTION);
+            if (res != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
         if (engine != null) {
             engine.pauseEngine();
         }

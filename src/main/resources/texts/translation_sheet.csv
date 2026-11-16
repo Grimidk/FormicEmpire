@@ -2706,7 +2706,7 @@ SAVED_MAP_CHOOSE_MODE_TITLE,World Setup,Configuración del mundo,Configuração 
 SAVED_MAP_CHOOSE_MODE_MSG,Select how the world for this game should be created:,Selecciona cómo crear el mundo para esta partida:,Selecione como o mundo deste jogo deve ser criado:,Sélectionnez comment le monde de cette partie doit être créé :
 SAVED_MAP_GENERATE_NEW,Generate New Map,Generar nuevo mapa,Gerar novo mapa,Générer une nouvelle carte
 SAVED_MAP_LOAD_SAVED,Choose Saved Map,Elegir mapa guardado,Escolher mapa salvo,Choisir une carte enregistrée
-SAVED_MAP_GALLERY_TITLE,Saved Maps Gallery,Galería de mapas guardados,Galeria de mapas salvos,Galerie des cartes enregistrées
+SAVED_MAP_GALLERY_TITLE,Map Gallery,Galería de Mapas,Galeria de Mapas,Galerie de Cartes
 SAVED_MAP_PAGE_FMT,Page %s / %s,Página %s / %s,Página %s / %s,Page %s / %s
 SAVED_MAP_SELECT,Play Map,Jugar mapa,Jogar mapa,Jouer la carte
 SAVED_MAP_PROMPT_NAME,Enter a name for this saved map:,Introduce un nombre para este mapa guardado:,Digite um nome para este mapa salvo:,Entrez un nom pour cette carte enregistrée :
@@ -2937,3 +2937,41 @@ LOG_BIOME_RECOVERY_FMT,"Nature has healed! %s recovered into %s.","¡La naturale
 REASON_OVERHARVESTING,Overharvesting,Sobreexplotación,Superexploração,Surexploitation
 REASON_RECOVERY,Ecological Recovery,Recuperación Ecológica,Recuperação Ecológica,Restauration Écologique
 BIOME_BARREN,Barren,Yermo,Estéril,Stérile
+UI_WORLD_MAKING,World Making,Creación de Mundos,Criação de Mundos,Création de Mondes
+UI_WORLD_MAKING_DESC,Create design or generate custom worlds.,Crea diseña o genera mundos personalizados.,Crie projete ou gere mundos personalizados.,Créez concevez ou générez des mondes personnalisés.
+UI_WORLD_BUILDER,World Designer,Diseñador de Mundos,Designer de Mundos,Concepteur de Mondes
+UI_WORLD_BUILDER_DESC,Step-by-step interactive manual world editor.,Editor interactivo manual de mundos paso a paso.,Editor manual interativo de mundos passo a passo.,Éditeur manuel interactif de mondes étape par étape.
+UI_WORLD_ALGORITHM,Algorithmic Generator,Generador Algorítmico,Gerador Algorítmico,Générateur Algorithmique
+UI_WORLD_ALGORITHM_DESC,Browse preview and generate procedural worlds.,Explora previsualiza y genera mundos procedimentales.,Navegue visualize e gere mundos procedurais.,Parcourez prévisualisez et générez des mondes procéduraux.
+UI_WORLD_STAGE_SETUP,1. Setup,1. Configuración,1. Configuração,1. Configuration
+UI_WORLD_STAGE_PLATES,2. Tectonic Plates,2. Placas Tectónicas,2. Placas Tectônicas,2. Plaques Tectoniques
+UI_WORLD_STAGE_LAND,3. Landmasses,3. Masas de Tierra,3. Massas de Terra,3. Masses Terrestres
+UI_WORLD_STAGE_BIOMES,4. Biomes,4. Biomas,4. Biomas,4. Biomes
+UI_WORLD_STAGE_DYNASTIES,5. Dynasties,5. Dinastías,5. Dinastias,5. Dynasties
+UI_WORLD_AUTO_GENERATE,Auto-Generate Step,Autogenerar Paso,Autogerar Passo,Générer Automatiquement l'Étape
+UI_WORLD_SAVE_MAP,Save World,Guardar Mundo,Salvar Mundo,Sauvegarder le Monde
+UI_WORLD_SAVE_SUCCESS,World saved successfully to saved worlds!,¡Mundo guardado exitosamente en mundos guardados!,Mundo salvo com sucesso nos mundos salvos!,Monde sauvegardé avec succès dans les mondes sauvegardés !
+UI_WORLD_TOOL_BRUSH,Brush,Pincel,Pincel,Pinceau
+UI_WORLD_TOOL_FILL,Bucket Fill,Relleno,Preenchimento,Remplissage
+UI_WORLD_TOOL_ERASER,Eraser,Borrador,Borracha,Gomme
+UI_WORLD_TOOL_PICKER,Eyedropper,Cuentagotas,Conta-gotas,Pipette
+UI_WORLD_BRUSH_SIZE,Brush Size,Tamaño de Pincel,Tamanho do Pincel,Taille du Pinceau
+UI_WORLD_WIDTH,Width,Ancho,Largura,Largeur
+UI_WORLD_HEIGHT,Height,Alto,Altura,Hauteur
+UI_WORLD_ICE_CAPS,Ice Caps,Casquetes Polares,Calotas Polares,Calottes Polaires
+UI_WORLD_ICE_CAP_LIMIT,Polar Ice Margin,Margen Polar de Hielo,Margem Polar de Gelo,Marge Polaire de Glace
+UI_WORLD_NAME,World Name,Nombre del Mundo,Nome do Mundo,Nom du Monde
+UI_WORLD_STAGE_FAULTS,"2. Faults & Plates","2. Fallas y Placas","2. Falhas e Placas","2. Failles et Plaques"
+UI_FAULT_CONVERGENT,Convergent,Convergente,Convergente,Convergent
+UI_FAULT_DIVERGENT,Divergent,Divergente,Divergente,Divergent
+UI_FAULT_TRANSFORM,Transform,Transformante,Transformante,Transformant
+UI_INTENSITY,Intensity,Intensidad,Intensidade,Intensité
+UI_UNDO,Undo,Deshacer,Desfazer,Annuler
+MAP_LAYER_DISASTERS,Disasters,Desastres,Desastres,Catastrophes
+MAP_MODE_DYNASTIC,Dynastic,Dinástico,Dinástico,Dynastique
+UI_WORLD_SIZE,Size,Tamaño,Tamanho,Taille
+UI_ELEVATION_RAISE,Raise,Elevar,Elevar,Élever
+UI_ELEVATION_LOWER,Lower,Bajar,Baixar,Abaisser
+UI_WORLD_TOOL_LINE,Line,Línea,Linha,Ligne
+UI_WORLD_RESET_STEP,Reset Step,Reiniciar Paso,Redefinir Etapa,Réinitialiser l'étape
+UI_WORLD_CONFIRM_SAVE_CLOSE,Do you want to save your progress before closing?,¿Quieres guardar tu progreso antes de cerrar?,Deseja salvar seu progresso antes de fechar?,Voulez-vous sauvegarder votre progression avant de fermer ?

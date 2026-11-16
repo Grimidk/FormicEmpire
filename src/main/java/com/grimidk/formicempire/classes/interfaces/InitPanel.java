@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.interfaces.menu.MenuSideRailPanel;
 import com.grimidk.formicempire.classes.interfaces.menu.VersionLicenseFooter;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.WorldMakingDialog;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -27,6 +28,7 @@ public class InitPanel extends JPanel {
             new VersionLicenseFooter(AssetStyles.COLOR_ABSOLUTE_BLACK);
     
     private JButton play;
+    private JButton worldMaking;
     private JButton audit;
     private JButton roadmap;
     private JButton credits;
@@ -74,6 +76,7 @@ public class InitPanel extends JPanel {
     
     private void initComponents() {
         play = createMenuButton(LanguageStrings.UI_PLAY, e -> frame.showCard(MainFrame.CARD_SAVE));
+        worldMaking = createMenuButton(LanguageStrings.UI_WORLD_MAKING, e -> new WorldMakingDialog(frame, frame.getEngine()).setVisible(true));
         audit = createMenuButton(LanguageStrings.UI_AUDIT, e -> HelpPanel.showAuditDialog(this));
         roadmap = createMenuButton(LanguageStrings.UI_ROADMAP, e -> HelpPanel.showRoadmapDialog(this));
         credits = createMenuButton(LanguageStrings.UI_CREDITS, e -> HelpPanel.showCreditsDialog(this));
@@ -117,8 +120,8 @@ public class InitPanel extends JPanel {
         menuColumn.add(menuHeader, c);
 
         JButton[] buttons = audit.isVisible()
-                ? new JButton[] { play, audit, roadmap, credits, quit }
-                : new JButton[] { play, roadmap, credits, quit };
+                ? new JButton[] { play, worldMaking, audit, roadmap, credits, quit }
+                : new JButton[] { play, worldMaking, roadmap, credits, quit };
 
         for (int i = 0; i < buttons.length; i++) {
             c.gridy = i + 1;
@@ -131,6 +134,7 @@ public class InitPanel extends JPanel {
     
     public void refreshTranslations() {
         play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
+        worldMaking.setText(LanguageStrings.get(LanguageStrings.UI_WORLD_MAKING));
         audit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         roadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
         credits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));

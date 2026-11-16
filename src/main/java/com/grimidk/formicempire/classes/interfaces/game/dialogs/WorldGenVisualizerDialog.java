@@ -120,7 +120,7 @@ public class WorldGenVisualizerDialog extends JDialog implements WorldGenStepLis
             miniMapPanel.repaint();
         });
         try {
-            Thread.sleep(135);
+            Thread.sleep(45);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

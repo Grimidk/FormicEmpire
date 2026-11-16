@@ -17,6 +17,7 @@ public class SavedMapData {
     public int tectonicPlateCount;
     public int continentCount;
     public int islandCount;
+    public Integer builderStage;
     public List<SavedMapHex> hexes = new ArrayList<>();
     public List<SavedMapPlate> tectonicPlates = new ArrayList<>();
     public List<SavedMapFault> faultLines = new ArrayList<>();
@@ -38,6 +39,12 @@ public class SavedMapData {
         public boolean[] riverEdges = new boolean[6];
         public int nonWaterResourceSourcesGenerated;
         public int plateId;
+        public String faultType;
+        public int faultIntensity;
+        public int dynastySpeciesId;
+        public boolean isPlayerColony;
+        public boolean isCapitalColony;
+        public String colonyName;
     }
 
     public static class SavedMapPlate {

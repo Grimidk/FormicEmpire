@@ -433,6 +433,13 @@ public class World {
     public void setHexes(ArrayList<Hex> hexes) {
         this.hexes = hexes;
         this.hexCoordCache.clear();
+        if (hexes != null) {
+            for (Hex h : hexes) {
+                if (h != null) {
+                    this.hexCoordCache.put(hexCoordKey(h.getQ(), h.getR()), h);
+                }
+            }
+        }
         markColonizedHexIndexDirty();
     }
 
@@ -513,9 +520,10 @@ public class World {
                 }
             }
         }
-        Hex spawn = getSpawnHex();
-        if (spawn != null && spawn.getColony() != null && spawn.getColony().isPlayer()) {
-            return spawn.getColony().getDynasty();
+        for (Hex colonized : colonizedHexesForTicks()) {
+            if (colonized != null && colonized.getColony() != null && colonized.getColony().isPlayer()) {
+                return colonized.getColony().getDynasty();
+            }
         }
         return null;
     }
@@ -945,25 +953,24 @@ public class World {
 
     public Hex getSpawnHex() {
         if (this.hexes == null || this.hexes.isEmpty()) return null;
-        
-        for (Hex h : this.hexes) {
-            if (h.getColony() != null && h.getColony().isPlayer()) {
+
+        for (Hex h : colonizedHexesForTicks()) {
+            if (h != null && h.getColony() != null && h.getColony().isPlayer()) {
                 return h;
             }
         }
         if (this.spectatorMode) {
-            for (Hex h : this.hexes) {
-                if (h.getColony() != null) {
+            for (Hex h : colonizedHexesForTicks()) {
+                if (h != null && h.getColony() != null) {
                     return h;
                 }
             }
         }
-        for (Hex h : this.hexes) {
-            if (h.getQ() == 0 && h.getR() == 0) {
-                return h;
-            }
+        Hex origin = getHexAt(0, 0);
+        if (origin != null) {
+            return origin;
         }
-        
+
         return this.hexes.get(0);
     }
     
@@ -989,8 +996,13 @@ public class World {
 
         this.activeHex = resolved;
         this.activeHex.setActive(true);
-        if (this.activeHex.getColony() != null && !this.spectatorMode && this.activeHex.getColony().isPlayer()) {
-            this.activeHex.getColony().setActive(true);
+        if (this.activeHex.getColony() != null) {
+            Colony col = this.activeHex.getColony();
+            col.setActive(true);
+            if (!col.isPlayer()) {
+                col.invalidateActiveRoleCountCache();
+                col.runRoleAssignment(this.engine);
+            }
         }
         
         updateEnvironmentalConditions();
@@ -1007,15 +1019,7 @@ public class World {
     }
 
     public Hex findHex(int q, int r) {
-        if (hexes == null) {
-            return null;
-        }
-        for (Hex hex : hexes) {
-            if (hex != null && hex.getQ() == q && hex.getR() == r) {
-                return hex;
-            }
-        }
-        return null;
+        return getHexAt(q, r);
     }
 
     public Hex findHexForColony(Colony colony) {
@@ -1166,6 +1170,17 @@ public class World {
         return Collections.unmodifiableList(faultLines);
     }
 
+    public void clearTectonicPlatesAndFaults() {
+        this.tectonicPlates.clear();
+        this.faultLines.clear();
+    }
+
+    public void addTectonicPlate(TectonicPlate plate) {
+        if (plate != null) {
+            this.tectonicPlates.add(plate);
+        }
+    }
+
     public void addFaultLine(FaultLine faultLine) {
         if (faultLine != null) {
             this.faultLines.add(faultLine);
@@ -1264,16 +1279,22 @@ public class World {
                 long key = (((long) Math.min(idA, idB)) << 32) | (Math.max(idA, idB) & 0xffffffffL);
                 FaultLine fault = faultMap.get(key);
                 if (fault == null) {
-                    FaultLine.FaultType type = getFaultTypeBetweenPlates(idA, idB);
+                    FaultLine.FaultType type = h.getFaultType() != null ? h.getFaultType() : getFaultTypeBetweenPlates(idA, idB);
                     if (type == null) {
                         type = FaultLine.FaultType.TRANSFORM;
                     }
-                    int intensity = getFaultIntensityBetweenPlates(idA, idB);
+                    int intensity = (h.getFaultType() != null && h.getFaultIntensity() > 0)
+                            ? h.getFaultIntensity()
+                            : getFaultIntensityBetweenPlates(idA, idB);
                     fault = new FaultLine(Math.min(idA, idB), Math.max(idA, idB), type, intensity);
                     faultMap.put(key, fault);
                     this.faultLines.add(fault);
                 }
                 fault.addBoundaryPair(h, n);
+                if (h.getFaultType() == null || fault.getIntensity() > h.getFaultIntensity()) {
+                    h.setFaultType(fault.getType());
+                    h.setFaultIntensity(fault.getIntensity());
+                }
             }
         }
     }
@@ -1851,6 +1872,7 @@ public class World {
                 }
 
                 hexMap.put(q + "," + r, hex);
+                this.hexCoordCache.put(hexCoordKey(q, r), hex);
                 this.hexes.add(hex);
             }
         }
@@ -1876,11 +1898,105 @@ public class World {
                 + this.islandCount + " island(s).");
     }
 
-    private void generateTectonicPlates() {
+    public void initializeBlankGrid(int width, int height, boolean hasIceCaps, double iceCapPolarLimit) {
+        this.worldWidth = width;
+        this.worldHeight = height;
+        this.hasIceCaps = hasIceCaps;
+        this.iceCapPolarLimit = iceCapPolarLimit;
+        this.hexes.clear();
+        this.hexCoordCache.clear();
+        this.colonizedHexes.clear();
+        this.colonizedHexesDirty = true;
+        this.dynastys.clear();
+        this.continentCount = 0;
+        this.islandCount = 0;
+        this.tectonicPlates.clear();
+        this.faultLines.clear();
+
+        Map<String, Hex> hexMap = new HashMap<>();
+        int minR = -this.worldHeight / 2;
+        int maxR = this.worldHeight / 2 - 1;
+        int minCol = -this.worldWidth / 2;
+        int maxCol = this.worldWidth / 2 - 1;
+
+        for (int r = minR; r <= maxR; r++) {
+            double absLat = Math.abs((double) r) / (this.worldHeight / 2.0);
+
+            for (int col = minCol; col <= maxCol; col++) {
+                int q = col - (r >> 1);
+                Hex hex = new Hex();
+                hex.setQ(q);
+                hex.setR(r);
+                hex.setTimeOffset(GameNumbers.calculateTimeZoneOffset(col, this.worldWidth));
+                hex.setActive(false);
+                hex.setColony(null);
+                hex.setIsland(false);
+
+                boolean isIce = false;
+                if (this.hasIceCaps) {
+                    double wave = 0.07 * Math.sin(col * 0.18 + (r > 0 ? 1.0 : -1.0))
+                            + 0.04 * Math.cos(col * 0.38)
+                            + 0.02 * Math.sin(col * 0.75);
+                    double oneRow = 1.0 / Math.max(1, this.worldHeight / 2.0);
+                    double polarLimit = this.iceCapPolarLimit + oneRow + wave;
+                    double transitionLimit = polarLimit - 0.08;
+
+                    if (absLat >= polarLimit) {
+                        isIce = true;
+                    } else if (absLat >= transitionLimit) {
+                        double fraction = (absLat - transitionLimit) / (polarLimit - transitionLimit);
+                        int chance = (int) Math.round(fraction * 70.0);
+                        isIce = (GameRandom.nextInt(100) < chance);
+                    }
+                }
+
+                if (isIce) {
+                    hex.setBiome(GameConstants.BIOME_ICE_FIELD);
+                    hex.setElevation(1);
+                    hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_ICE_FIELD));
+                } else {
+                    hex.setBiome(GameConstants.BIOME_OCEAN);
+                    hex.setElevation(0);
+                    hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
+                }
+
+                hexMap.put(q + "," + r, hex);
+                this.hexCoordCache.put(hexCoordKey(q, r), hex);
+                this.hexes.add(hex);
+            }
+        }
+        linkNeighbors(hexMap);
+    }
+
+    public void assignBiomesToLandHexes() {
+        int latScale = Math.max(1, this.worldHeight / 2);
+        for (Hex h : this.hexes) {
+            if (h == null || h.getBiome() == GameConstants.BIOME_ICE_FIELD || isWaterBiome(h.getBiome())) {
+                continue;
+            }
+            Biome b = pickBiomeForLandHex(h, latScale);
+            h.setBiome(b);
+            h.setLocalWeather(getRandomWeather(b));
+        }
+    }
+
+    public void generateDefaultPlatesAndElevation() {
+        generateTectonicPlates();
+        generateFaultLinesAndElevation();
+    }
+
+    public void generateTectonicPlates() {
         this.tectonicPlates.clear();
         this.faultLines.clear();
         if (this.hexes == null || this.hexes.isEmpty()) {
             return;
+        }
+        for (Hex h : this.hexes) {
+            if (h != null) {
+                h.setPlateId(0);
+                h.setFaultType(null);
+                h.setFaultIntensity(0);
+            }
         }
 
         int numPlates = (this.tectonicPlateCount > 0)
@@ -1944,14 +2060,22 @@ public class World {
         }
     }
 
-    private void generateFaultLinesAndElevation() {
+    public void generateFaultLinesFromPlates() {
         this.faultLines.clear();
-        if (this.hexes == null || this.hexes.isEmpty() || this.tectonicPlates.isEmpty()) {
+        if (this.hexes == null || this.hexes.isEmpty()) {
+            return;
+        }
+        for (Hex h : this.hexes) {
+            if (h != null) {
+                h.setFaultType(null);
+                h.setFaultIntensity(0);
+            }
+        }
+        if (this.tectonicPlates.isEmpty()) {
             return;
         }
 
         Map<Long, FaultLine> faultMap = new HashMap<>();
-        List<Hex> boundaryHexes = new ArrayList<>();
         Map<Hex, FaultLine.FaultType> boundaryFaultTypes = new HashMap<>();
         Map<Hex, Integer> boundaryFaultIntensity = new HashMap<>();
 
@@ -2002,13 +2126,55 @@ public class World {
                     this.faultLines.add(fault);
                 }
                 fault.addBoundaryPair(h, n);
-                if (!boundaryHexes.contains(h)) {
-                    boundaryHexes.add(h);
+                if (!boundaryFaultTypes.containsKey(h)
+                        || fault.getIntensity() > boundaryFaultIntensity.getOrDefault(h, 1)) {
                     boundaryFaultTypes.put(h, fault.getType());
                     boundaryFaultIntensity.put(h, fault.getIntensity());
-                } else if (fault.getIntensity() > boundaryFaultIntensity.getOrDefault(h, 1)) {
-                    boundaryFaultTypes.put(h, fault.getType());
-                    boundaryFaultIntensity.put(h, fault.getIntensity());
+                    h.setFaultType(fault.getType());
+                    h.setFaultIntensity(fault.getIntensity());
+                }
+            }
+        }
+    }
+
+    public void generateElevationFromFaults() {
+        if (this.hexes == null || this.hexes.isEmpty()) {
+            return;
+        }
+
+        List<Hex> boundaryHexes = new ArrayList<>();
+        Map<Hex, FaultLine.FaultType> boundaryFaultTypes = new HashMap<>();
+        Map<Hex, Integer> boundaryFaultIntensity = new HashMap<>();
+
+        for (Hex h : this.hexes) {
+            if (h != null && h.getFaultType() != null) {
+                boundaryHexes.add(h);
+                boundaryFaultTypes.put(h, h.getFaultType());
+                boundaryFaultIntensity.put(h, Math.max(1, h.getFaultIntensity()));
+            }
+        }
+        if (boundaryHexes.isEmpty() && !this.faultLines.isEmpty()) {
+            for (FaultLine fault : this.faultLines) {
+                if (fault == null) continue;
+                for (Hex bh : fault.getHexesA()) {
+                    if (bh != null && (!boundaryFaultTypes.containsKey(bh)
+                            || fault.getIntensity() > boundaryFaultIntensity.getOrDefault(bh, 1))) {
+                        if (!boundaryFaultTypes.containsKey(bh)) {
+                            boundaryHexes.add(bh);
+                        }
+                        boundaryFaultTypes.put(bh, fault.getType());
+                        boundaryFaultIntensity.put(bh, fault.getIntensity());
+                    }
+                }
+                for (Hex bh : fault.getHexesB()) {
+                    if (bh != null && (!boundaryFaultTypes.containsKey(bh)
+                            || fault.getIntensity() > boundaryFaultIntensity.getOrDefault(bh, 1))) {
+                        if (!boundaryFaultTypes.containsKey(bh)) {
+                            boundaryHexes.add(bh);
+                        }
+                        boundaryFaultTypes.put(bh, fault.getType());
+                        boundaryFaultIntensity.put(bh, fault.getIntensity());
+                    }
                 }
             }
         }
@@ -2057,19 +2223,23 @@ public class World {
                 if (isOceanPlate && dist == 0) {
                     h.setElevation(-2);
                 } else {
+                    int base0 = intensity >= 3 ? 6 : (intensity == 2 ? 5 : 3);
+                    int base1 = intensity >= 3 ? 4 : (intensity == 2 ? 3 : 2);
                     int uplift = switch (dist) {
-                        case 0 -> (int) Math.round(((intensity == 2 ? 5 : 3) + GameRandom.nextInt(3)) * faultUpliftFactor);
-                        case 1 -> (int) Math.round(((intensity == 2 ? 3 : 2) + GameRandom.nextInt(2)) * faultUpliftFactor);
-                        case 2 -> intensity == 2 ? 2 : 1;
+                        case 0 -> (int) Math.round((base0 + GameRandom.nextInt(3)) * faultUpliftFactor);
+                        case 1 -> (int) Math.round((base1 + GameRandom.nextInt(2)) * faultUpliftFactor);
+                        case 2 -> intensity >= 2 ? 2 : 1;
                         default -> 0;
                     };
                     h.setElevation(h.getElevation() + uplift);
                 }
             } else if (fType == FaultLine.FaultType.DIVERGENT) {
+                int base0 = intensity >= 3 ? 5 : (intensity == 2 ? 4 : 2);
+                int base1 = intensity >= 3 ? 3 : (intensity == 2 ? 2 : 1);
                 int subsidence = switch (dist) {
-                    case 0 -> (intensity == 2 ? 4 : 2) + GameRandom.nextInt(3);
-                    case 1 -> (intensity == 2 ? 2 : 1) + GameRandom.nextInt(2);
-                    case 2 -> intensity == 2 ? 1 : 0;
+                    case 0 -> base0 + GameRandom.nextInt(3);
+                    case 1 -> base1 + GameRandom.nextInt(2);
+                    case 2 -> intensity >= 2 ? 1 : 0;
                     default -> 0;
                 };
                 h.setElevation(h.getElevation() - subsidence);
@@ -2077,7 +2247,7 @@ public class World {
                     h.setElevation(Math.min(h.getElevation(), -2));
                 }
             } else if (fType == FaultLine.FaultType.TRANSFORM) {
-                if (intensity == 2) {
+                if (intensity >= 2) {
                     if (dist == 0) {
                         int flattened = (plate != null && plate.isOceanic()) ? 2 : 3;
                         h.setElevation(flattened);
@@ -2121,6 +2291,11 @@ public class World {
         }
 
         calibrateSeaLevelContour();
+    }
+
+    private void generateFaultLinesAndElevation() {
+        generateFaultLinesFromPlates();
+        generateElevationFromFaults();
     }
 
     private void calibrateSeaLevelContour() {
@@ -2174,7 +2349,242 @@ public class World {
         }
     }
 
+    public void generateAlgorithmicLandmasses() {
+        if (this.hexes == null || this.hexes.isEmpty()) {
+            return;
+        }
+        if (this.tectonicPlates.isEmpty()) {
+            generateTectonicPlates();
+            generateFaultLinesFromPlates();
+        }
+        generateElevationFromFaults();
+
+        this.continents.clear();
+        this.archipelagos.clear();
+        this.iceCaps.clear();
+        this.continentCount = 0;
+        this.islandCount = 0;
+        for (Hex h : this.hexes) {
+            if (h == null) {
+                continue;
+            }
+            h.setContinentId(0);
+            h.setIsland(false);
+            h.setCoastal(false);
+            h.setWaterDistance(0);
+            for (int d = 0; d < 6; d++) {
+                h.setRiverEdge(d, false);
+            }
+            if (h.getBiome() != GameConstants.BIOME_ICE_FIELD) {
+                h.setBiome(GameConstants.BIOME_OCEAN);
+            }
+        }
+
+        Map<Integer, Set<Hex>> continentHexes = new HashMap<>();
+        List<Hex> allLand = new ArrayList<>();
+        Set<Hex> allLandSet = new HashSet<>();
+        growContinentsAndComputeCoastalElevation(continentHexes, allLand, allLandSet);
+
+        for (Hex h : this.hexes) {
+            if (h == null || h.getBiome() == GameConstants.BIOME_LAKE || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
+                continue;
+            }
+            if (allLandSet.contains(h)) {
+                h.setBiome(GameConstants.BIOME_PLAINS);
+                h.setLocalWeather(getRandomWeather(GameConstants.BIOME_PLAINS));
+            } else if (h.getElevation() <= -1) {
+                h.setBiome(GameConstants.BIOME_ABYSS);
+            } else if (h.getElevation() == 0) {
+                h.setBiome(GameConstants.BIOME_DEEP_OCEAN);
+            } else if (h.getElevation() == 1) {
+                h.setBiome(GameConstants.BIOME_OCEAN);
+            } else {
+                h.setBiome(GameConstants.BIOME_SHALLOW_OCEAN);
+            }
+        }
+        classifyLandmasses();
+    }
+
+    public void generateAlgorithmicBiomesAndFeatures() {
+        if (this.hexes == null || this.hexes.isEmpty()) {
+            return;
+        }
+        for (Hex h : this.hexes) {
+            if (h != null) {
+                for (int d = 0; d < 6; d++) {
+                    h.setRiverEdge(d, false);
+                }
+            }
+        }
+
+        Map<Integer, Set<Hex>> continentHexes = new HashMap<>();
+        List<Hex> allLand = new ArrayList<>();
+        Set<Hex> allLandSet = new HashSet<>();
+
+        for (Hex h : this.hexes) {
+            if (h == null || h.getBiome() == GameConstants.BIOME_ICE_FIELD || h.getBiome() == GameConstants.BIOME_LAKE) {
+                continue;
+            }
+            if (h.getContinentId() > 0 && !h.isIsland()) {
+                continentHexes.computeIfAbsent(h.getContinentId(), k -> new HashSet<>()).add(h);
+                if (allLandSet.add(h)) {
+                    allLand.add(h);
+                }
+            } else if (isLandHex(h) || h.getElevation() >= 4) {
+                if (allLandSet.add(h)) {
+                    allLand.add(h);
+                }
+            }
+        }
+
+        if (continentHexes.isEmpty()) {
+            Set<Hex> visited = new HashSet<>();
+            int nextCid = 1;
+            for (Hex h : this.hexes) {
+                if (h == null || visited.contains(h) || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
+                    continue;
+                }
+                boolean isHandPaintedLand = isLandHex(h) || h.getElevation() >= 4;
+                if (!isHandPaintedLand || h.getBiome() == GameConstants.BIOME_LAKE) {
+                    continue;
+                }
+                List<Hex> comp = new ArrayList<>();
+                ArrayDeque<Hex> q = new ArrayDeque<>();
+                q.add(h);
+                visited.add(h);
+                while (!q.isEmpty()) {
+                    Hex cur = q.poll();
+                    comp.add(cur);
+                    for (Hex n : cur.getAdjacentNeighbors()) {
+                        if (n != null && !visited.contains(n) && n.getBiome() != GameConstants.BIOME_ICE_FIELD
+                                && n.getBiome() != GameConstants.BIOME_LAKE
+                                && (isLandHex(n) || n.getElevation() >= 4)) {
+                            visited.add(n);
+                            q.add(n);
+                        }
+                    }
+                }
+                if (comp.size() >= 4) {
+                    int cid = nextCid++;
+                    Set<Hex> cSet = new HashSet<>(comp);
+                    continentHexes.put(cid, cSet);
+                    for (Hex ch : comp) {
+                        ch.setContinentId(cid);
+                        ch.setIsland(false);
+                        if (allLandSet.add(ch)) {
+                            allLand.add(ch);
+                        }
+                    }
+                } else {
+                    for (Hex ch : comp) {
+                        ch.setContinentId(0);
+                        ch.setIsland(true);
+                        if (allLandSet.add(ch)) {
+                            allLand.add(ch);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (allLand.isEmpty()) {
+            generateAlgorithmicLandmasses();
+            for (Hex h : this.hexes) {
+                if (h == null || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
+                    continue;
+                }
+                if (h.getContinentId() > 0 && !h.isIsland()) {
+                    continentHexes.computeIfAbsent(h.getContinentId(), k -> new HashSet<>()).add(h);
+                    if (allLandSet.add(h)) {
+                        allLand.add(h);
+                    }
+                } else if (isLandHex(h)) {
+                    if (allLandSet.add(h)) {
+                        allLand.add(h);
+                    }
+                }
+            }
+        }
+
+        boolean needsWaterDistance = false;
+        for (Hex h : allLand) {
+            if (h.getWaterDistance() <= 0) {
+                needsWaterDistance = true;
+                break;
+            }
+        }
+        if (needsWaterDistance && !allLand.isEmpty()) {
+            ArrayDeque<Hex> bfsQueue = new ArrayDeque<>();
+            for (Hex h : allLand) {
+                boolean coastal = false;
+                for (Hex n : h.getAdjacentNeighbors()) {
+                    if (n == null || !allLandSet.contains(n)) {
+                        coastal = true;
+                        break;
+                    }
+                }
+                h.setCoastal(coastal);
+                if (coastal) {
+                    h.setWaterDistance(1);
+                    bfsQueue.add(h);
+                } else {
+                    h.setWaterDistance(Integer.MAX_VALUE);
+                }
+            }
+            while (!bfsQueue.isEmpty()) {
+                Hex cur = bfsQueue.poll();
+                int nextDist = cur.getWaterDistance() + 1;
+                for (Hex n : cur.getAdjacentNeighbors()) {
+                    if (n != null && allLandSet.contains(n) && n.getWaterDistance() > nextDist) {
+                        n.setWaterDistance(nextDist);
+                        bfsQueue.add(n);
+                    }
+                }
+            }
+        }
+
+        assignLakesBiomesIslandsRiversAndFeatures(continentHexes, allLand, allLandSet);
+    }
+
     private void generateMultiContinents(Biome startBiome, Colony startColony, boolean seedDynasties) {
+        Map<Integer, Set<Hex>> continentHexes = new HashMap<>();
+        List<Hex> allLand = new ArrayList<>();
+        Set<Hex> allLandSet = new HashSet<>();
+
+        growContinentsAndComputeCoastalElevation(continentHexes, allLand, allLandSet);
+        assignLakesBiomesIslandsRiversAndFeatures(continentHexes, allLand, allLandSet);
+
+        // Step 15: Spawn player dynasty and distribute rival dynasties
+        if (seedDynasties) {
+            continentHexes.clear();
+            for (Hex h : this.hexes) {
+                if (h != null && h.getContinentId() > 0 && isLandHex(h) && !h.isIsland()) {
+                    continentHexes.computeIfAbsent(h.getContinentId(), k -> new HashSet<>()).add(h);
+                }
+            }
+            if (continentHexes.isEmpty()) {
+                for (Hex h : this.hexes) {
+                    if (h != null && isLandHex(h)) {
+                        continentHexes.computeIfAbsent(1, k -> new HashSet<>()).add(h);
+                    }
+                }
+            }
+            if (!this.spectatorMode) {
+                spawnPlayerOnRandomContinent(startBiome, startColony, continentHexes);
+            }
+            distributeRivalDynastiesAcrossContinents(continentHexes);
+            rebuildColonizedHexIndexIfNeeded();
+            ensureDynastiesKnownHexesInitialized();
+            notifyStep(15, "Spawn Dynasties");
+        } else {
+            notifyStep(15, "Generate World Complete");
+        }
+    }
+
+    private void growContinentsAndComputeCoastalElevation(
+            Map<Integer, Set<Hex>> continentHexes,
+            List<Hex> allLand,
+            Set<Hex> allLandSet) {
         // Step 4: Seed and grow continental landmasses
         int numContinents = (this.targetContinentCount > 0)
                 ? this.targetContinentCount
@@ -2183,7 +2593,7 @@ public class World {
                         : (6 + GameRandom.nextInt(2)));
         List<Hex> seeds = new ArrayList<>();
 
-        int sectorWidth = this.worldWidth / numContinents;
+        int sectorWidth = Math.max(1, this.worldWidth / Math.max(1, numContinents));
         int latOffset = Math.max(1, (int) Math.round(this.worldHeight * 0.15));
         for (int i = 0; i < numContinents; i++) {
             int colCenter = -this.worldWidth / 2 + i * sectorWidth + sectorWidth / 2;
@@ -2225,203 +2635,203 @@ public class World {
             }
         }
 
-        int nonIceHexCount = 0;
-        int polarCutoff = Math.max(2, (int) Math.round(this.worldHeight * 0.44) + 1);
-        for (Hex h : this.hexes) {
-            if (h.getBiome() == GameConstants.BIOME_ICE_FIELD && Math.abs(h.getR()) >= polarCutoff) {
-                continue;
-            }
-            nonIceHexCount++;
-        }
-
-        int totalContinentalTarget = (int) Math.round(nonIceHexCount * this.continentalLandPercentage);
-        int basePerContinent = totalContinentalTarget / seeds.size();
-        int minHexesPerContinent = (int) Math.round(basePerContinent * 0.70);
-
-        int[] targets = new int[seeds.size()];
-        int assignedSum = 0;
-        for (int i = 0; i < seeds.size(); i++) {
-            double variance = 0.85 + GameRandom.nextDouble() * 0.30;
-            targets[i] = Math.max(minHexesPerContinent, (int) Math.round(basePerContinent * variance));
-            assignedSum += targets[i];
-        }
-        if (assignedSum < totalContinentalTarget) {
-            int diff = totalContinentalTarget - assignedSum;
-            for (int i = 0; i < diff; i++) {
-                targets[i % seeds.size()]++;
-            }
-        }
-
-        Map<Integer, Set<Hex>> continentHexes = new HashMap<>();
-        Map<Integer, List<Hex>> continentFrontiers = new HashMap<>();
-
-        int[] shapeTypes = new int[seeds.size()];
-        int[] bayCols = new int[seeds.size()];
-        int[] bayRs = new int[seeds.size()];
-        double[] bayRadSq = new double[seeds.size()];
-        double[] axisAngles = new double[seeds.size()];
-        double[] maxPerpWidths = new double[seeds.size()];
-        double[] maxRadiusSq = new double[seeds.size()];
-        double[] orientAngles = new double[seeds.size()];
-        double[] inRadii = new double[seeds.size()];
-
-        double scale = Math.max(0.25, this.worldHeight / 50.0);
-
-        for (int i = 0; i < seeds.size(); i++) {
-            int cid = i + 1;
-            Hex seed = seeds.get(i);
-            seed.setContinentId(cid);
-            Set<Hex> hexSet = new HashSet<>();
-            hexSet.add(seed);
-            continentHexes.put(cid, hexSet);
-
-            List<Hex> frontier = new ArrayList<>();
-            frontier.add(seed);
-            continentFrontiers.put(cid, frontier);
-
-            int sR = seed.getR();
-            int sCol = seed.getQ() + (sR >> 1);
-
-            shapeTypes[i] = GameRandom.nextInt(4);
-
-            double bayAngle = GameRandom.nextDouble() * 2.0 * Math.PI;
-            double bayDist = (8.0 + GameRandom.nextDouble() * 6.0) * scale;
-            bayCols[i] = sCol + (int) Math.round(bayDist * Math.cos(bayAngle));
-            bayRs[i] = sR + (int) Math.round((bayDist * Math.sin(bayAngle)) / 1.5);
-            double bayRad = (6.0 + GameRandom.nextDouble() * 4.0) * scale;
-            bayRadSq[i] = bayRad * bayRad * 3.0;
-
-            axisAngles[i] = GameRandom.nextDouble() * Math.PI;
-            maxPerpWidths[i] = (4.0 + GameRandom.nextDouble() * 2.5) * scale;
-
-            double cRad = (13.0 + GameRandom.nextDouble() * 4.0) * scale;
-            maxRadiusSq[i] = cRad * cRad * 3.0;
-
-            orientAngles[i] = GameRandom.nextDouble() * 2.0 * Math.PI;
-            inRadii[i] = (10.0 + GameRandom.nextDouble() * 4.0) * scale;
-        }
-
-        int maxRounds = 30000;
-        int round = 0;
-        int consecutiveFails = 0;
-
-        while (round++ < maxRounds && consecutiveFails < 500) {
-            boolean grewThisRound = false;
-            for (int i = 0; i < seeds.size(); i++) {
-                int cid = i + 1;
-                Set<Hex> cSet = continentHexes.get(cid);
-                List<Hex> frontier = continentFrontiers.get(cid);
-                if (cSet == null || frontier == null || cSet.size() >= targets[i]) {
+        if (!seeds.isEmpty()) {
+            int nonIceHexCount = 0;
+            int polarCutoff = Math.max(2, (int) Math.round(this.worldHeight * 0.44) + 1);
+            for (Hex h : this.hexes) {
+                if (h.getBiome() == GameConstants.BIOME_ICE_FIELD && Math.abs(h.getR()) >= polarCutoff) {
                     continue;
                 }
+                nonIceHexCount++;
+            }
 
-                if (frontier.isEmpty() && cSet.size() < targets[i]) {
-                    for (Hex h : cSet) {
-                        for (Hex n : h.getAdjacentNeighbors()) {
-                            if (n != null && n.getContinentId() == 0) {
-                                frontier.add(h);
-                                break;
-                            }
-                        }
-                    }
-                    if (frontier.isEmpty()) {
+            int totalContinentalTarget = (int) Math.round(nonIceHexCount * this.continentalLandPercentage);
+            int basePerContinent = totalContinentalTarget / seeds.size();
+            int minHexesPerContinent = (int) Math.round(basePerContinent * 0.70);
+
+            int[] targets = new int[seeds.size()];
+            int assignedSum = 0;
+            for (int i = 0; i < seeds.size(); i++) {
+                double variance = 0.85 + GameRandom.nextDouble() * 0.30;
+                targets[i] = Math.max(minHexesPerContinent, (int) Math.round(basePerContinent * variance));
+                assignedSum += targets[i];
+            }
+            if (assignedSum < totalContinentalTarget) {
+                int diff = totalContinentalTarget - assignedSum;
+                for (int i = 0; i < diff; i++) {
+                    targets[i % seeds.size()]++;
+                }
+            }
+
+            Map<Integer, List<Hex>> continentFrontiers = new HashMap<>();
+
+            int[] shapeTypes = new int[seeds.size()];
+            int[] bayCols = new int[seeds.size()];
+            int[] bayRs = new int[seeds.size()];
+            double[] bayRadSq = new double[seeds.size()];
+            double[] axisAngles = new double[seeds.size()];
+            double[] maxPerpWidths = new double[seeds.size()];
+            double[] maxRadiusSq = new double[seeds.size()];
+            double[] orientAngles = new double[seeds.size()];
+            double[] inRadii = new double[seeds.size()];
+
+            double scale = Math.max(0.25, this.worldHeight / 50.0);
+
+            for (int i = 0; i < seeds.size(); i++) {
+                int cid = i + 1;
+                Hex seed = seeds.get(i);
+                seed.setContinentId(cid);
+                Set<Hex> hexSet = new HashSet<>();
+                hexSet.add(seed);
+                continentHexes.put(cid, hexSet);
+
+                List<Hex> frontier = new ArrayList<>();
+                frontier.add(seed);
+                continentFrontiers.put(cid, frontier);
+
+                int sR = seed.getR();
+                int sCol = seed.getQ() + (sR >> 1);
+
+                shapeTypes[i] = GameRandom.nextInt(4);
+
+                double bayAngle = GameRandom.nextDouble() * 2.0 * Math.PI;
+                double bayDist = (8.0 + GameRandom.nextDouble() * 6.0) * scale;
+                bayCols[i] = sCol + (int) Math.round(bayDist * Math.cos(bayAngle));
+                bayRs[i] = sR + (int) Math.round((bayDist * Math.sin(bayAngle)) / 1.5);
+                double bayRad = (6.0 + GameRandom.nextDouble() * 4.0) * scale;
+                bayRadSq[i] = bayRad * bayRad * 3.0;
+
+                axisAngles[i] = GameRandom.nextDouble() * Math.PI;
+                maxPerpWidths[i] = (4.0 + GameRandom.nextDouble() * 2.5) * scale;
+
+                double cRad = (13.0 + GameRandom.nextDouble() * 4.0) * scale;
+                maxRadiusSq[i] = cRad * cRad * 3.0;
+
+                orientAngles[i] = GameRandom.nextDouble() * 2.0 * Math.PI;
+                inRadii[i] = (10.0 + GameRandom.nextDouble() * 4.0) * scale;
+            }
+
+            int maxRounds = 30000;
+            int round = 0;
+            int consecutiveFails = 0;
+
+            while (round++ < maxRounds && consecutiveFails < 500) {
+                boolean grewThisRound = false;
+                for (int i = 0; i < seeds.size(); i++) {
+                    int cid = i + 1;
+                    Set<Hex> cSet = continentHexes.get(cid);
+                    List<Hex> frontier = continentFrontiers.get(cid);
+                    if (cSet == null || frontier == null || cSet.size() >= targets[i]) {
                         continue;
                     }
-                }
 
-                Hex current = frontier.get(GameRandom.nextInt(frontier.size()));
-                List<Hex> candidates = new ArrayList<>();
-                boolean underMin = (consecutiveFails >= 100);
-
-                for (Hex n : current.getAdjacentNeighbors()) {
-                    if (n == null) continue;
-                    if (n.getContinentId() != 0) continue;
-                    if (this.hasIceCaps) {
-                        int col = n.getQ() + (n.getR() >> 1);
-                        double wave = 0.05 * Math.sin(col * 0.22) + 0.03 * Math.cos(col * 0.48);
-                        double absLat = Math.abs((double) n.getR()) / (this.worldHeight / 2.0);
-                        if (absLat >= (this.iceCapPolarLimit - 0.02 + wave) || n.getBiome() == GameConstants.BIOME_ICE_FIELD || touchesIceField(n)) {
+                    if (frontier.isEmpty() && cSet.size() < targets[i]) {
+                        for (Hex h : cSet) {
+                            for (Hex n : h.getAdjacentNeighbors()) {
+                                if (n != null && n.getContinentId() == 0) {
+                                    frontier.add(h);
+                                    break;
+                                }
+                            }
+                        }
+                        if (frontier.isEmpty()) {
                             continue;
                         }
                     }
 
-                    boolean touchesOtherContinent = false;
-                    for (Hex nn : n.getAdjacentNeighbors()) {
-                        if (nn != null && nn.getContinentId() != 0 && nn.getContinentId() != cid) {
-                            touchesOtherContinent = true;
-                            break;
-                        }
-                    }
-                    if (touchesOtherContinent) {
-                        continue;
-                    }
+                    Hex current = frontier.get(GameRandom.nextInt(frontier.size()));
+                    List<Hex> candidates = new ArrayList<>();
+                    boolean underMin = (consecutiveFails >= 100);
 
-                    if (!underMin) {
-                        Hex s = seeds.get(i);
-                        int sR = s.getR();
-                        int sCol = s.getQ() + (sR >> 1);
-                        int nR = n.getR();
-                        int nCol = n.getQ() + (nR >> 1);
-
-                        int signCol = nCol - sCol;
-                        if (signCol > this.worldWidth / 2) signCol -= this.worldWidth;
-                        else if (signCol < -this.worldWidth / 2) signCol += this.worldWidth;
-
-                        double dx = signCol * Math.sqrt(3.0);
-                        double dy = (nR - sR) * 1.5;
-
-                        int shape = shapeTypes[i];
-                        if (shape == 3) {
-                            int bCol = Math.abs(nCol - bayCols[i]);
-                            if (bCol > this.worldWidth / 2) bCol = this.worldWidth - bCol;
-                            double bdx = bCol * Math.sqrt(3.0);
-                            double bdy = (nR - bayRs[i]) * 1.5;
-                            if (bdx * bdx + bdy * bdy < bayRadSq[i] && GameRandom.nextInt(100) < 95) {
-                                continue;
-                            }
-                        } else if (shape == 2) {
-                            double perp = Math.abs(dx * (-Math.sin(axisAngles[i])) + dy * Math.cos(axisAngles[i])) / Math.sqrt(3.0);
-                            if (perp > maxPerpWidths[i] && GameRandom.nextInt(100) < 90) {
-                                continue;
-                            }
-                        } else if (shape == 1) {
-                            double distSq = dx * dx + dy * dy;
-                            if (distSq > maxRadiusSq[i] && GameRandom.nextInt(100) < 85) {
-                                continue;
-                            }
-                        } else if (shape == 0) {
-                            double angle = Math.atan2(dy, dx) - orientAngles[i];
-                            double sector = (2.0 * Math.PI) / 3.0;
-                            double phi = ((angle % sector) + sector) % sector;
-                            double rBound = inRadii[i] / Math.cos(Math.abs(phi - sector / 2.0));
-                            double dist = Math.sqrt(dx * dx + dy * dy);
-                            if (dist > rBound && GameRandom.nextInt(100) < 85) {
+                    for (Hex n : current.getAdjacentNeighbors()) {
+                        if (n == null) continue;
+                        if (n.getContinentId() != 0) continue;
+                        if (this.hasIceCaps) {
+                            int col = n.getQ() + (n.getR() >> 1);
+                            double wave = 0.05 * Math.sin(col * 0.22) + 0.03 * Math.cos(col * 0.48);
+                            double absLat = Math.abs((double) n.getR()) / (this.worldHeight / 2.0);
+                            if (absLat >= (this.iceCapPolarLimit - 0.02 + wave) || n.getBiome() == GameConstants.BIOME_ICE_FIELD || touchesIceField(n)) {
                                 continue;
                             }
                         }
+
+                        boolean touchesOtherContinent = false;
+                        for (Hex nn : n.getAdjacentNeighbors()) {
+                            if (nn != null && nn.getContinentId() != 0 && nn.getContinentId() != cid) {
+                                touchesOtherContinent = true;
+                                break;
+                            }
+                        }
+                        if (touchesOtherContinent) {
+                            continue;
+                        }
+
+                        if (!underMin) {
+                            Hex s = seeds.get(i);
+                            int sR = s.getR();
+                            int sCol = s.getQ() + (sR >> 1);
+                            int nR = n.getR();
+                            int nCol = n.getQ() + (nR >> 1);
+
+                            int signCol = nCol - sCol;
+                            if (signCol > this.worldWidth / 2) signCol -= this.worldWidth;
+                            else if (signCol < -this.worldWidth / 2) signCol += this.worldWidth;
+
+                            double dx = signCol * Math.sqrt(3.0);
+                            double dy = (nR - sR) * 1.5;
+
+                            int shape = shapeTypes[i];
+                            if (shape == 3) {
+                                int bCol = Math.abs(nCol - bayCols[i]);
+                                if (bCol > this.worldWidth / 2) bCol = this.worldWidth - bCol;
+                                double bdx = bCol * Math.sqrt(3.0);
+                                double bdy = (nR - bayRs[i]) * 1.5;
+                                if (bdx * bdx + bdy * bdy < bayRadSq[i] && GameRandom.nextInt(100) < 95) {
+                                    continue;
+                                }
+                            } else if (shape == 2) {
+                                double perp = Math.abs(dx * (-Math.sin(axisAngles[i])) + dy * Math.cos(axisAngles[i])) / Math.sqrt(3.0);
+                                if (perp > maxPerpWidths[i] && GameRandom.nextInt(100) < 90) {
+                                    continue;
+                                }
+                            } else if (shape == 1) {
+                                double distSq = dx * dx + dy * dy;
+                                if (distSq > maxRadiusSq[i] && GameRandom.nextInt(100) < 85) {
+                                    continue;
+                                }
+                            } else if (shape == 0) {
+                                double angle = Math.atan2(dy, dx) - orientAngles[i];
+                                double sector = (2.0 * Math.PI) / 3.0;
+                                double phi = ((angle % sector) + sector) % sector;
+                                double rBound = inRadii[i] / Math.cos(Math.abs(phi - sector / 2.0));
+                                double dist = Math.sqrt(dx * dx + dy * dy);
+                                if (dist > rBound && GameRandom.nextInt(100) < 85) {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        candidates.add(n);
                     }
 
-                    candidates.add(n);
+                    if (!candidates.isEmpty()) {
+                        Hex chosen = candidates.get(GameRandom.nextInt(candidates.size()));
+                        chosen.setContinentId(cid);
+                        cSet.add(chosen);
+                        frontier.add(chosen);
+                        grewThisRound = true;
+                    } else {
+                        frontier.remove(current);
+                    }
                 }
-
-                if (!candidates.isEmpty()) {
-                    Hex chosen = candidates.get(GameRandom.nextInt(candidates.size()));
-                    chosen.setContinentId(cid);
-                    cSet.add(chosen);
-                    frontier.add(chosen);
-                    grewThisRound = true;
+                if (grewThisRound) {
+                    consecutiveFails = 0;
                 } else {
-                    frontier.remove(current);
+                    consecutiveFails++;
                 }
-            }
-            if (grewThisRound) {
-                consecutiveFails = 0;
-            } else {
-                consecutiveFails++;
             }
         }
 
-        List<Hex> allLand = new ArrayList<>();
         for (Set<Hex> cSet : continentHexes.values()) {
             allLand.addAll(cSet);
         }
@@ -2430,7 +2840,8 @@ public class World {
         generateFaultLinePeninsulas(continentHexes, allLand);
 
         // Step 7: Convert enclosed oceans to lakes
-        List<List<Hex>> enclosedLakeComponents = convertEnclosedOceansToLakes(continentHexes, allLand);
+        convertEnclosedOceansToLakes(continentHexes, allLand);
+        allLandSet.addAll(allLand);
         notifyStep(7, "Convert Enclosed Lakes");
 
         // Step 8: Compute coastal water distance via BFS
@@ -2504,7 +2915,7 @@ public class World {
             }
         }
         for (Hex h : this.hexes) {
-            if (h == null || allLand.contains(h) || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
+            if (h == null || allLandSet.contains(h) || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
                 continue;
             }
             int d = oceanLandDist.getOrDefault(h, 9);
@@ -2519,7 +2930,12 @@ public class World {
                 h.setWaterDistance(d);
             }
         }
+    }
 
+    private void assignLakesBiomesIslandsRiversAndFeatures(
+            Map<Integer, Set<Hex>> continentHexes,
+            List<Hex> allLand,
+            Set<Hex> allLandSet) {
         // Step 7: Generate inland lakes
         List<Hex> createdLakes = new ArrayList<>();
         for (Map.Entry<Integer, Set<Hex>> entry : continentHexes.entrySet()) {
@@ -2576,7 +2992,7 @@ public class World {
         notifyStep(9, "Generate Inland Lakes");
 
         // Step 10: Assign land and water biomes by elevation, latitude, hydrology, and coastal proximity
-        int latScale = this.worldHeight / 2;
+        int latScale = Math.max(1, this.worldHeight / 2);
         for (Hex h : allLand) {
             if (h.getBiome() == GameConstants.BIOME_LAKE) {
                 continue;
@@ -2586,7 +3002,7 @@ public class World {
             h.setLocalWeather(getRandomWeather(biome));
         }
         for (Hex h : this.hexes) {
-            if (h == null || allLand.contains(h) || h.getBiome() == GameConstants.BIOME_LAKE || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
+            if (h == null || allLandSet.contains(h) || h.getBiome() == GameConstants.BIOME_LAKE || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
                 continue;
             }
             if (h.getElevation() <= -1) {
@@ -2606,7 +3022,7 @@ public class World {
         if (this.hasIceCaps && this.worldHeight > 0) {
             int polarMargin = Math.max(2, (int) Math.round(this.worldHeight * 0.38));
             for (Hex h : this.hexes) {
-                if (h == null || allLand.contains(h) || h.getBiome() != GameConstants.BIOME_ICE_FIELD) {
+                if (h == null || allLandSet.contains(h) || h.getBiome() != GameConstants.BIOME_ICE_FIELD) {
                     continue;
                 }
                 if (Math.abs(h.getR()) >= polarMargin) {
@@ -2646,12 +3062,14 @@ public class World {
         notifyStep(12, "Classify Landmasses");
 
         convertEnclosedOceansToLakes(continentHexes, allLand);
+        allLandSet.addAll(allLand);
         convertLakesSurroundedByIce();
         classifyLandmasses();
 
         // Step 13: Enforce minimum biome diversity quotas
         ensureMinimumBiomeCounts(this.worldHeight >= 30 ? 25 : Math.max(1, allLand.size() / 35));
         convertEnclosedOceansToLakes(continentHexes, allLand);
+        allLandSet.addAll(allLand);
         convertLakesSurroundedByIce();
         notifyStep(13, "Enforce Biome Quotas");
 
@@ -2685,32 +3103,6 @@ public class World {
         rebuildContinentsFromHexes();
         generateGeographicFeatures();
         notifyStep(14, "Generate Downhill River Networks");
-
-        // Step 15: Spawn player dynasty and distribute rival dynasties
-        if (seedDynasties) {
-            continentHexes.clear();
-            for (Hex h : this.hexes) {
-                if (h != null && h.getContinentId() > 0 && isLandHex(h) && !h.isIsland()) {
-                    continentHexes.computeIfAbsent(h.getContinentId(), k -> new HashSet<>()).add(h);
-                }
-            }
-            if (continentHexes.isEmpty()) {
-                for (Hex h : this.hexes) {
-                    if (h != null && isLandHex(h)) {
-                        continentHexes.computeIfAbsent(1, k -> new HashSet<>()).add(h);
-                    }
-                }
-            }
-            if (!this.spectatorMode) {
-                spawnPlayerOnRandomContinent(startBiome, startColony, continentHexes);
-            }
-            distributeRivalDynastiesAcrossContinents(continentHexes);
-            rebuildColonizedHexIndexIfNeeded();
-            ensureDynastiesKnownHexesInitialized();
-            notifyStep(15, "Spawn Dynasties");
-        } else {
-            notifyStep(15, "Generate World Complete");
-        }
     }
 
     private void generateArchipelagosAndIslands() {
@@ -6165,6 +6557,7 @@ public class World {
                 hex.setDisasterAgeHours(sh.disasterAgeHours);
                 
                 hexMap.put(sh.q + "," + sh.r, hex);
+                this.hexCoordCache.put(hexCoordKey(sh.q, sh.r), hex);
                 this.hexes.add(hex);
             }
             linkNeighbors(hexMap);
@@ -6394,20 +6787,23 @@ public class World {
         return (((long) q) << 32) | (r & 0xFFFFFFFFL);
     }
 
-    public Hex getHexAt(int q, int r) {
-        if (hexes == null || hexes.isEmpty()) return null;
-        long key = hexCoordKey(q, r);
-        Hex cached = hexCoordCache.get(key);
-        if (cached != null) {
-            return cached;
+    private void ensureHexCoordCache() {
+        if (hexes == null || hexes.isEmpty()) {
+            return;
         }
-        for (Hex h : hexes) {
-            if (h.getQ() == q && h.getR() == r) {
-                hexCoordCache.put(key, h);
-                return h;
+        if (hexCoordCache.size() != hexes.size()) {
+            for (Hex h : hexes) {
+                if (h != null) {
+                    hexCoordCache.put(hexCoordKey(h.getQ(), h.getR()), h);
+                }
             }
         }
-        return null;
+    }
+
+    public Hex getHexAt(int q, int r) {
+        if (hexes == null || hexes.isEmpty()) return null;
+        ensureHexCoordCache();
+        return hexCoordCache.get(hexCoordKey(q, r));
     }
     
     private void updateEnvironmentalConditions() {

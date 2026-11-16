@@ -112,6 +112,7 @@ public class Engine extends Thread {
     private boolean mapLayerLabelPeninsulas = true;
     private boolean mapLayerDayNight = true;
     private boolean mapLayerWeather = true;
+    private boolean mapLayerDisasters = true;
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
@@ -1032,6 +1033,14 @@ public class Engine extends Thread {
 
     public void setMapLayerWeather(boolean mapLayerWeather) {
         this.mapLayerWeather = mapLayerWeather;
+    }
+
+    public boolean isMapLayerDisasters() {
+        return mapLayerDisasters;
+    }
+
+    public void setMapLayerDisasters(boolean mapLayerDisasters) {
+        this.mapLayerDisasters = mapLayerDisasters;
     }
 
     public static List<AntRole> antRolesForAntClass(AntClass type) {

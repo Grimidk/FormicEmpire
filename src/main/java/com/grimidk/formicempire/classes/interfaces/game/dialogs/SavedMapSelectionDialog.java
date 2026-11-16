@@ -1,11 +1,13 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapData;
 import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.MiniMapPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
@@ -39,9 +41,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 public class SavedMapSelectionDialog extends JDialog {
 
@@ -52,6 +56,7 @@ public class SavedMapSelectionDialog extends JDialog {
     private final List<JLabel> nameLabels = new ArrayList<>();
     private final List<JLabel> statLabels = new ArrayList<>();
     private final List<JButton> selectButtons = new ArrayList<>();
+    private final List<JButton> editButtons = new ArrayList<>();
     private final List<JButton> deleteButtons = new ArrayList<>();
 
     private final JButton prevButton;
@@ -62,15 +67,27 @@ public class SavedMapSelectionDialog extends JDialog {
 
     private int currentPage = 0;
     private File[] allFiles = new File[0];
-    private final Map<String, SavedMapData> cachedData = new HashMap<>();
-    private final Map<String, World> cachedWorlds = new HashMap<>();
+    private final Map<String, SavedMapData> cachedData = new ConcurrentHashMap<>();
+    private final Map<String, World> cachedWorlds = new ConcurrentHashMap<>();
     private final SavedMapData[] pageData = new SavedMapData[PAGE_SIZE];
 
+    private final Engine engine;
+    private final boolean allowSelect;
     private SavedMapData selectedMapData = null;
     private SwingWorker<Void, PageLoadItem> currentWorker = null;
 
     public SavedMapSelectionDialog(JFrame owner) {
+        this(owner, null, true);
+    }
+
+    public SavedMapSelectionDialog(JFrame owner, boolean allowSelect) {
+        this(owner, null, allowSelect);
+    }
+
+    public SavedMapSelectionDialog(JFrame owner, Engine engine, boolean allowSelect) {
         super(owner, LanguageStrings.get(LanguageStrings.SAVED_MAP_GALLERY_TITLE), true);
+        this.engine = engine;
+        this.allowSelect = allowSelect;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(860, 640));
         setPreferredSize(new Dimension(1080, 780));
@@ -96,22 +113,24 @@ public class SavedMapSelectionDialog extends JDialog {
             nameLabels.add(nameLabel);
             card.add(nameLabel, BorderLayout.NORTH);
 
-            MiniMapPanel miniMap = new MiniMapPanel((World) null);
+            MiniMapPanel miniMap = new MiniMapPanel(null, (World) null, allowSelect ? () -> selectMapAt(slotIndex) : null);
             miniMap.setPreferredSize(new Dimension(220, 140));
             miniMap.setMinimumSize(new Dimension(120, 80));
             miniMaps.add(miniMap);
             card.add(miniMap, BorderLayout.CENTER);
 
-            MouseAdapter clickHandler = new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON1) {
-                        selectMapAt(slotIndex);
+            if (allowSelect) {
+                MouseAdapter clickHandler = new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            selectMapAt(slotIndex);
+                        }
                     }
-                }
-            };
-            card.addMouseListener(clickHandler);
-            AssetStyles.markClickable(card);
+                };
+                card.addMouseListener(clickHandler);
+                AssetStyles.markClickable(card);
+            }
 
             JPanel cardSouth = new JPanel(new BorderLayout(0, 4));
             cardSouth.setOpaque(false);
@@ -122,15 +141,24 @@ public class SavedMapSelectionDialog extends JDialog {
             statLabels.add(statLabel);
             cardSouth.add(statLabel, BorderLayout.NORTH);
 
-            JPanel actionPanel = new JPanel(new GridLayout(1, 2, 6, 0));
+            JPanel actionPanel = new JPanel(new GridLayout(1, allowSelect ? 3 : 2, 6, 0));
             actionPanel.setOpaque(false);
 
-            JButton selectBtn = new JButton(LanguageStrings.get(LanguageStrings.SAVED_MAP_SELECT));
-            AssetStyles.styleCompactButton(selectBtn);
-            selectBtn.setEnabled(false);
-            selectBtn.addActionListener(e -> selectMapAt(slotIndex));
-            selectButtons.add(selectBtn);
-            actionPanel.add(selectBtn);
+            if (allowSelect) {
+                JButton selectBtn = new JButton(LanguageStrings.get(LanguageStrings.SAVED_MAP_SELECT));
+                AssetStyles.styleCompactButton(selectBtn);
+                selectBtn.setEnabled(false);
+                selectBtn.addActionListener(e -> selectMapAt(slotIndex));
+                selectButtons.add(selectBtn);
+                actionPanel.add(selectBtn);
+            }
+
+            JButton editBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_EDIT));
+            AssetStyles.styleCompactButton(editBtn);
+            editBtn.setEnabled(false);
+            editBtn.addActionListener(e -> editMapAt(slotIndex));
+            editButtons.add(editBtn);
+            actionPanel.add(editBtn);
 
             JButton deleteBtn = new JButton(LanguageStrings.get(LanguageStrings.SAVED_MAP_DELETE));
             AssetStyles.styleCompactButton(deleteBtn);
@@ -274,7 +302,10 @@ public class SavedMapSelectionDialog extends JDialog {
                 cards.get(i).setVisible(true);
                 nameLabels.get(i).setText("Loading...");
                 statLabels.get(i).setText("");
-                selectButtons.get(i).setEnabled(false);
+                if (allowSelect && i < selectButtons.size()) {
+                    selectButtons.get(i).setEnabled(false);
+                }
+                editButtons.get(i).setEnabled(false);
                 deleteButtons.get(i).setEnabled(false);
                 miniMaps.get(i).setExplicitWorld(null);
             } else {
@@ -285,34 +316,37 @@ public class SavedMapSelectionDialog extends JDialog {
         currentWorker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
+                ForkJoinPool pool = ForkJoinPool.commonPool();
+                List<CompletableFuture<Void>> futures = new ArrayList<>();
                 for (int i = 0; i < PAGE_SIZE; i++) {
-                    if (isCancelled()) return null;
                     int fileIndex = startIndex + i;
                     if (fileIndex >= totalFiles) break;
-
-                    File f = allFiles[fileIndex];
-                    String path = f.getAbsolutePath();
-
-                    SavedMapData data = cachedData.get(path);
-                    World world = cachedWorlds.get(path);
-                    if (data == null) {
-                        try {
-                            data = SavedMapService.loadMapData(f);
-                            cachedData.put(path, data);
+                    final int slotIdx = i;
+                    final File f = allFiles[fileIndex];
+                    futures.add(CompletableFuture.runAsync(() -> {
+                        if (isCancelled()) return;
+                        String path = f.getAbsolutePath();
+                        SavedMapData data = cachedData.get(path);
+                        World world = cachedWorlds.get(path);
+                        if (data == null) {
+                            try {
+                                data = SavedMapService.loadMapData(f);
+                                cachedData.put(path, data);
+                                world = SavedMapService.buildWorldFromMapData(data);
+                                cachedWorlds.put(path, world);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        } else if (world == null) {
                             world = SavedMapService.buildWorldFromMapData(data);
                             cachedWorlds.put(path, world);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
                         }
-                    } else if (world == null) {
-                        world = SavedMapService.buildWorldFromMapData(data);
-                        cachedWorlds.put(path, world);
-                    }
-
-                    if (data != null && world != null) {
-                        publish(new PageLoadItem(i, data, world));
-                    }
+                        if (!isCancelled() && data != null && world != null) {
+                            publish(new PageLoadItem(slotIdx, data, world));
+                        }
+                    }, pool));
                 }
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
                 return null;
             }
 
@@ -347,7 +381,10 @@ public class SavedMapSelectionDialog extends JDialog {
                     String info = String.format("%dx%d | Land: %.1f%% | Cont: %d | Isl: %d",
                             w.getWorldWidth(), w.getWorldHeight(), landPct, w.getContinentCount(), w.getIslandCount());
                     statLabels.get(idx).setText(info);
-                    selectButtons.get(idx).setEnabled(true);
+                    if (allowSelect && idx < selectButtons.size()) {
+                        selectButtons.get(idx).setEnabled(true);
+                    }
+                    editButtons.get(idx).setEnabled(true);
                     deleteButtons.get(idx).setEnabled(true);
                 }
             }
@@ -366,6 +403,28 @@ public class SavedMapSelectionDialog extends JDialog {
         this.selectedMapData = data;
         cancelCurrentWorker();
         dispose();
+    }
+
+    private void editMapAt(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= PAGE_SIZE) {
+            return;
+        }
+        SavedMapData data = pageData[slotIndex];
+        if (data == null) {
+            return;
+        }
+        MainFrame mf = (getOwner() instanceof MainFrame m) ? m : null;
+        Engine eng = this.engine != null ? this.engine : (mf != null ? mf.getEngine() : null);
+        WorldBuilderDialog builder = new WorldBuilderDialog(mf, eng, data);
+        builder.setVisible(true);
+        if (mf != null && MainFrame.CARD_GAME.equals(mf.getCurrentCard())) {
+            cancelCurrentWorker();
+            dispose();
+        } else {
+            cachedData.clear();
+            cachedWorlds.clear();
+            loadFilesAndRenderPage();
+        }
     }
 
     private void deleteMapAt(int slotIndex) {

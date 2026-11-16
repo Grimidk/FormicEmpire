@@ -8,8 +8,9 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -43,23 +44,40 @@ public final class PanelBorderButtonUI extends BasicButtonUI {
             border.paintBorder(b, g, 0, 0, b.getWidth(), b.getHeight());
         }
 
-        Rectangle viewRect = new Rectangle(
-                insets.left,
-                insets.top,
-                b.getWidth() - (insets.left + insets.right),
-                b.getHeight() - (insets.top + insets.bottom));
+        Icon icon = b.getIcon();
+        String fullText = b.getText();
+        boolean hasText = fullText != null && !fullText.isEmpty();
 
         Rectangle textRect = new Rectangle();
         Rectangle iconRect = new Rectangle();
-        String text = SwingUtilities.layoutCompoundLabel(
-                b, fm, b.getText(), b.getIcon(),
-                b.getVerticalAlignment(), b.getHorizontalAlignment(),
-                b.getVerticalTextPosition(), b.getHorizontalTextPosition(),
-                viewRect, iconRect, textRect,
-                b.getText() == null ? 0 : b.getIconTextGap());
-
-        paintIcon(g, b, iconRect);
-        paintText(g, b, textRect, b.getText());
+        if (icon != null && hasText) {
+            int gap = Math.max(4, b.getIconTextGap());
+            int totalW = icon.getIconWidth() + gap + fm.stringWidth(fullText);
+            iconRect.x = b.getHorizontalAlignment() == SwingConstants.LEFT
+                    ? insets.left
+                    : Math.max(insets.left, (b.getWidth() - totalW) / 2);
+            iconRect.y = (b.getHeight() - icon.getIconHeight()) / 2;
+            iconRect.width = icon.getIconWidth();
+            iconRect.height = icon.getIconHeight();
+            textRect.x = iconRect.x + icon.getIconWidth() + gap;
+            textRect.y = 0;
+            textRect.width = fm.stringWidth(fullText);
+            textRect.height = b.getHeight();
+            paintIcon(g, b, iconRect);
+            paintText(g, b, textRect, fullText);
+        } else if (icon != null) {
+            iconRect.x = (b.getWidth() - icon.getIconWidth()) / 2;
+            iconRect.y = (b.getHeight() - icon.getIconHeight()) / 2;
+            iconRect.width = icon.getIconWidth();
+            iconRect.height = icon.getIconHeight();
+            paintIcon(g, b, iconRect);
+        } else if (hasText) {
+            textRect.x = 0;
+            textRect.y = 0;
+            textRect.width = b.getWidth();
+            textRect.height = b.getHeight();
+            paintText(g, b, textRect, fullText);
+        }
     }
 
     @Override
@@ -70,8 +88,10 @@ public final class PanelBorderButtonUI extends BasicButtonUI {
         FontMetrics fm = g.getFontMetrics(b.getFont());
         g.setFont(b.getFont());
         g.setColor(buttonTextColor(b));
-        int textX = textRect.x + (textRect.width - fm.stringWidth(text)) / 2;
-        int textY = textRect.y + fm.getAscent() + (textRect.height - fm.getHeight()) / 2;
+        int textX = (b.getIcon() != null)
+                ? textRect.x
+                : (b.getWidth() - fm.stringWidth(text)) / 2;
+        int textY = (b.getHeight() - fm.getHeight()) / 2 + fm.getAscent();
         g.drawString(text, textX, textY);
     }
 

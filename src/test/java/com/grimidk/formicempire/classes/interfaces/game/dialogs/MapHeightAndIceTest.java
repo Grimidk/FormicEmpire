@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossin
 import org.junit.jupiter.api.Test;
 
 import javax.swing.SwingUtilities;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MapHeightAndIceTest {
@@ -453,6 +455,24 @@ class MapHeightAndIceTest {
         assertEquals(1, cont1.getContinentId());
         assertEquals(0, ice1.getContinentId(), "Ice cap hex must not be fused to continent");
         assertTrue(HexWaterCrossing.isWaterBiome(bridge1.getBiome()), "Strait next to ice cap must not be bridged to fuse with ice cap");
+    }
+
+    @Test
+    void dynasticMapModeUsesDistinctGreysForUncolonizedLandAndSea() {
+        Hex landHex = new Hex();
+        landHex.setBiome(GameConstants.BIOME_PLAINS);
+        Hex seaHex = new Hex();
+        seaHex.setBiome(GameConstants.BIOME_OCEAN);
+        Hex lakeHex = new Hex();
+        lakeHex.setBiome(GameConstants.BIOME_LAKE);
+
+        Color landColor = MapDialog.resolveDynasticColorForHex(landHex);
+        Color seaColor = MapDialog.resolveDynasticColorForHex(seaHex);
+        Color lakeColor = MapDialog.resolveDynasticColorForHex(lakeHex);
+
+        assertNotEquals(landColor, seaColor);
+        assertEquals(seaColor, lakeColor);
+        assertTrue(landColor.getRed() > seaColor.getRed());
     }
 }
 

@@ -70,7 +70,6 @@ public class SettingsPanel extends JPanel {
     private JCheckBox cheatFogOfWarCheck;
     private JCheckBox cheatRandomDisasterCheck;
     private JCheckBox animateWorldGenCheck;
-    private JButton multiMapPreviewButton;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -568,21 +567,8 @@ public class SettingsPanel extends JPanel {
 
         animateWorldGenCheck = new JCheckBox();
         styleCheckBox(animateWorldGenCheck);
-
-        multiMapPreviewButton = new JButton(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW));
-        AssetStyles.styleCompactButton(multiMapPreviewButton);
-        multiMapPreviewButton.addActionListener(e -> {
-            java.awt.Window parent = javax.swing.SwingUtilities.getWindowAncestor(multiMapPreviewButton);
-            new MultiMapGalleryDialog(parent != null ? parent : frame, engine).setVisible(true);
-        });
-
-        JPanel worldGenPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 0));
-        worldGenPanel.setOpaque(false);
-        worldGenPanel.add(animateWorldGenCheck);
-        worldGenPanel.add(multiMapPreviewButton);
-
         c.gridx = 1;
-        panel.add(worldGenPanel, c);
+        panel.add(animateWorldGenCheck, c);
 
         c.gridy = 14;
         c.gridx = 0;
@@ -1078,7 +1064,6 @@ public class SettingsPanel extends JPanel {
         cheatFogOfWarLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_CHEAT_FOG_OF_WAR));
         cheatRandomDisasterLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_CHEAT_RANDOM_DISASTER));
         animateWorldGenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN));
-        multiMapPreviewButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -1165,7 +1150,6 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(cheatFogOfWarLabel, cheatFogOfWarCheck, LanguageStrings.SETTINGS_CHEAT_FOG_OF_WAR_TT);
         setSettingTooltip(cheatRandomDisasterLabel, cheatRandomDisasterCheck, LanguageStrings.SETTINGS_CHEAT_RANDOM_DISASTER_TT);
         setSettingTooltip(animateWorldGenLabel, animateWorldGenCheck, LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN_TT);
-        multiMapPreviewButton.setToolTipText(LanguageStrings.get(LanguageStrings.SETTINGS_MULTI_MAP_PREVIEW_TT));
         setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
         setSettingTooltip(fsLabel, fullScreenCheck, LanguageStrings.SETTINGS_FULLSCREEN_TT);
         setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
@@ -1476,9 +1460,6 @@ public class SettingsPanel extends JPanel {
         styleButton(resetAudioButton);
         styleButton(resetRolesButton);
         styleButton(resetSandboxButton);
-        if (multiMapPreviewButton != null) {
-            AssetStyles.styleCompactButton(multiMapPreviewButton);
-        }
         AssetStyles.applyThemeToContainer(this);
     }
 

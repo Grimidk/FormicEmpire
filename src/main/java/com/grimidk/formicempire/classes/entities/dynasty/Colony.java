@@ -2214,6 +2214,8 @@ public class Colony {
     public void runMinutelyJobs() {
         if (this.runsFullSimulation()) {
             this.runConverting();
+        }
+        if (this.isActive) {
             physicsService.tickAntSpriteAnimMinutes(this, lastPhysicsDimension, lastPhysicsViewport);
         }
     }
@@ -2247,8 +2249,15 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this, biome, season);
             }
+            if (this.isActive) {
+                this.runRoleAssignmentIfNeeded(engine);
+                this.runRoleAssignmentForPopulationDrift(engine);
+            }
             this.labourService.runTunnelConstruction(this);
             ColonyJobRules.runHourlyLite(this, biome);
+            if (this.isActive) {
+                physicsService.rollAntSpriteAnimHourly(this, lastPhysicsDimension, lastPhysicsViewport);
+            }
         }
     }
 

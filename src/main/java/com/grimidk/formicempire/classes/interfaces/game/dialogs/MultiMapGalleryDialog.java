@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapData;
 import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
@@ -48,8 +49,6 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -61,6 +60,7 @@ public class MultiMapGalleryDialog extends JDialog {
     private final List<MiniMapPanel> mapPanels = new ArrayList<>();
     private final List<JLabel> statLabels = new ArrayList<>();
     private final List<JButton> copyButtons = new ArrayList<>();
+    private final List<JButton> editButtons = new ArrayList<>();
     private final World[] generatedWorlds = new World[MAP_COUNT];
     private final JSpinner continentSpinner;
     private final JSpinner islandSpinner;
@@ -184,23 +184,10 @@ public class MultiMapGalleryDialog extends JDialog {
                     BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_INTERNAL),
                     BorderFactory.createEmptyBorder(6, 6, 6, 6)));
 
-            MiniMapPanel miniMap = new MiniMapPanel(null, (World) null, () -> openFullMap(cardIndex));
+            MiniMapPanel miniMap = new MiniMapPanel(null, (World) null, null);
             miniMap.setPreferredSize(new Dimension(240, 150));
-            miniMap.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_INSPECT_MAP));
             mapPanels.add(miniMap);
             card.add(miniMap, BorderLayout.CENTER);
-
-            MouseAdapter openMapClick = new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON1) {
-                        openFullMap(cardIndex);
-                    }
-                }
-            };
-            card.addMouseListener(openMapClick);
-            card.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_INSPECT_MAP));
-            AssetStyles.markClickable(card);
 
             JPanel cardSouth = new JPanel(new BorderLayout(0, 4));
             cardSouth.setOpaque(false);
@@ -208,18 +195,27 @@ public class MultiMapGalleryDialog extends JDialog {
             JLabel statLabel = new JLabel("Generating...", SwingConstants.CENTER);
             statLabel.setFont(AssetStyles.FONT_NORMAL);
             statLabel.setForeground(AssetStyles.FONT_COLOR);
-            statLabel.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_INSPECT_MAP));
-            statLabel.addMouseListener(openMapClick);
-            AssetStyles.markClickable(statLabel);
             statLabels.add(statLabel);
             cardSouth.add(statLabel, BorderLayout.NORTH);
+
+            JPanel cardActions = new JPanel(new GridLayout(1, 2, 6, 0));
+            cardActions.setOpaque(false);
 
             JButton copyBtn = new JButton(LanguageStrings.get(LanguageStrings.MULTI_MAP_COPY_BUTTON));
             AssetStyles.styleCompactButton(copyBtn);
             copyBtn.setEnabled(false);
             copyBtn.addActionListener(e -> saveMapToFile(cardIndex));
             copyButtons.add(copyBtn);
-            cardSouth.add(copyBtn, BorderLayout.SOUTH);
+            cardActions.add(copyBtn);
+
+            JButton editBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_EDIT));
+            AssetStyles.styleCompactButton(editBtn);
+            editBtn.setEnabled(false);
+            editBtn.addActionListener(e -> editMapInBuilder(cardIndex));
+            editButtons.add(editBtn);
+            cardActions.add(editBtn);
+
+            cardSouth.add(cardActions, BorderLayout.SOUTH);
 
             card.add(cardSouth, BorderLayout.SOUTH);
             gridPanel.add(card);
@@ -324,23 +320,13 @@ public class MultiMapGalleryDialog extends JDialog {
         for (JButton b : copyButtons) {
             AssetStyles.styleCompactButton(b);
         }
+        for (JButton b : editButtons) {
+            AssetStyles.styleCompactButton(b);
+        }
         AssetStyles.applyThemeToContainer(this);
         for (MiniMapPanel panel : mapPanels) {
             panel.refreshTheme();
         }
-    }
-
-    private void openFullMap(int index) {
-        if (index < 0 || index >= generatedWorlds.length) {
-            return;
-        }
-        World targetWorld = generatedWorlds[index];
-        if (targetWorld == null) {
-            return;
-        }
-        MapDialog dialog = new MapDialog(this, null, targetWorld, null, null);
-        dialog.setLegendVisible(false);
-        dialog.showDialog();
     }
 
     private SaveManager resolveSaveManager() {
@@ -473,6 +459,27 @@ public class MultiMapGalleryDialog extends JDialog {
         return trimmed.substring(0, 1).toUpperCase() + trimmed.substring(1);
     }
 
+    private void editMapInBuilder(int index) {
+        if (index < 0 || index >= generatedWorlds.length) {
+            return;
+        }
+        World targetWorld = generatedWorlds[index];
+        if (targetWorld == null) {
+            return;
+        }
+        SavedMapData data = SavedMapService.createSavedMapData(targetWorld, "Map " + (index + 1), 3);
+        Window owner = getOwner();
+        MainFrame mf = (owner instanceof MainFrame m)
+                ? m
+                : (SwingUtilities.getWindowAncestor(this) instanceof MainFrame m ? m : null);
+        Engine eng = this.engine != null ? this.engine : (mf != null ? mf.getEngine() : null);
+        WorldBuilderDialog builder = new WorldBuilderDialog(mf, eng, data);
+        builder.setVisible(true);
+        if (mf != null && MainFrame.CARD_GAME.equals(mf.getCurrentCard())) {
+            closeDialog();
+        }
+    }
+
     private void saveMapToFile(int index) {
         if (index < 0 || index >= generatedWorlds.length) {
             return;
@@ -519,6 +526,7 @@ public class MultiMapGalleryDialog extends JDialog {
             statLabels.get(i).setText("Generating...");
             copyButtons.get(i).setEnabled(false);
             copyButtons.get(i).setText(LanguageStrings.get(LanguageStrings.MULTI_MAP_COPY_BUTTON));
+            editButtons.get(i).setEnabled(false);
             generatedWorlds[i] = null;
         }
 
@@ -532,53 +540,59 @@ public class MultiMapGalleryDialog extends JDialog {
         currentWorker = new SwingWorker<Void, World>() {
             @Override
             protected Void doInBackground() {
+                java.util.concurrent.ForkJoinPool pool = java.util.concurrent.ForkJoinPool.commonPool();
+                List<java.util.concurrent.CompletableFuture<Void>> futures = new ArrayList<>();
                 for (int i = 0; i < MAP_COUNT; i++) {
-                    if (isCancelled()) {
-                        return null;
-                    }
-                    try {
-                        World world = new World();
-                        if (isFullRandom) {
-                            int rContinents = 1 + GameRandom.nextInt(10);
-                            int rIslands = GameRandom.nextInt(51);
-                            double rLandShare = (10 + GameRandom.nextInt(51)) / 100.0;
-                            int rIceCapPct = GameRandom.nextInt(51);
-                            int rPlates = 2 + GameRandom.nextInt(15);
+                    final int mapIndex = i;
+                    futures.add(java.util.concurrent.CompletableFuture.runAsync(() -> {
+                        if (isCancelled()) {
+                            return;
+                        }
+                        try {
+                            World world = new World();
+                            if (isFullRandom) {
+                                int rContinents = 1 + GameRandom.nextInt(10);
+                                int rIslands = GameRandom.nextInt(51);
+                                double rLandShare = (10 + GameRandom.nextInt(51)) / 100.0;
+                                int rIceCapPct = GameRandom.nextInt(51);
+                                int rPlates = 2 + GameRandom.nextInt(15);
 
-                            world.setTargetContinentCount(rContinents);
-                            world.setMinIslandCount(rIslands);
-                            world.setContinentalLandPercentage(rLandShare);
-                            world.setTectonicPlateCount(rPlates);
-                            if (rIceCapPct <= 0) {
-                                world.setHasIceCaps(false);
+                                world.setTargetContinentCount(rContinents);
+                                world.setMinIslandCount(rIslands);
+                                world.setContinentalLandPercentage(rLandShare);
+                                world.setTectonicPlateCount(rPlates);
+                                if (rIceCapPct <= 0) {
+                                    world.setHasIceCaps(false);
+                                } else {
+                                    world.setHasIceCaps(true);
+                                    world.setIceCapPolarLimit(1.0 - (rIceCapPct / 100.0));
+                                }
                             } else {
-                                world.setHasIceCaps(true);
-                                world.setIceCapPolarLimit(1.0 - (rIceCapPct / 100.0));
+                                if (targetContinents > 0) {
+                                    world.setTargetContinentCount(targetContinents);
+                                } else {
+                                    world.setTargetContinentCount(0);
+                                }
+                                world.setMinIslandCount(targetIslands);
+                                world.setContinentalLandPercentage(landSharePct / 100.0);
+                                world.setTectonicPlateCount(targetPlates);
+                                if (icecapPct <= 0) {
+                                    world.setHasIceCaps(false);
+                                } else {
+                                    world.setHasIceCaps(true);
+                                    world.setIceCapPolarLimit(1.0 - (icecapPct / 100.0));
+                                }
                             }
-                        } else {
-                            if (targetContinents > 0) {
-                                world.setTargetContinentCount(targetContinents);
-                            } else {
-                                world.setTargetContinentCount(0);
+                            world.generateRectangularWorld(null, null, "World " + (mapIndex + 1), null, false);
+                            if (!isCancelled()) {
+                                publish(world);
                             }
-                            world.setMinIslandCount(targetIslands);
-                            world.setContinentalLandPercentage(landSharePct / 100.0);
-                            world.setTectonicPlateCount(targetPlates);
-                            if (icecapPct <= 0) {
-                                world.setHasIceCaps(false);
-                            } else {
-                                world.setHasIceCaps(true);
-                                world.setIceCapPolarLimit(1.0 - (icecapPct / 100.0));
-                            }
+                        } catch (Throwable t) {
+                            t.printStackTrace();
                         }
-                        world.generateRectangularWorld(null, null, "World " + (i + 1), null, false);
-                        if (!isCancelled()) {
-                            publish(world);
-                        }
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
+                    }, pool));
                 }
+                java.util.concurrent.CompletableFuture.allOf(futures.toArray(new java.util.concurrent.CompletableFuture[0])).join();
                 return null;
             }
 
@@ -619,6 +633,7 @@ public class MultiMapGalleryDialog extends JDialog {
                                 w.getContinentCount(), w.getIslandCount(), contPct, icePct);
                         statLabels.get(index).setText(info);
                         copyButtons.get(index).setEnabled(true);
+                        editButtons.get(index).setEnabled(true);
                         generatedCount++;
                         statusLabel.setText("Generated " + generatedCount + "/" + MAP_COUNT + " maps...");
                     }

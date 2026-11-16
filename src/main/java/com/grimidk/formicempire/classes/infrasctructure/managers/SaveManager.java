@@ -2698,6 +2698,7 @@ public class SaveManager {
             writeJsonLine(w, "mapLayerLabelPeninsulas", engine.isMapLayerLabelPeninsulas(), false);
             writeJsonLine(w, "mapLayerDayNight", engine.isMapLayerDayNight(), false);
             writeJsonLine(w, "mapLayerWeather", engine.isMapLayerWeather(), false);
+            writeJsonLine(w, "mapLayerDisasters", engine.isMapLayerDisasters(), false);
             
             // Serialize Upgrade Coordinates
             StringBuilder sb = new StringBuilder();
@@ -2892,6 +2893,8 @@ public class SaveManager {
                     String.valueOf(engine.isMapLayerDayNight()))));
             engine.setMapLayerWeather(Boolean.parseBoolean(m.getOrDefault("mapLayerWeather",
                     String.valueOf(engine.isMapLayerWeather()))));
+            engine.setMapLayerDisasters(Boolean.parseBoolean(m.getOrDefault("mapLayerDisasters",
+                    String.valueOf(engine.isMapLayerDisasters()))));
 
             loadUpgradePositionsFromFile();
             if (m.containsKey("upgradePositions")) {

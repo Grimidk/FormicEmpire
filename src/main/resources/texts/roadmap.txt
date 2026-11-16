@@ -63,13 +63,15 @@ Other assets:
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		World Generation Overhaul Phases:
-			Phase 5: World Generation Setup UI and Debug Map Editor (world parameters configuration dialog, brush paint tool for biomes/altitude/rivers)
-			Phase 6: preloaded accurate earth 
+		Phase 6: preloaded accurate earth 
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		bridges (needs rafting)
 		Battle numeric animation with dice(?) and numbers
 		spectator player possesion
+		intra dynasty ai auto logisitcs with non esential resources 
+		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
+		rework abilities and alerts and triggers to be cleaner
+		rework saves to be cleaner and efficient
 
 	Everything else :
 		critter system:
@@ -87,7 +89,6 @@ Needed for launch (v1.0) (Launch Version):
 			uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
 		rethink hatching to other types taking more time so its balanced to not just spam a type (and class methamorphosis diagram)
 		reserve ants to ant exauhstion and punishing 100% worker capacity
-		intra dynasty ai auto logisitcs with non esential resources 
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 		revamp story and lore and maybe intro screen
 		more hive rooms, specially more twisty (research room after royal chamber, barrack room before royal chamber)
@@ -95,20 +96,17 @@ Needed for launch (v1.0) (Launch Version):
 			saved for later: RoomDecorationRenderer (storage/farm/nursery/royal two-band overlays, interior clip, door-aware padding)
 			saved for later: sprites/buildings/rooms/*.png wired on GameUnlocks Building.getSprite()
 			saved for later: GameConstantsRoomSpritesTest + RoomDecorationRendererTest
-		rework tutorial to clearer and obscure unlocks in menus, disable tutorial option and konami code to unboscure all
-		rework abilities and alerts and triggers (new classes?)
-		rework saves to be cleaner and efficient
-		rework manager and aux files
 		promo video and images 
 		recheck langs
 		more proper start animation and roadmap and credits design
+		global stats such as total playtime, games started, games finished, games won, maps created etc
 		register Grim Games or Grimidk in steam as dev team
 		steam upload and demo version and make sure saves are not overwritten by updates
 			TODO code (optional for listing; needed for Steam-native features): Steamworks init + App ID; cloud saves; achievements/stats API; demo build flavor (separate App ID/depot)
 			TODO ops: partner page, depots/builds, caps/trailers, wishlist, pricing
 			wishlist button
 		versioning to go back to previous stable patches
-		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
+		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code, no vibe code or bloated code
 
 Post launch (v1.1) (Improvements Update):
 	animated tile textures

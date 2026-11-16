@@ -30,6 +30,8 @@ public class Hex {
     private int elevation = 3;
     private int hydrology = 0;
     private int plateId = 0;
+    private FaultLine.FaultType faultType;
+    private int faultIntensity = 0;
     private DisasterType disasterType;
     private int disasterAgeHours = 0;
 
@@ -291,5 +293,21 @@ public class Hex {
             disasterType = null;
             disasterAgeHours = 0;
         }
+    }
+
+    public FaultLine.FaultType getFaultType() {
+        return faultType;
+    }
+
+    public void setFaultType(FaultLine.FaultType faultType) {
+        this.faultType = faultType;
+    }
+
+    public int getFaultIntensity() {
+        return faultIntensity;
+    }
+
+    public void setFaultIntensity(int faultIntensity) {
+        this.faultIntensity = Math.max(0, Math.min(3, faultIntensity));
     }
 }

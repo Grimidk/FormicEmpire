@@ -433,34 +433,6 @@ public final class HexGridMesh {
             edgeLine.setLine(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
             g2d.draw(edgeLine);
         }
-
-        double nodeRadius = Math.max(1.0, dividerStroke * 0.55);
-        Ellipse2D.Double nodeEllipse = new Ellipse2D.Double();
-        for (Vertex vertex : vertices) {
-            if (clip != null && !clip.intersects(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0)) {
-                continue;
-            }
-            if (faceVisible != null) {
-                boolean anyVisible = false;
-                for (Edge edge : vertex.edges) {
-                    if ((edge.faceA != null && faceVisible.test(edge.faceA))
-                            || (edge.faceB != null && faceVisible.test(edge.faceB))) {
-                        anyVisible = true;
-                        break;
-                    }
-                }
-                if (!anyVisible) {
-                    continue;
-                }
-            }
-            Color nodeColor = nodeColor(vertex, dynastyBorderMode, plainEdgeColor, dynastyFallback);
-            if (nodeColor == null) {
-                continue;
-            }
-            g2d.setColor(nodeColor);
-            nodeEllipse.setFrame(vertex.x - nodeRadius, vertex.y - nodeRadius, nodeRadius * 2.0, nodeRadius * 2.0);
-            g2d.fill(nodeEllipse);
-        }
     }
 
     private static boolean edgeIntersects(Edge edge, Rectangle clip) {

@@ -43,6 +43,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private final HelpPanel helpPanel;
     private final MenuChaoticPanel menuChaoticPanel;
     private String menuReturnCard = CARD_INIT;
+    private String currentCard = CARD_INTRO;
 
     private Cursor cursorNormal;
     private Cursor cursorClick;
@@ -337,6 +338,23 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     public String getMenuReturnCard() {
         return menuReturnCard;
+    }
+
+    public String getCurrentCard() {
+        return currentCard;
+    }
+
+    public void setMainMenuLoaded(boolean loaded) {
+        if (!loaded) {
+            menuChaoticPanel.setActive(false);
+            menuChaoticPanel.setVisible(false);
+            cards.setVisible(false);
+        } else {
+            menuChaoticPanel.setVisible(true);
+            cards.setVisible(true);
+            boolean showcaseActive = CARD_INIT.equals(currentCard) || CARD_SAVE.equals(currentCard);
+            menuChaoticPanel.setActive(showcaseActive);
+        }
     }
 
     public void showSettingsMenu(String returnTo) {
@@ -731,6 +749,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
                 helpPanel.ensureTabsContentCurrent();
             } catch (Exception ignore) {}
         }
+        this.currentCard = card;
+        menuChaoticPanel.setVisible(true);
+        cards.setVisible(true);
         cardLayout.show(cards, card);
         boolean showcaseActive = CARD_INIT.equals(card) || CARD_SAVE.equals(card);
         menuChaoticPanel.setActive(showcaseActive);

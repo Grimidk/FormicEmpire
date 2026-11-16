@@ -1,47 +1,59 @@
 package com.grimidk.formicempire.classes.infrasctructure.util;
 
 import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.Random;
 
 public final class GameRandom {
-    private static final Random RNG = new Random();
+    private static final ThreadLocal<Random> THREAD_RANDOM = ThreadLocal.withInitial(Random::new);
     private static final Deque<Double> TEST_DOUBLE_QUEUE = new ArrayDeque<>();
+    private static volatile boolean hasTestDoubles = false;
 
     private GameRandom() {}
 
     public static void enqueueTestDoubles(double... values) {
-        for (double value : values) {
-            TEST_DOUBLE_QUEUE.addLast(value);
+        synchronized (TEST_DOUBLE_QUEUE) {
+            for (double value : values) {
+                TEST_DOUBLE_QUEUE.addLast(value);
+            }
+            hasTestDoubles = !TEST_DOUBLE_QUEUE.isEmpty();
         }
     }
 
     public static void clearTestDoubles() {
-        TEST_DOUBLE_QUEUE.clear();
+        synchronized (TEST_DOUBLE_QUEUE) {
+            TEST_DOUBLE_QUEUE.clear();
+            hasTestDoubles = false;
+        }
     }
 
     public static double nextDouble() {
-        if (!TEST_DOUBLE_QUEUE.isEmpty()) {
-            return TEST_DOUBLE_QUEUE.removeFirst();
+        if (hasTestDoubles) {
+            synchronized (TEST_DOUBLE_QUEUE) {
+                if (!TEST_DOUBLE_QUEUE.isEmpty()) {
+                    double value = TEST_DOUBLE_QUEUE.removeFirst();
+                    hasTestDoubles = !TEST_DOUBLE_QUEUE.isEmpty();
+                    return value;
+                }
+            }
         }
-        return RNG.nextDouble();
+        return THREAD_RANDOM.get().nextDouble();
     }
 
     public static float nextFloat() {
-        return RNG.nextFloat();
+        return THREAD_RANDOM.get().nextFloat();
     }
 
     public static boolean nextBoolean() {
-        return RNG.nextBoolean();
+        return THREAD_RANDOM.get().nextBoolean();
     }
 
     public static int nextInt(int bound) {
-        return RNG.nextInt(bound);
+        return THREAD_RANDOM.get().nextInt(bound);
     }
 
     public static Random getShuffleRandom() {
-        return RNG;
+        return THREAD_RANDOM.get();
     }
 
     public static int seededNextInt(long seed, int bound) {
