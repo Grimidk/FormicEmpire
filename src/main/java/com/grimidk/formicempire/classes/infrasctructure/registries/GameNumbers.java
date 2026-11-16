@@ -347,6 +347,12 @@ public final class GameNumbers {
     public static final double AI_CREATINE_FOOD_STRESS_RATIO = 0.35;
     public static final double TRADE_AUTOMATION_SURPLUS_RATIO = 0.50;
     public static final double TRADE_AUTOMATION_DEFICIT_RATIO = 0.25;
+    public static final float TRADE_DISTANCE_TIME_FACTOR = 0.50f;
+    public static final double TRADE_DISTANCE_RISK_PER_HEX = 0.15;
+    public static final double AI_TRADE_MIN_PROFIT_AMOUNT = 25.0;
+    public static final double AI_TRADE_MAX_RISK_RATIO = 0.40;
+    public static final double AI_TRADE_HIGH_PROFIT_MIN_AMOUNT = 300.0;
+    public static final double AI_TRADE_ABORT_RISK_RATIO = 0.75;
     public static final int CREATINE_DIET_PROTEIN_COST = 300;
     public static final int CREATINE_DIET_DURATION_MONTHS = 6;
     public static final float CREATINE_DIET_SPEED_MULTIPLIER = 2f;

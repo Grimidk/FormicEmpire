@@ -1,10 +1,12 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -899,6 +902,15 @@ public class DynastyDiplomacyService {
         if (load.isEmpty()) {
             return TradeProposalResult.FAILED;
         }
+        if (!dynasty.isPlayer()) {
+            Hex originHex = world.getHexOfColony(origin);
+            Hex destHex = world.getHexOfColony(destination);
+            Map<AntClass, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
+            TradeMethod method = DynastyTradeAutomation.pickTradeMethod(dynasty, originHex, destHex);
+            if (!DynastyTradeAutomation.isConvoyWorthwhile(origin, originHex, destHex, method, transport, load)) {
+                return TradeProposalResult.FAILED;
+            }
+        }
 
         CrossDynastyTradeProposal proposal = new CrossDynastyTradeProposal(
                 dynasty.getId(),
@@ -908,6 +920,160 @@ public class DynastyDiplomacyService {
                 load);
 
         return deliverTradeProposal(proposal, other, world, tradeManager);
+    }
+
+    public static boolean areDynastiesMutuallyKnown(Dynasty a, Dynasty b, World world) {
+        if (a == null || b == null || a == b || world == null) {
+            return false;
+        }
+        if (a.hasDiplomaticModifierKey(b.getId(), GameConstants.DIPLO_MODIFIER_PACT.getNameKey())) {
+            return true;
+        }
+        boolean aKnowsB = false;
+        for (Colony cb : b.getColonies()) {
+            if (cb == null) {
+                continue;
+            }
+            Hex hb = world.getHexOfColony(cb);
+            if (hb != null && a.isHexKnown(hb)) {
+                aKnowsB = true;
+                break;
+            }
+        }
+        if (!aKnowsB) {
+            return false;
+        }
+        for (Colony ca : a.getColonies()) {
+            if (ca == null) {
+                continue;
+            }
+            Hex ha = world.getHexOfColony(ca);
+            if (ha != null && b.isHexKnown(ha)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int findCapitalTradeRouteDistance(Dynasty a, Dynasty b, World world) {
+        if (a == null || b == null || a == b || world == null) {
+            return -1;
+        }
+        Colony capA = a.getCapital();
+        Colony capB = b.getCapital();
+        if (capA == null || capB == null) {
+            return -1;
+        }
+        Hex hexA = world.getHexOfColony(capA);
+        Hex hexB = world.getHexOfColony(capB);
+        if (hexA == null || hexB == null) {
+            return -1;
+        }
+        Tunnel tunnel = a.getTunnelBetween(hexA, hexB);
+        if (tunnel != null && tunnel.isComplete()) {
+            return 1;
+        }
+        if (HexWaterCrossing.isWaterBiome(hexA.getBiome()) || HexWaterCrossing.isWaterBiome(hexB.getBiome())) {
+            return -1;
+        }
+        ArrayDeque<Hex> queue = new ArrayDeque<>();
+        Map<Hex, Integer> dist = new HashMap<>();
+        queue.add(hexA);
+        dist.put(hexA, 0);
+        while (!queue.isEmpty()) {
+            Hex cur = queue.poll();
+            int d = dist.get(cur);
+            if (cur == hexB) {
+                return d;
+            }
+            for (Hex n : cur.getAdjacentNeighbors()) {
+                if (n == null || dist.containsKey(n)) {
+                    continue;
+                }
+                if (HexWaterCrossing.isWaterBiome(n.getBiome())) {
+                    continue;
+                }
+                Colony c = n.getColony();
+                if (c != null && c.getDynasty() != null && !c.getDynasty().isDefeated()) {
+                    Dynasty owner = c.getDynasty();
+                    if (owner != a && owner != b) {
+                        continue;
+                    }
+                }
+                dist.put(n, d + 1);
+                queue.add(n);
+            }
+        }
+        return -1;
+    }
+
+    public boolean canEstablishNonBorderingCapitalTrade(Dynasty other, World world) {
+        if (other == null || other == dynasty || world == null
+                || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
+            return false;
+        }
+        if (isAtWarWith(other) || !dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
+            return false;
+        }
+        Colony originCap = dynasty.getCapital();
+        Colony destCap = other.getCapital();
+        if (originCap == null || destCap == null || !meetsTradeLoyaltyRequirement(originCap)) {
+            return false;
+        }
+        if (!areDynastiesMutuallyKnown(dynasty, other, world)) {
+            return false;
+        }
+        return findCapitalTradeRouteDistance(dynasty, other, world) > 0;
+    }
+
+    public TradeProposalResult proposeNonEssentialCapitalTradeOffer(
+            Dynasty other,
+            World world,
+            TradeManager tradeManager) {
+        if (other == null || other == dynasty || world == null || tradeManager == null) {
+            return TradeProposalResult.FAILED;
+        }
+        if (!canEstablishNonBorderingCapitalTrade(other, world)) {
+            return TradeProposalResult.FAILED;
+        }
+        if (!canProposeCrossDynastyTrade(other, world, CrossDynastyTradeProposal.Kind.OFFER)
+                || !canNpcProposeTradeOffer(other, world)) {
+            return TradeProposalResult.FAILED;
+        }
+        Colony origin = dynasty.getCapital();
+        Colony destination = other.getCapital();
+        if (origin == null || destination == null) {
+            return TradeProposalResult.FAILED;
+        }
+        dynasty.bindTradeManager(tradeManager);
+        DynastyTradeService tradeService = dynasty.getTradeService();
+        if (tradeService == null || tradeService.findTrade(origin, destination) != null) {
+            return TradeProposalResult.FAILED;
+        }
+        Map<ResourceType, Double> load = DynastyTradeAutomation.computeNonEssentialOutboundLoad(origin, destination);
+        if (load.isEmpty()) {
+            return TradeProposalResult.FAILED;
+        }
+        Hex originHex = world.getHexOfColony(origin);
+        Hex destHex = world.getHexOfColony(destination);
+        Map<AntClass, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
+        TradeMethod method = DynastyTradeAutomation.pickTradeMethod(dynasty, originHex, destHex);
+        if (!DynastyTradeAutomation.isConvoyWorthwhile(origin, originHex, destHex, method, transport, load)) {
+            return TradeProposalResult.FAILED;
+        }
+        CrossDynastyTradeProposal proposal = new CrossDynastyTradeProposal(
+                dynasty.getId(),
+                origin.getId(),
+                destination.getId(),
+                CrossDynastyTradeProposal.Kind.OFFER,
+                load);
+        TradeProposalResult result = deliverTradeProposal(proposal, other, world, tradeManager);
+        if (result != TradeProposalResult.FAILED
+                && getEffectiveDiplomaticReputation(other, world) > 0
+                && canRequestNonAggressionPact(other, world)) {
+            requestNonAggressionPact(other, world);
+        }
+        return result;
     }
 
     public TradeProposalResult requestTrade(Dynasty other, Colony localColony, World world, TradeManager tradeManager) {

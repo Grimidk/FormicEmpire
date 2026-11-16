@@ -6,7 +6,7 @@ To Fix (By decreasing priority):
 	High:
 		(none right now)
 	Mid:
-		(none right now)
+		biome clusters so they look more realistic
 	Low:
 		(none right now)
 	Important not Urgent:
@@ -66,7 +66,6 @@ Needed for launch (v1.0) (Launch Version):
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		bridges (needs rafting)
 		Battle numeric animation with dice(?) and numbers
-		intra dynasty ai auto logisitcs with non esential resources 
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
 		rework abilities and alerts and triggers to be cleaner
 		rework saves to be cleaner and efficient

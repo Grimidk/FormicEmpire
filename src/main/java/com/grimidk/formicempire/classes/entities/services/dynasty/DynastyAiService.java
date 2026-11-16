@@ -416,6 +416,17 @@ public class DynastyAiService {
                 }
             }
         }
+
+        for (Dynasty otherDynasty : world.getDynastys()) {
+            if (otherDynasty == null || otherDynasty == dynasty
+                    || !DynastyDiplomacyService.isDiplomaticallyContactable(otherDynasty)) {
+                continue;
+            }
+            if (diplo.proposeNonEssentialCapitalTradeOffer(otherDynasty, world, tradeManager)
+                    != DynastyDiplomacyService.TradeProposalResult.FAILED) {
+                return;
+            }
+        }
     }
 
     private void runAbilities(Dynasty dynasty, World world) {
