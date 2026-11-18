@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
@@ -215,6 +216,7 @@ public final class DynastyRebellionService {
                 WorldHistoryEvent.dynastyArg(rebellion.getId()));
 
         splitTunnels(parent, rebellion, rebelIds, world);
+        splitBridges(parent, rebellion, rebelIds);
         splitTrades(parent, rebellion, rebelIds, tradeManager);
         recallDiplomatsTargetingColonies(world, parent, rebelIds);
         cancelCrossDynastyLinks(parent, rebellion, tradeManager);
@@ -252,6 +254,27 @@ public final class DynastyRebellionService {
             rebellion.addTunnel(tunnel);
         }
         parent.getTunnels().removeAll(toRemove);
+    }
+
+    private static void splitBridges(Dynasty parent, Dynasty rebellion, Set<Integer> rebelColonyIds) {
+        List<Bridge> toRebellion = new ArrayList<>();
+        List<Bridge> toRemove = new ArrayList<>();
+        for (Bridge bridge : new ArrayList<>(parent.getBridges())) {
+            Colony colonyA = hexColony(bridge.getHexA());
+            Colony colonyB = hexColony(bridge.getHexB());
+            boolean aRebel = colonyA != null && rebelColonyIds.contains(colonyA.getId());
+            boolean bRebel = colonyB != null && rebelColonyIds.contains(colonyB.getId());
+            if (aRebel && bRebel) {
+                toRebellion.add(bridge);
+            } else if (aRebel != bRebel) {
+                toRemove.add(bridge);
+            }
+        }
+        for (Bridge bridge : toRebellion) {
+            parent.getBridges().remove(bridge);
+            rebellion.addBridge(bridge);
+        }
+        parent.getBridges().removeAll(toRemove);
     }
 
     private static Colony hexColony(Hex hex) {

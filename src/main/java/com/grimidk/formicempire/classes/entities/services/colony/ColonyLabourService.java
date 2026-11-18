@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
@@ -476,7 +477,7 @@ public class ColonyLabourService {
         int satellitesToSpawn = Math.min(potentialSatellites, colony.getStatsService().getSpreadingLimit(colony));
 
         List<Hex> neighbors = HexWaterCrossing.colonizableLandHexes(
-                currentHex, HexWaterCrossing.waterCrossRange(dynasty));
+                currentHex, HexWaterCrossing.waterCrossRange(dynasty), dynasty);
         Collections.shuffle(neighbors);
         
         int satellitesSpawned = 0;
@@ -1146,6 +1147,27 @@ public class ColonyLabourService {
         if (tunnel.isComplete()) {
             colony.logEvent(ColonyLogPrefixes.SUCCESS + " " + LanguageStrings.get(LanguageStrings.LOG_SUCCESS_TUNNEL));
             colony.setCurrentTunnelProject(null);
+        }
+    }
+
+    public void runBridgeConstruction(Colony colony) {
+        Bridge bridge = colony.getCurrentBridgeProject();
+        if (bridge == null || bridge.isComplete()) {
+            colony.setCurrentBridgeProject(null);
+            return;
+        }
+
+        int engineers = colony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
+        int borers = colony.getAssignedRoleCount(GameConstants.ROLE_BORER);
+
+        if (engineers <= 0 && borers <= 0) return;
+
+        double hourlyProgress = (engineers * 1.0) + (borers * 100.0);
+        bridge.addProgress(hourlyProgress);
+
+        if (bridge.isComplete()) {
+            colony.logEvent(ColonyLogPrefixes.SUCCESS + " " + LanguageStrings.get(LanguageStrings.LOG_SUCCESS_BRIDGE));
+            colony.setCurrentBridgeProject(null);
         }
     }
 }

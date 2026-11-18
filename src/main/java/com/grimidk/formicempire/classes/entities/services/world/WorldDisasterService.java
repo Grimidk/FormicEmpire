@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyUnassignedAntService;
 import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
@@ -153,7 +154,7 @@ public class WorldDisasterService {
 
         for (Hex hex : affected) {
             hex.recordDisaster(GameConstants.DISASTER_EARTHQUAKE);
-            int severedTunnels = severTunnelsConnectedTo(world, hex);
+            int severedTunnels = severTunnelsConnectedTo(world, hex) + severBridgesConnectedTo(world, hex);
             int damagedRooms = 0;
             Colony colony = hex.getColony();
             if (colony != null) {
@@ -508,6 +509,25 @@ public class WorldDisasterService {
             for (Tunnel tunnel : dynasty.getTunnels()) {
                 if (tunnel != null && tunnel.isComplete() && (tunnel.getHexA() == hex || tunnel.getHexB() == hex)) {
                     tunnel.restoreState(tunnel.getTotalCost() * 0.5, false);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private static int severBridgesConnectedTo(World world, Hex hex) {
+        if (world == null || world.getDynastys() == null || hex == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty == null || dynasty.getBridges() == null) {
+                continue;
+            }
+            for (Bridge bridge : dynasty.getBridges()) {
+                if (bridge != null && bridge.isComplete() && (bridge.getHexA() == hex || bridge.getHexB() == hex)) {
+                    bridge.restoreState(bridge.getTotalCost() * 0.5, false);
                     count++;
                 }
             }

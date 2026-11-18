@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.constants.world.DisasterType;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.services.world.WorldWeatherService;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -161,35 +162,65 @@ public final class HexMapOverlays {
         Rectangle clip = g2d.getClipBounds();
 
         for (Dynasty dynasty : world.getDynastys()) {
-            if (dynasty == null || dynasty.getTunnels() == null) {
+            if (dynasty == null) {
                 continue;
             }
             Color lineColor = HexMapGeometry.dynastyPaintColor(dynasty, AssetStyles.BORDER_COLOR);
-            for (Tunnel tunnel : dynasty.getTunnels()) {
-                if (tunnel == null) {
-                    continue;
+            if (dynasty.getTunnels() != null) {
+                for (Tunnel tunnel : dynasty.getTunnels()) {
+                    if (tunnel == null) {
+                        continue;
+                    }
+                    Hex hexA = tunnel.getHexA();
+                    Hex hexB = tunnel.getHexB();
+                    if (hexA == null || hexB == null || !areNeighbors(hexA, hexB)) {
+                        continue;
+                    }
+                    if (isHexDiscovered != null && (!isHexDiscovered.test(hexA) && !isHexDiscovered.test(hexB))) {
+                        continue;
+                    }
+                    long key = edgeKey(hexA.getQ(), hexA.getR(), hexB.getQ(), hexB.getR());
+                    if (!drawn.add(key)) {
+                        continue;
+                    }
+                    HexGridMesh.Face faceA = mesh.faceAt(hexA.getQ(), hexA.getR());
+                    HexGridMesh.Face faceB = mesh.faceAt(hexB.getQ(), hexB.getR());
+                    if (faceA == null || faceB == null) {
+                        continue;
+                    }
+                    if (clip != null && !clip.intersectsLine(faceA.centerX, faceA.centerY, faceB.centerX, faceB.centerY)) {
+                        continue;
+                    }
+                    paintTunnelBridge(g2d, faceA, faceB, layoutSize, lineColor, tunnel.isComplete());
                 }
-                Hex hexA = tunnel.getHexA();
-                Hex hexB = tunnel.getHexB();
-                if (hexA == null || hexB == null || !areNeighbors(hexA, hexB)) {
-                    continue;
+            }
+            if (dynasty.getBridges() != null) {
+                for (Bridge bridge : dynasty.getBridges()) {
+                    if (bridge == null) {
+                        continue;
+                    }
+                    Hex hexA = bridge.getHexA();
+                    Hex hexB = bridge.getHexB();
+                    if (hexA == null || hexB == null) {
+                        continue;
+                    }
+                    if (isHexDiscovered != null && (!isHexDiscovered.test(hexA) && !isHexDiscovered.test(hexB))) {
+                        continue;
+                    }
+                    long key = edgeKey(hexA.getQ(), hexA.getR(), hexB.getQ(), hexB.getR());
+                    if (!drawn.add(key)) {
+                        continue;
+                    }
+                    HexGridMesh.Face faceA = mesh.faceAt(hexA.getQ(), hexA.getR());
+                    HexGridMesh.Face faceB = mesh.faceAt(hexB.getQ(), hexB.getR());
+                    if (faceA == null || faceB == null) {
+                        continue;
+                    }
+                    if (clip != null && !clip.intersectsLine(faceA.centerX, faceA.centerY, faceB.centerX, faceB.centerY)) {
+                        continue;
+                    }
+                    paintWaterBridge(g2d, faceA, faceB, layoutSize, lineColor, bridge.isComplete());
                 }
-                if (isHexDiscovered != null && (!isHexDiscovered.test(hexA) && !isHexDiscovered.test(hexB))) {
-                    continue;
-                }
-                long key = edgeKey(hexA.getQ(), hexA.getR(), hexB.getQ(), hexB.getR());
-                if (!drawn.add(key)) {
-                    continue;
-                }
-                HexGridMesh.Face faceA = mesh.faceAt(hexA.getQ(), hexA.getR());
-                HexGridMesh.Face faceB = mesh.faceAt(hexB.getQ(), hexB.getR());
-                if (faceA == null || faceB == null) {
-                    continue;
-                }
-                if (clip != null && !clip.intersectsLine(faceA.centerX, faceA.centerY, faceB.centerX, faceB.centerY)) {
-                    continue;
-                }
-                paintTunnelBridge(g2d, faceA, faceB, layoutSize, lineColor, tunnel.isComplete());
             }
         }
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, previousAa);
@@ -375,6 +406,48 @@ public final class HexMapOverlays {
                     midY + oy - uy * halfSpan,
                     midX + ox + ux * halfSpan,
                     midY + oy + uy * halfSpan));
+        }
+    }
+
+    private static void paintWaterBridge(
+            Graphics2D g2d,
+            HexGridMesh.Face faceA,
+            HexGridMesh.Face faceB,
+            double layoutSize,
+            Color lineColor,
+            boolean complete) {
+        double dx = faceB.centerX - faceA.centerX;
+        double dy = faceB.centerY - faceA.centerY;
+        double len = Math.hypot(dx, dy);
+        if (len < 1e-6) {
+            return;
+        }
+        double ux = dx / len;
+        double uy = dy / len;
+        double bx = -uy;
+        double by = ux;
+        double railGap = layoutSize * TUNNEL_RAIL_GAP_FACTOR;
+
+        BasicStroke stroke = complete
+                ? new BasicStroke(HexGridMesh.DIVIDER_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+                : new BasicStroke(
+                        HexGridMesh.DIVIDER_STROKE,
+                        BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_MITER,
+                        10f,
+                        TUNNEL_DASH,
+                        0f);
+        g2d.setStroke(stroke);
+        g2d.setColor(lineColor);
+
+        for (int side = -1; side <= 1; side += 2) {
+            double ox = bx * railGap * side;
+            double oy = by * railGap * side;
+            g2d.draw(new Line2D.Double(
+                    faceA.centerX + ox,
+                    faceA.centerY + oy,
+                    faceB.centerX + ox,
+                    faceB.centerY + oy));
         }
     }
 

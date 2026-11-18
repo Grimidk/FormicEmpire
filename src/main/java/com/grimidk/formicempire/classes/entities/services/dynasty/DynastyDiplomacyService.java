@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
@@ -878,7 +879,7 @@ public class DynastyDiplomacyService {
             return null;
         }
         int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
-        for (Hex neighborHex : HexWaterCrossing.tradeReachableLandHexes(playerHex, waterRange)) {
+        for (Hex neighborHex : HexWaterCrossing.tradeReachableLandHexes(playerHex, waterRange, dynasty)) {
             if (neighborHex.getColony() == null) {
                 continue;
             }
@@ -1011,6 +1012,10 @@ public class DynastyDiplomacyService {
         if (tunnel != null && tunnel.isComplete()) {
             return 1;
         }
+        Bridge directBridge = a.getBridgeBetween(hexA, hexB);
+        if (directBridge != null && directBridge.isComplete()) {
+            return 1;
+        }
         if (HexWaterCrossing.isWaterBiome(hexA.getBiome()) || HexWaterCrossing.isWaterBiome(hexB.getBiome())) {
             return -1;
         }
@@ -1024,7 +1029,9 @@ public class DynastyDiplomacyService {
             if (cur == hexB) {
                 return d;
             }
-            for (Hex n : cur.getAdjacentNeighbors()) {
+            List<Hex> neighbors = new ArrayList<>(java.util.Arrays.asList(cur.getAdjacentNeighbors()));
+            neighbors.addAll(HexWaterCrossing.bridgedLandHexes(cur, a));
+            for (Hex n : neighbors) {
                 if (n == null || dist.containsKey(n)) {
                     continue;
                 }

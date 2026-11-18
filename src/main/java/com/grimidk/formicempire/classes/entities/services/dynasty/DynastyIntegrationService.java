@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
@@ -387,6 +388,7 @@ public final class DynastyIntegrationService {
         }
 
         transferTunnels(target, overlord);
+        transferBridges(target, overlord);
         target.setDefeated(true);
         world.getWarService().endWarsInvolving(target);
 
@@ -415,6 +417,16 @@ public final class DynastyIntegrationService {
             to.addTunnel(tunnel);
         }
         from.getTunnels().clear();
+    }
+
+    private static void transferBridges(Dynasty from, Dynasty to) {
+        if (from == null || to == null) {
+            return;
+        }
+        for (Bridge bridge : new ArrayList<>(from.getBridges())) {
+            to.addBridge(bridge);
+        }
+        from.getBridges().clear();
     }
 
     public static List<Dynasty> listIntegrationCandidates(Dynasty overlord, World world) {

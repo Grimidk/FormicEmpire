@@ -345,7 +345,7 @@ public class DynastyAiService {
             if (hex == null) {
                 continue;
             }
-            for (Hex neighbor : HexWaterCrossing.colonizableLandHexes(hex, waterRange)) {
+            for (Hex neighbor : HexWaterCrossing.colonizableLandHexes(hex, waterRange, dynasty)) {
                 Colony existing = neighbor.getColony();
                 if (existing == null) {
                     return true;

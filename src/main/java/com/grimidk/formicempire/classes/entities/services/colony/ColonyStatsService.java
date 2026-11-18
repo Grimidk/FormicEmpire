@@ -199,6 +199,10 @@ public class ColonyStatsService {
     public static double getTunnelWorkRequired(Dynasty dynasty) {
         return GameNumbers.TUNNEL_WORK_REQUIRED * woodburrowTimeMult(dynasty);
     }
+
+    public static double getBridgeWorkRequired(Dynasty dynasty, int hexDistance) {
+        return GameNumbers.BRIDGE_WORK_REQUIRED_PER_HEX * Math.max(1, hexDistance) * woodburrowTimeMult(dynasty);
+    }
     public int getAphidCapacity(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return 10;
         return 0;

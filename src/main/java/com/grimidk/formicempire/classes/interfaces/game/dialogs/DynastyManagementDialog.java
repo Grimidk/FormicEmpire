@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
@@ -19,6 +20,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelligenceService;
@@ -492,7 +494,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private void initUI() {
             removeAll();
-            tunnelsVisible = dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS);
+            tunnelsVisible = dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS) || dynasty.hasUpgrade(GameUnlocks.ABILITY_BRIDGES);
             
             List<String> cols = new ArrayList<>(List.of(LanguageStrings.get(LanguageStrings.DYNASTY_DIRECTION), LanguageStrings.get(LanguageStrings.DYNASTY_NEIGHBOR)));
             if (tunnelsVisible) cols.add(LanguageStrings.get(LanguageStrings.DYNASTY_TUNNEL_STATUS));
@@ -592,7 +594,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         @Override
         public void updateData() {
-            if (tunnelsVisible != dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) {
+            if (tunnelsVisible != (dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS) || dynasty.hasUpgrade(GameUnlocks.ABILITY_BRIDGES))) {
                 initUI();
             }
 
@@ -675,11 +677,30 @@ public class DynastyManagementDialog extends ZeroDialog {
 
                 addTradeRow(originColony, neighborColony, currentHex, neighborHex, dirNames[i]);
             }
+
+            if (dynasty.hasUpgrade(GameUnlocks.ABILITY_BRIDGES)) {
+                java.util.Set<Hex> shown = new java.util.HashSet<>(java.util.Arrays.asList(adjacent));
+                List<Hex> waterTargets = new ArrayList<>(HexWaterCrossing.bridgeableLandHexes(currentHex, dynasty));
+                for (Hex bridged : HexWaterCrossing.bridgedLandHexes(currentHex, dynasty)) {
+                    if (!waterTargets.contains(bridged)) {
+                        waterTargets.add(bridged);
+                    }
+                }
+                for (Hex targetHex : waterTargets) {
+                    if (targetHex == null || !shown.add(targetHex)) continue;
+                    Colony neighborColony = targetHex.getColony();
+                    if (neighborColony == null || neighborColony.getDynasty() != originColony.getDynasty()) continue;
+                    addTradeRow(originColony, neighborColony, currentHex, targetHex, LanguageStrings.get(LanguageStrings.BIOME_OCEAN));
+                }
+            }
         }
 
         private void addTradeRow(Colony originColony, Colony neighborColony, Hex originHex, Hex neighborHex,
                 String directionLabel) {
-            Tunnel tunnel = dynasty.getTunnelBetween(originHex, neighborHex);
+            boolean isWaterBridge = originHex != null && neighborHex != null
+                    && !java.util.Arrays.asList(originHex.getAdjacentNeighbors()).contains(neighborHex);
+            Tunnel tunnel = isWaterBridge ? null : dynasty.getTunnelBetween(originHex, neighborHex);
+            Bridge bridge = isWaterBridge ? dynasty.getBridgeBetween(originHex, neighborHex) : null;
 
             Trade outgoing = dynasty.getTradeService().findTrade(originColony, neighborColony);
             Trade incoming = dynasty.getTradeService().findTrade(neighborColony, originColony);
@@ -696,7 +717,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             TradeRouteStatus outStatus = tradeRouteStatus(outgoing, bilateralOut);
             TradeRouteStatus inStatus = tradeRouteStatus(incoming, bilateralIn);
 
-            TradeRowData rowData = new TradeRowData(originColony, neighborColony, neighborHex, outgoing, incoming, tunnel);
+            TradeRowData rowData = new TradeRowData(originColony, neighborColony, neighborHex, outgoing, incoming, tunnel, bridge, isWaterBridge);
 
             if (tunnelsVisible) {
                 model.addRow(new Object[]{directionLabel, neighborColony.getName(), rowData, outStatus, inStatus, rowData});
@@ -859,11 +880,38 @@ public class DynastyManagementDialog extends ZeroDialog {
             return tunnel != null && !tunnel.isComplete() && tunnel.getProgress() > 0;
         }
 
+        private boolean shouldShowBridgeProgress(Bridge bridge) {
+            return bridge != null && !bridge.isComplete() && bridge.getProgress() > 0;
+        }
+
         private boolean canStartTunnel(TradeRowData data) {
             if (data == null || data.neighbor == null) {
                 return false;
             }
             if (data.neighbor.getDynasty() != activeColony.getDynasty()) {
+                return false;
+            }
+            if (data.isWaterBridge) {
+                if (!dynasty.hasUpgrade(GameUnlocks.ABILITY_BRIDGES)) {
+                    return false;
+                }
+                if (activeColony.getCurrentBridgeProject() != null) {
+                    return false;
+                }
+                if (data.bridge != null && data.bridge.isComplete()) {
+                    return false;
+                }
+                World world = engine.getWorld();
+                if (world != null) {
+                    Hex originHex = world.getHexOfColony(activeColony);
+                    if (originHex != null && dynasty.hasIncompleteBridgeAt(originHex)
+                            && (data.bridge == null || data.bridge.isComplete())) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (!dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) {
                 return false;
             }
             if (activeColony.getCurrentTunnelProject() != null) {
@@ -903,13 +951,24 @@ public class DynastyManagementDialog extends ZeroDialog {
                 removeAll();
                 if (value instanceof TradeRowData) {
                     TradeRowData data = (TradeRowData) value;
-                    Tunnel tunnel = data.tunnel;
-                    if (tunnel != null && tunnel.isComplete()) {
+                    boolean complete = data.isWaterBridge
+                            ? (data.bridge != null && data.bridge.isComplete())
+                            : (data.tunnel != null && data.tunnel.isComplete());
+                    boolean inProgress = data.isWaterBridge
+                            ? shouldShowBridgeProgress(data.bridge)
+                            : shouldShowTunnelProgress(data.tunnel);
+                    double progress = data.isWaterBridge
+                            ? (data.bridge != null ? data.bridge.getProgress() : 0)
+                            : (data.tunnel != null ? data.tunnel.getProgress() : 0);
+                    double totalCost = data.isWaterBridge
+                            ? (data.bridge != null ? data.bridge.getTotalCost() : 1)
+                            : (data.tunnel != null ? data.tunnel.getTotalCost() : 1);
+                    if (complete) {
                         label.setText(LanguageStrings.get(LanguageStrings.DYNASTY_BUILT));
                         label.setForeground(AssetStyles.FONT_COLOR_SUCCESS);
                         add(label, BorderLayout.CENTER);
-                    } else if (shouldShowTunnelProgress(tunnel)) {
-                        double pct = (tunnel.getProgress() / tunnel.getTotalCost()) * 100;
+                    } else if (inProgress) {
+                        double pct = (progress / totalCost) * 100;
                         progressBar.setValue((int) pct);
                         progressBar.setString(LanguageStrings.format(LanguageStrings.DYNASTY_PROGRESS_PERCENT, pct));
 
@@ -926,8 +985,16 @@ public class DynastyManagementDialog extends ZeroDialog {
                         add(progressBar, BorderLayout.CENTER);
                     } else {
                         boolean sameDynasty = data.neighbor != null && data.neighbor.getDynasty() == activeColony.getDynasty();
-                        if (sameDynasty) {
-                            boolean alreadyBuilding = activeColony.getCurrentTunnelProject() != null;
+                        boolean hasRequiredUpgrade = data.isWaterBridge
+                                ? dynasty.hasUpgrade(GameUnlocks.ABILITY_BRIDGES)
+                                : dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS);
+                        if (sameDynasty && hasRequiredUpgrade) {
+                            boolean alreadyBuilding = data.isWaterBridge
+                                    ? activeColony.getCurrentBridgeProject() != null
+                                    : activeColony.getCurrentTunnelProject() != null;
+                            buildBtn.setText(LanguageStrings.get(data.isWaterBridge
+                                    ? LanguageStrings.DYNASTY_BUILD_BRIDGE
+                                    : LanguageStrings.DYNASTY_BUILD_TUNNEL));
                             buildBtn.setEnabled(!alreadyBuilding);
                             AssetStyles.styleCompactButton(buildBtn);
                             buildBtn.setToolTipText(alreadyBuilding ? LanguageStrings.get(LanguageStrings.DYNASTY_TUNNEL_SPONSORING) : buildBtn.getText());
@@ -960,6 +1027,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                             UiOptionPane.showMessageDialog(panel,
                                 LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_ASSIGN_BORERS),
                                 LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_LABOR_REQUIRED), JOptionPane.WARNING_MESSAGE);
+                        } else if (currentData.isWaterBridge) {
+                            startBridge(currentData.neighborHex);
                         } else {
                             startTunnel(currentData.neighborHex);
                         }
@@ -971,6 +1040,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 currentData = (TradeRowData) value;
                 panel.setBackground(table.getSelectionBackground());
+                if (currentData != null) {
+                    buildBtn.setText(LanguageStrings.get(currentData.isWaterBridge
+                            ? LanguageStrings.DYNASTY_BUILD_BRIDGE
+                            : LanguageStrings.DYNASTY_BUILD_TUNNEL));
+                }
                 AssetStyles.styleCompactButton(buildBtn);
                 return panel;
             }
@@ -985,15 +1059,19 @@ public class DynastyManagementDialog extends ZeroDialog {
             final Trade outgoingTrade;
             final Trade incomingTrade;
             final Tunnel tunnel;
+            final Bridge bridge;
+            final boolean isWaterBridge;
 
             TradeRowData(Colony originColony, Colony neighbor, Hex neighborHex, Trade outgoingTrade,
-                    Trade incomingTrade, Tunnel tunnel) {
+                    Trade incomingTrade, Tunnel tunnel, Bridge bridge, boolean isWaterBridge) {
                 this.originColony = originColony;
                 this.neighbor = neighbor;
                 this.neighborHex = neighborHex;
                 this.outgoingTrade = outgoingTrade;
                 this.incomingTrade = incomingTrade;
                 this.tunnel = tunnel;
+                this.bridge = bridge;
+                this.isWaterBridge = isWaterBridge;
             }
 
             Colony resolveOrigin(TradePanel panel) {
@@ -1102,10 +1180,15 @@ public class DynastyManagementDialog extends ZeroDialog {
             Hex neighborHex = world.getHexOfColony(neighbor);
             Trade outgoing = findTrade(activeColony, neighbor);
             Trade incoming = findIncomingTrade(activeColony, neighbor);
-            Tunnel tunnel = currentHex != null && neighborHex != null
+            boolean isWaterBridge = currentHex != null && neighborHex != null
+                    && !java.util.Arrays.asList(currentHex.getAdjacentNeighbors()).contains(neighborHex);
+            Tunnel tunnel = !isWaterBridge && currentHex != null && neighborHex != null
                     ? dynasty.getTunnelBetween(currentHex, neighborHex)
                     : null;
-            TradeRowData data = new TradeRowData(activeColony, neighbor, neighborHex, outgoing, incoming, tunnel);
+            Bridge bridge = isWaterBridge && currentHex != null && neighborHex != null
+                    ? dynasty.getBridgeBetween(currentHex, neighborHex)
+                    : null;
+            TradeRowData data = new TradeRowData(activeColony, neighbor, neighborHex, outgoing, incoming, tunnel, bridge, isWaterBridge);
             showTradeRowActionsMenu(data, invoker);
         }
 
@@ -1124,6 +1207,27 @@ public class DynastyManagementDialog extends ZeroDialog {
                 Tunnel tunnel = new Tunnel(originHex, targetHex, ColonyStatsService.getTunnelWorkRequired(dynasty));
                 dynasty.addTunnel(tunnel);
                 activeColony.setCurrentTunnelProject(tunnel);
+            }
+            updateData();
+        }
+
+        private void startBridge(Hex targetHex) {
+            Hex originHex = engine.getWorld().getHexOfColony(activeColony);
+            if (originHex == null || targetHex == null) {
+                return;
+            }
+            Bridge existing = dynasty.getBridgeBetween(originHex, targetHex);
+            if (existing != null && !existing.isComplete()) {
+                activeColony.setCurrentBridgeProject(existing);
+            } else if (existing == null) {
+                if (activeColony.getCurrentBridgeProject() != null || dynasty.hasIncompleteBridgeAt(originHex)) {
+                    return;
+                }
+                int distance = Math.max(1, GameNumbers.axialHexDistance(
+                        originHex.getQ(), originHex.getR(), targetHex.getQ(), targetHex.getR()));
+                Bridge bridge = new Bridge(originHex, targetHex, ColonyStatsService.getBridgeWorkRequired(dynasty, distance));
+                dynasty.addBridge(bridge);
+                activeColony.setCurrentBridgeProject(bridge);
             }
             updateData();
         }

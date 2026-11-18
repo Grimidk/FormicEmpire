@@ -23,6 +23,7 @@ import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
 import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyHuntService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyInvasionService;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.ResourceSource;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
@@ -550,6 +551,19 @@ public class SaveManager {
                         sc.tunnels.add(st);
                     }
                 }
+                if (dynasty.getBridges() != null) {
+                    for (Bridge b : dynasty.getBridges()) {
+                        Savefile.SavedTunnel sb = new Savefile.SavedTunnel();
+                        sb.qA = b.getHexA().getQ();
+                        sb.rA = b.getHexA().getR();
+                        sb.qB = b.getHexB().getQ();
+                        sb.rB = b.getHexB().getR();
+                        sb.progress = b.getProgress();
+                        sb.totalCost = b.getTotalCost();
+                        sb.isComplete = b.isComplete();
+                        sc.bridges.add(sb);
+                    }
+                }
 
                 dynastyList.add(sc);
             }
@@ -938,7 +952,8 @@ public class SaveManager {
         w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics) + ","); w.newLine();
         w.write("      \"knownHexKeys\": " + serializeLongListToJson(sc.knownHexKeys) + ","); w.newLine();
         w.write("      \"exploredHexCount\": " + sc.exploredHexCount + ","); w.newLine();
-        w.write("      \"tunnels\": " + serializeTunnelsToJson(sc.tunnels)); w.newLine();
+        w.write("      \"tunnels\": " + serializeTunnelsToJson(sc.tunnels) + ","); w.newLine();
+        w.write("      \"bridges\": " + serializeTunnelsToJson(sc.bridges)); w.newLine();
         w.write("    }");
         if (!isLast) w.write(",");
         w.newLine();
@@ -1274,6 +1289,7 @@ public class SaveManager {
         sc.knownHexKeys = deserializeJsonToLongList(map.get("knownHexKeys"));
         sc.exploredHexCount = Integer.parseInt(map.getOrDefault("exploredHexCount", "0"));
         sc.tunnels = deserializeJsonToTunnels(map.get("tunnels"));
+        sc.bridges = deserializeJsonToTunnels(map.get("bridges"));
         return sc;
     }
 

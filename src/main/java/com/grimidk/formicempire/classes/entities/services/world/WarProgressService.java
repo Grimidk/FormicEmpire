@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
@@ -717,6 +718,11 @@ public final class WarProgressService {
             return;
         }
         boolean wasLoserCapital = colony.isCapital();
+        Hex capturedHex = world != null ? world.getHexOfColony(colony) : null;
+        if (capturedHex != null && loser.getBridges() != null) {
+            loser.getBridges().removeIf(b -> b != null && (b.getHexA() == capturedHex || b.getHexB() == capturedHex));
+        }
+        colony.setCurrentBridgeProject(null);
         loser.removeColony(colony);
         colony.setDynasty(victor);
         colony.setCapital(false);
@@ -783,6 +789,12 @@ public final class WarProgressService {
         for (Hex neighbor : hex.getAdjacentNeighbors()) {
             if (neighbor != null && neighbor.getColony() != null
                     && neighbor.getColony().getDynasty() == dynasty) {
+                return true;
+            }
+        }
+        for (Hex bridged : HexWaterCrossing.bridgedLandHexes(hex, dynasty)) {
+            if (bridged != null && bridged.getColony() != null
+                    && bridged.getColony().getDynasty() == dynasty) {
                 return true;
             }
         }

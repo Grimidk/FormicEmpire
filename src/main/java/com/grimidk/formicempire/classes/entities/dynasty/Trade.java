@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
@@ -86,6 +87,10 @@ public class Trade {
             Tunnel tunnel = originColony.getDynasty().getTunnelBetween(origin, destination);
             if (tunnel != null && tunnel.isComplete()) {
                 speedFactor *= 1.5f;
+            }
+            Bridge bridge = originColony.getDynasty().getBridgeBetween(origin, destination);
+            if (bridge != null && bridge.isComplete()) {
+                speedFactor *= GameNumbers.BRIDGE_SPEED_MULT;
             }
             speedFactor *= originColony.getStatsService().getLocsenseSpeedMultiplier(originColony);
             speedFactor *= originColony.getStatsService().getHeatresistSpeedMultiplier(originColony);

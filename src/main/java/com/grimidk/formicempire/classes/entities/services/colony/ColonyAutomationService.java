@@ -316,12 +316,13 @@ public class ColonyAutomationService {
     }
 
     private int allocateTunnelEngineers(Colony colony, Map<AntRole, Integer> targets, int remaining) {
-        if (!colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return remaining;
+        boolean buildingBridge = colony.getCurrentBridgeProject() != null;
+        if (!buildingBridge && !colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return remaining;
         if (!colony.hasUpgrade(GameUnlocks.ROLE_ENGINEER)) return remaining;
         if (remaining <= 0) return remaining;
 
         boolean aggressive = usesAggressiveTunnelAutomation(colony);
-        boolean digging = colony.getCurrentTunnelProject() != null;
+        boolean digging = colony.getCurrentTunnelProject() != null || buildingBridge;
         boolean preparing = !digging && aggressive && needsTunnelDigging(colony);
         if (!digging && !preparing) return remaining;
 

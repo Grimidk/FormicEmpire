@@ -1240,6 +1240,7 @@ public final class LanguageStrings {
     public static final String DYNASTY_ACTIONS = "DYNASTY_ACTIONS";
     public static final String DYNASTY_TRANSIT_FORMAT = "DYNASTY_TRANSIT_FORMAT";
     public static final String DYNASTY_BUILD_TUNNEL = "DYNASTY_BUILD_TUNNEL";
+    public static final String DYNASTY_BUILD_BRIDGE = "DYNASTY_BUILD_BRIDGE";
     public static final String DYNASTY_TUNNEL_SPONSORING = "DYNASTY_TUNNEL_SPONSORING";
     public static final String DYNASTY_BUILT = "DYNASTY_BUILT";
     public static final String DYNASTY_PROGRESS_PERCENT = "DYNASTY_PROGRESS_PERCENT";
@@ -1576,6 +1577,7 @@ public final class LanguageStrings {
     public static final String LOG_NUPTIAL_QUEENS_FMT = "LOG_NUPTIAL_QUEENS_FMT";
     public static final String LOG_SUCCESS_ASSIMILATION_FMT = "LOG_SUCCESS_ASSIMILATION_FMT";
     public static final String LOG_SUCCESS_TUNNEL = "LOG_SUCCESS_TUNNEL";
+    public static final String LOG_SUCCESS_BRIDGE = "LOG_SUCCESS_BRIDGE";
     public static final String LOG_FOUND_NEW_SOURCE_FMT = "LOG_FOUND_NEW_SOURCE_FMT";
     public static final String LOG_FOUND_SOURCE_FULL_FMT = "LOG_FOUND_SOURCE_FULL_FMT";
     public static final String LOG_SOURCE_EXHAUSTED_FMT = "LOG_SOURCE_EXHAUSTED_FMT";
@@ -1659,6 +1661,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_TAB_AUDIO = "SETTINGS_TAB_AUDIO";
     public static final String SETTINGS_TAB_ROLES = "SETTINGS_TAB_ROLES";
     public static final String SETTINGS_TAB_SANDBOX = "SETTINGS_TAB_SANDBOX";
+    public static final String SETTINGS_TAB_CHEATS = "SETTINGS_TAB_CHEATS";
     public static final String SETTINGS_SANDBOX_NOTE = "SETTINGS_SANDBOX_NOTE";
     public static final String SETTINGS_SANDBOX_STAR_PREFIX = "SETTINGS_SANDBOX_STAR_PREFIX";
     public static final String SETTINGS_FREE_ABILITIES = "SETTINGS_FREE_ABILITIES";
@@ -2697,6 +2700,8 @@ public final class LanguageStrings {
     public static final String ABILITY_SUBTYPE_HATCH_DESC = "ABILITY_SUBTYPE_HATCH_DESC";
     public static final String ABILITY_TUNNELS_FLAVOR = "ABILITY_TUNNELS_FLAVOR";
     public static final String ABILITY_TUNNELS_DESC = "ABILITY_TUNNELS_DESC";
+    public static final String ABILITY_BRIDGES_FLAVOR = "ABILITY_BRIDGES_FLAVOR";
+    public static final String ABILITY_BRIDGES_DESC = "ABILITY_BRIDGES_DESC";
     public static final String ABILITY_BILATERAL_TRADE_FLAVOR = "ABILITY_BILATERAL_TRADE_FLAVOR";
     public static final String ABILITY_BILATERAL_TRADE_DESC = "ABILITY_BILATERAL_TRADE_DESC";
     public static final String ABILITY_MANAGEMENT_FLAVOR = "ABILITY_MANAGEMENT_FLAVOR";

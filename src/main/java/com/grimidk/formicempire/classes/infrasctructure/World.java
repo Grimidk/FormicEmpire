@@ -35,6 +35,7 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Continent;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.world.FaultLine.FaultType;
@@ -6782,6 +6783,29 @@ public class World {
                                 }
                                 if (sponsor != null && sponsor.getCurrentTunnelProject() == null) {
                                     sponsor.setCurrentTunnelProject(tunnel);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (d != null && sd.bridges != null) {
+                    for (Savefile.SavedTunnel sb : sd.bridges) {
+                        Hex hA = getHexAt(sb.qA, sb.rA);
+                        Hex hB = getHexAt(sb.qB, sb.rB);
+                        if (hA != null && hB != null) {
+                            Bridge bridge = new Bridge(hA, hB, sb.totalCost);
+                            bridge.restoreState(sb.progress, sb.isComplete);
+                            d.addBridge(bridge);
+
+                            if (!sb.isComplete) {
+                                Colony sponsor = null;
+                                if (hA.getColony() != null && hA.getColony().getDynasty() == d) {
+                                    sponsor = hA.getColony();
+                                } else if (hB.getColony() != null && hB.getColony().getDynasty() == d) {
+                                    sponsor = hB.getColony();
+                                }
+                                if (sponsor != null && sponsor.getCurrentBridgeProject() == null) {
+                                    sponsor.setCurrentBridgeProject(bridge);
                                 }
                             }
                         }

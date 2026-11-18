@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -151,12 +152,61 @@ public final class HexWaterCrossing {
         return result;
     }
 
+    public static boolean isBridgedBetween(Hex a, Hex b, Dynasty dynasty) {
+        if (a == null || b == null || dynasty == null) {
+            return false;
+        }
+        Bridge bridge = dynasty.getBridgeBetween(a, b);
+        return bridge != null && bridge.isComplete();
+    }
+
+    public static List<Hex> bridgedLandHexes(Hex origin, Dynasty dynasty) {
+        List<Hex> result = new ArrayList<>();
+        if (origin == null || dynasty == null || dynasty.getBridges() == null) {
+            return result;
+        }
+        for (Bridge bridge : dynasty.getBridges()) {
+            if (bridge == null || !bridge.isComplete()) {
+                continue;
+            }
+            Hex other = bridge.getHexA() == origin ? bridge.getHexB()
+                    : (bridge.getHexB() == origin ? bridge.getHexA() : null);
+            if (other != null && isLandHex(other) && !result.contains(other)) {
+                result.add(other);
+            }
+        }
+        return result;
+    }
+
+    public static List<Hex> bridgeableLandHexes(Hex origin, Dynasty dynasty) {
+        List<Hex> result = new ArrayList<>();
+        if (origin == null || dynasty == null || !dynasty.hasUpgrade(GameUnlocks.ABILITY_BRIDGES)) {
+            return result;
+        }
+        int range = waterCrossRange(dynasty);
+        if (range <= 0) {
+            return result;
+        }
+        Set<Hex> adjacent = new HashSet<>(java.util.Arrays.asList(origin.getAdjacentNeighbors()));
+        for (Hex candidate : waterCrossLandHexes(origin, range)) {
+            if (candidate != null && !adjacent.contains(candidate)) {
+                result.add(candidate);
+            }
+        }
+        return result;
+    }
+
     public static List<Hex> colonizableLandHexes(Hex origin, int waterCrossRange, Dynasty dynasty) {
         List<Hex> result = new ArrayList<>(adjacentColonizableLandHexes(origin, dynasty));
         Set<Hex> seen = new HashSet<>(result);
         for (Hex across : waterCrossLandHexes(origin, waterCrossRange)) {
             if (seen.add(across)) {
                 result.add(across);
+            }
+        }
+        for (Hex bridged : bridgedLandHexes(origin, dynasty)) {
+            if (seen.add(bridged)) {
+                result.add(bridged);
             }
         }
         return result;
@@ -185,6 +235,11 @@ public final class HexWaterCrossing {
         for (Hex across : waterCrossLandHexes(origin, waterCrossRange)) {
             if (seen.add(across)) {
                 result.add(across);
+            }
+        }
+        for (Hex bridged : bridgedLandHexes(origin, dynasty)) {
+            if (seen.add(bridged)) {
+                result.add(bridged);
             }
         }
         return result;

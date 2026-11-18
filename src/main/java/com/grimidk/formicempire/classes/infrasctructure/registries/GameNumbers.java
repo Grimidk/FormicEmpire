@@ -410,6 +410,8 @@ public final class GameNumbers {
 
     // --- Construction ---
     public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
+    public static final double BRIDGE_WORK_REQUIRED_PER_HEX = 2500000.0;
+    public static final float BRIDGE_SPEED_MULT = 1.5f;
 
     // --- Research ---
     public static final int RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR = 50;

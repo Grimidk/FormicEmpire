@@ -4,7 +4,7 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		settings are changed when selected all, may have to do with the difference between in and out of games
+		separate sandbox into sandbox for non cheats, and cheats for actual cheats
 	Mid:
 		(none right now)
 	Low:
@@ -64,7 +64,6 @@ To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
-		bridges (needs rafting)
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
 		rework abilities and alerts and triggers to be cleaner
 		rework saves to be cleaner and efficient

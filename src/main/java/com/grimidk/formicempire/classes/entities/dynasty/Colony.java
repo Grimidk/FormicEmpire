@@ -35,6 +35,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
@@ -140,6 +141,7 @@ public class Colony {
     private Dimension lastPhysicsDimension;
     private Building currentBuildingProject = null;
     private Tunnel currentTunnelProject = null;
+    private Bridge currentBridgeProject = null;
     private double buildingProgressHours = 0.0;
     private final List<String> eventLog = new ArrayList<>();
     private final List<com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget> knownHuntTargets = new ArrayList<>();
@@ -1256,6 +1258,8 @@ public class Colony {
     }
     public Tunnel getCurrentTunnelProject() { return currentTunnelProject; }
     public void setCurrentTunnelProject(Tunnel t) { this.currentTunnelProject = t; }
+    public Bridge getCurrentBridgeProject() { return currentBridgeProject; }
+    public void setCurrentBridgeProject(Bridge b) { this.currentBridgeProject = b; }
     public double getBuildingProgressHours() { return buildingProgressHours; }
     public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; }
 
@@ -2250,6 +2254,7 @@ public class Colony {
             this.runRanching();
             this.runBuilding();
             this.labourService.runTunnelConstruction(this);
+            this.labourService.runBridgeConstruction(this);
             this.runCollecting();
             ColonyHuntService.tickExpeditions(this);
             World invasionWorld = dynasty != null ? dynasty.getOwningWorld() : null;
@@ -2266,6 +2271,7 @@ public class Colony {
                 this.runRoleAssignmentForPopulationDrift(engine);
             }
             this.labourService.runTunnelConstruction(this);
+            this.labourService.runBridgeConstruction(this);
             ColonyJobRules.runHourlyLite(this, biome);
             if (this.isActive) {
                 physicsService.rollAntSpriteAnimHourly(this, lastPhysicsDimension, lastPhysicsViewport);

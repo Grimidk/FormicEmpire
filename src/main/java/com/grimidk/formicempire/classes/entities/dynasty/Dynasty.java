@@ -31,6 +31,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAutomationService;
@@ -90,6 +91,7 @@ public class Dynasty {
     private final transient List<Synergy> pendingSynergyAlerts = new ArrayList<>();
     private final List<Colony> colonies;
     private final List<Tunnel> tunnels;
+    private final List<Bridge> bridges;
     private final Map<String, Integer> globalDeathStatistics;
     private final List<Integer> absorbedDynastyIds;
     private final List<Integer> defeatedSpeciesIds;
@@ -161,6 +163,7 @@ public class Dynasty {
         this.announcedRankIds = new LinkedHashSet<>();
         seedStartingAnnouncedRanks();
         this.tunnels = new ArrayList<>();
+        this.bridges = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.absorbedDynastyIds = new ArrayList<>();
         this.defeatedSpeciesIds = new ArrayList<>();
@@ -269,6 +272,7 @@ public class Dynasty {
         this.unlockedSkills = new LinkedHashSet<>();
         this.announcedRankIds = new LinkedHashSet<>();
         this.tunnels = new ArrayList<>();
+        this.bridges = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.completedAssimilations = new HashSet<>();
         this.diplomaticReputations = new HashMap<>();
@@ -873,6 +877,32 @@ public class Dynasty {
         }
         for (Tunnel tunnel : tunnels) {
             if (!tunnel.isComplete() && (tunnel.getHexA() == hex || tunnel.getHexB() == hex)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Bridge> getBridges() { return bridges; }
+    public void addBridge(Bridge bridge) {
+        if (bridge != null && !bridges.contains(bridge)) {
+            bridges.add(bridge);
+        }
+    }
+
+    public Bridge getBridgeBetween(Hex a, Hex b) {
+        return bridges.stream()
+            .filter(br -> br.connects(a, b))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public boolean hasIncompleteBridgeAt(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Bridge bridge : bridges) {
+            if (!bridge.isComplete() && (bridge.getHexA() == hex || bridge.getHexB() == hex)) {
                 return true;
             }
         }

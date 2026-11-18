@@ -26,6 +26,7 @@ public class SettingsPanel extends JPanel {
     private static final String SECTION_AUDIO = "audio";
     private static final String SECTION_ROLES = "roles";
     private static final String SECTION_SANDBOX = "sandbox";
+    private static final String SECTION_CHEATS = "cheats";
     private static final String[] WINDOW_SIZE_PRESETS = {
             "1000x700", "1280x720", "1366x768", "1440x900", "1600x900", "1920x1080", "2560x1440"
     };
@@ -42,6 +43,7 @@ public class SettingsPanel extends JPanel {
     private JButton audioTabButton;
     private JButton rolesTabButton;
     private JButton sandboxTabButton;
+    private JButton cheatsTabButton;
     private String selectedSection = SECTION_GENERAL;
     
     // --- General Tab ---
@@ -99,6 +101,7 @@ public class SettingsPanel extends JPanel {
     private JButton resetAudioButton;
     private JButton resetRolesButton;
     private JButton resetSandboxButton;
+    private JButton resetCheatsButton;
     private boolean loadedFullScreen;
     private String loadedScreenSize;
 
@@ -146,7 +149,7 @@ public class SettingsPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
-        sectionTabs.setLayout(new java.awt.GridLayout(1, 5, -1, 0));
+        sectionTabs.setLayout(new java.awt.GridLayout(1, 6, -1, 0));
         sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
         sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
 
@@ -157,11 +160,13 @@ public class SettingsPanel extends JPanel {
         audioTabButton = createSectionTab(SECTION_AUDIO);
         rolesTabButton = createSectionTab(SECTION_ROLES);
         sandboxTabButton = createSectionTab(SECTION_SANDBOX);
+        cheatsTabButton = createSectionTab(SECTION_CHEATS);
         sectionTabs.add(generalTabButton);
         sectionTabs.add(videoTabButton);
         sectionTabs.add(audioTabButton);
         sectionTabs.add(rolesTabButton);
         sectionTabs.add(sandboxTabButton);
+        sectionTabs.add(cheatsTabButton);
 
         JPanel body = new JPanel(new BorderLayout());
         body.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -219,6 +224,7 @@ public class SettingsPanel extends JPanel {
         sectionCards.add(createAudioTab(), SECTION_AUDIO);
         sectionCards.add(createRolesTab(), SECTION_ROLES);
         sectionCards.add(createSandboxTab(), SECTION_SANDBOX);
+        sectionCards.add(createCheatsTab(), SECTION_CHEATS);
     }
 
     private JButton createSectionTab(String sectionId) {
@@ -237,6 +243,7 @@ public class SettingsPanel extends JPanel {
         styleSectionTab(audioTabButton, SECTION_AUDIO.equals(sectionId));
         styleSectionTab(rolesTabButton, SECTION_ROLES.equals(sectionId));
         styleSectionTab(sandboxTabButton, SECTION_SANDBOX.equals(sectionId));
+        styleSectionTab(cheatsTabButton, SECTION_CHEATS.equals(sectionId));
     }
 
     private void styleSectionTab(JButton button, boolean selected) {
@@ -390,15 +397,6 @@ public class SettingsPanel extends JPanel {
 
         c.gridy = 0;
         c.gridx = 0;
-        c.gridwidth = 2;
-        sandboxNoteLabel = new JLabel();
-        sandboxNoteLabel.setFont(AssetStyles.FONT_NORMAL);
-        sandboxNoteLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(sandboxNoteLabel, c);
-
-        c.gridwidth = 1;
-        c.gridy = 1;
-        c.gridx = 0;
         turboLabel = new JLabel();
         turboLabel.setFont(AssetStyles.FONT_NORMAL);
         turboLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -409,7 +407,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(turboCheck, c);
 
-        c.gridy = 2;
+        c.gridy = 1;
         c.gridx = 0;
         showAuditMenuLabel = new JLabel();
         showAuditMenuLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -421,7 +419,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(showAuditMenuCheck, c);
 
-        c.gridy = 3;
+        c.gridy = 2;
         c.gridx = 0;
         showFpsCounterLabel = new JLabel();
         showFpsCounterLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -433,55 +431,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(showFpsCounterCheck, c);
 
-        c.gridy = 4;
-        c.gridx = 0;
-        freeAbilitiesLabel = new JLabel();
-        freeAbilitiesLabel.setFont(AssetStyles.FONT_NORMAL);
-        freeAbilitiesLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(freeAbilitiesLabel, c);
-
-        freeAbilitiesCheck = new JCheckBox();
-        styleCheckBox(freeAbilitiesCheck);
-        c.gridx = 1;
-        panel.add(freeAbilitiesCheck, c);
-
-        c.gridy = 5;
-        c.gridx = 0;
-        infiniteResearchLabel = new JLabel();
-        infiniteResearchLabel.setFont(AssetStyles.FONT_NORMAL);
-        infiniteResearchLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(infiniteResearchLabel, c);
-
-        infiniteResearchCheck = new JCheckBox();
-        styleCheckBox(infiniteResearchCheck);
-        c.gridx = 1;
-        panel.add(infiniteResearchCheck, c);
-
-        c.gridy = 6;
-        c.gridx = 0;
-        instantBuildingsLabel = new JLabel();
-        instantBuildingsLabel.setFont(AssetStyles.FONT_NORMAL);
-        instantBuildingsLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(instantBuildingsLabel, c);
-
-        instantBuildingsCheck = new JCheckBox();
-        styleCheckBox(instantBuildingsCheck);
-        c.gridx = 1;
-        panel.add(instantBuildingsCheck, c);
-
-        c.gridy = 7;
-        c.gridx = 0;
-        assimilateAllLabel = new JLabel();
-        assimilateAllLabel.setFont(AssetStyles.FONT_NORMAL);
-        assimilateAllLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(assimilateAllLabel, c);
-
-        assimilateAllCheck = new JCheckBox();
-        styleCheckBox(assimilateAllCheck);
-        c.gridx = 1;
-        panel.add(assimilateAllCheck, c);
-
-        c.gridy = 8;
+        c.gridy = 3;
         c.gridx = 0;
         mapEditorEnabledLabel = new JLabel();
         mapEditorEnabledLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -511,67 +461,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(editorPanel, c);
 
-        c.gridy = 9;
-        c.gridx = 0;
-        easyConqueringLabel = new JLabel();
-        easyConqueringLabel.setFont(AssetStyles.FONT_NORMAL);
-        easyConqueringLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(easyConqueringLabel, c);
-
-        easyConqueringCheck = new JCheckBox();
-        styleCheckBox(easyConqueringCheck);
-        c.gridx = 1;
-        panel.add(easyConqueringCheck, c);
-
-        c.gridy = 10;
-        c.gridx = 0;
-        instantIntegrationLabel = new JLabel();
-        instantIntegrationLabel.setFont(AssetStyles.FONT_NORMAL);
-        instantIntegrationLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(instantIntegrationLabel, c);
-
-        instantIntegrationCheck = new JCheckBox();
-        styleCheckBox(instantIntegrationCheck);
-        c.gridx = 1;
-        panel.add(instantIntegrationCheck, c);
-
-        c.gridy = 11;
-        c.gridx = 0;
-        cheatFogOfWarLabel = new JLabel();
-        cheatFogOfWarLabel.setFont(AssetStyles.FONT_NORMAL);
-        cheatFogOfWarLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(cheatFogOfWarLabel, c);
-
-        cheatFogOfWarCheck = new JCheckBox();
-        styleCheckBox(cheatFogOfWarCheck);
-        c.gridx = 1;
-        panel.add(cheatFogOfWarCheck, c);
-
-        c.gridy = 12;
-        c.gridx = 0;
-        cheatRandomDisasterLabel = new JLabel();
-        cheatRandomDisasterLabel.setFont(AssetStyles.FONT_NORMAL);
-        cheatRandomDisasterLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(cheatRandomDisasterLabel, c);
-
-        cheatRandomDisasterCheck = new JCheckBox();
-        styleCheckBox(cheatRandomDisasterCheck);
-        c.gridx = 1;
-        panel.add(cheatRandomDisasterCheck, c);
-
-        c.gridy = 13;
-        c.gridx = 0;
-        cheatRandomWarLabel = new JLabel();
-        cheatRandomWarLabel.setFont(AssetStyles.FONT_NORMAL);
-        cheatRandomWarLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(cheatRandomWarLabel, c);
-
-        cheatRandomWarCheck = new JCheckBox();
-        styleCheckBox(cheatRandomWarCheck);
-        c.gridx = 1;
-        panel.add(cheatRandomWarCheck, c);
-
-        c.gridy = 14;
+        c.gridy = 4;
         c.gridx = 0;
         animateWorldGenLabel = new JLabel();
         animateWorldGenLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -583,7 +473,7 @@ public class SettingsPanel extends JPanel {
         c.gridx = 1;
         panel.add(animateWorldGenCheck, c);
 
-        c.gridy = 14;
+        c.gridy = 5;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -593,6 +483,145 @@ public class SettingsPanel extends JPanel {
         resetSandboxButton.addActionListener(e -> resetSandboxTabToDefaults());
         setupNavigation(resetSandboxButton);
         panel.add(resetSandboxButton, c);
+
+        return panel;
+    }
+
+    private JPanel createCheatsTab() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(5, 15, 5, 15);
+        c.anchor = GridBagConstraints.WEST;
+
+        c.gridy = 0;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        sandboxNoteLabel = new JLabel();
+        sandboxNoteLabel.setFont(AssetStyles.FONT_NORMAL);
+        sandboxNoteLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(sandboxNoteLabel, c);
+
+        c.gridwidth = 1;
+        c.gridy = 1;
+        c.gridx = 0;
+        freeAbilitiesLabel = new JLabel();
+        freeAbilitiesLabel.setFont(AssetStyles.FONT_NORMAL);
+        freeAbilitiesLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(freeAbilitiesLabel, c);
+
+        freeAbilitiesCheck = new JCheckBox();
+        styleCheckBox(freeAbilitiesCheck);
+        c.gridx = 1;
+        panel.add(freeAbilitiesCheck, c);
+
+        c.gridy = 2;
+        c.gridx = 0;
+        infiniteResearchLabel = new JLabel();
+        infiniteResearchLabel.setFont(AssetStyles.FONT_NORMAL);
+        infiniteResearchLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(infiniteResearchLabel, c);
+
+        infiniteResearchCheck = new JCheckBox();
+        styleCheckBox(infiniteResearchCheck);
+        c.gridx = 1;
+        panel.add(infiniteResearchCheck, c);
+
+        c.gridy = 3;
+        c.gridx = 0;
+        instantBuildingsLabel = new JLabel();
+        instantBuildingsLabel.setFont(AssetStyles.FONT_NORMAL);
+        instantBuildingsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(instantBuildingsLabel, c);
+
+        instantBuildingsCheck = new JCheckBox();
+        styleCheckBox(instantBuildingsCheck);
+        c.gridx = 1;
+        panel.add(instantBuildingsCheck, c);
+
+        c.gridy = 4;
+        c.gridx = 0;
+        assimilateAllLabel = new JLabel();
+        assimilateAllLabel.setFont(AssetStyles.FONT_NORMAL);
+        assimilateAllLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(assimilateAllLabel, c);
+
+        assimilateAllCheck = new JCheckBox();
+        styleCheckBox(assimilateAllCheck);
+        c.gridx = 1;
+        panel.add(assimilateAllCheck, c);
+
+        c.gridy = 5;
+        c.gridx = 0;
+        easyConqueringLabel = new JLabel();
+        easyConqueringLabel.setFont(AssetStyles.FONT_NORMAL);
+        easyConqueringLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(easyConqueringLabel, c);
+
+        easyConqueringCheck = new JCheckBox();
+        styleCheckBox(easyConqueringCheck);
+        c.gridx = 1;
+        panel.add(easyConqueringCheck, c);
+
+        c.gridy = 6;
+        c.gridx = 0;
+        instantIntegrationLabel = new JLabel();
+        instantIntegrationLabel.setFont(AssetStyles.FONT_NORMAL);
+        instantIntegrationLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(instantIntegrationLabel, c);
+
+        instantIntegrationCheck = new JCheckBox();
+        styleCheckBox(instantIntegrationCheck);
+        c.gridx = 1;
+        panel.add(instantIntegrationCheck, c);
+
+        c.gridy = 7;
+        c.gridx = 0;
+        cheatFogOfWarLabel = new JLabel();
+        cheatFogOfWarLabel.setFont(AssetStyles.FONT_NORMAL);
+        cheatFogOfWarLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(cheatFogOfWarLabel, c);
+
+        cheatFogOfWarCheck = new JCheckBox();
+        styleCheckBox(cheatFogOfWarCheck);
+        c.gridx = 1;
+        panel.add(cheatFogOfWarCheck, c);
+
+        c.gridy = 8;
+        c.gridx = 0;
+        cheatRandomDisasterLabel = new JLabel();
+        cheatRandomDisasterLabel.setFont(AssetStyles.FONT_NORMAL);
+        cheatRandomDisasterLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(cheatRandomDisasterLabel, c);
+
+        cheatRandomDisasterCheck = new JCheckBox();
+        styleCheckBox(cheatRandomDisasterCheck);
+        c.gridx = 1;
+        panel.add(cheatRandomDisasterCheck, c);
+
+        c.gridy = 9;
+        c.gridx = 0;
+        cheatRandomWarLabel = new JLabel();
+        cheatRandomWarLabel.setFont(AssetStyles.FONT_NORMAL);
+        cheatRandomWarLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(cheatRandomWarLabel, c);
+
+        cheatRandomWarCheck = new JCheckBox();
+        styleCheckBox(cheatRandomWarCheck);
+        c.gridx = 1;
+        panel.add(cheatRandomWarCheck, c);
+
+        c.gridy = 10;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(16, 15, 5, 15);
+        resetCheatsButton = new JButton();
+        styleButton(resetCheatsButton);
+        resetCheatsButton.addActionListener(e -> resetCheatsTabToDefaults());
+        setupNavigation(resetCheatsButton);
+        panel.add(resetCheatsButton, c);
 
         return panel;
     }
@@ -774,17 +803,20 @@ public class SettingsPanel extends JPanel {
         turboCheck.setSelected(false);
         showAuditMenuCheck.setSelected(false);
         showFpsCounterCheck.setSelected(false);
+        mapEditorEnabledCheck.setSelected(false);
+        animateWorldGenCheck.setSelected(true);
+    }
+
+    private void resetCheatsTabToDefaults() {
         freeAbilitiesCheck.setSelected(false);
         infiniteResearchCheck.setSelected(false);
         instantBuildingsCheck.setSelected(false);
         assimilateAllCheck.setSelected(false);
-        mapEditorEnabledCheck.setSelected(false);
         easyConqueringCheck.setSelected(false);
         instantIntegrationCheck.setSelected(false);
         cheatFogOfWarCheck.setSelected(false);
         cheatRandomDisasterCheck.setSelected(false);
         cheatRandomWarCheck.setSelected(false);
-        animateWorldGenCheck.setSelected(true);
     }
 
     private void resetVideoTabToDefaults() {
@@ -1049,6 +1081,7 @@ public class SettingsPanel extends JPanel {
             audioTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
             rolesTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
             sandboxTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_SANDBOX));
+            cheatsTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_CHEATS));
             showSection(selectedSection);
         }
         
@@ -1106,6 +1139,7 @@ public class SettingsPanel extends JPanel {
         resetAudioButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetRolesButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetSandboxButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
+        resetCheatsButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         
         int currentFreq = (autosaveCombo.getSelectedItem() != null) ? ((AutosaveOption)autosaveCombo.getSelectedItem()).value : 0;
         autosaveCombo.setModel(new DefaultComboBoxModel<>(new AutosaveOption[]{
@@ -1343,8 +1377,7 @@ public class SettingsPanel extends JPanel {
             assimilateAllCheck.setSelected(false);
         }
         if (easyConqueringCheck.isSelected() && !engine.isEasyConquering()) {
-            mapEditorEnabledCheck.setSelected(false);
-        easyConqueringCheck.setSelected(false);
+            easyConqueringCheck.setSelected(false);
         }
         if (instantIntegrationCheck.isSelected() && !engine.isInstantIntegration()) {
             instantIntegrationCheck.setSelected(false);
@@ -1478,6 +1511,7 @@ public class SettingsPanel extends JPanel {
         styleButton(resetAudioButton);
         styleButton(resetRolesButton);
         styleButton(resetSandboxButton);
+        styleButton(resetCheatsButton);
         AssetStyles.applyThemeToContainer(this);
     }
 
