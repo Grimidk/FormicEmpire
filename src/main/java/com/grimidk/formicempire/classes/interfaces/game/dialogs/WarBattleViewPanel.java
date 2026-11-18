@@ -55,6 +55,7 @@ public class WarBattleViewPanel extends JPanel {
     private final JPanel defenderHeaderPanel = new JPanel();
     private final JPanel centerHeaderPanel = new JPanel(new BorderLayout(0, 2));
     private final JPanel phaseIndicatorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+    private final JLabel stagePhaseLabel = new JLabel();
     private final JLabel infantryPhaseIcon = new JLabel();
     private final JLabel artilleryPhaseIcon = new JLabel();
     private final JLabel airSupportPhaseIcon = new JLabel();
@@ -95,6 +96,7 @@ public class WarBattleViewPanel extends JPanel {
         }
     };
     private final Map<Integer, Image> biomeTileCache = new HashMap<>();
+    private final Image riverSprite = UiResourceLoader.loadImage(WarBattleViewPanel.class, "/sprites/buildings/River.png");
     private final BattleNumericOverlay numericOverlay = new BattleNumericOverlay();
     private WarBattleScene scene;
     private List<BattleAnt> attackerAnts = List.of();
@@ -104,6 +106,9 @@ public class WarBattleViewPanel extends JPanel {
     private Timer animationTimer;
     private float animationSeconds;
     private float sceneRefreshAccumSec;
+    private float stageBannerSecondsRemaining;
+    private WarStagePhase lastObservedPhase;
+    private WarStagePhase stageBannerPhase;
     private long lastTickNanos;
     private String lastAttackerPoolSig = "";
     private String lastDefenderPoolSig = "";
@@ -132,9 +137,14 @@ public class WarBattleViewPanel extends JPanel {
 
         centerHeaderPanel.setOpaque(false);
         phaseIndicatorPanel.setOpaque(false);
+        stagePhaseLabel.setFont(AssetStyles.FONT_BOLD);
+        stagePhaseLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        stagePhaseLabel.setIconTextGap(5);
+        stagePhaseLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
         configurePhaseIconLabel(infantryPhaseIcon, GameConstants.BATTLE_LINE_INFANTRY);
         configurePhaseIconLabel(artilleryPhaseIcon, GameConstants.BATTLE_LINE_ARTILLERY);
         configurePhaseIconLabel(airSupportPhaseIcon, GameConstants.BATTLE_LINE_AIR_SUPPORT);
+        phaseIndicatorPanel.add(stagePhaseLabel);
         phaseIndicatorPanel.add(infantryPhaseIcon);
         phaseIndicatorPanel.add(createPhaseArrowLabel());
         phaseIndicatorPanel.add(artilleryPhaseIcon);
@@ -170,6 +180,14 @@ public class WarBattleViewPanel extends JPanel {
         scene = WarBattleSceneBuilder.build(world, war, warService);
         boolean activeBattle = war != null && war.isActive() && WarCreatureCombatService.getState(war) != null;
         if (activeBattle && scene.isAvailable()) {
+            WarStagePhase currentPhase = scene.getPhase();
+            if (lastObservedPhase != null && currentPhase != null && currentPhase != lastObservedPhase) {
+                stageBannerPhase = currentPhase;
+                stageBannerSecondsRemaining = 2.8f;
+            }
+            if (currentPhase != null) {
+                lastObservedPhase = currentPhase;
+            }
             targetContactLineRatio = scene.getFrontlineRatio();
             String atkSig = sideSignature(scene.getAttacker());
             if (!atkSig.equals(lastAttackerPoolSig)) {
@@ -245,9 +263,18 @@ public class WarBattleViewPanel extends JPanel {
     }
 
     private void updatePhaseIndicator() {
+        WarStagePhase stagePhase = scene != null ? scene.getPhase() : GameConstants.WAR_STAGE_ACTIVE_CLASH;
+        stagePhaseLabel.setText(formatPhase(stagePhase));
+        ImageIcon stageIcon = stagePhase != null ? stagePhase.getIcon() : null;
+        if (stageIcon != null && stageIcon.getImage() != null) {
+            stagePhaseLabel.setIcon(new ImageIcon(stageIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+        } else {
+            stagePhaseLabel.setIcon(null);
+        }
+
         WarBattleState battleState = WarCreatureCombatService.getState(war);
         if (battleState == null) {
-            phaseIndicatorPanel.setVisible(false);
+            phaseIndicatorPanel.setVisible(scene != null && scene.isAvailable());
             return;
         }
         BattleLine activeLine = battleState.getCurrentPhaseLine();
@@ -353,6 +380,9 @@ public class WarBattleViewPanel extends JPanel {
             if (animationSeconds > 10_000f) {
                 animationSeconds = 0f;
             }
+            if (stageBannerSecondsRemaining > 0f) {
+                stageBannerSecondsRemaining = Math.max(0f, stageBannerSecondsRemaining - deltaSec);
+            }
             sceneRefreshAccumSec += deltaSec;
             if (sceneRefreshAccumSec >= 0.35f) {
                 sceneRefreshAccumSec = 0f;
@@ -434,12 +464,58 @@ public class WarBattleViewPanel extends JPanel {
             drawBattlefieldBiomes(g2d, fieldX, fieldY, fieldW, fieldH, biomeSplitX,
                     scene.getAttackerBiome(), scene.getDefenderBiome());
         }
+        if (scene.isRiverCrossing()) {
+            drawCenterRiver(g2d, fieldX, fieldY, fieldW, fieldH);
+        }
 
         Rectangle field = new Rectangle(fieldX, fieldY, fieldW, fieldH);
         drawAntColumn(g2d, attackerAnts, field, contactLineX, true);
         drawAntColumn(g2d, defenderAnts, field, contactLineX, false);
+        drawStageTransitionBanner(g2d, fieldX, fieldY, fieldW);
 
         g2d.dispose();
+    }
+
+    private void drawStageTransitionBanner(Graphics2D g2d, int fieldX, int fieldY, int fieldW) {
+        if (stageBannerSecondsRemaining <= 0f || stageBannerPhase == null) {
+            return;
+        }
+        float alpha = Math.min(1f, stageBannerSecondsRemaining / 0.6f);
+        Composite oldComp = g2d.getComposite();
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+
+        String text = formatPhase(stageBannerPhase);
+        ImageIcon icon = stageBannerPhase.getIcon();
+        Image iconImg = (icon != null) ? icon.getImage() : null;
+        int iconSize = (iconImg != null) ? 20 : 0;
+        int iconGap = (iconImg != null) ? 8 : 0;
+
+        g2d.setFont(AssetStyles.FONT_BOLD);
+        FontMetrics fm = g2d.getFontMetrics();
+        int padX = 18;
+        int padY = 8;
+        int contentW = iconSize + iconGap + fm.stringWidth(text);
+        int boxW = contentW + padX * 2;
+        int boxH = Math.max(iconSize, fm.getHeight()) + padY * 2;
+        int boxX = fieldX + (fieldW - boxW) / 2;
+        int boxY = fieldY + 18;
+
+        Color bg = AssetStyles.BACKGROUND_SECONDARY;
+        g2d.setColor(new Color(bg.getRed(), bg.getGreen(), bg.getBlue(), 230));
+        g2d.fillRoundRect(boxX, boxY, boxW, boxH, 12, 12);
+        g2d.setColor(AssetStyles.FONT_COLOR_HEADER);
+        g2d.drawRoundRect(boxX, boxY, boxW, boxH, 12, 12);
+
+        int curX = boxX + padX;
+        if (iconImg != null) {
+            int iconY = boxY + (boxH - iconSize) / 2;
+            g2d.drawImage(iconImg, curX, iconY, iconSize, iconSize, this);
+            curX += iconSize + iconGap;
+        }
+        int textY = boxY + ((boxH - fm.getHeight()) / 2) + fm.getAscent();
+        g2d.drawString(text, curX, textY);
+
+        g2d.setComposite(oldComp);
     }
 
     private void installDiceHoverListeners() {
@@ -545,6 +621,24 @@ public class WarBattleViewPanel extends JPanel {
         if (rightW > 0) {
             g2d.setClip(splitX, fieldY, rightW, fieldH);
             tileRegion(g2d, rightTile, fieldX, fieldY, fieldW, fieldH, tileW, tileH);
+        }
+        g2d.setClip(oldClip);
+    }
+
+    private void drawCenterRiver(Graphics2D g2d, int fieldX, int fieldY, int fieldW, int fieldH) {
+        if (riverSprite == null) {
+            return;
+        }
+        int riverW = tileWidth(riverSprite);
+        int riverH = tileHeight(riverSprite);
+        if (riverW <= 0 || riverH <= 0) {
+            return;
+        }
+        int riverX = fieldX + (fieldW - riverW) / 2;
+        Shape oldClip = g2d.getClip();
+        g2d.setClip(fieldX, fieldY, fieldW, fieldH);
+        for (int y = fieldY; y < fieldY + fieldH; y += riverH) {
+            g2d.drawImage(riverSprite, riverX, y, this);
         }
         g2d.setClip(oldClip);
     }

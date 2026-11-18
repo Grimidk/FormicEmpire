@@ -97,11 +97,13 @@ public final class WarBattleScene {
     private final float warProgressPercent;
     private final int redeployHoursRemaining;
     private final boolean defenseOnlyBiome;
+    private final boolean riverCrossing;
     private final boolean available;
 
     public WarBattleScene(String warName, String locationName, Biome attackerBiome, Biome defenderBiome,
             Side attacker, Side defender, WarStagePhase phase, float frontlineRatio, float stageProgress,
-            float warProgressPercent, int redeployHoursRemaining, boolean defenseOnlyBiome, boolean available) {
+            float warProgressPercent, int redeployHoursRemaining, boolean defenseOnlyBiome,
+            boolean riverCrossing, boolean available) {
         this.warName = warName != null ? warName : "";
         this.locationName = locationName != null ? locationName : "";
         this.attackerBiome = attackerBiome;
@@ -114,6 +116,7 @@ public final class WarBattleScene {
         this.warProgressPercent = warProgressPercent;
         this.redeployHoursRemaining = Math.max(0, redeployHoursRemaining);
         this.defenseOnlyBiome = defenseOnlyBiome;
+        this.riverCrossing = riverCrossing;
         this.available = available;
     }
 
@@ -163,6 +166,10 @@ public final class WarBattleScene {
 
     public boolean isDefenseOnlyBiome() {
         return defenseOnlyBiome;
+    }
+
+    public boolean isRiverCrossing() {
+        return riverCrossing;
     }
 
     public boolean isAvailable() {

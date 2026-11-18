@@ -68,7 +68,6 @@ Needed for launch (v1.0) (Launch Version):
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
 		rework abilities and alerts and triggers to be cleaner
 		rework saves to be cleaner and efficient
-		battle simulator
 
 	Everything else :
 		critter system:
@@ -103,7 +102,7 @@ Needed for launch (v1.0) (Launch Version):
 			TODO ops: partner page, depots/builds, caps/trailers, wishlist, pricing
 			wishlist button
 		versioning to go back to previous stable patches
-		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code, no vibe code or bloated code
+		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code, no vibe code or bloated code, no assets made by someone other than me
 
 Post launch (v1.1) (Improvements Update):
 	animated tile textures

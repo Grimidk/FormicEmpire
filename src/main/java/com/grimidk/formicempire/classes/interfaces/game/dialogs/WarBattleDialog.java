@@ -50,6 +50,11 @@ public class WarBattleDialog extends ZeroDialog {
 
         if (owner instanceof MainFrame mainFrame) {
             mainFrame.applyGameCursors(this);
+        } else if (owner != null) {
+            Window root = SwingUtilities.getWindowAncestor(owner);
+            if (root instanceof MainFrame mainFrame) {
+                mainFrame.applyGameCursors(this);
+            }
         }
     }
 

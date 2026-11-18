@@ -59,8 +59,13 @@ final class BattleDialogSupport {
             }
             boundEngine.addTickListener(minuteListener);
         }
-        Rectangle bounds = (owner != null && owner.isShowing())
-                ? owner.getBounds()
+        Window boundsRef = (owner instanceof MainFrame)
+                ? owner
+                : (owner != null && SwingUtilities.getWindowAncestor(owner) != null
+                        ? SwingUtilities.getWindowAncestor(owner)
+                        : owner);
+        Rectangle bounds = (boundsRef != null && boundsRef.isShowing())
+                ? boundsRef.getBounds()
                 : GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         dialog.setBounds(bounds);
         GameControlKeyBindings.register(

@@ -92,6 +92,7 @@ public final class WarBattleSceneBuilder {
                 war.getProgressPercent(),
                 war.getRedeployHoursRemaining(),
                 war.getStagePhase() == GameConstants.WAR_STAGE_RESERVE_ASSAULT,
+                battle != null && battle.isRiverBattle(),
                 true);
     }
 
@@ -345,6 +346,7 @@ public final class WarBattleSceneBuilder {
                 0f,
                 war != null ? war.getProgressPercent() : 50f,
                 0,
+                false,
                 false,
                 false);
     }

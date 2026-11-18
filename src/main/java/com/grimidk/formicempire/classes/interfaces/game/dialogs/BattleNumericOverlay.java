@@ -5,9 +5,8 @@ import com.grimidk.formicempire.classes.entities.services.shared.BattleNumericEv
 import com.grimidk.formicempire.classes.entities.services.shared.BattleNumericFeed;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
-import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
+import com.grimidk.formicempire.classes.interfaces.ui.util.DiceRollResource;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -28,7 +27,7 @@ final class BattleNumericOverlay {
 
     static final int COLLAPSED_VISIBLE_ROWS = 2;
 
-    private static final int[] ROLL_SEQUENCE = {2, 6, 3, 5, 4, 1};
+    private static final int[] ROLL_SEQUENCE = DiceRollResource.DEFAULT_FACE_CYCLE;
     private static final float ROLL_STEP_SEC = 0.06f;
 
     private static final int ICON_SIZE = 16;
@@ -102,9 +101,7 @@ final class BattleNumericOverlay {
     private static Image[] loadDiceImages() {
         Image[] images = new Image[6];
         for (int i = 0; i < 6; i++) {
-            Icon icon = UiResourceLoader.loadDialogIcon(
-                    BattleNumericOverlay.class, "/icons/ui/Dice" + (i + 1) + ".png", ICON_SIZE);
-            images[i] = (icon instanceof ImageIcon ii) ? ii.getImage() : null;
+            images[i] = DiceRollResource.getFaceImage(i + 1, ICON_SIZE);
         }
         return images;
     }

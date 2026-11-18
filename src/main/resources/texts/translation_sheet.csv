@@ -2988,3 +2988,27 @@ UI_ELEVATION_LOWER,Lower,Bajar,Baixar,Abaisser
 UI_WORLD_TOOL_LINE,Line,Línea,Linha,Ligne
 UI_WORLD_RESET_STEP,Reset Step,Reiniciar Paso,Redefinir Etapa,Réinitialiser l'étape
 UI_WORLD_CONFIRM_SAVE_CLOSE,Do you want to save your progress before closing?,¿Quieres guardar tu progreso antes de cerrar?,Deseja salvar seu progresso antes de fechar?,Voulez-vous sauvegarder votre progression avant de fermer ?
+UI_BATTLE_SIMULATOR,Battle Simulator,Simulador de Batallas,Simulador de Batalhas,Simulateur de Bataille
+BATTLE_SIM_ATTACKER,Attacker,Atacante,Atacante,Attaquant
+BATTLE_SIM_DEFENDER,Defender,Defensor,Defensor,Défenseur
+BATTLE_SIM_CONDITIONS,Battle Conditions,Condiciones de Batalla,Condições de Batalha,Conditions de Bataille
+BATTLE_SIM_MODE,Battle Mode,Modo de Batalla,Modo de Batalha,Mode de Bataille
+BATTLE_SIM_MODE_BORDER,Border Battle,Batalla Fronteriza,Batalha de Fronteira,Bataille Frontalière
+BATTLE_SIM_MODE_HEX,Hex Assault,Asalto de Hexágono,Assalto de Hexágono,Assaut d'Hexagone
+BATTLE_SIM_MODE_FULL_STAGE,Full Stage (Border + Hex),Etapa Completa (Frontera + Hexágono),Etapa Completa (Fronteira + Hexágono),Étape Complète (Frontière + Hexagone)
+BATTLE_SIM_RIVER,River Crossing,Cruce de Río,Travessia de Rio,Traversée de Rivière
+BATTLE_SIM_SPECIES,Species,Especie,Espécie,Espèce
+BATTLE_SIM_BIOME,Biome,Bioma,Bioma,Biome
+BATTLE_SIM_UNITS,Ants & Battle Lines,Hormigas y Líneas de Batalla,Formigas e Linhas de Batalha,Fourmis et Lignes de Bataille
+BATTLE_SIM_UPGRADES,Upgrades & Abilities,Mejoras y Habilidades,Melhorias e Habilidades,Améliorations et Capacités
+BATTLE_SIM_SELECT_ALL,All,Todo,Tudo,Tout
+BATTLE_SIM_CLEAR_ALL,None,Nada,Nenhum,Aucun
+BATTLE_SIM_START,Start Battle,Iniciar Batalla,Iniciar Batalha,Lancer la Bataille
+BATTLE_SIM_RESET_DEFAULTS,Reset to Defaults,Restablecer Valores,Redefinir Padrões,Réinitialiser par Défaut
+BATTLE_SIM_COPY_ATK_TO_DEF,Copy Attacker to Defender,Copiar Atacante a Defensor,Copiar Atacante para Defensor,Copier Attaquant vers Défenseur
+BATTLE_SIM_MODIFICATIONS,Ant Modifications,Modificaciones de Hormigas,Modificações de Formigas,Modifications de Fourmis
+BATTLE_SIM_RANDOMIZE,Randomize Armies,Aleatorizar Ejércitos,Aleatorizar Exércitos,Aléatoiriser les Armées
+BATTLE_SIM_VICTORY_TITLE,Battle Complete,Batalla Completada,Batalha Concluída,Bataille Terminée
+BATTLE_SIM_VICTORY_FMT,%s Victory!,¡Victoria de %s!,Vitória de %s!,Victoire de %s !
+BATTLE_SIM_DRAW,Battle ended in a draw.,La batalla terminó en empate.,A batalha terminou em empate.,La bataille s'est terminée par un match nul.
+BATTLE_SIM_RUSH,Battle Rush,Asalto Rápido,Batalha Contínua,Enchaînement de Batailles
