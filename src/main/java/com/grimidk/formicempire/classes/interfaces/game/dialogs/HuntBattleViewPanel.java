@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.HuntBattleFalle
 import com.grimidk.formicempire.classes.entities.services.colony.HuntBattleParticipant;
 import com.grimidk.formicempire.classes.entities.services.colony.HuntBattleState;
 import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
+import com.grimidk.formicempire.classes.entities.services.shared.BattleNumericFeed;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -20,6 +21,8 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +36,7 @@ public class HuntBattleViewPanel extends JPanel {
         INVASION
     }
 
-    private static final int HEADER_HEIGHT = 72;
+    private static final int HEADER_HEIGHT = 0;
     private static final int ANT_SPRITE_SCALE = 2;
     private static final int CRITTER_SPRITE_SCALE = 1;
     private static final int ANIMATION_FRAME_MS = 50;
@@ -44,8 +47,44 @@ public class HuntBattleViewPanel extends JPanel {
     private final Engine engine;
     private final int battleId;
     private final BattleKind battleKind;
-    private final JLabel statusLabel = new JLabel();
+    private final JPanel headerPanel = new JPanel(new BorderLayout(0, 4));
+    private final JPanel diceTrayPanel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (!diceExpanded) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                numericOverlay.paint(g2d, getWidth(), BattleNumericOverlay.COLLAPSED_VISIBLE_ROWS);
+                g2d.dispose();
+            }
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            return event != null ? numericOverlay.getTooltipAt(event.getPoint()) : null;
+        }
+    };
+    private boolean diceExpanded;
+    private final JPanel battleProgressBar = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            int w = getWidth();
+            int h = getHeight();
+            if (w <= 0 || h <= 0) {
+                return;
+            }
+            float bugHp = state != null ? Math.max(0f, Math.min(1f, state.getBugHealthRatio())) : 0f;
+            int bugW = Math.round(w * bugHp);
+            g.setColor(new Color(95, 185, 255));
+            g.fillRect(0, 0, w - bugW, h);
+            g.setColor(new Color(255, 135, 95));
+            g.fillRect(w - bugW, 0, bugW, h);
+        }
+    };
     private final Map<Integer, Image> biomeTileCache = new HashMap<>();
+    private final BattleNumericOverlay numericOverlay = new BattleNumericOverlay();
     private HuntBattleState state;
     private Timer animationTimer;
     private float animationSeconds;
@@ -64,10 +103,22 @@ public class HuntBattleViewPanel extends JPanel {
         setOpaque(true);
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
-        statusLabel.setFont(AssetStyles.FONT_NORMAL);
-        statusLabel.setForeground(AssetStyles.FONT_COLOR);
-        statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
-        add(statusLabel, BorderLayout.NORTH);
+        headerPanel.setOpaque(true);
+        headerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+
+        diceTrayPanel.setOpaque(false);
+        diceTrayPanel.setPreferredSize(new Dimension(320, BattleNumericOverlay.COLLAPSED_HEIGHT));
+        ToolTipManager.sharedInstance().registerComponent(diceTrayPanel);
+        ToolTipManager.sharedInstance().registerComponent(this);
+        installDiceHoverListeners();
+
+        battleProgressBar.setOpaque(false);
+        battleProgressBar.setPreferredSize(new Dimension(100, 6));
+
+        headerPanel.add(diceTrayPanel, BorderLayout.CENTER);
+        headerPanel.add(battleProgressBar, BorderLayout.SOUTH);
+        add(headerPanel, BorderLayout.NORTH);
 
         loadBiomeTiles();
         refreshScene();
@@ -92,7 +143,7 @@ public class HuntBattleViewPanel extends JPanel {
 
     public void refreshScene() {
         state = resolveBattleState();
-        updateStatusLabel();
+        battleProgressBar.repaint();
     }
 
     private HuntBattleState resolveBattleState() {
@@ -105,25 +156,6 @@ public class HuntBattleViewPanel extends JPanel {
         return HuntCreatureCombatService.getState(colony, battleId);
     }
 
-    private void updateStatusLabel() {
-        if (state == null || state.getSpecies() == null) {
-            statusLabel.setText(LanguageStrings.get(battleKind == BattleKind.INVASION
-                    ? LanguageStrings.INVASION_BATTLE_UNAVAILABLE
-                    : LanguageStrings.HUNT_BATTLE_UNAVAILABLE));
-            return;
-        }
-        String bugName = state.getSpecies().getName();
-        int bugPct = Math.round(state.getBugHealthRatio() * 100f);
-        int fighters = state.livingHunters().size();
-        if (battleKind == BattleKind.INVASION) {
-            statusLabel.setText(LanguageStrings.format(
-                    LanguageStrings.INVASION_BATTLE_STATUS_FMT, bugName, bugPct, fighters));
-        } else {
-            statusLabel.setText(LanguageStrings.format(
-                    LanguageStrings.HUNT_BATTLE_STATUS_FMT, bugName, bugPct, fighters));
-        }
-    }
-
     public void startAnimation() {
         if (animationTimer != null) {
             animationTimer.start();
@@ -132,8 +164,18 @@ public class HuntBattleViewPanel extends JPanel {
         lastTickNanos = System.nanoTime();
         animationTimer = new Timer(ANIMATION_FRAME_MS, e -> {
             long now = System.nanoTime();
-            animationSeconds += (now - lastTickNanos) / 1_000_000_000f;
+            float deltaSec = (now - lastTickNanos) / 1_000_000_000f;
             lastTickNanos = now;
+            if (deltaSec <= 0f || deltaSec > 0.25f) {
+                deltaSec = ANIMATION_FRAME_MS / 1000f;
+            }
+            animationSeconds += deltaSec;
+            BattleNumericFeed feed = state != null ? state.getNumericFeed() : null;
+            int stateTickIndex = state != null ? state.getTickIndex() : -1;
+            World w = engine != null ? engine.getWorld() : null;
+            int minute = w != null ? w.getMinute() : 0;
+            numericOverlay.update(feed, deltaSec, minute, stateTickIndex);
+            diceTrayPanel.repaint();
             repaint();
         });
         animationTimer.start();
@@ -161,7 +203,7 @@ public class HuntBattleViewPanel extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
-        int fieldY = HEADER_HEIGHT;
+        int fieldY = headerPanel.getHeight();
         int fieldH = Math.max(120, getHeight() - fieldY);
         int fieldW = getWidth();
         Biome biome = resolveBiome();
@@ -176,6 +218,84 @@ public class HuntBattleViewPanel extends JPanel {
         drawOrbitingHunters(g2d, living, centerX, centerY, radius, slotCount);
         drawCenterCritter(g2d, centerX, centerY, radius, slotCount);
         g2d.dispose();
+    }
+
+    private void installDiceHoverListeners() {
+        MouseAdapter hover = new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (e.getComponent() == diceTrayPanel) {
+                    diceExpanded = true;
+                    repaint();
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                updateDiceExpandedFromPointer(e);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                updateDiceExpandedFromPointer(e);
+            }
+        };
+        diceTrayPanel.addMouseListener(hover);
+        diceTrayPanel.addMouseMotionListener(hover);
+        addMouseListener(hover);
+        addMouseMotionListener(hover);
+    }
+
+    private void updateDiceExpandedFromPointer(MouseEvent e) {
+        if (e == null || e.getComponent() == null) {
+            return;
+        }
+        Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), this);
+        Rectangle expandedRect = expandedDiceBounds();
+        boolean inside = expandedRect != null && expandedRect.contains(pt);
+        if (inside != diceExpanded) {
+            diceExpanded = inside;
+            repaint();
+        }
+    }
+
+    private Rectangle expandedDiceBounds() {
+        int w = diceTrayPanel.getWidth();
+        if (w <= 0) {
+            return null;
+        }
+        Point origin = SwingUtilities.convertPoint(diceTrayPanel, 0, 0, this);
+        int h = Math.max(BattleNumericOverlay.COLLAPSED_HEIGHT, numericOverlay.getRequiredHeight(w));
+        return new Rectangle(origin.x, origin.y, w, h);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        if (!diceExpanded || event == null) {
+            return null;
+        }
+        Point pt = SwingUtilities.convertPoint(this, event.getPoint(), diceTrayPanel);
+        return numericOverlay.getTooltipAt(pt);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (!diceExpanded) {
+            return;
+        }
+        Rectangle bounds = expandedDiceBounds();
+        if (bounds == null) {
+            return;
+        }
+        Graphics2D og = (Graphics2D) g.create();
+        og.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Color bg = AssetStyles.BACKGROUND_SECONDARY;
+        og.setColor(new Color(bg.getRed(), bg.getGreen(), bg.getBlue(), 235));
+        og.fillRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 8, 8);
+        og.translate(bounds.x, bounds.y);
+        numericOverlay.paint(og, bounds.width, Integer.MAX_VALUE);
+        og.dispose();
     }
 
     private float orbitRadius(int fieldH) {

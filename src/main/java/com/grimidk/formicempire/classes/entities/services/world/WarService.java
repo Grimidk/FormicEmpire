@@ -33,6 +33,10 @@ public class WarService {
         this.world = world;
     }
 
+    private TradeManager resolveTradeManager() {
+        return world != null && world.getEngine() != null ? world.getEngine().getTradeManager() : null;
+    }
+
     public War beginWar(Dynasty declarer, Dynasty target) {
         if (declarer == null || target == null || declarer == target
                 || declarer.isDefeated() || target.isDefeated()) {
@@ -48,6 +52,8 @@ public class WarService {
         if (dynastyA == null || dynastyB == null) {
             return null;
         }
+        declarer.getDiplomacyService().ensureWarStateWith(
+                target, resolveTradeManager(), world);
         War war = new War(
                 nextWarId++,
                 pair[0],
@@ -85,6 +91,8 @@ public class WarService {
         if (dynastyA == null || dynastyB == null) {
             return null;
         }
+        parent.getDiplomacyService().ensureWarStateWith(
+                rebellion, resolveTradeManager(), world);
         War war = new War(
                 nextWarId++,
                 pair[0],
@@ -114,6 +122,7 @@ public class WarService {
         if (war == null || !war.isActive() || !activeWars.remove(war)) {
             return;
         }
+        WarCreatureCombatService.clear(war);
         war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerDynastyId, conclusionKey);
         historicWars.add(war);
         String conclusion = conclusionKey != null ? conclusionKey : LanguageStrings.WAR_CONCLUSION_UNKNOWN;
@@ -285,6 +294,7 @@ public class WarService {
             if (!activeWars.remove(war) || !war.isActive()) {
                 continue;
             }
+            WarCreatureCombatService.clear(war);
             int winnerId = resolveArchiveWinnerId(war);
             String conclusion = winnerId > 0
                     ? LanguageStrings.WAR_CONCLUSION_DEFEAT
@@ -373,9 +383,12 @@ public class WarService {
             }
         }
         for (War war : activeWars) {
+            Dynasty aggressor = world.findDynastyById(war.getAggressorDynastyId());
+            Dynasty defender = world.findDynastyById(war.getDefenderDynastyId());
+            if (aggressor != null && defender != null && !aggressor.isDefeated() && !defender.isDefeated()) {
+                aggressor.getDiplomacyService().ensureWarStateWith(defender, resolveTradeManager(), world);
+            }
             if (!war.isCampaignInitialized()) {
-                Dynasty aggressor = world.findDynastyById(war.getAggressorDynastyId());
-                Dynasty defender = world.findDynastyById(war.getDefenderDynastyId());
                 WarProgressService.initializeCampaign(world, war, aggressor, defender);
             }
         }

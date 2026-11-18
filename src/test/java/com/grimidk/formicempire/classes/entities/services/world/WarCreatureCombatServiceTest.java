@@ -7,13 +7,17 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.WarBattleViewPanel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -215,6 +219,275 @@ class WarCreatureCombatServiceTest {
 
         WarCreatureCombatService.clear(war);
         WarCreatureCombatService.clear(second);
+    }
+
+    @Test
+    void tickAlternatesPhasesAndSkipsMissingLines() {
+        WarCreatureCombatService.clear(war);
+        attackerColony.getSoldiers().clear();
+        attackerColony.getMajors().clear();
+        attackerColony.getPrincesses().clear();
+        attackerColony.getWarAssignedRoleCounts().clear();
+        defenderColony.getSoldiers().clear();
+        defenderColony.getMajors().clear();
+        defenderColony.getPrincesses().clear();
+        defenderColony.getWarAssignedRoleCounts().clear();
+
+        for (int i = 0; i < 20; i++) {
+            Ant atkInf = new Ant(attackerColony, GameConstants.CLASS_SOLDIER);
+            attackerColony.getSoldiers().add(atkInf);
+
+            Ant defInf = new Ant(defenderColony, GameConstants.CLASS_SOLDIER);
+            defenderColony.getSoldiers().add(defInf);
+        }
+        for (int i = 0; i < 4; i++) {
+            Ant atkAir = new Ant(attackerColony, GameConstants.CLASS_PRINCESS);
+            attackerColony.getPrincesses().add(atkAir);
+
+            Ant defArt = new Ant(defenderColony, GameConstants.CLASS_MAJOR);
+            defenderColony.getMajors().add(defArt);
+        }
+        attackerColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 20);
+        attackerColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_AIR_SUPPORT, 4);
+        defenderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 20);
+        defenderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_ARTILLERY, 4);
+        ColonyMilitaryService.refreshColonyMilitaryPower(attackerColony);
+        ColonyMilitaryService.refreshColonyMilitaryPower(defenderColony);
+
+        WarBattleState state = WarCreatureCombatService.startBorderBattle(war, attacker, defender);
+        assertNotNull(state);
+
+        WarCreatureCombatService.tick(war);
+        assertTrue(state.isCurrentPhaseAttacker());
+        assertEquals(GameConstants.BATTLE_LINE_INFANTRY, state.getCurrentPhaseLine());
+
+        WarCreatureCombatService.tick(war);
+        assertFalse(state.isCurrentPhaseAttacker());
+        assertEquals(GameConstants.BATTLE_LINE_INFANTRY, state.getCurrentPhaseLine());
+
+        WarCreatureCombatService.tick(war);
+        assertFalse(state.isCurrentPhaseAttacker());
+        assertEquals(GameConstants.BATTLE_LINE_ARTILLERY, state.getCurrentPhaseLine());
+
+        WarCreatureCombatService.tick(war);
+        assertTrue(state.isCurrentPhaseAttacker());
+        assertEquals(GameConstants.BATTLE_LINE_AIR_SUPPORT, state.getCurrentPhaseLine());
+
+        WarCreatureCombatService.tick(war);
+        assertTrue(state.isCurrentPhaseAttacker());
+        assertEquals(GameConstants.BATTLE_LINE_INFANTRY, state.getCurrentPhaseLine());
+
+        WarCreatureCombatService.clear(war);
+    }
+
+    @Test
+    void warBattleViewPanelRendersPhaseIndicatorWithoutException() {
+        WarBattleViewPanel panel = new WarBattleViewPanel(war, null);
+        panel.setSize(1200, 800);
+        panel.doLayout();
+        WarCreatureCombatService.tick(war);
+        panel.refreshScene();
+        BufferedImage img = new BufferedImage(1200, 800, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
+        assertDoesNotThrow(() -> panel.paint(g2d));
+        g2d.dispose();
+        panel.stopAnimation();
+    }
+
+    @Test
+    void tickEndsBattleImmediatelyWhenActiveFrontlineHasNoLivingAntsEvenWithReserves() {
+        WarCreatureCombatService.clear(war);
+        WarBattleState state = WarCreatureCombatService.startBorderBattle(war, attacker, defender);
+        assertNotNull(state);
+        state.getDefender().getReserve(GameConstants.BATTLE_LINE_INFANTRY)
+                .add(new WarBattleParticipant(new Ant(defenderColony, GameConstants.CLASS_SOLDIER),
+                        defenderColony, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.ROLE_WARRIOR, false));
+        for (var line : GameConstants.getBattleLines()) {
+            for (WarBattleParticipant p : state.getDefender().getActive(line)) {
+                p.applyBattleDamage(99999f);
+            }
+            state.getDefender().getActive(line).clear();
+        }
+        assertEquals(0, state.getDefender().livingActiveSize());
+        assertTrue(state.getDefender().livingArmySize() > 0);
+        assertEquals(WarCreatureCombatService.TickOutcome.ATTACKER_WINS, WarCreatureCombatService.tick(war));
+        assertEquals(0, state.getDefender().livingActiveSize());
+        assertTrue(state.getDefender().livingArmySize() > 0);
+        WarCreatureCombatService.clear(war);
+    }
+
+    @Test
+    void warBattleViewPanelInvokesOnBattleEndedWhenBattleStateCleared() throws Exception {
+        java.util.concurrent.atomic.AtomicBoolean ended = new java.util.concurrent.atomic.AtomicBoolean(false);
+        WarBattleViewPanel panel = new WarBattleViewPanel(war, null, () -> ended.set(true));
+        assertFalse(ended.get());
+        WarCreatureCombatService.clear(war);
+        assertTrue(war.isActive());
+        panel.refreshScene();
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        assertTrue(ended.get());
+        panel.stopAnimation();
+    }
+
+    @Test
+    void stageTransitionReplacesNumericFeedWithFreshInstanceAndSequence() {
+        WarCreatureCombatService.TickOutcome tickOutcome = WarCreatureCombatService.TickOutcome.CONTINUE;
+        WarBattleState firstState = WarCreatureCombatService.getState(war);
+        assertNotNull(firstState);
+        for (int i = 0; i < 10 && firstState.getNumericFeed().getLatestSequence() == 0; i++) {
+            tickOutcome = WarCreatureCombatService.tick(war);
+        }
+        long firstSeq = firstState.getNumericFeed().getLatestSequence();
+        assertTrue(firstSeq > 0);
+
+        WarCreatureCombatService.clear(war);
+        WarBattleState secondState = WarCreatureCombatService.startHexBattle(war, attacker, defenderColony);
+        assertNotNull(secondState);
+        assertTrue(secondState.getNumericFeed() != firstState.getNumericFeed());
+        assertEquals(0L, secondState.getNumericFeed().getLatestSequence());
+        WarCreatureCombatService.clear(war);
+    }
+
+    @Test
+    void tickSkipsMissingLineAndOverrunsEmptyOpposingFrontline() {
+        configureBattleLineMask(attackerColony, attacker, 2);
+        configureBattleLineMask(defenderColony, defender, 2);
+
+        WarCreatureCombatService.clear(war);
+        WarBattleState missingLineState = WarCreatureCombatService.startBorderBattle(war, attacker, defender);
+        assertNotNull(missingLineState);
+        WarCreatureCombatService.tick(war);
+        assertTrue(missingLineState.isCurrentPhaseAttacker());
+        assertEquals(GameConstants.BATTLE_LINE_ARTILLERY, missingLineState.getCurrentPhaseLine());
+        WarCreatureCombatService.clear(war);
+
+        configureBattleLineMask(attackerColony, attacker, 1);
+        configureBattleLineMask(defenderColony, defender, 2);
+        WarBattleState overrunState = WarCreatureCombatService.startBorderBattle(war, attacker, defender);
+        assertNotNull(overrunState);
+        WarCreatureCombatService.tick(war);
+        assertTrue(overrunState.isCurrentPhaseAttacker());
+        assertEquals(GameConstants.BATTLE_LINE_INFANTRY, overrunState.getCurrentPhaseLine());
+        assertTrue(overrunState.getNumericFeed().getLatestSequence() > 0);
+        WarCreatureCombatService.clear(war);
+    }
+
+    @Test
+    void allBattleLinePresenceCombinationsProgressAndResolveWithoutSticking() {
+        for (int atkMask = 1; atkMask <= 7; atkMask++) {
+            for (int defMask = 1; defMask <= 7; defMask++) {
+                WarCreatureCombatService.clear(war);
+                configureBattleLineMask(attackerColony, attacker, atkMask);
+                configureBattleLineMask(defenderColony, defender, defMask);
+
+                WarBattleState state = WarCreatureCombatService.startBorderBattle(war, attacker, defender);
+                assertNotNull(state);
+
+                WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.TickOutcome.CONTINUE;
+                for (int i = 0; i < 400 && outcome == WarCreatureCombatService.TickOutcome.CONTINUE; i++) {
+                    outcome = WarCreatureCombatService.tick(war);
+                }
+                assertTrue(state.getTickIndex() > 0);
+                assertTrue(state.getNumericFeed().getLatestSequence() > 0,
+                        "Expected dice events for atkMask=" + atkMask + " defMask=" + defMask);
+                assertTrue(outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS
+                        || outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS,
+                        "Expected resolution within 400 ticks for atkMask=" + atkMask + " defMask=" + defMask);
+            }
+        }
+        WarCreatureCombatService.clear(war);
+    }
+
+    @Test
+    void randomBorderWarCheatProgressesHourlyThroughStagesWhenObserved() {
+        Dynasty cheatA = new Dynasty(101, "CheatA", false, GameConstants.SPECIES_OMNI);
+        Dynasty cheatB = new Dynasty(102, "CheatB", false, GameConstants.SPECIES_OMNI);
+        cheatA.unlockUpgrade(GameUnlocks.STAT_ACID);
+        cheatA.unlockUpgrade(GameUnlocks.STAT_SKELETON);
+        cheatB.unlockUpgrade(GameUnlocks.STAT_ACID);
+        cheatB.unlockUpgrade(GameUnlocks.STAT_SKELETON);
+
+        World cheatWorld = new World();
+        Hex hexA = new Hex();
+        hexA.setQ(0);
+        hexA.setR(0);
+        Hex hexB = new Hex();
+        hexB.setQ(1);
+        hexB.setR(0);
+        hexA.setNorthEast(hexB);
+        hexB.setSouthWest(hexA);
+
+        Colony colA = new Colony(201, "CheatA Cap", false);
+        Colony colB = new Colony(202, "CheatB Cap", false);
+        cheatA.addColony(colA);
+        cheatB.addColony(colB);
+        cheatA.setCapital(colA);
+        cheatB.setCapital(colB);
+        colA.setDynasty(cheatA);
+        colB.setDynasty(cheatB);
+        hexA.setColony(colA);
+        hexB.setColony(colB);
+        seedPopulation(cheatA, colA);
+        seedPopulation(cheatB, colB);
+        cheatWorld.getHexes().add(hexA);
+        cheatWorld.getHexes().add(hexB);
+        cheatWorld.getDynastys().add(cheatA);
+        cheatWorld.getDynastys().add(cheatB);
+
+        War cheatWar = SandboxCheatService.triggerRandomBorderWar(cheatWorld);
+        assertNotNull(cheatWar);
+        assertTrue(cheatA.getDiplomacyService().isAtWarWith(cheatB));
+        assertTrue(cheatB.getDiplomacyService().isAtWarWith(cheatA));
+
+        WarBattleViewPanel panel = new WarBattleViewPanel(cheatWar, null);
+        panel.setSize(800, 600);
+        panel.doLayout();
+
+        WarBattleState initial = WarCreatureCombatService.getState(cheatWar);
+        assertNotNull(initial);
+        assertEquals(0, initial.getTickIndex());
+
+        cheatWorld.getWarService().tickWarProgressHourly();
+        panel.refreshScene();
+        assertEquals(1, initial.getTickIndex());
+        assertTrue(initial.getNumericFeed().getLatestSequence() > 0);
+
+        String initialPhase = cheatWar.getStagePhase().getNameKey();
+        for (int h = 0; h < 600 && cheatWar.isActive() && initialPhase.equals(cheatWar.getStagePhase().getNameKey()); h++) {
+            cheatWorld.getWarService().tickWarProgressHourly();
+            panel.refreshScene();
+        }
+        assertTrue(!cheatWar.isActive() || !initialPhase.equals(cheatWar.getStagePhase().getNameKey()),
+                "Border war triggered by cheat should advance stage or conclude cleanly while observed");
+        panel.stopAnimation();
+        WarCreatureCombatService.clear(cheatWar);
+    }
+
+    private static void configureBattleLineMask(Colony colony, Dynasty dynasty, int mask) {
+        colony.getSoldiers().clear();
+        colony.getMajors().clear();
+        colony.getPrincesses().clear();
+        colony.getWarAssignedRoleCounts().clear();
+        if ((mask & 1) != 0) {
+            for (int i = 0; i < 4; i++) {
+                colony.getSoldiers().add(new Ant(colony, GameConstants.CLASS_SOLDIER));
+            }
+            colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 4);
+        }
+        if ((mask & 2) != 0) {
+            for (int i = 0; i < 4; i++) {
+                colony.getMajors().add(new Ant(colony, GameConstants.CLASS_MAJOR));
+            }
+            colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_ARTILLERY, 4);
+        }
+        if ((mask & 4) != 0) {
+            for (int i = 0; i < 4; i++) {
+                colony.getPrincesses().add(new Ant(colony, GameConstants.CLASS_PRINCESS));
+            }
+            colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_AIR_SUPPORT, 4);
+        }
+        ColonyMilitaryService.refreshColonyMilitaryPower(colony);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
     }
 
     private static int countLivingOnSide(WarBattleSideState side) {

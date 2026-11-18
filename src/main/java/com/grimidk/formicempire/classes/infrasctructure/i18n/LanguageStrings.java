@@ -3377,6 +3377,10 @@ public final class LanguageStrings {
     public static final String SETTINGS_CHEAT_RANDOM_DISASTER_TT = "SETTINGS_CHEAT_RANDOM_DISASTER_TT";
     public static final String MAP_DISASTER_CHEAT = "MAP_DISASTER_CHEAT";
     public static final String MAP_DISASTER_CHEAT_TT = "MAP_DISASTER_CHEAT_TT";
+    public static final String SETTINGS_CHEAT_RANDOM_WAR = "SETTINGS_CHEAT_RANDOM_WAR";
+    public static final String SETTINGS_CHEAT_RANDOM_WAR_TT = "SETTINGS_CHEAT_RANDOM_WAR_TT";
+    public static final String MAP_WAR_CHEAT = "MAP_WAR_CHEAT";
+    public static final String MAP_WAR_CHEAT_TT = "MAP_WAR_CHEAT_TT";
     public static final String LOG_BIOME_TRANSFORM_FMT = "LOG_BIOME_TRANSFORM_FMT";
     public static final String LOG_OVERHARVEST_DEPLETION_FMT = "LOG_OVERHARVEST_DEPLETION_FMT";
     public static final String LOG_BIOME_RECOVERY_FMT = "LOG_BIOME_RECOVERY_FMT";

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -268,6 +269,32 @@ class SandboxCheatServiceTest {
         assertNull(world.findPlayerDynasty());
         assertFalse(SandboxCheatService.canDepossessToSpectator(world));
         assertTrue(SandboxCheatService.canPossessHex(world, hexA));
+    }
+
+    @Test
+    void triggerRandomBorderWarStartsWarBetweenBorderingDynasties() {
+        World world = new World();
+        Hex h0 = new Hex(); h0.setQ(0); h0.setR(0); h0.setBiome(GameConstants.BIOME_PLAINS);
+        Hex h1 = new Hex(); h1.setQ(1); h1.setR(0); h1.setBiome(GameConstants.BIOME_PLAINS);
+        h0.setSouthEast(h1);
+        h1.setNorthWest(h0);
+        world.getHexes().add(h0);
+        world.getHexes().add(h1);
+
+        Dynasty d1 = new Dynasty(1, "One", false, GameConstants.SPECIES_OMNI);
+        Dynasty d2 = new Dynasty(2, "Two", false, GameConstants.SPECIES_OMNI);
+        Colony c1 = new Colony(1, "Alpha", false);
+        Colony c2 = new Colony(2, "Beta", false);
+        d1.addColony(c1);
+        d2.addColony(c2);
+        h0.setColony(c1);
+        h1.setColony(c2);
+        world.registerDynasty(d1);
+        world.registerDynasty(d2);
+
+        War started = SandboxCheatService.triggerRandomBorderWar(world);
+        assertEquals(1, world.getWarService().getActiveWars().size());
+        assertEquals(started, world.getWarService().findActiveWar(d1.getId(), d2.getId()));
     }
 
     private static Engine engineWithoutSandboxCheats() {

@@ -7,12 +7,14 @@ import java.util.List;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.services.shared.BattleNumericFeed;
 public final class HuntBattleState {
     private final Colony colony;
     private final int contextId;
     private final Species species;
     private final List<HuntBattleParticipant> hunters = new ArrayList<>();
     private final List<HuntBattleFallenBody> fallenBodies = new ArrayList<>();
+    private final BattleNumericFeed numericFeed = new BattleNumericFeed();
     private final int orbitSlotCount;
     private float bugHealth;
     private final float bugMaxHealth;
@@ -75,6 +77,10 @@ public final class HuntBattleState {
 
     public List<HuntBattleFallenBody> getFallenBodies() {
         return Collections.unmodifiableList(fallenBodies);
+    }
+
+    public BattleNumericFeed getNumericFeed() {
+        return numericFeed;
     }
 
     void recordFallenBody(HuntBattleParticipant victim, float bodyRotationDegrees) {

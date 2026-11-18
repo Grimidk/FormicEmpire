@@ -612,6 +612,37 @@ public final class GameNumbers {
         return Math.max(1, Math.round(baseDays * casteMultiplier));
     }
 
+    public static int d6TargetFromAccuracy(float accuracyMult) {
+        if (accuracyMult >= 0.95f) return 1;
+        if (accuracyMult >= 0.80f) return 2;
+        if (accuracyMult >= 0.65f) return 3;
+        if (accuracyMult >= 0.45f) return 4;
+        if (accuracyMult >= 0.25f) return 5;
+        return 6;
+    }
+
+    public static int computeD6HitTarget(
+            int baseTarget,
+            float accuracyBonus,
+            float lineAccuracyMult,
+            boolean riverPenalty,
+            float evasionPercent) {
+        int target = Math.max(1, Math.min(6, baseTarget));
+        if (accuracyBonus > 0.01f) {
+            target -= 1;
+        }
+        if (lineAccuracyMult < 0.75f) {
+            target += 1;
+        }
+        if (riverPenalty) {
+            target += 1;
+        }
+        if (evasionPercent >= 10f) {
+            target += 1;
+        }
+        return Math.max(1, Math.min(6, target));
+    }
+
     public static float applyEvasionToHitChance(float hitChance, float evasionPercent) {
         if (evasionPercent <= 0f) {
             return hitChance;

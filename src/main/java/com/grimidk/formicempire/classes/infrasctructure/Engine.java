@@ -26,6 +26,7 @@ public class Engine extends Thread {
     private final Semaphore semaphore;
     private boolean killSwitch;
     private volatile boolean paused;
+    private volatile boolean battleViewActive = false;
     
     // --- Managers ---
     private final TradeManager tradeManager;
@@ -79,6 +80,7 @@ public class Engine extends Thread {
     private boolean cheatFogOfWarToggle = false;
     private boolean cheatRevealMap = false;
     private boolean cheatRandomDisaster = false;
+    private boolean cheatRandomWar = false;
     private boolean animateWorldGen = true;
     private WorldGenStepListener worldGenStepListener;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
@@ -173,8 +175,17 @@ public class Engine extends Thread {
         return this.world != null && this.world.isSpectatorMode();
     }
 
+    private boolean allowsSpectatorHyperSpeed() {
+        return isSpectatorWorld() && !battleViewActive;
+    }
+
+    public void setBattleViewActive(boolean battleViewActive) {
+        this.battleViewActive = battleViewActive;
+        clampSpeedToCurrentRules();
+    }
+
     public void clampSpeedToCurrentRules() {
-        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, allowsSpectatorHyperSpeed());
         if (speed != null && speed.getId() > maxId) {
             speed = GameSpeed.fromId(maxId);
         }
@@ -204,7 +215,7 @@ public class Engine extends Thread {
             return;
         }
         GameSpeed resolved = speed;
-        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, allowsSpectatorHyperSpeed());
         if (speed.getId() > maxId) {
             resolved = GameSpeed.fromId(maxId);
         }
@@ -246,14 +257,14 @@ public class Engine extends Thread {
                 pauseEngine();
                 return;
             }
-            setSpeed(GameSpeed.step(speed, -1, allowTurboMode, isSpectatorWorld()));
+            setSpeed(GameSpeed.step(speed, -1, allowTurboMode, allowsSpectatorHyperSpeed()));
             return;
         }
         if (paused) {
             resumeEngine();
             return;
         }
-        setSpeed(GameSpeed.step(speed, 1, allowTurboMode, isSpectatorWorld()));
+        setSpeed(GameSpeed.step(speed, 1, allowTurboMode, allowsSpectatorHyperSpeed()));
     }
 
     public void togglePause() {
@@ -711,6 +722,14 @@ public class Engine extends Thread {
 
     public void setCheatRandomDisaster(boolean cheatRandomDisaster) {
         this.cheatRandomDisaster = cheatRandomDisaster;
+    }
+
+    public boolean isCheatRandomWar() {
+        return cheatRandomWar;
+    }
+
+    public void setCheatRandomWar(boolean cheatRandomWar) {
+        this.cheatRandomWar = cheatRandomWar;
     }
 
     public boolean isAnimateWorldGen() {

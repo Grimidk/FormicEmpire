@@ -220,13 +220,21 @@ public final class HuntCreatureCombatService {
                 if (skill == null || !skill.isAttack()) {
                     skill = GameConstants.SKILL_BASIC_BITE;
                 }
-                if (!rollHit(skill, ant)) {
+                int d6Target = computeHunterD6Target(skill, ant);
+                int d6Roll = GameRandom.nextInt(6) + 1;
+                if (d6Roll < d6Target) {
+                    state.getNumericFeed().recordD6Roll(
+                            state.getTickIndex(), true, d6Roll, d6Target, false, 0f, false,
+                            skill.getName(), skill.getIcon(), null);
                     continue;
                 }
                 float damageMult = CritterSkillService.resolveDamageMult(skill, ant.getModProfile());
                 float raw = damageMult * ant.getAttack();
                 float dealt = GameNumbers.damageAfterDefense(raw, state.getBugDefense());
                 state.applyBugDamage(dealt);
+                state.getNumericFeed().recordD6Roll(
+                        state.getTickIndex(), true, d6Roll, d6Target, false, dealt, !state.isBugAlive(),
+                        skill.getName(), skill.getIcon(), null);
             }
         }
     }
@@ -250,16 +258,27 @@ public final class HuntCreatureCombatService {
                 if (!target.isAlive()) {
                     continue;
                 }
-                if (!rollBugHit(skill, target)) {
+                int unEvadedTarget = computeBugD6Target(skill, null);
+                int d6Target = computeBugD6Target(skill, target);
+                int d6Roll = GameRandom.nextInt(6) + 1;
+                if (d6Roll < d6Target) {
+                    boolean dodged = d6Roll >= unEvadedTarget;
+                    state.getNumericFeed().recordD6Roll(
+                            state.getTickIndex(), false, d6Roll, d6Target, dodged, 0f, false,
+                            skill.getName(), skill.getIcon(), null);
                     continue;
                 }
                 float damageMult = skill.getDamageMult();
                 float raw = damageMult * state.getBugAttack();
                 Ant ant = target.getAnt();
                 float dealt = GameNumbers.damageAfterDefense(raw, ant.getDefense());
-                if (target.applyBattleDamage(dealt) <= 0f) {
+                boolean killed = target.applyBattleDamage(dealt) <= 0f;
+                if (killed) {
                     killHunter(state, target);
                 }
+                state.getNumericFeed().recordD6Roll(
+                        state.getTickIndex(), false, d6Roll, d6Target, false, dealt, killed,
+                        skill.getName(), skill.getIcon(), null);
             }
             state.rotateFocusTarget();
             living = state.livingHunters();
@@ -314,19 +333,18 @@ public final class HuntCreatureCombatService {
         return attacks.get(GameRandom.nextInt(attacks.size()));
     }
 
-    private static boolean rollHit(Skill skill, Ant ant) {
-        float skillAcc = CritterSkillService.resolveAccuracyMult(skill, ant.getModProfile());
-        float chance = Math.min(1f, Math.max(0f, skillAcc));
-        return GameRandom.nextDouble() < chance;
+    private static int computeHunterD6Target(Skill skill, Ant ant) {
+        int baseTarget = skill != null ? skill.getD6Target() : 1;
+        float accBonus = AntModService.combinedAccuracyBonus(ant.getModProfile());
+        return GameNumbers.computeD6HitTarget(baseTarget, accBonus, 1f, false, 0f);
     }
 
-    private static boolean rollBugHit(Skill skill, HuntBattleParticipant target) {
-        float baseChance = Math.min(1f, Math.max(0f, skill.getAccuracyMult()));
+    private static int computeBugD6Target(Skill skill, HuntBattleParticipant target) {
+        int baseTarget = skill != null ? skill.getD6Target() : 1;
         float targetEvasion = target != null && target.getAnt() != null
                 ? target.getAnt().getEvasionChance()
                 : 0f;
-        float chance = GameNumbers.applyEvasionToHitChance(baseChance, targetEvasion);
-        return GameRandom.nextDouble() < chance;
+        return GameNumbers.computeD6HitTarget(baseTarget, 0f, 1f, false, targetEvasion);
     }
 
     private static void killHunter(HuntBattleState state, HuntBattleParticipant victim) {

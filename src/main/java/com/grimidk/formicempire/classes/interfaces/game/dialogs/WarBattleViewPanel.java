@@ -9,8 +9,11 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
+import com.grimidk.formicempire.classes.entities.services.shared.BattleNumericFeed;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleSceneBuilder;
+import com.grimidk.formicempire.classes.entities.services.world.WarBattleState;
+import com.grimidk.formicempire.classes.entities.services.world.WarCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -22,6 +25,8 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +36,7 @@ import java.util.Random;
 
 public class WarBattleViewPanel extends JPanel {
 
-    private static final int HEADER_HEIGHT = 72;
+    private static final int HEADER_HEIGHT = 0;
     private static final int FIELD_MARGIN = 0;
     private static final int ANT_SPRITE_SCALE = 2;
     private static final int ANIMATION_FRAME_MS = 50;
@@ -44,8 +49,53 @@ public class WarBattleViewPanel extends JPanel {
 
     private final War war;
     private final Engine engine;
-    private final JLabel statusLabel = new JLabel();
+    private final Runnable onBattleEnded;
+    private final JPanel headerPanel = new JPanel(new BorderLayout(12, 4));
+    private final JPanel attackerHeaderPanel = new JPanel();
+    private final JPanel defenderHeaderPanel = new JPanel();
+    private final JPanel centerHeaderPanel = new JPanel(new BorderLayout(0, 2));
+    private final JPanel phaseIndicatorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+    private final JLabel infantryPhaseIcon = new JLabel();
+    private final JLabel artilleryPhaseIcon = new JLabel();
+    private final JLabel airSupportPhaseIcon = new JLabel();
+    private int lastObservedBattleTick = -1;
+    private final JPanel diceTrayPanel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (!diceExpanded) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                numericOverlay.paint(g2d, getWidth(), BattleNumericOverlay.COLLAPSED_VISIBLE_ROWS);
+                g2d.dispose();
+            }
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            return event != null ? numericOverlay.getTooltipAt(event.getPoint()) : null;
+        }
+    };
+    private boolean diceExpanded;
+    private final JPanel battleProgressBar = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            int w = getWidth();
+            int h = getHeight();
+            if (w <= 0 || h <= 0) {
+                return;
+            }
+            float ratio = Math.max(0f, Math.min(1f, targetContactLineRatio));
+            int splitX = Math.round(w * ratio);
+            g.setColor(new Color(95, 185, 255));
+            g.fillRect(0, 0, splitX, h);
+            g.setColor(new Color(255, 135, 95));
+            g.fillRect(splitX, 0, w - splitX, h);
+        }
+    };
     private final Map<Integer, Image> biomeTileCache = new HashMap<>();
+    private final BattleNumericOverlay numericOverlay = new BattleNumericOverlay();
     private WarBattleScene scene;
     private List<BattleAnt> attackerAnts = List.of();
     private List<BattleAnt> defenderAnts = List.of();
@@ -53,19 +103,61 @@ public class WarBattleViewPanel extends JPanel {
     private float targetContactLineRatio = 0.5f;
     private Timer animationTimer;
     private float animationSeconds;
+    private float sceneRefreshAccumSec;
     private long lastTickNanos;
+    private String lastAttackerPoolSig = "";
+    private String lastDefenderPoolSig = "";
+    private String lastHeaderSig = "";
 
     public WarBattleViewPanel(War war, Engine engine) {
+        this(war, engine, null);
+    }
+
+    public WarBattleViewPanel(War war, Engine engine, Runnable onBattleEnded) {
         super(new BorderLayout());
         this.war = war;
         this.engine = engine;
+        this.onBattleEnded = onBattleEnded;
         setOpaque(true);
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
-        statusLabel.setFont(AssetStyles.FONT_NORMAL);
-        statusLabel.setForeground(AssetStyles.FONT_COLOR);
-        statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
-        add(statusLabel, BorderLayout.NORTH);
+        headerPanel.setOpaque(true);
+        headerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 12, 4, 12));
+
+        attackerHeaderPanel.setLayout(new BoxLayout(attackerHeaderPanel, BoxLayout.Y_AXIS));
+        attackerHeaderPanel.setOpaque(false);
+        defenderHeaderPanel.setLayout(new BoxLayout(defenderHeaderPanel, BoxLayout.Y_AXIS));
+        defenderHeaderPanel.setOpaque(false);
+
+        centerHeaderPanel.setOpaque(false);
+        phaseIndicatorPanel.setOpaque(false);
+        configurePhaseIconLabel(infantryPhaseIcon, GameConstants.BATTLE_LINE_INFANTRY);
+        configurePhaseIconLabel(artilleryPhaseIcon, GameConstants.BATTLE_LINE_ARTILLERY);
+        configurePhaseIconLabel(airSupportPhaseIcon, GameConstants.BATTLE_LINE_AIR_SUPPORT);
+        phaseIndicatorPanel.add(infantryPhaseIcon);
+        phaseIndicatorPanel.add(createPhaseArrowLabel());
+        phaseIndicatorPanel.add(artilleryPhaseIcon);
+        phaseIndicatorPanel.add(createPhaseArrowLabel());
+        phaseIndicatorPanel.add(airSupportPhaseIcon);
+
+        diceTrayPanel.setOpaque(false);
+        diceTrayPanel.setPreferredSize(new Dimension(320, BattleNumericOverlay.COLLAPSED_HEIGHT));
+        ToolTipManager.sharedInstance().registerComponent(diceTrayPanel);
+        ToolTipManager.sharedInstance().registerComponent(this);
+        installDiceHoverListeners();
+
+        centerHeaderPanel.add(phaseIndicatorPanel, BorderLayout.NORTH);
+        centerHeaderPanel.add(diceTrayPanel, BorderLayout.CENTER);
+
+        battleProgressBar.setOpaque(false);
+        battleProgressBar.setPreferredSize(new Dimension(100, 6));
+
+        headerPanel.add(attackerHeaderPanel, BorderLayout.WEST);
+        headerPanel.add(centerHeaderPanel, BorderLayout.CENTER);
+        headerPanel.add(defenderHeaderPanel, BorderLayout.EAST);
+        headerPanel.add(battleProgressBar, BorderLayout.SOUTH);
+        add(headerPanel, BorderLayout.NORTH);
 
         loadBiomeTiles();
         refreshScene();
@@ -76,17 +168,171 @@ public class WarBattleViewPanel extends JPanel {
         World world = engine != null ? engine.getWorld() : null;
         WarService warService = world != null ? world.getWarService() : null;
         scene = WarBattleSceneBuilder.build(world, war, warService);
-        if (scene.isAvailable()) {
+        boolean activeBattle = war != null && war.isActive() && WarCreatureCombatService.getState(war) != null;
+        if (activeBattle && scene.isAvailable()) {
             targetContactLineRatio = scene.getFrontlineRatio();
-            attackerAnts = buildAntPool(scene.getAttacker(), true);
-            defenderAnts = buildAntPool(scene.getDefender(), false);
-            statusLabel.setText(buildHeaderText(scene));
+            String atkSig = sideSignature(scene.getAttacker());
+            if (!atkSig.equals(lastAttackerPoolSig)) {
+                lastAttackerPoolSig = atkSig;
+                attackerAnts = buildAntPool(scene.getAttacker(), true);
+            }
+            String defSig = sideSignature(scene.getDefender());
+            if (!defSig.equals(lastDefenderPoolSig)) {
+                lastDefenderPoolSig = defSig;
+                defenderAnts = buildAntPool(scene.getDefender(), false);
+            }
         } else {
+            lastAttackerPoolSig = "";
+            lastDefenderPoolSig = "";
             attackerAnts = List.of();
             defenderAnts = List.of();
-            statusLabel.setText(LanguageStrings.get(LanguageStrings.BATTLE_NOT_AVAILABLE));
+            updateSideHeaders();
+            battleProgressBar.repaint();
+            repaint();
+            if (!activeBattle && onBattleEnded != null) {
+                stopAnimation();
+                SwingUtilities.invokeLater(onBattleEnded);
+            }
+            return;
         }
+        updateSideHeaders();
+        battleProgressBar.repaint();
         repaint();
+    }
+
+    private void updateSideHeaders() {
+        WarBattleScene.Side atk = scene != null ? scene.getAttacker() : null;
+        WarBattleScene.Side def = scene != null ? scene.getDefender() : null;
+        String headerSig = sideSignature(atk) + "||" + sideSignature(def);
+        if (!headerSig.equals(lastHeaderSig)) {
+            lastHeaderSig = headerSig;
+            populateSideHeader(attackerHeaderPanel, atk, true);
+            populateSideHeader(defenderHeaderPanel, def, false);
+            headerPanel.revalidate();
+        }
+        updatePhaseIndicator();
+        headerPanel.repaint();
+    }
+
+    private static String sideSignature(WarBattleScene.Side side) {
+        if (side == null) {
+            return "null";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(side.dynastyId()).append(':').append(side.dynastyName()).append(':')
+                .append(side.livingArmy()).append(':').append(side.livingActive()).append('|');
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            sb.append(line.getId()).append('=').append(countAntsInLine(side.activeByLine(), line))
+                    .append('/').append(countAntsInLine(side.reserveByLine(), line)).append(';');
+        }
+        return sb.toString();
+    }
+
+    private static void configurePhaseIconLabel(JLabel label, BattleLine line) {
+        if (line != null) {
+            label.setIcon(line.getIcon());
+            label.setToolTipText(line.getName());
+        }
+        label.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+        label.setOpaque(false);
+    }
+
+    private static JLabel createPhaseArrowLabel() {
+        JLabel arrow = new JLabel(">");
+        arrow.setFont(AssetStyles.FONT_SMALL);
+        arrow.setForeground(AssetStyles.FONT_COLOR);
+        return arrow;
+    }
+
+    private void updatePhaseIndicator() {
+        WarBattleState battleState = WarCreatureCombatService.getState(war);
+        if (battleState == null) {
+            phaseIndicatorPanel.setVisible(false);
+            return;
+        }
+        BattleLine activeLine = battleState.getCurrentPhaseLine();
+        if (activeLine == null) {
+            activeLine = GameConstants.BATTLE_LINE_INFANTRY;
+        }
+        boolean attackerPhase = battleState.isCurrentPhaseAttacker();
+        Color turnColor = attackerPhase ? new Color(95, 185, 255) : new Color(255, 135, 95);
+        applyPhaseIconHighlight(infantryPhaseIcon, activeLine == GameConstants.BATTLE_LINE_INFANTRY, turnColor);
+        applyPhaseIconHighlight(artilleryPhaseIcon, activeLine == GameConstants.BATTLE_LINE_ARTILLERY, turnColor);
+        applyPhaseIconHighlight(airSupportPhaseIcon, activeLine == GameConstants.BATTLE_LINE_AIR_SUPPORT, turnColor);
+        phaseIndicatorPanel.setVisible(true);
+    }
+
+    private static void applyPhaseIconHighlight(JLabel label, boolean active, Color turnColor) {
+        if (active) {
+            label.setOpaque(true);
+            label.setBackground(new Color(turnColor.getRed(), turnColor.getGreen(), turnColor.getBlue(), 55));
+            label.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(turnColor, 2, true),
+                    BorderFactory.createEmptyBorder(1, 3, 1, 3)));
+        } else {
+            label.setOpaque(false);
+            label.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+        }
+    }
+
+    private static void populateSideHeader(JPanel container, WarBattleScene.Side side, boolean leftAligned) {
+        container.removeAll();
+        if (side == null) {
+            return;
+        }
+        JPanel topRow = new JPanel(new FlowLayout(leftAligned ? FlowLayout.LEFT : FlowLayout.RIGHT, 6, 0));
+        topRow.setOpaque(false);
+        topRow.setAlignmentX(leftAligned ? Component.LEFT_ALIGNMENT : Component.RIGHT_ALIGNMENT);
+
+        ImageIcon speciesIcon = side.species() != null ? side.species().getIcon() : null;
+        JLabel nameLabel = new JLabel(side.dynastyName() != null ? side.dynastyName() : "");
+        nameLabel.setFont(AssetStyles.FONT_BOLD);
+        nameLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        if (speciesIcon != null) {
+            if (leftAligned) {
+                nameLabel.setIcon(speciesIcon);
+                nameLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
+            } else {
+                nameLabel.setIcon(speciesIcon);
+                nameLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+            }
+            nameLabel.setIconTextGap(6);
+        }
+        topRow.add(nameLabel);
+        container.add(topRow);
+
+        JPanel linesRow = new JPanel(new FlowLayout(leftAligned ? FlowLayout.LEFT : FlowLayout.RIGHT, 8, 2));
+        linesRow.setOpaque(false);
+        linesRow.setAlignmentX(leftAligned ? Component.LEFT_ALIGNMENT : Component.RIGHT_ALIGNMENT);
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            int count = countAntsInLine(side.activeByLine(), line);
+            JLabel lineLabel = new JLabel(AssetStyles.formatNumber(count));
+            lineLabel.setFont(AssetStyles.FONT_SMALL);
+            lineLabel.setForeground(AssetStyles.FONT_COLOR);
+            if (line.getIcon() != null) {
+                lineLabel.setIcon(line.getIcon());
+                lineLabel.setIconTextGap(3);
+            }
+            linesRow.add(lineLabel);
+        }
+        container.add(linesRow);
+    }
+
+    private static int countAntsInLine(Map<BattleLine, Map<AntClass, Integer>> byLine, BattleLine line) {
+        if (byLine == null || line == null) {
+            return 0;
+        }
+        Map<AntClass, Integer> map = byLine.get(line);
+        if (map == null || map.isEmpty()) {
+            return 0;
+        }
+        int total = 0;
+        for (Integer c : map.values()) {
+            if (c != null && c > 0) {
+                total += c;
+            }
+        }
+        return total;
     }
 
     public void startAnimation() {
@@ -107,6 +353,11 @@ public class WarBattleViewPanel extends JPanel {
             if (animationSeconds > 10_000f) {
                 animationSeconds = 0f;
             }
+            sceneRefreshAccumSec += deltaSec;
+            if (sceneRefreshAccumSec >= 0.35f) {
+                sceneRefreshAccumSec = 0f;
+                refreshScene();
+            }
             float delta = targetContactLineRatio - contactLineRatio;
             if (Math.abs(delta) > 0.0005f) {
                 float step = 1f - (float) Math.exp(-1.237f * deltaSec);
@@ -114,6 +365,17 @@ public class WarBattleViewPanel extends JPanel {
             } else {
                 contactLineRatio = targetContactLineRatio;
             }
+            WarBattleState battleState = WarCreatureCombatService.getState(war);
+            BattleNumericFeed feed = battleState != null ? battleState.getNumericFeed() : null;
+            int stateTickIndex = battleState != null ? battleState.getTickIndex() : -1;
+            if (stateTickIndex != lastObservedBattleTick) {
+                lastObservedBattleTick = stateTickIndex;
+                updatePhaseIndicator();
+            }
+            World w = engine != null ? engine.getWorld() : null;
+            int minute = w != null ? w.getMinute() : 0;
+            numericOverlay.update(feed, deltaSec, minute, stateTickIndex);
+            diceTrayPanel.repaint();
             repaint();
         });
         animationTimer.setCoalesce(true);
@@ -149,7 +411,7 @@ public class WarBattleViewPanel extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
-        int fieldY = HEADER_HEIGHT;
+        int fieldY = headerPanel.getHeight();
         int fieldH = Math.max(120, getHeight() - fieldY);
         int fieldW = getWidth();
         int fieldX = FIELD_MARGIN;
@@ -178,6 +440,84 @@ public class WarBattleViewPanel extends JPanel {
         drawAntColumn(g2d, defenderAnts, field, contactLineX, false);
 
         g2d.dispose();
+    }
+
+    private void installDiceHoverListeners() {
+        MouseAdapter hover = new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (e.getComponent() == diceTrayPanel) {
+                    diceExpanded = true;
+                    repaint();
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                updateDiceExpandedFromPointer(e);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                updateDiceExpandedFromPointer(e);
+            }
+        };
+        diceTrayPanel.addMouseListener(hover);
+        diceTrayPanel.addMouseMotionListener(hover);
+        addMouseListener(hover);
+        addMouseMotionListener(hover);
+    }
+
+    private void updateDiceExpandedFromPointer(MouseEvent e) {
+        if (e == null || e.getComponent() == null) {
+            return;
+        }
+        Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), this);
+        Rectangle expandedRect = expandedDiceBounds();
+        boolean inside = expandedRect != null && expandedRect.contains(pt);
+        if (inside != diceExpanded) {
+            diceExpanded = inside;
+            repaint();
+        }
+    }
+
+    private Rectangle expandedDiceBounds() {
+        int w = diceTrayPanel.getWidth();
+        if (w <= 0) {
+            return null;
+        }
+        Point origin = SwingUtilities.convertPoint(diceTrayPanel, 0, 0, this);
+        int h = Math.max(BattleNumericOverlay.COLLAPSED_HEIGHT, numericOverlay.getRequiredHeight(w));
+        return new Rectangle(origin.x, origin.y, w, h);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        if (!diceExpanded || event == null) {
+            return null;
+        }
+        Point pt = SwingUtilities.convertPoint(this, event.getPoint(), diceTrayPanel);
+        return numericOverlay.getTooltipAt(pt);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (!diceExpanded) {
+            return;
+        }
+        Rectangle bounds = expandedDiceBounds();
+        if (bounds == null) {
+            return;
+        }
+        Graphics2D og = (Graphics2D) g.create();
+        og.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Color bg = AssetStyles.BACKGROUND_SECONDARY;
+        og.setColor(new Color(bg.getRed(), bg.getGreen(), bg.getBlue(), 235));
+        og.fillRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 8, 8);
+        og.translate(bounds.x, bounds.y);
+        numericOverlay.paint(og, bounds.width, Integer.MAX_VALUE);
+        og.dispose();
     }
 
     private void drawFullBiomeField(Graphics2D g2d, int fieldX, int fieldY, int fieldW, int fieldH, Biome biome) {

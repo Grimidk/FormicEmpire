@@ -358,6 +358,44 @@ public class DynastyDiplomacyService {
         applyWarEconomyToDynasty(other);
     }
 
+    public void ensureWarStateWith(Dynasty other, TradeManager tradeManager, World world) {
+        if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+            return;
+        }
+        if (tradeManager != null) {
+            cancelCrossDynastyTradesWith(other, tradeManager);
+        }
+        if (!isAtWarWith(other)) {
+            applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_WAR);
+        }
+        ensureWarEconomyInitialized(dynasty);
+        ensureWarEconomyInitialized(other);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(other);
+    }
+
+    private void ensureWarEconomyInitialized(Dynasty target) {
+        if (target == null) {
+            return;
+        }
+        ensureSoldierWarRoleUpgrades(target);
+        for (Colony colony : target.getColonies()) {
+            if (hasConfiguredWarEconomyAssignments(colony)) {
+                continue;
+            }
+            colony.copyPeaceRolesToWar();
+            if (!target.isPlayer() || colony.isAutomationEnabled()) {
+                Map<AntRole, Integer> quotas = colony.getAutomationService().calculateWarEconomyQuotas(colony);
+                if (sumActiveMilitaryRoleCounts(quotas) > 0) {
+                    for (Map.Entry<AntRole, Integer> entry : quotas.entrySet()) {
+                        colony.setWarAssignedRoleCount(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+            colony.refreshRoleAssignmentForWarState(null);
+        }
+    }
+
     public void applyWasAtWarModifier(Dynasty other, World world) {
         if (other == null || other == dynasty) {
             return;

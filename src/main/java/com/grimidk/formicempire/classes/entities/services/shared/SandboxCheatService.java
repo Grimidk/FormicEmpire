@@ -6,12 +6,19 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public final class SandboxCheatService {
     private SandboxCheatService() {
@@ -279,5 +286,55 @@ public final class SandboxCheatService {
             activeColony.runRoleAssignment(engine);
         }
         return true;
+    }
+
+    public static War triggerRandomBorderWar(World world) {
+        if (world == null || world.getWarService() == null || world.getHexes() == null) {
+            return null;
+        }
+        List<Dynasty[]> nonPactedPairs = new ArrayList<>();
+        List<Dynasty[]> allBorderPairs = new ArrayList<>();
+        Set<Long> seenPairs = new LinkedHashSet<>();
+        for (Hex hex : world.getHexes()) {
+            if (hex == null || hex.getColony() == null) {
+                continue;
+            }
+            Dynasty d1 = hex.getColony().getDynasty();
+            if (d1 == null || d1.isDefeated() || d1.getDiplomacyService() == null) {
+                continue;
+            }
+            for (Hex neighbor : hex.getAdjacentNeighbors()) {
+                if (neighbor == null || neighbor.getColony() == null) {
+                    continue;
+                }
+                Dynasty d2 = neighbor.getColony().getDynasty();
+                if (d2 == null || d2 == d1 || d2.isDefeated() || d2.getDiplomacyService() == null) {
+                    continue;
+                }
+                int low = Math.min(d1.getId(), d2.getId());
+                int high = Math.max(d1.getId(), d2.getId());
+                long key = (((long) low) << 32) | (high & 0xffffffffL);
+                if (!seenPairs.add(key)) {
+                    continue;
+                }
+                if (world.getWarService().findActiveWar(low, high) != null) {
+                    continue;
+                }
+                Dynasty[] pair = new Dynasty[] { d1, d2 };
+                allBorderPairs.add(pair);
+                if (!d1.getDiplomacyService().hasNonAggressionPact(d2)) {
+                    nonPactedPairs.add(pair);
+                }
+            }
+        }
+        List<Dynasty[]> pool = !nonPactedPairs.isEmpty() ? nonPactedPairs : allBorderPairs;
+        if (pool.isEmpty()) {
+            return null;
+        }
+        Dynasty[] chosen = pool.get(GameRandom.nextInt(pool.size()));
+        if (chosen[0].getDiplomacyService().hasNonAggressionPact(chosen[1])) {
+            chosen[0].getDiplomacyService().breakNonAggressionPact(chosen[1], world);
+        }
+        return world.getWarService().beginWar(chosen[0], chosen[1]);
     }
 }

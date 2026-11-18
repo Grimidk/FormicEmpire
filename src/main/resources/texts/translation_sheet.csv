@@ -2944,6 +2944,10 @@ LOG_BIOME_TRANSFORM_FMT,"Habitat transformed! %s changed into %s (%s).","¡El h�
 LOG_OVERHARVEST_DEPLETION_FMT,"Overharvesting exhausted local vegetation! %s degraded into %s.","¡La sobreexplotación agotó la vegetación local! %s se degradó a %s.","A superexploração esgotou a vegetação local! %s degradou-se em %s.","La surexploitation a épuisé la végétation locale ! %s s'est dégradé en %s."
 LOG_BIOME_RECOVERY_FMT,"Nature has healed! %s recovered into %s.","¡La naturaleza ha sanado! %s se recuperó en %s.","A natureza se curou! %s recuperou-se em %s.","La nature a guéri ! %s a récupéré en %s."
 REASON_OVERHARVESTING,Overharvesting,Sobreexplotación,Superexploração,Surexploitation
+SETTINGS_CHEAT_RANDOM_WAR,Random War Button (Cheat),Botón de Guerra Aleatoria (Truco),Botão de Guerra Aleatória (Trapaça),Bouton Guerre Aléatoire (Triche)
+SETTINGS_CHEAT_RANDOM_WAR_TT,Shows a cheat button inside the World Map that starts a war between two random bordering dynasties.,Muestra un botón de truco en el Mapa Mundial que inicia una guerra entre dos dinastias fronterizas aleatorias.,Mostra um botão de trapaça no Mapa Mundial que inicia uma guerra entre duas dinastias fronteiriças aleatórias.,Affiche un bouton de triche dans la Carte du Monde qui déclenche une guerre entre deux dynasties frontalières aléatoires.
+MAP_WAR_CHEAT,★ War,★ Guerra,★ Guerra,★ Guerre
+MAP_WAR_CHEAT_TT,Instigate a war between a random bordering pair of dynasties.,Provoca una guerra entre un par aleatorio de dinastías fronterizas.,Instiga uma guerra entre um par aleatório de dinastias fronteiriças.,Provoque une guerre entre deux dynasties frontalières aléatoires.
 REASON_RECOVERY,Ecological Recovery,Recuperación Ecológica,Recuperação Ecológica,Restauration Écologique
 BIOME_BARREN,Barren,Yermo,Estéril,Stérile
 UI_WORLD_MAKING,World Making,Creación de Mundos,Criação de Mundos,Création de Mondes

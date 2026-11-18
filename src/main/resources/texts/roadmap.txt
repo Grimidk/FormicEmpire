@@ -4,9 +4,9 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		(none right now)
+		settings are changed when selected all, may have to do with the difference between in and out of games
 	Mid:
-		biome clusters so they look more realistic
+		(none right now)
 	Low:
 		(none right now)
 	Important not Urgent:
@@ -65,10 +65,10 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		bridges (needs rafting)
-		Battle numeric animation with dice(?) and numbers
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
 		rework abilities and alerts and triggers to be cleaner
 		rework saves to be cleaner and efficient
+		battle simulator
 
 	Everything else :
 		critter system:

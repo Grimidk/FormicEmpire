@@ -14,12 +14,14 @@ import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.world.GeographicFeature;
 import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.entities.services.shared.SandboxCheatService;
+import com.grimidk.formicempire.classes.entities.services.world.WarCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexGridMesh;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.HexMapGeometry;
@@ -83,6 +85,7 @@ public class MapDialog extends ZeroDialog {
     private final JButton depossessButton;
     private final JButton fogCheatButton;
     private final JButton disasterCheatButton;
+    private final JButton warCheatButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
@@ -315,6 +318,17 @@ public class MapDialog extends ZeroDialog {
         disasterCheatButton.addActionListener(e -> triggerRandomDisasterCheat());
         zoomRail.add(Box.createVerticalStrut(4));
         zoomRail.add(disasterCheatButton);
+
+        warCheatButton = new JButton();
+        warCheatButton.setFocusable(false);
+        warCheatButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        configureMapActionIconButton(warCheatButton, "/icons/misc/MilitaryPower.png", LanguageStrings.MAP_WAR_CHEAT, LanguageStrings.MAP_WAR_CHEAT_TT, true);
+        if (warCheatButton.getIcon() == null) {
+            warCheatButton.setText("W");
+        }
+        warCheatButton.addActionListener(e -> triggerRandomWarCheat());
+        zoomRail.add(Box.createVerticalStrut(4));
+        zoomRail.add(warCheatButton);
 
         conquerButton = new JButton();
         conquerButton.setFocusable(false);
@@ -1380,6 +1394,15 @@ public class MapDialog extends ZeroDialog {
             }
         }
 
+        if (warCheatButton != null) {
+            boolean cheatWar = eng != null && eng.isCheatRandomWar();
+            warCheatButton.setVisible(cheatWar);
+            warCheatButton.setEnabled(cheatWar);
+            if (cheatWar) {
+                warCheatButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_WAR_CHEAT_TT));
+            }
+        }
+
         if (zoomRail != null) {
             zoomRail.revalidate();
             zoomRail.repaint();
@@ -1418,6 +1441,30 @@ public class MapDialog extends ZeroDialog {
         }
         DisasterType triggered = w.getDisasterService().triggerRandomDisaster(w);
         if (triggered != null) {
+            if (!isSpectatorMode()) {
+                w.disableAchievements();
+            }
+            if (mapPanel != null) {
+                mapPanel.invalidateBakedImage();
+                mapPanel.repaint();
+            }
+            if (legendPanel != null) {
+                legendPanel.updateLegend();
+                legendPanel.repaint();
+            }
+            if (onHexChange != null) {
+                onHexChange.run();
+            }
+        }
+    }
+
+    private void triggerRandomWarCheat() {
+        World w = currentWorld();
+        if (w == null) {
+            return;
+        }
+        War started = SandboxCheatService.triggerRandomBorderWar(w);
+        if (started != null) {
             if (!isSpectatorMode()) {
                 w.disableAchievements();
             }
@@ -1731,6 +1778,10 @@ public class MapDialog extends ZeroDialog {
         if (disasterCheatButton != null && disasterCheatButton.getIcon() == null) {
             disasterCheatButton.setText("D");
         }
+        configureMapActionIconButton(warCheatButton, "/icons/misc/MilitaryPower.png", LanguageStrings.MAP_WAR_CHEAT, LanguageStrings.MAP_WAR_CHEAT_TT, true);
+        if (warCheatButton != null && warCheatButton.getIcon() == null) {
+            warCheatButton.setText("W");
+        }
         configureMapActionIconButton(fogCheatButton, "/icons/weather/Fog.png", null, LanguageStrings.MAP_FOG_CHEAT_TOOLTIP, true);
         if (fogCheatButton != null && fogCheatButton.getIcon() == null) {
             fogCheatButton.setText("F");
@@ -1770,6 +1821,7 @@ public class MapDialog extends ZeroDialog {
         private final FlatChevronButton activeWarsToggle;
         private final JLabel activeWarsTitle;
         private boolean activeWarsExpanded = true;
+        private String lastActiveWarsSignature = "";
 
         private static final int MAX_WORLD_LOG_ENTRIES = 60;
         private final JPanel worldLogsSection;
@@ -1997,8 +2049,10 @@ public class MapDialog extends ZeroDialog {
             activeWarsSection.setVisible(!wars.isEmpty());
             activeWarsTitle.setText(LanguageStrings.format(
                     LanguageStrings.MAP_ACTIVE_WARS_TITLE_FMT, wars.size()));
-            activeWarsContent.removeAll();
             boolean playerCanManageWars = canPlayerManageWars();
+            StringBuilder sig = new StringBuilder();
+            sig.append(playerCanManageWars).append('|');
+            List<String> labels = new ArrayList<>(wars.size());
             for (War war : wars) {
                 String label = world.getWarService().formatWarNameForDisplay(war, null);
                 if (label == null || label.isEmpty()) {
@@ -2008,22 +2062,33 @@ public class MapDialog extends ZeroDialog {
                     String nameB = dynastyB != null ? dynastyB.getName() : "?";
                     label = LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, nameA, nameB);
                 }
-                JLabel warLabel = new JLabel(label);
-                warLabel.setFont(AssetStyles.FONT_SMALL);
-                warLabel.setForeground(AssetStyles.FONT_COLOR_WARNING);
-                warLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-                warLabel.setBorder(new EmptyBorder(0, 8, 2, 0));
-                if (playerCanManageWars && onOpenWarDialog != null) {
+                labels.add(label);
+                sig.append(war.getId()).append(':').append(label).append(';');
+            }
+            String nextSignature = sig.toString();
+            if (!nextSignature.equals(lastActiveWarsSignature)) {
+                lastActiveWarsSignature = nextSignature;
+                activeWarsContent.removeAll();
+                for (int i = 0; i < wars.size(); i++) {
+                    War war = wars.get(i);
+                    JLabel warLabel = new JLabel(labels.get(i));
+                    warLabel.setFont(AssetStyles.FONT_SMALL);
+                    warLabel.setForeground(AssetStyles.FONT_COLOR_WARNING);
+                    warLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    warLabel.setBorder(new EmptyBorder(0, 8, 2, 0));
                     AssetStyles.markClickable(warLabel);
-                    warLabel.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ACTIVE_WAR_OPEN));
+                    warLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WAR_ACTION_VIEW_BATTLE));
                     warLabel.addMouseListener(new MouseAdapter() {
                         @Override
-                        public void mouseClicked(MouseEvent e) {
-                            onOpenWarDialog.run();
+                        public void mousePressed(MouseEvent e) {
+                            if (SwingUtilities.isLeftMouseButton(e)) {
+                                openWarBattleFromMap(war, playerCanManageWars);
+                            }
                         }
                     });
+                    activeWarsContent.add(warLabel);
                 }
-                activeWarsContent.add(warLabel);
+                activeWarsSection.revalidate();
             }
             activeWarsContent.setVisible(activeWarsExpanded && !wars.isEmpty());
             activeWarsToggle.setChevronDirection(activeWarsExpanded
@@ -2031,8 +2096,41 @@ public class MapDialog extends ZeroDialog {
                     : FlatChevronButton.ChevronDirection.DOWN);
             activeWarsToggle.setToolTipText(LanguageStrings.get(
                     activeWarsExpanded ? LanguageStrings.MAP_ACTIVE_WARS_HIDE : LanguageStrings.MAP_ACTIVE_WARS_SHOW));
-            activeWarsSection.revalidate();
             activeWarsSection.repaint();
+        }
+
+        private void openWarBattleFromMap(War clickedWar, boolean playerCanManageWars) {
+            World w = currentWorld();
+            Engine eng = resolveEngine();
+            if (w == null || eng == null) {
+                return;
+            }
+            War targetWar = null;
+            if (clickedWar != null && WarCreatureCombatService.getState(clickedWar) != null) {
+                targetWar = clickedWar;
+            } else if (w.getWarService() != null) {
+                List<War> activeBattleWars = new ArrayList<>();
+                for (War candidate : w.getWarService().getActiveWars()) {
+                    if (candidate != null && WarCreatureCombatService.getState(candidate) != null) {
+                        activeBattleWars.add(candidate);
+                    }
+                }
+                if (!activeBattleWars.isEmpty()) {
+                    targetWar = activeBattleWars.get(GameRandom.nextInt(activeBattleWars.size()));
+                }
+            }
+            if (targetWar == null) {
+                if (playerCanManageWars && onOpenWarDialog != null) {
+                    onOpenWarDialog.run();
+                } else {
+                    UiOptionPane.showMessageDialog(
+                            MapDialog.this,
+                            LanguageStrings.get(LanguageStrings.BATTLE_NOT_AVAILABLE));
+                }
+                return;
+            }
+            WarBattleDialog dialog = new WarBattleDialog(MapDialog.this, targetWar, eng);
+            dialog.showDialog();
         }
 
         private void setWorldLogsExpanded(boolean expanded) {

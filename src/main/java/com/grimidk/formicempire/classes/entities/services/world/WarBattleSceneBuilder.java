@@ -110,11 +110,17 @@ public final class WarBattleSceneBuilder {
         }
         Map<BattleLine, Map<AntClass, Integer>> active = emptyLineMaps();
         Map<BattleLine, Map<AntClass, Integer>> reserve = emptyLineMaps();
-        for (BattleLine line : GameConstants.getBattleLines()) {
-            tallyParticipants(active.get(line), side.getActive(line));
-            tallyParticipants(reserve.get(line), side.getReserve(line));
+        int livingArmy;
+        int livingActive;
+        synchronized (side) {
+            for (BattleLine line : GameConstants.getBattleLines()) {
+                tallyParticipants(active.get(line), side.getActive(line));
+                tallyParticipants(reserve.get(line), side.getReserve(line));
+            }
+            livingArmy = side.livingArmySize();
+            livingActive = side.livingActiveSize();
         }
-        return new SideComposition(active, reserve, side.livingArmySize(), side.livingActiveSize());
+        return new SideComposition(active, reserve, livingArmy, livingActive);
     }
 
     private static void tallyParticipants(Map<AntClass, Integer> counts, java.util.List<WarBattleParticipant> list) {

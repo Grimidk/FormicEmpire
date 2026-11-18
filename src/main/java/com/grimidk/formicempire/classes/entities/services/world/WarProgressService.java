@@ -439,6 +439,12 @@ public final class WarProgressService {
         WarCreatureCombatService.clear(war);
         var state = WarCreatureCombatService.startHexBattle(war, activeWinner, reserveTarget, world.getDay());
         applyRiverBattleFlag(world, war, state);
+        if (state != null && state.getAttacker().livingActiveSize() <= 0) {
+            WarCreatureCombatService.clear(war);
+            enterRedeploying(world, war,
+                    world.findDynastyById(war.getAggressorDynastyId()),
+                    world.findDynastyById(war.getDefenderDynastyId()));
+        }
     }
 
     private static void resolveReserveAssaultHour(World world, WarService warService, War war,

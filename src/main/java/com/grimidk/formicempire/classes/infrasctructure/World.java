@@ -3020,6 +3020,7 @@ public class World {
             h.setBiome(biome);
             h.setLocalWeather(getRandomWeather(biome));
         }
+        smoothLandBiomeClusters(allLand, latScale);
         for (Hex h : this.hexes) {
             if (h == null || allLandSet.contains(h) || h.getBiome() == GameConstants.BIOME_LAKE || h.getBiome() == GameConstants.BIOME_ICE_FIELD) {
                 continue;
@@ -4249,6 +4250,8 @@ public class World {
             hydro = HydrologyLevel.MODERATE;
         }
 
+        double moisture = computeRegionalMoisture(hex, absLat, isCoastal, hasRiver, waterDist);
+
         List<Biome> candidates = new ArrayList<>();
         List<Integer> weights = new ArrayList<>();
 
@@ -4273,13 +4276,15 @@ public class World {
             if (b.getHydrologyLevel() == hydro) {
                 weight *= 2;
             }
+            weight += climateClusterBonus(b, absLat, moisture, isCoastal, hasRiver);
 
+            int matchingNeighbors = 0;
             for (Hex neighbor : hex.getAdjacentNeighbors()) {
                 if (neighbor != null && neighbor.getBiome() == b) {
-                    weight += 20;
-                    break;
+                    matchingNeighbors++;
                 }
             }
+            weight += matchingNeighbors * 55;
 
             candidates.add(b);
             weights.add(Math.max(1, weight));
@@ -4364,6 +4369,131 @@ public class World {
             return true;
         }
         return b.getClimateZone() == ClimateZone.ANY;
+    }
+
+    private double computeRegionalMoisture(Hex hex, double absLat, boolean isCoastal, boolean hasRiver, int waterDist) {
+        int col = hex.getQ() + (hex.getR() >> 1);
+        int row = hex.getR();
+        double freq = Math.max(0.14, 2.2 / Math.max(8, this.worldHeight));
+        double macro = 0.50 * Math.sin(col * freq + row * (freq * 0.65))
+                + 0.30 * Math.cos(col * (freq * 0.5) - row * (freq * 1.1))
+                + 0.20 * Math.sin((col + row) * (freq * 1.6));
+        double m = 0.50 + 0.30 * macro;
+        if (absLat <= 0.22) {
+            m += 0.20;
+        } else if (absLat >= 0.18 && absLat <= 0.38 && !isCoastal && !hasRiver) {
+            m -= 0.20;
+        } else if (absLat >= 0.42 && absLat <= 0.65) {
+            m += 0.10;
+        }
+        if (hasRiver) {
+            m += 0.22;
+        }
+        if (isCoastal) {
+            m += 0.12;
+        }
+        if (waterDist >= 4) {
+            m -= 0.12;
+        }
+        return Math.max(0.0, Math.min(1.0, m));
+    }
+
+    private int climateClusterBonus(Biome b, double absLat, double moisture, boolean isCoastal, boolean hasRiver) {
+        if (b == GameConstants.BIOME_JUNGLE && absLat <= 0.26 && moisture >= 0.62) {
+            return 90;
+        }
+        if (b == GameConstants.BIOME_MANGROVE && absLat <= 0.30 && (isCoastal || hasRiver) && moisture >= 0.60) {
+            return 65;
+        }
+        if (b == GameConstants.BIOME_DESERT && absLat >= 0.15 && absLat <= 0.45 && moisture <= 0.34) {
+            return 85;
+        }
+        if (b == GameConstants.BIOME_BARREN && moisture <= 0.30) {
+            return 45;
+        }
+        if ((b == GameConstants.BIOME_PLAINS || b == GameConstants.BIOME_PRAIRIE) && moisture >= 0.34 && moisture <= 0.64) {
+            return 75;
+        }
+        if (b == GameConstants.BIOME_FOREST && absLat >= 0.22 && absLat <= 0.62 && moisture >= 0.56) {
+            return 85;
+        }
+        if (b == GameConstants.BIOME_TAIGA && absLat >= 0.50 && absLat <= 0.80) {
+            return 85;
+        }
+        if (b == GameConstants.BIOME_TUNDRA && absLat >= 0.68) {
+            return 90;
+        }
+        if ((b == GameConstants.BIOME_SWAMP || b == GameConstants.BIOME_WETLANDS) && moisture >= 0.72) {
+            return 60;
+        }
+        return 0;
+    }
+
+    private void smoothLandBiomeClusters(List<Hex> landHexes, int latScale) {
+        if (landHexes == null || landHexes.isEmpty()) {
+            return;
+        }
+        for (int pass = 0; pass < 2; pass++) {
+            Map<Hex, Biome> updates = new HashMap<>();
+            for (Hex h : landHexes) {
+                if (h == null || h.getBiome() == null) {
+                    continue;
+                }
+                Biome cur = h.getBiome();
+                if (cur == GameConstants.BIOME_LAKE || cur == GameConstants.BIOME_ICE_FIELD
+                        || cur == GameConstants.BIOME_PEAK || cur == GameConstants.BIOME_MOUNTAIN
+                        || cur == GameConstants.BIOME_VOLCANIC || cur == GameConstants.BIOME_BEACH
+                        || cur == GameConstants.BIOME_CLIFFS || cur == GameConstants.BIOME_BURNT_FOREST) {
+                    continue;
+                }
+                double absLat = Math.abs((double) h.getR()) / Math.max(1, latScale);
+                boolean isCoastal = h.isCoastal();
+                boolean hasRiver = h.hasAnyRiver();
+                HydrologyLevel hydro = (hasRiver || isCoastal)
+                        ? HydrologyLevel.WET
+                        : (h.getWaterDistance() >= 3 ? HydrologyLevel.DRY : HydrologyLevel.MODERATE);
+
+                int ownCount = 0;
+                Map<Biome, Integer> counts = new HashMap<>();
+                for (Hex n : h.getAdjacentNeighbors()) {
+                    if (n == null || n.getBiome() == null || isWaterBiome(n.getBiome())) {
+                        continue;
+                    }
+                    Biome nb = n.getBiome();
+                    if (nb == cur) {
+                        ownCount++;
+                    }
+                    if (nb == GameConstants.BIOME_LAKE || nb == GameConstants.BIOME_ICE_FIELD
+                            || nb == GameConstants.BIOME_PEAK || nb == GameConstants.BIOME_MOUNTAIN
+                            || nb == GameConstants.BIOME_VOLCANIC || nb == GameConstants.BIOME_BEACH
+                            || nb == GameConstants.BIOME_CLIFFS) {
+                        continue;
+                    }
+                    if (!nb.supportsElevation(h.getElevation()) || !isBiomeEligibleAt(nb, absLat, isCoastal, hasRiver, hydro)) {
+                        continue;
+                    }
+                    counts.merge(nb, 1, Integer::sum);
+                }
+                if (ownCount > 1) {
+                    continue;
+                }
+                Biome best = null;
+                int bestCount = 2;
+                for (Map.Entry<Biome, Integer> entry : counts.entrySet()) {
+                    if (entry.getValue() > bestCount) {
+                        bestCount = entry.getValue();
+                        best = entry.getKey();
+                    }
+                }
+                if (best != null && best != cur) {
+                    updates.put(h, best);
+                }
+            }
+            for (Map.Entry<Hex, Biome> entry : updates.entrySet()) {
+                entry.getKey().setBiome(entry.getValue());
+                entry.getKey().setLocalWeather(getRandomWeather(entry.getValue()));
+            }
+        }
     }
 
     public void populateDynasties(Biome startBiome, Colony startColony, String baseName, String playerTitleKey) {

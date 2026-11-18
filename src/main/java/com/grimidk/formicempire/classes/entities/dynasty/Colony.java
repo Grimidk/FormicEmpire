@@ -264,14 +264,26 @@ public class Colony {
         return parsed;
     }
 
+    private static boolean hasAnyPositiveCount(Map<String, Integer> counts) {
+        if (counts == null || counts.isEmpty()) {
+            return false;
+        }
+        for (Integer value : counts.values()) {
+            if (value != null && value > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void loadAssignedRoleCountsFromSave(Savefile.SavedColony savedColony) {
         applySavedRoleCounts(peaceAssignedRoleCounts, savedColony.assignedRoleCounts);
-        stripWarEconomyExclusiveFromPeace();
-        if (savedColony.warAssignedRoleCounts != null && !savedColony.warAssignedRoleCounts.isEmpty()) {
+        if (hasAnyPositiveCount(savedColony.warAssignedRoleCounts)) {
             applySavedRoleCounts(warAssignedRoleCounts, savedColony.warAssignedRoleCounts);
         } else if (savedColony.assignedRoleCounts != null && !savedColony.assignedRoleCounts.isEmpty()) {
-            copyPeaceRolesToWar();
+            applySavedRoleCounts(warAssignedRoleCounts, savedColony.assignedRoleCounts);
         }
+        stripWarEconomyExclusiveFromPeace();
         applySavedRoleDisallowedMods(peaceRoleDisallowedMods, savedColony.roleDisallowedModsFlat);
         if (savedColony.warRoleDisallowedModsFlat != null && !savedColony.warRoleDisallowedModsFlat.isEmpty()) {
             applySavedRoleDisallowedMods(warRoleDisallowedMods, savedColony.warRoleDisallowedModsFlat);

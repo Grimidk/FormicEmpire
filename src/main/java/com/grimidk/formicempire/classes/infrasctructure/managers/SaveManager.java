@@ -2669,6 +2669,7 @@ public class SaveManager {
             writeJsonLine(w, "cheatFogOfWarToggle", engine.isCheatFogOfWarToggle(), false);
             writeJsonLine(w, "cheatRevealMap", engine.isCheatRevealMap(), false);
             writeJsonLine(w, "cheatRandomDisaster", engine.isCheatRandomDisaster(), false);
+            writeJsonLine(w, "cheatRandomWar", engine.isCheatRandomWar(), false);
             writeJsonLine(w, "animateWorldGen", engine.isAnimateWorldGen(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
@@ -2826,6 +2827,7 @@ public class SaveManager {
             engine.setCheatFogOfWarToggle(Boolean.parseBoolean(m.getOrDefault("cheatFogOfWarToggle", "false")));
             engine.setCheatRevealMap(Boolean.parseBoolean(m.getOrDefault("cheatRevealMap", "false")));
             engine.setCheatRandomDisaster(Boolean.parseBoolean(m.getOrDefault("cheatRandomDisaster", "false")));
+            engine.setCheatRandomWar(Boolean.parseBoolean(m.getOrDefault("cheatRandomWar", "false")));
             engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "true")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.CLASS_WORKER,
