@@ -73,8 +73,90 @@ public final class DynastyTradeAutomation {
         addIfSurplus(load, GameConstants.RESOURCE_ROCK, origin.getMineralsPrecise(),
                 stats.getMineralsCapacity(origin), destination.getMineralsPrecise(),
                 stats.getMineralsCapacity(destination));
+        addIfSurplus(load, GameConstants.RESOURCE_SYRUP, origin.getSyrupsPrecise(),
+                stats.getSyrupsCapacity(origin), destination.getSyrupsPrecise(),
+                stats.getSyrupsCapacity(destination));
+        addIfSurplus(load, GameConstants.RESOURCE_MEAT, origin.getProteinPrecise(),
+                stats.getProteinCapacity(origin), destination.getProteinPrecise(),
+                stats.getProteinCapacity(destination));
 
         return load;
+    }
+
+    public static Map<ResourceType, Double> computeNonEssentialOutboundLoad(Colony origin, Colony destination) {
+        Map<ResourceType, Double> load = new HashMap<>();
+        if (origin == null || destination == null) {
+            return load;
+        }
+        ColonyStatsService stats = origin.getStatsService();
+
+        addIfSurplus(load, GameConstants.RESOURCE_ROCK, origin.getMineralsPrecise(),
+                stats.getMineralsCapacity(origin), destination.getMineralsPrecise(),
+                stats.getMineralsCapacity(destination));
+        addIfSurplus(load, GameConstants.RESOURCE_RESIN, origin.getResinsPrecise(),
+                stats.getResinsCapacity(origin), destination.getResinsPrecise(),
+                stats.getResinsCapacity(destination));
+        addIfSurplus(load, GameConstants.RESOURCE_SYRUP, origin.getSyrupsPrecise(),
+                stats.getSyrupsCapacity(origin), destination.getSyrupsPrecise(),
+                stats.getSyrupsCapacity(destination));
+
+        return load;
+    }
+
+    public static double computeTotalTransportSecurity(Colony origin, Map<AntClass, Integer> transport) {
+        if (origin == null || transport == null || transport.isEmpty()) {
+            return 0.0;
+        }
+        double baseSec = origin.getStatsService().getBaseTradeSecurity(origin);
+        double totalSec = 0.0;
+        for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
+            int count = entry.getValue();
+            if (count <= 0) {
+                continue;
+            }
+            AntClass type = entry.getKey();
+            if (type == GameConstants.CLASS_WORKER) totalSec += count * baseSec * 1.0;
+            else if (type == GameConstants.CLASS_MAJOR) totalSec += count * baseSec * 2.5;
+            else if (type == GameConstants.CLASS_SOLDIER) totalSec += count * baseSec * 10.0;
+            else if (type == GameConstants.CLASS_PRINCESS) totalSec += count * baseSec * 1.0;
+        }
+        return totalSec;
+    }
+
+    public static boolean isConvoyWorthwhile(
+            Colony origin,
+            Hex originHex,
+            Hex destHex,
+            TradeMethod method,
+            Map<AntClass, Integer> transport,
+            Map<ResourceType, Double> load) {
+        if (origin == null || originHex == null || destHex == null || method == null
+                || transport == null || transport.isEmpty() || load == null || load.isEmpty()) {
+            return false;
+        }
+        double totalLoad = 0.0;
+        for (Double val : load.values()) {
+            if (val != null && val > 0.0) {
+                totalLoad += val;
+            }
+        }
+        if (totalLoad < GameNumbers.AI_TRADE_MIN_PROFIT_AMOUNT) {
+            return false;
+        }
+        int hexDistance = Math.max(1, GameNumbers.axialHexDistance(
+                originHex.getQ(), originHex.getR(), destHex.getQ(), destHex.getR()));
+        double dangerFactor = method.getDangerFactor()
+                + Math.max(0, hexDistance - 1) * GameNumbers.TRADE_DISTANCE_RISK_PER_HEX;
+        double totalSec = computeTotalTransportSecurity(origin, transport);
+        double mitigationPercent = origin.getStatsService()
+                .getConvoySecurityMitigationPercent(origin, totalSec, dangerFactor);
+        double riskRatio = 1.0 - (mitigationPercent / 100.0);
+        double expectedDelivered = totalLoad * (mitigationPercent / 100.0);
+        if (expectedDelivered <= 0.0 || riskRatio >= GameNumbers.AI_TRADE_ABORT_RISK_RATIO) {
+            return false;
+        }
+        return !(riskRatio > GameNumbers.AI_TRADE_MAX_RISK_RATIO
+                && expectedDelivered < GameNumbers.AI_TRADE_HIGH_PROFIT_MIN_AMOUNT);
     }
 
     public static boolean loadsDiffer(Map<ResourceType, Double> current, Map<ResourceType, Double> proposed) {

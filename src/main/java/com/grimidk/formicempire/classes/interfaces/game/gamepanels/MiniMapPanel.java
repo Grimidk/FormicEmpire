@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -35,6 +36,8 @@ public class MiniMapPanel extends ZeroGamePanel {
     private BufferedImage cachedBakedBaseImage;
     private int cachedBakedW = -1;
     private int cachedBakedH = -1;
+    private int cachedBakedKnownCount = -1;
+    private boolean cachedBakedCheatReveal = false;
     private double cachedHexRadius;
     private double cachedOriginX;
     private double cachedOriginY;
@@ -76,36 +79,38 @@ public class MiniMapPanel extends ZeroGamePanel {
         setPreferredSize(new Dimension(250, 180));
         setMinimumSize(new Dimension(200, 120));
         setTitledBorder(LanguageStrings.PANEL_MINIMAP);
-        AssetStyles.markClickable(this);
-        addMouseListener(new MouseAdapter() {
-            private Point pressPoint;
+        if (openMapAction != null) {
+            AssetStyles.markClickable(this);
+            addMouseListener(new MouseAdapter() {
+                private Point pressPoint;
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.getButton() != MouseEvent.BUTTON1) {
-                    return;
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if (e.getButton() != MouseEvent.BUTTON1) {
+                        return;
+                    }
+                    pressPoint = e.getPoint();
                 }
-                pressPoint = e.getPoint();
-            }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.getButton() != MouseEvent.BUTTON1 || pressPoint == null) {
-                    return;
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.getButton() != MouseEvent.BUTTON1 || pressPoint == null) {
+                        return;
+                    }
+                    Point release = e.getPoint();
+                    int dx = release.x - pressPoint.x;
+                    int dy = release.y - pressPoint.y;
+                    pressPoint = null;
+                    if (dx * dx + dy * dy > 36) {
+                        return;
+                    }
+                    if (getWorld() == null) {
+                        return;
+                    }
+                    openMapAction.run();
                 }
-                Point release = e.getPoint();
-                int dx = release.x - pressPoint.x;
-                int dy = release.y - pressPoint.y;
-                pressPoint = null;
-                if (dx * dx + dy * dy > 36) {
-                    return;
-                }
-                if (getWorld() == null || openMapAction == null) {
-                    return;
-                }
-                openMapAction.run();
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -116,6 +121,7 @@ public class MiniMapPanel extends ZeroGamePanel {
         cachedBakedBaseImage = null;
         cachedBakedW = -1;
         cachedBakedH = -1;
+        cachedBakedKnownCount = -1;
     }
 
     @Override
@@ -154,8 +160,12 @@ public class MiniMapPanel extends ZeroGamePanel {
 
         int panelW = getWidth();
         int panelH = getHeight();
+        Dynasty playerDynasty = world.findPlayerDynasty();
+        int knownCount = playerDynasty != null ? playerDynasty.getKnownHexCount() : 0;
+        boolean cheatReveal = engine != null && engine.isCheatRevealMap();
 
-        if (cachedBakedBaseImage == null || cachedBakedW != panelW || cachedBakedH != panelH) {
+        if (cachedBakedBaseImage == null || cachedBakedW != panelW || cachedBakedH != panelH
+                || cachedBakedKnownCount != knownCount || cachedBakedCheatReveal != cheatReveal) {
             double hexRadius;
             double originX;
             double originY;
@@ -235,7 +245,7 @@ public class MiniMapPanel extends ZeroGamePanel {
                     }
                 } else {
                     Hex active = world.getActiveHex();
-                    if (active != null) {
+                    if (active != null && isHexDiscovered(active)) {
                         int r = active.getR();
                         int col = active.getQ() + (r >> 1);
                         double hx = originX + col * Math.sqrt(3.0) * hexRadius + ((r & 1) != 0 ? (Math.sqrt(3.0) / 2.0) * hexRadius : 0.0);
@@ -284,6 +294,16 @@ public class MiniMapPanel extends ZeroGamePanel {
             return;
         }
 
+        final boolean cheatReveal = engine != null && engine.isCheatRevealMap();
+        final Dynasty player = world.findPlayerDynasty();
+        final boolean revealAll = explicitWorld != null
+                || engine == null
+                || cheatReveal
+                || player == null
+                || player.getKnownHexCount() == 0;
+        final java.util.function.Predicate<Hex> discovered = hex ->
+                hex != null && (revealAll || player.isHexKnown(hex));
+
         BufferedImage baked = new BufferedImage(panelW, panelH, BufferedImage.TYPE_INT_ARGB);
         Graphics2D bg2d = baked.createGraphics();
         try {
@@ -301,13 +321,17 @@ public class MiniMapPanel extends ZeroGamePanel {
                     originY,
                     hexRadius,
                     (q, r) -> hexLookup.get(packKey(q, r)));
-            mesh.paintFills(bg2d, face -> getBiomeColor(face.hex.getBiome()));
+            mesh.paintFills(bg2d, face -> discovered.test(face.hex) ? getBiomeColor(face.hex.getBiome()) : null);
+            if (!revealAll) {
+                mesh.paintFog(bg2d, AssetStyles.getFogTexturePaint(), discovered);
+            }
             mesh.paintDividers(
                     bg2d,
                     false,
                     face -> getBiomeColor(face.hex.getBiome()),
-                    AssetStyles.BORDER_COLOR);
-            mesh.paintRivers(bg2d);
+                    AssetStyles.BORDER_COLOR,
+                    face -> discovered.test(face.hex));
+            mesh.paintRivers(bg2d, 1.0f, edge -> discovered.test(edge.faceA != null ? edge.faceA.hex : null) || discovered.test(edge.faceB != null ? edge.faceB.hex : null));
         } finally {
             bg2d.dispose();
         }
@@ -315,6 +339,8 @@ public class MiniMapPanel extends ZeroGamePanel {
         cachedBakedBaseImage = baked;
         cachedBakedW = panelW;
         cachedBakedH = panelH;
+        cachedBakedKnownCount = player != null ? player.getKnownHexCount() : 0;
+        cachedBakedCheatReveal = cheatReveal;
         cachedOriginX = originX;
         cachedOriginY = originY;
         cachedHexRadius = hexRadius;
@@ -340,6 +366,16 @@ public class MiniMapPanel extends ZeroGamePanel {
         Color faded = AssetStyles.fadeTowardBackground(mapColor, fade);
         biomeColorCache.put(biome.getId(), faded);
         return faded;
+    }
+
+    private boolean isHexDiscovered(Hex hex) {
+        if (hex == null) return false;
+        if (explicitWorld != null || engine == null || engine.isCheatRevealMap()) return true;
+        World world = getWorld();
+        if (world == null) return true;
+        Dynasty playerDynasty = world.findPlayerDynasty();
+        if (playerDynasty == null || playerDynasty.getKnownHexCount() == 0) return true;
+        return playerDynasty.isHexKnown(hex);
     }
 
     private static double axialX(int q, int r) {

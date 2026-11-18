@@ -19,9 +19,11 @@ public class AntSpecies extends Constant {
     private final Set<String> preferredNameKeys;
     private final AntSpeciesPalette palette;
     private final Biome preferredBiome;
+    private final SpeciesDiet diet;
 
     public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
-            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette, Biome preferredBiome, ImageIcon icon) {
+            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette, Biome preferredBiome,
+            SpeciesDiet diet, ImageIcon icon) {
         super(id, name, icon);
         this.scientific = scientific;
         this.directory = directory;
@@ -32,21 +34,32 @@ public class AntSpecies extends Constant {
                 : Collections.unmodifiableSet(new LinkedHashSet<>(preferredNameKeys));
         this.palette = palette;
         this.preferredBiome = preferredBiome;
+        this.diet = diet;
+    }
+
+    public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
+            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette, Biome preferredBiome, ImageIcon icon) {
+        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, preferredBiome, null, icon);
     }
 
     public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
             Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette, ImageIcon icon) {
-        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, null, icon);
+        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, null, null, icon);
+    }
+
+    public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
+            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette, Biome preferredBiome, SpeciesDiet diet) {
+        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, preferredBiome, diet, null);
     }
 
     public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
             Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette, Biome preferredBiome) {
-        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, preferredBiome, null);
+        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, preferredBiome, null, null);
     }
 
     public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
             Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette) {
-        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, null, null);
+        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, null, null, null);
     }
 
     public String getScientific() {
@@ -86,5 +99,9 @@ public class AntSpecies extends Constant {
 
     public Biome getPreferredBiome() {
         return preferredBiome;
+    }
+
+    public SpeciesDiet getDiet() {
+        return diet;
     }
 }

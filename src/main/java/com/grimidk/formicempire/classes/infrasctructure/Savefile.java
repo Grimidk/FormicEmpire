@@ -16,8 +16,10 @@ import java.util.Map;
 public class Savefile implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+    public static final int CURRENT_FORMAT_VERSION = 2;
+
     // --- Global Save Data ---
+    private int formatVersion = CURRENT_FORMAT_VERSION;
     private final int id; 
     private final String name; 
     private String version;
@@ -35,6 +37,7 @@ public class Savefile implements Serializable {
     private String playerDynastyTitleKey;
     private int playerDynastyTitleId;
     private int starterBiomeId = 1;
+    private int starterDietId = 1;
     
     // --- Root Summary Data ---
     private int colonyId;
@@ -62,6 +65,10 @@ public class Savefile implements Serializable {
     private List<SavedWorldHistoryEvent> worldHistory;
     private boolean allowsAchievements = true;
     private boolean spectatorMode = false;
+
+    public Savefile() {
+        this(0, "");
+    }
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -97,6 +104,7 @@ public class Savefile implements Serializable {
         public boolean isDefeated;
         public String rankName;
         public int speciesId;
+        public int startingDietId;
         public int researchPoints;
         public int totalNuptialFlights;
         public int diplomatsSentTotal;
@@ -121,6 +129,8 @@ public class Savefile implements Serializable {
         public int capitalColonyId = -1;
         public double geneticIntegrity = 100.0;
         public int militaryPower;
+        public List<Long> knownHexKeys = new ArrayList<>();
+        public int exploredHexCount = 0;
         public Map<String, Integer> deathStatistics = new HashMap<>();
         public Map<String, Integer> diplomaticReputations = new HashMap<>();
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
@@ -138,6 +148,7 @@ public class Savefile implements Serializable {
         public List<SavedCrossDynastyTradeProposal> pendingTradeProposals = new ArrayList<>();
         public int forcedFlightCooldownDays;
         public List<SavedTunnel> tunnels = new ArrayList<>();
+        public List<SavedTunnel> bridges = new ArrayList<>();
         public int originDynastyId;
         public int activeRebellionDynastyId;
         public int pendingRebellionResponseFromId;
@@ -361,6 +372,8 @@ public class Savefile implements Serializable {
         public int hydrology;
         public boolean island;
         public int plateId;
+        public int disasterTypeId;
+        public int disasterAgeHours;
 
         public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
             this.q = q;
@@ -582,6 +595,14 @@ public class Savefile implements Serializable {
         this.allowsAchievements = false;
     }
 
+    public int getFormatVersion() {
+        return formatVersion;
+    }
+
+    public void setFormatVersion(int formatVersion) {
+        this.formatVersion = formatVersion;
+    }
+
     public boolean isSpectatorMode() {
         return spectatorMode;
     }
@@ -596,6 +617,14 @@ public class Savefile implements Serializable {
 
     public void setStarterBiomeId(int starterBiomeId) {
         this.starterBiomeId = starterBiomeId;
+    }
+
+    public int getStarterDietId() {
+        return starterDietId > 0 ? starterDietId : 1;
+    }
+
+    public void setStarterDietId(int starterDietId) {
+        this.starterDietId = starterDietId;
     }
 
     public String getVersion() {

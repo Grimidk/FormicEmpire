@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
@@ -24,6 +25,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;
@@ -339,6 +341,32 @@ public class HelpPanel extends JPanel {
             scientificLabel.setForeground(AssetStyles.FONT_COLOR);
             scientificLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             info.add(scientificLabel);
+
+            SpeciesDiet diet = (s == GameConstants.SPECIES_OMNI) ? GameConstants.DIET_OMNIVOROUS : s.getDiet();
+            if (diet != null) {
+                JLabel dietLabel = new JLabel(helpHtml("width:350px;font-size:11pt;",
+                        "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_DIET) + "</b> "
+                                + diet.getName()), diet.getIcon(), SwingConstants.LEFT);
+                dietLabel.setIconTextGap(6);
+                dietLabel.setToolTipText(diet.getName());
+                dietLabel.setFont(AssetStyles.FONT_NORMAL);
+                dietLabel.setForeground(AssetStyles.FONT_COLOR);
+                dietLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                info.add(dietLabel);
+            }
+
+            if (s.getPreferredBiome() != null) {
+                Biome pb = s.getPreferredBiome();
+                JLabel biomeLabel = new JLabel(helpHtml("width:350px;font-size:11pt;",
+                        "<b>" + LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX).trim() + "</b> "
+                                + pb.getName()), pb.getIcon(), SwingConstants.LEFT);
+                biomeLabel.setIconTextGap(6);
+                biomeLabel.setToolTipText(pb.getName());
+                biomeLabel.setFont(AssetStyles.FONT_NORMAL);
+                biomeLabel.setForeground(AssetStyles.FONT_COLOR);
+                biomeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                info.add(biomeLabel);
+            }
 
             Assimilation assimilation = s.getAssimilation();
             if (assimilation != null) {
@@ -1015,6 +1043,8 @@ public class HelpPanel extends JPanel {
 
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_TRADE, createTradeMethodSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_SPECIES_DIET, createDietsSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_LOYALTY, createLoyaltySection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_MILITARY_POWER, createMilitaryPowerSection()));
@@ -1091,6 +1121,32 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_COLOR_HEADER));
         section.add(content, BorderLayout.CENTER);
         return section;
+    }
+
+    private JPanel createDietsSection() {
+        JPanel grid = new JPanel(new GridLayout(0, 1, 0, 8));
+        grid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        grid.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (SpeciesDiet diet : GameConstants.getSpeciesDiets()) {
+            String desc;
+            if (diet == GameConstants.DIET_FUNGIVOROUS) {
+                desc = LanguageStrings.get(LanguageStrings.RESOURCE_FUNGI) + " & " + LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP);
+            } else if (diet == GameConstants.DIET_CARNIVOROUS) {
+                desc = LanguageStrings.get(LanguageStrings.RESOURCE_MEAT) + " & " + LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP);
+            } else {
+                desc = LanguageStrings.get(LanguageStrings.RESOURCE_FUNGI) + ", " + LanguageStrings.get(LanguageStrings.RESOURCE_MEAT) + " & " + LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP);
+            }
+            String info = helpHtml("width:420px;font-size:11pt;",
+                    "<b>" + diet.getName() + "</b> — " + desc);
+            JLabel row = new JLabel(info, diet.getIcon(), SwingConstants.LEFT);
+            row.setFont(AssetStyles.FONT_NORMAL);
+            row.setForeground(AssetStyles.FONT_COLOR);
+            row.setIconTextGap(10);
+            row.setToolTipText(diet.getName() + ": " + desc);
+            grid.add(row);
+        }
+        return grid;
     }
 
     private JPanel createTradeMethodSection() {
@@ -1425,10 +1481,14 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
         
         for (Biome b : GameConstants.getBiomes()) {
+            String heightRange = b.getMinElevation() == b.getMaxElevation()
+                    ? String.valueOf(b.getMinElevation())
+                    : b.getMinElevation() + "-" + b.getMaxElevation();
             String bInfo = helpHtml("width:120px;",
                     "<b>" + b.getName() + "</b><br>"
-                            + LanguageStrings.get("HELP_BIOME_TEMP") + b.getTemperature() + "°C<br>"
-                            + LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>"
+                            + LanguageStrings.get(LanguageStrings.HELP_BIOME_TEMP) + b.getTemperature() + "°C<br>"
+                            + LanguageStrings.get(LanguageStrings.HELP_BIOME_HUMID) + b.isIsHumid() + "/5<br>"
+                            + LanguageStrings.get(LanguageStrings.HELP_BIOME_HEIGHT) + heightRange + "<br>"
                             + LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>"
                             + LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>"
                             + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x<br>"
@@ -1457,6 +1517,35 @@ public class HelpPanel extends JPanel {
         worldInfoPanel.add(createHumidityListPanel(LanguageStrings.get("HELP_HUMID"), GameConstants.getHumidity()));
 
         panel.add(worldInfoPanel);
+
+        JPanel disastersPanel = new JPanel(new BorderLayout(8, 8));
+        disastersPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        disastersPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(LanguageStrings.HELP_DISASTERS_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+
+        JLabel disastersSummary = new JLabel(helpHtml("width:650px;",
+                LanguageStrings.get(LanguageStrings.HELP_DISASTERS_BODY)));
+        disastersSummary.setFont(AssetStyles.FONT_SMALL);
+        disastersSummary.setForeground(AssetStyles.FONT_COLOR);
+        disastersSummary.setBorder(new EmptyBorder(4, 6, 8, 6));
+        disastersPanel.add(disastersSummary, BorderLayout.NORTH);
+
+        JPanel disastersGrid = new JPanel(new GridLayout(0, 2, 10, 8));
+        disastersGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (DisasterType d : GameConstants.getDisasterTypes()) {
+            String dInfo = helpHtml("width:240px;",
+                    "<b>" + d.getName() + "</b><br>" + d.getDescription());
+            ImageIcon dIcon = d.getIcon() != GameConstants.ICON_UNKNOWN ? d.getIcon() : null;
+            JLabel dLabel = new JLabel(dInfo, dIcon, SwingConstants.LEFT);
+            dLabel.setFont(AssetStyles.FONT_SMALL);
+            dLabel.setForeground(AssetStyles.FONT_COLOR);
+            disastersGrid.add(dLabel);
+        }
+        disastersPanel.add(disastersGrid, BorderLayout.CENTER);
+        panel.add(disastersPanel);
         
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);

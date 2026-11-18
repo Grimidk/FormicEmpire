@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
@@ -34,6 +35,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
@@ -139,6 +141,7 @@ public class Colony {
     private Dimension lastPhysicsDimension;
     private Building currentBuildingProject = null;
     private Tunnel currentTunnelProject = null;
+    private Bridge currentBridgeProject = null;
     private double buildingProgressHours = 0.0;
     private final List<String> eventLog = new ArrayList<>();
     private final List<com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget> knownHuntTargets = new ArrayList<>();
@@ -263,14 +266,26 @@ public class Colony {
         return parsed;
     }
 
+    private static boolean hasAnyPositiveCount(Map<String, Integer> counts) {
+        if (counts == null || counts.isEmpty()) {
+            return false;
+        }
+        for (Integer value : counts.values()) {
+            if (value != null && value > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void loadAssignedRoleCountsFromSave(Savefile.SavedColony savedColony) {
         applySavedRoleCounts(peaceAssignedRoleCounts, savedColony.assignedRoleCounts);
-        stripWarEconomyExclusiveFromPeace();
-        if (savedColony.warAssignedRoleCounts != null && !savedColony.warAssignedRoleCounts.isEmpty()) {
+        if (hasAnyPositiveCount(savedColony.warAssignedRoleCounts)) {
             applySavedRoleCounts(warAssignedRoleCounts, savedColony.warAssignedRoleCounts);
         } else if (savedColony.assignedRoleCounts != null && !savedColony.assignedRoleCounts.isEmpty()) {
-            copyPeaceRolesToWar();
+            applySavedRoleCounts(warAssignedRoleCounts, savedColony.assignedRoleCounts);
         }
+        stripWarEconomyExclusiveFromPeace();
         applySavedRoleDisallowedMods(peaceRoleDisallowedMods, savedColony.roleDisallowedModsFlat);
         if (savedColony.warRoleDisallowedModsFlat != null && !savedColony.warRoleDisallowedModsFlat.isEmpty()) {
             applySavedRoleDisallowedMods(warRoleDisallowedMods, savedColony.warRoleDisallowedModsFlat);
@@ -993,6 +1008,36 @@ public class Colony {
         }
     }
 
+    public SpeciesDiet getDiet() {
+        if (dynasty != null) {
+            return dynasty.getDiet();
+        }
+        AntSpecies s = getSpecies();
+        return s != null && s.getDiet() != null ? s.getDiet() : GameConstants.DIET_FUNGIVOROUS;
+    }
+
+    public boolean isCarnivorous() {
+        return getDiet() == GameConstants.DIET_CARNIVOROUS;
+    }
+
+    public boolean isFungivorous() {
+        return getDiet() == GameConstants.DIET_FUNGIVOROUS;
+    }
+
+    public boolean isOmnivorous() {
+        return getDiet() == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public boolean canEatFungi() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_FUNGIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public boolean canEatMeat() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_CARNIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
     public int getNativeSpeciesId() {
         return nativeSpeciesId;
     }
@@ -1165,6 +1210,47 @@ public class Colony {
         invalidateAffordableAlertCache();
     }
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
+
+    public List<Building> downgradeEligibleBuildings(int maxRooms) {
+        List<Building> downgraded = new ArrayList<>();
+        if (maxRooms <= 0 || buildings.isEmpty()) {
+            return downgraded;
+        }
+        List<Building> candidates = new ArrayList<>();
+        for (Building b : buildings) {
+            if (b == null || b.getRequirement() == null) {
+                continue;
+            }
+            if (b.getTierIndex() < 1 || b.getTierIndex() >= 3) {
+                continue;
+            }
+            boolean hasChildUnlocked = false;
+            for (Building other : buildings) {
+                if (other != b && other.getRequirement() == b) {
+                    hasChildUnlocked = true;
+                    break;
+                }
+            }
+            if (!hasChildUnlocked) {
+                candidates.add(b);
+            }
+        }
+        if (candidates.isEmpty()) {
+            return downgraded;
+        }
+        Collections.shuffle(candidates, new java.util.Random(GameRandom.nextInt(Integer.MAX_VALUE)));
+        int toDamage = Math.min(maxRooms, candidates.size());
+        for (int i = 0; i < toDamage; i++) {
+            Building target = candidates.get(i);
+            if (this.buildings.remove(target)) {
+                downgraded.add(target);
+            }
+        }
+        if (!downgraded.isEmpty()) {
+            invalidateAffordableAlertCache();
+        }
+        return downgraded;
+    }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
     public void setCurrentBuildingProject(Building b) {
         this.currentBuildingProject = b;
@@ -1172,6 +1258,8 @@ public class Colony {
     }
     public Tunnel getCurrentTunnelProject() { return currentTunnelProject; }
     public void setCurrentTunnelProject(Tunnel t) { this.currentTunnelProject = t; }
+    public Bridge getCurrentBridgeProject() { return currentBridgeProject; }
+    public void setCurrentBridgeProject(Bridge b) { this.currentBridgeProject = b; }
     public double getBuildingProgressHours() { return buildingProgressHours; }
     public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; }
 
@@ -1646,7 +1734,7 @@ public class Colony {
         int researchPoints = getResearchPoints();
         for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
             if (!hasUpgrade(upgrade) && upgrade.getCost() > 0
-                    && (upgrade.getRequirement() == null || hasUpgrade(upgrade.getRequirement()))
+                    && GameUnlocks.isUpgradeRequirementMet(this, upgrade)
                     && GameUnlocks.meetsExtraAutomationPrerequisites(getDynasty(), upgrade)
                     && upgrade.isAvailableFor(getDynasty())
                     && researchPoints >= upgrade.getCost()) {
@@ -2142,6 +2230,8 @@ public class Colony {
     public void runMinutelyJobs() {
         if (this.runsFullSimulation()) {
             this.runConverting();
+        }
+        if (this.isActive) {
             physicsService.tickAntSpriteAnimMinutes(this, lastPhysicsDimension, lastPhysicsViewport);
         }
     }
@@ -2164,6 +2254,7 @@ public class Colony {
             this.runRanching();
             this.runBuilding();
             this.labourService.runTunnelConstruction(this);
+            this.labourService.runBridgeConstruction(this);
             this.runCollecting();
             ColonyHuntService.tickExpeditions(this);
             World invasionWorld = dynasty != null ? dynasty.getOwningWorld() : null;
@@ -2175,8 +2266,16 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this, biome, season);
             }
+            if (this.isActive) {
+                this.runRoleAssignmentIfNeeded(engine);
+                this.runRoleAssignmentForPopulationDrift(engine);
+            }
             this.labourService.runTunnelConstruction(this);
+            this.labourService.runBridgeConstruction(this);
             ColonyJobRules.runHourlyLite(this, biome);
+            if (this.isActive) {
+                physicsService.rollAntSpriteAnimHourly(this, lastPhysicsDimension, lastPhysicsViewport);
+            }
         }
     }
 

@@ -29,6 +29,8 @@ public final class UiPalette {
     public static final Color COLOR_LIGHTEST_BLUE = new Color(178, 220, 239);
     public static final Color COLOR_MEDIUM_PURPLE = new Color(148, 39, 196);
     public static final Color COLOR_LIGHT_PURPLE = new Color(174, 126, 229);
+    public static final Color COLOR_FOG_DARK = new Color(240, 234, 214);
+    public static final Color COLOR_FOG_LIGHT = new Color(240, 234, 214);
 
     private static final int OVERLAY_ALPHA = 40;
     public static final Color OVERLAY_DAWN = new Color(235, 137, 49, OVERLAY_ALPHA);

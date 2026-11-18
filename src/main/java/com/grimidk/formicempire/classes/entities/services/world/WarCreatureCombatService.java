@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.shared.CritterSkillService;
 import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
@@ -61,6 +62,7 @@ public final class WarCreatureCombatService {
         WarBattleSideState def = buildBorderSide(stageDefender, false, defenderFronts);
         WarBattleState state = new WarBattleState(atk, def, false, war.getContestedColonyId());
         state.setWorldDay(worldDay);
+        initializeInitialPhase(state);
         WAR_BATTLES.put(war.getId(), state);
         syncDeployedCounts(war, state);
         return state;
@@ -81,6 +83,7 @@ public final class WarCreatureCombatService {
         WarCombatSkillService.armShieldingForEligibleDefenders(contested);
         WarBattleState state = new WarBattleState(atk, def, true, contested.getId());
         state.setWorldDay(worldDay);
+        initializeInitialPhase(state);
         WAR_BATTLES.put(war.getId(), state);
         syncDeployedCounts(war, state);
         return state;
@@ -100,25 +103,123 @@ public final class WarCreatureCombatService {
         }
         state.setWorldDay(worldDay);
         state.advanceTick();
-        int tick = state.getTickIndex();
 
-        resolveLinePhase(state, true, GameConstants.BATTLE_LINE_INFANTRY);
-        resolveLinePhase(state, false, GameConstants.BATTLE_LINE_INFANTRY);
-        if (tick % 2 == 0) {
-            resolveLinePhase(state, true, GameConstants.BATTLE_LINE_ARTILLERY);
-            resolveLinePhase(state, false, GameConstants.BATTLE_LINE_ARTILLERY);
-        }
-        if (tick % 3 == 0) {
-            resolveLinePhase(state, true, GameConstants.BATTLE_LINE_AIR_SUPPORT);
-            resolveLinePhase(state, false, GameConstants.BATTLE_LINE_AIR_SUPPORT);
+        int startPhase = state.getNextPhaseIndex();
+        for (int offset = 0; offset < 6; offset++) {
+            int phaseIdx = (startPhase + offset) % 6;
+            boolean attackerActing = (phaseIdx % 2) == 0;
+            BattleLine line = phaseLineForIndex(phaseIdx);
+            WarBattleSideState acting = attackerActing ? state.getAttacker() : state.getDefender();
+            WarBattleSideState opposing = attackerActing ? state.getDefender() : state.getAttacker();
+            if (canPhaseAct(acting, opposing, line)) {
+                state.setCurrentPhaseAttacker(attackerActing);
+                state.setCurrentPhaseLine(line);
+                state.setNextPhaseIndex((phaseIdx + 1) % 6);
+                resolveLinePhase(state, attackerActing, line);
+                break;
+            }
         }
 
-        promoteReserves(state.getAttacker(), worldDay);
-        promoteReserves(state.getDefender(), worldDay);
+        removeDeadParticipants(state.getAttacker());
+        removeDeadParticipants(state.getDefender());
+        TickOutcome outcome = evaluateWinner(state);
+        if (outcome == TickOutcome.CONTINUE) {
+            promoteReserves(state.getAttacker(), worldDay);
+            promoteReserves(state.getDefender(), worldDay);
+        }
         syncDeployedCounts(war, state);
         updateStageCasualtyProgress(war, state);
 
-        return evaluateWinner(state);
+        return outcome;
+    }
+
+    private static void initializeInitialPhase(WarBattleState state) {
+        if (state == null) {
+            return;
+        }
+        for (int phaseIdx = 0; phaseIdx < 6; phaseIdx++) {
+            boolean attackerActing = (phaseIdx % 2) == 0;
+            BattleLine line = phaseLineForIndex(phaseIdx);
+            WarBattleSideState acting = attackerActing ? state.getAttacker() : state.getDefender();
+            WarBattleSideState opposing = attackerActing ? state.getDefender() : state.getAttacker();
+            if (canPhaseAct(acting, opposing, line)) {
+                state.setCurrentPhaseAttacker(attackerActing);
+                state.setCurrentPhaseLine(line);
+                state.setNextPhaseIndex(phaseIdx);
+                return;
+            }
+        }
+        state.setCurrentPhaseAttacker(true);
+        state.setCurrentPhaseLine(GameConstants.BATTLE_LINE_INFANTRY);
+        state.setNextPhaseIndex(0);
+    }
+
+    private static BattleLine phaseLineForIndex(int phaseIdx) {
+        return switch (phaseIdx / 2) {
+            case 0 -> GameConstants.BATTLE_LINE_INFANTRY;
+            case 1 -> GameConstants.BATTLE_LINE_ARTILLERY;
+            default -> GameConstants.BATTLE_LINE_AIR_SUPPORT;
+        };
+    }
+
+    private static boolean sideCanAttack(WarBattleSideState acting, WarBattleSideState opposing) {
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            if (canPhaseAct(acting, opposing, line)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean canPhaseAct(WarBattleSideState acting, WarBattleSideState opposing, BattleLine line) {
+        if (acting == null || opposing == null || line == null) {
+            return false;
+        }
+        for (WarBattleParticipant p : acting.getActive(line)) {
+            if (p == null || !p.isAlive() || p.getAnt() == null) {
+                continue;
+            }
+            Ant ant = p.getAnt();
+            Colony colony = resolveColony(p, acting);
+            List<Skill> skills = CritterSkillService.resolveAvailableSkills(ant, colony);
+            boolean hasActionable = false;
+            for (Skill candidate : skills) {
+                if (candidate != null && !candidate.isPassive()) {
+                    hasActionable = true;
+                    if (candidate.isAttack()
+                            && !combatEligibleTargets(line, opposing, acting.getDynasty(), candidate).isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+            if (!hasActionable
+                    && !combatEligibleTargets(line, opposing, acting.getDynasty(), GameConstants.SKILL_BASIC_BITE).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Colony resolveColony(WarBattleParticipant participant, WarBattleSideState side) {
+        if (participant != null && participant.getColony() != null) {
+            return participant.getColony();
+        }
+        if (participant == null || participant.getAnt() == null || side == null) {
+            return null;
+        }
+        return findColonyOf(participant.getAnt(), side.getDynasty());
+    }
+
+    private static void removeDeadParticipants(WarBattleSideState side) {
+        if (side == null) {
+            return;
+        }
+        synchronized (side) {
+            for (BattleLine line : GameConstants.getBattleLines()) {
+                side.getActive(line).removeIf(p -> p == null || !p.isAlive());
+                side.getReserve(line).removeIf(p -> p == null || !p.isAlive());
+            }
+        }
     }
 
     public static void clear(War war) {
@@ -193,26 +294,45 @@ public final class WarCreatureCombatService {
 
     private static TickOutcome evaluateWinner(WarBattleState state) {
         if (state.isHexAssault()) {
-            if (!state.getDefender().hasLivingQueen()) {
+            if (!state.getDefender().hasLivingQueen() || state.getDefender().livingActiveSize() <= 0) {
                 return TickOutcome.ATTACKER_WINS;
             }
-            if (state.getAttacker().livingArmySize() <= 0) {
+            if (state.getAttacker().livingActiveSize() <= 0) {
                 return TickOutcome.DEFENDER_WINS;
             }
-            return TickOutcome.CONTINUE;
+        } else {
+            if (isArmyDefeated(state.getAttacker())) {
+                return TickOutcome.DEFENDER_WINS;
+            }
+            if (isArmyDefeated(state.getDefender())) {
+                return TickOutcome.ATTACKER_WINS;
+            }
         }
-        if (isArmyDefeated(state.getAttacker())) {
+        boolean atkCanAttack = sideCanAttack(state.getAttacker(), state.getDefender());
+        boolean defCanAttack = sideCanAttack(state.getDefender(), state.getAttacker());
+        if (!atkCanAttack && !defCanAttack) {
+            if (state.isHexAssault()) {
+                return state.getDefender().hasLivingQueen() ? TickOutcome.DEFENDER_WINS : TickOutcome.ATTACKER_WINS;
+            }
+            return state.getAttacker().livingActiveSize() > state.getDefender().livingActiveSize()
+                    ? TickOutcome.ATTACKER_WINS
+                    : TickOutcome.DEFENDER_WINS;
+        }
+        if (!atkCanAttack) {
             return TickOutcome.DEFENDER_WINS;
         }
-        if (isArmyDefeated(state.getDefender())) {
+        if (!defCanAttack) {
             return TickOutcome.ATTACKER_WINS;
         }
         return TickOutcome.CONTINUE;
     }
 
     private static boolean isArmyDefeated(WarBattleSideState side) {
+        if (side == null || side.livingActiveSize() <= 0) {
+            return true;
+        }
         if (side.getStartingArmySize() <= 0) {
-            return side.livingArmySize() <= 0;
+            return false;
         }
         return side.getDeadCount() >= Math.ceil(side.getStartingArmySize() * GameNumbers.WAR_BATTLE_ARMY_DEFEAT_RATIO);
     }
@@ -256,18 +376,34 @@ public final class WarCreatureCombatService {
     private static void performAction(WarBattleState state, WarBattleParticipant actor, WarBattleSideState actingSide,
             WarBattleSideState opposingSide, boolean actorIsAttacker) {
         Ant ant = actor.getAnt();
-        Colony colony = findColonyOf(ant, actingSide.getDynasty());
+        Colony colony = resolveColony(actor, actingSide);
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(ant, colony);
-        List<Skill> actionable = new ArrayList<>();
+        List<Skill> attackWithTargets = new ArrayList<>();
+        List<Skill> supportSkills = new ArrayList<>();
+        boolean hasAnyNonPassive = false;
         for (Skill candidate : skills) {
-            if (candidate != null && !candidate.isPassive()) {
-                actionable.add(candidate);
+            if (candidate == null || candidate.isPassive()) {
+                continue;
+            }
+            hasAnyNonPassive = true;
+            if (!candidate.isAttack()) {
+                supportSkills.add(candidate);
+            } else if (!combatEligibleTargets(actor.getBattleLine(), opposingSide, actingSide.getDynasty(), candidate).isEmpty()) {
+                attackWithTargets.add(candidate);
             }
         }
-        if (actionable.isEmpty()) {
-            actionable = List.of(GameConstants.SKILL_BASIC_BITE);
+        if (!hasAnyNonPassive
+                && !combatEligibleTargets(actor.getBattleLine(), opposingSide, actingSide.getDynasty(), GameConstants.SKILL_BASIC_BITE)
+                        .isEmpty()) {
+            attackWithTargets.add(GameConstants.SKILL_BASIC_BITE);
         }
-        Skill skill = actionable.get(GameRandom.nextInt(actionable.size()));
+        if (attackWithTargets.isEmpty()) {
+            return;
+        }
+        List<Skill> pool = new ArrayList<>(attackWithTargets.size() + supportSkills.size());
+        pool.addAll(attackWithTargets);
+        pool.addAll(supportSkills);
+        Skill skill = pool.get(GameRandom.nextInt(pool.size()));
         if (!skill.isAttack()) {
             useSupportSkill(ant, colony, skill);
             return;
@@ -280,10 +416,17 @@ public final class WarCreatureCombatService {
             if (!target.isAlive()) {
                 continue;
             }
-            if (!rollHit(state, skill, actor, target, actingSide)) {
+            int unEvadedTarget = computeD6Target(state, skill, actor, null, actingSide);
+            int d6Target = computeD6Target(state, skill, actor, target, actingSide);
+            int d6Roll = GameRandom.nextInt(6) + 1;
+            if (d6Roll < d6Target) {
+                boolean dodged = d6Roll >= unEvadedTarget;
+                state.getNumericFeed().recordD6Roll(
+                        state.getTickIndex(), actorIsAttacker, d6Roll, d6Target, dodged, 0f, false,
+                        skill.getName(), skill.getIcon(), actor.getBattleLine());
                 continue;
             }
-            applyDamage(state, actor, target, opposingSide, skill, actorIsAttacker);
+            applyDamage(state, actor, target, opposingSide, skill, actorIsAttacker, d6Target, d6Roll);
         }
         if (skill.sacrificesSelf() && actor.isAlive()) {
             killParticipant(state, actor, actingSide);
@@ -298,26 +441,25 @@ public final class WarCreatureCombatService {
         }
     }
 
-    private static boolean rollHit(WarBattleState state, Skill skill, WarBattleParticipant actor,
+    private static int computeD6Target(WarBattleState state, Skill skill, WarBattleParticipant actor,
             WarBattleParticipant target, WarBattleSideState actingSide) {
-        float skillAcc = CritterSkillService.resolveAccuracyMult(skill, actor.getAnt().getModProfile());
+        int baseTarget = skill != null ? skill.getD6Target() : 1;
+        float accBonus = AntModService.combinedAccuracyBonus(actor.getAnt().getModProfile());
         float lineAcc = actor.getBattleLine().getBaseAccuracyPercent() / 100f;
-        float baseChance = Math.min(1f, Math.max(0f, skillAcc * lineAcc));
+        boolean riverPenalty = false;
         if (state != null && state.isRiverBattle()) {
             Dynasty d = actingSide != null ? actingSide.getDynasty() : null;
-            if (HexWaterCrossing.waterCrossRange(d) <= 0) {
-                baseChance *= GameNumbers.RIVER_BATTLE_NO_RAFTING_ACCURACY_MULT;
-            }
+            riverPenalty = HexWaterCrossing.waterCrossRange(d) <= 0;
         }
         float targetEvasion = target != null && target.getAnt() != null
                 ? target.getAnt().getEvasionChance()
                 : 0f;
-        float chance = GameNumbers.applyEvasionToHitChance(baseChance, targetEvasion);
-        return GameRandom.nextDouble() < chance;
+        return GameNumbers.computeD6HitTarget(baseTarget, accBonus, lineAcc, riverPenalty, targetEvasion);
     }
 
     private static void applyDamage(WarBattleState state, WarBattleParticipant attacker,
-            WarBattleParticipant target, WarBattleSideState targetSide, Skill skill, boolean attackerIsAttackerSide) {
+            WarBattleParticipant target, WarBattleSideState targetSide, Skill skill, boolean attackerIsAttackerSide,
+            int d6Target, int d6Roll) {
         Ant atkAnt = attacker.getAnt();
         Ant defAnt = target.getAnt();
         float attackStat = atkAnt.getAttack();
@@ -334,11 +476,18 @@ public final class WarCreatureCombatService {
         float raw = damageMult * attackStat * laneDamageMultiplier(actingSide, attacker.getBattleLine());
         float dealt = GameNumbers.damageAfterDefense(raw, defenseStat);
         if (dealt <= 0f) {
+            state.getNumericFeed().recordD6Roll(
+                    state.getTickIndex(), attackerIsAttackerSide, d6Roll, d6Target, false, 0f, false,
+                    skill.getName(), skill.getIcon(), attacker.getBattleLine());
             return;
         }
-        if (target.applyBattleDamage(dealt) <= 0f) {
+        boolean killed = target.applyBattleDamage(dealt) <= 0f;
+        if (killed) {
             killParticipant(state, target, targetSide);
         }
+        state.getNumericFeed().recordD6Roll(
+                state.getTickIndex(), attackerIsAttackerSide, d6Roll, d6Target, false, dealt, killed,
+                skill.getName(), skill.getIcon(), attacker.getBattleLine());
     }
 
     private static float laneDamageMultiplier(WarBattleSideState side, BattleLine line) {
@@ -376,7 +525,7 @@ public final class WarCreatureCombatService {
             return;
         }
         ant.setHealth(0);
-        Colony colony = findColonyOf(ant, side.getDynasty());
+        Colony colony = resolveColony(victim, side);
         AntRole role = ant.getRole();
         if (colony != null) {
             ant.goDie(colony, DeathCause.CONFLICT);
@@ -392,7 +541,6 @@ public final class WarCreatureCombatService {
         side.incrementDead();
         clearFocusOn(state, victim);
         detachAntFromOtherBattles(ant, state);
-        promoteReserves(side, state.getWorldDay());
     }
 
     private static void detachAntFromOtherBattles(Ant ant, WarBattleState except) {
@@ -413,9 +561,11 @@ public final class WarCreatureCombatService {
         if (side == null || ant == null) {
             return;
         }
-        for (BattleLine line : GameConstants.getBattleLines()) {
-            side.getActive(line).removeIf(p -> p != null && p.getAnt() == ant);
-            side.getReserve(line).removeIf(p -> p != null && p.getAnt() == ant);
+        synchronized (side) {
+            for (BattleLine line : GameConstants.getBattleLines()) {
+                side.getActive(line).removeIf(p -> p != null && p.getAnt() == ant);
+                side.getReserve(line).removeIf(p -> p != null && p.getAnt() == ant);
+            }
         }
     }
 
@@ -458,7 +608,7 @@ public final class WarCreatureCombatService {
 
     private static WarBattleParticipant pickTarget(WarBattleParticipant actor, WarBattleSideState enemy,
             Dynasty actingDynasty, Skill skill, List<WarBattleParticipant> exclude) {
-        List<WarBattleParticipant> pool = eligibleTargets(actor.getBattleLine(), enemy, actingDynasty, skill);
+        List<WarBattleParticipant> pool = combatEligibleTargets(actor.getBattleLine(), enemy, actingDynasty, skill);
         pool.removeIf(exclude::contains);
         if (pool.isEmpty()) {
             return null;
@@ -506,6 +656,22 @@ public final class WarCreatureCombatService {
         return eligibleTargets(attackerLine, enemy, actingDynasty, skill);
     }
 
+    private static List<WarBattleParticipant> combatEligibleTargets(BattleLine attackerLine, WarBattleSideState enemy,
+            Dynasty actingDynasty, Skill skill) {
+        List<WarBattleParticipant> pool = eligibleTargets(attackerLine, enemy, actingDynasty, skill);
+        if (!pool.isEmpty() || enemy == null) {
+            return pool;
+        }
+        addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_INFANTRY));
+        if (pool.isEmpty()) {
+            addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_ARTILLERY));
+        }
+        if (pool.isEmpty()) {
+            addLiving(pool, enemy.getActive(GameConstants.BATTLE_LINE_AIR_SUPPORT));
+        }
+        return pool;
+    }
+
     private static List<WarBattleParticipant> eligibleTargets(BattleLine attackerLine, WarBattleSideState enemy,
             Dynasty actingDynasty, Skill skill) {
         List<WarBattleParticipant> pool = new ArrayList<>();
@@ -551,25 +717,27 @@ public final class WarCreatureCombatService {
         if (side == null || side.getDynasty() == null) {
             return;
         }
-        side.resetReinforcementDayIfNeeded(worldDay);
-        Dynasty dynasty = side.getDynasty();
-        int capacity = Math.max(1, dynasty.getCombatCapacity());
-        int frontCount = Math.max(1, countBattlesInvolving(dynasty));
-        int carrierShare = fairShare(totalWarQuota(dynasty, GameConstants.ROLE_CARRIER), frontCount);
-        int allowancePerLine = GameNumbers.warDailyReinforcementAllowancePerLine(capacity, carrierShare);
-        for (BattleLine line : GameConstants.getBattleLines()) {
-            List<WarBattleParticipant> active = side.getActive(line);
-            List<WarBattleParticipant> reserve = side.getReserve(line);
-            active.removeIf(p -> !p.isAlive());
-            reserve.removeIf(p -> !p.isAlive());
-            while (active.size() < capacity
-                    && side.getReinforcementPromotionsUsed(line) < allowancePerLine) {
-                WarBattleParticipant next = pollNextReinforcement(reserve);
-                if (next == null) {
-                    break;
+        synchronized (side) {
+            side.resetReinforcementDayIfNeeded(worldDay);
+            Dynasty dynasty = side.getDynasty();
+            int capacity = Math.max(1, dynasty.getCombatCapacity());
+            int frontCount = Math.max(1, countBattlesInvolving(dynasty));
+            int carrierShare = fairShare(totalWarQuota(dynasty, GameConstants.ROLE_CARRIER), frontCount);
+            int allowancePerLine = GameNumbers.warDailyReinforcementAllowancePerLine(capacity, carrierShare);
+            for (BattleLine line : GameConstants.getBattleLines()) {
+                List<WarBattleParticipant> active = side.getActive(line);
+                List<WarBattleParticipant> reserve = side.getReserve(line);
+                active.removeIf(p -> !p.isAlive());
+                reserve.removeIf(p -> !p.isAlive());
+                while (active.size() < capacity
+                        && side.getReinforcementPromotionsUsed(line) < allowancePerLine) {
+                    WarBattleParticipant next = pollNextReinforcement(reserve);
+                    if (next == null) {
+                        break;
+                    }
+                    active.add(next);
+                    side.recordReinforcementPromotion(line);
                 }
-                active.add(next);
-                side.recordReinforcementPromotion(line);
             }
         }
     }
@@ -819,12 +987,12 @@ public final class WarCreatureCombatService {
             }
         }
         int claimed = 0;
-        claimed += takeClaims(preferred, role, pool, seen, quota - claimed);
-        claimed += takeClaims(fallback, role, pool, seen, quota - claimed);
+        claimed += takeClaims(colony, preferred, role, pool, seen, quota - claimed);
+        claimed += takeClaims(colony, fallback, role, pool, seen, quota - claimed);
         return claimed;
     }
 
-    private static int takeClaims(List<Ant> ants, AntRole role, List<WarBattleParticipant> pool,
+    private static int takeClaims(Colony colony, List<Ant> ants, AntRole role, List<WarBattleParticipant> pool,
             Map<Ant, Boolean> seen, int remaining) {
         int claimed = 0;
         for (Ant ant : ants) {
@@ -844,7 +1012,7 @@ public final class WarCreatureCombatService {
             if (line == null) {
                 line = WarBattleSideState.lineForAnt(ant);
             }
-            pool.add(new WarBattleParticipant(ant, line, previous, override));
+            pool.add(new WarBattleParticipant(ant, colony, line, previous, override));
             claimed++;
         }
         return claimed;
@@ -857,7 +1025,7 @@ public final class WarCreatureCombatService {
                 continue;
             }
             seen.put(ant, Boolean.TRUE);
-            pool.add(new WarBattleParticipant(ant, WarBattleSideState.lineForAnt(ant), ant.getRole(), false));
+            pool.add(new WarBattleParticipant(ant, colony, WarBattleSideState.lineForAnt(ant), ant.getRole(), false));
         }
     }
 

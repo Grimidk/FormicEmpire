@@ -190,7 +190,7 @@ class GeographicFeatureTest {
             assertTrue(colors.add(biome.getMapColorHex().toLowerCase(java.util.Locale.ROOT)),
                     "Duplicate map color found for biome: " + biome.getId() + " (" + biome.getMapColorHex() + ")");
         }
-        assertEquals(23, colors.size());
+        assertEquals(24, colors.size());
     }
 
     @Test

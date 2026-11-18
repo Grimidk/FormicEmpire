@@ -17,8 +17,10 @@ public final class UiResourceLoader {
             URL url = anchor.getResource(path);
             if (url != null) {
                 Image img = new ImageIcon(url).getImage();
-                int hotspot = Math.max(0, img.getWidth(null) / 2);
-                return Toolkit.getDefaultToolkit().createCustomCursor(img, new Point(hotspot, hotspot), name);
+                int width = Math.max(1, img.getWidth(null));
+                int height = Math.max(1, img.getHeight(null));
+                int hotspot = Math.max(0, Math.min(width, height) / 2);
+                return UiCursors.createBestCursor(img, width, height, hotspot, hotspot, name);
             }
         } catch (Exception e) {
             e.printStackTrace();

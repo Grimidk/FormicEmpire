@@ -64,10 +64,10 @@ public class WorldGenStepListenerTest {
     @Test
     public void testEngineAnimateWorldGenSetting() {
         Engine engine = new Engine();
-        assertFalse(engine.isAnimateWorldGen());
-
-        engine.setAnimateWorldGen(true);
         assertTrue(engine.isAnimateWorldGen());
+
+        engine.setAnimateWorldGen(false);
+        assertFalse(engine.isAnimateWorldGen());
 
         List<Integer> steps = new ArrayList<>();
         engine.setWorldGenStepListener((stepNumber, stepName, w) -> steps.add(stepNumber));

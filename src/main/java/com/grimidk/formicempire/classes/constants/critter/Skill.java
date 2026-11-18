@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.constants.Constant;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public class Skill extends Constant {
     private final float accuracyMult;
@@ -44,6 +45,10 @@ public class Skill extends Constant {
 
     public float getAccuracyMult() {
         return accuracyMult;
+    }
+
+    public int getD6Target() {
+        return GameNumbers.d6TargetFromAccuracy(accuracyMult);
     }
 
     public float getDamageMult() {

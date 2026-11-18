@@ -345,7 +345,7 @@ public class DynastyAiService {
             if (hex == null) {
                 continue;
             }
-            for (Hex neighbor : HexWaterCrossing.colonizableLandHexes(hex, waterRange)) {
+            for (Hex neighbor : HexWaterCrossing.colonizableLandHexes(hex, waterRange, dynasty)) {
                 Colony existing = neighbor.getColony();
                 if (existing == null) {
                     return true;
@@ -414,6 +414,17 @@ public class DynastyAiService {
                                 != DynastyDiplomacyService.TradeProposalResult.FAILED) {
                     return;
                 }
+            }
+        }
+
+        for (Dynasty otherDynasty : world.getDynastys()) {
+            if (otherDynasty == null || otherDynasty == dynasty
+                    || !DynastyDiplomacyService.isDiplomaticallyContactable(otherDynasty)) {
+                continue;
+            }
+            if (diplo.proposeNonEssentialCapitalTradeOffer(otherDynasty, world, tradeManager)
+                    != DynastyDiplomacyService.TradeProposalResult.FAILED) {
+                return;
             }
         }
     }

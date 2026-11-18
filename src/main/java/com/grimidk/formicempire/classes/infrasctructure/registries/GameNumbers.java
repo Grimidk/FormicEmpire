@@ -347,6 +347,12 @@ public final class GameNumbers {
     public static final double AI_CREATINE_FOOD_STRESS_RATIO = 0.35;
     public static final double TRADE_AUTOMATION_SURPLUS_RATIO = 0.50;
     public static final double TRADE_AUTOMATION_DEFICIT_RATIO = 0.25;
+    public static final float TRADE_DISTANCE_TIME_FACTOR = 0.50f;
+    public static final double TRADE_DISTANCE_RISK_PER_HEX = 0.15;
+    public static final double AI_TRADE_MIN_PROFIT_AMOUNT = 25.0;
+    public static final double AI_TRADE_MAX_RISK_RATIO = 0.40;
+    public static final double AI_TRADE_HIGH_PROFIT_MIN_AMOUNT = 300.0;
+    public static final double AI_TRADE_ABORT_RISK_RATIO = 0.75;
     public static final int CREATINE_DIET_PROTEIN_COST = 300;
     public static final int CREATINE_DIET_DURATION_MONTHS = 6;
     public static final float CREATINE_DIET_SPEED_MULTIPLIER = 2f;
@@ -363,6 +369,7 @@ public final class GameNumbers {
     public static final int TRIGGER_BILATERAL_MIN_TRADES = 5;
     public static final int TRIGGER_SCOUT_PLANT_COLLECTED = 6000;
     public static final int TRIGGER_MINER_TIER3_BUILDINGS = 10;
+    public static final int TRIGGER_EXPLORER_MIN_HEXES = 10;
     public static final double MINING_GATHER_SUCCESS_CHANCE = 0.10;
     public static final double RESIN_FORAGE_BONUS_CHANCE = 0.01;
     public static final int TRIGGER_DYNASTY_MIN_COLONIES = 2;
@@ -372,6 +379,8 @@ public final class GameNumbers {
     public static final int TRIGGER_AUTOMATION_MIN_COLONIES = 7;
     public static final int TRIGGER_RESEARCHER_MIN_MONTHS = 2;
     public static final int TRIGGER_ASSIMILATION_MIN_ABSORBED = 1;
+    public static final int TRIGGER_OMNIVORE_MIN_OPPOSITE_ASSIMILATIONS = 3;
+    public static final float HUNTER_MEAT_COLLECTING_MULT = 6.0f;
     public static final int TRIGGER_NPC_RESEARCHER_MIN_ANTS = 20;
     public static final int TRIGGER_NPC_GRAVER_DEAD_ANTS = 20;
     public static final int TRIGGER_NPC_SCOUT_MIN_ANTS = 50;
@@ -389,13 +398,20 @@ public final class GameNumbers {
     public static final double SPY_CI_REDUCTION_PER_POINT = 0.1;
     public static final double COUNTER_INTELLIGENCE_START = 5.0;
     public static final double COUNTER_INTELLIGENCE_MAX = 50.0;
+    public static final double INTELLIGENCE_BASE_CAP = 20.0;
     public static final double INTELLIGENCE_MAX = 100.0;
+    public static final double SPY_STEALTH_DETECTION_MULTIPLIER = 0.5;
+    public static final int SPY_STEALTH_POWER_MULTIPLIER = 2;
+    public static final int ROLE_SPY_RESEARCH_COST = 1500;
+    public static final int ROLE_EXPLORER_RESEARCH_COST = 0;
     public static final double SPY_THEFT_FRACTION_MIN = 0.01;
     public static final double SPY_THEFT_FRACTION_MAX = 0.03;
     public static final int CAUGHT_SPYING_DURATION_DAYS = DAYS_PER_MONTH * 12;
 
     // --- Construction ---
     public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
+    public static final double BRIDGE_WORK_REQUIRED_PER_HEX = 2500000.0;
+    public static final float BRIDGE_SPEED_MULT = 1.5f;
 
     // --- Research ---
     public static final int RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR = 50;
@@ -434,6 +450,18 @@ public final class GameNumbers {
         int dq = q1 - q2;
         int dr = r1 - r2;
         return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+    }
+
+    public static long packHexKey(int q, int r) {
+        return (((long) q) << 32) ^ (r & 0xffffffffL);
+    }
+
+    public static int unpackHexQ(long key) {
+        return (int) (key >> 32);
+    }
+
+    public static int unpackHexR(long key) {
+        return (int) key;
     }
 
     public static int monthsToDays(int months) {
@@ -584,6 +612,37 @@ public final class GameNumbers {
             return 1;
         }
         return Math.max(1, Math.round(baseDays * casteMultiplier));
+    }
+
+    public static int d6TargetFromAccuracy(float accuracyMult) {
+        if (accuracyMult >= 0.95f) return 1;
+        if (accuracyMult >= 0.80f) return 2;
+        if (accuracyMult >= 0.65f) return 3;
+        if (accuracyMult >= 0.45f) return 4;
+        if (accuracyMult >= 0.25f) return 5;
+        return 6;
+    }
+
+    public static int computeD6HitTarget(
+            int baseTarget,
+            float accuracyBonus,
+            float lineAccuracyMult,
+            boolean riverPenalty,
+            float evasionPercent) {
+        int target = Math.max(1, Math.min(6, baseTarget));
+        if (accuracyBonus > 0.01f) {
+            target -= 1;
+        }
+        if (lineAccuracyMult < 0.75f) {
+            target += 1;
+        }
+        if (riverPenalty) {
+            target += 1;
+        }
+        if (evasionPercent >= 10f) {
+            target += 1;
+        }
+        return Math.max(1, Math.min(6, target));
     }
 
     public static float applyEvasionToHitChance(float hitChance, float evasionPercent) {
@@ -770,4 +829,15 @@ public final class GameNumbers {
         }
         return MILITARY_BASELINE_ATTACK_SPEED;
     }
+
+    public static final int DISASTER_DAILY_CHANCE_DENOMINATOR = 360;
+    public static final int ECLIPSE_DAILY_CHANCE_DENOMINATOR = 500;
+    public static final int DISASTER_HEX_ICON_DURATION_HOURS = 720;
+    public static final int DISASTER_GAME_AREA_EFFECT_HOURS = 72;
+    public static final double DISASTER_ANT_CASUALTY_MIN_FRACTION = 0.25;
+    public static final double DISASTER_ANT_CASUALTY_MAX_FRACTION = 0.50;
+    public static final double DISASTER_PET_LOSS_FRACTION = 0.40;
+    public static final int DISASTER_METEOR_MINERALS = 5000;
+    public static final int DISASTER_VOLCANO_MINERALS = 2500;
+    public static final int DISASTER_EARTHQUAKE_MAX_DOWNGRADES = 2;
 }

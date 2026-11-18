@@ -15,7 +15,8 @@ public enum WorldHistoryEventType {
     BATTLE(WorldHistoryCategory.BATTLE),
     REBELLION(WorldHistoryCategory.REBELLION),
     NUPTIAL_FLIGHT(WorldHistoryCategory.NUPTIAL),
-    ASSIMILATION_COMPLETED(WorldHistoryCategory.ASSIMILATION);
+    ASSIMILATION_COMPLETED(WorldHistoryCategory.ASSIMILATION),
+    DISASTER(WorldHistoryCategory.DISASTER);
 
     private final WorldHistoryCategory category;
 
@@ -45,7 +46,8 @@ public enum WorldHistoryEventType {
         BATTLE(LanguageStrings.HISTORY_FILTER_BATTLE),
         REBELLION(LanguageStrings.HISTORY_FILTER_REBELLION),
         NUPTIAL(LanguageStrings.HISTORY_FILTER_NUPTIAL),
-        ASSIMILATION(LanguageStrings.HISTORY_FILTER_ASSIMILATION);
+        ASSIMILATION(LanguageStrings.HISTORY_FILTER_ASSIMILATION),
+        DISASTER(LanguageStrings.HISTORY_FILTER_DISASTER);
 
         private final String labelKey;
 

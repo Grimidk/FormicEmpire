@@ -292,9 +292,12 @@ public final class ResearchTreeGraph {
                     && requirement == subtypeAssimilation.getReward();
             if (!infinite
                     && requirement != null
-                    && !colony.hasUpgrade(requirement)
+                    && !GameUnlocks.isUpgradeRequirementMet(colony, upgrade)
                     && !requirementIsSubtypeAssimilationReward) {
-                parts.add(requirement.getDisplayName());
+                Upgrade displayedReq = (upgrade == GameUnlocks.STAT_HEX_SUSTAIN && !colony.canEatFungi() && colony.canEatMeat())
+                        ? GameUnlocks.STAT_CARNIVORY_3
+                        : requirement;
+                parts.add(displayedReq.getDisplayName());
             }
             if (!infinite && !upgrade.isAvailableFor(dynasty)) {
                 parts.add(formatTierRequirement(upgrade.getTier()));
@@ -310,7 +313,7 @@ public final class ResearchTreeGraph {
                     }
                 }
             }
-            boolean gatesMet = (requirement == null || colony.hasUpgrade(requirement))
+            boolean gatesMet = GameUnlocks.isUpgradeRequirementMet(colony, upgrade)
                     && (infinite || upgrade.isAvailableFor(dynasty))
                     && (infinite || GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade))
                     && GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, upgrade);
@@ -354,8 +357,7 @@ public final class ResearchTreeGraph {
         Dynasty dynasty = colony.getDynasty();
         boolean infinite = engine != null && engine.isInfiniteResearch();
         boolean reqMet = infinite
-                || upgrade.getRequirement() == null
-                || colony.hasUpgrade(upgrade.getRequirement());
+                || GameUnlocks.isUpgradeRequirementMet(colony, upgrade);
         boolean extraMet = infinite || GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade);
         boolean tierMet = infinite || upgrade.isAvailableFor(dynasty);
         boolean subtypeAssimMet = GameUnlocks.meetsSubtypeRoleAssimilationRequirement(dynasty, upgrade);
@@ -458,6 +460,26 @@ public final class ResearchTreeGraph {
         return EdgeShape.SKEWED;
     }
 
+    private static boolean isDietRestrictedFromView(Colony colony, Engine engine, Upgrade upgrade) {
+        if (colony == null || upgrade == null || colony.hasUpgrade(upgrade)) {
+            return false;
+        }
+        if (engine != null && engine.isInfiniteResearch()) {
+            return false;
+        }
+        if (upgrade == GameUnlocks.STAT_CARNIVORY_1
+                || upgrade == GameUnlocks.STAT_CARNIVORY_2
+                || upgrade == GameUnlocks.STAT_CARNIVORY_3) {
+            return !colony.canEatMeat();
+        }
+        if (upgrade == GameUnlocks.STAT_FARMING_1
+                || upgrade == GameUnlocks.STAT_FARMING_2
+                || upgrade == GameUnlocks.STAT_FARMING_3) {
+            return !colony.canEatFungi();
+        }
+        return false;
+    }
+
     public static boolean isVisible(Colony colony, Engine engine, Upgrade upgrade) {
         if (colony == null || upgrade == null) {
             return false;
@@ -465,11 +487,14 @@ public final class ResearchTreeGraph {
         if (colony.hasUpgrade(upgrade)) {
             return true;
         }
+        if (isDietRestrictedFromView(colony, engine, upgrade)) {
+            return false;
+        }
         Upgrade requirement = upgrade.getRequirement();
         if (requirement == null) {
             return true;
         }
-        if (colony.hasUpgrade(requirement)) {
+        if (GameUnlocks.isUpgradeRequirementMet(colony, upgrade)) {
             return true;
         }
         NodeState state = stateFor(colony, engine, upgrade);
@@ -478,18 +503,21 @@ public final class ResearchTreeGraph {
                 || state == NodeState.SPECIAL_PROGRESS;
     }
 
-    private static boolean isVisible(Upgrade upgrade, Colony colony, Map<Upgrade, NodeState> nodeStates) {
+    private static boolean isVisible(Upgrade upgrade, Colony colony, Engine engine, Map<Upgrade, NodeState> nodeStates) {
         if (colony == null || upgrade == null) {
             return false;
         }
         if (colony.hasUpgrade(upgrade)) {
             return true;
         }
+        if (isDietRestrictedFromView(colony, engine, upgrade)) {
+            return false;
+        }
         Upgrade requirement = upgrade.getRequirement();
         if (requirement == null) {
             return true;
         }
-        if (colony.hasUpgrade(requirement)) {
+        if (GameUnlocks.isUpgradeRequirementMet(colony, upgrade)) {
             return true;
         }
         NodeState state = nodeStates.get(upgrade);
@@ -531,7 +559,7 @@ public final class ResearchTreeGraph {
         Set<Upgrade> visible = new HashSet<>();
         if (obscure) {
             for (Upgrade upgrade : nodeStates.keySet()) {
-                if (isVisible(upgrade, colony, nodeStates)) {
+                if (isVisible(upgrade, colony, engine, nodeStates)) {
                     visible.add(upgrade);
                 }
             }

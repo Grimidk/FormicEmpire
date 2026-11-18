@@ -39,7 +39,7 @@ class GlobeWorldGenerationTest {
 
     @Test
     void allBiomesHavePropertiesAssigned() {
-        assertEquals(23, GameConstants.getBiomes().size());
+        assertEquals(24, GameConstants.getBiomes().size());
         for (Biome b : GameConstants.getBiomes()) {
             assertNotNull(b.getRarity(), "Biome " + b.getId() + " has null rarity");
             assertNotNull(b.getClimateZone(), "Biome " + b.getId() + " has null climateZone");
@@ -54,6 +54,7 @@ class GlobeWorldGenerationTest {
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_SHALLOW_OCEAN));
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_PEAK));
         assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_ABYSS));
+        assertFalse(GameConstants.getStartingBiomes().contains(GameConstants.BIOME_BARREN));
     }
 
     @Test
@@ -280,7 +281,7 @@ class GlobeWorldGenerationTest {
             }
         }
 
-        assertEquals(23, counts.size(), "All 23 biomes must be present on the globe");
+        assertEquals(24, counts.size(), "All 24 biomes must be present on the globe");
         for (Biome b : GameConstants.getBiomes()) {
             int count = counts.getOrDefault(b, 0);
             assertTrue(count >= 20, "Biome " + b.getId() + " count (" + count + ") should be at least 20");

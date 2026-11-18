@@ -10,6 +10,8 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntelli
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatService;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 
@@ -75,6 +77,15 @@ public class IntelligenceDossierDialog extends JDialog {
         header.add(label(LanguageStrings.format(
                 LanguageStrings.INTEL_LEVEL_FMT, String.format("%.1f", level)),
                 true, GameConstants.ICON_STAT_INTELLIGENCE));
+        if (!viewer.hasUpgrade(GameUnlocks.ASSIMILATED_STEALTH)) {
+            header.add(Box.createVerticalStrut(2));
+            JLabel capLabel = label(LanguageStrings.format(
+                    LanguageStrings.INTEL_CAP_NO_STEALTH_FMT,
+                    String.format("%.0f", GameNumbers.INTELLIGENCE_BASE_CAP)),
+                    false, null);
+            capLabel.setForeground(AssetStyles.FONT_COLOR);
+            header.add(capLabel);
+        }
         header.add(Box.createVerticalStrut(4));
         header.add(label(LanguageStrings.format(
                 LanguageStrings.INTEL_CI_FMT,
@@ -168,7 +179,8 @@ public class IntelligenceDossierDialog extends JDialog {
 
     private String describeSpecies() {
         String species = target.getSpecies() != null ? target.getSpecies().getName() : "?";
-        return species + " — " + LanguageStrings.formatNumber(target.getCompletedAssimilations().size());
+        String diet = target.getDiet() != null ? " [" + target.getDiet().getName() + "]" : "";
+        return species + diet + " — " + LanguageStrings.formatNumber(target.getCompletedAssimilations().size());
     }
 
     private String describePopulation() {

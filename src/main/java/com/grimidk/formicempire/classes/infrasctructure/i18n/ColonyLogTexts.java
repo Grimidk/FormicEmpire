@@ -14,6 +14,7 @@ public final class ColonyLogTexts {
             case DeathCause.CONTAMINATION -> LanguageStrings.get(LanguageStrings.LOG_CAUSE_CONTAMINATION);
             case DeathCause.CONFLICT -> LanguageStrings.get(LanguageStrings.LOG_CAUSE_CONFLICT);
             case DeathCause.ILLNESS -> LanguageStrings.get(LanguageStrings.LOG_CAUSE_ILLNESS);
+            case DeathCause.DISASTER -> LanguageStrings.get(LanguageStrings.LOG_CAUSE_DISASTER);
             default -> LanguageStrings.get(LanguageStrings.LOG_CAUSE_OTHER);
         };
     }

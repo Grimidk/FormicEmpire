@@ -6,11 +6,13 @@ import java.util.List;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 final class WarBattleParticipant {
     private final Ant ant;
+    private final Colony colony;
     private final BattleLine battleLine;
     private final AntRole previousRole;
     private final boolean roleOverridden;
@@ -19,7 +21,12 @@ final class WarBattleParticipant {
     private float battleHealth;
 
     WarBattleParticipant(Ant ant, BattleLine battleLine, AntRole previousRole, boolean roleOverridden) {
+        this(ant, null, battleLine, previousRole, roleOverridden);
+    }
+
+    WarBattleParticipant(Ant ant, Colony colony, BattleLine battleLine, AntRole previousRole, boolean roleOverridden) {
         this.ant = ant;
+        this.colony = colony;
         this.battleLine = battleLine != null ? battleLine : GameConstants.BATTLE_LINE_INFANTRY;
         this.previousRole = previousRole;
         this.roleOverridden = roleOverridden;
@@ -41,6 +48,10 @@ final class WarBattleParticipant {
 
     Ant getAnt() {
         return ant;
+    }
+
+    Colony getColony() {
+        return colony;
     }
 
     BattleLine getBattleLine() {

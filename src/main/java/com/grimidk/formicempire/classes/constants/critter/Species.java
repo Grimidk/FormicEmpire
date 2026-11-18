@@ -5,7 +5,10 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 
@@ -25,6 +28,7 @@ public class Species extends Constant {
     private final int legFrameCount;
     private final int antennaFrameCount;
     private final BugRole bugRole;
+    private final Set<BugRole> bugRoles;
     private final List<Skill> baseSkills;
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
@@ -69,6 +73,15 @@ public class Species extends Constant {
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
             ImageIcon icon, ImageIcon sprite, String spriteFolder, String bodySpriteFile, boolean legWalkCycle,
             BugRole bugRole, List<Skill> baseSkills, int legFrameCount, int antennaFrameCount) {
+        this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
+                baseDefense, baseSpeed, icon, sprite, spriteFolder, bodySpriteFile, legWalkCycle, bugRole, baseSkills,
+                legFrameCount, antennaFrameCount, (BugRole[]) null);
+    }
+
+    public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
+            float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
+            ImageIcon icon, ImageIcon sprite, String spriteFolder, String bodySpriteFile, boolean legWalkCycle,
+            BugRole bugRole, List<Skill> baseSkills, int legFrameCount, int antennaFrameCount, BugRole... additionalRoles) {
         super(id, name, icon);
         this.critterClass = critterClass;
         this.scientificNameKey = scientificNameKey;
@@ -85,6 +98,19 @@ public class Species extends Constant {
         this.legFrameCount = Math.max(1, legFrameCount);
         this.antennaFrameCount = Math.max(0, antennaFrameCount);
         this.bugRole = bugRole;
+        if (bugRole != null) {
+            EnumSet<BugRole> roles = EnumSet.of(bugRole);
+            if (additionalRoles != null) {
+                for (BugRole r : additionalRoles) {
+                    if (r != null) {
+                        roles.add(r);
+                    }
+                }
+            }
+            this.bugRoles = Collections.unmodifiableSet(roles);
+        } else {
+            this.bugRoles = Collections.emptySet();
+        }
         this.baseSkills = baseSkills == null || baseSkills.isEmpty() ? List.of() : List.copyOf(baseSkills);
     }
 
@@ -96,12 +122,32 @@ public class Species extends Constant {
         return bugRole;
     }
 
+    public Set<BugRole> getBugRoles() {
+        return bugRoles;
+    }
+
     public boolean hasBugRole(BugRole role) {
-        return role != null && role == bugRole;
+        return role != null && bugRoles.contains(role);
     }
 
     public boolean isPet() {
         return hasBugRole(BugRole.PET);
+    }
+
+    public boolean isHunt() {
+        return hasBugRole(BugRole.HUNT);
+    }
+
+    public boolean isInvasion() {
+        return hasBugRole(BugRole.INVASION);
+    }
+
+    public boolean isBoss() {
+        return hasBugRole(BugRole.BOSS);
+    }
+
+    public boolean isParasite() {
+        return hasBugRole(BugRole.PARASITE);
     }
 
     public String getScientificName() {

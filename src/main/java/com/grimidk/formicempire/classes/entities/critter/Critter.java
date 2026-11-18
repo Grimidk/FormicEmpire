@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.critter;
 
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
 import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntStatus;
@@ -72,6 +73,34 @@ public class Critter {
 
     public void setSpecies(Species species) {
         this.species = species;
+    }
+
+    public BugRole getBugRole() {
+        return species != null ? species.getBugRole() : null;
+    }
+
+    public boolean hasBugRole(BugRole role) {
+        return species != null && species.hasBugRole(role);
+    }
+
+    public boolean isPet() {
+        return species != null && species.isPet();
+    }
+
+    public boolean isHunt() {
+        return species != null && species.isHunt();
+    }
+
+    public boolean isInvasion() {
+        return species != null && species.isInvasion();
+    }
+
+    public boolean isBoss() {
+        return species != null && species.isBoss();
+    }
+
+    public boolean isParasite() {
+        return species != null && species.isParasite();
     }
 
     public List<Skill> getAvailableSkills() {

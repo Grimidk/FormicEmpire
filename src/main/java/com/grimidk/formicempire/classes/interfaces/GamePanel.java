@@ -956,7 +956,7 @@ public class GamePanel extends ZeroGamePanel {
             mapDialog = null;
         }
         if (mapDialog == null) {
-            mapDialog = new MapDialog(frame, engine, world, this::refreshAllGUIData, this::showWarDialog, this::handleBackButton);
+            mapDialog = new MapDialog(frame, engine, world, this::refreshAllGUIData, this::showWarDialog, this::handleBackButtonFromMap);
         } else {
             mapDialog.bindWorld(world);
         }
@@ -1414,7 +1414,26 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void handleBackButton() {
+        handleBackButton(false);
+    }
+
+    private void handleBackButtonFromMap() {
+        handleBackButton(true);
+    }
+
+    private void handleBackButton(boolean confirmedFromMap) {
         Engine engine = frame.getEngine();
+        if (!confirmedFromMap && engine != null && engine.getWorld() != null && engine.getWorld().isSpectatorMode()
+                && (mapDialog == null || !mapDialog.isShowing())) {
+            int res = UiOptionPane.showConfirmDialog(
+                    frame,
+                    LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_MSG),
+                    LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_TITLE),
+                    JOptionPane.YES_NO_OPTION);
+            if (res != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
         if (engine != null) {
             engine.pauseEngine();
         }
@@ -1522,7 +1541,7 @@ public class GamePanel extends ZeroGamePanel {
                     return null;
                 }
                 World world = engine.getWorld();
-                if (world != null && !world.isSpectatorMode()) {
+                if (world != null) {
                     Colony colony = world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
                     GameSpritePreloader.warmSession(colony, this::isCancelled);
                 }
@@ -1542,7 +1561,7 @@ public class GamePanel extends ZeroGamePanel {
                     World world = engine.getWorld();
                     boolean spectator = world != null && world.isSpectatorMode();
                     Colony colony = null;
-                    if (!spectator && world != null && world.getActiveHex() != null) {
+                    if (world != null && world.getActiveHex() != null) {
                         colony = world.getActiveHex().getColony();
                     }
                     if (!spectator && (colony == null || !colony.belongsToPlayerDynasty())) {
@@ -1557,11 +1576,8 @@ public class GamePanel extends ZeroGamePanel {
 
                     registerTickListeners();
 
-                    if (spectator) {
-                        gameAreaPanel.setColony(null);
-                    } else {
-                        gameAreaPanel.setColony(colony);
-
+                    gameAreaPanel.setColony(colony);
+                    if (!spectator) {
                         alertManager = new AlertManager(colony.getDynasty(), alertPanel);
 
                         triggerManager = new TriggerManager(world, colony, engine);
@@ -1588,9 +1604,7 @@ public class GamePanel extends ZeroGamePanel {
 
                     controlPanel.setPlayPauseButtonText(engine.isPaused());
                     updateStatusIndicator(engine.isPaused());
-                    if (!spectator) {
-                        paintGameAreaWhilePaused();
-                    }
+                    paintGameAreaWhilePaused();
                     if (engine.getMusicService() != null) {
                         engine.getMusicService().enterSession();
                     }
@@ -1718,7 +1732,7 @@ public class GamePanel extends ZeroGamePanel {
             drainPendingMinuteGuiSteps(false);
         }
         World world = engine != null ? engine.getWorld() : null;
-        if (gameAreaPanel != null && (world == null || !world.isSpectatorMode())) {
+        if (gameAreaPanel != null) {
             gameAreaPanel.repaint();
         }
         if (visualFrameListener != null) {
@@ -1791,6 +1805,59 @@ public class GamePanel extends ZeroGamePanel {
         lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
     }
 
+    public void onSpectatorPossessed() {
+        Engine engine = frame.getEngine();
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null || world.isSpectatorMode()) {
+            return;
+        }
+        Colony colony = world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
+        if (colony == null || !colony.belongsToPlayerDynasty()) {
+            return;
+        }
+        alertManager = new AlertManager(colony.getDynasty(), alertPanel);
+        if (triggerManager != null) {
+            triggerManager.unregisterListeners();
+        }
+        triggerManager = new TriggerManager(world, colony, engine);
+        if (frame instanceof TriggerManager.TriggerListener) {
+            triggerManager.addListener((TriggerManager.TriggerListener) frame);
+        }
+        triggerManager.registerListeners();
+        gameAreaPanel.setColony(colony);
+        updateStaticWorldInfo();
+        forceControlPanelMenuRefresh();
+        onGameSpeedChanged();
+        updateSpeedLabel();
+        refreshAllGUIData();
+        updateGameAreaSize();
+        centerOverworldScroll();
+        paintGameAreaWhilePaused();
+    }
+
+    public void onEnteredSpectatorMode() {
+        Engine engine = frame.getEngine();
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null || !world.isSpectatorMode()) {
+            return;
+        }
+        if (triggerManager != null) {
+            triggerManager.unregisterListeners();
+            triggerManager = null;
+        }
+        alertManager = null;
+        if (alertPanel != null) {
+            alertPanel.updateAlerts(new ArrayList<>());
+        }
+        updateStaticWorldInfo();
+        forceControlPanelMenuRefresh();
+        onGameSpeedChanged();
+        updateSpeedLabel();
+        refreshAllGUIData();
+        updateGameAreaSize();
+        paintGameAreaWhilePaused();
+    }
+
     private void updateStaticWorldInfo() {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
@@ -1799,7 +1866,7 @@ public class GamePanel extends ZeroGamePanel {
         if (miniMapPanel != null) {
             miniMapPanel.refreshMap();
         }
-        if (!world.isSpectatorMode() && world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
+        if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
             gameAreaPanel.setBackgroundBiome(world.getActiveHex().getBiome());
         }
     }
@@ -1833,10 +1900,9 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = (world != null && world.getActiveHex() != null)
                 ? world.getActiveHex().getColony()
                 : null;
-        Colony visualColony = spectator ? null : colony;
 
-        gameAreaPanel.setColony(visualColony);
-        if (visualColony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
+        gameAreaPanel.setColony(colony);
+        if (colony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
             updateGameAreaSize();
         }
         Hex activeHex = world != null ? world.getActiveHex() : null;
@@ -1845,15 +1911,6 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         if (world == null) {
-            return;
-        }
-
-        if (spectator) {
-            worldPanel.updateMinuteData(world);
-            colonyPanel.updateMinuteData(colony);
-            if (mapDialog != null && mapDialog.isShowing()) {
-                mapDialog.updateTimeDisplay();
-            }
             return;
         }
 

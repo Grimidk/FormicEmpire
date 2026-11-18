@@ -4,14 +4,11 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		crashed and cant exit in spectator mode
-		there is no sprites in the colonies for spectator
+	    (none right now)
 	Mid:
-		(none right now)	
+		(none right now)
 	Low:
-		checbox look odd in win os
-		font is different in win os
-		performance is worse in win os
+		(none right now)
 	Important not Urgent:
 		(none right now)
 	Can't reproduce:
@@ -31,7 +28,28 @@ To Draw (PascalCase filenames; under src/main/resources):
 		overworld mound sprites (path TBD)
 	Room sprites (sprites/buildings/rooms/ — 48x48 blank placeholders):
 		L0–L5 and L3S for Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock, Resin
-		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter
+		Passives: PassiveLab, PassiveAphid, PassiveNurse, PassiveFarm, PassiveGrave, PassiveComposter, PassiveWater, PassiveWeb
+	Disaster environment sprites (sprites/environment/ — 1:1 native pixel art placeholders; transparent background; top-down colony view):
+		Earthquake (128x64):
+			DisasterEarthquake.png — Primary jagged ground fissure / fault-line crack decal stamped on soil with depth shadow.
+			DisasterEarthquake2.png — Secondary branching ground crack decal variant for visual variation around the colony yard.
+		Tsunami (128x128):
+			DisasterTsunami.png — Frame 1 of incoming sea-water surge / wave crest with white churning foam. Sweeps horizontally across the overworld.
+			DisasterTsunami2.png — Frame 2 of crashing wave surge (alternating foam spray and water churn).
+		Tornado (128x128):
+			DisasterTornado.png, DisasterTornado2.png, DisasterTornado3.png, DisasterTornado4.png — 4-frame rotating funnel vortex with swirling dust and debris at base. Roams along a smooth path across the playfield.
+		Meteor (128x128):
+			DisasterMeteor.png — Static charred impact crater with scorched earth rim and glowing rock fragments.
+			DisasterMeteorSmoke1.png, DisasterMeteorSmoke2.png — 2-frame plume of billowy dark smoke, heat distortion, and rising sparks layered directly on top of the crater.
+		Volcano (128x128):
+			DisasterVolcano.png — Static magma fissure / caldera vent with cooled black crust and molten glow.
+			DisasterVolcanoEruption1.png, DisasterVolcanoEruption2.png — 2-frame eruption plume with spewing molten lava, dark volcanic ash, and embers layered over the fissure.
+		Wildfire (64x64):
+			DisasterWildfire.png, DisasterWildfire2.png, DisasterWildfire3.png, DisasterWildfire4.png — 4-frame looping ground flame animation with flickering orange/yellow fire tongues and smoke wisps. Stamped at scattered spots across the burning biome.
+		Ice Collapse (128x128):
+			DisasterIceCollapse.png, DisasterIceCollapse2.png — Fractured, shattered ice-shelf chasm decals showing deep dark water beneath broken ice slabs.
+		Ocean Freeze (128x128):
+			DisasterOceanFreeze.png, DisasterOceanFreeze2.png — Creeping jagged frost crystal sheets and ice crust spreading over the surface.
 
 To Compose (.mp3 in resources/audio)
 	Songs:
@@ -45,34 +63,26 @@ Other assets:
 To Feature (to be done in priority order by blocks): 
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		launch creatures (single battle or swarm; needs battle system):
-			Bugs: Bombardier(B), Ant lion(I), CommonFly(H)
-			Arachnids: Spider(I), Tarantula(H)
-		carnivore ant
+		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
+		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
+		rework abilities and alerts and triggers to be cleaner
 
 	Everything else :
-		swarm vs swarm system
-		more enemies (single battle or swarm battles):
-			Bugs (soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, goliath beetle, cricket moles, locust swarms, scalopendra, giant cockroach)
-			Arachnids (catapult ants, vinegaroons, horsehoecrabs)
+		critter system:
+			swarm vs swarm system
+			launch creatures (single battle or swarm; needs battle system):
+				Bugs: Bombardier(B), Ant lion(I), CommonFly(H)
+				Arachnids: Spider(I), Tarantula(H)
+			(other bugs (soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, goliath beetle, cricket moles, locust swarms, scalopendra, giant cockroach))
+			(other arachnids (catapult ants, vinegaroons, horsehoecrabs))
 			Anphibians (Salamander, frog, toad)
 			Reptiles (Gecko, Snake, Tortiose)
 			Birds (Crow, Finch, Chicken)
 			Mammals (Rats, Possum, Anteater)
 			Zombie ant colonies (Cordiceps)
-		uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
-		World Generation Overhaul Phases:
-			Phase 3: Hex Fog of War and Exploration System (sight radius, scout exploration, colonization/diplomacy fog gating, intel trade)
-			Phase 4: Dynamic Cloud Shadows and Natural Disasters (drifting cloud noise layer, earthquakes, tsunamis, tornadoes, meteors), other weater effects and day/night filter over map hexes 
-			Phase 5: World Generation Setup UI and Debug Map Editor (world parameters configuration dialog, brush paint tool for biomes/altitude/rivers)
-		fog of war, range of 1 at the start, cant interact with dynasties outside the fog, scouts (or explorer princess role with exploring range) have a small chance to venture to adjacent hexes to explore, cant colonize into fog, cheat to remove fog, action to exchange intel for trade (and rep)
-		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
-		bridges (needs rafting)
-		rethink hatching to other types taking more time so its balanced to not just spam a type
+			uncolonizable terrain with boss enemies (system; non-ant assimilation reward, unique bosses)
+		rethink hatching to other types taking more time so its balanced to not just spam a type (and class methamorphosis diagram)
 		reserve ants to ant exauhstion and punishing 100% worker capacity
-		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events)) disasters penalie overworked colonies
-		more stats (kills, historic productions, graphs?)
-		intra dynasty ai auto logisitcs with non esential resources 
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 		revamp story and lore and maybe intro screen
 		more hive rooms, specially more twisty (research room after royal chamber, barrack room before royal chamber)
@@ -80,24 +90,20 @@ Needed for launch (v1.0) (Launch Version):
 			saved for later: RoomDecorationRenderer (storage/farm/nursery/royal two-band overlays, interior clip, door-aware padding)
 			saved for later: sprites/buildings/rooms/*.png wired on GameUnlocks Building.getSprite()
 			saved for later: GameConstantsRoomSpritesTest + RoomDecorationRendererTest
-		rework tutorial to clearer and obscure unlocks in menus, disable tutorial option and konami code to unboscure all
-		rework abilities and alerts and triggers (new classes?)
-		rework saves to be cleaner and efficient
-		rework manager and aux files
 		promo video and images 
-		langs (GER, RUS, CHN, JAP) and translate credits and roadmap and recheck known languages
+		recheck langs
 		more proper start animation and roadmap and credits design
+		global stats such as total playtime, games started, games finished, games won, maps created etc
 		register Grim Games or Grimidk in steam as dev team
 		steam upload and demo version and make sure saves are not overwritten by updates
 			TODO code (optional for listing; needed for Steam-native features): Steamworks init + App ID; cloud saves; achievements/stats API; demo build flavor (separate App ID/depot)
 			TODO ops: partner page, depots/builds, caps/trailers, wishlist, pricing
 			wishlist button
 		versioning to go back to previous stable patches
-		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
+		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code, no vibe code or bloated code, no assets made by someone other than me
 
 Post launch (v1.1) (Improvements Update):
 	animated tile textures
-	tectonic plates to determine mountain ranges, volcanic chains, valleys, give altitude to hexes (and restrictions) so rivers go from high to low forking on tie and making lakes where they surrond, need mountain, peak. shallow and deep ocean biome (make sure world gen is: 1 tectonic plates and faults (going up, going down or sliding), 2 determine oceans vs continental shelfs by height ( from (abyss)0 to 3 (sea level) to 10 (peak) determine ice caps and set lakes, 4 make rivers by going down 5 determing land biomes by latitude, humidity and height)
 	better crash detection and reporting
 	spawn ant cheat and spawn bug
     engine clean up for reusability (Core Engine Package) with addiontal codegen tools for saves and repositories etc
@@ -107,18 +113,17 @@ Post launch (v1.1) (Improvements Update):
 		deeper air battle resolution (not just passive air support)
 		paratroopers — attacker skips border clash → hex siege (paid drop, landing debuff; not instant capture)
 	editable stat panel 
-	world editing (size, islands, dynasty amounts and size) and further dynasty editing like color species and starting upgrades, starting biome and species assimilation
+	more stats (kills, historic productions, graphs?)
+	further dynasty editing like color species and starting upgrades and species assimilation
 	console and commands for debugging (to include in core)
 	native universal modding support (to include in core)
 	custom key bind settings for all keys (to include in core)
 	ant menus (detailed per ant)
 	theme modificacions (colors, text scale, font) (to include in core)
 	global stats from all players (needs api and consent) (to include in core)
-	socials screen with discord server, bluesky, itch, steam and instagram (to include in core) and feedback button
-	more langs as petitioned
+	socials screen with bluesky and instagram (to include in core)
 	link to IRL documentation for ant facts  and bug facts
 	achievements (to include in core)
-	map loading and manual editing with debug
 	click and react minigame
 	discord integration
 	sound board

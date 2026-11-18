@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.dynasty;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,11 +25,13 @@ import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
+import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
 import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.entities.world.Hex;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAutomationService;
@@ -63,6 +66,7 @@ public class Dynasty {
     private boolean wildDynasty;
     private AiPersonality aiPersonality;
     private AntSpecies species;
+    private SpeciesDiet startingDiet;
     private int researchPoints;
     private int totalNuptialFlights;
     private int diplomatsSentTotal;
@@ -87,6 +91,7 @@ public class Dynasty {
     private final transient List<Synergy> pendingSynergyAlerts = new ArrayList<>();
     private final List<Colony> colonies;
     private final List<Tunnel> tunnels;
+    private final List<Bridge> bridges;
     private final Map<String, Integer> globalDeathStatistics;
     private final List<Integer> absorbedDynastyIds;
     private final List<Integer> defeatedSpeciesIds;
@@ -123,6 +128,8 @@ public class Dynasty {
     private int integrationTargetDynastyId;
     private double integrationProgressDays;
     private boolean integrationDiplomatsManual;
+    private final Set<Long> knownHexKeys = Collections.synchronizedSet(new HashSet<>());
+    private int exploredHexCount = 0;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -145,6 +152,9 @@ public class Dynasty {
         this.titleKey = titleKey != null ? titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY;
         this.isPlayer = isPlayer;
         this.species = species;
+        this.startingDiet = species != null && species.getDiet() != null
+                ? species.getDiet()
+                : GameConstants.DIET_FUNGIVOROUS;
         this.aiPersonality = isPlayer ? null : AiPersonality.random();
         this.colonies = new CopyOnWriteArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
@@ -153,6 +163,7 @@ public class Dynasty {
         this.announcedRankIds = new LinkedHashSet<>();
         seedStartingAnnouncedRanks();
         this.tunnels = new ArrayList<>();
+        this.bridges = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.absorbedDynastyIds = new ArrayList<>();
         this.defeatedSpeciesIds = new ArrayList<>();
@@ -248,12 +259,20 @@ public class Dynasty {
                 break;
             }
         }
+        SpeciesDiet resolvedDiet = GameConstants.getSpeciesDietById(savedDynasty.startingDietId);
+        if (resolvedDiet == null || resolvedDiet == GameConstants.DIET_OMNIVOROUS) {
+            resolvedDiet = this.species != null && this.species.getDiet() != null
+                    ? this.species.getDiet()
+                    : GameConstants.DIET_FUNGIVOROUS;
+        }
+        this.startingDiet = resolvedDiet;
 
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
         this.unlockedSkills = new LinkedHashSet<>();
         this.announcedRankIds = new LinkedHashSet<>();
         this.tunnels = new ArrayList<>();
+        this.bridges = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.completedAssimilations = new HashSet<>();
         this.diplomaticReputations = new HashMap<>();
@@ -527,6 +546,11 @@ public class Dynasty {
         } else {
             seedAnnouncedRanksThrough(GameConstants.getColonyRankByKey(savedDynasty.rankName));
         }
+
+        if (savedDynasty.knownHexKeys != null) {
+            this.knownHexKeys.addAll(savedDynasty.knownHexKeys);
+        }
+        this.exploredHexCount = savedDynasty.exploredHexCount;
         
         initializeColor();
         initializeServices();
@@ -853,6 +877,32 @@ public class Dynasty {
         }
         for (Tunnel tunnel : tunnels) {
             if (!tunnel.isComplete() && (tunnel.getHexA() == hex || tunnel.getHexB() == hex)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Bridge> getBridges() { return bridges; }
+    public void addBridge(Bridge bridge) {
+        if (bridge != null && !bridges.contains(bridge)) {
+            bridges.add(bridge);
+        }
+    }
+
+    public Bridge getBridgeBetween(Hex a, Hex b) {
+        return bridges.stream()
+            .filter(br -> br.connects(a, b))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public boolean hasIncompleteBridgeAt(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Bridge bridge : bridges) {
+            if (!bridge.isComplete() && (bridge.getHexA() == hex || bridge.getHexB() == hex)) {
                 return true;
             }
         }
@@ -1706,7 +1756,66 @@ public class Dynasty {
         initializeColor(); 
     }
     public AntSpecies getSpecies() { return species; }
-    public void setSpecies(AntSpecies species) { this.species = species; }
+    public void setSpecies(AntSpecies species) {
+        this.species = species;
+        if (species != null && species.getDiet() != null && !isPlayer) {
+            this.startingDiet = species.getDiet();
+        }
+    }
+
+    public SpeciesDiet getStartingDiet() {
+        return startingDiet != null ? startingDiet : GameConstants.DIET_FUNGIVOROUS;
+    }
+
+    public void setStartingDiet(SpeciesDiet startingDiet) {
+        if (startingDiet != null && startingDiet != GameConstants.DIET_OMNIVOROUS) {
+            this.startingDiet = startingDiet;
+        }
+    }
+
+    public SpeciesDiet getDiet() {
+        if (hasUpgrade(GameUnlocks.ABILITY_OMNIVORE)) {
+            return GameConstants.DIET_OMNIVOROUS;
+        }
+        return getStartingDiet();
+    }
+
+    public boolean canEatFungi() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_FUNGIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public boolean canEatMeat() {
+        SpeciesDiet diet = getDiet();
+        return diet == GameConstants.DIET_CARNIVOROUS || diet == GameConstants.DIET_OMNIVOROUS;
+    }
+
+    public int countOppositeDietAssimilations() {
+        SpeciesDiet baseDiet = getStartingDiet();
+        int count = 0;
+        for (AntSpecies candidate : GameConstants.getSpecies()) {
+            if (candidate == null || candidate == this.species) {
+                continue;
+            }
+            SpeciesDiet candidateDiet = candidate.getDiet();
+            if (candidateDiet == null || candidateDiet == baseDiet) {
+                continue;
+            }
+            Assimilation assimilation = candidate.getAssimilation();
+            if (assimilation == null) {
+                continue;
+            }
+            if (completedAssimilations.contains(assimilation)
+                    || (assimilation.getReward() != null && unlockedUpgrades.contains(assimilation.getReward()))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean meetsOmnivorePrerequisites() {
+        return countOppositeDietAssimilations() >= GameNumbers.TRIGGER_OMNIVORE_MIN_OPPOSITE_ASSIMILATIONS;
+    }
     
     public Color getColor() { return color; }
     public void setColor(Color color) { this.color = color; }
@@ -1881,6 +1990,12 @@ public class Dynasty {
         }
     }
 
+    public double getMaxIntelligenceCap() {
+        return hasUpgrade(GameUnlocks.ASSIMILATED_STEALTH)
+                ? GameNumbers.INTELLIGENCE_MAX
+                : GameNumbers.INTELLIGENCE_BASE_CAP;
+    }
+
     public double getIntelligenceToward(int otherDynastyId) {
         return intelligenceToward.getOrDefault(otherDynastyId, 0.0);
     }
@@ -1889,7 +2004,8 @@ public class Dynasty {
         if (otherDynastyId == id) {
             return;
         }
-        double clamped = Math.max(0.0, Math.min(GameNumbers.INTELLIGENCE_MAX, value));
+        double cap = getMaxIntelligenceCap();
+        double clamped = Math.max(0.0, Math.min(cap, value));
         if (clamped <= 0.0) {
             intelligenceToward.remove(otherDynastyId);
         } else {
@@ -2002,6 +2118,16 @@ public class Dynasty {
         } else if (upgrade == GameUnlocks.ASSIMILATED_STEALTH) {
             if (!hasUpgrade(GameUnlocks.ROLE_SPY)) {
                 unlockedUpgrades.add(GameUnlocks.ROLE_SPY);
+            }
+        } else if (upgrade == GameUnlocks.ABILITY_OMNIVORE) {
+            if (!hasUpgrade(GameUnlocks.ROLE_FARMER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_FARMER);
+            }
+            if (!hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+                unlockedUpgrades.add(GameUnlocks.TYPE_SOLDIER);
+            }
+            if (!hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_HUNTER);
             }
         }
     }
@@ -2322,5 +2448,125 @@ public class Dynasty {
 
     public double getAverageAntAge() {
         return statService != null ? statService.getAverageAntAge(this) : 0.0;
+    }
+
+    public boolean isHexKnown(Hex hex) {
+        if (hex == null) return false;
+        return isHexKnown(hex.getQ(), hex.getR());
+    }
+
+    public boolean isHexKnown(int q, int r) {
+        return knownHexKeys.contains(GameNumbers.packHexKey(q, r));
+    }
+
+    public void discoverHex(Hex hex) {
+        if (hex == null) return;
+        discoverHex(hex.getQ(), hex.getR());
+    }
+
+    public void discoverHex(int q, int r) {
+        knownHexKeys.add(GameNumbers.packHexKey(q, r));
+    }
+
+    public void discoverHexAndAdjacent(Hex hex) {
+        if (hex == null) return;
+        discoverHex(hex);
+        boolean hasPointerNeighbors = false;
+        for (Hex n : hex.getAdjacentNeighbors()) {
+            if (n != null) {
+                discoverHex(n);
+                hasPointerNeighbors = true;
+            }
+        }
+        if (!hasPointerNeighbors) {
+            int[][] offsets = {{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}};
+            for (int[] off : offsets) {
+                discoverHex(hex.getQ() + off[0], hex.getR() + off[1]);
+            }
+        }
+    }
+
+    public Set<Long> getKnownHexKeys() {
+        synchronized (knownHexKeys) {
+            return new HashSet<>(knownHexKeys);
+        }
+    }
+
+    public void setKnownHexKeys(Collection<Long> keys) {
+        synchronized (knownHexKeys) {
+            knownHexKeys.clear();
+            if (keys != null) {
+                knownHexKeys.addAll(keys);
+            }
+        }
+    }
+
+    public int getKnownHexCount() {
+        return knownHexKeys.size();
+    }
+
+    public int getExploredHexCount() {
+        return exploredHexCount;
+    }
+
+    public void setExploredHexCount(int exploredHexCount) {
+        this.exploredHexCount = exploredHexCount;
+    }
+
+    public void incrementExploredHexCount() {
+        this.exploredHexCount++;
+    }
+
+    public void discoverHexKeys(Collection<Long> keys) {
+        if (keys == null || keys.isEmpty()) return;
+        synchronized (knownHexKeys) {
+            knownHexKeys.addAll(keys);
+        }
+    }
+
+    public int learnHexesFrom(Dynasty other) {
+        if (other == null || other == this) return 0;
+        Set<Long> otherKeys = other.getKnownHexKeys();
+        int added = 0;
+        synchronized (knownHexKeys) {
+            for (Long key : otherKeys) {
+                if (key != null && knownHexKeys.add(key)) {
+                    added++;
+                }
+            }
+        }
+        return added;
+    }
+
+    public void initKnownHexes(World world) {
+        if (world == null) return;
+        List<Colony> colonyList = getColonies();
+        if (colonyList == null) return;
+        for (Colony c : colonyList) {
+            if (c == null) continue;
+            Hex h = world.getHexOfColony(c);
+            if (h != null) {
+                discoverHexAndAdjacent(h);
+            }
+        }
+    }
+
+    public boolean hasDiscoveredDynasty(Dynasty other, World world) {
+        if (other == null) return false;
+        if (other == this) return true;
+        if (isAtWarWith(other.getId())) return true;
+        if (world == null) return true;
+        List<Colony> otherColonies = other.getColonies();
+        if (otherColonies == null || otherColonies.isEmpty()) {
+            return false;
+        }
+        for (Colony c : otherColonies) {
+            if (c == null) continue;
+            Hex h = world.getHexOfColony(c);
+            if (h != null && isHexKnown(h)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

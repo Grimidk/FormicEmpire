@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
@@ -13,8 +14,10 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyConvoyTransitService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyResourceService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 
@@ -62,7 +65,8 @@ public class Trade {
     }
 
     private void calculateHours() {
-        float baseHours = 168f;
+        int hexDistance = getHexDistance();
+        float baseHours = 168f * (1f + GameNumbers.TRADE_DISTANCE_TIME_FACTOR * Math.max(0, hexDistance - 1));
 
         float methodSpeed = method.getSpeedMult();
         
@@ -83,6 +87,10 @@ public class Trade {
             Tunnel tunnel = originColony.getDynasty().getTunnelBetween(origin, destination);
             if (tunnel != null && tunnel.isComplete()) {
                 speedFactor *= 1.5f;
+            }
+            Bridge bridge = originColony.getDynasty().getBridgeBetween(origin, destination);
+            if (bridge != null && bridge.isComplete()) {
+                speedFactor *= GameNumbers.BRIDGE_SPEED_MULT;
             }
             speedFactor *= originColony.getStatsService().getLocsenseSpeedMultiplier(originColony);
             speedFactor *= originColony.getStatsService().getHeatresistSpeedMultiplier(originColony);
@@ -265,26 +273,25 @@ public class Trade {
         }
     }
 
+    public int getHexDistance() {
+        if (origin == null || destination == null) {
+            return 1;
+        }
+        return Math.max(1, GameNumbers.axialHexDistance(origin.getQ(), origin.getR(), destination.getQ(), destination.getR()));
+    }
+
+    public double getEffectiveDangerFactor() {
+        int hexDistance = getHexDistance();
+        return method.getDangerFactor() + Math.max(0, hexDistance - 1) * GameNumbers.TRADE_DISTANCE_RISK_PER_HEX;
+    }
+
     private Map<ResourceType, Double> calculateSecuredLoad(Map<ResourceType, Double> cargo) {
         Colony originColony = origin.getColony();
         Map<ResourceType, Double> securedLoad = new HashMap<>(cargo);
         if (originColony == null) return securedLoad;
-        
-        double baseSec = originColony.getStatsService().getBaseTradeSecurity(originColony);
-        double totalSec = 0;
-        
-        for (Map.Entry<AntClass, Integer> entry : transport.entrySet()) {
-            int count = entry.getValue();
-            if (count <= 0) continue;
 
-            AntClass type = entry.getKey();
-            if (type == GameConstants.CLASS_WORKER) totalSec += count * baseSec * 1.0;
-            else if (type == GameConstants.CLASS_MAJOR) totalSec += count * baseSec * 2.5;
-            else if (type == GameConstants.CLASS_SOLDIER) totalSec += count * baseSec * 10.0;
-            else if (type == GameConstants.CLASS_PRINCESS) totalSec += count * baseSec * 1.0;
-        }
-
-        double dangerFactor = method.getDangerFactor();
+        double totalSec = DynastyTradeAutomation.computeTotalTransportSecurity(originColony, transport);
+        double dangerFactor = getEffectiveDangerFactor();
         double mitigationPercent = originColony.getStatsService()
                 .getConvoySecurityMitigationPercent(originColony, totalSec, dangerFactor);
         

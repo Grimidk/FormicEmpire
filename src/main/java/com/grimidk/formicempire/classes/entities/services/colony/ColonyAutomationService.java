@@ -139,15 +139,9 @@ public class ColonyAutomationService {
         }
 
         if (!candidates.isEmpty()) {
-            Dynasty dynasty = colony.getDynasty();
-            boolean npcPriority = dynasty != null && !dynasty.isPlayer();
-            if (npcPriority) {
-                candidates.sort(Comparator
-                        .comparingInt(DynastyAiPriorities::buildingPriorityScore)
-                        .thenComparingInt(b -> b.getMineralCost() + b.getResinCost() + b.getPlantCost()));
-            } else {
-                candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost() + b.getPlantCost()));
-            }
+            candidates.sort(Comparator
+                    .comparingInt(DynastyAiPriorities::buildingPriorityScore)
+                    .thenComparingInt(b -> b.getMineralCost() + b.getResinCost() + b.getPlantCost()));
             Building target = candidates.get(0);
 
             colony.startBuildingProject(target);
@@ -226,19 +220,23 @@ public class ColonyAutomationService {
         if (remaining == 0) return;
 
         ColonyStatsService stats = colony.getStatsService();
+        boolean hasFarmerRole = colony.canEatFungi() || colony.hasUpgrade(GameUnlocks.ROLE_FARMER);
 
-        int farmerTarget = Math.max(MIN_FARMERS, (int) (totalWorkers * 0.05));
-        int farmers = assignMinimum(remaining, farmerTarget);
-        remaining -= farmers;
+        int farmers = 0;
+        if (hasFarmerRole) {
+            int farmerTarget = Math.max(MIN_FARMERS, (int) (totalWorkers * 0.05));
+            farmers = assignMinimum(remaining, farmerTarget);
+            remaining -= farmers;
+        }
 
         int foragers = assignMinimum(remaining, MIN_FORAGERS);
         remaining -= foragers;
 
         float nursingRate = stats.getNursingRate(colony);
-        int maxBrood = stats.getEggsCapacity(colony) * 3;
+        int actualBrood = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
         int nurseTarget = MIN_NURSES;
         if (nursingRate > 0) {
-            nurseTarget = Math.max(MIN_NURSES, (int) Math.ceil(maxBrood / nursingRate));
+            nurseTarget = Math.max(MIN_NURSES, (int) Math.ceil(actualBrood / nursingRate) + 1);
         }
         int nurses = assignMinimum(remaining, nurseTarget);
         remaining -= nurses;
@@ -255,27 +253,38 @@ public class ColonyAutomationService {
         }
         targets.put(GameConstants.ROLE_GRAVER, gravers);
 
+        int scouts = 0;
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
+            int scoutTarget = Math.max(1, (int) (totalWorkers * 0.02));
+            boolean missingCriticalSource = colony.getLocationService() != null
+                    && !colony.getLocationService().getDiscoveredSources().isEmpty()
+                    && (colony.getLocationService().getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0
+                    || (colony.canEatFungi() && colony.getLocationService().getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0)
+                    || (!colony.canEatFungi() && colony.getLocationService().getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0));
+            if (missingCriticalSource) {
+                scoutTarget = Math.max(4, remaining / 3);
+            }
+            scouts = Math.min(scoutTarget, remaining);
+            remaining -= scouts;
+        }
+        targets.put(GameConstants.ROLE_SCOUT, scouts);
+
         int extraNurses = calculateExtraNurseNeeds(colony, remaining, nurses, stats);
         nurses += extraNurses;
         remaining -= extraNurses;
         targets.put(GameConstants.ROLE_NURSE, nurses);
 
-        int extraFarmers = calculateExtraFarmerNeeds(colony, remaining, farmers, stats);
-        farmers += extraFarmers;
-        remaining -= extraFarmers;
+        if (hasFarmerRole) {
+            int extraFarmers = calculateExtraFarmerNeeds(colony, remaining, farmers, stats);
+            farmers += extraFarmers;
+            remaining -= extraFarmers;
+        }
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) && colony.getAphids() > 0) {
             int rancherTarget = Math.max(1, (int) (totalWorkers * 0.05));
             int toAdd = Math.min(rancherTarget, remaining);
             targets.put(GameConstants.ROLE_RANCHER, toAdd);
-            remaining -= toAdd;
-        }
-
-        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
-            int scoutTarget = Math.max(1, (int) (totalWorkers * 0.02));
-            int toAdd = Math.min(scoutTarget, remaining);
-            targets.put(GameConstants.ROLE_SCOUT, toAdd);
             remaining -= toAdd;
         }
 
@@ -293,8 +302,9 @@ public class ColonyAutomationService {
 
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             if (colony.getCurrentBuildingProject() != null) {
-                targets.put(GameConstants.ROLE_BUILDER, remaining);
-                targets.put(GameConstants.ROLE_FORAGER, foragers);
+                int builders = Math.max(1, remaining / 2);
+                targets.put(GameConstants.ROLE_BUILDER, builders);
+                targets.put(GameConstants.ROLE_FORAGER, foragers + (remaining - builders));
             } else {
                 targets.put(GameConstants.ROLE_BUILDER, 0);
                 targets.put(GameConstants.ROLE_FORAGER, foragers + remaining);
@@ -306,12 +316,13 @@ public class ColonyAutomationService {
     }
 
     private int allocateTunnelEngineers(Colony colony, Map<AntRole, Integer> targets, int remaining) {
-        if (!colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return remaining;
+        boolean buildingBridge = colony.getCurrentBridgeProject() != null;
+        if (!buildingBridge && !colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return remaining;
         if (!colony.hasUpgrade(GameUnlocks.ROLE_ENGINEER)) return remaining;
         if (remaining <= 0) return remaining;
 
         boolean aggressive = usesAggressiveTunnelAutomation(colony);
-        boolean digging = colony.getCurrentTunnelProject() != null;
+        boolean digging = colony.getCurrentTunnelProject() != null || buildingBridge;
         boolean preparing = !digging && aggressive && needsTunnelDigging(colony);
         if (!digging && !preparing) return remaining;
 
@@ -421,8 +432,20 @@ public class ColonyAutomationService {
         int remainingSoldiers = totalSoldiers;
         if (remainingSoldiers == 0) return;
 
-        remainingSoldiers -= reserveMinimumShares(colony, targets, totalSoldiers, PEACE_EXTRA_SOLDIER_ROLES);
-        if (remainingSoldiers == 0) return;
+        int reservedHunters = 0;
+        if (!colony.canEatFungi() && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            int neededHunters = calculateMinimumHunterNeeds(colony, remainingSoldiers);
+            reservedHunters = Math.min(remainingSoldiers, neededHunters);
+            remainingSoldiers -= reservedHunters;
+        }
+
+        remainingSoldiers -= reserveMinimumShares(colony, targets, remainingSoldiers, PEACE_EXTRA_SOLDIER_ROLES);
+        if (remainingSoldiers == 0) {
+            if (reservedHunters > 0) {
+                targets.put(GameConstants.ROLE_HUNTER, reservedHunters);
+            }
+            return;
+        }
 
         int assignedPolice = Math.min(remainingSoldiers, desiredPoliceCount(colony, biome, season, remainingSoldiers));
         targets.put(GameConstants.ROLE_POLICE, assignedPolice);
@@ -456,9 +479,26 @@ public class ColonyAutomationService {
             remainingSoldiers -= toAdd;
         }
 
-        if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            targets.put(GameConstants.ROLE_HUNTER, reservedHunters + remainingSoldiers);
         }
+    }
+
+    private int calculateMinimumHunterNeeds(Colony colony, int availableSoldiers) {
+        if (availableSoldiers <= 0 || !colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            return 0;
+        }
+        ColonyStatsService stats = colony.getStatsService();
+        int totalConsumption = stats.getTotalConsumption(colony);
+        double dailyPerHunter = stats.getHuntingRate(colony) * 24.0 * stats.getMeatEatingEfficiency(colony);
+        if (dailyPerHunter <= 0) {
+            return Math.min(availableSoldiers, 3);
+        }
+        int needed = (int) Math.ceil((totalConsumption * 1.2) / dailyPerHunter);
+        if (colony.getProtein() < stats.getProteinCapacity(colony) * 0.2) {
+            needed += 2;
+        }
+        return Math.min(availableSoldiers, Math.max(3, needed));
     }
 
     private int desiredPoliceCount(Colony colony, Biome biome, Season season, int availableSoldiers) {
@@ -567,8 +607,9 @@ public class ColonyAutomationService {
         }
 
         ColonyStatsService stats = colony.getStatsService();
+        boolean hasFarmerRole = colony.canEatFungi() || colony.hasUpgrade(GameUnlocks.ROLE_FARMER);
 
-        int farmers = assignMinimum(remaining, MIN_FARMERS);
+        int farmers = hasFarmerRole ? assignMinimum(remaining, MIN_FARMERS) : 0;
         remaining -= farmers;
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
@@ -591,9 +632,11 @@ public class ColonyAutomationService {
         remaining -= extraNurses;
         targets.put(GameConstants.ROLE_NURSE, nurses);
 
-        int extraFarmers = calculateExtraFarmerNeeds(colony, remaining, farmers, stats);
-        farmers += extraFarmers;
-        remaining -= extraFarmers;
+        if (hasFarmerRole) {
+            int extraFarmers = calculateExtraFarmerNeeds(colony, remaining, farmers, stats);
+            farmers += extraFarmers;
+            remaining -= extraFarmers;
+        }
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
         if (remaining > 0) {
@@ -609,6 +652,13 @@ public class ColonyAutomationService {
         int remainingSoldiers = colony.getSoldiers().size();
         if (remainingSoldiers == 0) {
             return;
+        }
+
+        int reservedHunters = 0;
+        if (!colony.canEatFungi() && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            int neededHunters = calculateMinimumHunterNeeds(colony, remainingSoldiers);
+            reservedHunters = Math.min(remainingSoldiers, neededHunters);
+            remainingSoldiers -= reservedHunters;
         }
 
         int warCap = Math.max(1, (int) (colony.getSoldiers().size() * 0.10));
@@ -628,14 +678,17 @@ public class ColonyAutomationService {
         }
 
         if (remainingSoldiers <= 0) {
+            if (reservedHunters > 0) {
+                targets.put(GameConstants.ROLE_HUNTER, reservedHunters);
+            }
             return;
         }
 
         int militaryAssigned = distributeAmongUnlockedRoles(
                 colony, targets, remainingSoldiers, WAR_MILITARY_SOLDIER_ROLES);
         remainingSoldiers -= militaryAssigned;
-        if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            targets.put(GameConstants.ROLE_HUNTER, reservedHunters + remainingSoldiers);
         }
     }
 
@@ -705,15 +758,19 @@ public class ColonyAutomationService {
                 skyTrans = Math.min(remainingPrincesses, 1);
             }
         }
+        int explorerQuota = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_EXPLORER)) {
+            explorerQuota = Math.min(remainingPrincesses - skyTrans, 1);
+        }
 
         int diplomatReserve = 0;
         Dynasty dynasty = colony.getDynasty();
         if (dynasty != null
                 && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY)
                 && colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
-            diplomatReserve = Math.min(2, Math.max(0, remainingPrincesses - skyTrans));
+            diplomatReserve = Math.min(2, Math.max(0, remainingPrincesses - skyTrans - explorerQuota));
         }
-        int remaining = Math.max(0, remainingPrincesses - skyTrans - diplomatReserve);
+        int remaining = Math.max(0, remainingPrincesses - skyTrans - explorerQuota - diplomatReserve);
         int assistantCount = 0;
         if (colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT)) {
             int minBreeders = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? Math.min(remaining, 2) : 0;
@@ -722,6 +779,7 @@ public class ColonyAutomationService {
         int breederCount = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) ? (remaining - assistantCount) : 0;
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
+        targets.put(GameConstants.ROLE_EXPLORER, explorerQuota);
         targets.put(GameConstants.ROLE_DIPLOMAT, diplomatReserve);
         targets.put(GameConstants.ROLE_BREEDER, breederCount);
     }
@@ -739,6 +797,7 @@ public class ColonyAutomationService {
         targets.put(GameConstants.ROLE_BREEDER, breeders);
         targets.put(GameConstants.ROLE_DIPLOMAT, diplomats);
         targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
+        targets.put(GameConstants.ROLE_EXPLORER, 0);
         targets.put(GameConstants.ROLE_ASSISTANT, assistants);
     }
 
@@ -909,6 +968,7 @@ public class ColonyAutomationService {
         if (role == GameConstants.ROLE_TRANSPORT) return GameUnlocks.ROLE_TRANSPORT;
         if (role == GameConstants.ROLE_DIPLOMAT) return GameUnlocks.ROLE_DIPLOMAT;
         if (role == GameConstants.ROLE_SKYTRANS) return GameUnlocks.ROLE_SKYTRANS;
+        if (role == GameConstants.ROLE_EXPLORER) return GameUnlocks.ROLE_EXPLORER;
         if (role == GameConstants.ROLE_COMMANDER) return GameUnlocks.ROLE_COMMANDER;
         if (role == GameConstants.ROLE_CAPTAIN) return GameUnlocks.ROLE_CAPTAIN;
         if (role == GameConstants.ROLE_AIR_SUPPORT) return GameUnlocks.ROLE_AIR_SUPPORT;

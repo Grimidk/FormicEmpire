@@ -26,6 +26,7 @@ public class Engine extends Thread {
     private final Semaphore semaphore;
     private boolean killSwitch;
     private volatile boolean paused;
+    private volatile boolean battleViewActive = false;
     
     // --- Managers ---
     private final TradeManager tradeManager;
@@ -76,7 +77,11 @@ public class Engine extends Thread {
     private boolean mapEditorEnabled = false;
     private boolean easyConquering = false;
     private boolean instantIntegration = false;
-    private boolean animateWorldGen = false;
+    private boolean cheatFogOfWarToggle = false;
+    private boolean cheatRevealMap = false;
+    private boolean cheatRandomDisaster = false;
+    private boolean cheatRandomWar = false;
+    private boolean animateWorldGen = true;
     private WorldGenStepListener worldGenStepListener;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
     private int defaultRoleSoldier = GameConstants.ROLE_HUNTER.getId();
@@ -107,6 +112,9 @@ public class Engine extends Thread {
     private boolean mapLayerLabelLakes = true;
     private boolean mapLayerLabelRivers = true;
     private boolean mapLayerLabelPeninsulas = true;
+    private boolean mapLayerDayNight = true;
+    private boolean mapLayerWeather = true;
+    private boolean mapLayerDisasters = true;
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
@@ -167,8 +175,17 @@ public class Engine extends Thread {
         return this.world != null && this.world.isSpectatorMode();
     }
 
-    private void clampSpeedToCurrentRules() {
-        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+    private boolean allowsSpectatorHyperSpeed() {
+        return isSpectatorWorld() && !battleViewActive;
+    }
+
+    public void setBattleViewActive(boolean battleViewActive) {
+        this.battleViewActive = battleViewActive;
+        clampSpeedToCurrentRules();
+    }
+
+    public void clampSpeedToCurrentRules() {
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, allowsSpectatorHyperSpeed());
         if (speed != null && speed.getId() > maxId) {
             speed = GameSpeed.fromId(maxId);
         }
@@ -198,7 +215,7 @@ public class Engine extends Thread {
             return;
         }
         GameSpeed resolved = speed;
-        int maxId = GameSpeed.maxPlayableId(allowTurboMode, isSpectatorWorld());
+        int maxId = GameSpeed.maxPlayableId(allowTurboMode, allowsSpectatorHyperSpeed());
         if (speed.getId() > maxId) {
             resolved = GameSpeed.fromId(maxId);
         }
@@ -240,14 +257,14 @@ public class Engine extends Thread {
                 pauseEngine();
                 return;
             }
-            setSpeed(GameSpeed.step(speed, -1, allowTurboMode, isSpectatorWorld()));
+            setSpeed(GameSpeed.step(speed, -1, allowTurboMode, allowsSpectatorHyperSpeed()));
             return;
         }
         if (paused) {
             resumeEngine();
             return;
         }
-        setSpeed(GameSpeed.step(speed, 1, allowTurboMode, isSpectatorWorld()));
+        setSpeed(GameSpeed.step(speed, 1, allowTurboMode, allowsSpectatorHyperSpeed()));
     }
 
     public void togglePause() {
@@ -683,6 +700,38 @@ public class Engine extends Thread {
         this.instantIntegration = instantIntegration;
     }
 
+    public boolean isCheatFogOfWarToggle() {
+        return cheatFogOfWarToggle;
+    }
+
+    public void setCheatFogOfWarToggle(boolean cheatFogOfWarToggle) {
+        this.cheatFogOfWarToggle = cheatFogOfWarToggle;
+    }
+
+    public boolean isCheatRevealMap() {
+        return cheatRevealMap;
+    }
+
+    public void setCheatRevealMap(boolean cheatRevealMap) {
+        this.cheatRevealMap = cheatRevealMap;
+    }
+
+    public boolean isCheatRandomDisaster() {
+        return cheatRandomDisaster;
+    }
+
+    public void setCheatRandomDisaster(boolean cheatRandomDisaster) {
+        this.cheatRandomDisaster = cheatRandomDisaster;
+    }
+
+    public boolean isCheatRandomWar() {
+        return cheatRandomWar;
+    }
+
+    public void setCheatRandomWar(boolean cheatRandomWar) {
+        this.cheatRandomWar = cheatRandomWar;
+    }
+
     public boolean isAnimateWorldGen() {
         return animateWorldGen;
     }
@@ -708,7 +757,8 @@ public class Engine extends Thread {
                 || instantBuildings
                 || assimilateAll
                 || easyConquering
-                || instantIntegration;
+                || instantIntegration
+                || cheatRevealMap;
     }
 
     public void applySandboxTaintToActiveWorld() {
@@ -986,6 +1036,30 @@ public class Engine extends Thread {
 
     public void setMapLayerLabelPeninsulas(boolean mapLayerLabelPeninsulas) {
         this.mapLayerLabelPeninsulas = mapLayerLabelPeninsulas;
+    }
+
+    public boolean isMapLayerDayNight() {
+        return mapLayerDayNight;
+    }
+
+    public void setMapLayerDayNight(boolean mapLayerDayNight) {
+        this.mapLayerDayNight = mapLayerDayNight;
+    }
+
+    public boolean isMapLayerWeather() {
+        return mapLayerWeather;
+    }
+
+    public void setMapLayerWeather(boolean mapLayerWeather) {
+        this.mapLayerWeather = mapLayerWeather;
+    }
+
+    public boolean isMapLayerDisasters() {
+        return mapLayerDisasters;
+    }
+
+    public void setMapLayerDisasters(boolean mapLayerDisasters) {
+        this.mapLayerDisasters = mapLayerDisasters;
     }
 
     public static List<AntRole> antRolesForAntClass(AntClass type) {

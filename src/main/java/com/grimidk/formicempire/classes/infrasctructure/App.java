@@ -10,6 +10,9 @@ public class App {
     public static void start(){
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
+        if (System.getProperty("sun.java2d.d3d") == null) {
+            System.setProperty("sun.java2d.d3d", "true");
+        }
         if (MacOsNativeFullscreen.isMac()) {
             System.setProperty("apple.awt.application.name", "FormicEmpire");
         }

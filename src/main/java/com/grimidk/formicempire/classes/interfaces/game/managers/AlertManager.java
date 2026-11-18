@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel.Alert;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.OverworldAtmosphereRenderer;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.util.ArrayList;
@@ -140,6 +141,13 @@ public class AlertManager {
                 return iconOf(GameConstants.ICON_STAT_REPUTATION);
             case "AUTO":
                 return iconOf(GameConstants.ICON_AUTOMATION);
+            case "DISASTER":
+                ImageIcon disasterIcon = GameConstants.DISASTER_EARTHQUAKE.getIcon();
+                if (disasterIcon != null && disasterIcon != GameConstants.ICON_UNKNOWN
+                        && OverworldAtmosphereRenderer.hasVisiblePixels(disasterIcon.getImage())) {
+                    return iconOf(disasterIcon);
+                }
+                return iconOf(GameConstants.REPUTATION_AGGRESSIVE.getIcon());
             case "INFO":
             default:
                 return iconOf(GameConstants.REPUTATION_NEUTRAL.getIcon());
@@ -253,6 +261,8 @@ public class AlertManager {
             addAlert("HUNT_FAIL", stripPrefix(msg, ColonyLogPrefixes.HUNT_FAILURE), durationDefault);
         } else if (msg.startsWith(ColonyLogPrefixes.HUNT)) {
             addAlert("HUNT", stripPrefix(msg, ColonyLogPrefixes.HUNT), durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.DISASTER)) {
+            addAlert("DISASTER", stripPrefix(msg, ColonyLogPrefixes.DISASTER), durationDefault);
         } else if (msg.startsWith(ColonyLogPrefixes.INFO)) {
             addAlert("INFO", stripPrefix(msg, ColonyLogPrefixes.INFO), durationDefault);
         } else {
@@ -306,6 +316,8 @@ public class AlertManager {
                 return LanguageStrings.ALERT_DETAIL_AUTO;
             case "PROMO":
                 return LanguageStrings.ALERT_DETAIL_PROMO;
+            case "DISASTER":
+                return LanguageStrings.ALERT_DETAIL_DISASTER;
             case "INFO":
             default:
                 return LanguageStrings.ALERT_DETAIL_INFO;

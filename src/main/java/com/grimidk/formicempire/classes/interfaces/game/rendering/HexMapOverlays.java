@@ -1,21 +1,31 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
+import com.grimidk.formicempire.classes.constants.world.DisasterType;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.services.world.WorldWeatherService;
+import com.grimidk.formicempire.classes.entities.world.Bridge;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -38,6 +48,10 @@ public final class HexMapOverlays {
     }
 
     public static void paintTrades(Graphics2D g2d, World world, HexGridMesh mesh) {
+        paintTrades(g2d, world, mesh, null);
+    }
+
+    public static void paintTrades(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
         if (g2d == null || world == null || mesh == null) {
             return;
         }
@@ -60,6 +74,9 @@ public final class HexMapOverlays {
             Hex origin = trade.getOrigin();
             Hex destination = trade.getDestination();
             if (origin == null || destination == null || !areNeighbors(origin, destination)) {
+                continue;
+            }
+            if (isHexDiscovered != null && (!isHexDiscovered.test(origin) && !isHexDiscovered.test(destination))) {
                 continue;
             }
             HexGridMesh.Face originFace = mesh.faceAt(origin.getQ(), origin.getR());
@@ -131,6 +148,10 @@ public final class HexMapOverlays {
     }
 
     public static void paintTunnels(Graphics2D g2d, World world, HexGridMesh mesh) {
+        paintTunnels(g2d, world, mesh, null);
+    }
+
+    public static void paintTunnels(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
         if (g2d == null || world == null || mesh == null || world.getDynastys() == null) {
             return;
         }
@@ -141,38 +162,75 @@ public final class HexMapOverlays {
         Rectangle clip = g2d.getClipBounds();
 
         for (Dynasty dynasty : world.getDynastys()) {
-            if (dynasty == null || dynasty.getTunnels() == null) {
+            if (dynasty == null) {
                 continue;
             }
             Color lineColor = HexMapGeometry.dynastyPaintColor(dynasty, AssetStyles.BORDER_COLOR);
-            for (Tunnel tunnel : dynasty.getTunnels()) {
-                if (tunnel == null) {
-                    continue;
+            if (dynasty.getTunnels() != null) {
+                for (Tunnel tunnel : dynasty.getTunnels()) {
+                    if (tunnel == null) {
+                        continue;
+                    }
+                    Hex hexA = tunnel.getHexA();
+                    Hex hexB = tunnel.getHexB();
+                    if (hexA == null || hexB == null || !areNeighbors(hexA, hexB)) {
+                        continue;
+                    }
+                    if (isHexDiscovered != null && (!isHexDiscovered.test(hexA) && !isHexDiscovered.test(hexB))) {
+                        continue;
+                    }
+                    long key = edgeKey(hexA.getQ(), hexA.getR(), hexB.getQ(), hexB.getR());
+                    if (!drawn.add(key)) {
+                        continue;
+                    }
+                    HexGridMesh.Face faceA = mesh.faceAt(hexA.getQ(), hexA.getR());
+                    HexGridMesh.Face faceB = mesh.faceAt(hexB.getQ(), hexB.getR());
+                    if (faceA == null || faceB == null) {
+                        continue;
+                    }
+                    if (clip != null && !clip.intersectsLine(faceA.centerX, faceA.centerY, faceB.centerX, faceB.centerY)) {
+                        continue;
+                    }
+                    paintTunnelBridge(g2d, faceA, faceB, layoutSize, lineColor, tunnel.isComplete());
                 }
-                Hex hexA = tunnel.getHexA();
-                Hex hexB = tunnel.getHexB();
-                if (hexA == null || hexB == null || !areNeighbors(hexA, hexB)) {
-                    continue;
+            }
+            if (dynasty.getBridges() != null) {
+                for (Bridge bridge : dynasty.getBridges()) {
+                    if (bridge == null) {
+                        continue;
+                    }
+                    Hex hexA = bridge.getHexA();
+                    Hex hexB = bridge.getHexB();
+                    if (hexA == null || hexB == null) {
+                        continue;
+                    }
+                    if (isHexDiscovered != null && (!isHexDiscovered.test(hexA) && !isHexDiscovered.test(hexB))) {
+                        continue;
+                    }
+                    long key = edgeKey(hexA.getQ(), hexA.getR(), hexB.getQ(), hexB.getR());
+                    if (!drawn.add(key)) {
+                        continue;
+                    }
+                    HexGridMesh.Face faceA = mesh.faceAt(hexA.getQ(), hexA.getR());
+                    HexGridMesh.Face faceB = mesh.faceAt(hexB.getQ(), hexB.getR());
+                    if (faceA == null || faceB == null) {
+                        continue;
+                    }
+                    if (clip != null && !clip.intersectsLine(faceA.centerX, faceA.centerY, faceB.centerX, faceB.centerY)) {
+                        continue;
+                    }
+                    paintWaterBridge(g2d, faceA, faceB, layoutSize, lineColor, bridge.isComplete());
                 }
-                long key = edgeKey(hexA.getQ(), hexA.getR(), hexB.getQ(), hexB.getR());
-                if (!drawn.add(key)) {
-                    continue;
-                }
-                HexGridMesh.Face faceA = mesh.faceAt(hexA.getQ(), hexA.getR());
-                HexGridMesh.Face faceB = mesh.faceAt(hexB.getQ(), hexB.getR());
-                if (faceA == null || faceB == null) {
-                    continue;
-                }
-                if (clip != null && !clip.intersectsLine(faceA.centerX, faceA.centerY, faceB.centerX, faceB.centerY)) {
-                    continue;
-                }
-                paintTunnelBridge(g2d, faceA, faceB, layoutSize, lineColor, tunnel.isComplete());
             }
         }
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, previousAa);
     }
 
     public static void paintBattles(Graphics2D g2d, World world, HexGridMesh mesh) {
+        paintBattles(g2d, world, mesh, null);
+    }
+
+    public static void paintBattles(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
         if (g2d == null || world == null || mesh == null || world.getWarService() == null) {
             return;
         }
@@ -194,6 +252,9 @@ public final class HexMapOverlays {
             int idB = war.getDynastyIdB();
             for (HexGridMesh.Edge edge : mesh.edges()) {
                 if (edge.faceA == null || edge.faceB == null) {
+                    continue;
+                }
+                if (isHexDiscovered != null && (!isHexDiscovered.test(edge.faceA.hex) && !isHexDiscovered.test(edge.faceB.hex))) {
                     continue;
                 }
                 Dynasty dynA = HexMapGeometry.dynastyOf(edge.faceA.hex);
@@ -348,6 +409,48 @@ public final class HexMapOverlays {
         }
     }
 
+    private static void paintWaterBridge(
+            Graphics2D g2d,
+            HexGridMesh.Face faceA,
+            HexGridMesh.Face faceB,
+            double layoutSize,
+            Color lineColor,
+            boolean complete) {
+        double dx = faceB.centerX - faceA.centerX;
+        double dy = faceB.centerY - faceA.centerY;
+        double len = Math.hypot(dx, dy);
+        if (len < 1e-6) {
+            return;
+        }
+        double ux = dx / len;
+        double uy = dy / len;
+        double bx = -uy;
+        double by = ux;
+        double railGap = layoutSize * TUNNEL_RAIL_GAP_FACTOR;
+
+        BasicStroke stroke = complete
+                ? new BasicStroke(HexGridMesh.DIVIDER_STROKE, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+                : new BasicStroke(
+                        HexGridMesh.DIVIDER_STROKE,
+                        BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_MITER,
+                        10f,
+                        TUNNEL_DASH,
+                        0f);
+        g2d.setStroke(stroke);
+        g2d.setColor(lineColor);
+
+        for (int side = -1; side <= 1; side += 2) {
+            double ox = bx * railGap * side;
+            double oy = by * railGap * side;
+            g2d.draw(new Line2D.Double(
+                    faceA.centerX + ox,
+                    faceA.centerY + oy,
+                    faceB.centerX + ox,
+                    faceB.centerY + oy));
+        }
+    }
+
     private static void paintAlternatingTradeLine(
             Graphics2D g2d,
             HexGridMesh.Face faceA,
@@ -445,5 +548,208 @@ public final class HexMapOverlays {
         int x = HexMapGeometry.centeredIconOrigin(centerX, size);
         int y = HexMapGeometry.centeredIconOrigin(centerY, size);
         g2d.drawImage(image, x, y, size, size, null);
+    }
+
+    public static void paintDayNightFilter(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
+        if (g2d == null || world == null || mesh == null) {
+            return;
+        }
+        Rectangle clip = g2d.getClipBounds();
+        for (HexGridMesh.Face face : mesh.faces()) {
+            if (face == null || face.hex == null) {
+                continue;
+            }
+            if (isHexDiscovered != null && !isHexDiscovered.test(face.hex)) {
+                continue;
+            }
+            if (clip != null && !face.intersects(clip)) {
+                continue;
+            }
+            TimeOfDay tod = world.getTimeOfDay(face.hex);
+            if (tod == null) {
+                continue;
+            }
+            Color overlayColor = resolveTimeOfDayColor(tod);
+            if (overlayColor != null && overlayColor.getAlpha() > 0) {
+                g2d.setColor(overlayColor);
+                g2d.fillPolygon(face.toPolygon());
+            }
+        }
+    }
+
+    public static void paintDisasters(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
+        if (g2d == null || world == null || mesh == null) {
+            return;
+        }
+        double layoutSize = mesh.layoutSize();
+        int iconSize = Math.max(12, (int) Math.round(layoutSize * 0.72));
+        Rectangle clip = g2d.getClipBounds();
+
+        for (HexGridMesh.Face face : mesh.faces()) {
+            if (face == null || face.hex == null || face.hex.getDisasterType() == null) {
+                continue;
+            }
+            if (isHexDiscovered != null && !isHexDiscovered.test(face.hex)) {
+                continue;
+            }
+            if (clip != null && !face.intersects(clip)) {
+                continue;
+            }
+            paintDisasterBadge(g2d, face.hex.getDisasterType(), face.centerX, face.centerY, iconSize);
+        }
+    }
+
+    public static void paintDisasterBadge(Graphics2D g2d, DisasterType disaster, double centerX, double centerY, int iconSize) {
+        if (g2d == null || disaster == null || iconSize <= 0) {
+            return;
+        }
+        ImageIcon icon = disaster.getIcon();
+        if (icon != null && icon.getImage() != null && icon != GameConstants.ICON_UNKNOWN
+                && OverworldAtmosphereRenderer.hasVisiblePixels(icon.getImage())) {
+            drawCenteredIcon(g2d, icon, centerX, centerY, iconSize);
+            return;
+        }
+        int r = Math.max(5, iconSize / 2);
+        int x = (int) Math.round(centerX - r);
+        int y = (int) Math.round(centerY - r);
+        Color badgeColor;
+        if (disaster == GameConstants.DISASTER_TSUNAMI || disaster == GameConstants.DISASTER_ICE_COLLAPSE || disaster == GameConstants.DISASTER_OCEAN_FREEZE) {
+            badgeColor = new Color(40, 150, 230, 220);
+        } else if (disaster == GameConstants.DISASTER_VOLCANO || disaster == GameConstants.DISASTER_WILDFIRE || disaster == GameConstants.DISASTER_METEOR) {
+            badgeColor = new Color(225, 75, 35, 225);
+        } else {
+            badgeColor = new Color(210, 165, 45, 225);
+        }
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(badgeColor);
+        g.fill(new Ellipse2D.Double(x, y, r * 2.0, r * 2.0));
+        g.setColor(new Color(255, 255, 255, 230));
+        g.setStroke(new BasicStroke(Math.max(1.2f, iconSize * 0.10f)));
+        g.draw(new Ellipse2D.Double(x, y, r * 2.0, r * 2.0));
+        g.draw(new Line2D.Double(centerX, centerY - r * 0.45, centerX, centerY + r * 0.15));
+        g.fill(new Ellipse2D.Double(centerX - r * 0.12, centerY + r * 0.30, r * 0.24, r * 0.24));
+        g.dispose();
+    }
+
+    private static Color resolveTimeOfDayColor(TimeOfDay tod) {
+        if (tod == GameConstants.TIME_NIGHT) {
+            return new Color(20, 28, 48, 95);
+        } else if (tod == GameConstants.TIME_DUSK) {
+            return new Color(120, 40, 160, 65);
+        } else if (tod == GameConstants.TIME_DAWN) {
+            return new Color(210, 110, 40, 60);
+        } else if (tod == GameConstants.TIME_SOLAR_ECLIPSE) {
+            return new Color(0, 0, 0, 140);
+        } else if (tod == GameConstants.TIME_LUNAR_ECLIPSE) {
+            return new Color(120, 20, 20, 100);
+        }
+        return null;
+    }
+
+    private static Image mapCloudSprite;
+    private static long mapCloudAnimTimeMs = 0L;
+    private static long lastMapCloudRealTimeMs = 0L;
+
+    private static Image getMapCloudSprite() {
+        if (mapCloudSprite == null) {
+            try {
+                URL url = HexMapOverlays.class.getResource("/sprites/environment/MapCloud.png");
+                if (url != null) {
+                    mapCloudSprite = new ImageIcon(url).getImage();
+                }
+            } catch (Throwable ignore) {
+            }
+        }
+        return mapCloudSprite;
+    }
+
+    private static synchronized long advanceMapCloudTime(boolean isPaused) {
+        long now = System.currentTimeMillis();
+        if (lastMapCloudRealTimeMs == 0L) {
+            lastMapCloudRealTimeMs = now;
+        }
+        long delta = now - lastMapCloudRealTimeMs;
+        lastMapCloudRealTimeMs = now;
+        if (!isPaused && delta > 0 && delta < 500) {
+            mapCloudAnimTimeMs += delta;
+        }
+        return mapCloudAnimTimeMs;
+    }
+
+    public static void paintWeatherClouds(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
+        paintWeatherClouds(g2d, world, mesh, isHexDiscovered, false);
+    }
+
+    public static void paintWeatherClouds(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered, boolean isPaused) {
+        if (g2d == null || world == null || mesh == null) {
+            return;
+        }
+        Rectangle clip = g2d.getClipBounds();
+        double radius = mesh.layoutSize();
+        if (radius <= 0) {
+            return;
+        }
+        long timeMs = advanceMapCloudTime(isPaused);
+        double driftOffset = Math.sin((timeMs % 10000) / 10000.0 * Math.PI * 2) * (radius * 0.08);
+
+        for (HexGridMesh.Face face : mesh.faces()) {
+            if (face == null || face.hex == null) {
+                continue;
+            }
+            if (isHexDiscovered != null && !isHexDiscovered.test(face.hex)) {
+                continue;
+            }
+            if (clip != null && !face.intersects(clip)) {
+                continue;
+            }
+            Weather w = face.hex.getLocalWeather();
+            if (w == null) {
+                w = world.getWeather();
+            }
+            if (!WorldWeatherService.isPrecipitation(w)) {
+                continue;
+            }
+            drawFaceCloudCluster(g2d, face, radius, driftOffset, w);
+        }
+    }
+
+    private static void drawFaceCloudCluster(Graphics2D g2d, HexGridMesh.Face face, double r, double drift, Weather weather) {
+        double cx = face.centerX + drift;
+        double cy = face.centerY;
+        Image sprite = getMapCloudSprite();
+        if (sprite != null) {
+            int size = (int) Math.round(r * 1.25);
+            int x = (int) Math.round(cx - size / 2.0);
+            int y = (int) Math.round(cy - size / 2.0);
+            Composite origComp = g2d.getComposite();
+            float alpha = (weather == GameConstants.WEATHER_THUNDER || weather == GameConstants.WEATHER_HEAVY_RAIN) ? 0.85f : 0.65f;
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+            g2d.drawImage(sprite, x, y, size, size, null);
+            g2d.setComposite(origComp);
+            return;
+        }
+
+        Color cloudColor;
+        if (weather == GameConstants.WEATHER_THUNDER || weather == GameConstants.WEATHER_HEAVY_RAIN) {
+            cloudColor = new Color(75, 80, 95, 175);
+        } else if (weather == GameConstants.WEATHER_ACID_RAIN) {
+            cloudColor = new Color(130, 160, 85, 165);
+        } else {
+            cloudColor = new Color(210, 220, 235, 150);
+        }
+        g2d.setColor(cloudColor);
+
+        double p1 = r * 0.65;
+        g2d.fill(new Ellipse2D.Double(cx - p1 * 0.5, cy - p1 * 0.5, p1, p1));
+
+        double p2 = r * 0.52;
+        g2d.fill(new Ellipse2D.Double(cx - r * 0.35, cy - r * 0.1, p2, p2));
+
+        double p3 = r * 0.50;
+        g2d.fill(new Ellipse2D.Double(cx + r * 0.05, cy - r * 0.18, p3, p3));
+
+        double p4 = r * 0.44;
+        g2d.fill(new Ellipse2D.Double(cx - r * 0.15, cy + r * 0.08, p4, p4));
     }
 }

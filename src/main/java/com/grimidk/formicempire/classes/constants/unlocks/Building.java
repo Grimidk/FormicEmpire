@@ -94,6 +94,10 @@ public class Building extends Constant {
         return tiers.get(Math.max(0, index));
     }
 
+    public int getTierIndex() {
+        return tierIndex;
+    }
+
     public boolean isAvailableFor(Dynasty dynasty) {
         return getTier().isUnlocked(dynasty);
     }

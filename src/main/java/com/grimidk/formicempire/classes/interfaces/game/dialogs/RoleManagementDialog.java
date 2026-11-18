@@ -285,6 +285,7 @@ public class RoleManagementDialog extends ZeroDialog {
         if (role == GameConstants.ROLE_DIPLOMAT) return GameUnlocks.ROLE_DIPLOMAT;
         if (role == GameConstants.ROLE_SPY) return GameUnlocks.ROLE_SPY;
         if (role == GameConstants.ROLE_SKYTRANS) return GameUnlocks.ROLE_SKYTRANS;
+        if (role == GameConstants.ROLE_EXPLORER) return GameUnlocks.ROLE_EXPLORER;
         if (role == GameConstants.ROLE_COMMANDER) return GameUnlocks.ROLE_COMMANDER;
         if (role == GameConstants.ROLE_CAPTAIN) return GameUnlocks.ROLE_CAPTAIN;
         if (role == GameConstants.ROLE_AIR_SUPPORT) return GameUnlocks.ROLE_AIR_SUPPORT;

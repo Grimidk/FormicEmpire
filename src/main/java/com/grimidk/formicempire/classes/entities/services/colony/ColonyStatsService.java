@@ -199,6 +199,10 @@ public class ColonyStatsService {
     public static double getTunnelWorkRequired(Dynasty dynasty) {
         return GameNumbers.TUNNEL_WORK_REQUIRED * woodburrowTimeMult(dynasty);
     }
+
+    public static double getBridgeWorkRequired(Dynasty dynasty, int hexDistance) {
+        return GameNumbers.BRIDGE_WORK_REQUIRED_PER_HEX * Math.max(1, hexDistance) * woodburrowTimeMult(dynasty);
+    }
     public int getAphidCapacity(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return 10;
         return 0;
@@ -308,6 +312,16 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) return 0.1f;
         return 0f;
     }
+
+    public float getMeatEatingEfficiency(Colony colony) {
+        if (colony == null) {
+            return 1f;
+        }
+        if (colony.hasUpgrade(GameUnlocks.STAT_CARNIVORY_3)) return 8f;
+        if (colony.hasUpgrade(GameUnlocks.STAT_CARNIVORY_2)) return 4f;
+        if (colony.hasUpgrade(GameUnlocks.STAT_CARNIVORY_1)) return 2f;
+        return 1f;
+    }
     public float getNursingRate(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.ROLE_NURSE)) return 10f;
         return 0f;
@@ -323,6 +337,14 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) return 1f;
         return 0f;
     }
+
+    public float getHuntingRate(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            return 0f;
+        }
+        float base = getCollectingRate(colony);
+        return colony.canEatMeat() ? base * GameNumbers.HUNTER_MEAT_COLLECTING_MULT : base;
+    }
     public float getParasiteDetection(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.STAT_POLICING_3)) return 0.55f;
         if (colony.hasUpgrade(GameUnlocks.STAT_POLICING_2)) return 0.35f;
@@ -334,7 +356,7 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3)) return 0.8f;
         if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) return 0.4f;
         if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_1)) return 0.2f;
-        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return 0.1f;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT) || colony.hasUpgrade(GameUnlocks.ROLE_EXPLORER)) return 0.1f;
         return 0f;
     }
 
@@ -558,6 +580,9 @@ public class ColonyStatsService {
     }
     
     public int getEffectiveFarmerCount(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) {
+            return 0;
+        }
         int count = colony.runsFullSimulation()
                 ? colony.getActiveRoleCount(GameConstants.ROLE_FARMER)
                 : colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
@@ -593,7 +618,7 @@ public class ColonyStatsService {
         if (colony.hasBuilding(GameUnlocks.PASSIVE_PROTEIN)) {
             passive = (getProteinCapacity(colony) * GameNumbers.WEB_BUILDING_PROTEIN_DAILY_FRACTION) / 24.0;
         }
-        return (hunterCount * getCollectingRate(colony)) + passive;
+        return (hunterCount * getHuntingRate(colony)) + passive;
     }
 
     public double getMineralProductionHourly(Colony colony) {
@@ -666,6 +691,13 @@ public class ColonyStatsService {
     }
 
     public int getProteinConsumption(Colony colony) {
+        if (!colony.canEatFungi()) {
+            float meatEff = Math.max(1f, getMeatEatingEfficiency(colony));
+            return (int) Math.ceil(getTotalConsumption(colony) / meatEff);
+        }
+        if (colony.canEatMeat()) {
+            return 0;
+        }
         int farmerCount = getEffectiveFarmerCount(colony);
         double demand = farmerCount * getConversionRate(colony) * 1440.0;
         int available = getProteinProduction(colony) + colony.getProtein();
@@ -673,9 +705,18 @@ public class ColonyStatsService {
     }
 
     public int getTotalProduction(Colony colony){
+        if (!colony.canEatFungi()) {
+            return Math.round(getProteinProduction(colony) * getMeatEatingEfficiency(colony));
+        }
         int farmerCount = getEffectiveFarmerCount(colony);
         double potentialOutput = farmerCount * getConversionRate(colony) * 1440.0;
         
+        if (colony.canEatMeat()) {
+            int plantInput = getPlantProduction(colony) + colony.getPlants();
+            int fungiOutput = Math.min((int) potentialOutput, plantInput);
+            return fungiOutput + Math.round(getProteinProduction(colony) * getMeatEatingEfficiency(colony));
+        }
+
         int sustainableInput = getPlantProduction(colony) + colony.getPlants() + ((getProteinProduction(colony) + colony.getProtein()) * 2);
                                
         return Math.min((int)potentialOutput, sustainableInput);

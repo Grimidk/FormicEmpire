@@ -273,6 +273,16 @@ public final class TriggerProgressService {
                 GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3),
                 GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS));
 
+        entries.add(numeric(
+                GameUnlocks.ROLE_EXPLORER,
+                LanguageStrings.TRIGGER_EXPLORER_ROLE_TITLE,
+                LanguageStrings.TRIGGER_PROGRESS_HINT_EXPLORER,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_HEXES,
+                colony.hasUpgrade(GameUnlocks.ROLE_EXPLORER),
+                colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS),
+                dynasty != null ? Math.max(dynasty.getExploredHexCount(), Math.max(0, dynasty.getKnownHexCount() - 7)) : 0,
+                GameNumbers.TRIGGER_EXPLORER_MIN_HEXES));
+
         boolean parasiticMiteUnlocked = colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
         entries.add(numeric(
                 GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,

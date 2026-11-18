@@ -74,7 +74,7 @@ public final class WarBattleSideState {
         deadCount++;
     }
 
-    public int livingArmySize() {
+    public synchronized int livingArmySize() {
         int n = 0;
         for (BattleLine line : GameConstants.getBattleLines()) {
             n += countLiving(getActive(line));
@@ -83,7 +83,7 @@ public final class WarBattleSideState {
         return n;
     }
 
-    public int livingActiveSize() {
+    public synchronized int livingActiveSize() {
         int n = 0;
         for (BattleLine line : GameConstants.getBattleLines()) {
             n += countLiving(getActive(line));
@@ -91,7 +91,7 @@ public final class WarBattleSideState {
         return n;
     }
 
-    boolean hasLivingDefenders() {
+    synchronized boolean hasLivingDefenders() {
         for (BattleLine line : GameConstants.getBattleLines()) {
             for (WarBattleParticipant p : getActive(line)) {
                 if (p.isAlive() && p.isDefenderRole()) {
@@ -102,7 +102,7 @@ public final class WarBattleSideState {
         return false;
     }
 
-    public boolean hasLivingQueen() {
+    public synchronized boolean hasLivingQueen() {
         for (BattleLine line : GameConstants.getBattleLines()) {
             for (WarBattleParticipant p : getActive(line)) {
                 if (p.isAlive() && p.isQueen()) {

@@ -21,4 +21,5 @@ public final class ColonyLogPrefixes {
     public static final String INVASION = "INVASION:";
     public static final String INVASION_SUCCESS = "INVASION_SUCCESS:";
     public static final String INVASION_FAILURE = "INVASION_FAILURE:";
+    public static final String DISASTER = "DISASTER:";
 }

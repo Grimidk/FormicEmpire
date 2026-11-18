@@ -228,6 +228,7 @@ TRIGGER_PROGRESS_METRIC_RANK,Dynasty rank tier,Nivel de rango dinástico,Nível 
 TRIGGER_PROGRESS_METRIC_PLANTS,Mega-plant harvested,Mega-planta cosechada,Mega-planta colhida,Méga-plante récoltée,,,
 TRIGGER_PROGRESS_METRIC_TIER3_BUILDINGS,Tier 3 buildings,Edificios de nivel 3,Edifícios de nível 3,Bâtiments de niveau 3,,,
 TRIGGER_PROGRESS_METRIC_RESOURCES,Stored resources,Recursos almacenados,Recursos armazenados,Ressources stockées,,,
+TRIGGER_PROGRESS_METRIC_HEXES,Hexes charted,Hexágonos cartografiados,Hexágonos mapeados,Hexagones cartographiés,,,
 TRIGGER_PROGRESS_HINT_RESEARCHER,Survive into the second month to unlock researchers.,Sobrevive hasta el segundo mes para desbloquear investigadoras.,Sobrevive até ao segundo mês para desbloquear investigadoras.,Survivez jusqu'au deuxième mois pour débloquer les chercheuses.,,,
 TRIGGER_PROGRESS_HINT_GRAVER,Accumulate corpses in the colony to unlock grave keepers.,Acumula cadáveres en la colonia para desbloquear sepultureras.,Acumula cadáveres na colónia para desbloquear coveiras.,Accumulez des cadavres dans la colonie pour débloquer les fossoyeuses.,,,
 TRIGGER_PROGRESS_HINT_RESEARCH,Earn research points from researcher queens.,Gana puntos de investigación con reinas investigadoras.,Ganha pontos de pesquisa com rainhas investigadoras.,Gagnez des points de recherche avec des reines chercheuses.,,,
@@ -243,6 +244,7 @@ TRIGGER_PROGRESS_HINT_RANK,Reach Empire dynasty rank to unlock Cloning (assimila
 TRIGGER_PROGRESS_HINT_SCOUT,Harvest enough plants from any discovered plant source.,Cosecha suficientes plantas de cualquier fuente de plantas descubierta.,Colhe plantas suficientes de qualquer fonte de plantas descoberta.,Récoltez assez de plantes depuis n'importe quelle source de plantes découverte.,,,
 TRIGGER_PROGRESS_HINT_MINER,Complete 10 Tier 3 buildings across your dynasty (requires Soldier type).,Completa 10 edificios de nivel 3 en tu dinastía (requiere tipo Soldado).,Conclua 10 edifícios de nível 3 na dinastia (requer tipo Soldada).,Terminez 10 bâtiments de niveau 3 dans votre dynastie (type Soldat requis).,,,
 TRIGGER_PROGRESS_HINT_PARASITIC_MITE,"Stockpile resources. Outbreaks (cold biomes, fall/winter) unlock symbiotic mite catching dynasty-wide.","Acumula recursos. Los brotes (biomas fríos, otoño/invierno) desbloquean la captura de ácaros simbióticos en toda la dinastía.","Acumula recursos. Surtos (biomas frios, outono/inverno) desbloqueiam a captura de ácaros simbióticos em toda a dinastia.","Stockez des ressources. Les épidémies (biomes froids, automne/hiver) débloquent la capture d'acariens symbiotiques pour toute la dynastie.",,,
+TRIGGER_PROGRESS_HINT_EXPLORER,Discover 10 new hexes with scouts to unlock Explorer princesses.,Descubre 10 hexágonos nuevos con exploradores para desbloquear princesas Exploradoras.,Descobre 10 novos hexágonos com batedores para desbloquear princesas Exploradoras.,Découvrez 10 nouveaux hexagones avec des éclaireuses pour débloquer les princesses Exploratrices.,,,
 SYNERGY_SUPER_VENOM,Super Venom,Súper Veneno,Super Veneno,Super Venin,,,
 SYNERGY_SUPER_VENOM_FLAVOR,Super Venom,Súper Veneno,Super Veneno,Super Venin,,,
 SYNERGY_SUPER_VENOM_DESC,Replaces Fire + Neurotoxic venom stacking (+50% each) with a +200% colony attack bonus (3x total) when both venoms are assimilated and Synergies are researched.,Sustituye el apilamiento de veneno de fuego + neurotóxico (+50% cada uno) por un bonus de ataque de +200% (3x total) cuando ambos venenos están asimilados y se investigaron Sinergias.,Substitui o empilhamento de veneno de fogo + neurotóxico (+50% cada) por um bónus de ataque de +200% (3x total) quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.,Remplace l'empilement venin de feu + neurotoxique (+50 % chacun) par un bonus d'attaque de +200 % (3x au total) lorsque les deux venins sont assimilés et que les Synergies sont recherchées.,,,
@@ -542,6 +544,15 @@ MAP_LAYER_BATTLES,Active battles,Batallas activas,Batalhas ativas,Batailles acti
 MAP_CONQUER_COLONY,Conquer,Conquistar,Conquistar,Conquérir,,,
 MAP_CONQUER_COLONY_TT,"Click a foreign colony or an empty land hex, then Conquer.",Haz clic en una colonia ajena o un hexágono vacío y luego en Conquistar.,Clique em uma colônia estrangeira ou um hexágono vazio e depois em Conquistar.,"Cliquez sur une colonie étrangère ou un hexagone vide, puis Conquérir.",,,
 MAP_CONQUER_COLONY_SELECT_TT,Select a foreign colony or an empty land hex first.,Primero selecciona una colonia ajena o un hexágono vacío.,Primeiro selecione uma colônia estrangeira ou um hexágono vazio.,Sélectionnez d'abord une colonie étrangère ou un hexagone vide.,,,
+MAP_POSSESS_COLONY,Possess,Poseer,Possuir,Posséder,,,
+MAP_POSSESS_COLONY_TT,Take control of the selected colony and exit spectator mode.,Toma el control de la colonia seleccionada y sal del modo espectador.,Assuma o controle da colônia selecionada e saia do modo espectador.,Prenez le contrôle de la colonie sélectionnée et quittez le mode spectateur.,,,
+MAP_POSSESS_COLONY_SELECT_TT,Select a living colony hex first.,Primero selecciona un hexágono con una colonia viva.,Primeiro selecione um hexágono com uma colônia viva.,Sélectionnez d'abord un hexagone avec une colonie vivante.,,,
+MAP_POSSESS_COLONY_CONFIRM_TITLE,Possess Colony,Poseer colonia,Possuir colônia,Posséder la colonie,,,
+MAP_POSSESS_COLONY_CONFIRM_MSG,Take control of %s (%s) and end spectator mode?,¿Tomar el control de %s (%s) y salir del modo espectador?,Assumir o controle de %s (%s) e sair do modo espectador?,Prendre le contrôle de %s (%s) et quitter le mode spectateur ?,,,
+MAP_DEPOSSESS_COLONY,Spectate,Espectar,Espectar,Observer,,,
+MAP_DEPOSSESS_COLONY_TT,Release control of your dynasty to AI and enter spectator mode.,Cede el control de tu dinastía a la IA y entra en modo espectador.,Libere o controle da sua dinastia para a IA e entre no modo espectador.,Cédez le contrôle de votre dynastie à l'IA et passez en mode spectateur.,,,
+MAP_DEPOSSESS_COLONY_CONFIRM_TITLE,Enter Spectator Mode,Entrar en modo espectador,Entrar no modo espectador,Passer en mode spectateur,,,
+MAP_DEPOSSESS_COLONY_CONFIRM_MSG,Release %s back to AI control and enter spectator mode?,¿Ceder %s de nuevo al control de la IA y entrar en modo espectador?,Liberar %s de volta ao controle da IA e entrar no modo espectador?,Rendre %s au contrôle de l'IA et passer en mode spectateur ?,,,
 MAP_ZOOM_IN_TT,Zoom in (mouse wheel on the map),Acercar (rueda del ratón en el mapa),Aproximar (roda do mouse no mapa),Zoom avant (molette sur la carte),,,
 MAP_ZOOM_OUT_TT,Zoom out (mouse wheel on the map),Alejar (rueda del ratón en el mapa),Afastar (roda do mouse no mapa),Zoom arrière (molette sur la carte),,,
 DIALOG_WAR_TITLE,Wars,Guerras,Guerras,Guerres,,,
@@ -648,6 +659,7 @@ DYNASTY_INCOMING,Incoming Route,Ruta de Entrada,Rota de entrada,Route entrante,,
 DYNASTY_ACTIONS,Actions,Acciones,Ações,Actions,,,
 DYNASTY_TRANSIT_FORMAT,%s (%sh)%s,%s (%sh)%s,%s (%sh)%s,%s (%sh)%s,,,
 DYNASTY_BUILD_TUNNEL,Build Tunnel,Construir Túnel,Construir túnel,Construire un tunnel,,,
+DYNASTY_BUILD_BRIDGE,Build Bridge,Construir Puente,Construir ponte,Construire un pont,,,
 DYNASTY_TUNNEL_SPONSORING,This colony is already sponsoring a tunnel project.,Esta colonia ya está patrocinando un proyecto de túnel.,Esta colônia já patrocina um projeto de túnel.,Cette colonie parraine déjà un projet de tunnel.,,,
 DYNASTY_BUILT,Built,Construido,Construído,Construit,,,
 DYNASTY_PROGRESS_PERCENT,%s%%,%s%%,%s%%,%s%%,,,
@@ -907,6 +919,7 @@ SETTINGS_TAB_VIDEO,Video,Vídeo,Vídeo,Vidéo,,,
 SETTINGS_TAB_AUDIO,Audio,Audio,Áudio,Audio,,,
 SETTINGS_TAB_ROLES,Roles,Roles,Funções,Rôles,,,
 SETTINGS_TAB_SANDBOX,Sandbox,Sandbox,Sandbox,Bac à sable,,,
+SETTINGS_TAB_CHEATS,Cheats,Trucos,Trapaças,Triches,,,
 SETTINGS_SANDBOX_NOTE,★ options permanently disable achievements on any save used with them.,Las opciones ★ desactivan permanentemente los logros en cualquier partida que las use.,Opções ★ desativam permanentemente as conquistas em qualquer save que as use.,Les options ★ désactivent définitivement les succès sur toute sauvegarde qui les utilise.,,,
 SETTINGS_SANDBOX_STAR_PREFIX,★ ,★ ,★ ,★ ,,,
 SETTINGS_FREE_ABILITIES,Free abilities:,Habilidades gratis:,Habilidades grátis:,Capacités gratuites :,,,
@@ -1172,6 +1185,7 @@ ROLE_ASSISTANT,Lab Assistant,Asistente de lab.,Assistente de lab.,Assistante de 
 ROLE_ESCORT,Convoy Escort,Escolta de convoy,Escolta de comboio,Escorte convoi,,,
 ROLE_ENGINEER,Tunnel Engineer,Ingeniera Túnel,Engenheira de túnel,Ingénieuse tunnel,,,
 ROLE_SKYTRANS,Sky Transport,Transp. Aéreo,Transp. aéreo,Transp. aérien,,,
+ROLE_EXPLORER,Explorer,Exploradora,Exploradora,Exploratrice,,,
 RANK_ANT,Ant,Hormiga,Formiga,Fourmi,,,
 RANK_COLONY,Ant Colony,Colonia,Colônia,Colonie,,,
 RANK_COUNTY,Ant County,Condado,Condado,Comté,,,
@@ -1280,10 +1294,13 @@ DIPLO_ERROR_WAR_ACTIVE_MILITARY,"Assign active military roles in war economy (Wa
 DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT,%s cannot be attacked yet — they have no active military roles.,%s aún no puede ser atacada: no tiene roles militares activos.,%s ainda não pode ser atacada — não tem funções militares activas.,%s ne peut pas encore être attaquée : aucun rôle militaire actif.,,,
 DIPLO_ERROR_WAR_NO_BORDER,Can only declare war to a bordering dynasty.,Solo se puede declarar la guerra a una dinastía vecina.,Só é possível declarar guerra a uma dinastia fronteiriça.,On ne peut déclarer la guerre qu'à une dynastie voisine.,,,
 DIPLO_ACTION_TRADE,Trade,Comerciar,Comerciar,Commerce,,,
+DIPLO_CATEGORY_DIPLOMATIC,Diplomatic,Diplomático,Diplomático,Diplomatique,,,
+DIPLO_CATEGORY_AGGRESSIVE,Aggressive,Agresivo,Agressivo,Agressif,,,
+DIPLO_CATEGORY_SUBVERSIVE,Subversive,Subversivo,Subversivo,Subversif,,,
 DIPLO_ACTION_REQUEST_TRADE,Request Trade,Solicitar comercio,Solicitar comércio,Demander un commerce,,,
 DIPLO_ACTION_SEND_DIPLOMATS,Send Diplomats,Enviar diplomáticas,Enviar diplomatas,Envoyer des diplomates,,,
 DIPLO_ACTION_VISIT,Visit,Visitar,Visitar,Visiter,,,
-DIPLO_ERROR_NO_SPY_ROLE,Unlock Spies via Ghost assimilation first.,Desbloquea Espías con la asimilación Fantasma primero.,Desbloqueie Espiões via assimilação Fantasma primeiro.,Débloquez les Espions via l'assimilation Fantôme d'abord.,,,
+DIPLO_ERROR_NO_SPY_ROLE,Research the Spy role under Princesses first.,Investiga el rol de Espía bajo Princesas primero.,Pesquise a função de Espião sob Princesas primeiro.,Recherchez le rôle d'Espion sous les Princesses d'abord.,,,
 DIPLO_ERROR_NO_SPIES,No spies available.,No hay espías disponibles.,Não há espiões disponíveis.,Aucun espion disponible.,,,
 DIPLO_SEND_SPIES_TITLE,Send Spies,Enviar espías,Enviar espiões,Envoyer des espions,,,
 DIPLO_ACTION_INTELLIGENCE,Intelligence,Inteligencia,Inteligência,Renseignement,,,
@@ -1451,7 +1468,7 @@ ASSIMILATION_SWARMING,Swarming,Enjambre,Enxame,Essaim,,,
 ASSIMILATION_SWARMING_DESC,After assimilating the army ant genome:,Tras asimilar el genoma de la hormiga enjambre:,Após assimilar o genoma da formiga enxame:,Après assimilation du génome de la fourmi essaim :,,,
 ASSIMILATED_STEALTH,Stealth,Sigilo,Furtividade,Furtivité,,,
 ASSIMILATED_STEALTH_FLAVOR,Ghost Infiltration,Infiltración Fantasma,Infiltração Fantasma,Infiltration Fantôme,,,
-ASSIMILATED_STEALTH_DESC,"Unlocks the Spy princess role. Send spies against foreign dynasties to build Intelligence (0–100%). Idle spies raise Counter-Intelligence (5 + idle spies, max 50). At 100% Intelligence, spies steal a small share of RP, resin, minerals, or syrup each day.","Desbloquea el rol Espía. Envía espías contra dinastías extranjeras para acumular Inteligencia (0–100%). Las espías inactivas suben el Contraespionaje (5 + espías inactivas, máx. 50). Al 100% de Inteligencia, roban cada día una pequeña parte de PI, resina, minerales o jarabe.","Desbloqueia a função Espião. Envie espiões contra dinastias estrangeiras para acumular Inteligência (0–100%). Espiões ociosos aumentam a Contrainteligência (5 + espiões ociosos, máx. 50). Em 100% de Inteligência, roubam diariamente uma pequena parte de PP, resina, minerais ou xarope.","Débloque le rôle Espion. Envoyez des espions contre des dynasties étrangères pour accumuler du Renseignement (0–100 %). Les espions inactifs augmentent le Contre-espionnage (5 + espions inactifs, max. 50). À 100 % de renseignement, ils volent chaque jour une petite part de PR, résine, minerais ou sirop.",,,
+ASSIMILATED_STEALTH_DESC,"Mastery of Ghost Stealth. Unlocks the Spy role for free, removes the 20% Intelligence cap (allowing up to 100%), doubles spy power, halves spy detection chance, and enables daily resource theft at 100% Intelligence.","Maestría del Sigilo Fantasma. Desbloquea el rol Espía gratis, elimina el límite de 20% de Inteligencia (hasta 100%), duplica el poder de espionaje, reduce a la mitad la detección y permite el robo diario de recursos al 100%.","Mestria da Furtividade Fantasma. Desbloqueia a função Espião gratuitamente, remove o limite de 20% de Inteligência (até 100%), duplica o poder de espionagem, reduz pela metade a deteção e permite o roubo diário de recursos em 100%.","Maîtrise de la Furtivité Fantôme. Débloque le rôle Espion gratuitement, supprime le plafond de 20 % de Renseignement (jusqu'à 100 %), double la puissance d'espionnage, réduit de moitié la détection et permet le vol quotidien de ressources à 100 %.",,,
 ASSIMILATION_STEALTH,Stealth,Sigilo,Furtividade,Furtivité,,,
 ASSIMILATION_STEALTH_DESC,After assimilating the ghost ant genome:,Tras asimilar el genoma de la hormiga fantasma:,Após assimilar o genoma da formiga fantasma:,Après assimilation du génome de la fourmi fantôme :,,,
 ASSIMILATED_FASTBITE,Fast Bite,Mordida Rápida,Mordida rápida,Morsure rapide,,,
@@ -1603,7 +1620,7 @@ ROLE_BREEDER_DESC,Allows Princesses and Drones to go to nuptial flights and get 
 ROLE_DIPLOMAT_UPGRADE,Diplomat Role,Rol Diplomática,Função diplomata,Rôle diplomate,,,
 ROLE_DIPLOMAT_FLAVOR,Mightier Than The Sword,Más fuerte que la espada,Mais forte que a espada,Plus fort que l'épée,,,
 ROLE_DIPLOMAT_DESC,Allows princesses to improve colony loyalty or dynasty reputation via diplomatic missions.,Permite a las princesas mejorar la lealtad de la colonia o la reputación dinástica mediante misiones diplomáticas.,Permite que princesas melhorem a lealdade da colônia ou a reputação dinástica via missões diplomáticas.,Permet aux princesses d'améliorer la loyauté d'une colonie ou la réputation dynastique via des missions diplomatiques.,,,
-ROLE_SPY_DESC,Princess role unlocked by Ghost Stealth assimilation. Send Spies from Diplomacy (D) Actions — same menu as Diplomats; missions work even at war. Assigned spies not sent abroad are idle and raise Counter-Intelligence. Diplomatic Pressure II/III also raise spy power (1→3→5).,Rol de princesa desbloqueado por la asimilación Sigilo Fantasma. Envía Espías desde Acciones de Diplomacia (D) — el mismo menú que las Diplomáticas; las misiones funcionan incluso en guerra. Las espías asignadas que no se envían están inactivas y suben el Contraespionaje. Presión Diplomática II/III también sube el poder de espionaje (1→3→5).,Função de princesa desbloqueada pela assimilação Furtividade Fantasma. Envie Espiões em Ações de Diplomacia (D) — o mesmo menu dos Diplomatas; missões funcionam mesmo em guerra. Espiões atribuídos e não enviados ficam ociosos e aumentam a Contrainteligência. Pressão Diplomática II/III também aumentam o poder de espionagem (1→3→5).,Rôle de princesse débloqué par l'assimilation Furtivité Fantôme. Envoyez des Espions via Actions de Diplomatie (D) — même menu que les Diplomates ; les missions fonctionnent même en guerre. Les espions assignés non envoyés sont inactifs et augmentent le Contre-espionnage. Pression diplomatique II/III augmente aussi la puissance d'espionnage (1→3→5).,,,
+ROLE_SPY_DESC,"Princess role researchable under Princesses (free for Ghost ants). Send Spies from Diplomacy (D) Subversive Actions; works even at war. Builds up to 20% Intelligence on foreign dynasties (Ghost Stealth assimilation required for 100%). Idle spies raise Counter-Intelligence. Diplomatic Pressure II/III also raise spy power.","Rol de princesa investigable bajo Princesas (gratis para hormigas Fantasma). Envía Espías desde Acciones Subversivas de Diplomacia (D); funciona incluso en guerra. Acumula hasta 20% de Inteligencia (se requiere asimilación Sigilo Fantasma para 100%). Las espías inactivas suben el Contraespionaje. Presión Diplomática II/III también sube el poder de espionaje.","Função de princesa pesquisável sob Princesas (gratuita para formigas Fantasma). Envie Espiões em Ações Subversivas de Diplomacia (D); funciona mesmo em guerra. Acumula até 20% de Inteligência (assimilação Furtividade Fantasma necessária para 100%). Espiões ociosos aumentam a Contrainteligência. Pressão Diplomática II/III também aumentam o poder de espionagem.","Rôle de princesse recherchable sous les Princesses (gratuit pour les fourmis Fantômes). Envoyez des Espions via Actions Subversives de Diplomatie (D) ; fonctionne même en guerre. Accumule jusqu'à 20 % de Renseignement (assimilation Furtivité Fantôme requise pour 100 %). Les espions inactifs augmentent le Contre-espionnage. Pression diplomatique II/III augmente aussi la puissance d'espionnage.",,,
 ROLE_SPY_FLAVOR,Whispers In The Nest,Susurros en el nido,Sussurros no ninho,Murmures dans le nid,,,
 ROLE_SPY_UPGRADE,Spy Role,Rol Espía,Função espião,Rôle espion,,,
 ROLE_MILITIA_UPGRADE,Militia Role,Rol Milicia,Função milícia,Rôle milice,,,
@@ -1636,6 +1653,9 @@ ROLE_ENGINEER_DESC,Allows workers to dig tunnels for safer trade routes but at 1
 ROLE_SKYTRANS_UPGRADE,Sky Transport Role,Rol Transporte Aéreo,Função transporte aéreo,Rôle transport aérien,,,
 ROLE_SKYTRANS_FLAVOR,Aerial Logistics,Logística Aérea,Logística aérea,Logistique aérienne,,,
 ROLE_SKYTRANS_DESC,"Allows princesses to transport resources for trade routes, reducing travel time but at less capacity.","Permite a las princesas transportar recursos, reduciendo el tiempo de viaje pero con menos capacidad.","Permite que princesas transportem recursos, reduzindo o tempo de viagem com menos capacidade.","Permet aux princesses de transporter des ressources, moins de temps mais moins de capacité.",,,
+ROLE_EXPLORER_UPGRADE,Explorer Role,Rol Exploradora,Função exploradora,Rôle exploratrice,,,
+ROLE_EXPLORER_FLAVOR,Aerial Reconnaissance,Reconocimiento Aéreo,Reconhecimento aéreo,Reconnaissance aérienne,,,
+ROLE_EXPLORER_DESC,"Allows princesses to explore the map with double range and efficiency, including open ocean hexes.","Permite a las princesas explorar el mapa con el doble de alcance y eficiencia, incluidos los océanos abiertos.","Permite que princesas explorem o mapa com o dobro de alcance e eficiência, incluindo oceanos abertos.","Permet aux princesses d'explorer la carte avec deux fois plus de portée et d'efficacité, y compris les océans ouverts.",,,
 ABILITY_RESEARCH,Research,Investigación,Pesquisa,Recherche,,,
 ABILITY_RESEARCH_FLAVOR,Micro Microscopes,Micro Microscopios,Microscópios,Micro microscopes,,,
 ABILITY_RESEARCH_DESC,"Allows you to research more ant technology by using research points, go to the research menu (Y).",Permite investigar más tecnología mediante puntos de investigación en el menú (Y).,Permite pesquisar mais tecnologia com pontos de pesquisa no menu (Y).,Permet de rechercher plus de technologie via les points de recherche (menu Y).,,,
@@ -1682,6 +1702,9 @@ ABILITY_SUBTYPE_HATCH_DESC,Adjust per-type head and abdomen subtype odds in the 
 ABILITY_TUNNELS,Tunnels,Túneles,Túneis,Tunnels,,,
 ABILITY_TUNNELS_FLAVOR,Subterranean Highways,Autopistas Subterráneas,Rodovias subterrâneas,Autoroutes souterraines,,,
 ABILITY_TUNNELS_DESC,Allows your colonies to build tunnel networks between each other for faster and safer resource transport.,Permite construir redes de túneles entre colonias para un transporte más rápido y seguro.,Permite redes de túneis entre colônias para transporte mais rápido e seguro.,Permet des réseaux de tunnels entre colonies pour un transport plus rapide et sûr.,,,
+ABILITY_BRIDGES,Bridges,Puentes,Pontes,Ponts,,,
+ABILITY_BRIDGES_FLAVOR,Living Spanways,Puentes Vivientes,Pontes vivas,Ponts vivants,,,
+ABILITY_BRIDGES_DESC,Allows colonies with rafting to build bridges across water hexes for land-speed colonization, convoys, and war marches.,Permite a las colonias con balsas construir puentes sobre hexágonos de agua para colonización, convoyes y marchas de guerra a velocidad terrestre.,Permite que colônias com jangadas construam pontes sobre hexágonos de água para colonização, comboios e marchas de guerra em velocidade terrestre.,Permet aux colonies dotées du radeau de construire des ponts sur les cases d'eau pour la colonisation, les convois et les marches de guerre à vitesse terrestre.,,,
 ABILITY_BILATERAL_TRADE,Bilateral Trade,Comercio Bilateral,Comércio bilateral,Commerce bilatéral,,,
 ABILITY_BILATERAL_TRADE_FLAVOR,Two-Way Logistics,Logística de Doble Sentido,Logística de mão dupla,Logistique deux sens,,,
 ABILITY_BILATERAL_TRADE_DESC,Allows your trade convoys to bring resources back on their return trip.,Permite que tus convoys traigan recursos de vuelta en su viaje de retorno.,Permite que comboios tragam recursos na volta.,Les convois ramènent des ressources au retour.,,,
@@ -1782,6 +1805,15 @@ STAT_FARMING_2_DESC,Increases farming conversion rate by another 0.2 per minute.
 STAT_FARMING_3,Farming III,Agricultura III,Cultivo III,Culture III,,,
 STAT_FARMING_3_FLAVOR,Genetic Modification,Modificación Genética,Modificação genética,Modification génétique,,,
 STAT_FARMING_3_DESC,Increases farming conversion rate by another 0.4 per minute.,Aumenta la tasa de conversión agrícola en otros 0.4 por minuto.,"Aumenta conversão agrícola em mais 0,4 por minuto.","+0,4 par minute en plus.",,,
+STAT_CARNIVORY_1,Carnivory I,Carnivoría I,Carnivoria I,Carnivorie I,,,
+STAT_CARNIVORY_1_FLAVOR,Prey Butchery,Despiece de Presas,Desmanche de presas,Découpe des proies,,,
+STAT_CARNIVORY_1_DESC,Doubles the nutritional efficiency of consumed protein (each unit of protein feeds 2 ants).,Duplica la eficiencia nutricional de la proteína consumida (cada unidad de proteína alimenta a 2 hormigas).,Dobra a eficiência nutricional da proteína consumida (cada unidade de proteína alimenta 2 formigas).,Double l'efficacité nutritionnelle des protéines consommées (chaque unité de protéine nourrit 2 fourmis).,,,
+STAT_CARNIVORY_2,Carnivory II,Carnivoría II,Carnivoria II,Carnivorie II,,,
+STAT_CARNIVORY_2_FLAVOR,Enzymatic Digestion,Digestión Enzimática,Digestão enzimática,Digestion enzymatique,,,
+STAT_CARNIVORY_2_DESC,Further doubles the nutritional efficiency of consumed protein (each unit of protein feeds 4 ants).,Duplica aún más la eficiencia nutricional de la proteína consumida (cada unidad de proteína alimenta a 4 hormigas).,Dobra ainda mais a eficiência nutricional da proteína consumida (cada unidade de proteína alimenta 4 formigas).,Double à nouveau l'efficacité nutritionnelle des protéines consommées (chaque unité de protéine nourrit 4 fourmis).,,,
+STAT_CARNIVORY_3,Carnivory III,Carnivoría III,Carnivoria III,Carnivorie III,,,
+STAT_CARNIVORY_3_FLAVOR,Hyper-Metabolic Assimilation,Asimilación Hipermetabólica,Assimilação hipermetabólica,Assimilation hypermétabolique,,,
+STAT_CARNIVORY_3_DESC,Further doubles the nutritional efficiency of consumed protein (each unit of protein feeds 8 ants).,Duplica aún más la eficiencia nutricional de la proteína consumida (cada unidad de proteína alimenta a 8 hormigas).,Dobra ainda mais a eficiência nutricional da proteína consumida (cada unidade de proteína alimenta 8 formigas).,Double à nouveau l'efficacité nutritionnelle des protéines consommées (chaque unité de protéine nourrit 8 fourmis).,,,
 STAT_CONTAMINATION_1,Contamination I,Contaminación I,Contaminação I,Contamination I,,,
 STAT_CONTAMINATION_1_FLAVOR,Body Disposal,Eliminación de Cuerpos,Remoção de corpos,Élimination des corps,,,
 STAT_CONTAMINATION_1_DESC,Reduces contamination death rate by 20%.,Reduce la tasa de mortalidad por contaminación en un 20%.,Reduz mortes por contaminação em 20%.,Réduit la mortalité par contamination de 20%.,,,
@@ -1979,7 +2011,7 @@ PASSIVE_FARM_DESC,"Enables passive farming even if there are no ants assigned, s
 PASSIVE_GRAVE,Passive Graveyard,Cementerio Pasivo,Cemitério passivo,Cimetière passif,,,
 PASSIVE_GRAVE_DESC,"Enables passive grave keeping even if there are no ants assigned, simulates 1 graver.",Limpieza pasiva de tumbas sin necesidad de sepultureras.,Limpeza passiva de túmulos sem coveiras.,Nettoyage passif des tombes sans fossoyeuses.,,,
 BUILDING_COMPOSTER,Composter,Compostador,Composteira,Composteur,,,
-BUILDING_COMPOSTER_DESC,Turns dead bodies into mushrooms daily. 1 body to 4 mushrooms matter.,Convierte cuerpos en hongo diariamente (1 cuerpo = 4 hongos).,Converte corpos em cogumelo diariamente (1 corpo = 4 cogumelos).,Transforme les corps en champignon chaque jour (1 corps = 4 champignons).,,,
+BUILDING_COMPOSTER_DESC,Turns dead bodies into mushrooms (or protein for carnivorous colonies) daily. 1 body to 4 food matter.,Convierte cuerpos en hongo (o proteína para colonias carnívoras) diariamente (1 cuerpo = 4 de alimento).,Converte corpos em cogumelo (ou proteína para colônias carnívoras) diariamente (1 corpo = 4 de alimento).,Transforme les corps en champignon (ou protéine pour les colonies carnivores) chaque jour (1 corps = 4 de nourriture).,,,
 ASSIMILATION_LEAFCUTTER,Farming,Agricultura,Cultivo,Culture,,,
 ASSIMILATION_LEAFCUTTER_DESC,After assimilating the leafcutter ant genome:,Tras asimilar el genoma de la hormiga cortadora de hojas:,Após assimilar o genoma da cortadeira de folhas:,Après assimilation du génome de la fourmi coupe-feuille :,,,
 ASSIMILATION_PHARAOH,Multiqueen,Multireina,Multirainha,Multi-reines,,,
@@ -2083,6 +2115,7 @@ HELP_BUG_TARANTULA_DESC,"Hunt prey (Critter Management → Hunts). A heavier ara
 HELP_BIOMES_TITLE,Biomes,Biomas,Biomas,Biomes,,,
 HELP_BIOME_TEMP,Temp: ,Temp.: ,Temp.: ,Temp : ,,,
 HELP_BIOME_HUMID,Humid: ,Humedad: ,Umidade: ,Humidité : ,,,
+HELP_BIOME_HEIGHT,Height: ,Altura: ,Altura: ,Altitude : ,,,
 HELP_WORLD_INFO_TITLE,World Info,Información del Mundo,Informações do mundo,Infos monde,,,
 HELP_SEASONS,Seasons,Estaciones,Estações,Saisons,,,
 HELP_WEATHER,Weather,Clima,Clima,Météo,,,
@@ -2243,6 +2276,7 @@ LOG_SYMBIOTIC_MITES_PREDATION_FMT,Symbiotic mites eliminated %s parasitic mite(s
 LOG_NUPTIAL_QUEENS_FMT,Nuptial flight occurred. %s new queens joined.,Vuelo nupcial. Se unieron %s reinas nuevas.,Voo nupcial. %s novas rainhas se juntaram.,Essaim nuptial : %s nouvelles reines ont rejoint.,,,
 LOG_SUCCESS_ASSIMILATION_FMT,%s completed! Reward: %s,¡%s completada! Recompensa: %s,%s concluída! Recompensa: %s,%s terminée ! Récompense : %s,,,
 LOG_SUCCESS_TUNNEL,Tunnel connection completed!,¡Conexión de túnel completada!,Conexão de túnel concluída!,Connexion de tunnel terminée !,,,
+LOG_SUCCESS_BRIDGE,Bridge connection completed!,¡Conexión de puente completada!,Conexão de ponte concluída!,Connexion de pont terminée !,,,
 LOG_FOUND_NEW_SOURCE_FMT,Found new %s source.,Nueva fuente de %s encontrada.,Nova fonte de %s encontrada.,Nouvelle source de %s trouvée.,,,
 LOG_FOUND_SOURCE_FULL_FMT,Found %s but capacity is full.,Se encontró %s pero la capacidad está llena.,"%s encontrado, mas capacidade cheia.",%s trouvé mais capacité pleine.,,,
 LOG_SOURCE_EXHAUSTED_FMT,A %s source has been exhausted.,Una fuente de %s se ha agotado.,Uma fonte de %s esgotou-se.,Une source de %s est épuisée.,,,
@@ -2342,6 +2376,8 @@ TRIGGER_HUNTS_ABILITY_TITLE,Creature Hunts,Cacerías de criaturas,Caçadas de cr
 TRIGGER_HUNTS_ABILITY_MSG,"Your scouts are ready to track overworld bugs. Open Hunts from the game menu or press H to dispatch hunting parties during peacetime.","Tus exploradores están listos para rastrear bichos en el supramundo. Abre Cacerías en el menú de juego o pulsa H para enviar partidas de caza en tiempos de paz.","Os teus batedores estão prontos para rastrear insetos no supermundo. Abre Caçadas no menu do jogo ou prime H para enviar grupos de caça em tempos de paz.","Vos éclaireurs peuvent traquer des proies sur la surface. Ouvrez Chasses dans le menu jeu ou appuyez sur H pour envoyer des expéditions en temps de paix.",,,
 TRIGGER_MINER_ROLE_TITLE,Call of the Depths,Llamada de las profundidades,Chamada das profundezas,Appel des profondeurs,,,
 TRIGGER_MINER_ROLE_MSG,"With ten Tier 3 buildings across the dynasty, soldiers yearn for the mines! The Miner role is unlocked — scouts can now spot mineral sources.","¡Con diez edificios de nivel 3 en la dinastía, las soldadas anhelan las minas! Se desbloquea el rol Minera; las exploradoras pueden detectar minerales.","Com dez edifícios de nível 3 na dinastia, as soldadas anseiam pelas minas! A função Mineradora é desbloqueada; batedoras podem detectar minerais.","Avec dix bâtiments de niveau 3 dans la dynastie, les soldates aspirent aux mines ! Le rôle Mineuse est débloqué ; les éclaireuses peuvent repérer des minéraux.",,,
+TRIGGER_EXPLORER_ROLE_TITLE,Horizon Unveiled,Horizonte revelado,Horizonte revelado,Horizon dévoilé,,,
+TRIGGER_EXPLORER_ROLE_MSG,"Ten hexes have been charted across the world! Princesses take to the skies as Explorers, doubling exploration range and charting open oceans.","¡Diez hexágonos han sido explorados por el mundo! Las princesas vuelan como Exploradoras, duplicando el alcance y cruzando océanos abiertos.","Dez hexágonos foram mapeados pelo mundo! As princesas voam como Exploradoras, dobrando o alcance e explorando oceanos abertos.","Dix hexagones ont été cartographiés à travers le monde ! Les princesses deviennent Exploratrices, doublant la portée et explorant les océans.",,,
 TRIGGER_POLICE_ROLE_TITLE,Parasite Ant Infestation,Infestación de hormigas parásitas,Infestação de formigas parasitas,Infestation de fourmis parasites,,,
 TRIGGER_POLICE_ROLE_MSG,The colony has become so prosperous that parasite ants may infiltrate it!,¡La colonia se ha vuelto tan próspera que las hormigas parásitas pueden infiltrarse!,A colónia tornou-se tão próspera que formigas parasitas podem infiltrar-se!,La colonie est devenue si prospère que des fourmis parasites peuvent s'y infiltrer !,,,
 TRIGGER_PARASITIC_MITE_TITLE,Parasitic Mites,Ácaros parásitos,Ácaros parasitas,Acariens parasitaires,,,
@@ -2389,6 +2425,7 @@ TRIGGER_OPERATIONS_ABILITY_MSG,You have gained a special active ability! You can
 INTEL_DOSSIER_TITLE,Intelligence Dossier,Dossier de inteligencia,Dossiê de inteligência,Dossier de renseignement,,,
 INTEL_REDACTED,████████,████████,████████,████████,,,
 INTEL_LEVEL_FMT,Intelligence: %s%%,Inteligencia: %s%%,Inteligência: %s%%,Renseignement : %s%%,,,
+INTEL_CAP_NO_STEALTH_FMT,Cap: %s%% (Ghost Stealth required for higher),Límite: %s%% (Se requiere Sigilo Fantasma para mayor),Limite: %s%% (Furtividade Fantasma necessária para mais),Plafond : %s%% (Furtivité Fantôme requise pour plus),,,
 INTEL_CI_FMT,Counter-Intelligence: %s,Contraespionaje: %s,Contrainteligência: %s,Contre-espionnage : %s,,,
 INTEL_SPIES_ASSIGNED_FMT,Spies assigned: %s,Espías asignados: %s,Espiões atribuídos: %s,Espions assignés : %s,,,
 INTEL_TIER_1,Rank and colony count,Rango y número de colonias,Rank e número de colônias,Rang et nombre de colonies,,,
@@ -2684,7 +2721,7 @@ SAVED_MAP_CHOOSE_MODE_TITLE,World Setup,Configuración del mundo,Configuração 
 SAVED_MAP_CHOOSE_MODE_MSG,Select how the world for this game should be created:,Selecciona cómo crear el mundo para esta partida:,Selecione como o mundo deste jogo deve ser criado:,Sélectionnez comment le monde de cette partie doit être créé :
 SAVED_MAP_GENERATE_NEW,Generate New Map,Generar nuevo mapa,Gerar novo mapa,Générer une nouvelle carte
 SAVED_MAP_LOAD_SAVED,Choose Saved Map,Elegir mapa guardado,Escolher mapa salvo,Choisir une carte enregistrée
-SAVED_MAP_GALLERY_TITLE,Saved Maps Gallery,Galería de mapas guardados,Galeria de mapas salvos,Galerie des cartes enregistrées
+SAVED_MAP_GALLERY_TITLE,Map Gallery,Galería de Mapas,Galeria de Mapas,Galerie de Cartes
 SAVED_MAP_PAGE_FMT,Page %s / %s,Página %s / %s,Página %s / %s,Page %s / %s
 SAVED_MAP_SELECT,Play Map,Jugar mapa,Jogar mapa,Jouer la carte
 SAVED_MAP_PROMPT_NAME,Enter a name for this saved map:,Introduce un nombre para este mapa guardado:,Digite um nome para este mapa salvo:,Entrez un nom pour cette carte enregistrée :
@@ -2837,8 +2874,147 @@ MAP_LAYER_LABEL_LAKES,Lake basins,Cuencas de lagos,Bacias de lagos,Bassins lacus
 MAP_LAYER_LABEL_RIVERS,River names,Nombres de ríos,Nomes de rios,Noms de rivières
 MAP_LAYER_LABEL_PENINSULAS,Peninsulas,Penínsulas,Penínsulas,Péninsules
 MAP_LAYER_ALL,All layers,Todas las capas,Todas as camadas,Tous les calques
+MAP_LAYER_DAY_NIGHT,Daylight cycle,Ciclo de luz diurna,Ciclo de luz diurna,Cycle de lumière du jour
+MAP_LAYER_WEATHER,Weather systems,Sistemas climáticos,Sistemas climáticos,Systèmes météorologiques
 SAVE_SPECTATOR_MODE,Spectator Mode,Modo Espectador,Modo Espectador,Mode Spectateur
 UI_SPEED_HYPER_TURBO,Hyper Turbo,Híper Turbo,Hiper Turbo,Hyper Turbo
 MAP_WORLD_LOGS_TITLE_FMT,World logs (%s),Registros del mundo (%s),Registos do mundo (%s),Journaux du monde (%s)
 MAP_WORLD_LOGS_SHOW,Show world logs,Mostrar registros del mundo,Mostrar registos do mundo,Afficher les journaux du monde
 MAP_WORLD_LOGS_HIDE,Hide world logs,Ocultar registros del mundo,Ocultar registos do mundo,Masquer les journaux du monde
+DIET_FUNGIVOROUS,Fungivorous,Fungívora,Fungívora,Fongivore
+DIET_CARNIVOROUS,Carnivorous,Carnívora,Carnívora,Carnivore
+DIET_OMNIVOROUS,Omnivorous,Omnívora,Onívora,Omnivore
+SAVE_ENTER_DIET,Diet:,Dieta:,Dieta:,Régime :
+ABILITY_OMNIVORE,Omnivorous Diet,Dieta Omnívora,Dieta Onívora,Régime Omnivore
+ABILITY_OMNIVORE_FLAVOR,Adaptive Metabolism,Metabolismo Adaptativo,Metabolismo Adaptativo,Métabolisme Adaptatif
+ABILITY_OMNIVORE_DESC,"Unlocked after assimilating 3 species of the opposite diet. Your ants can consume both mushrooms and meat alongside syrups, and unlock both the Farmer and Hunter roles.","Se desbloquea tras asimilar 3 especies de la dieta opuesta. Tus hormigas pueden consumir tanto hongos como carne junto a los jarabes, y desbloquean los roles Granjera y Cazadora.","Desbloqueada após assimilar 3 espécies da dieta oposta. Suas formigas podem consumir tanto cogumelos quanto carne além de xaropes, e desbloqueiam as funções Agricultora e Caçadora.","Débloqué après avoir assimilé 3 espèces du régime opposé. Vos fourmis peuvent consommer à la fois des champignons et de la viande en plus des sirops, et débloquent les rôles Agricultrice et Chasseuse."
+TRIGGER_OMNIVORE_TITLE,Omnivorous Diet Unlocked!,¡Dieta Omnívora Desbloqueada!,Dieta Onívora Desbloqueada!,Régime Omnivore Débloqué !
+TRIGGER_OMNIVORE_MSG,"By assimilating %s species of the opposite diet, your dynasty has evolved an Omnivorous Diet! Your ants can now eat both mushrooms and meat, and can use both Farmers and Hunters.","Al asimilar %s especies de la dieta opuesta, ¡tu dinastía ha evolucionado una Dieta Omnívora! Tus hormigas ahora pueden comer tanto hongos como carne, y usar tanto Granjeras como Cazadoras.","Ao assimilar %s espécies da dieta oposta, sua dinastia evoluiu uma Dieta Onívora! Suas formigas agora podem comer tanto cogumelos quanto carne, e usar tanto Agricultoras quanto Caçadoras.","En assimilant %s espèces du régime opposé, votre dynastie a développé un Régime Omnivore ! Vos fourmis peuvent désormais manger des champignons et de la viande, et utiliser à la fois des Agricultrices et des Chasseuses."
+HELP_SPECIES_DIET,Diet,Dieta,Dieta,Régime
+MAP_FOG_OF_WAR_TITLE,Unexplored Region,Región Inexplorada,Região Inexplorada,Région Inexplorée
+MAP_FOG_OF_WAR_DESC,Covered by fog of war. Send scouts to explore.,Cubierto por niebla de guerra. Envía exploradores a investigar.,Coberto pela névoa da guerra. Envie exploradores para explorar.,Couvert par le brouillard de guerre. Envoyez des éclaireurs explorer.
+MAP_TOOLTIP_FOG_OF_WAR,Undiscovered Territory,Territorio Inexplorado,Território Inexplorado,Territoire Inexploré
+DIPLO_ACTION_SHARE_KNOWLEDGE,Share Knowledge,Compartir Conocimiento,Compartilhar Conhecimento,Partager les Connaissances
+DIPLO_ACTION_SHARE_KNOWLEDGE_CONFIRM,"Share cartographic knowledge with %s? Both dynasties will reveal their known territories.","¿Compartir conocimientos cartográficos con %s? Ambas dinastías se revelarán sus territorios conocidos.","Compartilhar conhecimentos cartográficos com %s? Ambas as dinastias revelarão seus territórios conhecidos.","Partager les connaissances cartographiques avec %s ? Les deux dynasties révéleront leurs territoires connus."
+DIPLO_ACTION_SHARE_KNOWLEDGE_SUCCESS,Knowledge shared with %s! You discovered %s new hexes.,¡Conocimiento compartido con %s! Descubriste %s nuevos hexágonos.,Conhecimento compartilhado com %s! Você descobriu %s novos hexágonos.,Connaissances partagées avec %s ! Vous avez découvert %s nouveaux hexagones.
+DIPLO_ACTION_SHARE_KNOWLEDGE_ALREADY,Both dynasties already know the same territories.,Ambas dinastías ya conocen los mismos territorios.,Ambas as dinastias já conhecem os mesmos territórios.,Les deux dynasties connaissent déjà les mêmes territoires.
+DIPLO_ACTION_STEAL_INTELLIGENCE,Steal Cartography,Robar Cartografía,Roubar Cartografia,Voler la Cartographie
+DIPLO_ACTION_STEAL_INTELLIGENCE_CONFIRM,Dispatch spies to steal cartographic charts from %s?,¿Enviar espías a robar mapas cartográficos de %s?,Enviar espiões para roubar mapas cartográficos de %s?,Envoyer des espions pour voler des cartes cartographiques de %s ?
+DIPLO_ACTION_STEAL_INTELLIGENCE_SUCCESS,Spies successfully stole cartographic charts from %s! Discovered %s new hexes.,¡Los espías robaron con éxito mapas cartográficos de %s! Descubrieron %s nuevos hexágonos.,Os espiões roubaram mapas cartográficos de %s com sucesso! Descobriram %s novos hexágonos.,Les espions ont volé avec succès des cartes cartographiques à %s ! Découvert %s nouveaux hexagones.
+DIPLO_ACTION_STEAL_INTELLIGENCE_DETECTED,Spies were detected attempting to infiltrate %s! Lost %s reputation.,¡Los espías fueron detectados intentando infiltrarse en %s! Se perdió %s de reputación.,Espiões foram detectados tentando se infiltrar em %s! Perdeu %s de reputação.,Des espions ont été détectés en tentant d'infiltrer %s ! Perdu %s de réputation.
+DIPLO_ACTION_STEAL_INTELLIGENCE_NO_SPIES,Requires at least 1 spy assigned to this dynasty.,Requiere al menos 1 espía asignado a esta dinastía.,Requer pelo menos 1 espião atribuído a esta dinastia.,Nécessite au moins 1 espion assigné à cette dynastie.
+DIPLO_UNKNOWN_DYNASTY,Unknown Dynasty,Dinastía Desconocida,Dinastia Desconhecida,Dynastie Inconnue
+DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED,Cannot interact with an unknown dynasty. Uncover their territory first.,No se puede interactuar con una dinastía desconocida. Descubre su territorio primero.,Não é possível interagir com uma dinastia desconhecida. Descubra o território deles primeiro.,Impossible d'interagir avec une dynastie inconnue. Découvrez d'abord leur territoire.
+ALERT_SCOUT_DISCOVERED_HEX,"Scouts from %s charted new lands at (%s, %s)!","¡Exploradores de %s exploraron nuevas tierras en (%s, %s)!","Exploradores de %s mapearam novas terras em (%s, %s)!","Des éclaireurs de %s ont cartographié de nouvelles terres en (%s, %s) !"
+SETTINGS_CHEAT_FOG_OF_WAR,Map Fog of War Toggle (Cheat),Interruptor Niebla de Guerra en Mapa (Truco),Alternar Névoa de Guerra no Mapa (Trapaça),Basculer Brouillard de Guerre Carte (Triche)
+SETTINGS_CHEAT_FOG_OF_WAR_TT,Shows a cheat toggle button inside the Map Dialog to disable or enable Fog of War.,Muestra un botón de truco en el diálogo del Mapa para desactivar o activar la niebla de guerra.,Mostra um botão de trapaça no diálogo do Mapa para desativar ou ativar a névoa de guerra.,Affiche un bouton de triche dans la boîte de dialogue de la Carte pour désactiver ou activer le brouillard de guerre.
+MAP_FOG_CHEAT_REVEALED,★ Fog: OFF (Revealed),★ Niebla: NO (Revelado),★ Névoa: NÃO (Revelada),★ Brouillard : DÉSACTIVÉ
+MAP_FOG_CHEAT_HIDDEN,★ Fog: ON (Hidden),★ Niebla: SÍ (Oculto),★ Névoa: SIM (Oculta),★ Brouillard : ACTIVÉ
+MAP_FOG_CHEAT_TOOLTIP,Toggle Fog,Alternar Niebla,Alternar Névoa,Basculer le Brouillard
+LOG_CAUSE_DISASTER,Natural Disaster,Desastre Natural,Desastre Natural,Catastrophe Naturelle
+ALERT_DETAIL_DISASTER,Natural Disaster,Desastre Natural,Desastre Natural,Catastrophe Naturelle
+HISTORY_FILTER_DISASTER,Disasters,Desastres,Desastres,Catastrophes
+HISTORY_DISASTER_FMT,"%s struck near %s! (%s)","¡%s azotó cerca de %s! (%s)","%s atingiu perto de %s! (%s)","%s a frappé près de %s ! (%s)"
+DISASTER_EARTHQUAKE,Earthquake,Terremoto,Terremoto,Tremblement de terre
+DISASTER_EARTHQUAKE_DESC,"A violent tremor along a tectonic fault line, damaging non-reinforced underground chambers and breaking transit tunnels.","Un violento temblor a lo largo de una falla tectónica que daña cámaras subterráneas no reforzadas y rompe túneles de tránsito.","Um violento tremor ao longo de uma falha tectônica, danificando câmaras subterrâneas não reforçadas e quebrando túneis de trânsito.","Un violent tremblement le long d'une faille tectonique, endommageant les chambres souterraines non renforcées et brisant les tunnels de transit."
+DISASTER_TSUNAMI,Tsunami,Tsunami,Tsunami,Tsunami
+DISASTER_TSUNAMI_DESC,"A colossal tidal surge crashing onto coastal shores, washing away outside foragers, pets, and erasing known resource trails.","Una ola colosal que azota las costas, arrasando con recolectores y mascotas exteriores y borrando rastros de recursos conocidos.","Uma onda colossal que atinge as costas, arrastrando forrageadores e animais de estimação externos e apagando trilhas de recursos conhecidas.","Une vague colossale frappant les côtes, emportant les butineuses et familiers extérieurs et effaçant les pistes de ressources connues."
+DISASTER_TORNADO,Tornado,Tornado,Tornado,Tornade
+DISASTER_TORNADO_DESC,"A vortex tearing across flat inland terrain, destroying active surface workers, scattering pets, and obliterating known foraging trails.","Un vórtice que atraviesa terrenos llanos continentales, destruyendo trabajadores de superficie activos, dispersando mascotas y destruyendo rastros de forrajeo.","Um vórtice rasgando terrenos planos do interior, destruindo trabalhadores ativos da superfície, dispersando animais de estimação e obliterando trilhas de forrageamento.","Un vortex déchirant les terres plates de l'intérieur, détruisant les travailleuses actives en surface, dispersant les familiers et oblitérant les pistes de recherche."
+DISASTER_METEOR,Meteor Impact,Impacto de Meteorito,Impacto de Meteoro,Impact de Météorite
+DISASTER_METEOR_DESC,"A flaming celestial body crashing to earth, obliterating surface creatures in the blast zone but leaving behind vast deposits of valuable minerals.","Un cuerpo celeste en llamas que se estrella contra la tierra, arrasando con las criaturas de la superficie pero dejando enormes depósitos de minerales valiosos.","Um corpo celeste em chamas colidindo com a terra, destruindo criaturas da superfície na zona de impacto, mas deixando vastos depósitos de minerais valiosos.","Un corps céleste enflammé s'écrasant sur terre, pulvérisant les créatures en surface mais laissant de vastes gisements de minéraux précieux."
+DISASTER_VOLCANO,Volcanic Eruption,Erupción Volcánica,Erupção Vulcânica,Éruption Volcanique
+DISASTER_VOLCANO_DESC,"A cataclysmic volcanic eruption raining magma and ash, sweeping away surface foragers and pets while surfacing rich veins of minerals.","Una cataclísmica erupción volcánica que arroja magma y ceniza, arrasando recolectores y mascotas mientras afloran ricas vetas minerales.","Uma erupção vulcânica cataclísmica chovendo magma e cinzas, varrendo forrageadores e animais da superfície enquanto faz emergir ricas veias de minerais.","Une éruption volcanique cataclysmique faisant pleuvoir magma et cendres, balayant les butineuses et familiers de surface tout en révélant de riches filons minéraux."
+DISASTER_WILDFIRE,Wildfire,Incendio Forestal,Incêndio Florestal,Feu de Forêt
+DISASTER_WILDFIRE_DESC,"A raging blaze sweeping through forests and jungles, incinerating outside workers, burning vegetation to ash, and leaving behind burnt woodland.","Un fuego voraz que arrasa bosques y selvas, incinerando trabajadores exteriores, reduciendo la vegetación a cenizas y dejando un bosque quemado.","Um incêndio violento varrendo florestas e selvas, incinerando trabalhadores externos, reduzindo a vegetação a cinzas e deixando floresta queimada.","Un incendie violent ravageant forêts et jungles, incinérant les ouvrières extérieures, réduisant la végétation en cendres et laissant derrière lui une forêt brûlée."
+DISASTER_ICE_COLLAPSE,Glacial Collapse,Colapso Glaciar,Colapso Glacial,Effondrement Glaciaire
+DISASTER_ICE_COLLAPSE_DESC,"A coastal ice shelf shatters and collapses into the ocean abyss, plunging any nest atop it into freezing waters.","Una plataforma de hielo costera se quiebra y colapsa en el océano, sumergiendo cualquier nido sobre ella en las aguas heladas.","Uma plataforma de gelo costeira se quebra e desmorona no abismo oceânico, mergulhando qualquer ninho sobre ela nas águas geladas.","Une banquise côtière se brise et s'effondre dans l'abysse océanique, plongeant tout nid situé dessus dans les eaux glacées."
+DISASTER_OCEAN_FREEZE,Ocean Freeze,Congelación Oceánica,Congelamento Oceânico,Gel Océanique
+DISASTER_OCEAN_FREEZE_DESC,"Extreme polar cold freezes adjacent ocean waters solid into a vast sheet of ice field.","Un frío polar extremo congela las aguas oceánicas adyacentes convirtiéndolas en una vasta capa de campo de hielo.","O frio polar extremo congela as águas oceânicas adjacentes transformando-as em uma vasta camada de campo de gelo.","Un froid polaire extrême gèle les eaux océaniques adjacentes en une vaste étendue de banquise."
+LOG_DISASTER_EARTHQUAKE_FMT,"Earthquake struck! Fault tremors damaged %d room(s) and severed %d tunnel(s).","¡Terremoto! Los temblores de la falla dañaron %d sala(s) y cortaron %d túnel(es).","Terremoto atingiu! Tremores de falha danificaram %d sala(s) e cortaram %d túnel(eis).","Tremblement de terre ! Les secousses de faille ont endommagé %d salle(s) et rompu %d tunnel(s)."
+LOG_DISASTER_TSUNAMI_FMT,"Tsunami flooded the coastline! Lost %d outside worker(s), %d pet(s), and all known resource sources.","¡Un tsunami inundó la costa! Se perdieron %d trabajador(es) exterior(es), %d mascota(s) y todas las fuentes conocidas.","Tsunami inundou o litoral! Perdeu %d trabalhador(es) externo(s), %d animal(is) e todas as fontes conhecidas.","Un tsunami a inondé le littoral ! Perte de %d ouvrière(s) extérieure(s), %d familier(s) et toutes les sources connues."
+LOG_DISASTER_TORNADO_FMT,"Tornado swept the plains! Lost %d outside worker(s), %d pet(s), and all known resource sources.","¡Un tornado arrasó las llanuras! Se perdieron %d trabajador(es) exterior(es), %d mascota(s) y todas las fuentes conocidas.","Tornado varreu as planícies! Perdeu %d trabalhador(es) externo(s), %d animal(is) e todas as fontes conhecidas.","Une tornade a balayé les plaines ! Perte de %d ouvrière(s) extérieure(s), %d familier(s) et toutes les sources connues."
+LOG_DISASTER_METEOR_FMT,"Meteor struck! Blast killed %d surface worker(s) and deposited %d mineral.","¡Cayó un meteorito! La explosión mató a %d trabajador(es) de superficie y depositó %d minerales.","Meteoro atingiu! Explosão matou %d trabalhador(es) da superfície e depositou %d minerais.","Un météore a frappé ! Le souffle a tué %d ouvrière(s) de surface et déposé %d minéraux."
+LOG_DISASTER_VOLCANO_FMT,"Volcano erupted! Lost %d outside worker(s), %d pet(s), all sources cleared, but gathered %d volcanic mineral.","¡El volcán hizo erupción! Se perdieron %d trabajador(es) exterior(es), %d mascota(s), fuentes borradas, pero se recolectaron %d minerales volcánicos.","Vulcão entrou em erupção! Perdeu %d trabalhador(es) externo(s), %d animal(is), fontes limpas, mas coletou %d minerais vulcânicos.","Le volcan est entré en éruption ! Perte de %d ouvrière(s) extérieure(s), %d familier(s), sources effacées, mais gain de %d minéraux volcaniques."
+LOG_DISASTER_WILDFIRE_FMT,"Wildfire consumed the woodlands! Habitat burned into Burnt Forest, losing %d worker(s), %d pet(s), and all sources.","¡Incendio forestal! El hábitat se convirtió en Bosque Quemado, perdiendo %d trabajador(es), %d mascota(s) y todas las fuentes.","Incêndio florestal consumiu os bosques! O habitat virou Floresta Queimada, perdendo %d trabalhador(es), %d animal(is) e todas as fontes.","Un incendie a ravagé les bois ! L'habitat est devenu une Forêt Brûlée, perdant %d ouvrière(s), %d familier(s) et toutes les sources."
+LOG_DISASTER_ICE_COLLAPSE_FMT,"Glacial ice shelf collapsed into the ocean! Hex turned into Ocean, destroying any colony atop it.","¡La plataforma glaciar colapsó en el océano! El hexágono se convirtió en Océano, destruyendo cualquier colonia sobre él.","Plataforma glacial desmoronou no oceano! O hexágono virou Oceano, destruindo qualquer colônia sobre ele.","La banquise s'est effondrée dans l'océan ! L'hexagone est devenu Océan, détruisant toute colonie située dessus."
+LOG_DISASTER_OCEAN_FREEZE_FMT,"Polar freeze swept the sea! Ocean froze into a new Ice Field.","¡La congelación polar barrió el mar! El océano se congeló en un nuevo Campo de Hielo.","Congelamento polar varreu o mar! O oceano congelou em um novo Campo de Gelo.","Le gel polaire a balayé la mer ! L'océan a gelé en une nouvelle Banquise."
+LOG_SOURCES_LOST_DISASTER,All established foraging trails were wiped out by the disaster!,¡Todos los rastros de forrajeo establecidos fueron destruidos por el desastre!,Todas as trilhas de forrageamento estabelecidas foram destruídas pelo desastre!,Toutes les pistes de butinage établies ont été anéanties par la catastrophe !
+HELP_DISASTERS_TITLE,Natural Disasters & Eclipses,Desastres Naturales y Eclipses,Desastres Naturais e Eclipses,Catastrophes Naturelles et Éclipses
+HELP_DISASTERS_BODY,"Natural disasters occur rarely around the world (~1 per year). Earthquakes along tectonic fault lines damage unreinforced rooms (< Tier 3) and break transit tunnels. Tsunamis flood coasts, tornadoes sweep flat inland biomes, wildfires burn woodlands into Burnt Forest, and volcanic eruptions eject magma and minerals. Disasters harm only active workers and pets outside the nest; unassigned (idle) ants are safely harbored underground and will NEVER be killed by disasters. Eclipses are rare global celestial phenomena that plunge the world into darkness and trigger spontaneous nuptial flights across all colonies.","Los desastres naturales ocurren raramente en el mundo (~1 por año). Los terremotos a lo largo de fallas tectónicas dañan salas no reforzadas (< Nivel 3) y rompen túneles. Los tsunamis inundan costas, los tornados barren biomas llanos, los incendios convierten bosques en Bosque Quemado y las erupciones arrojan magma y minerales. Los desastres solo dañan a trabajadores y mascotas activos en el exterior; las hormigas inactivas (sin asignar) permanecen seguras bajo tierra y NUNCA morirán por desastres. Los eclipses son raros fenómenos celestes globales que sumergen al mundo en la oscuridad y provocan vuelos nupciales espontáneos en todas las colonias.","Desastres naturais ocorrem raramente ao redor do mundo (~1 por ano). Terremotos ao longo de falhas tectônicas danificam salas não reforçadas (< Nível 3) e quebram túneis. Tsunamis inundam costas, tornados varrem biomas planos, incêndios transformam florestas em Floresta Queimada e erupções expelem magma e minerais. Os desastres prejudicam apenas trabalhadores e animais ativos fora do ninho; formigas ociosas (não atribuídas) estão seguras no subsolo e NUNCA serão mortas por desastres. Eclipses são fenômenos celestes globais raros que mergulham o mundo na escuridão e desencadeiam voos nupciais espontâneos em todas as colônias.","Les catastrophes naturelles surviennent rarement dans le monde (~1 par an). Les séismes le long des failles tectoniques endommagent les salles non renforcées (< Rang 3) et brisent les tunnels. Les tsunamis inondent les côtes, les tornades balayent les plaines, les feux transforment les bois en Forêt Brûlée et les éruptions rejettent magma et minéraux. Les catastrophes n'affectent que les travailleuses et familiers actifs hors du nid ; les fourmis inactives (non assignées) sont abritées sous terre et ne seront JAMAIS tuées par les catastrophes. Les éclipses sont de rares phénomènes célestes mondiaux qui plongent le monde dans l'obscurité et déclenchent des vols nuptiaux spontanés dans toutes les colonies."
+SETTINGS_CHEAT_RANDOM_DISASTER,Random Disaster Button (Cheat),Botón de Desastre Aleatorio (Truco),Botão de Desastre Aleatório (Trapaça),Bouton Catastrophe Aléatoire (Triche)
+SETTINGS_CHEAT_RANDOM_DISASTER_TT,Shows a cheat button inside the World Map (especially in Spectator Mode) that triggers a random disaster.,Muestra un botón de truco en el Mapa Mundial (especialmente en Modo Espectador) que provoca un desastre aleatorio.,Mostra um botão de trapaça no Mapa Mundial (especialmente no Modo Espectador) que provoca um desastre aleatório.,Affiche un bouton de triche dans la Carte du Monde (spécialement en Mode Spectateur) qui déclenche une catastrophe aléatoire.
+MAP_DISASTER_CHEAT,★ Disaster,★ Desastre,★ Desastre,★ Catastrophe
+MAP_DISASTER_CHEAT_TT,Trigger a random natural disaster somewhere in the world.,Provoca un desastre natural aleatorio en algún lugar del mundo.,Provoca um desastre natural aleatório em algum lugar do mundo.,Déclenche une catastrophe naturelle aléatoire quelque part dans le monde.
+LOG_BIOME_TRANSFORM_FMT,"Habitat transformed! %s changed into %s (%s).","¡El hábitat se transformó! %s cambió a %s (%s).","O habitat se transformou! %s mudou para %s (%s).","L'habitat s'est transformé ! %s est devenu %s (%s)."
+LOG_OVERHARVEST_DEPLETION_FMT,"Overharvesting exhausted local vegetation! %s degraded into %s.","¡La sobreexplotación agotó la vegetación local! %s se degradó a %s.","A superexploração esgotou a vegetação local! %s degradou-se em %s.","La surexploitation a épuisé la végétation locale ! %s s'est dégradé en %s."
+LOG_BIOME_RECOVERY_FMT,"Nature has healed! %s recovered into %s.","¡La naturaleza ha sanado! %s se recuperó en %s.","A natureza se curou! %s recuperou-se em %s.","La nature a guéri ! %s a récupéré en %s."
+REASON_OVERHARVESTING,Overharvesting,Sobreexplotación,Superexploração,Surexploitation
+SETTINGS_CHEAT_RANDOM_WAR,Random War Button (Cheat),Botón de Guerra Aleatoria (Truco),Botão de Guerra Aleatória (Trapaça),Bouton Guerre Aléatoire (Triche)
+SETTINGS_CHEAT_RANDOM_WAR_TT,Shows a cheat button inside the World Map that starts a war between two random bordering dynasties.,Muestra un botón de truco en el Mapa Mundial que inicia una guerra entre dos dinastias fronterizas aleatorias.,Mostra um botão de trapaça no Mapa Mundial que inicia uma guerra entre duas dinastias fronteiriças aleatórias.,Affiche un bouton de triche dans la Carte du Monde qui déclenche une guerre entre deux dynasties frontalières aléatoires.
+MAP_WAR_CHEAT,★ War,★ Guerra,★ Guerra,★ Guerre
+MAP_WAR_CHEAT_TT,Instigate a war between a random bordering pair of dynasties.,Provoca una guerra entre un par aleatorio de dinastías fronterizas.,Instiga uma guerra entre um par aleatório de dinastias fronteiriças.,Provoque une guerre entre deux dynasties frontalières aléatoires.
+REASON_RECOVERY,Ecological Recovery,Recuperación Ecológica,Recuperação Ecológica,Restauration Écologique
+BIOME_BARREN,Barren,Yermo,Estéril,Stérile
+UI_WORLD_MAKING,World Making,Creación de Mundos,Criação de Mundos,Création de Mondes
+UI_WORLD_MAKING_DESC,Create design or generate custom worlds.,Crea diseña o genera mundos personalizados.,Crie projete ou gere mundos personalizados.,Créez concevez ou générez des mondes personnalisés.
+UI_WORLD_BUILDER,World Designer,Diseñador de Mundos,Designer de Mundos,Concepteur de Mondes
+UI_WORLD_BUILDER_DESC,Step-by-step interactive manual world editor.,Editor interactivo manual de mundos paso a paso.,Editor manual interativo de mundos passo a passo.,Éditeur manuel interactif de mondes étape par étape.
+UI_WORLD_ALGORITHM,Algorithmic Generator,Generador Algorítmico,Gerador Algorítmico,Générateur Algorithmique
+UI_WORLD_ALGORITHM_DESC,Browse preview and generate procedural worlds.,Explora previsualiza y genera mundos procedimentales.,Navegue visualize e gere mundos procedurais.,Parcourez prévisualisez et générez des mondes procéduraux.
+UI_WORLD_STAGE_SETUP,1. Setup,1. Configuración,1. Configuração,1. Configuration
+UI_WORLD_STAGE_PLATES,2. Tectonic Plates,2. Placas Tectónicas,2. Placas Tectônicas,2. Plaques Tectoniques
+UI_WORLD_STAGE_LAND,3. Landmasses,3. Masas de Tierra,3. Massas de Terra,3. Masses Terrestres
+UI_WORLD_STAGE_BIOMES,4. Biomes,4. Biomas,4. Biomas,4. Biomes
+UI_WORLD_STAGE_DYNASTIES,5. Dynasties,5. Dinastías,5. Dinastias,5. Dynasties
+UI_WORLD_AUTO_GENERATE,Auto-Generate Step,Autogenerar Paso,Autogerar Passo,Générer Automatiquement l'Étape
+UI_WORLD_SAVE_MAP,Save World,Guardar Mundo,Salvar Mundo,Sauvegarder le Monde
+UI_WORLD_SAVE_SUCCESS,World saved successfully to saved worlds!,¡Mundo guardado exitosamente en mundos guardados!,Mundo salvo com sucesso nos mundos salvos!,Monde sauvegardé avec succès dans les mondes sauvegardés !
+UI_WORLD_TOOL_BRUSH,Brush,Pincel,Pincel,Pinceau
+UI_WORLD_TOOL_FILL,Bucket Fill,Relleno,Preenchimento,Remplissage
+UI_WORLD_TOOL_ERASER,Eraser,Borrador,Borracha,Gomme
+UI_WORLD_TOOL_PICKER,Eyedropper,Cuentagotas,Conta-gotas,Pipette
+UI_WORLD_BRUSH_SIZE,Brush Size,Tamaño de Pincel,Tamanho do Pincel,Taille du Pinceau
+UI_WORLD_WIDTH,Width,Ancho,Largura,Largeur
+UI_WORLD_HEIGHT,Height,Alto,Altura,Hauteur
+UI_WORLD_ICE_CAPS,Ice Caps,Casquetes Polares,Calotas Polares,Calottes Polaires
+UI_WORLD_ICE_CAP_LIMIT,Polar Ice Margin,Margen Polar de Hielo,Margem Polar de Gelo,Marge Polaire de Glace
+UI_WORLD_NAME,World Name,Nombre del Mundo,Nome do Mundo,Nom du Monde
+UI_WORLD_STAGE_FAULTS,"2. Faults & Plates","2. Fallas y Placas","2. Falhas e Placas","2. Failles et Plaques"
+UI_FAULT_CONVERGENT,Convergent,Convergente,Convergente,Convergent
+UI_FAULT_DIVERGENT,Divergent,Divergente,Divergente,Divergent
+UI_FAULT_TRANSFORM,Transform,Transformante,Transformante,Transformant
+UI_INTENSITY,Intensity,Intensidad,Intensidade,Intensité
+UI_UNDO,Undo,Deshacer,Desfazer,Annuler
+MAP_LAYER_DISASTERS,Disasters,Desastres,Desastres,Catastrophes
+MAP_MODE_DYNASTIC,Dynastic,Dinástico,Dinástico,Dynastique
+UI_WORLD_SIZE,Size,Tamaño,Tamanho,Taille
+UI_ELEVATION_RAISE,Raise,Elevar,Elevar,Élever
+UI_ELEVATION_LOWER,Lower,Bajar,Baixar,Abaisser
+UI_WORLD_TOOL_LINE,Line,Línea,Linha,Ligne
+UI_WORLD_RESET_STEP,Reset Step,Reiniciar Paso,Redefinir Etapa,Réinitialiser l'étape
+UI_WORLD_CONFIRM_SAVE_CLOSE,Do you want to save your progress before closing?,¿Quieres guardar tu progreso antes de cerrar?,Deseja salvar seu progresso antes de fechar?,Voulez-vous sauvegarder votre progression avant de fermer ?
+UI_BATTLE_SIMULATOR,Battle Simulator,Simulador de Batallas,Simulador de Batalhas,Simulateur de Bataille
+BATTLE_SIM_ATTACKER,Attacker,Atacante,Atacante,Attaquant
+BATTLE_SIM_DEFENDER,Defender,Defensor,Defensor,Défenseur
+BATTLE_SIM_CONDITIONS,Battle Conditions,Condiciones de Batalla,Condições de Batalha,Conditions de Bataille
+BATTLE_SIM_MODE,Battle Mode,Modo de Batalla,Modo de Batalha,Mode de Bataille
+BATTLE_SIM_MODE_BORDER,Border Battle,Batalla Fronteriza,Batalha de Fronteira,Bataille Frontalière
+BATTLE_SIM_MODE_HEX,Hex Assault,Asalto de Hexágono,Assalto de Hexágono,Assaut d'Hexagone
+BATTLE_SIM_MODE_FULL_STAGE,Full Stage (Border + Hex),Etapa Completa (Frontera + Hexágono),Etapa Completa (Fronteira + Hexágono),Étape Complète (Frontière + Hexagone)
+BATTLE_SIM_RIVER,River Crossing,Cruce de Río,Travessia de Rio,Traversée de Rivière
+BATTLE_SIM_SPECIES,Species,Especie,Espécie,Espèce
+BATTLE_SIM_BIOME,Biome,Bioma,Bioma,Biome
+BATTLE_SIM_UNITS,Ants & Battle Lines,Hormigas y Líneas de Batalla,Formigas e Linhas de Batalha,Fourmis et Lignes de Bataille
+BATTLE_SIM_UPGRADES,Upgrades & Abilities,Mejoras y Habilidades,Melhorias e Habilidades,Améliorations et Capacités
+BATTLE_SIM_SELECT_ALL,All,Todo,Tudo,Tout
+BATTLE_SIM_CLEAR_ALL,None,Nada,Nenhum,Aucun
+BATTLE_SIM_START,Start Battle,Iniciar Batalla,Iniciar Batalha,Lancer la Bataille
+BATTLE_SIM_RESET_DEFAULTS,Reset to Defaults,Restablecer Valores,Redefinir Padrões,Réinitialiser par Défaut
+BATTLE_SIM_COPY_ATK_TO_DEF,Copy Attacker to Defender,Copiar Atacante a Defensor,Copiar Atacante para Defensor,Copier Attaquant vers Défenseur
+BATTLE_SIM_MODIFICATIONS,Ant Modifications,Modificaciones de Hormigas,Modificações de Formigas,Modifications de Fourmis
+BATTLE_SIM_RANDOMIZE,Randomize Armies,Aleatorizar Ejércitos,Aleatorizar Exércitos,Aléatoiriser les Armées
+BATTLE_SIM_VICTORY_TITLE,Battle Complete,Batalla Completada,Batalha Concluída,Bataille Terminée
+BATTLE_SIM_VICTORY_FMT,%s Victory!,¡Victoria de %s!,Vitória de %s!,Victoire de %s !
+BATTLE_SIM_DRAW,Battle ended in a draw.,La batalla terminó en empate.,A batalha terminou em empate.,La bataille s'est terminée par un match nul.
+BATTLE_SIM_RUSH,Battle Rush,Asalto Rápido,Batalha Contínua,Enchaînement de Batailles

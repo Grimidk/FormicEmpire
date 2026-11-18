@@ -28,6 +28,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.CoastalTideRenderer;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.ColonySpriteMergeLod;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.OverworldAtmosphereRenderer;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
@@ -89,6 +90,8 @@ public class GameAreaPanel extends ZeroGamePanel {
     private int lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
     private List<AntSpecies> cachedAssimilatedDroneSpecies = List.of();
     private int cachedAssimilatedDroneSignature = Integer.MIN_VALUE;
+    private List<AntSpecies> cachedForeignVisitorSpecies = List.of();
+    private int cachedForeignVisitorSignature = Integer.MIN_VALUE;
     private BufferedImage cachedBackgroundLayer;
     private int cachedBackgroundW;
     private int cachedBackgroundH;
@@ -211,6 +214,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         this.colony = colony;
         this.lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
         this.cachedAssimilatedDroneSignature = Integer.MIN_VALUE;
+        this.cachedForeignVisitorSignature = Integer.MIN_VALUE;
     }
 
     public void setEngine(Engine engine) {
@@ -512,6 +516,11 @@ public class GameAreaPanel extends ZeroGamePanel {
         int panelW = getWidth();
         int panelH = getHeight();
         Hex currentHex = resolveCurrentHex();
+        if (currentHex != null && currentHex.getBiome() != null && currentHex.getBiome().getId() != currentBiomeId) {
+            currentBiomeId = currentHex.getBiome().getId();
+            backgroundImage = resolveBackgroundImage();
+            invalidateBackgroundLayerCache();
+        }
         int bordersKey = CoastalTideRenderer.getWaterBordersKey(currentHex, currentBiomeId);
         if (cachedBackgroundLayer != null && cachedBackgroundW == panelW && cachedBackgroundH == panelH
                 && cachedBackgroundBiomeId == currentBiomeId
@@ -635,21 +644,28 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (engine == null) return;
         boolean dayOn = engine.isDaylightColorOverlayEnabled();
         boolean weatherOn = engine.isWeatherColorOverlayEnabled();
-        if (!dayOn && !weatherOn) return;
 
         World world = engine.getWorld();
         if (world == null) return;
 
-        TimeOfDay tod = (world.getActiveHex() != null) ? world.getTimeOfDay(world.getActiveHex()) : world.getTimeOfDay();
-        if (dayOn && tod != null && tod.getOverlayColor() != null) {
-            g2d.setColor(tod.getOverlayColor());
-            g2d.fillRect(0, 0, getWidth(), getHeight());
+        Hex activeHex = world.getActiveHex();
+        boolean hasDisaster = activeHex != null && activeHex.getDisasterType() != null
+                && activeHex.getDisasterAgeHours() < GameNumbers.DISASTER_GAME_AREA_EFFECT_HOURS;
+
+        if (!dayOn && !weatherOn && !hasDisaster) return;
+
+        if (dayOn) {
+            TimeOfDay tod = (activeHex != null) ? world.getTimeOfDay(activeHex) : world.getTimeOfDay();
+            if (tod != null && tod.getOverlayColor() != null) {
+                g2d.setColor(tod.getOverlayColor());
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
         }
 
         if (weatherOn) {
             Weather w = world.getWeather();
-            if (world.getActiveHex() != null && world.getActiveHex().getLocalWeather() != null) {
-                w = world.getActiveHex().getLocalWeather();
+            if (activeHex != null && activeHex.getLocalWeather() != null) {
+                w = activeHex.getLocalWeather();
             }
 
             if (w != null && w.getOverlayColor() != null) {
@@ -657,6 +673,21 @@ public class GameAreaPanel extends ZeroGamePanel {
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         }
+
+        int anchorX;
+        int anchorY;
+        if (colony != null) {
+            anchorX = overworldLayoutOffsetX;
+            anchorY = overworldLayoutOffsetY;
+        } else if (paintViewportRect != null) {
+            anchorX = Math.max(0, (getWidth() - paintViewportRect.width) / 2);
+            anchorY = Math.max(0, (getHeight() - paintViewportRect.height) / 2);
+        } else {
+            anchorX = Math.max(0, (getWidth() - ColonySpatialLayout.ANCHOR_WIDTH) / 2);
+            anchorY = Math.max(0, (getHeight() - ColonySpatialLayout.ANCHOR_HEIGHT) / 2);
+        }
+        boolean isPaused = engine.isPaused();
+        OverworldAtmosphereRenderer.render(g2d, getWidth(), getHeight(), anchorX, anchorY, world, activeHex, dayOn, weatherOn, isPaused);
     }
     
     private void drawOverworldStructure(Graphics2D g2d) {
@@ -1091,6 +1122,11 @@ public class GameAreaPanel extends ZeroGamePanel {
                     ? assimilatedDroneSpeciesForPaint()
                     : List.of();
 
+            List<AntSpecies> foreignVisitors = (type == GameConstants.CLASS_PRINCESS
+                    || (type == GameConstants.CLASS_WORKER && colony.getPrincesses().isEmpty()))
+                    ? foreignVisitorSpeciesForPaint()
+                    : List.of();
+
             Map<ColonySpriteMergeLod.AntMergeBucket, List<Ant>> buckets = new HashMap<>();
             List<Ant> individuals = new ArrayList<>();
 
@@ -1108,7 +1144,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
 
             for (Ant ant : individuals) {
-                paintAntSprite(g2d, ant, type, assimilatedSpecies);
+                paintAntSprite(g2d, ant, type, assimilatedSpecies, foreignVisitors);
             }
 
             ColonySpriteMergeLod.forEachAntGroup(buckets, group -> {
@@ -1124,7 +1160,8 @@ public class GameAreaPanel extends ZeroGamePanel {
                         type,
                         ColonySpriteMergeLod.mergeCentroidX(group),
                         ColonySpriteMergeLod.mergeCentroidY(group),
-                        assimilatedSpecies);
+                        assimilatedSpecies,
+                        foreignVisitors);
             });
         }
     }
@@ -1139,8 +1176,8 @@ public class GameAreaPanel extends ZeroGamePanel {
         return ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), typeW, typeH);
     }
 
-    private void paintAntSprite(Graphics2D g2d, Ant ant, AntClass type, List<AntSpecies> assimilatedSpecies) {
-        paintAntSpriteAt(g2d, ant, type, ant.getX(), ant.getY(), assimilatedSpecies);
+    private void paintAntSprite(Graphics2D g2d, Ant ant, AntClass type, List<AntSpecies> assimilatedSpecies, List<AntSpecies> foreignVisitors) {
+        paintAntSpriteAt(g2d, ant, type, ant.getX(), ant.getY(), assimilatedSpecies, foreignVisitors);
     }
 
     private void paintAntSpriteAt(
@@ -1149,11 +1186,20 @@ public class GameAreaPanel extends ZeroGamePanel {
             AntClass type,
             int drawX,
             int drawY,
-            List<AntSpecies> assimilatedSpecies) {
+            List<AntSpecies> assimilatedSpecies,
+            List<AntSpecies> foreignVisitors) {
         boolean showCarry = RouteViewVisuals.showsGathererCarry(ant);
+        AntSpecies antSpecies = colony.getSpecies();
+        if (!foreignVisitors.isEmpty()) {
+            int seed = System.identityHashCode(ant);
+            if (Math.abs(seed) % 10 < 3) {
+                int index = (Math.abs(seed) / 10) % foreignVisitors.size();
+                antSpecies = foreignVisitors.get(index);
+            }
+        }
         ImageIcon antSpriteIcon = GameConstants.getAntSprite(
                 type,
-                colony.getSpecies(),
+                antSpecies,
                 ant.getModProfile(),
                 ant.getLegFrame(),
                 RouteViewVisuals.jawFrameForCarry(ant.getJawFrame(), showCarry),
@@ -1232,6 +1278,78 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
         }
         return signature;
+    }
+
+    private List<AntSpecies> foreignVisitorSpeciesForPaint() {
+        if (colony == null || engine == null) {
+            cachedForeignVisitorSignature = Integer.MIN_VALUE;
+            cachedForeignVisitorSpecies = List.of();
+            return cachedForeignVisitorSpecies;
+        }
+        int signature = foreignVisitorPaintSignature(colony);
+        if (signature == cachedForeignVisitorSignature) {
+            return cachedForeignVisitorSpecies;
+        }
+        cachedForeignVisitorSignature = signature;
+        if (signature == 0) {
+            cachedForeignVisitorSpecies = List.of();
+            return cachedForeignVisitorSpecies;
+        }
+        World world = engine.getWorld();
+        if (world == null || colony.getDynasty() == null) {
+            cachedForeignVisitorSpecies = List.of();
+            return cachedForeignVisitorSpecies;
+        }
+        Dynasty myDynasty = colony.getDynasty();
+        List<AntSpecies> species = new ArrayList<>();
+        for (Dynasty foreign : world.getDynastys()) {
+            if (foreign == null || foreign == myDynasty || foreign.isDefeated()) {
+                continue;
+            }
+            int diplomats = foreign.getDiplomacyService() != null
+                    ? foreign.getDiplomacyService().countDynastyMissionDiplomatsToward(myDynasty)
+                    : 0;
+            int spies = foreign.getIntelligenceService() != null
+                    ? foreign.getIntelligenceService().countSpiesToward(myDynasty)
+                    : 0;
+            if (diplomats > 0 || spies > 0) {
+                AntSpecies s = foreign.getSpecies();
+                if (s != null && s != colony.getSpecies() && !species.contains(s)) {
+                    species.add(s);
+                }
+            }
+        }
+        cachedForeignVisitorSpecies = List.copyOf(species);
+        return cachedForeignVisitorSpecies;
+    }
+
+    private int foreignVisitorPaintSignature(Colony colony) {
+        if (colony == null || engine == null) {
+            return 0;
+        }
+        World world = engine.getWorld();
+        Dynasty myDynasty = colony.getDynasty();
+        if (world == null || myDynasty == null) {
+            return 0;
+        }
+        int signature = colony.getId() * 31 + myDynasty.getId();
+        int activeForeignCount = 0;
+        for (Dynasty foreign : world.getDynastys()) {
+            if (foreign == null || foreign == myDynasty || foreign.isDefeated()) {
+                continue;
+            }
+            int diplomats = foreign.getDiplomacyService() != null
+                    ? foreign.getDiplomacyService().countDynastyMissionDiplomatsToward(myDynasty)
+                    : 0;
+            int spies = foreign.getIntelligenceService() != null
+                    ? foreign.getIntelligenceService().countSpiesToward(myDynasty)
+                    : 0;
+            if (diplomats > 0 || spies > 0) {
+                signature = signature * 31 + foreign.getId() * 7 + diplomats + spies * 13;
+                activeForeignCount++;
+            }
+        }
+        return activeForeignCount > 0 ? signature : 0;
     }
 
     private void drawBugs(Graphics2D g2d, ColonySpriteMergeLod.ZoneMergeContext zoneMergeContext) {

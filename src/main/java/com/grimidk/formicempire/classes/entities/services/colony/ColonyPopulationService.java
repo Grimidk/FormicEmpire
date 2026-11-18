@@ -246,7 +246,7 @@ public class ColonyPopulationService {
         double consumedWater = resources.consumeResource(colony, GameConstants.RESOURCE_WATER, waterNeeded);
         double waterDeficit = waterNeeded - consumedWater;
 
-        if (waterDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+        if (waterDeficit > 0 && (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) || colony.canEatMeat())) {
             double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, waterDeficit);
             waterDeficit -= syrupConsumed;
         }
@@ -257,10 +257,19 @@ public class ColonyPopulationService {
             foodNeeded += parasiteCount;
         }
 
-        double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodNeeded);
-        double foodDeficit = foodNeeded - consumedFood;
+        double foodDeficit = foodNeeded;
+        if (colony.canEatFungi()) {
+            double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodDeficit);
+            foodDeficit -= consumedFood;
+        }
+        if (foodDeficit > 0 && colony.canEatMeat()) {
+            float meatEff = Math.max(1f, stats.getMeatEatingEfficiency(colony));
+            double meatNeeded = Math.ceil(foodDeficit / meatEff);
+            double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, meatNeeded);
+            foodDeficit = Math.max(0.0, foodDeficit - (consumedMeat * meatEff));
+        }
 
-        if (foodDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+        if (foodDeficit > 0 && (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) || colony.canEatMeat())) {
             double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
             foodDeficit -= syrupConsumed;
         }
@@ -311,7 +320,7 @@ public class ColonyPopulationService {
         double consumedWater = resources.consumeResource(colony, GameConstants.RESOURCE_WATER, waterNeeded);
         double waterDeficit = waterNeeded - consumedWater;
         
-        if (waterDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+        if (waterDeficit > 0 && (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) || colony.canEatMeat())) {
             double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, waterDeficit);
             waterDeficit -= syrupConsumed;
         }
@@ -344,10 +353,19 @@ public class ColonyPopulationService {
             foodNeeded += parasiteCount; 
         }
 
-        double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodNeeded);
-        double foodDeficit = foodNeeded - consumedFood;
+        double foodDeficit = foodNeeded;
+        if (colony.canEatFungi()) {
+            double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodDeficit);
+            foodDeficit -= consumedFood;
+        }
+        if (foodDeficit > 0 && colony.canEatMeat()) {
+            float meatEff = Math.max(1f, stats.getMeatEatingEfficiency(colony));
+            double meatNeeded = Math.ceil(foodDeficit / meatEff);
+            double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, meatNeeded);
+            foodDeficit = Math.max(0.0, foodDeficit - (consumedMeat * meatEff));
+        }
 
-        if (foodDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+        if (foodDeficit > 0 && (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) || colony.canEatMeat())) {
             double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
             foodDeficit -= syrupConsumed;
         }

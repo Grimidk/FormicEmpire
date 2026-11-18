@@ -77,7 +77,7 @@ public class DynastyTradeService {
             return neighbors;
         }
         int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
-        for (Hex hex : HexWaterCrossing.tradeReachableLandHexes(center, waterRange)) {
+        for (Hex hex : HexWaterCrossing.tradeReachableLandHexes(center, waterRange, dynasty)) {
             if (hex.getColony() != null && hex.getColony() != colony) {
                 neighbors.add(hex.getColony());
             }
@@ -91,7 +91,7 @@ public class DynastyTradeService {
             return null;
         }
         int waterRange = HexWaterCrossing.waterCrossRange(dynasty);
-        for (Hex hex : HexWaterCrossing.tradeReachableLandHexes(center, waterRange)) {
+        for (Hex hex : HexWaterCrossing.tradeReachableLandHexes(center, waterRange, dynasty)) {
             if (hex.getColony() == neighbor) {
                 return hex;
             }
