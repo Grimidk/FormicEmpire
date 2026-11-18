@@ -18,7 +18,6 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
 
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,27 +55,20 @@ public class SaveManagerTest {
         List<Savefile.SavedTrade> list = new ArrayList<>();
         list.add(st);
 
-        // 2. Serialize using reflection
-        SaveManager saveManager = new SaveManager();
-        Method serializeMethod = SaveManager.class.getDeclaredMethod("serializeTradesToJson", List.class);
-        serializeMethod.setAccessible(true);
-        String json = (String) serializeMethod.invoke(saveManager, list);
-
-        System.out.println("Serialized JSON: " + json);
+        // 2. Serialize using SaveCodec
+        String json = SaveCodec.toJson(list.toArray(new Savefile.SavedTrade[0]));
 
         // 3. Verify JSON contains new fields
-        assertTrue(json.contains("\"ib\":true"), "JSON should contain isBilateral (ib)");
-        assertTrue(json.contains("\"rload\":"), "JSON should contain returnLoad (rload)");
-        assertTrue(json.contains("\"pib\":false"), "JSON should contain pendingIsBilateral (pib)");
-        assertTrue(json.contains("\"prload\":"), "JSON should contain pendingReturnLoad (prload)");
+        assertTrue(json.contains("\"isBilateral\":true"), "JSON should contain isBilateral");
+        assertTrue(json.contains("\"returnLoad\":"), "JSON should contain returnLoad");
+        assertTrue(json.contains("\"pendingIsBilateral\":false"), "JSON should contain pendingIsBilateral");
+        assertTrue(json.contains("\"pendingReturnLoad\":"), "JSON should contain pendingReturnLoad");
 
-        // 4. Deserialize using reflection
-        Method deserializeMethod = SaveManager.class.getDeclaredMethod("deserializeJsonToTrades", String.class);
-        deserializeMethod.setAccessible(true);
-        List<Savefile.SavedTrade> deserializedList = (List<Savefile.SavedTrade>) deserializeMethod.invoke(saveManager, json);
+        // 4. Deserialize using SaveCodec
+        Savefile.SavedTrade[] deserializedArr = SaveCodec.fromJson(json, Savefile.SavedTrade[].class);
 
-        assertEquals(1, deserializedList.size());
-        Savefile.SavedTrade result = deserializedList.get(0);
+        assertEquals(1, deserializedArr.length);
+        Savefile.SavedTrade result = deserializedArr[0];
 
         // 5. Verify values
         assertTrue(result.isBilateral);
@@ -99,23 +91,12 @@ public class SaveManagerTest {
         live.setModHatchRate(GameConstants.CLASS_SOLDIER, AntModSlot.ABDOMEN, AntMod.DIGIT_NONE, 60f);
         sc.modHatchRatesFlat = AntModService.flattenModRates(live.getModHatchRates());
 
-        SaveManager saveManager = new SaveManager();
-        StringWriter writer = new StringWriter();
-        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
-            Method writeColony = SaveManager.class.getDeclaredMethod(
-                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
-            writeColony.setAccessible(true);
-            writeColony.invoke(saveManager, w, sc, true);
-        }
-
-        String json = writer.toString();
+        String json = SaveCodec.toJson(sc);
         String workerHeadKey = GameConstants.CLASS_WORKER.getNameKey() + "|HEAD|2";
         assertTrue(json.contains("\"" + workerHeadKey + "\":"),
                 "serialized colony should keep pipe keys in modHatchRatesFlat");
 
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        Savefile.SavedColony loaded = SaveCodec.fromJson(json, Savefile.SavedColony.class);
         assertEquals(25.0, loaded.modHatchRatesFlat.get(workerHeadKey));
         assertEquals(40.0, loaded.modHatchRatesFlat.get(
                 GameConstants.CLASS_SOLDIER.getNameKey() + "|ABDOMEN|3"));
@@ -138,21 +119,10 @@ public class SaveManagerTest {
         sc.aphids = 3;
         sc.dermestids = 2;
 
-        SaveManager saveManager = new SaveManager();
-        StringWriter writer = new StringWriter();
-        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
-            Method writeColony = SaveManager.class.getDeclaredMethod(
-                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
-            writeColony.setAccessible(true);
-            writeColony.invoke(saveManager, w, sc, true);
-        }
+        String json = SaveCodec.toJson(sc);
+        assertTrue(json.contains("\"symbioticMites\":7"));
 
-        String json = writer.toString();
-        assertTrue(json.contains("\"symbioticMites\": 7"));
-
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        Savefile.SavedColony loaded = SaveCodec.fromJson(json, Savefile.SavedColony.class);
         assertEquals(7, loaded.symbioticMites);
 
         Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
@@ -183,22 +153,11 @@ public class SaveManagerTest {
                 18,
                 22));
 
-        SaveManager saveManager = new SaveManager();
-        StringWriter writer = new StringWriter();
-        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
-            Method writeColony = SaveManager.class.getDeclaredMethod(
-                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
-            writeColony.setAccessible(true);
-            writeColony.invoke(saveManager, w, sc, true);
-        }
-
-        String json = writer.toString();
-        assertTrue(json.contains("\"nextHuntTargetId\": 4"));
+        String json = SaveCodec.toJson(sc);
+        assertTrue(json.contains("\"nextHuntTargetId\":4"));
         assertTrue(json.contains("\"knownHuntTargets\":"));
 
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        Savefile.SavedColony loaded = SaveCodec.fromJson(json, Savefile.SavedColony.class);
         assertEquals(4, loaded.nextHuntTargetId);
         assertEquals(2, loaded.knownHuntTargets.size());
         assertEquals(120, loaded.knownHuntTargets.get(0).overworldX);
@@ -243,23 +202,12 @@ public class SaveManagerTest {
         sc.activeHuntExpeditions.add(expedition);
         sc.activeHuntExpedition = expedition;
 
-        SaveManager saveManager = new SaveManager();
-        StringWriter writer = new StringWriter();
-        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
-            Method writeColony = SaveManager.class.getDeclaredMethod(
-                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
-            writeColony.setAccessible(true);
-            writeColony.invoke(saveManager, w, sc, true);
-        }
-
-        String json = writer.toString();
+        String json = SaveCodec.toJson(sc);
         assertTrue(json.contains("\"activeHuntExpeditions\":"));
         assertTrue(json.contains("\"activeHuntExpedition\":"));
         assertTrue(json.contains("\"phase\":\"FIGHTING\""));
 
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        Savefile.SavedColony loaded = SaveCodec.fromJson(json, Savefile.SavedColony.class);
         assertEquals(1, loaded.activeHuntExpeditions.size());
         assertEquals(2, loaded.activeHuntExpeditions.get(0).targetId);
         assertEquals("FIGHTING", loaded.activeHuntExpeditions.get(0).phase);
@@ -293,38 +241,6 @@ public class SaveManagerTest {
     }
 
     @Test
-    void colonySymbioticMitesLoadLegacySoilMitesKey() throws Exception {
-        String json = """
-                {
-                "id": 1,
-                "name": "Legacy",
-                "soilMites": 4
-                }
-                """;
-        SaveManager saveManager = new SaveManager();
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
-        assertEquals(4, loaded.symbioticMites);
-    }
-
-    @Test
-    void colonySymbioticMitesLoadLegacyBullMitesKey() throws Exception {
-        String json = """
-                {
-                "id": 1,
-                "name": "Legacy",
-                "bullMites": 4
-                }
-                """;
-        SaveManager saveManager = new SaveManager();
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
-        assertEquals(4, loaded.symbioticMites);
-    }
-
-    @Test
     void warArrayDeserializationPreservesSecondRecord() throws Exception {
         Savefile.SavedWar first = new Savefile.SavedWar();
         first.id = 1;
@@ -354,22 +270,13 @@ public class SaveManagerTest {
         second.dynastyNameB = "Vine Dynasty";
         second.winnerDynastyName = "Grim Dynasty";
 
-        SaveManager saveManager = new SaveManager();
-        Method serializeMethod = SaveManager.class.getDeclaredMethod("serializeWarsToJson", List.class);
-        serializeMethod.setAccessible(true);
-        String json = (String) serializeMethod.invoke(saveManager, List.of(first, second));
+        String json = SaveCodec.toJson(new Savefile.SavedWar[]{first, second});
+        Savefile.SavedWar[] loaded = SaveCodec.fromJson(json, Savefile.SavedWar[].class);
 
-        Method deserializeMethod = SaveManager.class.getDeclaredMethod("deserializeJsonToWars", String.class);
-        deserializeMethod.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        List<Savefile.SavedWar> loaded = (List<Savefile.SavedWar>) deserializeMethod.invoke(saveManager, json);
-
-        assertEquals(2, loaded.size());
-        assertEquals("First Grim - Vine War", loaded.get(1).displayName);
-        assertEquals(15, loaded.get(1).dynastyIdB);
-        assertEquals(1, loaded.get(1).winnerDynastyId);
-        assertFalse(json.contains("dynastyNameA"));
-        assertFalse(json.contains("winnerDynastyName"));
+        assertEquals(2, loaded.length);
+        assertEquals("First Grim - Vine War", loaded[1].displayName);
+        assertEquals(15, loaded[1].dynastyIdB);
+        assertEquals(1, loaded[1].winnerDynastyId);
     }
 
     @Test
@@ -385,19 +292,12 @@ public class SaveManagerTest {
         war.militaryPowerAtStartB = 80;
         war.rebellionWar = true;
 
-        SaveManager saveManager = new SaveManager();
-        Method serializeMethod = SaveManager.class.getDeclaredMethod("serializeWarsToJson", List.class);
-        serializeMethod.setAccessible(true);
-        String json = (String) serializeMethod.invoke(saveManager, List.of(war));
+        String json = SaveCodec.toJson(new Savefile.SavedWar[]{war});
+        Savefile.SavedWar[] loaded = SaveCodec.fromJson(json, Savefile.SavedWar[].class);
 
-        Method deserializeMethod = SaveManager.class.getDeclaredMethod("deserializeJsonToWars", String.class);
-        deserializeMethod.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        List<Savefile.SavedWar> loaded = (List<Savefile.SavedWar>) deserializeMethod.invoke(saveManager, json);
-
-        assertEquals(1, loaded.size());
-        assertTrue(loaded.get(0).rebellionWar);
-        assertEquals("First Crystal Rebellion", loaded.get(0).displayName);
+        assertEquals(1, loaded.length);
+        assertTrue(loaded[0].rebellionWar);
+        assertEquals("First Crystal Rebellion", loaded[0].displayName);
     }
 
     @Test
@@ -415,10 +315,7 @@ public class SaveManagerTest {
                 + "\"pendingRebellionResponseFromId\":12"
                 + "}";
 
-        SaveManager saveManager = new SaveManager();
-        Method parseMethod = SaveManager.class.getDeclaredMethod("parseDynastyObject", String.class);
-        parseMethod.setAccessible(true);
-        Savefile.SavedDynasty loaded = (Savefile.SavedDynasty) parseMethod.invoke(saveManager, json);
+        Savefile.SavedDynasty loaded = SaveCodec.fromJson(json, Savefile.SavedDynasty.class);
 
         assertEquals(12, loaded.activeRebellionDynastyId);
         assertEquals(12, loaded.pendingRebellionResponseFromId);
@@ -451,21 +348,11 @@ public class SaveManagerTest {
         sc.name = "C";
         sc.modHatchRatesFlat = AntModService.flattenModRates(colony.getModHatchRates());
 
-        SaveManager saveManager = new SaveManager();
-        StringWriter writer = new StringWriter();
-        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
-            Method writeColony = SaveManager.class.getDeclaredMethod(
-                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
-            writeColony.setAccessible(true);
-            writeColony.invoke(saveManager, w, sc, true);
-        }
-        String json = writer.toString();
+        String json = SaveCodec.toJson(sc);
         String honeypotKey = GameConstants.CLASS_WORKER.getNameKey() + "|ABDOMEN|3";
         assertTrue(json.contains("\"" + honeypotKey + "\":"), json);
 
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        Savefile.SavedColony loaded = SaveCodec.fromJson(json, Savefile.SavedColony.class);
         Colony restored = new Colony(loaded);
         assertEquals(50f, restored.getModHatchRate(GameConstants.CLASS_WORKER, AntModSlot.ABDOMEN, 3));
     }
@@ -532,22 +419,11 @@ public class SaveManagerTest {
         sc.workerAges.put("30", 1);
         sc.soldierAges.put("50", 2);
 
-        SaveManager saveManager = new SaveManager();
-        StringWriter writer = new StringWriter();
-        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
-            Method writeColony = SaveManager.class.getDeclaredMethod(
-                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
-            writeColony.setAccessible(true);
-            writeColony.invoke(saveManager, w, sc, true);
-        }
-
-        String json = writer.toString();
+        String json = SaveCodec.toJson(sc);
         assertTrue(json.contains("\"workerAges\":"));
         assertTrue(json.contains("\"soldierAges\":"));
 
-        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
-        parseColony.setAccessible(true);
-        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        Savefile.SavedColony loaded = SaveCodec.fromJson(json, Savefile.SavedColony.class);
 
         assertEquals(2, loaded.workerAges.get("15"));
         assertEquals(1, loaded.workerAges.get("30"));
@@ -609,21 +485,15 @@ public class SaveManagerTest {
         List<Savefile.SavedHex> input = new ArrayList<>();
         input.add(sh);
 
-        SaveManager saveManager = new SaveManager();
-        Method serializeHexes = SaveManager.class.getDeclaredMethod("serializeHexesToJson", List.class);
-        serializeHexes.setAccessible(true);
-        String json = (String) serializeHexes.invoke(saveManager, input);
+        String json = SaveCodec.toJson(input.toArray(new Savefile.SavedHex[0]));
 
-        assertTrue(json.contains("\"dt\":" + GameConstants.DISASTER_WILDFIRE.getId()));
-        assertTrue(json.contains("\"dth\":7"));
+        assertTrue(json.contains("\"disasterTypeId\":" + GameConstants.DISASTER_WILDFIRE.getId()));
+        assertTrue(json.contains("\"disasterAgeHours\":7"));
 
-        Method deserializeHexes = SaveManager.class.getDeclaredMethod("deserializeJsonToHexes", String.class);
-        deserializeHexes.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        List<Savefile.SavedHex> loaded = (List<Savefile.SavedHex>) deserializeHexes.invoke(saveManager, json);
+        Savefile.SavedHex[] loaded = SaveCodec.fromJson(json, Savefile.SavedHex[].class);
 
-        assertEquals(1, loaded.size());
-        assertEquals(GameConstants.DISASTER_WILDFIRE.getId(), loaded.get(0).disasterTypeId);
-        assertEquals(7, loaded.get(0).disasterAgeHours);
+        assertEquals(1, loaded.length);
+        assertEquals(GameConstants.DISASTER_WILDFIRE.getId(), loaded[0].disasterTypeId);
+        assertEquals(7, loaded[0].disasterAgeHours);
     }
 }

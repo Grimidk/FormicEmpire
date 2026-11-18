@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
@@ -97,6 +98,8 @@ public class WarBattleViewPanel extends JPanel {
     };
     private final Map<Integer, Image> biomeTileCache = new HashMap<>();
     private final Image riverSprite = UiResourceLoader.loadImage(WarBattleViewPanel.class, "/sprites/buildings/River.png");
+    private final boolean riverFlipX = GameRandom.nextBoolean();
+    private final boolean riverFlipY = GameRandom.nextBoolean();
     private final BattleNumericOverlay numericOverlay = new BattleNumericOverlay();
     private WarBattleScene scene;
     private List<BattleAnt> attackerAnts = List.of();
@@ -637,8 +640,12 @@ public class WarBattleViewPanel extends JPanel {
         int riverX = fieldX + (fieldW - riverW) / 2;
         Shape oldClip = g2d.getClip();
         g2d.setClip(fieldX, fieldY, fieldW, fieldH);
+        int dx1 = riverFlipX ? riverX + riverW : riverX;
+        int dx2 = riverFlipX ? riverX : riverX + riverW;
         for (int y = fieldY; y < fieldY + fieldH; y += riverH) {
-            g2d.drawImage(riverSprite, riverX, y, this);
+            int dy1 = riverFlipY ? y + riverH : y;
+            int dy2 = riverFlipY ? y : y + riverH;
+            g2d.drawImage(riverSprite, dx1, dy1, dx2, dy2, 0, 0, riverW, riverH, this);
         }
         g2d.setClip(oldClip);
     }

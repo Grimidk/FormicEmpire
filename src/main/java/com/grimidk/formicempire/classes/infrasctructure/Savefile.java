@@ -16,8 +16,10 @@ import java.util.Map;
 public class Savefile implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+    public static final int CURRENT_FORMAT_VERSION = 2;
+
     // --- Global Save Data ---
+    private int formatVersion = CURRENT_FORMAT_VERSION;
     private final int id; 
     private final String name; 
     private String version;
@@ -63,6 +65,10 @@ public class Savefile implements Serializable {
     private List<SavedWorldHistoryEvent> worldHistory;
     private boolean allowsAchievements = true;
     private boolean spectatorMode = false;
+
+    public Savefile() {
+        this(0, "");
+    }
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -587,6 +593,14 @@ public class Savefile implements Serializable {
 
     public void disableAchievements() {
         this.allowsAchievements = false;
+    }
+
+    public int getFormatVersion() {
+        return formatVersion;
+    }
+
+    public void setFormatVersion(int formatVersion) {
+        this.formatVersion = formatVersion;
     }
 
     public boolean isSpectatorMode() {

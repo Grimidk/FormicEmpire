@@ -4,7 +4,7 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		separate sandbox into sandbox for non cheats, and cheats for actual cheats
+	    (none right now)
 	Mid:
 		(none right now)
 	Low:
@@ -66,7 +66,6 @@ Needed for launch (v1.0) (Launch Version):
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
 		rework abilities and alerts and triggers to be cleaner
-		rework saves to be cleaner and efficient
 
 	Everything else :
 		critter system:

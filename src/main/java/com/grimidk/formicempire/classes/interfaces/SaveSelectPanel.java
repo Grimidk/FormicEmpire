@@ -178,7 +178,7 @@ public class SaveSelectPanel extends JPanel {
 
     public void refreshSlots() {
         for (int i = 0; i < 3; i++) {
-            cachedSaves[i] = saveManager.loadSlot(i + 1);
+            cachedSaves[i] = saveManager.loadSlotMetadata(i + 1);
         }
         applySlotLabels();
     }
@@ -321,13 +321,7 @@ public class SaveSelectPanel extends JPanel {
                     return;
                 }
                 refreshSlots();
-
-                Savefile newSave = cachedSaves[idx];
-                if (newSave != null) {
-                    frame.openGameWithSave(newSave);
-                } else {
-                    UiOptionPane.showMessageDialog(frame, LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE), LanguageStrings.get(LanguageStrings.UI_ERROR), JOptionPane.ERROR_MESSAGE);
-                }
+                frame.openGameWithSave(save);
             });
         } else {
             Savefile fresh = saveManager.loadSlot(slotId);
