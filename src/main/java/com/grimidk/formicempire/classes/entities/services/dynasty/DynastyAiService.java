@@ -22,8 +22,10 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class DynastyAiService {
 
@@ -103,17 +105,20 @@ public class DynastyAiService {
             deployed = intel.countDeployedSpies();
         }
 
+        Set<Dynasty> bordering = diplo.computeBorderingDynasties(world);
         List<Dynasty> disliked = new ArrayList<>();
+        Map<Dynasty, Integer> repMap = new IdentityHashMap<>();
         for (Dynasty other : world.getDynastys()) {
             if (other == null || other == dynasty || !other.isActiveForDiplomacy()) {
                 continue;
             }
-            int rep = diplo.getEffectiveDiplomaticReputation(other, world);
+            int rep = diplo.getEffectiveDiplomaticReputation(other, world, bordering.contains(other));
             if (rep < GameConstants.REPUTATION_NEUTRAL.getMinScore()) {
                 disliked.add(other);
+                repMap.put(other, rep);
             }
         }
-        disliked.sort(Comparator.comparingInt(other -> diplo.getEffectiveDiplomaticReputation(other, world)));
+        disliked.sort(Comparator.comparingInt(other -> repMap.getOrDefault(other, 0)));
 
         for (Dynasty other : disliked) {
             if (deployed >= maxAbroad) {
@@ -146,17 +151,20 @@ public class DynastyAiService {
         if (excess <= 0 || world == null || dynasty == null) {
             return;
         }
+        Set<Dynasty> bordering = diplo.computeBorderingDynasties(world);
         List<Dynasty> targets = new ArrayList<>();
+        Map<Dynasty, Integer> repMap = new IdentityHashMap<>();
         for (Dynasty other : world.getDynastys()) {
             if (other == null || other == dynasty) {
                 continue;
             }
             if (intel.countSpiesToward(other) > 0) {
                 targets.add(other);
+                repMap.put(other, diplo.getEffectiveDiplomaticReputation(other, world, bordering.contains(other)));
             }
         }
         targets.sort(Comparator
-                .comparingInt((Dynasty other) -> diplo.getEffectiveDiplomaticReputation(other, world))
+                .comparingInt((Dynasty other) -> repMap.getOrDefault(other, 0))
                 .reversed());
         int remaining = excess;
         for (Dynasty other : targets) {
@@ -225,16 +233,21 @@ public class DynastyAiService {
             }
         }
 
-        List<Dynasty> others = new ArrayList<>(world.getDynastys());
-        others.remove(dynasty);
-        others.sort(Comparator
-                .comparingInt((Dynasty other) -> diplo.sharesBorderWith(other, world) ? 0 : 1)
-                .thenComparingInt(other -> diplo.getEffectiveDiplomaticReputation(other, world)));
-
-        for (Dynasty other : others) {
-            if (!other.isActiveForDiplomacy()) {
+        Set<Dynasty> bordering = diplo.computeBorderingDynasties(world);
+        List<Dynasty> others = new ArrayList<>();
+        Map<Dynasty, Integer> repMap = new IdentityHashMap<>();
+        for (Dynasty other : world.getDynastys()) {
+            if (other == null || other == dynasty || !other.isActiveForDiplomacy()) {
                 continue;
             }
+            others.add(other);
+            repMap.put(other, diplo.getEffectiveDiplomaticReputation(other, world, bordering.contains(other)));
+        }
+        others.sort(Comparator
+                .comparingInt((Dynasty other) -> bordering.contains(other) ? 0 : 1)
+                .thenComparingInt(other -> repMap.getOrDefault(other, 0)));
+
+        for (Dynasty other : others) {
             if (diplo.canRequestNonAggressionPact(other, world)) {
                 diplo.requestNonAggressionPact(other, world);
                 if (diplo.hasNonAggressionPact(other)) {
@@ -245,7 +258,7 @@ public class DynastyAiService {
             if (tryAiGeneticExchange(dynasty, diplo, other, world)) {
                 continue;
             }
-            int effectiveRep = diplo.getEffectiveDiplomaticReputation(other, world);
+            int effectiveRep = repMap.getOrDefault(other, GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION);
             if (effectiveRep >= REPUTATION_MISSION_TARGET) {
                 continue;
             }
@@ -290,12 +303,13 @@ public class DynastyAiService {
             return;
         }
 
+        Set<Dynasty> bordering = diplo.computeBorderingDynasties(world);
         List<Dynasty> candidates = new ArrayList<>();
         for (Dynasty other : world.getDynastys()) {
             if (other == dynasty || !other.isActiveForDiplomacy()) {
                 continue;
             }
-            if (!diplo.sharesBorderWith(other, world)) {
+            if (!bordering.contains(other)) {
                 continue;
             }
             if (!diplo.canDeclareWar(other, world)) {
@@ -313,7 +327,7 @@ public class DynastyAiService {
             double chance = ColonyMilitaryService.computeAiWarDeclarationChance(
                     dynasty.getMilitaryPower(),
                     other.getMilitaryPower(),
-                    diplo.getEffectiveDiplomaticReputation(other, world));
+                    diplo.getEffectiveDiplomaticReputation(other, world, true));
             chance *= warChanceMultiplier(personality);
             if (chance > bestChance) {
                 bestChance = chance;
@@ -417,6 +431,10 @@ public class DynastyAiService {
             }
         }
 
+        Colony capital = dynasty.getCapital();
+        if (capital == null || !diplo.meetsTradeLoyaltyRequirement(capital)) {
+            return;
+        }
         for (Dynasty otherDynasty : world.getDynastys()) {
             if (otherDynasty == null || otherDynasty == dynasty
                     || !DynastyDiplomacyService.isDiplomaticallyContactable(otherDynasty)) {

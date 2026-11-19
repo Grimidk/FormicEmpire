@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,10 +64,15 @@ public class SaveManager {
     }
 
     private final File savesDir;
+    private final AtomicBoolean autosaveInFlight = new AtomicBoolean(false);
 
     public SaveManager() {
         this.savesDir = GamePaths.resolveSavesDirectory();
         System.out.println("[SaveManager] Saves directory: " + savesDir.getAbsolutePath());
+    }
+
+    public SaveManager(File savesDir) {
+        this.savesDir = savesDir;
     }
 
     public File getSlotFile(int slotId, String type) {
@@ -120,9 +126,42 @@ public class SaveManager {
         try {
             slotId = w.getSaveSlotId();
         } catch (Exception ignore) {
-            slotId = 0; 
+            slotId = 0;
         }
-        saveWorldToSlot(w, slotId);
+        if (slotId == 0) {
+            System.out.println("[SaveManager] Skipping autosave for new game (Slot ID 0).");
+            return;
+        }
+        if (!autosaveInFlight.compareAndSet(false, true)) {
+            return;
+        }
+        final int targetSlot = slotId;
+        final Savefile save = new Savefile(targetSlot, LanguageStrings.get(LanguageStrings.SAVE_AUTOSAVE_NAME));
+        try {
+            populateSavefileFromGame(save, w, e != null ? e : w.getEngine());
+        } catch (RuntimeException ex) {
+            autosaveInFlight.set(false);
+            throw ex;
+        }
+        try {
+            SHARED_EXECUTOR.submit(() -> {
+                try {
+                    if (applyManualMetadataAndShouldSkip(save, targetSlot)) {
+                        return;
+                    }
+                    File autosaveFile = getSlotFile(targetSlot, "autosave");
+                    writeSaveToFile(save, autosaveFile);
+                    System.out.println("[SaveManager] Autosaved world to " + autosaveFile.getAbsolutePath());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    autosaveInFlight.set(false);
+                }
+            });
+        } catch (RuntimeException ex) {
+            autosaveInFlight.set(false);
+            throw ex;
+        }
     }
 
     public void saveUserSlot(Savefile save) throws IOException {
@@ -208,6 +247,32 @@ public class SaveManager {
         return false;
     }
 
+    private boolean applyManualMetadataAndShouldSkip(Savefile save, int slotId) {
+        if (save == null || slotId <= 0) {
+            return false;
+        }
+        File manualFile = getSlotFile(slotId, "manual");
+        if (!manualFile.exists() || manualFile.length() == 0) {
+            return false;
+        }
+        try {
+            Savefile existing = loadMetadataOrFile(manualFile);
+            if (existing == null) {
+                return false;
+            }
+            if (existing.getName() != null && !existing.getName().trim().isEmpty()) {
+                save.setName(existing.getName());
+            }
+            int existingPlay = existing.getPlayTime() != 0 ? existing.getPlayTime() : computePlayTimeFromSave(existing);
+            if (existingPlay > save.getPlayTime()) {
+                System.out.println("[SaveManager] Manual save for slot " + slotId + " has more playtime than autosave - skipping autosave");
+                return true;
+            }
+        } catch (Exception ignore) {
+        }
+        return false;
+    }
+
     public void saveWorldToSlot(World w, int slotId) {
         if (w == null) return;
         if (isPlayerDynastyAboutToDieWithoutQueen(w)) {
@@ -220,37 +285,13 @@ public class SaveManager {
             return;
         }
 
-        String nameToUse = LanguageStrings.get(LanguageStrings.SAVE_AUTOSAVE_NAME);
-        File manualFile = getSlotFile(slotId, "manual");
-        if (manualFile.exists() && manualFile.length() > 0) {
-            try {
-                Savefile existingManual = loadMetadataOrFile(manualFile);
-                if (existingManual != null && existingManual.getName() != null && !existingManual.getName().trim().isEmpty()) {
-                    nameToUse = existingManual.getName(); 
-                }
-            } catch (Exception ignore) {}
-        }
-
         File f = getSlotFile(slotId, "autosave");
-        Savefile save = new Savefile(slotId, nameToUse);
+        Savefile save = new Savefile(slotId, LanguageStrings.get(LanguageStrings.SAVE_AUTOSAVE_NAME));
         populateSavefileFromGame(save, w, w.getEngine());
 
         try {
-            if (slotId > 0) {
-                File manual = getSlotFile(slotId, "manual");
-                if (manual.exists() && manual.length() > 0) {
-                    try {
-                        Savefile existing = loadMetadataOrFile(manual);
-                        if (existing != null) {
-                            int existingPlay = existing.getPlayTime() != 0 ? existing.getPlayTime() : computePlayTimeFromSave(existing);
-                            if (existingPlay > save.getPlayTime()) {
-                                System.out.println("[SaveManager] Manual save for slot " + slotId + " has more playtime than autosave - skipping autosave");
-                                return;
-                            }
-                        }
-                    } catch (Exception ignore) {
-                    }
-                }
+            if (applyManualMetadataAndShouldSkip(save, slotId)) {
+                return;
             }
             
             writeSaveToFile(save, f);

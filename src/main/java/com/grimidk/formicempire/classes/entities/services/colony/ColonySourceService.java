@@ -48,26 +48,38 @@ public class ColonySourceService {
     }
 
     public int getTotalQuantityAvailable(ResourceType type) {
-        return discoveredSources.stream()
-                .filter(source -> source.getResourceType() == type)
-                .mapToInt(ResourceSource::getQuantity)
-                .sum();
+        int sum = 0;
+        for (ResourceSource source : discoveredSources) {
+            if (source.getResourceType() == type) {
+                sum += source.getQuantity();
+            }
+        }
+        return sum;
     }
 
     public boolean isSourceFull(Colony colony, ResourceType type) {
         int capacity = colony.getStatsService().getSourceCapacity(colony);
-        long count = discoveredSources.stream()
-                .filter(s -> s.getResourceType() == type)
-                .count();
-        return count >= capacity;
+        int count = 0;
+        for (ResourceSource s : discoveredSources) {
+            if (s.getResourceType() == type) {
+                count++;
+                if (count >= capacity) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean addSource(Colony colony, ResourceSource source) {
         int capacity = colony.getStatsService().getSourceCapacity(colony);
 
-        long count = discoveredSources.stream()
-                .filter(s -> s.getResourceType() == source.getResourceType())
-                .count();
+        int count = 0;
+        for (ResourceSource s : discoveredSources) {
+            if (s.getResourceType() == source.getResourceType()) {
+                count++;
+            }
+        }
 
         if (count < capacity) {
             this.discoveredSources.add(source);

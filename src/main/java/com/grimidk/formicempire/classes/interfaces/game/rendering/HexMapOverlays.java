@@ -242,43 +242,50 @@ public final class HexMapOverlays {
             return;
         }
 
-        Rectangle clip = g2d.getClipBounds();
-        Set<Long> drawnEdges = new HashSet<>();
+        Set<Long> activeWarPairs = new HashSet<>(Math.max(4, wars.size() * 2));
         for (War war : wars) {
-            if (war == null || !war.isActive()) {
-                continue;
-            }
-            int idA = war.getDynastyIdA();
-            int idB = war.getDynastyIdB();
-            for (HexGridMesh.Edge edge : mesh.edges()) {
-                if (edge.faceA == null || edge.faceB == null) {
-                    continue;
-                }
-                if (isHexDiscovered != null && (!isHexDiscovered.test(edge.faceA.hex) && !isHexDiscovered.test(edge.faceB.hex))) {
-                    continue;
-                }
-                Dynasty dynA = HexMapGeometry.dynastyOf(edge.faceA.hex);
-                Dynasty dynB = HexMapGeometry.dynastyOf(edge.faceB.hex);
-                if (dynA == null || dynB == null) {
-                    continue;
-                }
-                int aId = dynA.getId();
-                int bId = dynB.getId();
-                if (!((aId == idA && bId == idB) || (aId == idB && bId == idA))) {
-                    continue;
-                }
-                double midX = (edge.a.x + edge.b.x) * 0.5;
-                double midY = (edge.a.y + edge.b.y) * 0.5;
-                if (clip != null && !clip.intersects(midX - iconSize, midY - iconSize, iconSize * 2.0, iconSize * 2.0)) {
-                    continue;
-                }
-                long key = edgeKey(edge.faceA.q, edge.faceA.r, edge.faceB.q, edge.faceB.r);
-                if (!drawnEdges.add(key)) {
-                    continue;
-                }
-                drawCenteredIcon(g2d, warIcon, midX, midY, iconSize);
+            if (war != null && war.isActive()) {
+                activeWarPairs.add(warPairKey(war.getDynastyIdA(), war.getDynastyIdB()));
             }
         }
+        if (activeWarPairs.isEmpty()) {
+            return;
+        }
+
+        Rectangle clip = g2d.getClipBounds();
+        Set<Long> drawnEdges = new HashSet<>();
+        for (HexGridMesh.Edge edge : mesh.edges()) {
+            if (edge.faceA == null || edge.faceB == null) {
+                continue;
+            }
+            Dynasty dynA = HexMapGeometry.dynastyOf(edge.faceA.hex);
+            Dynasty dynB = HexMapGeometry.dynastyOf(edge.faceB.hex);
+            if (dynA == null || dynB == null || dynA == dynB) {
+                continue;
+            }
+            if (!activeWarPairs.contains(warPairKey(dynA.getId(), dynB.getId()))) {
+                continue;
+            }
+            if (isHexDiscovered != null && (!isHexDiscovered.test(edge.faceA.hex) && !isHexDiscovered.test(edge.faceB.hex))) {
+                continue;
+            }
+            double midX = (edge.a.x + edge.b.x) * 0.5;
+            double midY = (edge.a.y + edge.b.y) * 0.5;
+            if (clip != null && !clip.intersects(midX - iconSize, midY - iconSize, iconSize * 2.0, iconSize * 2.0)) {
+                continue;
+            }
+            long key = edgeKey(edge.faceA.q, edge.faceA.r, edge.faceB.q, edge.faceB.r);
+            if (!drawnEdges.add(key)) {
+                continue;
+            }
+            drawCenteredIcon(g2d, warIcon, midX, midY, iconSize);
+        }
+    }
+
+    private static long warPairKey(int idA, int idB) {
+        int lo = Math.min(idA, idB);
+        int hi = Math.max(idA, idB);
+        return (((long) lo) << 32) | (hi & 0xFFFFFFFFL);
     }
 
     static double tradeLegProgress(Trade trade) {

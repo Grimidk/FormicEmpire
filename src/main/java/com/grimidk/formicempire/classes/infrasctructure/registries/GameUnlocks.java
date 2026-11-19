@@ -381,7 +381,7 @@ public final class GameUnlocks {
                 static { upgrades.add(ASSIMILATED_SILKWEAVE); }
         public static final Upgrade ASSIMILATED_RAFTING = new Upgrade(1008, "ASSIMILATED_RAFTING", "ASSIMILATED_RAFTING_FLAVOR", "ASSIMILATED_RAFTING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedRafting.png"), 0, -6, -6);
                 static { upgrades.add(ASSIMILATED_RAFTING); }
-        public static final Upgrade ABILITY_BRIDGES = new Upgrade(515, "ABILITY_BRIDGES", "ABILITY_BRIDGES_FLAVOR", "ABILITY_BRIDGES_DESC", ASSIMILATED_RAFTING, 50000, loadIcon("icons/upgrades/AbilityTunnels.png"), 4, -6, -7);
+        public static final Upgrade ABILITY_BRIDGES = new Upgrade(532, "ABILITY_BRIDGES", "ABILITY_BRIDGES_FLAVOR", "ABILITY_BRIDGES_DESC", ASSIMILATED_RAFTING, 50000, loadIcon("icons/upgrades/AbilityBridges.png"), 4, -6, -7);
                 static { upgrades.add(ABILITY_BRIDGES); }
         public static final Upgrade STAT_RAFTING_1 = new Upgrade(528, "STAT_RAFTING_1", "STAT_RAFTING_1_FLAVOR", "STAT_RAFTING_1_DESC", ASSIMILATED_RAFTING, 2500, loadIcon("icons/upgrades/StatRafting1.png"), 4, -5, -7);
                 static { upgrades.add(STAT_RAFTING_1); }

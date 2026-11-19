@@ -4,13 +4,25 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-	    (none right now)
+	    Tooltips take too long
+		Sandbox alert should not pop, only with cheats
+		Invasions should not happen until 6 months
+		Fog of war not appearing and block diplomacy
+		There is 2 cancel buttons in builds, one should say abort building
+		Diplo view add sort by mil power
+		Random start biome (use random dice animation)
+		Hunts to battle sim
+		seeded dynasties only have the dynasty title
+		cehck to exclude dead dynasties from lists
+		sandbox allow non omni to assimilate
+		keep game speed in battle rush
+		no close button in the battle sim menu
 	Mid:
 		(none right now)
 	Low:
 		(none right now)
 	Important not Urgent:
-		(none right now)
+		evaluate rust 
 	Can't reproduce:
 		(none right now)
 
@@ -65,7 +77,8 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
-		rework abilities and alerts and triggers to be cleaner
+		rework abilities and alerts (click to go) and triggers to be cleaner and logs
+		rework ai so it its even smarter and progressed almost always, adapts and takes advantage of all features
 
 	Everything else :
 		critter system:

@@ -347,9 +347,15 @@ public final class WarProgressService {
         }
         float borderOdds = borderAi / (float) Math.max(1, borderEnemy);
 
-        ColonyMilitaryService.refreshColonyMilitaryPower(contested);
-        ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
-        ColonyMilitaryService.refreshDynastyMilitaryPower(ai);
+        if (contested.getMilitaryPower() <= 0) {
+            ColonyMilitaryService.refreshColonyMilitaryPower(contested);
+        }
+        if (stageAttacker.getMilitaryPower() <= 0 && !stageAttacker.getColonies().isEmpty()) {
+            ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
+        }
+        if (ai.getMilitaryPower() <= 0 && !ai.getColonies().isEmpty()) {
+            ColonyMilitaryService.refreshDynastyMilitaryPower(ai);
+        }
         int hexDefense = ColonyMilitaryService.computeHexDefenseEffectivePower(contested);
         int hexAssault = ColonyMilitaryService.computeHexAssaultEffectiveAttackerPower(stageAttacker);
         if (hexDefense <= 0 || hexAssault <= 0) {
@@ -376,8 +382,12 @@ public final class WarProgressService {
         if (counterTarget == null) {
             return false;
         }
-        ColonyMilitaryService.refreshColonyMilitaryPower(counterTarget);
-        ColonyMilitaryService.refreshDynastyMilitaryPower(ai);
+        if (counterTarget.getMilitaryPower() <= 0) {
+            ColonyMilitaryService.refreshColonyMilitaryPower(counterTarget);
+        }
+        if (ai.getMilitaryPower() <= 0 && !ai.getColonies().isEmpty()) {
+            ColonyMilitaryService.refreshDynastyMilitaryPower(ai);
+        }
         int counterDefense = ColonyMilitaryService.computeHexDefenseEffectivePower(counterTarget);
         int counterAssault = ColonyMilitaryService.computeHexAssaultEffectiveAttackerPower(ai);
         if (counterAssault <= 0) {

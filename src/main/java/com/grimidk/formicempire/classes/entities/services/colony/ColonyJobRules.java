@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -22,7 +23,12 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public final class ColonyJobRules {
 
@@ -214,11 +220,15 @@ public final class ColonyJobRules {
         toLay = Math.min(toLay, spaceAvailable);
 
         List<Ant> eggs = colony.getEggs();
-        for (int i = 0; i < toLay; i++) {
-            Ant newEgg = new Ant(colony, GameConstants.CLASS_EGG);
-            newEgg.setDimension(WorldSpaces.UNDERWORLD);
-            newEgg.setPosition(new Point(0, 0));
-            eggs.add(newEgg);
+        if (toLay > 0) {
+            List<Ant> newEggs = new ArrayList<>(toLay);
+            for (int i = 0; i < toLay; i++) {
+                Ant newEgg = new Ant(colony, GameConstants.CLASS_EGG);
+                newEgg.setDimension(WorldSpaces.UNDERWORLD);
+                newEgg.setPosition(new Point(0, 0));
+                newEggs.add(newEgg);
+            }
+            eggs.addAll(newEggs);
         }
     }
 
@@ -258,7 +268,7 @@ public final class ColonyJobRules {
         ColonyStatsService stats = colony.getStatsService();
         ColonyResourceService resources = colony.getResourceService();
 
-        int totalConsumption = stats.getTotalConsumption(colony);
+        int totalConsumption = colony.getTotalConsumption();
         totalConsumption += colony.getParasiteAnts();
 
         double foodDeficit = totalConsumption;
@@ -311,9 +321,7 @@ public final class ColonyJobRules {
 
         int actualToCompost = Math.min(potentialCompost, deadAnts.size());
 
-        for (int i = 0; i < actualToCompost; i++) {
-            deadAnts.remove(deadAnts.size() - 1);
-        }
+        deadAnts.subList(deadAnts.size() - actualToCompost, deadAnts.size()).clear();
 
         int foodGain = actualToCompost * 4;
         if (!colony.canEatFungi() && colony.canEatMeat()) {
@@ -347,14 +355,9 @@ public final class ColonyJobRules {
         }
 
         List<Ant> deadAnts = colony.getDeadAnts();
-        int removed = 0;
-
-        for (int i = deadAnts.size() - 1; i >= 0; i--) {
-            if (removed >= cleanCapacity) {
-                break;
-            }
-            deadAnts.remove(i);
-            removed++;
+        int toRemove = Math.min(cleanCapacity, deadAnts.size());
+        if (toRemove > 0) {
+            deadAnts.subList(deadAnts.size() - toRemove, deadAnts.size()).clear();
         }
     }
 
@@ -487,26 +490,38 @@ public final class ColonyJobRules {
         }
 
         List<Ant> victims = ColonyResourceDeathSelection.selectVictims(candidates, deaths, null);
-        for (Ant victim : victims) {
-            List<Ant> typeList = colony.getAntsByClass(victim.getAntClass());
-            if (typeList != null) {
-                typeList.remove(victim);
-            }
-            colony.recordAntDeath(victim, cause);
+        if (victims.isEmpty()) {
+            return;
         }
+        Map<AntClass, Set<Ant>> victimSetsByClass = new HashMap<>();
+        for (Ant victim : victims) {
+            AntClass type = victim.getAntClass();
+            victimSetsByClass
+                    .computeIfAbsent(type, ignored -> Collections.newSetFromMap(new IdentityHashMap<>()))
+                    .add(victim);
+        }
+        for (Map.Entry<AntClass, Set<Ant>> entry : victimSetsByClass.entrySet()) {
+            List<Ant> typeList = colony.getAntsByClass(entry.getKey());
+            if (typeList != null) {
+                typeList.removeIf(entry.getValue()::contains);
+            }
+        }
+        colony.recordAntDeathsBatch(victims, cause);
     }
 
     private static int cullBrood(Colony colony, List<Ant> broodList, int amount) {
-        int removed = 0;
-        for (int i = broodList.size() - 1; i >= 0; i--) {
-            if (removed >= amount) {
-                break;
-            }
-            Ant victim = broodList.remove(i);
-            colony.recordAntDeath(victim, DeathCause.LACK_OF_CARE);
-            removed++;
+        int toRemove = Math.min(amount, broodList.size());
+        if (toRemove <= 0) {
+            return 0;
         }
-        return removed;
+        int start = broodList.size() - toRemove;
+        List<Ant> removed = new ArrayList<>(toRemove);
+        for (int i = broodList.size() - 1; i >= start; i--) {
+            removed.add(broodList.get(i));
+        }
+        broodList.subList(start, broodList.size()).clear();
+        colony.recordAntDeathsBatch(removed, DeathCause.LACK_OF_CARE);
+        return removed.size();
     }
 
     private static double parasiticMiteWorkEfficiency(Colony colony) {

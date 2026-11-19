@@ -693,7 +693,7 @@ public class ColonyStatsService {
     public int getProteinConsumption(Colony colony) {
         if (!colony.canEatFungi()) {
             float meatEff = Math.max(1f, getMeatEatingEfficiency(colony));
-            return (int) Math.ceil(getTotalConsumption(colony) / meatEff);
+            return (int) Math.ceil(colony.getTotalConsumption() / meatEff);
         }
         if (colony.canEatMeat()) {
             return 0;

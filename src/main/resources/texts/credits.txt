@@ -5,6 +5,7 @@ Testers (in order of participation):
     Gopher
     Hazelmeadow
     Rick Hard 86
+    Bardux
     
 Translations:
     English: Grimidk

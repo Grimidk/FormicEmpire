@@ -17,6 +17,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,7 +74,7 @@ public final class AntModService {
 
     private static Map<AntModSlot, Map<Integer, Float>> defaultSlotRates() {
         Map<AntModSlot, Map<Integer, Float>> rates = new EnumMap<>(AntModSlot.class);
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             Map<Integer, Float> slotRates = new HashMap<>();
             slotRates.put(AntMod.DIGIT_NONE, 100f);
             rates.put(slot, slotRates);
@@ -211,7 +212,7 @@ public final class AntModService {
             for (Map.Entry<AntModSlot, Map<Integer, Float>> slotEntry : entry.getValue().entrySet()) {
                 slotCopy.put(slotEntry.getKey(), new HashMap<>(slotEntry.getValue()));
             }
-            for (AntModSlot slot : AntModSlot.values()) {
+            for (AntModSlot slot : AntModSlot.ALL) {
                 slotCopy.putIfAbsent(slot, new HashMap<>(Map.of(AntMod.DIGIT_NONE, 100f)));
             }
             copy.put(entry.getKey(), slotCopy);
@@ -356,7 +357,7 @@ public final class AntModService {
     public static float combinedAttackMult(AntModProfile profile) {
         float total = 0f;
         boolean hasAttackMod = false;
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod mod = profile != null ? profile.getMod(slot) : null;
             if (mod == null || mod.isNone() || mod.getAttackMult() == 1f) {
                 continue;
@@ -372,7 +373,7 @@ public final class AntModService {
         if (profile == null) {
             return total;
         }
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod mod = profile.getMod(slot);
             if (mod == null || mod.isNone()) {
                 continue;
@@ -384,7 +385,7 @@ public final class AntModService {
 
     public static float combinedDefenseBonus(AntModProfile profile) {
         float total = 0f;
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod mod = profile != null ? profile.getMod(slot) : null;
             if (mod == null || mod.isNone() || mod.getDefenseMult() == 1f) {
                 continue;
@@ -396,7 +397,7 @@ public final class AntModService {
 
     public static float combinedRegenMult(AntModProfile profile) {
         float mult = 1f;
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod mod = profile != null ? profile.getMod(slot) : null;
             if (mod != null && !mod.isNone()) {
                 mult *= mod.getRegenMult();
@@ -407,7 +408,7 @@ public final class AntModService {
 
     public static float combinedSpeedMult(AntModProfile profile) {
         float mult = 1f;
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod mod = profile != null ? profile.getMod(slot) : null;
             if (mod != null && !mod.isNone()) {
                 mult *= mod.getSpeedMult();
@@ -472,7 +473,7 @@ public final class AntModService {
         if (colony == null || type == null || ants == null || ants.isEmpty()) {
             return 1f;
         }
-        return weightedModCombatFactor(colony, type, aggregateModCounts(ants));
+        return weightedModCombatFactor(colony, type, ants);
     }
 
     public static float forageMult(Ant ant) {
@@ -484,7 +485,7 @@ public final class AntModService {
             return 1f;
         }
         float mult = 1f;
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod mod = profile.getMod(slot);
             if (mod != null && !mod.isNone()) {
                 mult *= mod.getForageMult();
@@ -555,21 +556,78 @@ public final class AntModService {
         return profile != null ? profile : AntModProfile.standard();
     }
 
-    public static Map<String, Integer> aggregateModCounts(List<Ant> ants) {
-        Map<String, Integer> counts = new HashMap<>();
-        if (ants == null) {
-            return counts;
+    public static Map<Integer, Integer> aggregateModCountsByCode(List<Ant> ants) {
+        if (ants == null || ants.isEmpty()) {
+            return Collections.emptyMap();
         }
+        int standardCount = 0;
+        Map<Integer, Integer> counts = null;
         for (Ant ant : ants) {
             if (ant == null || !ant.isAlive()) {
                 continue;
             }
             AntModProfile profile = ant.getModProfile();
             int code = profile != null ? profile.getCode() : AntModProfile.STANDARD_CODE;
-            String key = String.valueOf(code);
-            counts.merge(key, 1, Integer::sum);
+            if (code == AntModProfile.STANDARD_CODE) {
+                standardCount++;
+            } else {
+                if (counts == null) {
+                    counts = new HashMap<>();
+                }
+                counts.merge(code, 1, Integer::sum);
+            }
+        }
+        if (counts == null) {
+            return standardCount > 0 ? Map.of(AntModProfile.STANDARD_CODE, standardCount) : Collections.emptyMap();
+        }
+        if (standardCount > 0) {
+            counts.put(AntModProfile.STANDARD_CODE, standardCount);
         }
         return counts;
+    }
+
+    public static Map<String, Integer> aggregateModCounts(List<Ant> ants) {
+        Map<Integer, Integer> byCode = aggregateModCountsByCode(ants);
+        if (byCode.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<String, Integer> counts = new HashMap<>(byCode.size() * 2);
+        for (Map.Entry<Integer, Integer> entry : byCode.entrySet()) {
+            counts.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return counts;
+    }
+
+    public static float weightedModCombatFactor(Colony colony, AntClass type, List<Ant> ants) {
+        if (colony == null || type == null || ants == null || ants.isEmpty()) {
+            return 1f;
+        }
+        if (allAliveAntsStandard(ants)) {
+            return 1f;
+        }
+        return weightedModCombatFactorByCode(colony, type, aggregateModCountsByCode(ants));
+    }
+
+    public static float weightedModCombatFactorByCode(Colony colony, AntClass type, Map<Integer, Integer> modCounts) {
+        if (colony == null || type == null || modCounts == null || modCounts.isEmpty()) {
+            return 1f;
+        }
+        float weightedSum = 0f;
+        int total = 0;
+        for (Map.Entry<Integer, Integer> entry : modCounts.entrySet()) {
+            Integer countObj = entry.getValue();
+            if (countObj == null || countObj <= 0) {
+                continue;
+            }
+            int code = entry.getKey();
+            int count = countObj;
+            float factor = (code == AntModProfile.STANDARD_CODE)
+                    ? 1f
+                    : computeModCombatFactor(type, AntModProfile.fromCode(code), colony);
+            weightedSum += count * factor;
+            total += count;
+        }
+        return total > 0 ? weightedSum / total : 1f;
     }
 
     public static float weightedModCombatFactor(Colony colony, AntClass type, Map<String, Integer> modCounts) {
@@ -587,6 +645,106 @@ public final class AntModService {
             total += entry.getValue();
         }
         return total > 0 ? weightedSum / total : 1f;
+    }
+
+    public static int summarizeMilitaryCaste(
+            Colony colony, AntClass type, List<Ant> ants, float colonyMult, float[] outModFactor) {
+        if (outModFactor != null && outModFactor.length > 0) {
+            outModFactor[0] = 1f;
+        }
+        int weight = GameConstants.getMilitaryWeightForAntClass(type);
+        if (colony == null || weight == 0 || ants == null || ants.isEmpty()) {
+            return 0;
+        }
+        int aliveStandard = 0;
+        Map<Integer, Integer> nonStandard = null;
+        for (Ant ant : ants) {
+            if (ant == null || !ant.isAlive()) {
+                continue;
+            }
+            AntModProfile profile = ant.getModProfile();
+            int code = profile != null ? profile.getCode() : AntModProfile.STANDARD_CODE;
+            if (code == AntModProfile.STANDARD_CODE) {
+                aliveStandard++;
+            } else {
+                if (nonStandard == null) {
+                    nonStandard = new HashMap<>();
+                }
+                nonStandard.merge(code, 1, Integer::sum);
+            }
+        }
+        int totalPoints = aliveStandard > 0 ? Math.round(aliveStandard * weight * colonyMult) : 0;
+        if (nonStandard == null) {
+            return totalPoints;
+        }
+        float weightedSum = aliveStandard;
+        int totalAlive = aliveStandard;
+        for (Map.Entry<Integer, Integer> entry : nonStandard.entrySet()) {
+            int count = entry.getValue();
+            if (count <= 0) {
+                continue;
+            }
+            AntModProfile profile = AntModProfile.fromCode(entry.getKey());
+            float modFactor = computeModCombatFactor(type, profile, colony);
+            totalPoints += Math.round(count * weight * colonyMult * modFactor);
+            weightedSum += count * modFactor;
+            totalAlive += count;
+        }
+        if (outModFactor != null && outModFactor.length > 0 && totalAlive > 0) {
+            outModFactor[0] = weightedSum / totalAlive;
+        }
+        return totalPoints;
+    }
+
+    public static int sumMilitaryPointsForAnts(Colony colony, AntClass type, List<Ant> ants) {
+        int weight = GameConstants.getMilitaryWeightForAntClass(type);
+        if (colony == null || weight == 0 || ants == null || ants.isEmpty()) {
+            return 0;
+        }
+        float colonyMult = ColonyMilitaryService.computeStatMultiplier(colony);
+        int aliveStandard = 0;
+        Map<Integer, Integer> nonStandard = null;
+        for (Ant ant : ants) {
+            if (ant == null || !ant.isAlive()) {
+                continue;
+            }
+            AntModProfile profile = ant.getModProfile();
+            int code = profile != null ? profile.getCode() : AntModProfile.STANDARD_CODE;
+            if (code == AntModProfile.STANDARD_CODE) {
+                aliveStandard++;
+            } else {
+                if (nonStandard == null) {
+                    nonStandard = new HashMap<>();
+                }
+                nonStandard.merge(code, 1, Integer::sum);
+            }
+        }
+        int total = aliveStandard > 0 ? Math.round(aliveStandard * weight * colonyMult) : 0;
+        if (nonStandard != null) {
+            for (Map.Entry<Integer, Integer> entry : nonStandard.entrySet()) {
+                int count = entry.getValue();
+                if (count <= 0) {
+                    continue;
+                }
+                AntModProfile profile = AntModProfile.fromCode(entry.getKey());
+                float modFactor = computeModCombatFactor(type, profile, colony);
+                total += Math.round(count * weight * colonyMult * modFactor);
+            }
+        }
+        return total;
+    }
+
+    private static boolean allAliveAntsStandard(List<Ant> ants) {
+        for (Ant ant : ants) {
+            if (ant == null || !ant.isAlive()) {
+                continue;
+            }
+            AntModProfile profile = ant.getModProfile();
+            if (profile != null && profile.getCode() != AntModProfile.STANDARD_CODE) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static int sumMilitaryPointsForModCounts(Colony colony, AntClass type, Map<String, Integer> modCounts) {

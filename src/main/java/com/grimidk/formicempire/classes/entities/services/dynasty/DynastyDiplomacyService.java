@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -670,8 +670,35 @@ public class DynastyDiplomacyService {
         return false;
     }
 
+    public Set<Dynasty> computeBorderingDynasties(World world) {
+        if (world == null || dynasty == null) {
+            return Collections.emptySet();
+        }
+        Set<Dynasty> bordering = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Colony colony : dynasty.getColonies()) {
+            Hex hex = world.getHexOfColony(colony);
+            if (hex == null) {
+                continue;
+            }
+            for (Hex neighborHex : hex.getAdjacentNeighbors()) {
+                if (neighborHex == null || neighborHex.getColony() == null) {
+                    continue;
+                }
+                Dynasty neighborDynasty = neighborHex.getColony().getDynasty();
+                if (neighborDynasty != null && neighborDynasty != dynasty) {
+                    bordering.add(neighborDynasty);
+                }
+            }
+        }
+        return bordering;
+    }
+
     public int getBorderFrictionAdjustment(Dynasty other, World world) {
-        if (!sharesBorderWith(other, world) || hasNonAggressionPact(other) || isAtWarWith(other)) {
+        return getBorderFrictionAdjustment(other, sharesBorderWith(other, world));
+    }
+
+    public int getBorderFrictionAdjustment(Dynasty other, boolean sharesBorder) {
+        if (!sharesBorder || hasNonAggressionPact(other) || isAtWarWith(other)) {
             return 0;
         }
         return GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getReputationDelta();
@@ -701,11 +728,15 @@ public class DynastyDiplomacyService {
     }
 
     public int getEffectiveDiplomaticReputation(Dynasty other, World world) {
+        return getEffectiveDiplomaticReputation(other, world, sharesBorderWith(other, world));
+    }
+
+    public int getEffectiveDiplomaticReputation(Dynasty other, World world, boolean sharesBorder) {
         if (other == null || other == dynasty) {
             return GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION;
         }
         int score = dynasty.getDiplomaticReputation(other.getId())
-                + getBorderFrictionAdjustment(other, world)
+                + getBorderFrictionAdjustment(other, sharesBorder)
                 + getWarmongerAdjustment(other, world)
                 + getSameSpeciesAdjustment(other)
                 + getMilitaryReputationAdjustment(other)
@@ -1019,37 +1050,90 @@ public class DynastyDiplomacyService {
         if (HexWaterCrossing.isWaterBiome(hexA.getBiome()) || HexWaterCrossing.isWaterBiome(hexB.getBiome())) {
             return -1;
         }
-        ArrayDeque<Hex> queue = new ArrayDeque<>();
-        Map<Hex, Integer> dist = new HashMap<>();
-        queue.add(hexA);
-        dist.put(hexA, 0);
-        while (!queue.isEmpty()) {
-            Hex cur = queue.poll();
-            int d = dist.get(cur);
-            if (cur == hexB) {
-                return d;
-            }
-            List<Hex> neighbors = new ArrayList<>(java.util.Arrays.asList(cur.getAdjacentNeighbors()));
-            neighbors.addAll(HexWaterCrossing.bridgedLandHexes(cur, a));
-            for (Hex n : neighbors) {
-                if (n == null || dist.containsKey(n)) {
-                    continue;
+        Map<Hex, List<Hex>> bridgeAdj = buildCompletedLandBridgeMap(a);
+        Set<Hex> visited = new HashSet<>();
+        List<Hex> frontier = new ArrayList<>();
+        visited.add(hexA);
+        frontier.add(hexA);
+        int depth = 0;
+        while (!frontier.isEmpty()) {
+            List<Hex> nextFrontier = new ArrayList<>();
+            for (Hex cur : frontier) {
+                if (cur == hexB) {
+                    return depth;
                 }
-                if (HexWaterCrossing.isWaterBiome(n.getBiome())) {
-                    continue;
-                }
-                Colony c = n.getColony();
-                if (c != null && c.getDynasty() != null && !c.getDynasty().isDefeated()) {
-                    Dynasty owner = c.getDynasty();
-                    if (owner != a && owner != b) {
-                        continue;
+                enqueueTradeRouteNeighbor(cur.getNorth(), a, b, visited, nextFrontier);
+                enqueueTradeRouteNeighbor(cur.getNorthWest(), a, b, visited, nextFrontier);
+                enqueueTradeRouteNeighbor(cur.getNorthEast(), a, b, visited, nextFrontier);
+                enqueueTradeRouteNeighbor(cur.getSouth(), a, b, visited, nextFrontier);
+                enqueueTradeRouteNeighbor(cur.getSouthWest(), a, b, visited, nextFrontier);
+                enqueueTradeRouteNeighbor(cur.getSouthEast(), a, b, visited, nextFrontier);
+                if (bridgeAdj != null) {
+                    List<Hex> bridged = bridgeAdj.get(cur);
+                    if (bridged != null) {
+                        for (Hex n : bridged) {
+                            enqueueTradeRouteNeighbor(n, a, b, visited, nextFrontier);
+                        }
                     }
                 }
-                dist.put(n, d + 1);
-                queue.add(n);
             }
+            frontier = nextFrontier;
+            depth++;
         }
         return -1;
+    }
+
+    private static Map<Hex, List<Hex>> buildCompletedLandBridgeMap(Dynasty dynasty) {
+        if (dynasty == null || dynasty.getBridges() == null || dynasty.getBridges().isEmpty()) {
+            return null;
+        }
+        Map<Hex, List<Hex>> map = null;
+        for (Bridge bridge : dynasty.getBridges()) {
+            if (bridge == null || !bridge.isComplete()) {
+                continue;
+            }
+            Hex hexA = bridge.getHexA();
+            Hex hexB = bridge.getHexB();
+            if (hexA == null || hexB == null) {
+                continue;
+            }
+            if (HexWaterCrossing.isLandHex(hexB)) {
+                if (map == null) {
+                    map = new HashMap<>();
+                }
+                map.computeIfAbsent(hexA, ignored -> new ArrayList<>()).add(hexB);
+            }
+            if (HexWaterCrossing.isLandHex(hexA)) {
+                if (map == null) {
+                    map = new HashMap<>();
+                }
+                map.computeIfAbsent(hexB, ignored -> new ArrayList<>()).add(hexA);
+            }
+        }
+        return map;
+    }
+
+    private static void enqueueTradeRouteNeighbor(
+            Hex n,
+            Dynasty a,
+            Dynasty b,
+            Set<Hex> visited,
+            List<Hex> nextFrontier) {
+        if (n == null || visited.contains(n)) {
+            return;
+        }
+        if (HexWaterCrossing.isWaterBiome(n.getBiome())) {
+            return;
+        }
+        Colony c = n.getColony();
+        if (c != null && c.getDynasty() != null && !c.getDynasty().isDefeated()) {
+            Dynasty owner = c.getDynasty();
+            if (owner != a && owner != b) {
+                return;
+            }
+        }
+        visited.add(n);
+        nextFrontier.add(n);
     }
 
     public boolean canEstablishNonBorderingCapitalTrade(Dynasty other, World world) {
@@ -1078,16 +1162,19 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty || world == null || tradeManager == null) {
             return TradeProposalResult.FAILED;
         }
-        if (!canEstablishNonBorderingCapitalTrade(other, world)) {
+        if (!isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return TradeProposalResult.FAILED;
         }
-        if (!canProposeCrossDynastyTrade(other, world, CrossDynastyTradeProposal.Kind.OFFER)
-                || !canNpcProposeTradeOffer(other, world)) {
+        if (isAtWarWith(other) || !dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
             return TradeProposalResult.FAILED;
         }
         Colony origin = dynasty.getCapital();
         Colony destination = other.getCapital();
-        if (origin == null || destination == null) {
+        if (origin == null || destination == null || !meetsTradeLoyaltyRequirement(origin)) {
+            return TradeProposalResult.FAILED;
+        }
+        if (!canProposeCrossDynastyTrade(other, world, CrossDynastyTradeProposal.Kind.OFFER)
+                || !canNpcProposeTradeOffer(other, world)) {
             return TradeProposalResult.FAILED;
         }
         dynasty.bindTradeManager(tradeManager);
@@ -1104,6 +1191,10 @@ public class DynastyDiplomacyService {
         Map<AntClass, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
         TradeMethod method = DynastyTradeAutomation.pickTradeMethod(dynasty, originHex, destHex);
         if (!DynastyTradeAutomation.isConvoyWorthwhile(origin, originHex, destHex, method, transport, load)) {
+            return TradeProposalResult.FAILED;
+        }
+        if (!areDynastiesMutuallyKnown(dynasty, other, world)
+                || findCapitalTradeRouteDistance(dynasty, other, world) <= 0) {
             return TradeProposalResult.FAILED;
         }
         CrossDynastyTradeProposal proposal = new CrossDynastyTradeProposal(

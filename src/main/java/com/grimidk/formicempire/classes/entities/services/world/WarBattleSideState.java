@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -111,6 +112,38 @@ public final class WarBattleSideState {
             }
             for (WarBattleParticipant p : getReserve(line)) {
                 if (p.isAlive() && p.isQueen()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    synchronized boolean hasLivingInLine(BattleLine line) {
+        for (WarBattleParticipant p : getActive(line)) {
+            if (p != null && p.isAlive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    synchronized boolean hasAnyLivingActive() {
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            if (hasLivingInLine(line)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    synchronized boolean hasLivingWithRole(AntRole role) {
+        if (role == null) {
+            return false;
+        }
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            for (WarBattleParticipant p : getActive(line)) {
+                if (p != null && p.isAlive() && p.getAnt() != null && p.getAnt().getRole() == role) {
                     return true;
                 }
             }

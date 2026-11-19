@@ -403,7 +403,7 @@ public class ColonyAutomationService {
 
     private int calculateExtraFarmerNeeds(Colony colony, int available, int currentFarmers, ColonyStatsService stats) {
         if (available <= 0) return 0;
-        int totalConsumption = stats.getTotalConsumption(colony);
+        int totalConsumption = colony.getTotalConsumption();
         float conversionRate = stats.getConversionRate(colony);
         double productionPerFarmer = conversionRate * 1440.0;
 
@@ -489,7 +489,7 @@ public class ColonyAutomationService {
             return 0;
         }
         ColonyStatsService stats = colony.getStatsService();
-        int totalConsumption = stats.getTotalConsumption(colony);
+        int totalConsumption = colony.getTotalConsumption();
         double dailyPerHunter = stats.getHuntingRate(colony) * 24.0 * stats.getMeatEatingEfficiency(colony);
         if (dailyPerHunter <= 0) {
             return Math.min(availableSoldiers, 3);

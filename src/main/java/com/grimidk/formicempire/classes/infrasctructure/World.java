@@ -75,11 +75,13 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 public class World {
 
     private static final DynastyDeathService DYNASTY_DEATH_SERVICE = new DynastyDeathService();
-    private static final ExecutorService CONTINENT_EXECUTOR = Executors.newCachedThreadPool(r -> {
-        Thread thread = new Thread(r, "continent-worker");
-        thread.setDaemon(true);
-        return thread;
-    });
+    private static final ExecutorService CONTINENT_EXECUTOR = Executors.newFixedThreadPool(
+            Math.max(2, Math.min(Runtime.getRuntime().availableProcessors(), 8)),
+            r -> {
+                Thread thread = new Thread(r, "continent-worker");
+                thread.setDaemon(true);
+                return thread;
+            });
     private static final List<Weather> STANDARD_RANDOM_WEATHERS = buildStandardRandomWeathers();
 
     private static List<Weather> buildStandardRandomWeathers() {
@@ -103,8 +105,10 @@ public class World {
     private int humidity;
     private ArrayList<Hex> hexes;
     private final Map<Long, Hex> hexCoordCache = new ConcurrentHashMap<>();
-    private ArrayList<Hex> colonizedHexes;
-    private boolean colonizedHexesDirty = true;
+    private volatile List<Hex> colonizedHexes;
+    private volatile boolean colonizedHexesDirty = true;
+    private int syncedDisasterEpoch = Integer.MIN_VALUE;
+    private final List<Hex> activeDisasterHexes = new ArrayList<>();
     private List<Dynasty> dynastys;
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
@@ -156,7 +160,7 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
-        this.colonizedHexes = new ArrayList<>();
+        this.colonizedHexes = List.of();
         this.colonizedHexesDirty = true;
         this.dynastys = new ArrayList<>();
         this.timeOfDay = GameConstants.TIME_DAWN;
@@ -406,11 +410,11 @@ public class World {
         if (!colonizedHexesDirty) {
             return;
         }
-        colonizedHexes.clear();
+        List<Hex> rebuilt = new ArrayList<>();
         if (hexes != null) {
             for (Hex hex : hexes) {
                 if (hex != null && hex.getColony() != null) {
-                    colonizedHexes.add(hex);
+                    rebuilt.add(hex);
                 }
             }
         }
@@ -419,16 +423,19 @@ public class World {
                 c.refreshPopulatedHexes();
             }
         }
-        colonizedHexesDirty = false;
+        this.colonizedHexes = Collections.unmodifiableList(rebuilt);
+        this.colonizedHexesDirty = false;
     }
 
-    private synchronized ArrayList<Hex> colonizedHexesForTicks() {
-        rebuildColonizedHexIndexIfNeeded();
-        return new ArrayList<>(colonizedHexes);
+    private List<Hex> colonizedHexesForTicks() {
+        if (colonizedHexesDirty) {
+            rebuildColonizedHexIndexIfNeeded();
+        }
+        return this.colonizedHexes;
     }
 
-    public synchronized ArrayList<Hex> getColonizedHexes() {
-        return colonizedHexesForTicks();
+    public ArrayList<Hex> getColonizedHexes() {
+        return new ArrayList<>(colonizedHexesForTicks());
     }
 
     public void setHexes(ArrayList<Hex> hexes) {
@@ -437,6 +444,7 @@ public class World {
         if (hexes != null) {
             for (Hex h : hexes) {
                 if (h != null) {
+                    h.setHostWorld(this);
                     this.hexCoordCache.put(hexCoordKey(h.getQ(), h.getR()), h);
                 }
             }
@@ -445,19 +453,54 @@ public class World {
     }
 
     public Hex getHexOfColony(Colony colony) {
-        if (colony == null) return null;
-        for (Hex h : colonizedHexesForTicks()) {
-            if (h.getColony() == colony) return h;
+        if (colony == null || this.hexes == null || this.hexes.isEmpty()) return null;
+        Hex cached = colony.getHostHex();
+        if (cached != null && cached.getColony() == colony && cached.getHostWorld() == this) {
+            return cached;
         }
-        if (this.hexes != null) {
-            for (Hex h : this.hexes) {
-                if (h.getColony() == colony) {
-                    markColonizedHexIndexDirty();
-                    return h;
-                }
+        for (Hex h : colonizedHexesForTicks()) {
+            if (h != null && h.getColony() == colony) {
+                h.setHostWorld(this);
+                colony.setHostHex(h);
+                return h;
+            }
+        }
+        for (Hex h : this.hexes) {
+            if (h != null && h.getColony() == colony) {
+                h.setHostWorld(this);
+                colony.setHostHex(h);
+                markColonizedHexIndexDirty();
+                return h;
             }
         }
         return null;
+    }
+
+    public void tickActiveDisasterHexes() {
+        if (this.hexes == null) {
+            return;
+        }
+        int currentEpoch = Hex.getDisasterEpoch();
+        if (syncedDisasterEpoch != currentEpoch) {
+            activeDisasterHexes.clear();
+            for (Hex hex : this.hexes) {
+                if (hex != null && hex.getDisasterType() != null) {
+                    activeDisasterHexes.add(hex);
+                }
+            }
+            syncedDisasterEpoch = currentEpoch;
+        }
+        for (int i = activeDisasterHexes.size() - 1; i >= 0; i--) {
+            Hex hex = activeDisasterHexes.get(i);
+            hex.tickDisasterHour();
+            if (hex.getDisasterType() == null) {
+                int last = activeDisasterHexes.size() - 1;
+                if (i != last) {
+                    activeDisasterHexes.set(i, activeDisasterHexes.get(last));
+                }
+                activeDisasterHexes.remove(last);
+            }
+        }
     }
 
     public int colonyHexDistance(Colony from, Colony to) {
@@ -1872,6 +1915,7 @@ public class World {
                     hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
                 }
 
+                hex.setHostWorld(this);
                 hexMap.put(q + "," + r, hex);
                 this.hexCoordCache.put(hexCoordKey(q, r), hex);
                 this.hexes.add(hex);
@@ -1906,8 +1950,10 @@ public class World {
         this.iceCapPolarLimit = iceCapPolarLimit;
         this.hexes.clear();
         this.hexCoordCache.clear();
-        this.colonizedHexes.clear();
+        this.colonizedHexes = List.of();
         this.colonizedHexesDirty = true;
+        this.activeDisasterHexes.clear();
+        this.syncedDisasterEpoch = Integer.MIN_VALUE;
         this.dynastys.clear();
         this.continentCount = 0;
         this.islandCount = 0;
@@ -1961,6 +2007,7 @@ public class World {
                     hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
                 }
 
+                hex.setHostWorld(this);
                 hexMap.put(q + "," + r, hex);
                 this.hexCoordCache.put(hexCoordKey(q, r), hex);
                 this.hexes.add(hex);
@@ -4631,9 +4678,19 @@ public class World {
 
     private void distributeRivalDynastiesAcrossContinents(Map<Integer, Set<Hex>> continentHexes) {
         List<AntSpecies> spawnableSpecies = GameConstants.getWorldSpawnableNpcSpecies();
-        int minRequired = spawnableSpecies.size() * 4;
-        int multiplier = Math.max(4, (this.worldHeight >= 30) ? 4 : 2);
-        int requiredNpcs = Math.max(minRequired, spawnableSpecies.size() * multiplier);
+        int multiplier;
+        if (this.worldHeight <= 16) {
+            multiplier = 1;
+        } else if (this.worldHeight <= 32) {
+            multiplier = 2;
+        } else if (this.worldHeight <= 48) {
+            multiplier = 3;
+        } else {
+            multiplier = 4;
+        }
+        int requiredNpcs = (this.targetRivalDynastyCount >= 0)
+                ? this.targetRivalDynastyCount
+                : spawnableSpecies.size() * multiplier;
         List<AntSpecies> speciesList = assignNpcSpecies(requiredNpcs);
         List<Integer> continentIds = new ArrayList<>(continentHexes.keySet());
         Collections.shuffle(continentIds, GameRandom.getShuffleRandom());
@@ -6367,30 +6424,18 @@ public class World {
 
     private List<AntSpecies> assignNpcSpecies(int colonyCount) {
         List<AntSpecies> pool = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
-        if (colonyCount == 0 || pool.isEmpty()) {
+        if (colonyCount <= 0 || pool.isEmpty()) {
             return List.of();
         }
-        int targetCount = Math.max(colonyCount, pool.size() * 4);
-        List<AntSpecies> assignment = new ArrayList<>(targetCount);
-        for (int p = 0; p < 2; p++) {
+        List<AntSpecies> assignment = new ArrayList<>(colonyCount);
+        while (assignment.size() < colonyCount) {
             List<AntSpecies> pass = new ArrayList<>(pool);
             Collections.shuffle(pass, GameRandom.getShuffleRandom());
-            for (AntSpecies s : pass) {
-                assignment.add(s);
-                assignment.add(s);
-            }
-        }
-
-        while (assignment.size() < targetCount) {
-            Collections.shuffle(pool, GameRandom.getShuffleRandom());
-            for (AntSpecies species : pool) {
-                if (assignment.size() >= targetCount) {
+            for (AntSpecies species : pass) {
+                if (assignment.size() >= colonyCount) {
                     break;
                 }
                 assignment.add(species);
-                if (assignment.size() < targetCount) {
-                    assignment.add(species);
-                }
             }
         }
         return assignment;
@@ -7051,13 +7096,13 @@ public class World {
             this.minute++;
 
             if (!this.spectatorMode) {
-                int hexCount = colonizedHexesForTicks().size();
-                SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_MINUTE, hexCount);
+                List<Hex> colonized = colonizedHexesForTicks();
+                SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_MINUTE, colonized.size());
 
                 long colonyNanos = 0L;
                 int colonies = 0;
                 boolean timingColonies = SimulationDiagnostics.isEnabled();
-                for (Hex hex : colonizedHexesForTicks()) {
+                for (Hex hex : colonized) {
                     if (hex == null || hex.getColony() == null) {
                         continue;
                     }
@@ -7207,13 +7252,13 @@ public class World {
             }
             SimulationDiagnostics.record(Scope.DYNASTY_DAILY_TOTAL, dynastyNanos);
 
-            int hexCount = colonizedHexesForTicks().size();
-            SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_DAY, hexCount);
+            List<Hex> colonized = colonizedHexesForTicks();
+            SimulationDiagnostics.addCounter(Counter.HEXES_SCANNED_DAY, colonized.size());
 
             long colonyNanos = 0L;
             int colonies = 0;
             boolean timingColonies = SimulationDiagnostics.isEnabled();
-            for (Hex hex : colonizedHexesForTicks()) {
+            for (Hex hex : colonized) {
                 if (hex == null || hex.getColony() == null) {
                     continue;
                 }

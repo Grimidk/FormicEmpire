@@ -207,10 +207,11 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
     
     public void setColony(Colony colony) {
-        if (this.colony != colony) {
-            invalidateStructuralCaches();
-            invalidateBackgroundLayerCache();
+        if (this.colony == colony) {
+            return;
         }
+        invalidateStructuralCaches();
+        invalidateBackgroundLayerCache();
         this.colony = colony;
         this.lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
         this.cachedAssimilatedDroneSignature = Integer.MIN_VALUE;

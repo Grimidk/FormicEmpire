@@ -17,10 +17,15 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -495,5 +500,47 @@ public class SaveManagerTest {
         assertEquals(1, loaded.length);
         assertEquals(GameConstants.DISASTER_WILDFIRE.getId(), loaded[0].disasterTypeId);
         assertEquals(7, loaded[0].disasterAgeHours);
+    }
+
+    @Test
+    void saveAutosaveWritesReadableFileAsynchronously(@TempDir Path tempDir) throws Exception {
+        Engine engine = new Engine();
+        World world = new World();
+        world.setEngine(engine);
+        world.setSaveSlotId(1);
+        world.setYear(2);
+        world.setMonth(4);
+        world.setDay(9);
+
+        Dynasty player = new Dynasty(1, "AsyncDyn", true, GameConstants.SPECIES_OMNI);
+        Colony capital = new Colony(1, "AsyncCap", true);
+        player.addColony(capital);
+        player.setCapital(capital);
+        capital.setDynasty(player);
+        capital.getQueens().add(new Ant(capital, GameConstants.CLASS_QUEEN));
+
+        Hex hex = new Hex(GameConstants.BIOME_PLAINS, capital, null, null, null, null, null, null);
+        hex.setQ(0);
+        hex.setR(0);
+        world.setHexes(new ArrayList<>(List.of(hex)));
+        world.registerDynasty(player);
+
+        SaveManager manager = new SaveManager(tempDir.toFile());
+        manager.saveAutosave(world, engine);
+
+        Field execField = SaveManager.class.getDeclaredField("SHARED_EXECUTOR");
+        execField.setAccessible(true);
+        ExecutorService executor = (ExecutorService) execField.get(null);
+        executor.submit(() -> {}).get();
+
+        File autosaveFile = manager.getSlotFile(1, "autosave");
+        assertTrue(autosaveFile.exists());
+        assertTrue(autosaveFile.length() > 0);
+        Savefile loaded = SaveCodec.read(autosaveFile);
+        assertNotNull(loaded);
+        assertEquals(1, loaded.getId());
+        assertEquals(2, loaded.getYear());
+        assertEquals(4, loaded.getMonth());
+        assertEquals(9, loaded.getDay());
     }
 }

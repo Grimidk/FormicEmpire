@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 
 public final class AntModProfile {
     public static final int STANDARD_CODE = 1111;
+    private static final AntModProfile STANDARD = new AntModProfile(STANDARD_CODE);
 
     private final int code;
 
@@ -12,12 +13,12 @@ public final class AntModProfile {
     }
 
     public static AntModProfile standard() {
-        return new AntModProfile(STANDARD_CODE);
+        return STANDARD;
     }
 
     public static AntModProfile fromCode(int code) {
-        if (code < 1111 || code > 9999) {
-            return standard();
+        if (code < 1111 || code > 9999 || code == STANDARD_CODE) {
+            return STANDARD;
         }
         return new AntModProfile(code);
     }
@@ -49,7 +50,7 @@ public final class AntModProfile {
 
     public int countActiveMods() {
         int count = 0;
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod mod = getMod(slot);
             if (mod != null && !mod.isNone()) {
                 count++;

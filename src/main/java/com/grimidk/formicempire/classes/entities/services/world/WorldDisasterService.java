@@ -2,7 +2,11 @@ package com.grimidk.formicempire.classes.entities.services.world;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
@@ -50,11 +54,7 @@ public class WorldDisasterService {
         if (world == null || world.getHexes() == null) {
             return;
         }
-        for (Hex hex : world.getHexes()) {
-            if (hex != null && hex.getDisasterType() != null) {
-                hex.tickDisasterHour();
-            }
-        }
+        world.tickActiveDisasterHexes();
     }
 
     public void triggerGlobalEclipse(World world) {
@@ -411,6 +411,8 @@ public class WorldDisasterService {
         int killCount = Math.max(1, (int) Math.round(victims.size() * casualtyFraction));
         killCount = Math.min(killCount, victims.size());
 
+        List<Ant> killed = new ArrayList<>(killCount);
+        Map<AntClass, Set<Ant>> killedByClass = new HashMap<>();
         for (int i = 0; i < killCount; i++) {
             Ant victim = victims.get(i);
             AntClass originalType = victim.getAntClass();
@@ -418,14 +420,19 @@ public class WorldDisasterService {
             boolean wasOnTrade = victim.isOnTrade();
 
             victim.goDie(colony, DeathCause.DISASTER);
-            colony.recordAntDeath(victim, DeathCause.DISASTER);
+            killed.add(victim);
+            killedByClass
+                    .computeIfAbsent(originalType, ignored -> Collections.newSetFromMap(new IdentityHashMap<>()))
+                    .add(victim);
             colony.handleAntCasualtyAftermath(victim, originalType, formerRole, wasOnTrade);
-
-            List<Ant> antList = colony.getAntsByClass(originalType);
+        }
+        for (Map.Entry<AntClass, Set<Ant>> entry : killedByClass.entrySet()) {
+            List<Ant> antList = colony.getAntsByClass(entry.getKey());
             if (antList != null) {
-                antList.remove(victim);
+                antList.removeIf(entry.getValue()::contains);
             }
         }
+        colony.recordAntDeathsBatch(killed, DeathCause.DISASTER);
         return killCount;
     }
 

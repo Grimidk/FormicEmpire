@@ -21,7 +21,7 @@ public class Savefile implements Serializable {
     // --- Global Save Data ---
     private int formatVersion = CURRENT_FORMAT_VERSION;
     private final int id; 
-    private final String name; 
+    private String name; 
     private String version;
     private long timestamp;
     private int playTime;
@@ -475,6 +475,7 @@ public class Savefile implements Serializable {
 
     public int getId() { return id; }
     public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }

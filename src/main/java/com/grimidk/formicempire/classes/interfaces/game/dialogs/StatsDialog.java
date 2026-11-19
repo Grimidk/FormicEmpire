@@ -970,7 +970,7 @@ public class StatsDialog extends ZeroDialog {
             prodResins += (int)(cs.getPlantProduction(c) * 0.01);
 
             consPlants += cs.getPlantConsumption(c);
-            consMushrooms += cs.getTotalConsumption(c);
+            consMushrooms += c.getTotalConsumption();
             subtypeFoodOverhead += cs.getSubtypeFoodOverhead(c);
             consProtein += cs.getProteinConsumption(c);
             consWater += cs.getWaterConsumption(c);

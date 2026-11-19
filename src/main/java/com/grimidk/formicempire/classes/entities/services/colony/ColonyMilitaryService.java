@@ -141,13 +141,45 @@ public final class ColonyMilitaryService {
         if (colony == null) {
             return 0;
         }
-        int total = computeMilitaryPowerFromPopulation(colony);
-        Dynasty dynasty = colony.getDynasty();
-        if (dynasty != null && dynasty.isAtWar()) {
-            int active = computeActiveMilitaryPower(colony);
-            return active + Math.max(0, total - active);
+        int[] stats = computeColonyMilitaryBreakdown(colony);
+        return stats[0];
+    }
+
+    private static int[] computeColonyMilitaryBreakdown(Colony colony) {
+        float colonyMult = computeStatMultiplier(colony);
+        float[] factorOut = new float[1];
+
+        int wPts = AntModService.summarizeMilitaryCaste(colony, GameConstants.CLASS_WORKER, colony.getWorkers(), colonyMult, factorOut);
+        float wFac = factorOut[0];
+        int sPts = AntModService.summarizeMilitaryCaste(colony, GameConstants.CLASS_SOLDIER, colony.getSoldiers(), colonyMult, factorOut);
+        float sFac = factorOut[0];
+        int mPts = AntModService.summarizeMilitaryCaste(colony, GameConstants.CLASS_MAJOR, colony.getMajors(), colonyMult, factorOut);
+        float mFac = factorOut[0];
+        int pPts = AntModService.summarizeMilitaryCaste(colony, GameConstants.CLASS_PRINCESS, colony.getPrincesses(), colonyMult, factorOut);
+        float pFac = factorOut[0];
+        int qPts = AntModService.summarizeMilitaryCaste(colony, GameConstants.CLASS_QUEEN, colony.getQueens(), colonyMult, factorOut);
+        float qFac = factorOut[0];
+
+        int total = wPts + sPts + mPts + pPts + qPts;
+        if (total <= 0) {
+            int typePoints = computeClassPoints(
+                    sizeOf(colony.getWorkers()),
+                    sizeOf(colony.getSoldiers()),
+                    sizeOf(colony.getMajors()),
+                    sizeOf(colony.getPrincesses()),
+                    sizeOf(colony.getQueens()));
+            total = Math.round(typePoints * colonyMult);
         }
-        return total;
+
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || !dynasty.isAtWar()) {
+            return new int[]{total, 0, total};
+        }
+        int active = computeRolePowerFromWarCountsWithFactors(
+                colony, colony.getWarAssignedRoleCounts(), colonyMult, true, false,
+                wFac, sFac, mFac, pFac, qFac);
+        int reserve = Math.max(0, total - active);
+        return new int[]{active + reserve, active, reserve};
     }
 
     public static int computeMilitaryPowerFromPopulation(Colony colony) {
@@ -155,16 +187,11 @@ public final class ColonyMilitaryService {
             return 0;
         }
         int points = 0;
-        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_WORKER,
-                AntModService.aggregateModCounts(colony.getWorkers()));
-        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_SOLDIER,
-                AntModService.aggregateModCounts(colony.getSoldiers()));
-        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_MAJOR,
-                AntModService.aggregateModCounts(colony.getMajors()));
-        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_PRINCESS,
-                AntModService.aggregateModCounts(colony.getPrincesses()));
-        points += sumMilitaryPointsForModCounts(colony, GameConstants.CLASS_QUEEN,
-                AntModService.aggregateModCounts(colony.getQueens()));
+        points += AntModService.sumMilitaryPointsForAnts(colony, GameConstants.CLASS_WORKER, colony.getWorkers());
+        points += AntModService.sumMilitaryPointsForAnts(colony, GameConstants.CLASS_SOLDIER, colony.getSoldiers());
+        points += AntModService.sumMilitaryPointsForAnts(colony, GameConstants.CLASS_MAJOR, colony.getMajors());
+        points += AntModService.sumMilitaryPointsForAnts(colony, GameConstants.CLASS_PRINCESS, colony.getPrincesses());
+        points += AntModService.sumMilitaryPointsForAnts(colony, GameConstants.CLASS_QUEEN, colony.getQueens());
         if (points > 0) {
             return points;
         }
@@ -175,10 +202,6 @@ public final class ColonyMilitaryService {
                 sizeOf(colony.getPrincesses()),
                 sizeOf(colony.getQueens()));
         return Math.round(typePoints * computeStatMultiplier(colony));
-    }
-
-    private static int sumMilitaryPointsForModCounts(Colony colony, AntClass antClass, Map<String, Integer> modCounts) {
-        return AntModService.sumMilitaryPointsForModCounts(colony, antClass, modCounts);
     }
 
     public static int computeActiveMilitaryPower(Colony colony) {
@@ -268,7 +291,7 @@ public final class ColonyMilitaryService {
         int roleWeight = GameConstants.getActiveMilitaryRoleWeight(role);
         int typePoints = count * roleWeight;
         float avgModFactor = AntModService.weightedModCombatFactor(colony,
-                role.getAntClass(), AntModService.aggregateModCounts(colony.getAntsByClass(role.getAntClass())));
+                role.getAntClass(), colony.getAntsByClass(role.getAntClass()));
         float points = count * roleWeight * colonyMult * avgModFactor;
         return withWarStandingFloor(colony, typePoints, Math.round(points));
     }
@@ -311,23 +334,56 @@ public final class ColonyMilitaryService {
             int roleWeight = GameConstants.getActiveMilitaryRoleWeight(role);
             typePoints += count * roleWeight;
             float avgModFactor = AntModService.weightedModCombatFactor(colony,
-                    role.getAntClass(), AntModService.aggregateModCounts(colony.getAntsByClass(role.getAntClass())));
+                    role.getAntClass(), colony.getAntsByClass(role.getAntClass()));
             points += count * roleWeight * colonyMult * avgModFactor;
         }
         return withWarStandingFloor(colony, typePoints, Math.round(points));
+    }
+
+    private static int computeRolePowerFromWarCountsWithFactors(
+            Colony colony, Map<AntRole, Integer> warCounts, float colonyMult,
+            boolean includeBorder, boolean includeHexDefenseOnly,
+            float wFac, float sFac, float mFac, float pFac, float qFac) {
+        if (colony == null || warCounts == null) {
+            return 0;
+        }
+        float points = 0f;
+        int typePoints = 0;
+        for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
+            if (role.isHexDefenseOnly()) {
+                if (!includeHexDefenseOnly) {
+                    continue;
+                }
+            } else if (!includeBorder) {
+                continue;
+            }
+            int count = warCounts.getOrDefault(role, 0);
+            AntClass ac = role.getAntClass();
+            if (count <= 0 || ac == null) {
+                continue;
+            }
+            int roleWeight = GameConstants.getActiveMilitaryRoleWeight(role);
+            typePoints += count * roleWeight;
+            float avgModFactor = factorForClass(ac, wFac, sFac, mFac, pFac, qFac);
+            points += count * roleWeight * colonyMult * avgModFactor;
+        }
+        return withWarStandingFloor(colony, typePoints, Math.round(points));
+    }
+
+    private static float factorForClass(AntClass ac, float wFac, float sFac, float mFac, float pFac, float qFac) {
+        if (ac == GameConstants.CLASS_WORKER) return wFac;
+        if (ac == GameConstants.CLASS_SOLDIER) return sFac;
+        if (ac == GameConstants.CLASS_MAJOR) return mFac;
+        if (ac == GameConstants.CLASS_PRINCESS) return pFac;
+        if (ac == GameConstants.CLASS_QUEEN) return qFac;
+        return 1f;
     }
 
     public static int computeReserveMilitaryPower(Colony colony) {
         if (colony == null) {
             return 0;
         }
-        Dynasty dynasty = colony.getDynasty();
-        if (dynasty == null || !dynasty.isAtWar()) {
-            return computeMilitaryPowerFromPopulation(colony);
-        }
-        int total = computeMilitaryPowerFromPopulation(colony);
-        int assignedBorder = computeRolePowerFromWarCounts(colony, colony.getWarAssignedRoleCounts(), true, false);
-        return Math.max(0, total - assignedBorder);
+        return computeColonyMilitaryBreakdown(colony)[2];
     }
 
     public static int computeFromSavedColony(Savefile.SavedColony savedColony, Dynasty dynasty) {
@@ -404,11 +460,10 @@ public final class ColonyMilitaryService {
         if (colony == null) {
             return;
         }
-        int active = computeActiveMilitaryPower(colony);
-        int reserve = computeReserveMilitaryPower(colony);
-        colony.setActiveMilitaryPower(active);
-        colony.setReserveMilitaryPower(reserve);
-        colony.setMilitaryPower(active + reserve);
+        int[] stats = computeColonyMilitaryBreakdown(colony);
+        colony.setActiveMilitaryPower(stats[1]);
+        colony.setReserveMilitaryPower(stats[2]);
+        colony.setMilitaryPower(stats[0]);
     }
 
     public static void refreshDynastyMilitaryPower(Dynasty dynasty) {

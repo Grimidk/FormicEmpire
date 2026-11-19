@@ -104,6 +104,7 @@ public class Dynasty {
     private int reserveMilitaryPower;
     private final Map<Integer, Integer> diplomaticReputations;
     private final Map<Integer, Map<String, Integer>> diplomaticModifierRemainingDays;
+    private int activeWarModifierCount;
     private final List<Integer> crossDynastyTradeRepGrantedIds;
     private final Set<Integer> pendingPactRequestFromIds;
     private final Set<Integer> pendingWarDeclarationFromIds;
@@ -392,6 +393,7 @@ public class Dynasty {
                 addDiplomaticModifierKey(otherDynastyId, GameConstants.DIPLO_MODIFIER_TRADE.getNameKey());
             }
         }
+        recomputeActiveWarModifierCount();
 
         if (savedDynasty.pendingPactRequestFromIds != null) {
             this.pendingPactRequestFromIds.addAll(savedDynasty.pendingPactRequestFromIds);
@@ -1083,9 +1085,12 @@ public class Dynasty {
         if (GameConstants.getDiplomaticReputationModifierByKey(modifierKey) == null) {
             return;
         }
-        diplomaticModifierRemainingDays
+        Integer prev = diplomaticModifierRemainingDays
                 .computeIfAbsent(otherDynastyId, ignored -> new LinkedHashMap<>())
                 .put(modifierKey, remainingDays);
+        if (prev == null && GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(modifierKey)) {
+            activeWarModifierCount++;
+        }
     }
 
     public void removeDiplomaticModifierKey(int otherDynastyId, String modifierKey) {
@@ -1096,7 +1101,11 @@ public class Dynasty {
         if (modifiers == null) {
             return;
         }
-        modifiers.remove(modifierKey);
+        if (modifiers.remove(modifierKey) != null
+                && GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(modifierKey)
+                && activeWarModifierCount > 0) {
+            activeWarModifierCount--;
+        }
         if (modifiers.isEmpty()) {
             diplomaticModifierRemainingDays.remove(otherDynastyId);
         }
@@ -1107,7 +1116,7 @@ public class Dynasty {
             return;
         }
         if (modifierKey == null) {
-            diplomaticModifierRemainingDays.remove(otherDynastyId);
+            clearDiplomaticModifierKey(otherDynastyId);
             return;
         }
         DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(modifierKey);
@@ -1118,7 +1127,11 @@ public class Dynasty {
     }
 
     public void clearDiplomaticModifierKey(int otherDynastyId) {
-        diplomaticModifierRemainingDays.remove(otherDynastyId);
+        Map<String, Integer> removed = diplomaticModifierRemainingDays.remove(otherDynastyId);
+        if (removed != null && removed.containsKey(GameConstants.DIPLO_MODIFIER_WAR.getNameKey())
+                && activeWarModifierCount > 0) {
+            activeWarModifierCount--;
+        }
     }
 
     private void removeExclusiveGroupKeys(int otherDynastyId, String exclusiveGroupKey) {
@@ -1126,9 +1139,14 @@ public class Dynasty {
         if (modifiers == null || exclusiveGroupKey == null) {
             return;
         }
+        String warKey = GameConstants.DIPLO_MODIFIER_WAR.getNameKey();
         modifiers.keySet().removeIf(key -> {
             DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(key);
-            return modifier != null && exclusiveGroupKey.equals(modifier.getExclusiveGroupKey());
+            boolean remove = modifier != null && exclusiveGroupKey.equals(modifier.getExclusiveGroupKey());
+            if (remove && warKey.equals(key) && activeWarModifierCount > 0) {
+                activeWarModifierCount--;
+            }
+            return remove;
         });
         if (modifiers.isEmpty()) {
             diplomaticModifierRemainingDays.remove(otherDynastyId);
@@ -1139,6 +1157,7 @@ public class Dynasty {
         List<String> expiredKeys = new ArrayList<>();
         List<Integer> expiredOtherIds = new ArrayList<>();
         List<Integer> emptyOtherIds = new ArrayList<>();
+        String warKey = GameConstants.DIPLO_MODIFIER_WAR.getNameKey();
         for (Map.Entry<Integer, Map<String, Integer>> pairEntry : diplomaticModifierRemainingDays.entrySet()) {
             int otherDynastyId = pairEntry.getKey();
             Map<String, Integer> modifiers = pairEntry.getValue();
@@ -1155,7 +1174,9 @@ public class Dynasty {
                 }
             }
             for (String key : toRemove) {
-                modifiers.remove(key);
+                if (modifiers.remove(key) != null && warKey.equals(key) && activeWarModifierCount > 0) {
+                    activeWarModifierCount--;
+                }
                 expiredOtherIds.add(otherDynastyId);
                 expiredKeys.add(key);
             }
@@ -1169,6 +1190,17 @@ public class Dynasty {
         for (int i = 0; i < expiredKeys.size(); i++) {
             expireDiplomaticModifier(expiredOtherIds.get(i), expiredKeys.get(i));
         }
+    }
+
+    private void recomputeActiveWarModifierCount() {
+        String warKey = GameConstants.DIPLO_MODIFIER_WAR.getNameKey();
+        int count = 0;
+        for (Map<String, Integer> modifiers : diplomaticModifierRemainingDays.values()) {
+            if (modifiers.containsKey(warKey)) {
+                count++;
+            }
+        }
+        activeWarModifierCount = count;
     }
 
     private void expireDiplomaticModifier(int otherDynastyId, String modifierKey) {
@@ -1323,12 +1355,7 @@ public class Dynasty {
     }
 
     public boolean isAtWar() {
-        for (Map<String, Integer> modifiers : diplomaticModifierRemainingDays.values()) {
-            if (modifiers.containsKey(GameConstants.DIPLO_MODIFIER_WAR.getNameKey())) {
-                return true;
-            }
-        }
-        return false;
+        return activeWarModifierCount > 0;
     }
 
     public boolean isAtWarWith(int otherDynastyId) {

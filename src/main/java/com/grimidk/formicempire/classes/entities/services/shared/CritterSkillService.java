@@ -94,7 +94,7 @@ public final class CritterSkillService {
         if (profile == null || skills == null) {
             return;
         }
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod subtype = profile.getMod(slot);
             if (subtype == null || subtype.isNone()) {
                 continue;
@@ -110,7 +110,7 @@ public final class CritterSkillService {
         if (profile == null || skills == null) {
             return;
         }
-        for (AntModSlot slot : AntModSlot.values()) {
+        for (AntModSlot slot : AntModSlot.ALL) {
             AntMod subtype = profile.getMod(slot);
             if (subtype == null || subtype.isNone()) {
                 continue;

@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
+import com.grimidk.formicempire.classes.entities.services.world.WarCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -1399,6 +1400,7 @@ public class GamePanel extends ZeroGamePanel {
 
         Engine eng = frame.getEngine();
         HuntCreatureCombatService.clearAll();
+        WarCreatureCombatService.clearAll();
         if (eng != null) {
             eng.pauseEngine();
             eng.setWorld(null);

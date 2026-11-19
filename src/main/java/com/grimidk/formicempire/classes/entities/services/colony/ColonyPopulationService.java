@@ -19,8 +19,10 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +114,9 @@ public class ColonyPopulationService {
     }
 
     private void evolveAnts(Colony colony, List<Ant> sourceList, List<Ant> destList, AntClass newType) {
+        if (sourceList == null || sourceList.isEmpty()) {
+            return;
+        }
         List<Ant> antsToEvolve = new ArrayList<>();
         int growthTime = colony.getStatsService().getGrowthTime(colony);
         
@@ -120,22 +125,39 @@ public class ColonyPopulationService {
                 antsToEvolve.add(ant);
             }
         }
+        if (antsToEvolve.isEmpty()) {
+            return;
+        }
         for (Ant ant : antsToEvolve) {
             ant.transform(colony, newType); 
-            destList.add(ant);
         }
-        sourceList.removeAll(antsToEvolve);
+        destList.addAll(antsToEvolve);
+        if (antsToEvolve.size() == sourceList.size()) {
+            sourceList.clear();
+        } else {
+            Set<Ant> evolvedSet = Collections.newSetFromMap(new IdentityHashMap<>(antsToEvolve.size() * 2));
+            evolvedSet.addAll(antsToEvolve);
+            sourceList.removeIf(evolvedSet::contains);
+        }
     }
 
     private void hatchPupae(Colony colony) {
+        List<Ant> pupae = colony.getPupae();
+        if (pupae == null || pupae.isEmpty()) {
+            return;
+        }
         List<Ant> pupaeToHatch = new ArrayList<>();
         int growthTime = colony.getStatsService().getGrowthTime(colony);
         
-        for (Ant pupa : colony.getPupae()) {
+        for (Ant pupa : pupae) {
             if (pupa.getAge() >= growthTime) {
                 pupaeToHatch.add(pupa);
             }
         }
+        if (pupaeToHatch.isEmpty()) {
+            return;
+        }
+        Map<AntClass, List<Ant>> hatchedByType = new HashMap<>();
         for (Ant pupa : pupaeToHatch) {
             AntClass newType = determineHatchType(colony);
             pupa.transform(colony, newType);
@@ -143,9 +165,18 @@ public class ColonyPopulationService {
                 pupa.setModProfile(AntModService.rollProfile(colony, newType));
                 AntModService.applyModStats(pupa, colony);
             }
-            colony.getAntsByClass(newType).add(pupa);
+            hatchedByType.computeIfAbsent(newType, ignored -> new ArrayList<>()).add(pupa);
         }
-        colony.getPupae().removeAll(pupaeToHatch);
+        for (Map.Entry<AntClass, List<Ant>> entry : hatchedByType.entrySet()) {
+            colony.getAntsByClass(entry.getKey()).addAll(entry.getValue());
+        }
+        if (pupaeToHatch.size() == pupae.size()) {
+            pupae.clear();
+        } else {
+            Set<Ant> hatchedSet = Collections.newSetFromMap(new IdentityHashMap<>(pupaeToHatch.size() * 2));
+            hatchedSet.addAll(pupaeToHatch);
+            pupae.removeIf(hatchedSet::contains);
+        }
     }
 
     private void applyAutomatedHatchRates(Colony colony) {
@@ -201,21 +232,7 @@ public class ColonyPopulationService {
             }
         }
         
-        int agedDeaths = 0;
-        for (Ant ant : antsToKill) {
-             if (ant.isAlive()) { 
-                AntClass originalType = ant.getAntClass();
-                AntRole formerRole = ant.getRole();
-                boolean wasOnTrade = ant.isOnTrade();
-                ant.goDie(colony, DeathCause.OLD_AGE);
-                colony.recordAntDeath(ant, DeathCause.OLD_AGE);
-                colony.handleAntCasualtyAftermath(ant, originalType, formerRole, wasOnTrade);
-                
-                List<Ant> antList = colony.getAntsByClass(originalType);
-                if (antList != null) antList.remove(ant);
-                agedDeaths++;
-            }
-        }
+        int agedDeaths = applyBatchDeaths(colony, antsToKill, DeathCause.OLD_AGE);
         
         if (agedDeaths > 0) {
             colony.logEvent(ColonyLogPrefixes.DEATH + " "
@@ -431,26 +448,44 @@ public class ColonyPopulationService {
     }
 
     private void processDeaths(Colony colony, List<Ant> ants, String cause) {
-        int count = 0;
-        for (Ant ant : ants) {
-            if (ant.isAlive()) {
-                AntClass originalType = ant.getAntClass();
-                AntRole formerRole = ant.getRole();
-                boolean wasOnTrade = ant.isOnTrade();
-                ant.goDie(colony, cause);
-                colony.recordAntDeath(ant, cause);
-                colony.handleAntCasualtyAftermath(ant, originalType, formerRole, wasOnTrade);
-                
-                List<Ant> antList = colony.getAntsByClass(originalType);
-                if (antList != null) antList.remove(ant);
-                count++;
-            }
-        }
+        int count = applyBatchDeaths(colony, ants, cause);
         if (count > 0) {
             colony.logEvent(ColonyLogPrefixes.DEATH + " "
                 + String.format(LanguageStrings.get(LanguageStrings.LOG_DEATH_COUNT_CAUSE_FMT),
                     count, ColonyLogTexts.localizedDeathCause(cause)));
         }
+    }
+
+    private static int applyBatchDeaths(Colony colony, List<Ant> ants, String cause) {
+        if (colony == null || ants == null || ants.isEmpty()) {
+            return 0;
+        }
+        List<Ant> killed = new ArrayList<>(ants.size());
+        Map<AntClass, Set<Ant>> killedByClass = new HashMap<>();
+        for (Ant ant : ants) {
+            if (ant != null && ant.isAlive()) {
+                AntClass originalType = ant.getAntClass();
+                AntRole formerRole = ant.getRole();
+                boolean wasOnTrade = ant.isOnTrade();
+                ant.goDie(colony, cause);
+                killed.add(ant);
+                killedByClass
+                        .computeIfAbsent(originalType, ignored -> Collections.newSetFromMap(new IdentityHashMap<>()))
+                        .add(ant);
+                colony.handleAntCasualtyAftermath(ant, originalType, formerRole, wasOnTrade);
+            }
+        }
+        if (killed.isEmpty()) {
+            return 0;
+        }
+        for (Map.Entry<AntClass, Set<Ant>> entry : killedByClass.entrySet()) {
+            List<Ant> antList = colony.getAntsByClass(entry.getKey());
+            if (antList != null) {
+                antList.removeIf(entry.getValue()::contains);
+            }
+        }
+        colony.recordAntDeathsBatch(killed, cause);
+        return killed.size();
     }
     
     public void runContamination(Colony colony) { 

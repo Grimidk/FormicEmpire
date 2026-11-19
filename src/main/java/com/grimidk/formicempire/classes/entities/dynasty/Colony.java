@@ -1,8 +1,10 @@
 package com.grimidk.formicempire.classes.entities.dynasty;
 
 import com.grimidk.formicempire.classes.entities.spatial.Room;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList; 
 import java.awt.Rectangle;
 
@@ -79,8 +82,8 @@ public class Colony {
     
     // --- Population Data ---
     private final Map<AntClass, List<Ant>> antGroups;
-    private final List<Ant> deadAnts;
-    private final List<Critter> critters; 
+    private volatile List<Ant> deadAnts;
+    private volatile List<Critter> critters; 
     
     private final Map<AntRole, Integer> peaceAssignedRoleCounts = createEmptyRoleCountMap();
     private final Map<AntRole, Integer> warAssignedRoleCounts = createEmptyRoleCountMap();
@@ -143,7 +146,8 @@ public class Colony {
     private Tunnel currentTunnelProject = null;
     private Bridge currentBridgeProject = null;
     private double buildingProgressHours = 0.0;
-    private final List<String> eventLog = new ArrayList<>();
+    private static final int MAX_EVENT_LOG_SIZE = 200;
+    private final Deque<String> eventLog = new ArrayDeque<>();
     private final List<com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget> knownHuntTargets = new ArrayList<>();
     private final List<com.grimidk.formicempire.classes.entities.hunt.HuntExpedition> activeHuntExpeditions = new ArrayList<>();
     private int nextHuntTargetId = 1;
@@ -165,6 +169,7 @@ public class Colony {
     private Rectangle insectPenBounds;
 
     // --- Service Dependencies ---
+    private transient Hex hostHex;
     private transient ColonyStatsService statsService;
     private transient ColonySpatialService spatialService;
     private transient ColonySourceService sourceService;
@@ -200,15 +205,45 @@ public class Colony {
 
     // --- Initialization Methods ---
     private void initializeLists() {
-        this.antGroups.put(GameConstants.CLASS_EGG, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_LARVA, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_PUPA, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_WORKER, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_SOLDIER, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_MAJOR, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_DRONE, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_PRINCESS, new CopyOnWriteArrayList<>());
-        this.antGroups.put(GameConstants.CLASS_QUEEN, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.CLASS_EGG, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_LARVA, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_PUPA, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_WORKER, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_SOLDIER, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_MAJOR, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_DRONE, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_PRINCESS, createManagedAntList(null));
+        this.antGroups.put(GameConstants.CLASS_QUEEN, createManagedAntList(null));
+    }
+
+    private List<Ant> createManagedAntList(List<Ant> source) {
+        if (this.isActive) {
+            return source == null ? new CopyOnWriteArrayList<>() : new CopyOnWriteArrayList<>(source);
+        }
+        return source == null ? new ArrayList<>() : new ArrayList<>(source);
+    }
+
+    private void syncManagedListsForActiveState() {
+        for (Map.Entry<AntClass, List<Ant>> entry : antGroups.entrySet()) {
+            List<Ant> existing = entry.getValue();
+            if (this.isActive && !(existing instanceof CopyOnWriteArrayList<?>)) {
+                entry.setValue(existing == null ? new CopyOnWriteArrayList<>() : new CopyOnWriteArrayList<>(existing));
+            } else if (!this.isActive && (existing instanceof CopyOnWriteArrayList<?>)) {
+                entry.setValue(new ArrayList<>(existing));
+            }
+        }
+        List<Ant> existingDead = this.deadAnts;
+        if (this.isActive && !(existingDead instanceof CopyOnWriteArrayList<?>)) {
+            this.deadAnts = existingDead == null ? new CopyOnWriteArrayList<>() : new CopyOnWriteArrayList<>(existingDead);
+        } else if (!this.isActive && (existingDead instanceof CopyOnWriteArrayList<?>)) {
+            this.deadAnts = new ArrayList<>(existingDead);
+        }
+        List<Critter> existingCritters = this.critters;
+        if (this.isActive && !(existingCritters instanceof CopyOnWriteArrayList<?>)) {
+            this.critters = existingCritters == null ? new CopyOnWriteArrayList<>() : new CopyOnWriteArrayList<>(existingCritters);
+        } else if (!this.isActive && (existingCritters instanceof CopyOnWriteArrayList<?>)) {
+            this.critters = new ArrayList<>(existingCritters);
+        }
     }
 
     private static Map<AntRole, Integer> createEmptyRoleCountMap() {
@@ -379,9 +414,9 @@ public class Colony {
         this.totalDeaths = 0;
         this.age = 0;
         this.daysWithoutQueen = 0;
-        this.antGroups = new HashMap<>();
-        this.deadAnts = new CopyOnWriteArrayList<>(); 
-        this.critters = new CopyOnWriteArrayList<>();
+        this.antGroups = new ConcurrentHashMap<>();
+        this.deadAnts = new ArrayList<>(); 
+        this.critters = new ArrayList<>();
         this.buildings = new HashSet<>();
         
         initializeLists();
@@ -397,9 +432,9 @@ public class Colony {
         this.isPlayer = savedColony.isPlayer;
         
         this.rank = GameConstants.RANK_COLONY;
-        this.antGroups = new HashMap<>();
-        this.deadAnts = new CopyOnWriteArrayList<>();
-        this.critters = new CopyOnWriteArrayList<>();
+        this.antGroups = new ConcurrentHashMap<>();
+        this.deadAnts = new ArrayList<>();
+        this.critters = new ArrayList<>();
         this.buildings = new HashSet<>();
 
         initializeLists();
@@ -574,7 +609,10 @@ public class Colony {
     // --- Event Log  ---
     public void logEvent(String message) {
         synchronized (eventLog) {
-            eventLog.add(message);
+            while (eventLog.size() >= MAX_EVENT_LOG_SIZE) {
+                eventLog.removeFirst();
+            }
+            eventLog.addLast(message);
         }
     }
 
@@ -614,6 +652,28 @@ public class Colony {
             deathService.recordDeath(cause, this);
         }
         if (ant.getAntClass() == GameConstants.CLASS_QUEEN) {
+            clampCommanderWarAssignment();
+        }
+    }
+
+    public void recordAntDeathsBatch(List<Ant> ants, String cause) {
+        if (ants == null || ants.isEmpty()) return;
+        List<Ant> deadBatch = new ArrayList<>(ants.size());
+        boolean queenDied = false;
+        for (Ant ant : ants) {
+            if (ant == null) continue;
+            deadBatch.add(ant);
+            if (deathService != null) {
+                deathService.recordDeath(cause, this);
+            }
+            if (ant.getAntClass() == GameConstants.CLASS_QUEEN) {
+                queenDied = true;
+            }
+        }
+        if (deadBatch.isEmpty()) return;
+        this.totalDeaths += deadBatch.size();
+        this.deadAnts.addAll(deadBatch);
+        if (queenDied) {
             clampCommanderWarAssignment();
         }
     }
@@ -1086,7 +1146,12 @@ public class Colony {
     public Rank getRank() { return rank; }
     public void setRank(Rank rank) { this.rank = rank; }
     public boolean isActive() { return isActive; }
-    public void setActive(boolean isActive) { this.isActive = isActive; }
+    public void setActive(boolean isActive) {
+        if (this.isActive != isActive) {
+            this.isActive = isActive;
+            syncManagedListsForActiveState();
+        }
+    }
 
     public boolean runsFullSimulation() {
         return isActive && isPlayer;
@@ -1175,33 +1240,41 @@ public class Colony {
         return Collections.emptyList();
     }
     public List<Ant> getEggs() { return antGroups.get(GameConstants.CLASS_EGG); }
-    public void setEggs(List<Ant> eggs) { antGroups.put(GameConstants.CLASS_EGG, eggs); }
+    public void setEggs(List<Ant> eggs) { antGroups.put(GameConstants.CLASS_EGG, createManagedAntList(eggs)); }
     public List<Ant> getLarvae() { return antGroups.get(GameConstants.CLASS_LARVA); }
-    public void setLarvae(List<Ant> larvae) { antGroups.put(GameConstants.CLASS_LARVA, larvae); }
+    public void setLarvae(List<Ant> larvae) { antGroups.put(GameConstants.CLASS_LARVA, createManagedAntList(larvae)); }
     public List<Ant> getPupae() { return antGroups.get(GameConstants.CLASS_PUPA); }
-    public void setPupae(List<Ant> pupae) { antGroups.put(GameConstants.CLASS_PUPA, pupae); }
+    public void setPupae(List<Ant> pupae) { antGroups.put(GameConstants.CLASS_PUPA, createManagedAntList(pupae)); }
     public List<Ant> getWorkers() { return antGroups.get(GameConstants.CLASS_WORKER); }
-    public void setWorkers(List<Ant> workers) { antGroups.put(GameConstants.CLASS_WORKER, workers); }
+    public void setWorkers(List<Ant> workers) { antGroups.put(GameConstants.CLASS_WORKER, createManagedAntList(workers)); }
     public List<Ant> getSoldiers() { return antGroups.get(GameConstants.CLASS_SOLDIER); }
-    public void setSoldiers(List<Ant> soldiers) { antGroups.put(GameConstants.CLASS_SOLDIER, soldiers); }
+    public void setSoldiers(List<Ant> soldiers) { antGroups.put(GameConstants.CLASS_SOLDIER, createManagedAntList(soldiers)); }
     public List<Ant> getMajors() { return antGroups.get(GameConstants.CLASS_MAJOR); }
-    public void setMajors(List<Ant> majors) { antGroups.put(GameConstants.CLASS_MAJOR, majors); }
+    public void setMajors(List<Ant> majors) { antGroups.put(GameConstants.CLASS_MAJOR, createManagedAntList(majors)); }
     public List<Ant> getDrones() { return antGroups.get(GameConstants.CLASS_DRONE); }
-    public void setDrones(List<Ant> drones) { antGroups.put(GameConstants.CLASS_DRONE, drones); }
+    public void setDrones(List<Ant> drones) { antGroups.put(GameConstants.CLASS_DRONE, createManagedAntList(drones)); }
     public List<Ant> getPrincesses() { return antGroups.get(GameConstants.CLASS_PRINCESS); }
-    public void setPrincesses(List<Ant> princesses) { antGroups.put(GameConstants.CLASS_PRINCESS, princesses); }
+    public void setPrincesses(List<Ant> princesses) { antGroups.put(GameConstants.CLASS_PRINCESS, createManagedAntList(princesses)); }
     public List<Ant> getQueens() { return antGroups.get(GameConstants.CLASS_QUEEN); }
-    public void setQueens(List<Ant> queens) { antGroups.put(GameConstants.CLASS_QUEEN, queens); }
+    public void setQueens(List<Ant> queens) { antGroups.put(GameConstants.CLASS_QUEEN, createManagedAntList(queens)); }
     public List<Ant> getDeadAnts() { return deadAnts; }
     public void setDeadAnts(List<Ant> deadAnts) {
         this.deadAnts.clear();
-        this.deadAnts.addAll(deadAnts);
+        if (deadAnts != null && !deadAnts.isEmpty()) {
+            this.deadAnts.addAll(deadAnts);
+        }
     }
     
     public List<Critter> getCritters() { return critters; }
     
     public int getAntTotal() {
-        return antGroups.values().stream().mapToInt(List::size).sum();
+        int total = 0;
+        for (List<Ant> list : antGroups.values()) {
+            if (list != null) {
+                total += list.size();
+            }
+        }
+        return total;
     }
 
     public boolean hasBuilding(Building building) { return this.buildings.contains(building); }
@@ -1668,9 +1741,18 @@ public class Colony {
     }
 
     private int totalConsumptionCacheKey() {
-        return getAntTotal()
-                + 31 * getParasiteAnts()
-                + 961 * (listSize(getEggs()) + listSize(getLarvae()) + listSize(getPupae()));
+        int key = listSize(getLarvae());
+        key = 31 * key + listSize(getWorkers());
+        key = 31 * key + listSize(getSoldiers());
+        key = 31 * key + listSize(getMajors());
+        key = 31 * key + listSize(getDrones());
+        key = 31 * key + listSize(getPrincesses());
+        key = 31 * key + listSize(getQueens());
+        key = 31 * key + listSize(getEggs());
+        key = 31 * key + listSize(getPupae());
+        key = 31 * key + getParasiteAnts();
+        key = 31 * key + Float.floatToIntBits(getBaseConsumption());
+        return key;
     }
 
     public void invalidateTotalConsumptionCache() {
@@ -1889,6 +1971,9 @@ public class Colony {
     }
 
     // --- Public getters for services ---
+    public Hex getHostHex() { return this.hostHex; }
+    public void setHostHex(Hex hostHex) { this.hostHex = hostHex; }
+
     public ColonyStatsService getStatsService() { return this.statsService; }
     public ColonySpatialService getSpatialService() { return this.spatialService; }
     public ColonySourceService getSourceService() { return this.sourceService; }
@@ -2371,6 +2456,7 @@ public class Colony {
                 a.updateStatsFromColony(this);
             }
         }
+        invalidateTotalConsumptionCache();
     }
 
     public double getAverageAntAge(AntClass antClass) {

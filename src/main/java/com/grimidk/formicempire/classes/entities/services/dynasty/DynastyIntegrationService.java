@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 public final class DynastyIntegrationService {
 
@@ -441,8 +442,9 @@ public final class DynastyIntegrationService {
         }
         DynastyDiplomacyService diplo = overlord.getDiplomacyService();
         if (diplo != null) {
+            Set<Dynasty> bordering = diplo.computeBorderingDynasties(world);
             candidates.sort(Comparator
-                    .comparingInt((Dynasty d) -> diplo.sharesBorderWith(d, world) ? 0 : 1)
+                    .comparingInt((Dynasty d) -> bordering.contains(d) ? 0 : 1)
                     .thenComparingInt(Dynasty::getMilitaryPower));
         }
         return candidates;

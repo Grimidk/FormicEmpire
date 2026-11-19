@@ -56,9 +56,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MapDialog extends ZeroDialog {
 
@@ -101,6 +103,12 @@ public class MapDialog extends ZeroDialog {
     private boolean showDayNight = true;
     private boolean showWeather = true;
     private boolean showDisasters = true;
+    private World lastLegendWorld;
+    private int lastLegendYear = Integer.MIN_VALUE;
+    private int lastLegendDay = Integer.MIN_VALUE;
+    private int lastLegendActiveWars = -1;
+    private int lastLegendHistoryCount = -1;
+    private int lastLegendSortMode = -1;
     public enum MapMode {
         BIOME, HEIGHT, TECTONIC_PLATES, DYNASTIC
     }
@@ -1727,6 +1735,7 @@ public class MapDialog extends ZeroDialog {
         }
         if (legendPanel != null) {
             legendPanel.updateLegend();
+            recordLegendSnapshot();
         }
         updateConquerButton();
         if (zoomOutButton != null) {
@@ -1740,7 +1749,52 @@ public class MapDialog extends ZeroDialog {
     }
 
     public void liveUpdate() {
-        refreshDialog();
+        syncWorldFromEngine();
+        if (mapPanel != null) {
+            mapPanel.repaint();
+        }
+        if (legendPanel != null && shouldRefreshLegendOnLiveUpdate()) {
+            legendPanel.updateLegend();
+            recordLegendSnapshot();
+        }
+        updateConquerButton();
+        updateZoomControls();
+        updateSpeedAndTimeControls();
+    }
+
+    private boolean shouldRefreshLegendOnLiveUpdate() {
+        World current = currentWorld();
+        if (current != lastLegendWorld) {
+            return true;
+        }
+        if (current == null) {
+            return false;
+        }
+        int activeWars = current.getWarService() != null ? current.getWarService().getActiveWars().size() : 0;
+        int historyCount = current.getHistoryService() != null ? current.getHistoryService().getEvents().size() : 0;
+        int sortMode = legendPanel != null ? legendPanel.sortMode : -1;
+        return current.getYear() != lastLegendYear
+                || current.getDay() != lastLegendDay
+                || activeWars != lastLegendActiveWars
+                || historyCount != lastLegendHistoryCount
+                || sortMode != lastLegendSortMode;
+    }
+
+    private void recordLegendSnapshot() {
+        World current = currentWorld();
+        lastLegendWorld = current;
+        if (current == null) {
+            lastLegendYear = Integer.MIN_VALUE;
+            lastLegendDay = Integer.MIN_VALUE;
+            lastLegendActiveWars = -1;
+            lastLegendHistoryCount = -1;
+        } else {
+            lastLegendYear = current.getYear();
+            lastLegendDay = current.getDay();
+            lastLegendActiveWars = current.getWarService() != null ? current.getWarService().getActiveWars().size() : 0;
+            lastLegendHistoryCount = current.getHistoryService() != null ? current.getHistoryService().getEvents().size() : 0;
+        }
+        lastLegendSortMode = legendPanel != null ? legendPanel.sortMode : -1;
     }
 
     public void updateTimeDisplay() {
@@ -1830,6 +1884,9 @@ public class MapDialog extends ZeroDialog {
         private final FlatChevronButton worldLogsToggle;
         private final JLabel worldLogsTitle;
         private boolean worldLogsExpanded = true;
+        private boolean lastWorldLogsVisible = false;
+        private int lastWorldLogCount = -1;
+        private WorldHistoryEvent lastWorldLogHead = null;
 
         public LegendPanel() {
             setLayout(new BorderLayout());
@@ -2148,16 +2205,35 @@ public class MapDialog extends ZeroDialog {
         private void updateWorldLogsSection() {
             boolean showLogs = isSpectatorMode() && world != null && world.getHistoryService() != null;
             if (!showLogs) {
-                worldLogsSection.setVisible(false);
-                worldLogsContent.removeAll();
+                if (lastWorldLogsVisible || lastWorldLogCount != 0) {
+                    worldLogsSection.setVisible(false);
+                    worldLogsContent.removeAll();
+                    lastWorldLogsVisible = false;
+                    lastWorldLogCount = 0;
+                    lastWorldLogHead = null;
+                }
                 return;
             }
             List<WorldHistoryEvent> events = world.getHistoryService().getEvents();
+            int eventCount = events.size();
+            WorldHistoryEvent head = eventCount > 0 ? events.get(0) : null;
+            if (lastWorldLogsVisible && lastWorldLogCount == eventCount && lastWorldLogHead == head) {
+                worldLogsScroll.setVisible(worldLogsExpanded && eventCount > 0);
+                worldLogsToggle.setChevronDirection(worldLogsExpanded
+                        ? FlatChevronButton.ChevronDirection.UP
+                        : FlatChevronButton.ChevronDirection.DOWN);
+                worldLogsToggle.setToolTipText(LanguageStrings.get(
+                        worldLogsExpanded ? LanguageStrings.MAP_WORLD_LOGS_HIDE : LanguageStrings.MAP_WORLD_LOGS_SHOW));
+                return;
+            }
+            lastWorldLogsVisible = true;
+            lastWorldLogCount = eventCount;
+            lastWorldLogHead = head;
             worldLogsSection.setVisible(true);
             worldLogsTitle.setText(LanguageStrings.format(
-                    LanguageStrings.MAP_WORLD_LOGS_TITLE_FMT, events.size()));
+                    LanguageStrings.MAP_WORLD_LOGS_TITLE_FMT, eventCount));
             worldLogsContent.removeAll();
-            int limit = Math.min(events.size(), MAX_WORLD_LOG_ENTRIES);
+            int limit = Math.min(eventCount, MAX_WORLD_LOG_ENTRIES);
             for (int i = 0; i < limit; i++) {
                 WorldHistoryEvent event = events.get(i);
                 String msg = event.formatMessage(world);
@@ -2173,7 +2249,7 @@ public class MapDialog extends ZeroDialog {
                 logLabel.setToolTipText(line);
                 worldLogsContent.add(logLabel);
             }
-            worldLogsScroll.setVisible(worldLogsExpanded && !events.isEmpty());
+            worldLogsScroll.setVisible(worldLogsExpanded && eventCount > 0);
             worldLogsToggle.setChevronDirection(worldLogsExpanded
                     ? FlatChevronButton.ChevronDirection.UP
                     : FlatChevronButton.ChevronDirection.DOWN);
@@ -2277,6 +2353,8 @@ public class MapDialog extends ZeroDialog {
             collapseControl.repaint();
             AssetStyles.styleCompactButton(sortButton);
             updateSortButtonLabel();
+            lastWorldLogCount = -1;
+            lastWorldLogHead = null;
             updateLegend();
             revalidate();
             repaint();
@@ -2287,10 +2365,10 @@ public class MapDialog extends ZeroDialog {
             updateActiveWarsSection();
             updateWorldLogsSection();
             content.removeAll();
-            if (world == null || world.getHexes() == null) return;
+            if (world == null) return;
 
             Map<Integer, Dynasty> activeDynastiesMap = new HashMap<>();
-            for (Hex h : world.getHexes()) {
+            for (Hex h : world.getColonizedHexes()) {
                 if (h.getColony() != null && h.getColony().getDynasty() != null) {
                     Dynasty d = h.getColony().getDynasty();
                     if (d.isPlayer() || d.isDefeated() || d.isActiveForDiplomacy()) {
@@ -2309,9 +2387,16 @@ public class MapDialog extends ZeroDialog {
             Dynasty playerDynasty = findPlayerDynasty();
             List<Dynasty> sortedDynasties = new ArrayList<>(activeDynastiesMap.values());
             if (sortMode == SORT_DIPLOMACY && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
+                Set<Dynasty> bordering = playerDynasty.getDiplomacyService().computeBorderingDynasties(world);
+                Map<Dynasty, Integer> repByDynasty = new IdentityHashMap<>(Math.max(4, sortedDynasties.size() * 2));
+                for (Dynasty d : sortedDynasties) {
+                    int rep = d.isPlayer() ? Integer.MIN_VALUE
+                            : playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(
+                                    d, world, bordering.contains(d));
+                    repByDynasty.put(d, rep);
+                }
                 sortedDynasties.sort(Comparator
-                        .comparingInt((Dynasty d) -> d.isPlayer() ? Integer.MIN_VALUE
-                                : playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world))
+                        .comparingInt((Dynasty d) -> repByDynasty.getOrDefault(d, 0))
                         .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
             } else if (sortMode == SORT_MILITARY) {
                 sortedDynasties.sort(Comparator
@@ -2319,11 +2404,13 @@ public class MapDialog extends ZeroDialog {
                         .reversed()
                         .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
             } else {
-                sortedDynasties.sort((d1, d2) -> {
-                    int p1 = d1.getStatService().getTotalPopulation(d1);
-                    int p2 = d2.getStatService().getTotalPopulation(d2);
-                    return Integer.compare(p2, p1);
-                });
+                Map<Dynasty, Integer> popByDynasty = new IdentityHashMap<>(Math.max(4, sortedDynasties.size() * 2));
+                for (Dynasty d : sortedDynasties) {
+                    popByDynasty.put(d, d.getStatService().getTotalPopulation(d));
+                }
+                sortedDynasties.sort((d1, d2) -> Integer.compare(
+                        popByDynasty.getOrDefault(d2, 0),
+                        popByDynasty.getOrDefault(d1, 0)));
             }
 
             for (Dynasty d : sortedDynasties) {

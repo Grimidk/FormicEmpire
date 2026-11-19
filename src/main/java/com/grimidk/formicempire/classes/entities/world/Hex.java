@@ -10,7 +10,10 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class Hex {
+    private static final AtomicInteger DISASTER_EPOCH = new AtomicInteger(0);
     private Biome biome;
     private Colony colony;
     private Hex north;
@@ -36,10 +39,14 @@ public class Hex {
     private int disasterAgeHours = 0;
 
     private int nonWaterResourceSourcesGenerated;
+    private transient World hostWorld;
 
     public Hex(Biome biome, Colony colony, Hex north, Hex northWest, Hex northEast, Hex south, Hex southWest, Hex southEast) {
         this.biome = biome;
         this.colony = colony;
+        if (colony != null) {
+            colony.setHostHex(this);
+        }
         this.north = north;
         this.northWest = northWest;
         this.northEast = northEast;
@@ -59,7 +66,19 @@ public class Hex {
 
     public Colony getColony() { return colony; }
 
-    public void setColony(Colony colony) { this.colony = colony; }
+    public void setColony(Colony colony) {
+        if (this.colony != null && this.colony != colony && this.colony.getHostHex() == this) {
+            this.colony.setHostHex(null);
+        }
+        this.colony = colony;
+        if (colony != null) {
+            colony.setHostHex(this);
+        }
+    }
+
+    public World getHostWorld() { return hostWorld; }
+
+    public void setHostWorld(World hostWorld) { this.hostWorld = hostWorld; }
 
     public Hex getNorth() { return north; }
 
@@ -267,8 +286,15 @@ public class Hex {
         return disasterType;
     }
 
+    public static int getDisasterEpoch() {
+        return DISASTER_EPOCH.get();
+    }
+
     public void setDisasterType(DisasterType disasterType) {
         this.disasterType = disasterType;
+        if (disasterType != null) {
+            DISASTER_EPOCH.incrementAndGet();
+        }
     }
 
     public int getDisasterAgeHours() {
@@ -282,6 +308,9 @@ public class Hex {
     public void recordDisaster(DisasterType type) {
         this.disasterType = type;
         this.disasterAgeHours = 0;
+        if (type != null) {
+            DISASTER_EPOCH.incrementAndGet();
+        }
     }
 
     public void tickDisasterHour() {

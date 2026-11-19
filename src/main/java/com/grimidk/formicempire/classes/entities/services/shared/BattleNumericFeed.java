@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities.services.shared;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 
 import javax.swing.ImageIcon;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public final class BattleNumericFeed {
 
     private static final int MAX_EVENTS = 2048;
 
-    private final List<BattleNumericEvent> events = new ArrayList<>();
+    private final ArrayDeque<BattleNumericEvent> events = new ArrayDeque<>(MAX_EVENTS + 1);
     private long nextSequence = 1L;
 
     public synchronized BattleNumericEvent recordD6Roll(
@@ -40,14 +41,17 @@ public final class BattleNumericFeed {
                 skillName,
                 skillIcon,
                 battleLine);
-        events.add(event);
+        events.addLast(event);
         if (events.size() > MAX_EVENTS) {
-            events.remove(0);
+            events.pollFirst();
         }
         return event;
     }
 
     public synchronized List<BattleNumericEvent> pollEventsSince(long lastSequence) {
+        if (events.isEmpty() || lastSequence >= nextSequence - 1L) {
+            return List.of();
+        }
         List<BattleNumericEvent> result = new ArrayList<>();
         for (BattleNumericEvent event : events) {
             if (event.sequence() > lastSequence) {
@@ -58,7 +62,7 @@ public final class BattleNumericFeed {
     }
 
     public synchronized BattleNumericEvent getLatestEvent() {
-        return events.isEmpty() ? null : events.get(events.size() - 1);
+        return events.peekLast();
     }
 
     public synchronized long getLatestSequence() {

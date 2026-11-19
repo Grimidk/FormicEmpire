@@ -20,13 +20,19 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class WarService {
 
     private final World world;
     private final List<War> activeWars = new ArrayList<>();
     private final List<War> historicWars = new ArrayList<>();
+    private final Map<Integer, Integer> declaredWarCountByDynasty = new HashMap<>();
+    private final Set<Integer> dynastiesWithWarHistory = new HashSet<>();
     private int nextWarId = 1;
 
     public WarService(World world) {
@@ -64,6 +70,9 @@ public class WarService {
                 dynastyA.getMilitaryPower(),
                 dynastyB.getMilitaryPower());
         activeWars.add(war);
+        if (war.getDeclaredByDynastyId() > 0) {
+            declaredWarCountByDynasty.merge(war.getDeclaredByDynastyId(), 1, Integer::sum);
+        }
         Dynasty aggressor = declarer;
         Dynasty defender = declarer.getId() == pair[0] ? dynastyB : dynastyA;
         WarProgressService.initializeCampaign(world, war, aggressor, defender);
@@ -104,6 +113,9 @@ public class WarService {
                 dynastyB.getMilitaryPower());
         war.setRebellionWar(true);
         activeWars.add(war);
+        if (war.getDeclaredByDynastyId() > 0) {
+            declaredWarCountByDynasty.merge(war.getDeclaredByDynastyId(), 1, Integer::sum);
+        }
         WarProgressService.initializeCampaign(world, war, parent, rebellion);
         world.getHistoryService().record(WorldHistoryEventType.WAR_STARTED,
                 LanguageStrings.HISTORY_WAR_STARTED_FMT,
@@ -125,6 +137,7 @@ public class WarService {
         WarCreatureCombatService.clear(war);
         war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerDynastyId, conclusionKey);
         historicWars.add(war);
+        recordHistoryParticipants(war);
         String conclusion = conclusionKey != null ? conclusionKey : LanguageStrings.WAR_CONCLUSION_UNKNOWN;
         world.getHistoryService().record(WorldHistoryEventType.WAR_ENDED,
                 LanguageStrings.HISTORY_WAR_ENDED_FMT,
@@ -216,11 +229,11 @@ public class WarService {
     }
 
     private Colony findColonyById(int colonyId) {
-        if (colonyId <= 0 || world.getHexes() == null) {
+        if (colonyId <= 0 || world == null) {
             return null;
         }
-        for (Hex hex : world.getHexes()) {
-            if (hex.getColony() != null && hex.getColony().getId() == colonyId) {
+        for (Hex hex : world.getColonizedHexes()) {
+            if (hex != null && hex.getColony() != null && hex.getColony().getId() == colonyId) {
                 return hex.getColony();
             }
         }
@@ -302,6 +315,7 @@ public class WarService {
             war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerId, conclusion);
             historicWars.add(war);
         }
+        rebuildWarIndexes();
     }
 
     private int resolveArchiveWinnerId(War war) {
@@ -359,11 +373,14 @@ public class WarService {
         if (!activeWars.isEmpty()) {
             nextWarId = activeWars.get(activeWars.size() - 1).getId() + 1;
         }
+        rebuildWarIndexes();
     }
 
     public void loadFromSave(List<Savefile.SavedWar> savedWars) {
         activeWars.clear();
         historicWars.clear();
+        declaredWarCountByDynasty.clear();
+        dynastiesWithWarHistory.clear();
         nextWarId = 1;
         if (savedWars == null) {
             return;
@@ -382,6 +399,7 @@ public class WarService {
                 historicWars.add(war);
             }
         }
+        rebuildWarIndexes();
         for (War war : activeWars) {
             Dynasty aggressor = world.findDynastyById(war.getAggressorDynastyId());
             Dynasty defender = world.findDynastyById(war.getDefenderDynastyId());
@@ -456,19 +474,39 @@ public class WarService {
         return count;
     }
     
-    public int countWarsDeclaredBy(int dynastyId) {
-        int count = 0;
+    private void recordHistoryParticipants(War war) {
+        if (war == null) {
+            return;
+        }
+        if (war.getDynastyIdA() > 0) {
+            dynastiesWithWarHistory.add(war.getDynastyIdA());
+        }
+        if (war.getDynastyIdB() > 0) {
+            dynastiesWithWarHistory.add(war.getDynastyIdB());
+        }
+    }
+
+    private void rebuildWarIndexes() {
+        declaredWarCountByDynasty.clear();
+        dynastiesWithWarHistory.clear();
         for (War war : activeWars) {
-            if (war.getDeclaredByDynastyId() == dynastyId) {
-                count++;
+            if (war != null && war.getDeclaredByDynastyId() > 0) {
+                declaredWarCountByDynasty.merge(war.getDeclaredByDynastyId(), 1, Integer::sum);
             }
         }
         for (War war : historicWars) {
-            if (war.getDeclaredByDynastyId() == dynastyId) {
-                count++;
+            if (war == null) {
+                continue;
             }
+            if (war.getDeclaredByDynastyId() > 0) {
+                declaredWarCountByDynasty.merge(war.getDeclaredByDynastyId(), 1, Integer::sum);
+            }
+            recordHistoryParticipants(war);
         }
-        return count;
+    }
+
+    public int countWarsDeclaredBy(int dynastyId) {
+        return declaredWarCountByDynasty.getOrDefault(dynastyId, 0);
     }
 
     public boolean isWarmonger(int dynastyId) {
@@ -476,12 +514,7 @@ public class WarService {
     }
 
     public boolean hasWarHistoryForDynasty(int dynastyId) {
-        for (War war : historicWars) {
-            if (war.involves(dynastyId)) {
-                return true;
-            }
-        }
-        return false;
+        return dynastiesWithWarHistory.contains(dynastyId);
     }
 
     public War findActiveWar(int dynastyIdOne, int dynastyIdTwo) {

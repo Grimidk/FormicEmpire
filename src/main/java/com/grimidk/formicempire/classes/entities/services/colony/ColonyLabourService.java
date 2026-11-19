@@ -5,7 +5,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
@@ -384,21 +387,23 @@ public class ColonyLabourService {
         if (spaceAvailable <= 0) return;   
         
         int toLay = Math.min(layerCount * (int) colony.getStatsService().getLayingRate(colony), spaceAvailable);
+        if (toLay <= 0) {
+            return;
+        }
+        List<Ant> newEggs = new ArrayList<>(toLay);
+        Rectangle nursery = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.NURSERY);
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(colony, GameConstants.CLASS_EGG);
-            
-            newEgg.setDimension(WorldSpaces.UNDERWORLD);            
-            Rectangle nursery = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.NURSERY);
-            
+            newEgg.setDimension(WorldSpaces.UNDERWORLD);
             if (nursery != null) {
                 Point spawnPos = colony.getPhysicsService().getSpecificRoomPoint(colony, nursery);
                 newEgg.setPosition(spawnPos);
             } else {
                 newEgg.setPosition(new Point(0, 0));
             }
-
-            eggList.add(newEgg);
+            newEggs.add(newEgg);
         }
+        eggList.addAll(newEggs);
     }
 
     public void runNursing(Colony colony) {
@@ -446,19 +451,24 @@ public class ColonyLabourService {
                 antsToCull.add(list.get(list.size() - 1 - i));
             }
             
+            List<Ant> killedBatch = new ArrayList<>(toCullCount);
+            Set<Ant> killedSet = Collections.newSetFromMap(new IdentityHashMap<>(toCullCount * 2));
             for (Ant antToCull : antsToCull) {
                 if (antToCull.isAlive()) {
                     AntClass originalClass = antToCull.getAntClass();
                     AntRole formerRole = antToCull.getRole();
                     boolean wasOnTrade = antToCull.isOnTrade();
                     antToCull.goDie(colony, DeathCause.LACK_OF_CARE);
-                    colony.recordAntDeath(antToCull, DeathCause.LACK_OF_CARE);
+                    killedBatch.add(antToCull);
+                    killedSet.add(antToCull);
                     colony.handleAntCasualtyAftermath(antToCull, originalClass, formerRole, wasOnTrade);
-                    
-                    list.remove(antToCull);
                     deathCount++;
                     deficit--;
                 }
+            }
+            if (!killedBatch.isEmpty()) {
+                list.removeIf(killedSet::contains);
+                colony.recordAntDeathsBatch(killedBatch, DeathCause.LACK_OF_CARE);
             }
         }
         
@@ -617,6 +627,7 @@ public class ColonyLabourService {
 
         float chancePerScout = colony.getStatsService().getScoutingRate(colony); 
         float totalChance = scoutCount * chancePerScout;
+        boolean wanderedWhenFull = false;
 
         while (totalChance > 0) {
             boolean found = false;
@@ -632,12 +643,15 @@ public class ColonyLabourService {
             }
 
             if (found) {
-                generateAndAddSource(colony, biome, currentHex);
+                if (!generateAndAddSource(colony, biome, currentHex, explorerCount == 0 && !wanderedWhenFull)) {
+                    wanderedWhenFull = true;
+                    break;
+                }
             }
         }
     }
 
-    private void generateAndAddSource(Colony colony, Biome biome, Hex currentHex) {
+    private boolean generateAndAddSource(Colony colony, Biome biome, Hex currentHex, boolean allowWanderFallback) {
         ColonyLocationService locations = colony.getLocationService();
         List<ResourceType> possibleTypes = new ArrayList<>();
         boolean isBurntForest = biome == GameConstants.BIOME_BURNT_FOREST;
@@ -665,13 +679,10 @@ public class ColonyLabourService {
         }
 
         if (possibleTypes.isEmpty()) {
-            boolean hasExplorer = (colony.runsFullSimulation()
-                    ? colony.getActiveRoleCount(GameConstants.ROLE_EXPLORER)
-                    : colony.getAssignedRoleCount(GameConstants.ROLE_EXPLORER)) > 0;
-            if (!hasExplorer) {
+            if (allowWanderFallback) {
                 wanderAndScoutHexes(colony, currentHex);
             }
-            return;
+            return false;
         }
         List<ResourceType> missingCritical = new ArrayList<>();
         if (possibleTypes.contains(GameConstants.RESOURCE_WATER)
@@ -711,7 +722,7 @@ public class ColonyLabourService {
         }
 
         // None (0)
-        if (abundance <= 0) return; 
+        if (abundance <= 0) return true; 
         
         int quantity = 100; // Small
         float roll = GameRandom.nextFloat();
@@ -761,6 +772,7 @@ public class ColonyLabourService {
                 world.getBiomeTransformationService().checkOverharvestDepletion(world, colony, currentHex);
             }
         }
+        return true;
     }
 
     private long scoutWanderStep = 0L;
@@ -781,27 +793,57 @@ public class ColonyLabourService {
                 ? colony.getActiveRoleCount(GameConstants.ROLE_EXPLORER)
                 : colony.getAssignedRoleCount(GameConstants.ROLE_EXPLORER)) > 0;
         int maxDist = hasExplorer ? 10 : 5;
-        int curQ = currentHex.getQ();
-        int curR = currentHex.getR();
         int closestDist = Integer.MAX_VALUE;
         List<Hex> candidates = new ArrayList<>();
-        for (Hex h : world.getHexes()) {
-            if (h == null || dynasty.isHexKnown(h.getQ(), h.getR())) {
-                continue;
+        if (hasLinkedNeighbor(currentHex)) {
+            List<Hex> ring = new ArrayList<>();
+            Set<Hex> visited = new HashSet<>();
+            ring.add(currentHex);
+            visited.add(currentHex);
+            for (int dist = 1; dist <= maxDist && !ring.isEmpty(); dist++) {
+                List<Hex> nextRing = new ArrayList<>();
+                for (Hex cur : ring) {
+                    for (Hex n : cur.getAdjacentNeighbors()) {
+                        if (n == null || !visited.add(n)) {
+                            continue;
+                        }
+                        nextRing.add(n);
+                        if (dynasty.isHexKnown(n.getQ(), n.getR())) {
+                            continue;
+                        }
+                        if (!hasExplorer && HexWaterCrossing.isOceanHex(n) && !HexWaterCrossing.touchesLand(n)) {
+                            continue;
+                        }
+                        candidates.add(n);
+                    }
+                }
+                if (!candidates.isEmpty()) {
+                    closestDist = dist;
+                    break;
+                }
+                ring = nextRing;
             }
-            if (!hasExplorer && HexWaterCrossing.isOceanHex(h) && !HexWaterCrossing.touchesLand(h)) {
-                continue;
-            }
-            int dist = GameNumbers.axialHexDistance(curQ, curR, h.getQ(), h.getR());
-            if (dist <= 0 || dist > maxDist) {
-                continue;
-            }
-            if (dist < closestDist) {
-                closestDist = dist;
-                candidates.clear();
-                candidates.add(h);
-            } else if (dist == closestDist) {
-                candidates.add(h);
+        } else {
+            int curQ = currentHex.getQ();
+            int curR = currentHex.getR();
+            for (Hex h : world.getHexes()) {
+                if (h == null || dynasty.isHexKnown(h.getQ(), h.getR())) {
+                    continue;
+                }
+                if (!hasExplorer && HexWaterCrossing.isOceanHex(h) && !HexWaterCrossing.touchesLand(h)) {
+                    continue;
+                }
+                int dist = GameNumbers.axialHexDistance(curQ, curR, h.getQ(), h.getR());
+                if (dist <= 0 || dist > maxDist) {
+                    continue;
+                }
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    candidates.clear();
+                    candidates.add(h);
+                } else if (dist == closestDist) {
+                    candidates.add(h);
+                }
             }
         }
         if (candidates.isEmpty()) {
@@ -823,6 +865,15 @@ public class ColonyLabourService {
             colony.logEvent(ColonyLogPrefixes.SUCCESS + " "
                     + LanguageStrings.format(LanguageStrings.ALERT_SCOUT_DISCOVERED_HEX, colony.getName(), target.getQ(), target.getR()));
         }
+    }
+
+    private static boolean hasLinkedNeighbor(Hex hex) {
+        return hex.getNorth() != null
+                || hex.getNorthWest() != null
+                || hex.getNorthEast() != null
+                || hex.getSouth() != null
+                || hex.getSouthWest() != null
+                || hex.getSouthEast() != null;
     }
 
     public void runNuptial(Colony colony, World world, Hex currentHex) {
@@ -881,6 +932,21 @@ public class ColonyLabourService {
 
         if (queensToAdd > 0) {
             colony.setDaysWithoutQueen(0);
+        }
+
+        if (!colony.isActive() && pairsToFly > 0) {
+            Set<Ant> flownDrones = Collections.newSetFromMap(new IdentityHashMap<>(pairsToFly * 2));
+            Set<Ant> flownPrincesses = Collections.newSetFromMap(new IdentityHashMap<>(pairsToFly * 2));
+            for (int i = 0; i < pairsToFly; i++) {
+                flownDrones.add(allDrones.get(i));
+                flownPrincesses.add(breederPrincesses.get(i));
+            }
+            if (colony.getDrones() != null) {
+                colony.getDrones().removeIf(flownDrones::contains);
+            }
+            if (colony.getPrincesses() != null) {
+                colony.getPrincesses().removeIf(flownPrincesses::contains);
+            }
         }
 
         colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
@@ -1022,15 +1088,10 @@ public class ColonyLabourService {
         
         if (graverCount == 0 || !hasBodies) return;
         
-        int canClean = graverCount * (int) colony.getStatsService().getGravingRate(colony);
-        List<Ant> antsToRemove = new ArrayList<>();
-        
-        for (Ant deadAnt : colony.getDeadAnts()) {
-            if (canClean <= 0) break;
-            antsToRemove.add(deadAnt);
-            canClean--;
+        int toClean = Math.min(graverCount * (int) colony.getStatsService().getGravingRate(colony), colony.getDeadAnts().size());
+        if (toClean > 0) {
+            colony.getDeadAnts().subList(0, toClean).clear();
         }
-        colony.getDeadAnts().removeAll(antsToRemove);
     }
     
     public void runComposting(Colony colony) {
@@ -1043,12 +1104,7 @@ public class ColonyLabourService {
         if (potentialCompost == 0 || deadAnts.isEmpty()) return;
 
         int actualToCompost = Math.min(potentialCompost, deadAnts.size());
-        
-        List<Ant> compostedAnts = new ArrayList<>();
-        for(int i = 0; i < actualToCompost; i++) {
-            compostedAnts.add(deadAnts.get(i));
-        }
-        deadAnts.removeAll(compostedAnts);
+        deadAnts.subList(0, actualToCompost).clear();
 
         int foodGain = actualToCompost * 4; 
         if (!colony.canEatFungi() && colony.canEatMeat()) {
