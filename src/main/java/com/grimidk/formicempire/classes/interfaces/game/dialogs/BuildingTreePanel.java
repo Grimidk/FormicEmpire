@@ -432,9 +432,9 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 if (!actionButton.isEnabled()) {
                     actionButton.setEnabled(true);
                 }
-                String cancelText = LanguageStrings.get(LanguageStrings.UI_CANCEL);
-                if (!cancelText.equals(actionButton.getText())) {
-                    actionButton.setText(cancelText);
+                String abortText = LanguageStrings.get(LanguageStrings.UI_ABORT);
+                if (!abortText.equals(actionButton.getText())) {
+                    actionButton.setText(abortText);
                 }
                 actionButton.setToolTipText(null);
             } else {

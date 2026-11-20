@@ -2,11 +2,16 @@ package com.grimidk.formicempire.classes.infrasctructure.registries;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiService;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
+import org.junit.jupiter.api.Test;
 
 class OmniAssimilationAndCommandRolesTest {
 
@@ -118,5 +123,54 @@ class OmniAssimilationAndCommandRolesTest {
         assertEquals(null, GameConstants.RANK_COUNTY.getUnlockOnAnnounce());
         assertEquals(null, GameConstants.RANK_SUPER.getUnlockOnAnnounce());
         assertEquals(null, GameConstants.RANK_GIGA.getUnlockOnAnnounce());
+    }
+
+    @Test
+    void sandboxAllowsNonOmniSpeciesAssimilationWithoutOmniBridge() {
+        Engine engine = new Engine();
+        engine.setAllowNonOmniAssimilation(false);
+        World world = new World();
+        world.setEngine(engine);
+
+        Dynasty nonOmni = new Dynasty(1, "Leaf", true, GameConstants.SPECIES_LEAFCUTTER);
+        nonOmni.setOwningWorld(world);
+        nonOmni.getStarterService().initializeDynasty(nonOmni);
+        nonOmni.unlockUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+        nonOmni.absorbSpecies(GameConstants.SPECIES_FIRE.getId());
+
+        assertFalse(GameUnlocks.canAssimilateForeignSpecies(nonOmni));
+        assertFalse(GameUnlocks.isAssimilationAvailable(nonOmni, GameUnlocks.ASSIMILATION_FIREVENOM));
+        assertFalse(GameUnlocks.shouldShowAssimilationUi(nonOmni));
+
+        engine.setAllowNonOmniAssimilation(true);
+
+        assertTrue(GameUnlocks.canAssimilateForeignSpecies(nonOmni));
+        assertTrue(GameUnlocks.isAssimilationAvailable(nonOmni, GameUnlocks.ASSIMILATION_FIREVENOM));
+        assertTrue(GameUnlocks.shouldShowAssimilationUi(nonOmni));
+        assertFalse(nonOmni.hasUpgrade(GameUnlocks.ASSIMILATED_ASSIMILATION));
+        assertFalse(nonOmni.isAssimilationCompleted(GameUnlocks.ASSIMILATION_OMNI));
+    }
+
+    @Test
+    void aiNonOmniStartsForeignAssimilationWhenSandboxEnabled() {
+        Engine engine = new Engine();
+        engine.setAllowNonOmniAssimilation(true);
+        World world = new World();
+        world.setEngine(engine);
+
+        Dynasty aiNonOmni = new Dynasty(2, "Leaf AI", false, GameConstants.SPECIES_LEAFCUTTER);
+        aiNonOmni.setOwningWorld(world);
+        aiNonOmni.getStarterService().initializeDynasty(aiNonOmni);
+        aiNonOmni.unlockUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+        aiNonOmni.unlockUpgrade(GameUnlocks.ROLE_RESEARCHER);
+        aiNonOmni.absorbSpecies(GameConstants.SPECIES_FIRE.getId());
+        Colony capital = new Colony(1, "Capital", false);
+        capital.setCapital(true);
+        aiNonOmni.addColony(capital);
+        world.getDynastys().add(aiNonOmni);
+
+        assertNull(aiNonOmni.getCurrentAssimilation());
+        new DynastyAiService().runDailyAi(aiNonOmni, world, new TradeManager());
+        assertEquals(GameUnlocks.ASSIMILATION_FIREVENOM, aiNonOmni.getCurrentAssimilation());
     }
 }

@@ -9,7 +9,9 @@ import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatScrollBarUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatSliderUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatSpinnerUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatTabbedPaneUI;
+import com.grimidk.formicempire.classes.interfaces.ui.plaf.IconTooltipLabelUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.PanelBorderButtonUI;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
 import java.awt.Insets;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -73,6 +75,8 @@ public final class UiLookAndFeel {
         UIManager.put("PasswordField.foreground", AssetStyles.FONT_COLOR);
         UIManager.put("ToolTip.background", AssetStyles.BACKGROUND_SECONDARY);
         UIManager.put("ToolTip.foreground", AssetStyles.FONT_COLOR);
+        ToolTipManager.sharedInstance().setInitialDelay(UiIconTooltips.TOOLTIP_INITIAL_DELAY_MS);
+        ToolTipManager.sharedInstance().setReshowDelay(UiIconTooltips.TOOLTIP_RESHOW_DELAY_MS);
         ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
         UIManager.put("OptionPane.background", AssetStyles.BACKGROUND_COLOR);
         UIManager.put("OptionPane.foreground", AssetStyles.FONT_COLOR);
@@ -166,6 +170,7 @@ public final class UiLookAndFeel {
     }
 
     private static void installFlatComponentUis() {
+        UIManager.put("LabelUI", IconTooltipLabelUI.class.getName());
         UIManager.put("ButtonUI", PanelBorderButtonUI.class.getName());
         UIManager.put("ToggleButtonUI", PanelBorderButtonUI.class.getName());
         UIManager.put("ScrollBarUI", FlatScrollBarUI.class.getName());

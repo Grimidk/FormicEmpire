@@ -34,6 +34,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiNameSearchBar;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -58,11 +59,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class DynastyManagementDialog extends ZeroDialog {
 
@@ -86,6 +89,49 @@ public class DynastyManagementDialog extends ZeroDialog {
     private DiplomacyPanel diplomacyPanel;
     private WarManagementPanel warsPanel;
     private TradeCreationDialog tradeCreationDialog;
+
+    static boolean shouldIncludeDynastyInDiplomacy(Dynasty viewer, Dynasty candidate, boolean excludeDead) {
+        return candidate != null && candidate != viewer && (!excludeDead || candidate.isActiveForDiplomacy());
+    }
+
+    static List<Dynasty> orderDiplomacyDynasties(
+            Collection<Dynasty> candidates,
+            Predicate<Dynasty> isDiscovered,
+            Comparator<Dynasty> discoveredSorter) {
+        List<Dynasty> discovered = new ArrayList<>();
+        List<Dynasty> undiscovered = new ArrayList<>();
+        if (candidates != null) {
+            for (Dynasty candidate : candidates) {
+                if (candidate == null) {
+                    continue;
+                }
+                if (isDiscovered == null || isDiscovered.test(candidate)) {
+                    discovered.add(candidate);
+                } else {
+                    undiscovered.add(candidate);
+                }
+            }
+        }
+        if (discoveredSorter != null) {
+            discovered.sort(discoveredSorter);
+        }
+        undiscovered.sort(Comparator.comparingInt(Dynasty::getId));
+        List<Dynasty> ordered = new ArrayList<>(discovered.size() + undiscovered.size());
+        ordered.addAll(discovered);
+        ordered.addAll(undiscovered);
+        return ordered;
+    }
+
+    private boolean isDynastyDiscoveredByPlayer(Dynasty other) {
+        if (other == null) {
+            return false;
+        }
+        if (engine != null && engine.isCheatRevealMap()) {
+            return true;
+        }
+        World world = engine != null ? engine.getWorld() : null;
+        return dynasty != null && dynasty.hasDiscoveredDynasty(other, world);
+    }
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony,
             Runnable onOpenWarRoles, Consumer<War> onViewBattle, Consumer<Trade> onViewConvoy) {
@@ -872,6 +918,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 } else {
                     setIcon(null);
                 }
+                setToolTipText(UiIconTooltips.resolveTooltip(getIcon()));
                 return this;
             }
         }
@@ -1833,6 +1880,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private JComboBox<PactRequestIncomingPolicy> pactIncomingPolicyCombo;
         private final JComboBox<String> sortCombo;
         private final UiNameSearchBar searchBar;
+        private final JCheckBox excludeDeadCheck;
         private Comparator<Dynasty> currentSorter;
         private final List<Dynasty> displayedDynasties = new ArrayList<>();
         private static final int COL_DYNASTY = 0;
@@ -1848,7 +1896,9 @@ public class DynastyManagementDialog extends ZeroDialog {
             this.sortCombo = new JComboBox<>(new String[]{
                     LanguageStrings.get(LanguageStrings.DYNASTY_SORT_REPUTATION_HIGH),
                     LanguageStrings.get(LanguageStrings.DYNASTY_SORT_DISTANCE_NEAR),
-                    LanguageStrings.get(LanguageStrings.DYNASTY_SORT_DISTANCE_FAR)
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SORT_DISTANCE_FAR),
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SORT_MILITARY_HIGH),
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SORT_MILITARY_LOW)
             });
             this.sortCombo.setFocusable(false);
             AssetStyles.styleComboBox(this.sortCombo);
@@ -1858,6 +1908,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                     LanguageStrings.get(LanguageStrings.DYNASTY_SEARCH),
                     LanguageStrings.get(LanguageStrings.DYNASTY_SEARCH_TOOLTIP),
                     this::updateData);
+
+            this.excludeDeadCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD), true);
+            this.excludeDeadCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD_TT));
+            this.excludeDeadCheck.setFocusable(false);
+            AssetStyles.styleCheckBox(this.excludeDeadCheck);
+            this.excludeDeadCheck.addActionListener(e -> updateData());
             initUI();
         }
 
@@ -1889,6 +1945,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             return byDistance.thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER);
         }
 
+        private Comparator<Dynasty> militaryPowerSorter(boolean highestFirst) {
+            Comparator<Dynasty> byMilitary = Comparator.comparingInt(Dynasty::getMilitaryPower);
+            if (highestFirst) {
+                byMilitary = byMilitary.reversed();
+            }
+            return byMilitary.thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER);
+        }
+
         private void updateSorter() {
             int idx = sortCombo.getSelectedIndex();
             switch (idx) {
@@ -1897,6 +1961,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                     break;
                 case 2:
                     currentSorter = distanceSorter(false);
+                    break;
+                case 3:
+                    currentSorter = militaryPowerSorter(true);
+                    break;
+                case 4:
+                    currentSorter = militaryPowerSorter(false);
                     break;
                 case 0:
                 default:
@@ -1912,6 +1982,9 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             if (other == null) {
                 return false;
+            }
+            if (!isDynastyDiscovered(other)) {
+                return searchBar.matchesAny(LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY));
             }
             if (searchBar.matchesAny(other.getName())) {
                 return true;
@@ -1939,7 +2012,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             }, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return column == COL_ACTIONS;
+                    return column == COL_ACTIONS
+                            && row >= 0
+                            && row < displayedDynasties.size()
+                            && isDynastyDiscovered(displayedDynasties.get(row))
+                            && displayedDynasties.get(row).isActiveForDiplomacy();
                 }
 
                 @Override
@@ -1984,6 +2061,17 @@ public class DynastyManagementDialog extends ZeroDialog {
                     updateDiplomacyTableCursor(e);
                     int row = table.rowAtPoint(e.getPoint());
                     int col = table.columnAtPoint(e.getPoint());
+                    if (row >= 0 && row < displayedDynasties.size()) {
+                        Dynasty hovered = displayedDynasties.get(row);
+                        if (!isDynastyDiscovered(hovered)) {
+                            table.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED));
+                            return;
+                        }
+                        if (!hovered.isActiveForDiplomacy()) {
+                            table.setToolTipText(LanguageStrings.get(LanguageStrings.WAR_CONCLUSION_DEFEAT));
+                            return;
+                        }
+                    }
                     if (row >= 0 && row < displayedDynasties.size()
                             && (col == COL_REPUTATION || col == COL_STANCE)) {
                         Dynasty other = displayedDynasties.get(row);
@@ -2050,6 +2138,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             sortPanel.add(sortCombo);
             filterPanel.add(sortPanel);
             filterPanel.add(searchBar);
+            filterPanel.add(excludeDeadCheck);
 
             JPanel settingsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
             settingsPanel.setBorder(BorderFactory.createTitledBorder(
@@ -2122,14 +2211,11 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private boolean isDynastyDiscovered(Dynasty other) {
-            if (other == null) return false;
-            if (engine != null && engine.isCheatRevealMap()) return true;
-            World world = engine.getWorld();
-            return dynasty.hasDiscoveredDynasty(other, world);
+            return DynastyManagementDialog.this.isDynastyDiscoveredByPlayer(other);
         }
 
         private boolean canNavigateToDynastyCapital(Dynasty other) {
-            if (other == null || engine.getWorld() == null || !isDynastyDiscovered(other)) {
+            if (other == null || engine.getWorld() == null || !isDynastyDiscovered(other) || other.isDefeated()) {
                 return false;
             }
             Colony capital = other.getCapital();
@@ -2168,7 +2254,16 @@ public class DynastyManagementDialog extends ZeroDialog {
                     Dynasty other = displayedDynasties.get(row);
                     boolean discovered = isDynastyDiscovered(other);
                     swatch.setDynastyColor(discovered ? other.getColor() : AssetStyles.COLOR_FOG);
-                    nameLabel.setText(discovered ? other.getName() : LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY));
+                    if (!discovered) {
+                        nameLabel.setText(LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY));
+                    } else if (other.isDefeated()) {
+                        nameLabel.setText(other.getName() + " (" + GameConstants.CLASS_DEAD.getName() + ")");
+                        if (!isSelected) {
+                            nameLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
+                        }
+                    } else {
+                        nameLabel.setText(other.getName());
+                    }
                     if (discovered && canNavigateToDynastyCapital(other)) {
                         setToolTipText(LanguageStrings.format(
                                 LanguageStrings.MAP_CLICK_VIEW_CAPITAL, other.getName()));
@@ -2193,7 +2288,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 setHorizontalAlignment(JLabel.CENTER);
                 if (row >= 0 && row < displayedDynasties.size()) {
                     Dynasty other = displayedDynasties.get(row);
-                    if (!isDynastyDiscovered(other)) {
+                    if (!isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) {
                         setText("---");
                         setIcon(null);
                         return this;
@@ -2225,9 +2320,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                 removeAll();
                 if (row >= 0 && row < displayedDynasties.size()) {
                     Dynasty other = displayedDynasties.get(row);
-                    if (!isDynastyDiscovered(other)) {
+                    if (!isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) {
                         scoreLabel.setText("---");
                         scoreLabel.setIcon(null);
+                        scoreLabel.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+                        scoreLabel.setBackground(getBackground());
+                        scoreLabel.setOpaque(true);
                         add(scoreLabel, BorderLayout.CENTER);
                         return this;
                     }
@@ -2291,21 +2389,38 @@ public class DynastyManagementDialog extends ZeroDialog {
             model.setRowCount(0);
             displayedDynasties.clear();
 
+            excludeDeadCheck.setText(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD));
+            excludeDeadCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD_TT));
+            boolean excludeDead = excludeDeadCheck.isSelected();
             List<Dynasty> others = new ArrayList<>();
             for (Dynasty other : world.getDynastys()) {
-                if (other != dynasty && other.isActiveForDiplomacy()
+                if (shouldIncludeDynastyInDiplomacy(dynasty, other, excludeDead)
                         && matchesDiplomacySearch(other)) {
                     others.add(other);
                 }
             }
-            if (currentSorter != null) {
-                others.sort(currentSorter);
-            }
-
-            displayedDynasties.addAll(others);
+            displayedDynasties.addAll(orderDiplomacyDynasties(others, this::isDynastyDiscovered, currentSorter));
             for (Dynasty other : displayedDynasties) {
                 boolean discovered = isDynastyDiscovered(other);
-                if (discovered) {
+                if (!discovered) {
+                    model.addRow(new Object[]{
+                            LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY),
+                            null,
+                            "---",
+                            null,
+                            0,
+                            new DiplomacyRowData(other)
+                    });
+                } else if (!other.isActiveForDiplomacy()) {
+                    model.addRow(new Object[]{
+                            other.getName(),
+                            other.getSpecies(),
+                            "---",
+                            GameConstants.CLASS_DEAD,
+                            0,
+                            new DiplomacyRowData(other)
+                    });
+                } else {
                     int score = dynasty.getDiplomacyService().getEffectiveDiplomaticReputation(other, world);
                     DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(score);
                     Object stanceValue = dynasty.isIntegratingDynasty(other)
@@ -2319,15 +2434,6 @@ public class DynastyManagementDialog extends ZeroDialog {
                             other.getMilitaryPower(),
                             new DiplomacyRowData(other)
                     });
-                } else {
-                    model.addRow(new Object[]{
-                            LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY),
-                            null,
-                            "---",
-                            null,
-                            0,
-                            new DiplomacyRowData(other)
-                    });
                 }
             }
 
@@ -2339,7 +2445,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void performPactAction(Dynasty other) {
-            if (other == null || dynasty.getDiplomacyService() == null) {
+            if (other == null || dynasty.getDiplomacyService() == null
+                    || !isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) {
                 return;
             }
             World world = engine.getWorld();
@@ -2380,7 +2487,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private void performIntegrateAction(Dynasty other) {
             World world = engine.getWorld();
-            if (other == null || world == null) {
+            if (other == null || world == null || !isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) {
                 return;
             }
             TradeManager tradeManager = engine.getTradeManager();
@@ -2477,7 +2584,8 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private void performDeclareWarAction(Dynasty other) {
             World world = engine.getWorld();
-            if (other == null || dynasty.getDiplomacyService() == null || world == null) {
+            if (other == null || dynasty.getDiplomacyService() == null || world == null
+                    || !isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) {
                 return;
             }
             DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
@@ -2518,7 +2626,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         private void performTradeAction(Dynasty other) {
             World world = engine.getWorld();
             Colony activeColony = getActivePlayerColony();
-            if (other == null || dynasty.getDiplomacyService() == null || world == null) {
+            if (other == null || dynasty.getDiplomacyService() == null || world == null
+                    || !isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) {
                 return;
             }
             if (activeColony == null) {
@@ -2578,7 +2687,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void performRequestTradeAction(Dynasty other) {
-            if (other == null || dynasty.getDiplomacyService() == null) {
+            if (other == null || dynasty.getDiplomacyService() == null
+                    || !isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) {
                 return;
             }
             World world = engine.getWorld();
@@ -2634,7 +2744,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void performShareKnowledgeAction(Dynasty other) {
-            if (other == null) return;
+            if (other == null || !isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) return;
             int confirm = UiOptionPane.showConfirmDialog(
                     this,
                     LanguageStrings.format(LanguageStrings.DIPLO_ACTION_SHARE_KNOWLEDGE_CONFIRM, other.getName()),
@@ -2664,7 +2774,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void performStealIntelligenceAction(Dynasty other) {
-            if (other == null) return;
+            if (other == null || !isDynastyDiscovered(other) || !other.isActiveForDiplomacy()) return;
             int confirm = UiOptionPane.showConfirmDialog(
                     this,
                     LanguageStrings.format(LanguageStrings.DIPLO_ACTION_STEAL_INTELLIGENCE_CONFIRM, other.getName()),
@@ -2719,6 +2829,16 @@ public class DynastyManagementDialog extends ZeroDialog {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
                 AssetStyles.styleCompactButton(actionsBtn);
+                boolean discovered = value instanceof DiplomacyRowData data && isDynastyDiscovered(data.other);
+                boolean active = discovered && ((DiplomacyRowData) value).other.isActiveForDiplomacy();
+                actionsBtn.setEnabled(active);
+                if (!discovered) {
+                    actionsBtn.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED));
+                } else if (!active) {
+                    actionsBtn.setToolTipText(LanguageStrings.get(LanguageStrings.WAR_CONCLUSION_DEFEAT));
+                } else {
+                    actionsBtn.setToolTipText(null);
+                }
                 return this;
             }
         }
@@ -3098,6 +3218,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (value instanceof DiplomaticReputation reputation) {
                 setText(reputation.getName());
                 setIcon(reputation.getIcon());
+                setIconTextGap(8);
+            } else if (value instanceof AntClass antClass) {
+                setText(antClass.getName());
+                setIcon(antClass.getIcon());
                 setIconTextGap(8);
             } else if (value instanceof String stanceText) {
                 setText(stanceText);
@@ -3934,7 +4058,8 @@ public class DynastyManagementDialog extends ZeroDialog {
     private void performGeneticExchangeAction(Dynasty other) {
         DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
         World world = engine.getWorld();
-        if (diplo == null || other == null || world == null) {
+        if (diplo == null || other == null || world == null
+                || !isDynastyDiscoveredByPlayer(other) || !other.isActiveForDiplomacy()) {
             return;
         }
         if (!diplo.canOfferGeneticExchange(other, world)) {

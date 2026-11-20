@@ -2,10 +2,12 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.SpeciesDiet;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.entities.world.TectonicPlate;
@@ -310,6 +312,7 @@ public class WorldBuilderDialog extends JDialog {
     private SpeciesDiet selectedDynastyDiet = GameConstants.DIET_FUNGIVOROUS;
     private AntSpecies selectedDynastySpecies = GameConstants.SPECIES_OMNI;
     private int dynastyAction = 0;
+    private final DynastyNamingService dynastyNamingService = new DynastyNamingService();
 
     private final Deque<WorldSnapshot> undoStack = new ArrayDeque<>();
     private final WorldSnapshot[] stageBaselineSnapshots = new WorldSnapshot[5];
@@ -1476,7 +1479,8 @@ public class WorldBuilderDialog extends JDialog {
             }
             world.markColonizedHexIndexDirty();
             world.classifyLandmasses();
-            world.populateDynasties(GameConstants.BIOME_PLAINS, null, "Player", GameConstants.DYNASTY_TITLE_DYNASTY.getNameKey());
+            DynastyTitle playerTitle = dynastyNamingService.pickRandomTitle();
+            world.populateDynasties(GameConstants.BIOME_PLAINS, null, "Player", playerTitle.getNameKey());
             statusMessageLabel.setText("Auto-generated dynasties on landmasses.");
         }
         canvas.invalidateStageImages();
@@ -1528,7 +1532,14 @@ public class WorldBuilderDialog extends JDialog {
         try {
             SavedMapData data = SavedMapService.createSavedMapData(world, mapName, currentStage);
             Savefile save = new Savefile(1, mapName);
-            save.setPlayerDynastyTitleId(1);
+            int playerTitleId = GameConstants.DYNASTY_TITLE_DYNASTY.getId();
+            for (Dynasty d : world.getDynastys()) {
+                if (d != null && d.isPlayer()) {
+                    playerTitleId = d.getTitleId();
+                    break;
+                }
+            }
+            save.setPlayerDynastyTitleId(playerTitleId);
             save.setStarterBiomeId(1);
             save.setStarterDietId(1);
             save.setSpectatorMode(false);
@@ -1771,8 +1782,27 @@ public class WorldBuilderDialog extends JDialog {
             }
         }
         boolean isPlayer = !hasPlayer && species.getId() == GameConstants.SPECIES_OMNI.getId();
-        Dynasty dyn = new Dynasty(world.allocateDynastyId(), species.getName(), LanguageStrings.DYNASTY_TITLE_DYNASTY, isPlayer, species);
+        for (Dynasty d : world.getDynastys()) {
+            if (d != null) {
+                dynastyNamingService.registerUsedThemeKey(d.getThemeBase());
+                dynastyNamingService.registerUsedName(d.getName());
+            }
+        }
+        Dynasty dyn = createEditorDynasty(world, species, isPlayer, dynastyNamingService);
         world.registerDynasty(dyn);
+        return dyn;
+    }
+
+    public static Dynasty createEditorDynasty(
+            World world,
+            AntSpecies species,
+            boolean isPlayer,
+            DynastyNamingService namingService) {
+        DynastyTitle title = namingService.pickRandomTitle();
+        String themeBase = isPlayer ? "Player" : namingService.claimThemeKey(species);
+        String dynName = LanguageStrings.formatDynastyName(themeBase, title);
+        Dynasty dyn = new Dynasty(world.allocateDynastyId(), dynName, title.getNameKey(), isPlayer, species);
+        dyn.setThemeBase(themeBase);
         return dyn;
     }
 

@@ -410,9 +410,12 @@ public final class HexGridMesh {
             if (clip != null && !edgeIntersects(edge, clip)) {
                 continue;
             }
-            if (faceVisible != null && edge.faceA != null && edge.faceB != null
-                    && !faceVisible.test(edge.faceA) && !faceVisible.test(edge.faceB)) {
-                continue;
+            if (faceVisible != null) {
+                boolean aVisible = edge.faceA != null && faceVisible.test(edge.faceA);
+                boolean bVisible = edge.faceB != null && faceVisible.test(edge.faceB);
+                if (!aVisible && !bVisible) {
+                    continue;
+                }
             }
             Color color = null;
             Color plain = plainColor(edge, plainEdgeColor);

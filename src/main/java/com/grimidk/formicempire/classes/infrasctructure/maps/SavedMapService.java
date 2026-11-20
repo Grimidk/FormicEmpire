@@ -3,9 +3,11 @@ package com.grimidk.formicempire.classes.infrasctructure.maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
 import com.grimidk.formicempire.classes.entities.world.GeographicFeature;
 import com.grimidk.formicempire.classes.entities.world.Hex;
@@ -147,8 +149,17 @@ public class SavedMapService {
                     sh.isPlayerColony = c.isPlayer();
                     sh.isCapitalColony = c.isCapital();
                     sh.colonyName = c.getName();
-                    if (c.getDynasty() != null && c.getDynasty().getSpecies() != null) {
-                        sh.dynastySpeciesId = c.getDynasty().getSpecies().getId();
+                    if (c.getDynasty() != null) {
+                        Dynasty d = c.getDynasty();
+                        sh.dynastyId = d.getId();
+                        sh.dynastyName = d.getName();
+                        sh.dynastyTitleKey = d.getTitleKey();
+                        sh.dynastyThemeBase = d.getThemeBase();
+                        if (d.getSpecies() != null) {
+                            sh.dynastySpeciesId = d.getSpecies().getId();
+                        } else {
+                            sh.dynastySpeciesId = GameConstants.SPECIES_OMNI.getId();
+                        }
                     } else {
                         sh.dynastySpeciesId = GameConstants.SPECIES_OMNI.getId();
                     }
@@ -222,6 +233,7 @@ public class SavedMapService {
         Map<String, Hex> hexMap = new HashMap<>();
         ArrayList<Hex> hexList = new ArrayList<>();
         Map<String, Dynasty> restoredDynasties = new HashMap<>();
+        DynastyNamingService namingService = new DynastyNamingService();
         if (data.hexes != null) {
             for (SavedMapData.SavedMapHex sh : data.hexes) {
                 Hex h = new Hex();
@@ -254,12 +266,24 @@ public class SavedMapService {
                     if (species == null) {
                         species = GameConstants.SPECIES_OMNI;
                     }
-                    String dKey = species.getId() + ":" + sh.isPlayerColony;
+                    String dKey = sh.dynastyId > 0
+                            ? "id:" + sh.dynastyId
+                            : species.getId() + ":" + sh.isPlayerColony;
                     Dynasty dyn = restoredDynasties.get(dKey);
                     if (dyn == null) {
                         int dynId = world.allocateDynastyId();
-                        String dName = sh.isPlayerColony ? "Player Dynasty" : species.getName() + " Dynasty";
-                        dyn = new Dynasty(dynId, dName, LanguageStrings.DYNASTY_TITLE_DYNASTY, sh.isPlayerColony, species);
+                        DynastyTitle title = (sh.dynastyTitleKey != null && !sh.dynastyTitleKey.isBlank())
+                                ? GameConstants.getDynastyTitleByKey(sh.dynastyTitleKey)
+                                : namingService.pickRandomTitle();
+                        String themeBase = (sh.dynastyThemeBase != null && !sh.dynastyThemeBase.isBlank())
+                                ? sh.dynastyThemeBase
+                                : (sh.isPlayerColony ? "Player" : namingService.claimThemeKey(species));
+                        namingService.registerUsedThemeKey(themeBase);
+                        String dName = (sh.dynastyName != null && !sh.dynastyName.isBlank())
+                                ? sh.dynastyName
+                                : LanguageStrings.formatDynastyName(themeBase, title);
+                        dyn = new Dynasty(dynId, dName, title.getNameKey(), sh.isPlayerColony, species);
+                        dyn.setThemeBase(themeBase);
                         if (species.getDiet() != null) {
                             dyn.setStartingDiet(species.getDiet());
                         }
@@ -335,6 +359,7 @@ public class SavedMapService {
         List<Savefile.SavedDynasty> savedDynasties = new ArrayList<>();
         List<Savefile.SavedColony> savedColonies = new ArrayList<>();
         Map<String, Savefile.SavedDynasty> dynastyByKey = new HashMap<>();
+        DynastyNamingService namingService = new DynastyNamingService();
         int nextDynastyId = 1;
         int nextColonyId = 1;
         if (data.hexes != null) {
@@ -347,7 +372,9 @@ public class SavedMapService {
                     species = GameConstants.SPECIES_OMNI;
                 }
                 boolean effectivePlayer = !save.isSpectatorMode() && sh.isPlayerColony;
-                String dKey = species.getId() + ":" + effectivePlayer;
+                String dKey = sh.dynastyId > 0
+                        ? "id:" + sh.dynastyId + ":" + effectivePlayer
+                        : species.getId() + ":" + effectivePlayer;
                 Savefile.SavedDynasty sd = dynastyByKey.get(dKey);
                 if (sd == null) {
                     sd = new Savefile.SavedDynasty();
@@ -355,13 +382,44 @@ public class SavedMapService {
                     sd.speciesId = species.getId();
                     sd.startingDietId = (species.getDiet() != null) ? species.getDiet().getId() : GameConstants.DIET_FUNGIVOROUS.getId();
                     sd.isPlayer = effectivePlayer;
-                    sd.titleKey = LanguageStrings.DYNASTY_TITLE_DYNASTY;
-                    sd.titleId = GameConstants.getDynastyTitleByKey(sd.titleKey).getId();
-                    String baseName = effectivePlayer && save.getName() != null && !save.getName().isBlank()
-                            ? save.getName().trim()
-                            : species.getName();
-                    sd.themeBase = baseName;
-                    sd.name = LanguageStrings.formatDynastyName(baseName, sd.titleKey);
+                    if (effectivePlayer) {
+                        DynastyTitle title;
+                        if (save.getPlayerDynastyTitleId() > 0) {
+                            title = GameConstants.getDynastyTitleById(save.getPlayerDynastyTitleId());
+                        } else if (sh.dynastyTitleKey != null && !sh.dynastyTitleKey.isBlank()) {
+                            title = GameConstants.getDynastyTitleByKey(sh.dynastyTitleKey);
+                        } else {
+                            title = namingService.pickRandomTitle();
+                        }
+                        String baseName;
+                        if (save.getName() != null && !save.getName().isBlank()) {
+                            baseName = save.getName().trim();
+                        } else if (sh.dynastyThemeBase != null && !sh.dynastyThemeBase.isBlank()) {
+                            baseName = sh.dynastyThemeBase;
+                        } else {
+                            baseName = "Player";
+                        }
+                        namingService.registerUsedThemeKey(baseName);
+                        sd.titleKey = title.getNameKey();
+                        sd.titleId = title.getId();
+                        sd.themeBase = baseName;
+                        sd.name = LanguageStrings.formatDynastyName(baseName, title);
+                    } else {
+                        DynastyTitle title = (sh.dynastyTitleKey != null && !sh.dynastyTitleKey.isBlank())
+                                ? GameConstants.getDynastyTitleByKey(sh.dynastyTitleKey)
+                                : namingService.pickRandomTitle();
+                        String themeBase = (sh.dynastyThemeBase != null && !sh.dynastyThemeBase.isBlank())
+                                ? sh.dynastyThemeBase
+                                : namingService.claimThemeKey(species);
+                        namingService.registerUsedThemeKey(themeBase);
+                        sd.titleKey = title.getNameKey();
+                        sd.titleId = title.getId();
+                        sd.themeBase = themeBase;
+                        sd.name = (sh.dynastyName != null && !sh.dynastyName.isBlank()
+                                && sh.dynastyTitleKey != null && !sh.dynastyTitleKey.isBlank())
+                                ? sh.dynastyName
+                                : LanguageStrings.formatDynastyName(themeBase, title);
+                    }
                     sd.rankName = LanguageStrings.RANK_ANT;
                     Dynasty starterDyn = new Dynasty(sd.id, sd.name, sd.titleKey, effectivePlayer, species);
                     if (species.getDiet() != null) {

@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.diagnostics.FrameRateTra
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.FpsOverlayPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiCursors;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.interfaces.menu.MenuChaoticPanel;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -334,6 +335,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         settingsPanel.refreshTranslations();
         gamePanel.refreshTranslations();
         helpPanel.refreshTranslations();
+        UiIconTooltips.refreshTree(this);
+        for (Window owned : getOwnedWindows()) {
+            UiIconTooltips.refreshTree(owned);
+        }
     }
 
     public String getMenuReturnCard() {

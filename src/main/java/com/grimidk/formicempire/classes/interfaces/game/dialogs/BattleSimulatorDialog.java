@@ -75,6 +75,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 
 public class BattleSimulatorDialog extends ZeroDialog {
 
@@ -146,6 +148,9 @@ public class BattleSimulatorDialog extends ZeroDialog {
             Colony attackerColony,
             Colony defenderColony,
             War war) {
+    }
+
+    record BattleRunResult(boolean completed, GameSpeed endingSpeed) {
     }
 
     private static final Biome[] SIMULATOR_BIOMES = new Biome[] {
@@ -256,6 +261,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
     private final JButton randomizeArmiesButton = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RANDOMIZE));
     private final JButton battleRushButton = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RUSH));
     private final JButton startBattleButton = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_START));
+    private final JButton closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
 
     public BattleSimulatorDialog(Window owner, Engine engine) {
         super(owner, LanguageStrings.UI_BATTLE_SIMULATOR, new Dimension(1180, 780));
@@ -274,14 +280,35 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.BATTLE_SIM_DEFENDER), this.defaultDefenderSpecies);
 
         buildLayout();
-        southPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 6));
+        southPanel.removeAll();
+        southPanel.setLayout(new BorderLayout(10, 0));
+        southPanel.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
         randomizeArmiesButton.setIcon(DiceRollResource.getFaceIcon(DiceRollResource.faceAtStep(0), 16));
         randomizeArmiesButton.setIconTextGap(6);
-        addToSouthPanel(resetDefaultsButton);
-        addToSouthPanel(copyAttackerToDefenderButton);
-        addToSouthPanel(randomizeArmiesButton);
-        addToSouthPanel(battleRushButton);
-        addToSouthPanel(startBattleButton);
+
+        JPanel actionButtonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
+        actionButtonsPanel.setOpaque(false);
+        AssetStyles.styleButton(resetDefaultsButton);
+        AssetStyles.styleButton(copyAttackerToDefenderButton);
+        AssetStyles.styleButton(randomizeArmiesButton);
+        AssetStyles.styleButton(battleRushButton);
+        AssetStyles.styleButton(startBattleButton);
+        actionButtonsPanel.add(resetDefaultsButton);
+        actionButtonsPanel.add(copyAttackerToDefenderButton);
+        actionButtonsPanel.add(randomizeArmiesButton);
+        actionButtonsPanel.add(battleRushButton);
+        actionButtonsPanel.add(startBattleButton);
+
+        JPanel closeButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        closeButtonPanel.setOpaque(false);
+        AssetStyles.styleButton(closeButton);
+        closeButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
+        closeButton.addActionListener(e -> requestClose());
+        closeButtonPanel.add(closeButton);
+
+        southPanel.add(actionButtonsPanel, BorderLayout.CENTER);
+        southPanel.add(closeButtonPanel, BorderLayout.EAST);
+
         resetDefaultsButton.addActionListener(e -> resetToDefaults());
         copyAttackerToDefenderButton.addActionListener(e -> copyAttackerToDefender());
         randomizeArmiesButton.addActionListener(e -> randomizeArmies());
@@ -300,6 +327,10 @@ public class BattleSimulatorDialog extends ZeroDialog {
         UiDialogUtils.prepareDialog(this, owner);
     }
 
+    JButton getCloseButton() {
+        return closeButton;
+    }
+
     @Override
     protected boolean shouldDelegateEscapeToGamePanel() {
         return false;
@@ -308,7 +339,6 @@ public class BattleSimulatorDialog extends ZeroDialog {
     @Override
     public void showDialog() {
         refreshDialog();
-        normalizeSouthPanelButtons();
         disableFocusTraversal(this);
         Window owner = getOwner();
         Rectangle bounds = (owner != null && owner.isShowing())
@@ -329,6 +359,8 @@ public class BattleSimulatorDialog extends ZeroDialog {
         randomizeArmiesButton.setText(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RANDOMIZE));
         battleRushButton.setText(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RUSH));
         startBattleButton.setText(LanguageStrings.get(LanguageStrings.BATTLE_SIM_START));
+        closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        closeButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
         attackerPanel.setTitle(LanguageStrings.get(LanguageStrings.BATTLE_SIM_ATTACKER));
         defenderPanel.setTitle(LanguageStrings.get(LanguageStrings.BATTLE_SIM_DEFENDER));
     }
@@ -411,32 +443,59 @@ public class BattleSimulatorDialog extends ZeroDialog {
     }
 
     private void launchBattle() {
-        runSingleBattle(true);
+        runSingleBattle(true, null, true);
     }
 
     private void launchBattleRush() {
-        while (isDisplayable()) {
+        runBattleRush(engine, this::isDisplayable, startingSpeed -> {
             randomizeArmies();
-            boolean completed = runSingleBattle(false);
-            if (!completed) {
-                break;
+            return runSingleBattle(false, startingSpeed, false);
+        });
+    }
+
+    static void runBattleRush(
+            Engine engine,
+            BooleanSupplier keepGoing,
+            Function<GameSpeed, BattleRunResult> battleRunner) {
+        GameSpeed initialSpeed = engine != null ? engine.getSpeed() : null;
+        GameSpeed currentSpeed = initialSpeed;
+        try {
+            while (keepGoing != null && keepGoing.getAsBoolean()) {
+                BattleRunResult result = battleRunner.apply(currentSpeed);
+                if (result != null && result.endingSpeed() != null) {
+                    currentSpeed = result.endingSpeed();
+                }
+                if (result == null || !result.completed()) {
+                    break;
+                }
+            }
+        } finally {
+            if (engine != null && initialSpeed != null) {
+                engine.setSpeed(initialSpeed);
             }
         }
     }
 
-    private boolean runSingleBattle(boolean showOutcomeFanfare) {
+    private BattleRunResult runSingleBattle(
+            boolean showOutcomeFanfare,
+            GameSpeed startingSpeed,
+            boolean restoreSpeedAfterBattle) {
         SimulationConfig config = buildConfigFromUi();
         BuiltSimulation sim = buildSimulation(config);
 
         World previousWorld = engine != null ? engine.getWorld() : null;
         boolean previousPaused = engine == null || engine.isPaused();
         GameSpeed previousSpeed = engine != null ? engine.getSpeed() : GameConstants.SPEED_NORMAL;
+        GameSpeed endingSpeed = startingSpeed != null ? startingSpeed : previousSpeed;
 
         if (engine != null) {
             engine.pauseEngine();
             engine.getSema().acquireUninterruptibly();
             try {
                 engine.setWorld(sim.world());
+                if (startingSpeed != null) {
+                    engine.setSpeed(startingSpeed);
+                }
             } finally {
                 engine.getSema().release();
             }
@@ -476,6 +535,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
             }
             if (engine != null) {
                 engine.pauseEngine();
+                endingSpeed = engine.getSpeed();
                 engine.removeTickListener(simTickListener);
                 engine.getSema().acquireUninterruptibly();
                 try {
@@ -484,7 +544,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 } finally {
                     engine.getSema().release();
                 }
-                if (previousSpeed != null) {
+                if (restoreSpeedAfterBattle && previousSpeed != null) {
                     engine.setSpeed(previousSpeed);
                 }
                 if (!previousPaused && previousWorld != null) {
@@ -497,7 +557,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
         if (battleCompleted && showOutcomeFanfare) {
             showBattleOutcomeFanfare(sim);
         }
-        return battleCompleted;
+        return new BattleRunResult(battleCompleted, endingSpeed);
     }
 
     private void showBattleOutcomeFanfare(BuiltSimulation sim) {

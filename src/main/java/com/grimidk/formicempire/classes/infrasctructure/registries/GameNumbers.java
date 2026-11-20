@@ -320,6 +320,7 @@ public final class GameNumbers {
     public static final int HUNT_TARANTULA_REWARD_MUSHROOMS = 100;
     public static final int HUNT_MAX_PARTY_FROM_CAPACITY_DIVISOR = 50;
     public static final float INVASION_RANDOM_CHANCE_PER_HOUR = 0.003f;
+    public static final int INVASION_MIN_MONTHS = 6;
     public static final int INVASION_RESPONSE_HOURS = 72;
     public static final int INVASION_ANT_LION_HP = 12000;
     public static final float INVASION_ANT_LION_ATTACK = 600f;

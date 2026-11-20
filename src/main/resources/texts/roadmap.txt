@@ -4,25 +4,14 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-	    Tooltips take too long
-		Sandbox alert should not pop, only with cheats
-		Invasions should not happen until 6 months
-		Fog of war not appearing and block diplomacy
-		There is 2 cancel buttons in builds, one should say abort building
-		Diplo view add sort by mil power
-		Random start biome (use random dice animation)
 		Hunts to battle sim
-		seeded dynasties only have the dynasty title
-		cehck to exclude dead dynasties from lists
-		sandbox allow non omni to assimilate
-		keep game speed in battle rush
-		no close button in the battle sim menu
+		add continue (points to last file opened) make other button a save select, if no file only have a new game
 	Mid:
 		(none right now)
 	Low:
 		(none right now)
 	Important not Urgent:
-		evaluate rust 
+		(none right now)
 	Can't reproduce:
 		(none right now)
 
@@ -77,7 +66,7 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 		rework popups and dialogs to not be different windows and make mainframe borderless (setting default)
 		rework tutorial and help menus to clearer and obscure unlocks in menus, disable tutorial option and cheat code to unboscure all
-		rework abilities and alerts (click to go) and triggers to be cleaner and logs
+		rework abilities and alerts (click to go) and triggers to be cleaner and logs less repetitive
 		rework ai so it its even smarter and progressed almost always, adapts and takes advantage of all features
 
 	Everything else :
@@ -107,7 +96,7 @@ Needed for launch (v1.0) (Launch Version):
 		recheck langs
 		more proper start animation and roadmap and credits design
 		global stats such as total playtime, games started, games finished, games won, maps created etc
-		register Grim Games or Grimidk in steam as dev team
+		register Grim Games or Grimidk in steam as dev team amd re do personal icon 
 		steam upload and demo version and make sure saves are not overwritten by updates
 			TODO code (optional for listing; needed for Steam-native features): Steamworks init + App ID; cloud saves; achievements/stats API; demo build flavor (separate App ID/depot)
 			TODO ops: partner page, depots/builds, caps/trailers, wishlist, pricing

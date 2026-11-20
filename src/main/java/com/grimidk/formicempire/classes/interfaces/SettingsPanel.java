@@ -73,6 +73,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox cheatRandomDisasterCheck;
     private JCheckBox cheatRandomWarCheck;
     private JCheckBox animateWorldGenCheck;
+    private JCheckBox allowNonOmniAssimilationCheck;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -88,7 +89,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, disablePopupsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
-    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel, cheatFogOfWarLabel, cheatRandomDisasterLabel, cheatRandomWarLabel, animateWorldGenLabel;
+    private JLabel sandboxNoteLabel, turboLabel, showAuditMenuLabel, showFpsCounterLabel, freeAbilitiesLabel, infiniteResearchLabel, instantBuildingsLabel, assimilateAllLabel, allowNonOmniAssimilationLabel, mapEditorEnabledLabel, easyConqueringLabel, instantIntegrationLabel, cheatFogOfWarLabel, cheatRandomDisasterLabel, cheatRandomWarLabel, animateWorldGenLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -475,6 +476,18 @@ public class SettingsPanel extends JPanel {
 
         c.gridy = 5;
         c.gridx = 0;
+        allowNonOmniAssimilationLabel = new JLabel();
+        allowNonOmniAssimilationLabel.setFont(AssetStyles.FONT_NORMAL);
+        allowNonOmniAssimilationLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(allowNonOmniAssimilationLabel, c);
+
+        allowNonOmniAssimilationCheck = new JCheckBox();
+        styleCheckBox(allowNonOmniAssimilationCheck);
+        c.gridx = 1;
+        panel.add(allowNonOmniAssimilationCheck, c);
+
+        c.gridy = 6;
+        c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(16, 15, 5, 15);
@@ -805,6 +818,7 @@ public class SettingsPanel extends JPanel {
         showFpsCounterCheck.setSelected(false);
         mapEditorEnabledCheck.setSelected(false);
         animateWorldGenCheck.setSelected(true);
+        allowNonOmniAssimilationCheck.setSelected(false);
     }
 
     private void resetCheatsTabToDefaults() {
@@ -1112,6 +1126,7 @@ public class SettingsPanel extends JPanel {
         cheatRandomDisasterLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_CHEAT_RANDOM_DISASTER));
         cheatRandomWarLabel.setText(starPrefix + LanguageStrings.get(LanguageStrings.SETTINGS_CHEAT_RANDOM_WAR));
         animateWorldGenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN));
+        allowNonOmniAssimilationLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ALLOW_NON_OMNI_ASSIMILATION));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -1200,6 +1215,7 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(cheatRandomDisasterLabel, cheatRandomDisasterCheck, LanguageStrings.SETTINGS_CHEAT_RANDOM_DISASTER_TT);
         setSettingTooltip(cheatRandomWarLabel, cheatRandomWarCheck, LanguageStrings.SETTINGS_CHEAT_RANDOM_WAR_TT);
         setSettingTooltip(animateWorldGenLabel, animateWorldGenCheck, LanguageStrings.SETTINGS_ANIMATE_WORLD_GEN_TT);
+        setSettingTooltip(allowNonOmniAssimilationLabel, allowNonOmniAssimilationCheck, LanguageStrings.SETTINGS_ALLOW_NON_OMNI_ASSIMILATION_TT);
         setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
         setSettingTooltip(fsLabel, fullScreenCheck, LanguageStrings.SETTINGS_FULLSCREEN_TT);
         setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
@@ -1261,6 +1277,7 @@ public class SettingsPanel extends JPanel {
         cheatRandomDisasterCheck.setSelected(engine.isCheatRandomDisaster());
         cheatRandomWarCheck.setSelected(engine.isCheatRandomWar());
         animateWorldGenCheck.setSelected(engine.isAnimateWorldGen());
+        allowNonOmniAssimilationCheck.setSelected(engine.isAllowNonOmniAssimilation());
         
         refreshScreenSizeCombo(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
@@ -1438,9 +1455,11 @@ public class SettingsPanel extends JPanel {
         engine.setCheatRandomDisaster(cheatRandomDisasterCheck.isSelected());
         engine.setCheatRandomWar(cheatRandomWarCheck.isSelected());
         engine.setAnimateWorldGen(animateWorldGenCheck.isSelected());
+        engine.setAllowNonOmniAssimilation(allowNonOmniAssimilationCheck.isSelected());
         engine.applySandboxTaintToActiveWorld();
         SandboxCheatService.applyEnabledCheats(engine);
         if (frame.getGamePanel() != null) {
+            frame.getGamePanel().forceControlPanelMenuRefresh();
             frame.getGamePanel().refreshAllGUIData();
         }
         

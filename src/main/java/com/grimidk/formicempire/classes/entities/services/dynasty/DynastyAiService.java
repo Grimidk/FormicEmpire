@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsServ
 import com.grimidk.formicempire.classes.entities.services.shared.HexWaterCrossing;
 import com.grimidk.formicempire.classes.constants.dynasty.AiPersonality;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -48,6 +49,7 @@ public class DynastyAiService {
         runWarConsideration(dynasty, world, tradeManager);
         runCrossDynastyTrade(dynasty, world, tradeManager);
         runIntegrationAttempts(dynasty, world, tradeManager);
+        runAssimilationSelection(dynasty);
         runAbilities(dynasty, world);
     }
 
@@ -110,6 +112,9 @@ public class DynastyAiService {
         Map<Dynasty, Integer> repMap = new IdentityHashMap<>();
         for (Dynasty other : world.getDynastys()) {
             if (other == null || other == dynasty || !other.isActiveForDiplomacy()) {
+                continue;
+            }
+            if (!DynastyDiplomacyService.hasDiplomaticDiscovery(dynasty, other, world)) {
                 continue;
             }
             int rep = diplo.getEffectiveDiplomaticReputation(other, world, bordering.contains(other));
@@ -238,6 +243,9 @@ public class DynastyAiService {
         Map<Dynasty, Integer> repMap = new IdentityHashMap<>();
         for (Dynasty other : world.getDynastys()) {
             if (other == null || other == dynasty || !other.isActiveForDiplomacy()) {
+                continue;
+            }
+            if (!DynastyDiplomacyService.hasDiplomaticDiscovery(dynasty, other, world)) {
                 continue;
             }
             others.add(other);
@@ -518,6 +526,22 @@ public class DynastyAiService {
             return false;
         }
         return colony.getMushroomsPrecise() / mushroomCap < GameNumbers.AI_CREATINE_FOOD_STRESS_RATIO;
+    }
+
+    private void runAssimilationSelection(Dynasty dynasty) {
+        if (dynasty == null
+                || !dynasty.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)
+                || !dynasty.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)
+                || dynasty.getCurrentAssimilation() != null) {
+            return;
+        }
+        for (Assimilation assimilation : GameUnlocks.getAssimilations()) {
+            if (GameUnlocks.isAssimilationAvailable(dynasty, assimilation)) {
+                dynasty.setCurrentAssimilation(assimilation);
+                dynasty.setAssimilationProgress(0);
+                return;
+            }
+        }
     }
 
     private void runIntegrationAttempts(Dynasty dynasty, World world, TradeManager tradeManager) {

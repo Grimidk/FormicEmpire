@@ -49,6 +49,8 @@ public final class UiResourceLoader {
         if (image.getWidth(null) != sizePx || image.getHeight(null) != sizePx) {
             image = image.getScaledInstance(sizePx, sizePx, Image.SCALE_SMOOTH);
         }
-        return new ImageIcon(image);
+        ImageIcon icon = new ImageIcon(image);
+        UiIconTooltips.registerResourceIcon(icon, path);
+        return icon;
     }
 }

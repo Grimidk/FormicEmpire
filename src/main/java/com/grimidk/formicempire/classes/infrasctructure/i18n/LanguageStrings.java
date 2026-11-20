@@ -474,6 +474,7 @@ public final class LanguageStrings {
     public static final String UI_SAVE = "UI_SAVE";
     public static final String UI_DELETE = "UI_DELETE";
     public static final String UI_CANCEL = "UI_CANCEL";
+    public static final String UI_ABORT = "UI_ABORT";
     public static final String UI_CONFIRM = "UI_CONFIRM";
     public static final String UI_YES = "UI_YES";
     public static final String UI_NO = "UI_NO";
@@ -3453,4 +3454,18 @@ public final class LanguageStrings {
     public static final String BATTLE_SIM_VICTORY_FMT = "BATTLE_SIM_VICTORY_FMT";
     public static final String BATTLE_SIM_DRAW = "BATTLE_SIM_DRAW";
     public static final String BATTLE_SIM_RUSH = "BATTLE_SIM_RUSH";
+    public static final String ICON_SOCIALISM = "ICON_SOCIALISM";
+    public static final String ICON_GROWTH = "ICON_GROWTH";
+    public static final String ICON_COUNTER_INTELLIGENCE = "ICON_COUNTER_INTELLIGENCE";
+    public static final String ICON_FOOD_CONSUMPTION = "ICON_FOOD_CONSUMPTION";
+    public static final String ICON_FOOD_PRODUCTION = "ICON_FOOD_PRODUCTION";
+    public static final String ICON_NET_FOOD = "ICON_NET_FOOD";
+    public static final String SAVE_BIOME_RANDOM = "SAVE_BIOME_RANDOM";
+    public static final String SAVE_BIOME_RANDOM_TT = "SAVE_BIOME_RANDOM_TT";
+    public static final String SAVE_RANDOMIZE_ALL = "SAVE_RANDOMIZE_ALL";
+    public static final String SAVE_RANDOMIZE_ALL_TT = "SAVE_RANDOMIZE_ALL_TT";
+    public static final String SETTINGS_ALLOW_NON_OMNI_ASSIMILATION = "SETTINGS_ALLOW_NON_OMNI_ASSIMILATION";
+    public static final String SETTINGS_ALLOW_NON_OMNI_ASSIMILATION_TT = "SETTINGS_ALLOW_NON_OMNI_ASSIMILATION_TT";
+    public static final String DYNASTY_EXCLUDE_DEAD = "DYNASTY_EXCLUDE_DEAD";
+    public static final String DYNASTY_EXCLUDE_DEAD_TT = "DYNASTY_EXCLUDE_DEAD_TT";
 }

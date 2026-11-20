@@ -174,8 +174,9 @@ public class AlertPanel extends ZeroGamePanel {
                     new EmptyBorder(2, 4, 2, 4)
                 ));
 
+                JLabel iconLabel = null;
                 if (alert.icon != null) {
-                    JLabel iconLabel = new JLabel(alert.icon);
+                    iconLabel = new JLabel(alert.icon);
                     iconLabel.setOpaque(false);
                     itemPanel.add(iconLabel, BorderLayout.WEST);
                 }
@@ -190,11 +191,17 @@ public class AlertPanel extends ZeroGamePanel {
                 if (tip != null && !tip.isEmpty()) {
                     itemPanel.setToolTipText(tip);
                     msgLabel.setToolTipText(tip);
+                    if (iconLabel != null) {
+                        iconLabel.setToolTipText(tip);
+                    }
                 }
 
                 if (opensCritterManagement(alert.key)) {
                     AssetStyles.markClickable(itemPanel);
                     AssetStyles.markClickable(msgLabel);
+                    if (iconLabel != null) {
+                        AssetStyles.markClickable(iconLabel);
+                    }
                 }
 
                 itemPanel.addMouseListener(new MouseAdapter() {

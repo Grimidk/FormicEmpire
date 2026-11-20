@@ -326,6 +326,7 @@ class DynastyDiplomacyServiceTest {
         Colony playerColony = new Colony(22, "Player Capital", true);
         player.addColony(playerColony);
         player.setCapital(playerColony);
+        player.discoverHex(aggressorHex);
 
         aggressor.getDiplomacyService().declareWar(rival, world, null);
 
@@ -333,6 +334,58 @@ class DynastyDiplomacyServiceTest {
         assertEquals(1, player.copyPendingNpcWarAlerts().size());
         assertEquals(aggressor.getId(), player.copyPendingNpcWarAlerts().get(0).attackerId);
         assertEquals(rival.getId(), player.copyPendingNpcWarAlerts().get(0).defenderId);
+    }
+
+    @Test
+    void undiscoveredNpcWarDoesNotQueueAlertOnPlayerDynasty() {
+        World world = new World();
+        Dynasty aggressor = new Dynasty(3, "Aggressor", false, GameConstants.SPECIES_OMNI);
+        Dynasty rival = new Dynasty(4, "Rival", false, GameConstants.SPECIES_OMNI);
+        world.getDynastys().add(aggressor);
+        world.getDynastys().add(rival);
+        world.getDynastys().add(player);
+
+        Hex aggressorHex = new Hex();
+        Hex rivalHex = new Hex();
+        aggressorHex.setQ(2);
+        aggressorHex.setR(0);
+        rivalHex.setQ(3);
+        rivalHex.setR(0);
+        aggressorHex.setNorthEast(rivalHex);
+        rivalHex.setSouthWest(aggressorHex);
+
+        Colony aggressorColony = new Colony(20, "Aggressor Capital", false);
+        Colony rivalColony = new Colony(21, "Rival Capital", false);
+        aggressor.addColony(aggressorColony);
+        rival.addColony(rivalColony);
+        aggressorColony.setDynasty(aggressor);
+        rivalColony.setDynasty(rival);
+        aggressorHex.setColony(aggressorColony);
+        rivalHex.setColony(rivalColony);
+
+        Hex playerHex = new Hex();
+        playerHex.setQ(10);
+        playerHex.setR(10);
+        Colony playerColony = new Colony(22, "Player Capital", true);
+        player.addColony(playerColony);
+        player.setCapital(playerColony);
+        playerColony.setDynasty(player);
+        playerHex.setColony(playerColony);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(aggressorHex);
+        hexes.add(rivalHex);
+        hexes.add(playerHex);
+        world.setHexes(hexes);
+
+        ensureWarPopulation(aggressor, aggressorColony);
+        ensureWarPopulation(rival, rivalColony);
+        player.discoverHex(playerHex);
+
+        aggressor.getDiplomacyService().declareWar(rival, world, null);
+
+        assertTrue(aggressor.getDiplomacyService().isAtWarWith(rival));
+        assertTrue(player.copyPendingNpcWarAlerts().isEmpty());
     }
 
     private World buildBorderWorld() {

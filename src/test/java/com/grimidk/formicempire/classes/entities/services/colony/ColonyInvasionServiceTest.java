@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
@@ -127,5 +128,44 @@ class ColonyInvasionServiceTest {
 
         assertTrue(largePreview.winChance >= smallPreview.winChance);
         assertFalse(largePreview.winChance <= 0f);
+    }
+
+    @Test
+    void invasionPeriodRequiresSixMonths() {
+        assertFalse(ColonyInvasionService.isInvasionPeriodReached(null));
+
+        World world = new World();
+        world.setYear(0);
+        for (int month = 1; month <= 5; month++) {
+            world.setMonth(month);
+            assertFalse(ColonyInvasionService.isInvasionPeriodReached(world));
+        }
+
+        world.setMonth(6);
+        assertTrue(ColonyInvasionService.isInvasionPeriodReached(world));
+
+        world.setYear(1);
+        world.setMonth(1);
+        assertTrue(ColonyInvasionService.isInvasionPeriodReached(world));
+    }
+
+    @Test
+    void randomInvasionsAreBlockedBeforeSixMonthsAndAllowedAtMonthSix() {
+        World world = new World();
+        colony.getDynasty().setOwningWorld(world);
+        colony.setActive(true);
+
+        world.setYear(0);
+        world.setMonth(5);
+        for (int i = 0; i < 5000; i++) {
+            ColonyInvasionService.tickInvasions(colony, 1, 0);
+        }
+        assertTrue(colony.getInvasionAlerts().isEmpty());
+
+        world.setMonth(6);
+        for (int i = 0; i < 10000 && colony.getInvasionAlerts().isEmpty(); i++) {
+            ColonyInvasionService.tickInvasions(colony, 1, 0);
+        }
+        assertFalse(colony.getInvasionAlerts().isEmpty());
     }
 }

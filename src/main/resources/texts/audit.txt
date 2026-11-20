@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 92% (82/89 checked)
+Completion: 88% (79/90 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > Sandbox to open this file from the main menu or in-game ESC menu.
 
@@ -40,6 +40,7 @@ Roles (default hatch roles):
 Sandbox:
 [X] Turbo speed, show mechanics audit
 [X] Show FPS counter (top-right overlay)
+[ ] Allow non-Omni assimilation toggle (allows non-Omni species to assimilate defeated genomes without Genome Bridge)
 [X] ★ Free abilities, infinite research, instant buildings, assimilate all, easy conquering, instant integration (each taints achievements when used)
 [X] ★ Random disaster cheat button sandbox option & spectator mode trigger
 [X] Save & Apply with new ★ options — Yes taints save; No clears ★ then applies
@@ -49,7 +50,7 @@ Sandbox:
 ================================================================================
 3. SAVE / LOAD FLOW
 ================================================================================
-[X] Three save slots (Create / Load / Delete); OS save path; dynasty preview on create; ★ taint marker; sandbox ★ warning
+[ ] Three save slots (Create / Load / Delete); OS save path; dynasty preview on create; Random default biome & Randomize All dice button; ★ taint marker; cheats ★ warning
 [X] Tutorial auto-opens on first create; load re-reads disk; autosave during play
 [X] Back to menu saves and refreshes slots; colony death — Reload or Main Menu
 
@@ -98,7 +99,7 @@ Sandbox:
 ================================================================================
 10. CONSTRUCTION (U)
 ================================================================================
-[X] Building tree UI — chains, tier dividers, detail card, progress bar, build/cancel, hidden locked nodes, Help reveals full tree
+[ ] Building tree UI — chains, tier dividers, detail card, progress bar, build/abort, hidden locked nodes, Help reveals full tree
 [X] Storage chains L0–L5 — Royal, Egg, Mushroom, Plant, Water, Meat, Syrup, Rock (Miner), Resin (Resin ability)
 [X] Passive rooms — Lab, Aphid, Nurse, Farm, Grave, Composter
 [X] Passive Water + Passive Web (Web Building synergy)
@@ -126,7 +127,7 @@ Sandbox:
 14. CRITTER MANAGEMENT (H)
 ================================================================================
 [X] Hunts — scout discovery, party from unassigned soldiers/majors/princesses, travel preview, hourly battle, rewards/loss, escape timer, blocked at war
-[ ] Invasions — alerts, 72h deadline, unassigned defense party, immediate hourly battle, raid on timeout/defeat
+[ ] Invasions — blocked before month 6, alerts, 72h deadline, unassigned defense party, immediate hourly battle, raid on timeout/defeat
 [X] Pets / Parasites tabs — counts, capacity, natives, outbreak info; role management unassigned % warning below 10%
 
 ================================================================================
@@ -146,9 +147,9 @@ Sandbox:
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)
 ================================================================================
-[X] Sort/search; pact propose/accept/break; declare war; trade request/negotiation; send diplomats; genetic exchange; reputation modifiers; integration flow; convoy/diplomat auto-cancel alerts
+[ ] Sort (Reputation, Distance, Military Power asc/desc — discovered only) / exclude dead dynasties toggle (default on) / search; pact propose/accept/break; declare war; trade request/negotiation; send diplomats; genetic exchange; reputation modifiers; integration flow; convoy/diplomat auto-cancel alerts
 [X] Pact request policy (Ask / auto accept / auto decline); Send spies, intelligence dossier, caught-spying penalty
-[X] Share knowledge, Steal cartography subversive action, unknown dynasty interaction mask
+[ ] Share knowledge, Steal cartography subversive action, unknown dynasty interaction mask & diplomatic block
 
 ================================================================================
 18. DYNASTY — WARS (F)
@@ -158,9 +159,9 @@ Sandbox:
 ================================================================================
 19. WORLD MAP (M)
 ================================================================================
-[X] Hex select; dynasty legend (collapse, color jump, hover tooltip); war sidebar focus; tunnel/battle layers; Easy conquering; Go Home; randomized city titles
+[ ] Hex select; dynasty legend (collapse, exclude dead dynasties toggle default on, color jump, hover tooltip); war sidebar focus; tunnel/battle layers; Easy conquering; Go Home; randomized city titles
 [X] Mouse wheel zoom + pan when zoomed; trade route layer animation on map
-[X] Fog of war layer on map and minimap (baked together), undiscovered hex mask, scout wandering discovery, cheat fog toggle
+[ ] Fog of war layer on map and minimap (baked together), undiscovered hex/dynasty mask, scout wandering discovery, cheat fog toggle
 [X] Ocean exploration limits — coastal waters only for standard scouts, open ocean reachable by Explorer princesses
 [X] Day/night filter, weather cloud layer, disaster icons & tooltips on map; disaster overlay art and burnt/ice biome refresh in game area
 

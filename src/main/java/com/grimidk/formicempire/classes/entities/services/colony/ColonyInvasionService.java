@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
 import com.grimidk.formicempire.classes.entities.invasion.InvasionDefense;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
@@ -232,12 +233,19 @@ public final class ColonyInvasionService {
         colony.removeInvasionDefense(alertId);
     }
 
+    static boolean isInvasionPeriodReached(World world) {
+        return world != null && (world.getYear() * 12 + world.getMonth()) >= GameNumbers.INVASION_MIN_MONTHS;
+    }
+
     private static void trySpawnRandomAlert(Colony colony, int worldDay, int worldHour) {
         if (colony == null || !colony.isPlayer() || !colony.runsFullSimulation()) {
             return;
         }
         Dynasty dynasty = colony.getDynasty();
         if (dynasty == null || dynasty.isAtWar()) {
+            return;
+        }
+        if (!isInvasionPeriodReached(dynasty.getOwningWorld())) {
             return;
         }
         if (hasPendingAlert(colony)) {

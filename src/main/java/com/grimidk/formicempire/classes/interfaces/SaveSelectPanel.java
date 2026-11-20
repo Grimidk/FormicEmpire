@@ -7,8 +7,10 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.DiceRollResource;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapData;
 import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapService;
@@ -24,11 +26,12 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
     private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(460, 32);
-    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 340);
+    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 360);
     private static final Dimension SLOT_LABEL_SIZE = new Dimension(AssetStyles.MENU_BUTTON_WIDTH, 28);
     private static final int SLOT_ACTION_GAP = 8;
 
@@ -413,18 +416,29 @@ public class SaveSelectPanel extends JPanel {
         c.weightx = 0;
         form.add(biomeLabel, c);
 
-        JComboBox<Biome> biomeCombo = new JComboBox<>(
-                GameConstants.getStartingBiomes().toArray(new Biome[0]));
-        biomeCombo.setSelectedItem(GameConstants.BIOME_PLAINS);
+        List<Biome> startingBiomes = GameConstants.getStartingBiomes();
+        Biome[] biomeOptions = new Biome[startingBiomes.size() + 1];
+        biomeOptions[0] = null;
+        for (int i = 0; i < startingBiomes.size(); i++) {
+            biomeOptions[i + 1] = startingBiomes.get(i);
+        }
+        JComboBox<Biome> biomeCombo = new JComboBox<>(biomeOptions);
+        biomeCombo.setSelectedIndex(0);
         biomeCombo.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX).trim());
         biomeCombo.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
         biomeCombo.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
         biomeCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            JLabel label = new JLabel(value != null ? value.getName() : "");
+            JLabel label = new JLabel(value != null
+                    ? value.getName()
+                    : LanguageStrings.get(LanguageStrings.SAVE_BIOME_RANDOM));
             if (value != null) {
                 label.setIcon(value.getIcon());
                 label.setIconTextGap(8);
                 label.setToolTipText(value.getName());
+            } else {
+                label.setIcon(DiceRollResource.getFaceIcon(DiceRollResource.faceAtStep(0), 16));
+                label.setIconTextGap(8);
+                label.setToolTipText(LanguageStrings.get(LanguageStrings.SAVE_BIOME_RANDOM_TT));
             }
             if (isSelected) {
                 label.setOpaque(true);
@@ -473,11 +487,40 @@ public class SaveSelectPanel extends JPanel {
 
         JCheckBox spectatorCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.SAVE_SPECTATOR_MODE));
         AssetStyles.styleCheckBox(spectatorCheck);
+
+        JButton randomizeAllButton = new JButton(LanguageStrings.get(LanguageStrings.SAVE_RANDOMIZE_ALL));
+        AssetStyles.styleButton(randomizeAllButton);
+        randomizeAllButton.setIcon(DiceRollResource.getFaceIcon(DiceRollResource.faceAtStep(0), 16));
+        randomizeAllButton.setIconTextGap(6);
+        randomizeAllButton.setToolTipText(LanguageStrings.get(LanguageStrings.SAVE_RANDOMIZE_ALL_TT));
+        randomizeAllButton.addActionListener(e -> {
+            if (spectatorCheck.isSelected()) {
+                return;
+            }
+            DiceRollResource.triggerRollAnimation(randomizeAllButton, 16);
+            nameField.setText(pickRandomDynastyBaseName(nameField.getText()));
+            List<DynastyTitle> titles = GameConstants.getDynastyTitles();
+            if (!titles.isEmpty()) {
+                titleCombo.setSelectedItem(titles.get(GameRandom.nextInt(titles.size())));
+            }
+            if (!startingBiomes.isEmpty()) {
+                biomeCombo.setSelectedItem(startingBiomes.get(GameRandom.nextInt(startingBiomes.size())));
+            }
+            List<SpeciesDiet> diets = GameConstants.getStartingSpeciesDiets();
+            if (!diets.isEmpty()) {
+                dietCombo.setSelectedItem(diets.get(GameRandom.nextInt(diets.size())));
+            }
+        });
+
+        JPanel optionsRow = new JPanel(new BorderLayout(12, 0));
+        optionsRow.setOpaque(false);
+        optionsRow.add(spectatorCheck, BorderLayout.WEST);
+        optionsRow.add(randomizeAllButton, BorderLayout.EAST);
         c.gridx = 1;
         c.gridy = 4;
         c.weightx = 1.0;
         c.insets = new Insets(6, 0, 6, 12);
-        form.add(spectatorCheck, c);
+        form.add(optionsRow, c);
 
         JLabel previewLabel = new JLabel();
         previewLabel.setFont(AssetStyles.FONT_BOLD);
@@ -507,6 +550,7 @@ public class SaveSelectPanel extends JPanel {
             titleLabel.setEnabled(!spec);
             biomeLabel.setEnabled(!spec);
             dietLabel.setEnabled(!spec);
+            randomizeAllButton.setEnabled(!spec);
             refreshPreview.run();
         });
         nameField.getDocument().addDocumentListener(new DocumentListener() {
@@ -577,11 +621,38 @@ public class SaveSelectPanel extends JPanel {
             return null;
         }
 
-        Biome selectedBiome = (Biome) biomeCombo.getSelectedItem();
-        int starterBiomeId = selectedBiome != null ? selectedBiome.getId() : GameConstants.BIOME_PLAINS.getId();
+        int starterBiomeId = resolveStarterBiomeId((Biome) biomeCombo.getSelectedItem());
         SpeciesDiet selectedDiet = (SpeciesDiet) dietCombo.getSelectedItem();
         int starterDietId = selectedDiet != null ? selectedDiet.getId() : GameConstants.DIET_FUNGIVOROUS.getId();
         return new NewSaveRequest(baseName, titleId, starterBiomeId, starterDietId, false);
+    }
+
+    static int resolveStarterBiomeId(Biome selectedBiome) {
+        if (selectedBiome != null) {
+            return selectedBiome.getId();
+        }
+        List<Biome> startingBiomes = GameConstants.getStartingBiomes();
+        if (startingBiomes != null && !startingBiomes.isEmpty()) {
+            Biome picked = startingBiomes.get(GameRandom.nextInt(startingBiomes.size()));
+            if (picked != null) {
+                return picked.getId();
+            }
+        }
+        return GameConstants.BIOME_PLAINS.getId();
+    }
+
+    static String pickRandomDynastyBaseName(String currentName) {
+        List<String> keys = GameConstants.getAllDynastyThemeKeys();
+        if (keys == null || keys.isEmpty()) {
+            return "Solari";
+        }
+        String trimmedCurrent = currentName != null ? currentName.trim() : "";
+        String picked = LanguageStrings.resolveDynastyThemeDisplay(keys.get(GameRandom.nextInt(keys.size())));
+        for (int attempt = 0; attempt < 6 && keys.size() > 1 && picked.equalsIgnoreCase(trimmedCurrent); attempt++) {
+            picked = LanguageStrings.resolveDynastyThemeDisplay(keys.get(GameRandom.nextInt(keys.size())));
+        }
+        String formatted = formatBaseName(picked);
+        return formatted.isEmpty() ? "Solari" : formatted;
     }
 
     private static void updateDynastyPreview(JLabel previewLabel, JTextField nameField, JComboBox<DynastyTitle> titleCombo) {

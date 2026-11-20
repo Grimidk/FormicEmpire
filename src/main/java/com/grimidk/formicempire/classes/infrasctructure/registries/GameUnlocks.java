@@ -661,9 +661,17 @@ public final class GameUnlocks {
         public static final Assimilation ASSIMILATION_OMNI = new Assimilation(12, "ASSIMILATION_OMNI", "ASSIMILATION_OMNI_DESC", ASSIMILATED_ASSIMILATION, ASSIMILATION_COST, loadIcon("icons/assimilations/Omni.png"));
         static { assimilations.add(ASSIMILATION_OMNI); }
 
+        public static boolean isAllowNonOmniAssimilationEnabled(Dynasty dynasty) {
+                return dynasty != null
+                        && dynasty.getOwningWorld() != null
+                        && dynasty.getOwningWorld().getEngine() != null
+                        && dynasty.getOwningWorld().getEngine().isAllowNonOmniAssimilation();
+        }
+
         public static boolean canAssimilateForeignSpecies(Dynasty dynasty) {
                 return dynasty != null && (dynasty.hasUpgrade(ASSIMILATED_ASSIMILATION)
-                        || dynasty.isAssimilationCompleted(ASSIMILATION_OMNI));
+                        || dynasty.isAssimilationCompleted(ASSIMILATION_OMNI)
+                        || isAllowNonOmniAssimilationEnabled(dynasty));
         }
 
         public static boolean isAssimilationAvailable(Dynasty dynasty, Assimilation assimilation) {

@@ -96,14 +96,90 @@ public final class WorldHistoryEvent {
     }
 
     public String formatMessage(World world) {
+        return formatMessage(world, null);
+    }
+
+    public String formatMessage(World world, Dynasty viewer) {
         if (messageKey.isEmpty()) {
             return "";
         }
         Object[] resolved = new Object[args.size()];
         for (int i = 0; i < args.size(); i++) {
-            resolved[i] = resolveArg(world, args.get(i));
+            resolved[i] = resolveArg(world, args.get(i), viewer);
         }
         return LanguageStrings.format(messageKey, resolved);
+    }
+
+    public boolean isVisibleToViewer(World world, Dynasty viewer) {
+        if (world == null || viewer == null) {
+            return true;
+        }
+        boolean hasEntityRef = false;
+        if (relatedDynastyId > 0) {
+            hasEntityRef = true;
+            Dynasty related = world.findDynastyById(relatedDynastyId);
+            if (isDynastyVisible(world, viewer, related)) {
+                return true;
+            }
+        }
+        if (relatedColonyId > 0) {
+            hasEntityRef = true;
+            Colony colony = findColony(world, relatedColonyId);
+            if (colony != null && isDynastyVisible(world, viewer, colony.getDynasty())) {
+                return true;
+            }
+        }
+        if (relatedWarId > 0 && world.getWarService() != null) {
+            War war = world.getWarService().findWarById(relatedWarId);
+            if (war != null) {
+                hasEntityRef = true;
+                Dynasty dA = world.findDynastyById(war.getDynastyIdA());
+                Dynasty dB = world.findDynastyById(war.getDynastyIdB());
+                if (isDynastyVisible(world, viewer, dA) || isDynastyVisible(world, viewer, dB)) {
+                    return true;
+                }
+            }
+        }
+        for (String arg : args) {
+            if (arg == null || arg.isEmpty()) {
+                continue;
+            }
+            if (arg.startsWith(ARG_DYNASTY)) {
+                hasEntityRef = true;
+                int id = parseId(arg, ARG_DYNASTY.length());
+                Dynasty dynasty = world.findDynastyById(id);
+                if (isDynastyVisible(world, viewer, dynasty)) {
+                    return true;
+                }
+            } else if (arg.startsWith(ARG_COLONY)) {
+                hasEntityRef = true;
+                int id = parseId(arg, ARG_COLONY.length());
+                Colony colony = findColony(world, id);
+                if (colony != null && isDynastyVisible(world, viewer, colony.getDynasty())) {
+                    return true;
+                }
+            }
+        }
+        return !hasEntityRef;
+    }
+
+    private static boolean isDynastyVisible(World world, Dynasty viewer, Dynasty target) {
+        if (viewer == null) {
+            return true;
+        }
+        if (target == null) {
+            return false;
+        }
+        if (target == viewer) {
+            return true;
+        }
+        if (world.getHexes() == null || world.getHexes().isEmpty()) {
+            return true;
+        }
+        if (viewer.getKnownHexCount() == 0) {
+            viewer.initKnownHexes(world);
+        }
+        return viewer.hasDiscoveredDynasty(target, world);
     }
 
     public static String dynastyArg(int dynastyId) {
@@ -133,7 +209,7 @@ public final class WorldHistoryEvent {
         return value != null ? String.valueOf(value) : "";
     }
 
-    private static String resolveArg(World world, String arg) {
+    private static String resolveArg(World world, String arg, Dynasty viewer) {
         if (arg == null || arg.isEmpty()) {
             return "";
         }
@@ -142,6 +218,9 @@ public final class WorldHistoryEvent {
             if (world != null) {
                 Dynasty dynasty = world.findDynastyById(id);
                 if (dynasty != null) {
+                    if (viewer != null && !isDynastyVisible(world, viewer, dynasty)) {
+                        return LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY);
+                    }
                     return dynasty.getName();
                 }
             }
@@ -152,6 +231,10 @@ public final class WorldHistoryEvent {
             if (world != null) {
                 Colony colony = findColony(world, id);
                 if (colony != null) {
+                    if (viewer != null && colony.getDynasty() != null
+                            && !isDynastyVisible(world, viewer, colony.getDynasty())) {
+                        return LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY);
+                    }
                     return colony.getName();
                 }
             }

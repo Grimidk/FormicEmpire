@@ -74,6 +74,7 @@ public class Engine extends Thread {
     private boolean infiniteResearch = false;
     private boolean instantBuildings = false;
     private boolean assimilateAll = false;
+    private boolean allowNonOmniAssimilation = false;
     private boolean mapEditorEnabled = false;
     private boolean easyConquering = false;
     private boolean instantIntegration = false;
@@ -676,6 +677,14 @@ public class Engine extends Thread {
         this.assimilateAll = assimilateAll;
     }
 
+    public boolean isAllowNonOmniAssimilation() {
+        return allowNonOmniAssimilation;
+    }
+
+    public void setAllowNonOmniAssimilation(boolean allowNonOmniAssimilation) {
+        this.allowNonOmniAssimilation = allowNonOmniAssimilation;
+    }
+
     public boolean isEasyConquering() {
         return easyConquering;
     }
@@ -706,14 +715,17 @@ public class Engine extends Thread {
 
     public void setCheatFogOfWarToggle(boolean cheatFogOfWarToggle) {
         this.cheatFogOfWarToggle = cheatFogOfWarToggle;
+        if (!cheatFogOfWarToggle) {
+            this.cheatRevealMap = false;
+        }
     }
 
     public boolean isCheatRevealMap() {
-        return cheatRevealMap;
+        return cheatFogOfWarToggle && cheatRevealMap;
     }
 
     public void setCheatRevealMap(boolean cheatRevealMap) {
-        this.cheatRevealMap = cheatRevealMap;
+        this.cheatRevealMap = cheatFogOfWarToggle && cheatRevealMap;
     }
 
     public boolean isCheatRandomDisaster() {
@@ -758,7 +770,7 @@ public class Engine extends Thread {
                 || assimilateAll
                 || easyConquering
                 || instantIntegration
-                || cheatRevealMap;
+                || (cheatFogOfWarToggle && cheatRevealMap);
     }
 
     public void applySandboxTaintToActiveWorld() {

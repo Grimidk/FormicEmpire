@@ -1403,6 +1403,7 @@ public class GamePanel extends ZeroGamePanel {
         WarCreatureCombatService.clearAll();
         if (eng != null) {
             eng.pauseEngine();
+            eng.setCheatRevealMap(false);
             eng.setWorld(null);
         }
         updateStatusIndicator(true);
@@ -1797,6 +1798,14 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     public void refreshAllGUIData() {
+        lastMiniMapRefreshHourKey = Integer.MIN_VALUE;
+        lastControlPanelRefreshHourKey = Integer.MIN_VALUE;
+        if (miniMapPanel != null) {
+            miniMapPanel.invalidateMapCache();
+        }
+        if (mapDialog != null) {
+            mapDialog.refreshFogState();
+        }
         updateMinuteGUI();
         updateHourGUI();
         updateDayGUI();
@@ -2102,6 +2111,8 @@ public class GamePanel extends ZeroGamePanel {
             return;
         }
 
+        Engine engine = frame.getEngine();
+        boolean cheatReveal = engine != null && engine.isCheatRevealMap();
         for (Dynasty.PendingNpcWarAlert pending : playerDynasty.copyPendingNpcWarAlerts()) {
             playerDynasty.removePendingNpcWarAlert(pending.attackerId, pending.defenderId);
             Dynasty attacker = world.findDynastyById(pending.attackerId);
@@ -2109,9 +2120,16 @@ public class GamePanel extends ZeroGamePanel {
             if (attacker == null || defender == null || attacker.isDefeated() || defender.isDefeated()) {
                 continue;
             }
+            boolean knowsAttacker = cheatReveal || playerDynasty.hasDiscoveredDynasty(attacker, world);
+            boolean knowsDefender = cheatReveal || playerDynasty.hasDiscoveredDynasty(defender, world);
+            if (!knowsAttacker && !knowsDefender) {
+                continue;
+            }
+            String attackerName = knowsAttacker ? attacker.getName() : LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY);
+            String defenderName = knowsDefender ? defender.getName() : LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY);
             alertColony.logEvent(ColonyLogPrefixes.WAR + " "
                     + LanguageStrings.format(
-                            LanguageStrings.DIPLO_NPC_WAR_ALERT_FMT, attacker.getName(), defender.getName()));
+                            LanguageStrings.DIPLO_NPC_WAR_ALERT_FMT, attackerName, defenderName));
         }
     }
 
@@ -2194,6 +2212,12 @@ public class GamePanel extends ZeroGamePanel {
         int fromId = pending.get(0);
         Dynasty requester = world.findDynastyById(fromId);
         if (requester == null || requester.isDefeated()) {
+            playerDynasty.removePendingPactRequest(fromId);
+            return;
+        }
+        Engine engine = frame.getEngine();
+        boolean cheatReveal = engine != null && engine.isCheatRevealMap();
+        if (!cheatReveal && !playerDynasty.hasDiscoveredDynasty(requester, world)) {
             playerDynasty.removePendingPactRequest(fromId);
             return;
         }

@@ -42,6 +42,10 @@ public class SavedMapData {
         public String faultType;
         public int faultIntensity;
         public int dynastySpeciesId;
+        public int dynastyId;
+        public String dynastyName;
+        public String dynastyTitleKey;
+        public String dynastyThemeBase;
         public boolean isPlayerColony;
         public boolean isCapitalColony;
         public String colonyName;

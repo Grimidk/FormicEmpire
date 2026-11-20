@@ -74,6 +74,9 @@ public final class DynastyIntegrationService {
                 || !DynastyDiplomacyService.isDiplomaticallyContactable(target)) {
             return false;
         }
+        if (!DynastyDiplomacyService.hasDiplomaticDiscovery(overlord, target, world)) {
+            return false;
+        }
         DynastyDiplomacyService diplo = overlord.getDiplomacyService();
         if (diplo == null || diplo.isAtWarWith(target)) {
             return false;

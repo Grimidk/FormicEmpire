@@ -109,6 +109,7 @@ public class MapDialog extends ZeroDialog {
     private int lastLegendActiveWars = -1;
     private int lastLegendHistoryCount = -1;
     private int lastLegendSortMode = -1;
+    private boolean lastLegendExcludeDead = true;
     public enum MapMode {
         BIOME, HEIGHT, TECTONIC_PLATES, DYNASTIC
     }
@@ -128,6 +129,16 @@ public class MapDialog extends ZeroDialog {
             return UNCOLONIZED_DYNASTIC_SEA_COLOR;
         }
         return UNCOLONIZED_DYNASTIC_LAND_COLOR;
+    }
+
+    static boolean shouldIncludeDynastyInLegend(Dynasty dynasty, boolean excludeDead) {
+        if (dynasty == null) {
+            return false;
+        }
+        if (excludeDead) {
+            return !dynasty.isDefeated() && (dynasty.isPlayer() || dynasty.isActiveForDiplomacy());
+        }
+        return true;
     }
     private static final Color[] PLATE_COLORS = {
         new Color(185, 85, 85),
@@ -794,6 +805,7 @@ public class MapDialog extends ZeroDialog {
         World current = currentWorld();
         if (current != null) {
             this.world = current;
+            this.cachedPlayerDynastyWorld = current;
             this.world.ensureGeographicFeaturesReconstructed();
             this.cachedPlayerDynasty = findPlayerDynasty();
         }
@@ -1513,6 +1525,9 @@ public class MapDialog extends ZeroDialog {
         if (playerDynasty == null) {
             return true;
         }
+        if (playerDynasty.getKnownHexCount() == 0 && w != null) {
+            playerDynasty.initKnownHexes(w);
+        }
         return playerDynasty.isHexKnown(hex);
     }
 
@@ -1762,6 +1777,19 @@ public class MapDialog extends ZeroDialog {
         updateSpeedAndTimeControls();
     }
 
+    public void refreshFogState() {
+        syncWorldFromEngine();
+        if (mapPanel != null) {
+            mapPanel.invalidateBakedImage();
+            mapPanel.repaint();
+        }
+        if (legendPanel != null) {
+            legendPanel.updateLegend();
+            legendPanel.repaint();
+        }
+        updateConquerButton();
+    }
+
     private boolean shouldRefreshLegendOnLiveUpdate() {
         World current = currentWorld();
         if (current != lastLegendWorld) {
@@ -1773,11 +1801,13 @@ public class MapDialog extends ZeroDialog {
         int activeWars = current.getWarService() != null ? current.getWarService().getActiveWars().size() : 0;
         int historyCount = current.getHistoryService() != null ? current.getHistoryService().getEvents().size() : 0;
         int sortMode = legendPanel != null ? legendPanel.sortMode : -1;
+        boolean excludeDead = legendPanel != null && legendPanel.excludeDeadCheck.isSelected();
         return current.getYear() != lastLegendYear
                 || current.getDay() != lastLegendDay
                 || activeWars != lastLegendActiveWars
                 || historyCount != lastLegendHistoryCount
-                || sortMode != lastLegendSortMode;
+                || sortMode != lastLegendSortMode
+                || excludeDead != lastLegendExcludeDead;
     }
 
     private void recordLegendSnapshot() {
@@ -1795,6 +1825,7 @@ public class MapDialog extends ZeroDialog {
             lastLegendHistoryCount = current.getHistoryService() != null ? current.getHistoryService().getEvents().size() : 0;
         }
         lastLegendSortMode = legendPanel != null ? legendPanel.sortMode : -1;
+        lastLegendExcludeDead = legendPanel != null && legendPanel.excludeDeadCheck.isSelected();
     }
 
     public void updateTimeDisplay() {
@@ -1865,6 +1896,7 @@ public class MapDialog extends ZeroDialog {
         private final JPanel content;
         private final JScrollPane legendScroll;
         private final JButton sortButton;
+        private final JCheckBox excludeDeadCheck;
         private final FlatChevronButton collapseControl;
         private int metricsColumnWidth = METRICS_COLUMN_WIDTH;
         private int sortMode = SORT_POPULATION;
@@ -1941,7 +1973,24 @@ public class MapDialog extends ZeroDialog {
             sortWrap.setOpaque(false);
             sortWrap.setBorder(new EmptyBorder(0, 4, 0, 4));
             sortWrap.add(sortButton, BorderLayout.CENTER);
-            header.add(sortWrap, BorderLayout.SOUTH);
+
+            excludeDeadCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD), true);
+            excludeDeadCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD_TT));
+            excludeDeadCheck.setFocusable(false);
+            AssetStyles.styleCheckBox(excludeDeadCheck);
+            excludeDeadCheck.setFont(AssetStyles.FONT_SMALL);
+            excludeDeadCheck.addActionListener(e -> updateLegend());
+
+            JPanel excludeDeadWrap = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+            excludeDeadWrap.setOpaque(false);
+            excludeDeadWrap.add(excludeDeadCheck);
+
+            JPanel controlsPanel = new JPanel();
+            controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.Y_AXIS));
+            controlsPanel.setOpaque(false);
+            controlsPanel.add(sortWrap);
+            controlsPanel.add(excludeDeadWrap);
+            header.add(controlsPanel, BorderLayout.SOUTH);
             legendBody.add(header, BorderLayout.NORTH);
 
             activeWarsContent = new JPanel();
@@ -2102,25 +2151,44 @@ public class MapDialog extends ZeroDialog {
         }
 
         private void updateActiveWarsSection() {
-            List<War> wars = world != null ? world.getWarService().getActiveWars() : List.of();
+            List<War> allWars = world != null ? world.getWarService().getActiveWars() : List.of();
+            Dynasty playerDynasty = findPlayerDynasty();
+            boolean cheatReveal = resolveEngine() != null && resolveEngine().isCheatRevealMap();
+            boolean maskUndiscovered = !isSpectatorMode() && !cheatReveal && playerDynasty != null;
+            List<War> wars = new ArrayList<>();
+            List<String> labels = new ArrayList<>();
+            for (War war : allWars) {
+                Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
+                Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
+                boolean knowsA = !maskUndiscovered || playerDynasty.hasDiscoveredDynasty(dynastyA, world);
+                boolean knowsB = !maskUndiscovered || playerDynasty.hasDiscoveredDynasty(dynastyB, world);
+                if (!knowsA && !knowsB) {
+                    continue;
+                }
+                wars.add(war);
+                String label;
+                if (maskUndiscovered && (!knowsA || !knowsB)) {
+                    String nameA = knowsA && dynastyA != null ? dynastyA.getName() : LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY);
+                    String nameB = knowsB && dynastyB != null ? dynastyB.getName() : LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY);
+                    label = LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, nameA, nameB);
+                } else {
+                    label = world.getWarService().formatWarNameForDisplay(war, null);
+                    if (label == null || label.isEmpty()) {
+                        String nameA = dynastyA != null ? dynastyA.getName() : "?";
+                        String nameB = dynastyB != null ? dynastyB.getName() : "?";
+                        label = LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, nameA, nameB);
+                    }
+                }
+                labels.add(label);
+            }
             activeWarsSection.setVisible(!wars.isEmpty());
             activeWarsTitle.setText(LanguageStrings.format(
                     LanguageStrings.MAP_ACTIVE_WARS_TITLE_FMT, wars.size()));
             boolean playerCanManageWars = canPlayerManageWars();
             StringBuilder sig = new StringBuilder();
             sig.append(playerCanManageWars).append('|');
-            List<String> labels = new ArrayList<>(wars.size());
-            for (War war : wars) {
-                String label = world.getWarService().formatWarNameForDisplay(war, null);
-                if (label == null || label.isEmpty()) {
-                    Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
-                    Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
-                    String nameA = dynastyA != null ? dynastyA.getName() : "?";
-                    String nameB = dynastyB != null ? dynastyB.getName() : "?";
-                    label = LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, nameA, nameB);
-                }
-                labels.add(label);
-                sig.append(war.getId()).append(':').append(label).append(';');
+            for (int i = 0; i < wars.size(); i++) {
+                sig.append(wars.get(i).getId()).append(':').append(labels.get(i)).append(';');
             }
             String nextSignature = sig.toString();
             if (!nextSignature.equals(lastActiveWarsSignature)) {
@@ -2352,6 +2420,8 @@ public class MapDialog extends ZeroDialog {
             collapseControl.setForeground(AssetStyles.FONT_COLOR);
             collapseControl.repaint();
             AssetStyles.styleCompactButton(sortButton);
+            AssetStyles.styleCheckBox(excludeDeadCheck);
+            excludeDeadCheck.setFont(AssetStyles.FONT_SMALL);
             updateSortButtonLabel();
             lastWorldLogCount = -1;
             lastWorldLogHead = null;
@@ -2362,56 +2432,75 @@ public class MapDialog extends ZeroDialog {
 
         public void updateLegend() {
             syncWorldFromEngine();
+            excludeDeadCheck.setText(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD));
+            excludeDeadCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_EXCLUDE_DEAD_TT));
             updateActiveWarsSection();
             updateWorldLogsSection();
             content.removeAll();
             if (world == null) return;
 
+            boolean excludeDead = excludeDeadCheck.isSelected();
             Map<Integer, Dynasty> activeDynastiesMap = new HashMap<>();
             for (Hex h : world.getColonizedHexes()) {
                 if (h.getColony() != null && h.getColony().getDynasty() != null) {
                     Dynasty d = h.getColony().getDynasty();
-                    if (d.isPlayer() || d.isDefeated() || d.isActiveForDiplomacy()) {
+                    if ((d.isPlayer() || d.isDefeated() || d.isActiveForDiplomacy())
+                            && shouldIncludeDynastyInLegend(d, excludeDead)) {
                         activeDynastiesMap.put(d.getId(), d);
                     }
                 }
             }
             if (world.getDynastys() != null) {
                 for (Dynasty d : world.getDynastys()) {
-                    if (d.isDefeated() || world.getWarService().hasWarHistoryForDynasty(d.getId())) {
+                    if ((d.isDefeated() || world.getWarService().hasWarHistoryForDynasty(d.getId()))
+                            && shouldIncludeDynastyInLegend(d, excludeDead)) {
                         activeDynastiesMap.putIfAbsent(d.getId(), d);
                     }
                 }
             }
 
             Dynasty playerDynasty = findPlayerDynasty();
-            List<Dynasty> sortedDynasties = new ArrayList<>(activeDynastiesMap.values());
+            boolean cheatReveal = resolveEngine() != null && resolveEngine().isCheatRevealMap();
+            List<Dynasty> discoveredDynasties = new ArrayList<>();
+            List<Dynasty> undiscoveredDynasties = new ArrayList<>();
+            for (Dynasty d : activeDynastiesMap.values()) {
+                boolean isDiscovered = playerDynasty == null || cheatReveal || playerDynasty.hasDiscoveredDynasty(d, world);
+                if (isDiscovered) {
+                    discoveredDynasties.add(d);
+                } else {
+                    undiscoveredDynasties.add(d);
+                }
+            }
             if (sortMode == SORT_DIPLOMACY && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
                 Set<Dynasty> bordering = playerDynasty.getDiplomacyService().computeBorderingDynasties(world);
-                Map<Dynasty, Integer> repByDynasty = new IdentityHashMap<>(Math.max(4, sortedDynasties.size() * 2));
-                for (Dynasty d : sortedDynasties) {
+                Map<Dynasty, Integer> repByDynasty = new IdentityHashMap<>(Math.max(4, discoveredDynasties.size() * 2));
+                for (Dynasty d : discoveredDynasties) {
                     int rep = d.isPlayer() ? Integer.MIN_VALUE
                             : playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(
                                     d, world, bordering.contains(d));
                     repByDynasty.put(d, rep);
                 }
-                sortedDynasties.sort(Comparator
+                discoveredDynasties.sort(Comparator
                         .comparingInt((Dynasty d) -> repByDynasty.getOrDefault(d, 0))
                         .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
             } else if (sortMode == SORT_MILITARY) {
-                sortedDynasties.sort(Comparator
+                discoveredDynasties.sort(Comparator
                         .comparingInt((Dynasty d) -> d.isPlayer() ? Integer.MAX_VALUE : d.getMilitaryPower())
                         .reversed()
                         .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
             } else {
-                Map<Dynasty, Integer> popByDynasty = new IdentityHashMap<>(Math.max(4, sortedDynasties.size() * 2));
-                for (Dynasty d : sortedDynasties) {
+                Map<Dynasty, Integer> popByDynasty = new IdentityHashMap<>(Math.max(4, discoveredDynasties.size() * 2));
+                for (Dynasty d : discoveredDynasties) {
                     popByDynasty.put(d, d.getStatService().getTotalPopulation(d));
                 }
-                sortedDynasties.sort((d1, d2) -> Integer.compare(
+                discoveredDynasties.sort((d1, d2) -> Integer.compare(
                         popByDynasty.getOrDefault(d2, 0),
                         popByDynasty.getOrDefault(d1, 0)));
             }
+            undiscoveredDynasties.sort(Comparator.comparingInt(Dynasty::getId));
+            List<Dynasty> sortedDynasties = new ArrayList<>(discoveredDynasties.size() + undiscoveredDynasties.size());
+            sortedDynasties.addAll(discoveredDynasties);
+            sortedDynasties.addAll(undiscoveredDynasties);
 
             for (Dynasty d : sortedDynasties) {
                 JPanel item = new JPanel(new BorderLayout(4, 0));
@@ -2422,7 +2511,7 @@ public class MapDialog extends ZeroDialog {
                 JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 badges.setOpaque(false);
 
-                boolean isDiscovered = playerDynasty == null || playerDynasty.hasDiscoveredDynasty(d, world) || (resolveEngine() != null && resolveEngine().isCheatRevealMap());
+                boolean isDiscovered = playerDynasty == null || cheatReveal || playerDynasty.hasDiscoveredDynasty(d, world);
                 Color swatchColor = isDiscovered ? d.getColor() : AssetStyles.COLOR_FOG;
                 DynastyColorSwatch colorSwatch = new DynastyColorSwatch(swatchColor);
                 badges.add(colorSwatch);
@@ -2486,8 +2575,10 @@ public class MapDialog extends ZeroDialog {
 
                 JLabel name = new JLabel(nameStr);
                 name.setFont(d.isPlayer() ? AssetStyles.FONT_BOLD.deriveFont(10f) : AssetStyles.FONT_SMALL);
-                name.setForeground(defeated ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
-                name.setToolTipText(buildDynastyLegendInfoTooltip(d, playerDynasty));
+                name.setForeground((isDiscovered && defeated) ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
+                name.setToolTipText(isDiscovered
+                        ? buildDynastyLegendInfoTooltip(d, playerDynasty)
+                        : LanguageStrings.get(LanguageStrings.DIPLO_UNKNOWN_DYNASTY_ACTION_DISABLED));
                 if (capitalHex != null) {
                     AssetStyles.markClickable(name);
                     name.addMouseListener(new MouseAdapter() {
@@ -3379,7 +3470,7 @@ public class MapDialog extends ZeroDialog {
                     AssetStyles.BORDER_COLOR,
                     face -> isHexDiscovered(face.hex));
             if (mapMode == MapMode.TECTONIC_PLATES) {
-                mesh.paintFaultBoundariesWithStyles(bg, this::resolveFaultStyle);
+                mesh.paintFaultBoundariesWithStyles(bg, this::resolveVisibleFaultStyle);
             }
             if (showRivers) {
                 mesh.paintRivers(bg, 1.0f, edge -> isHexDiscovered(edge.faceA != null ? edge.faceA.hex : null) || isHexDiscovered(edge.faceB != null ? edge.faceB.hex : null));
@@ -3570,7 +3661,7 @@ public class MapDialog extends ZeroDialog {
                             AssetStyles.BORDER_COLOR,
                             face -> isHexDiscovered(face.hex));
                     if (mapMode == MapMode.TECTONIC_PLATES) {
-                        mesh.paintFaultBoundariesWithStyles(sg, this::resolveFaultStyle);
+                        mesh.paintFaultBoundariesWithStyles(sg, this::resolveVisibleFaultStyle);
                     }
                     if (showRivers) {
                         mesh.paintRivers(sg, 1.0f, edge -> isHexDiscovered(edge.faceA != null ? edge.faceA.hex : null) || isHexDiscovered(edge.faceB != null ? edge.faceB.hex : null));
@@ -3982,6 +4073,18 @@ public class MapDialog extends ZeroDialog {
             return new Point(
                     (int) Math.round(getWidth() / 2.0 + panX),
                     (int) Math.round(getHeight() / 2.0 + vertAdjust + panY));
+        }
+
+        private HexGridMesh.FaultStyle resolveVisibleFaultStyle(HexGridMesh.Edge edge) {
+            if (edge == null) {
+                return null;
+            }
+            boolean aVisible = edge.faceA != null && isHexDiscovered(edge.faceA.hex);
+            boolean bVisible = edge.faceB != null && isHexDiscovered(edge.faceB.hex);
+            if (!aVisible && !bVisible) {
+                return null;
+            }
+            return resolveFaultStyle(edge);
         }
 
         private HexGridMesh.FaultStyle resolveFaultStyle(HexGridMesh.Edge edge) {

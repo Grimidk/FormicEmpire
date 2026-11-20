@@ -1,11 +1,15 @@
 package com.grimidk.formicempire.classes.interfaces.ui.styles;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiNumberFormat;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -14,8 +18,6 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-
-import com.grimidk.formicempire.classes.interfaces.ui.util.UiNumberFormat;
 
 public final class UiTableStyles {
     private static final int DEFAULT_PADDING = 16;
@@ -40,6 +42,7 @@ public final class UiTableStyles {
         table.setSelectionForeground(AssetStyles.FONT_COLOR);
         styleHeader(table);
         applyDefaultNumberRenderers(table);
+        applyDefaultIconRenderers(table);
     }
 
     public static void applyScrollableDialogTable(JTable table) {
@@ -58,6 +61,29 @@ public final class UiTableStyles {
         table.setDefaultRenderer(Double.class, renderer);
         table.setDefaultRenderer(Short.class, renderer);
         table.setDefaultRenderer(Byte.class, renderer);
+    }
+
+    private static void applyDefaultIconRenderers(JTable table) {
+        DefaultTableCellRenderer renderer = createIconCellRenderer();
+        table.setDefaultRenderer(Icon.class, renderer);
+        table.setDefaultRenderer(ImageIcon.class, renderer);
+    }
+
+    public static DefaultTableCellRenderer createIconCellRenderer() {
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                Icon icon = value instanceof Icon i ? i : null;
+                setText("");
+                setIcon(icon);
+                setToolTipText(UiIconTooltips.resolveTooltip(icon));
+                return this;
+            }
+        };
+        renderer.setHorizontalAlignment(SwingConstants.CENTER);
+        return renderer;
     }
 
     public static DefaultTableCellRenderer createNumericCellRenderer() {
@@ -319,7 +345,7 @@ public final class UiTableStyles {
         protected void updateTruncationTooltip(JTable table, int column) {
             String text = getText();
             if (text == null || text.isEmpty()) {
-                setToolTipText(null);
+                setToolTipText(UiIconTooltips.resolveTooltip(getIcon()));
                 return;
             }
             int columnWidth = table.getColumnModel().getColumn(column).getWidth();
@@ -328,7 +354,7 @@ public final class UiTableStyles {
             if (available > 0 && metrics.stringWidth(text) > available) {
                 setToolTipText(text);
             } else {
-                setToolTipText(null);
+                setToolTipText(UiIconTooltips.resolveTooltip(getIcon()));
             }
         }
     }

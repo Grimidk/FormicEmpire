@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -23,6 +24,26 @@ public final class PanelBorderButtonUI extends BasicButtonUI {
     }
 
     private PanelBorderButtonUI() {
+    }
+
+    @Override
+    public void installUI(JComponent c) {
+        super.installUI(c);
+        if (c instanceof AbstractButton b) {
+            UiIconTooltips.syncComponentTooltip(b, b.getIcon());
+        }
+    }
+
+    @Override
+    protected void installListeners(AbstractButton b) {
+        super.installListeners(b);
+        b.addPropertyChangeListener(UiIconTooltips.BUTTON_PROPERTY_LISTENER);
+    }
+
+    @Override
+    protected void uninstallListeners(AbstractButton b) {
+        b.removePropertyChangeListener(UiIconTooltips.BUTTON_PROPERTY_LISTENER);
+        super.uninstallListeners(b);
     }
 
     @Override

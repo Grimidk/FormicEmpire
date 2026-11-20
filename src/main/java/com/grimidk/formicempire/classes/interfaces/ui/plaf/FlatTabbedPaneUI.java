@@ -1,21 +1,54 @@
 package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
 public final class FlatTabbedPaneUI extends BasicTabbedPaneUI {
     private static final int SELECTED_LIFT_PX = 2;
+    private final ContainerListener tabContainerListener = new ContainerAdapter() {
+        @Override
+        public void componentAdded(ContainerEvent e) {
+            UiIconTooltips.syncTabbedPane(tabPane);
+        }
+
+        @Override
+        public void componentRemoved(ContainerEvent e) {
+            UiIconTooltips.syncTabbedPane(tabPane);
+        }
+    };
 
     public static ComponentUI createUI(JComponent c) {
         return new FlatTabbedPaneUI();
+    }
+
+    @Override
+    public void installUI(JComponent c) {
+        super.installUI(c);
+        UiIconTooltips.syncTabbedPane(tabPane);
+    }
+
+    @Override
+    protected void installListeners() {
+        super.installListeners();
+        tabPane.addContainerListener(tabContainerListener);
+    }
+
+    @Override
+    protected void uninstallListeners() {
+        tabPane.removeContainerListener(tabContainerListener);
+        super.uninstallListeners();
     }
 
     @Override

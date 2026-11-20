@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 
 import javax.swing.*;
@@ -667,6 +668,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
                 setIcon(null);
             }
             setIconTextGap(6);
+            setToolTipText(UiIconTooltips.resolveTooltip(getIcon()));
             return this;
         }
     }

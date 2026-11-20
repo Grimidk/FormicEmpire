@@ -28,6 +28,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiIconTooltips;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -261,6 +262,7 @@ public class StatsDialog extends ZeroDialog {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setToolTipText(null);
             Object property = table.getModel().getValueAt(row, 1);
             if (LanguageStrings.get(LanguageStrings.STAT_LOYALTY).equals(property) && value instanceof Integer score) {
                 ColonyLoyalty tier = GameConstants.getColonyLoyaltyLevel(score);
@@ -318,7 +320,9 @@ public class StatsDialog extends ZeroDialog {
                 setText(value != null ? value.toString() : "");
                 setToolTipText(null);
             }
-            updateTruncationTooltip(table, column);
+            if (getToolTipText() == null) {
+                updateTruncationTooltip(table, column);
+            }
             return this;
         }
     }
@@ -332,7 +336,7 @@ public class StatsDialog extends ZeroDialog {
                 setIcon(icon);
                 setText("");
                 setHorizontalAlignment(SwingConstants.CENTER);
-                setToolTipText(null);
+                setToolTipText(UiIconTooltips.resolveTooltip(icon));
             } else {
                 setIcon(null);
                 setText(value != null ? value.toString() : "");
@@ -848,6 +852,9 @@ public class StatsDialog extends ZeroDialog {
                 ? world.getHistoryService().getEvents()
                 : world.getHistoryService().getEvents(filter.category);
         boolean ownOnly = worldHistoryOwnOnly != null && worldHistoryOwnOnly.isSelected();
+        Engine eng = this.engine != null ? this.engine : world.getEngine();
+        boolean cheatReveal = eng != null && eng.isCheatRevealMap();
+        Dynasty viewerDynasty = (!world.isSpectatorMode() && !cheatReveal) ? world.findPlayerDynasty() : null;
         int ownDynastyId = -1;
         if (ownOnly) {
             Dynasty own = colony != null ? colony.getDynasty() : null;
@@ -866,10 +873,13 @@ public class StatsDialog extends ZeroDialog {
             if (ownOnly && (ownDynastyId <= 0 || !event.involvesDynasty(world, ownDynastyId))) {
                 continue;
             }
+            if (viewerDynasty != null && !event.isVisibleToViewer(world, viewerDynasty)) {
+                continue;
+            }
             model.addRow(new Object[]{
                     event.formatDateTime(),
                     event.formatCategoryLabel(),
-                    event.formatMessage(world)
+                    viewerDynasty != null ? event.formatMessage(world, viewerDynasty) : event.formatMessage(world)
             });
             shown++;
         }

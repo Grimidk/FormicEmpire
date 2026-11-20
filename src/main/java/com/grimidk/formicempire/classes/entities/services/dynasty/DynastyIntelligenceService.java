@@ -166,11 +166,17 @@ public class DynastyIntelligenceService {
         if (countSpiesToward(other) > 0) {
             return true;
         }
+        if (!DynastyDiplomacyService.hasDiplomaticDiscovery(dynasty, other, world)) {
+            return false;
+        }
         return countDynastyWideAvailableSpies() > 0;
     }
 
     public void assignSpiesToward(Dynasty other, int targetTotal, World world) {
         if (other == null || other == dynasty || world == null || !hasSpyRole()) {
+            return;
+        }
+        if (targetTotal > 0 && !DynastyDiplomacyService.hasDiplomaticDiscovery(dynasty, other, world)) {
             return;
         }
         int capped = Math.max(0, Math.min(targetTotal, getMaxSpiesPerTarget()));

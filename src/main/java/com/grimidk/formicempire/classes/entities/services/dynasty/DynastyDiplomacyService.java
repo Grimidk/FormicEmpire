@@ -46,6 +46,32 @@ public class DynastyDiplomacyService {
         return dynasty != null && dynasty.isActiveForDiplomacy();
     }
 
+    public static boolean hasDiplomaticDiscovery(Dynasty actor, Dynasty target, World world) {
+        if (actor == null || target == null || actor == target) {
+            return false;
+        }
+        if (world == null || world.getHexes() == null || world.getHexes().isEmpty()) {
+            return true;
+        }
+        if (actor.isPlayer() && world.getEngine() != null && world.getEngine().isCheatRevealMap()) {
+            return true;
+        }
+        boolean targetHasPlacedColony = false;
+        for (Colony colony : target.getColonies()) {
+            if (colony != null && world.getHexOfColony(colony) != null) {
+                targetHasPlacedColony = true;
+                break;
+            }
+        }
+        if (!targetHasPlacedColony) {
+            return true;
+        }
+        if (actor.getKnownHexCount() == 0) {
+            actor.initKnownHexes(world);
+        }
+        return actor.hasDiscoveredDynasty(target, world);
+    }
+
     public static boolean meetsWarDeclarationPopulationRequirement(Dynasty dynasty) {
         if (dynasty == null || dynasty.isDefeated()) {
             return false;
@@ -140,6 +166,9 @@ public class DynastyDiplomacyService {
                 || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
+        if (!hasDiplomaticDiscovery(dynasty, other, world)) {
+            return false;
+        }
         if (hasNonAggressionPact(other)) {
             return false;
         }
@@ -196,6 +225,9 @@ public class DynastyDiplomacyService {
         }
 
         if (other.isPlayer()) {
+            if (!hasDiplomaticDiscovery(other, dynasty, world)) {
+                return;
+            }
             other.getDiplomacyService().handleIncomingPactRequest(dynasty, world);
             return;
         }
@@ -416,6 +448,9 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
+        if (!hasDiplomaticDiscovery(dynasty, other, world)) {
+            return false;
+        }
         if (!meetsWarDeclarationPopulationRequirement(dynasty)) {
             return false;
         }
@@ -486,9 +521,14 @@ public class DynastyDiplomacyService {
     }
 
     private static void queueNpcWarAlertForPlayer(World world, int attackerId, int defenderId) {
+        Dynasty attacker = world.findDynastyById(attackerId);
+        Dynasty defender = world.findDynastyById(defenderId);
         for (Dynasty dynasty : world.getDynastys()) {
             if (dynasty.isPlayer() && !dynasty.isDefeated()) {
-                dynasty.addPendingNpcWarAlert(attackerId, defenderId);
+                if (hasDiplomaticDiscovery(dynasty, attacker, world)
+                        || hasDiplomaticDiscovery(dynasty, defender, world)) {
+                    dynasty.addPendingNpcWarAlert(attackerId, defenderId);
+                }
                 return;
             }
         }
@@ -869,6 +909,9 @@ public class DynastyDiplomacyService {
 
     public boolean canProposeCrossDynastyTrade(Dynasty other, World world, CrossDynastyTradeProposal.Kind kind) {
         if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
+            return false;
+        }
+        if (!hasDiplomaticDiscovery(dynasty, other, world)) {
             return false;
         }
         if (world != null) {
@@ -1790,6 +1833,9 @@ public class DynastyDiplomacyService {
         if (from.getDynasty() != dynasty || isAtWarWith(other)) {
             return false;
         }
+        if (!hasDiplomaticDiscovery(dynasty, other, world)) {
+            return false;
+        }
         return countAvailableDiplomats(from) > 0 && needsDiplomatMissionToDynasty(other, world);
     }
 
@@ -1879,6 +1925,9 @@ public class DynastyDiplomacyService {
         if (countDynastyMissionDiplomatsToward(other) > 0) {
             return true;
         }
+        if (!hasDiplomaticDiscovery(dynasty, other, world)) {
+            return false;
+        }
         return countDynastyWideAvailableDiplomats() > 0 && needsDiplomatMissionToDynasty(other, world);
     }
 
@@ -1898,6 +1947,9 @@ public class DynastyDiplomacyService {
 
     public void assignDynastyMissionDiplomats(Dynasty other, int targetTotal, World world) {
         if (other == null || other == dynasty || world == null) {
+            return;
+        }
+        if (targetTotal > 0 && !hasDiplomaticDiscovery(dynasty, other, world)) {
             return;
         }
         int before = countDynastyMissionDiplomatsToward(other);
@@ -2115,6 +2167,9 @@ public class DynastyDiplomacyService {
             return false;
         }
         if (isAtWarWith(target)) {
+            return false;
+        }
+        if (!hasDiplomaticDiscovery(dynasty, target, world)) {
             return false;
         }
         if (!isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(target)) {

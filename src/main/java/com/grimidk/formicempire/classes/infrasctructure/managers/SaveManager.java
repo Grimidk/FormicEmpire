@@ -954,11 +954,12 @@ public class SaveManager {
             writeJsonLine(w, "infiniteResearch", engine.isInfiniteResearch(), false);
             writeJsonLine(w, "instantBuildings", engine.isInstantBuildings(), false);
             writeJsonLine(w, "assimilateAll", engine.isAssimilateAll(), false);
+            writeJsonLine(w, "allowNonOmniAssimilation", engine.isAllowNonOmniAssimilation(), false);
             writeJsonLine(w, "mapEditorEnabled", engine.isMapEditorEnabled(), false);
             writeJsonLine(w, "easyConquering", engine.isEasyConquering(), false);
             writeJsonLine(w, "instantIntegration", engine.isInstantIntegration(), false);
             writeJsonLine(w, "cheatFogOfWarToggle", engine.isCheatFogOfWarToggle(), false);
-            writeJsonLine(w, "cheatRevealMap", engine.isCheatRevealMap(), false);
+            writeJsonLine(w, "cheatRevealMap", false, false);
             writeJsonLine(w, "cheatRandomDisaster", engine.isCheatRandomDisaster(), false);
             writeJsonLine(w, "cheatRandomWar", engine.isCheatRandomWar(), false);
             writeJsonLine(w, "animateWorldGen", engine.isAnimateWorldGen(), false);
@@ -1112,11 +1113,12 @@ public class SaveManager {
             engine.setInfiniteResearch(Boolean.parseBoolean(m.getOrDefault("infiniteResearch", "false")));
             engine.setInstantBuildings(Boolean.parseBoolean(m.getOrDefault("instantBuildings", "false")));
             engine.setAssimilateAll(Boolean.parseBoolean(m.getOrDefault("assimilateAll", "false")));
+            engine.setAllowNonOmniAssimilation(Boolean.parseBoolean(m.getOrDefault("allowNonOmniAssimilation", "false")));
             engine.setMapEditorEnabled(Boolean.parseBoolean(m.getOrDefault("mapEditorEnabled", "false")));
             engine.setEasyConquering(Boolean.parseBoolean(m.getOrDefault("easyConquering", "false")));
             engine.setInstantIntegration(Boolean.parseBoolean(m.getOrDefault("instantIntegration", "false")));
             engine.setCheatFogOfWarToggle(Boolean.parseBoolean(m.getOrDefault("cheatFogOfWarToggle", "false")));
-            engine.setCheatRevealMap(Boolean.parseBoolean(m.getOrDefault("cheatRevealMap", "false")));
+            engine.setCheatRevealMap(false);
             engine.setCheatRandomDisaster(Boolean.parseBoolean(m.getOrDefault("cheatRandomDisaster", "false")));
             engine.setCheatRandomWar(Boolean.parseBoolean(m.getOrDefault("cheatRandomWar", "false")));
             engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "true")));

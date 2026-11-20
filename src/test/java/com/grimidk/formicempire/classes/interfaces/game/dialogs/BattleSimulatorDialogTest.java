@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.services.shared.CritterSkillService;
@@ -10,20 +11,25 @@ import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleSceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleState;
 import com.grimidk.formicempire.classes.entities.services.world.WarCreatureCombatService;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.BattleSimulatorDialog.BattleMode;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.BattleSimulatorDialog.BattleRunResult;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.BattleSimulatorDialog.BuiltSimulation;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.BattleSimulatorDialog.SideConfig;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.BattleSimulatorDialog.SimulationConfig;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.JButton;
 import javax.swing.SwingUtilities;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -251,5 +257,54 @@ class BattleSimulatorDialogTest {
         } finally {
             WarCreatureCombatService.clear(riverSim.war());
         }
+    }
+
+    @Test
+    void creatorDialogHasCloseButtonAndBattleRushKeepsSpeedAcrossBattles() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            BattleSimulatorDialog dialog = new BattleSimulatorDialog(null, null);
+            try {
+                dialog.pack();
+                JButton closeButton = dialog.getCloseButton();
+                assertNotNull(closeButton);
+                assertTrue(closeButton.isVisible());
+                assertEquals(LanguageStrings.get(LanguageStrings.UI_CLOSE), closeButton.getText());
+                assertTrue(dialog.southPanel.getPreferredSize().width <= 1180,
+                        "South panel buttons should fit within dialog width without clipping");
+                assertTrue(dialog.isDisplayable());
+                closeButton.doClick();
+                assertFalse(dialog.isDisplayable());
+            } finally {
+                if (dialog.isDisplayable()) {
+                    dialog.dispose();
+                }
+            }
+        });
+
+        Engine engine = new Engine();
+        engine.setSpeed(GameConstants.SPEED_NORMAL);
+        List<GameSpeed> seenStartingSpeeds = new ArrayList<>();
+        AtomicInteger runs = new AtomicInteger(0);
+
+        BattleSimulatorDialog.runBattleRush(
+                engine,
+                () -> runs.get() < 3,
+                startingSpeed -> {
+                    int idx = runs.getAndIncrement();
+                    seenStartingSpeeds.add(startingSpeed);
+                    if (idx == 0) {
+                        engine.setSpeed(GameConstants.SPEED_VERY_FAST);
+                        return new BattleRunResult(true, engine.getSpeed());
+                    }
+                    if (idx == 1) {
+                        return new BattleRunResult(true, engine.getSpeed());
+                    }
+                    return new BattleRunResult(false, engine.getSpeed());
+                });
+
+        assertEquals(
+                List.of(GameConstants.SPEED_NORMAL, GameConstants.SPEED_VERY_FAST, GameConstants.SPEED_VERY_FAST),
+                seenStartingSpeeds);
+        assertEquals(GameConstants.SPEED_NORMAL, engine.getSpeed());
     }
 }

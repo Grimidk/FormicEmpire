@@ -2,11 +2,13 @@ package com.grimidk.formicempire.classes.infrasctructure.maps;
 
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.WorldBuilderDialog;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -255,5 +259,92 @@ class SavedMapServiceTest {
         assertTrue(hasPeak);
         assertTrue(hasRiver);
         assertTrue(hasCoastal);
+    }
+
+    @Test
+    void seededDynastiesPreserveNonDefaultTitlesAndRandomizeMissingTitles() {
+        World editorWorld = new World();
+        editorWorld.initializeBlankGrid(8, 4, false, 0);
+
+        DynastyNamingService namingService = new DynastyNamingService();
+        Set<String> generatedTitleKeys = new HashSet<>();
+        for (int i = 0; i < 30; i++) {
+            World sampleWorld = new World();
+            sampleWorld.initializeBlankGrid(4, 2, false, 0);
+            Dynasty created = WorldBuilderDialog.createEditorDynasty(
+                    sampleWorld, GameConstants.SPECIES_FIRE, false, namingService);
+            generatedTitleKeys.add(created.getTitleKey());
+        }
+        assertTrue(generatedTitleKeys.size() > 1);
+
+        Dynasty playerDyn = new Dynasty(1, "Solar Empire", LanguageStrings.DYNASTY_TITLE_EMPIRE, true, GameConstants.SPECIES_OMNI);
+        playerDyn.setThemeBase("Solar");
+        Colony playerCap = new Colony(1, "Solar Prime", true);
+        playerCap.setDynasty(playerDyn);
+        playerCap.setCapital(true);
+        playerDyn.addColony(playerCap);
+        playerDyn.setCapital(playerCap);
+        editorWorld.registerDynasty(playerDyn);
+
+        Dynasty aiOne = new Dynasty(2, "Crimson Technocracy", LanguageStrings.DYNASTY_TITLE_TECHNOCRACY, false, GameConstants.SPECIES_FIRE);
+        aiOne.setThemeBase("Crimson");
+        Colony aiOneCap = new Colony(2, "Crimson Prime", false);
+        aiOneCap.setDynasty(aiOne);
+        aiOneCap.setCapital(true);
+        aiOne.addColony(aiOneCap);
+        aiOne.setCapital(aiOneCap);
+        editorWorld.registerDynasty(aiOne);
+
+        Dynasty aiTwo = new Dynasty(3, "Amber Union", LanguageStrings.DYNASTY_TITLE_UNION, false, GameConstants.SPECIES_FIRE);
+        aiTwo.setThemeBase("Amber");
+        Colony aiTwoCap = new Colony(3, "Amber Prime", false);
+        aiTwoCap.setDynasty(aiTwo);
+        aiTwoCap.setCapital(true);
+        aiTwo.addColony(aiTwoCap);
+        aiTwo.setCapital(aiTwoCap);
+        editorWorld.registerDynasty(aiTwo);
+
+        editorWorld.findHex(0, 0).setColony(playerCap);
+        editorWorld.findHex(1, 0).setColony(aiOneCap);
+        editorWorld.findHex(2, 0).setColony(aiTwoCap);
+
+        SavedMapData data = SavedMapService.createSavedMapData(editorWorld, "TitledMap");
+        World rebuilt = SavedMapService.buildWorldFromMapData(data);
+        assertEquals(3, rebuilt.getDynastys().size());
+        assertEquals(LanguageStrings.DYNASTY_TITLE_EMPIRE, rebuilt.findHex(0, 0).getColony().getDynasty().getTitleKey());
+        assertEquals(LanguageStrings.DYNASTY_TITLE_TECHNOCRACY, rebuilt.findHex(1, 0).getColony().getDynasty().getTitleKey());
+        assertEquals(LanguageStrings.DYNASTY_TITLE_UNION, rebuilt.findHex(2, 0).getColony().getDynasty().getTitleKey());
+
+        Savefile savefile = new Savefile(1, "Solar");
+        savefile.setPlayerDynastyTitleId(GameConstants.getDynastyTitleByKey(LanguageStrings.DYNASTY_TITLE_EMPIRE).getId());
+        SavedMapService.populateSavefileFromMapData(savefile, data);
+        assertEquals(3, savefile.getDynastys().size());
+        assertTrue(savefile.getDynastys().stream().anyMatch(d -> !d.isPlayer && LanguageStrings.DYNASTY_TITLE_TECHNOCRACY.equals(d.titleKey)));
+        assertTrue(savefile.getDynastys().stream().anyMatch(d -> !d.isPlayer && LanguageStrings.DYNASTY_TITLE_UNION.equals(d.titleKey)));
+
+        Set<String> legacyTitles = new HashSet<>();
+        for (int i = 0; i < 30; i++) {
+            SavedMapData legacyData = new SavedMapData();
+            legacyData.worldWidth = 4;
+            legacyData.worldHeight = 2;
+            for (int r = 0; r < 2; r++) {
+                for (int q = 0; q < 4; q++) {
+                    SavedMapData.SavedMapHex sh = new SavedMapData.SavedMapHex();
+                    sh.q = q;
+                    sh.r = r;
+                    sh.biomeId = GameConstants.BIOME_PLAINS.getId();
+                    if (q == 0 && r == 0) {
+                        sh.dynastySpeciesId = GameConstants.SPECIES_FIRE.getId();
+                        sh.isPlayerColony = false;
+                        sh.isCapitalColony = true;
+                        sh.colonyName = "Legacy Fire";
+                    }
+                    legacyData.hexes.add(sh);
+                }
+            }
+            World legacyRebuilt = SavedMapService.buildWorldFromMapData(legacyData);
+            legacyTitles.add(legacyRebuilt.findHex(0, 0).getColony().getDynasty().getTitleKey());
+        }
+        assertTrue(legacyTitles.size() > 1);
     }
 }

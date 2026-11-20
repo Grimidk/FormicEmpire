@@ -797,11 +797,11 @@ SAVE_DELETE_CONFIRM,Delete save in slot %s?,¿Eliminar guardado en el espacio %s
 SAVE_DELETE_TITLE,Delete Save,Eliminar Guardado,Excluir save,Supprimer la sauvegarde,,,
 SAVE_DELETE_ERROR,Failed to delete save (file may not exist).,Error al eliminar guardado (el archivo puede no existir).,Erro ao excluir save (o arquivo pode não existir).,Échec de la suppression (fichier peut-être absent).,,,
 SAVE_ACHIEVEMENTS_WARN_TITLE,Achievements will be disabled,Los logros se desactivarán,As conquistas serão desativadas,Les succès seront désactivés,,,
-SAVE_ACHIEVEMENTS_WARN_CREATE,Sandbox ★ options are on. Creating this save will permanently disable achievements for it. Continue?,Hay opciones Sandbox ★ activas. Crear esta partida desactivará permanentemente sus logros. ¿Continuar?,Opções Sandbox ★ estão ativas. Criar este save desativará permanentemente as conquistas dele. Continuar?,Des options Sandbox ★ sont actives. Créer cette sauvegarde désactivera définitivement ses succès. Continuer ?,,,
-SAVE_ACHIEVEMENTS_WARN_LOAD,Sandbox ★ options are on. Loading this save will permanently disable achievements for it. Continue?,Hay opciones Sandbox ★ activas. Cargar esta partida desactivará permanentemente sus logros. ¿Continuar?,Opções Sandbox ★ estão ativas. Carregar este save desativará permanentemente as conquistas dele. Continuar?,Des options Sandbox ★ sont actives. Charger cette sauvegarde désactivera définitivement ses succès. Continuer ?,,,
+SAVE_ACHIEVEMENTS_WARN_CREATE,Cheat ★ options are on. Creating this save will permanently disable achievements for it. Continue?,Hay opciones de trucos ★ activas. Crear esta partida desactivará permanentemente sus logros. ¿Continuar?,Opções de trapaças ★ estão ativas. Criar este save desativará permanentemente as conquistas dele. Continuar?,Des options de triche ★ sont actives. Créer cette sauvegarde désactivera définitivement ses succès. Continuer ?,,,
+SAVE_ACHIEVEMENTS_WARN_LOAD,Cheat ★ options are on. Loading this save will permanently disable achievements for it. Continue?,Hay opciones de trucos ★ activas. Cargar esta partida desactivará permanentemente sus logros. ¿Continuar?,Opções de trapaças ★ estão ativas. Carregar este save desativará permanentemente as conquistas dele. Continuar?,Des options de triche ★ sont actives. Charger cette sauvegarde désactivera définitivement ses succès. Continuer ?,,,
 SAVE_UPDATE_VERSION_PROMPT,Do you want to update this save?,¿Quieres actualizar esta partida?,Queres atualizar este save?,Voulez-vous mettre à jour cette sauvegarde ?,,,
 SAVE_UPDATE_VERSION_TITLE,Update Save,Actualizar Partida,Atualizar Save,Mettre à jour la sauvegarde,,,
-SETTINGS_SANDBOX_WARN_IN_GAME,Sandbox ★ options will permanently disable achievements for this save. Are you sure?,Las opciones Sandbox ★ desactivarán permanentemente los logros de esta partida. ¿Seguro?,Opções Sandbox ★ desativarão permanentemente as conquistas deste save. Tem a certeza?,Les options Sandbox ★ désactiveront définitivement les succès de cette sauvegarde. Êtes-vous sûr ?,,,
+SETTINGS_SANDBOX_WARN_IN_GAME,Cheat ★ options will permanently disable achievements for this save. Are you sure?,Las opciones de trucos ★ desactivarán permanentemente los logros de esta partida. ¿Seguro?,Opções de trapaças ★ desativarão permanentemente as conquistas deste save. Tem a certeza?,Les options de triche ★ désactiveront définitivement les succès de cette sauvegarde. Êtes-vous sûr ?,,,
 DYNASTY_THEME_PLAYER,Player,Jugador,Jogador,Joueur,,,
 DYNASTY_THEME_OMNI,Omni,Omni,Omni,Omni,,,
 DYNASTY_THEME_ANT,Ant,Hormiga,Formiga,Fourmi,,,
@@ -3018,3 +3018,18 @@ BATTLE_SIM_VICTORY_TITLE,Battle Complete,Batalla Completada,Batalha Concluída,B
 BATTLE_SIM_VICTORY_FMT,%s Victory!,¡Victoria de %s!,Vitória de %s!,Victoire de %s !
 BATTLE_SIM_DRAW,Battle ended in a draw.,La batalla terminó en empate.,A batalha terminou em empate.,La bataille s'est terminée par un match nul.
 BATTLE_SIM_RUSH,Battle Rush,Asalto Rápido,Batalha Contínua,Enchaînement de Batailles
+UI_ABORT,Abort,Abortar,Abortar,Abandonner
+ICON_SOCIALISM,Socialism,Socialismo,Socialismo,Socialisme
+ICON_GROWTH,Growth,Crecimiento,Crescimento,Croissance
+ICON_COUNTER_INTELLIGENCE,Counter-Intelligence,Contraespionaje,Contrainteligência,Contre-espionnage
+ICON_FOOD_CONSUMPTION,Food Consumption,Consumo de Alimento,Consumo de Alimento,Consommation alimentaire
+ICON_FOOD_PRODUCTION,Food Production,Producción de Alimento,Produção de Alimento,Production alimentaire
+ICON_NET_FOOD,Net Food,Alimento Neto,Alimento Líquido,Aliment net
+SAVE_BIOME_RANDOM,Random,Aleatorio,Aleatório,Aléatoire
+SAVE_BIOME_RANDOM_TT,Selects a random starting biome when the game is created.,Selecciona un bioma inicial aleatorio cuando se crea la partida.,Seleciona um bioma inicial aleatório quando o jogo é criado.,Sélectionne un biome de départ aléatoire lors de la création de la partie.
+SAVE_RANDOMIZE_ALL,Randomize All,Aleatorizar Todo,Aleatorizar Tudo,Tout randomiser
+SAVE_RANDOMIZE_ALL_TT,"Picks a random dynasty name, title, biome, and diet before creating.","Elige aleatoriamente un nombre de dinastía, título, bioma y dieta antes de crear.","Escolhe aleatoriamente um nome de dinastia, título, bioma e dieta antes de criar.","Choisit aléatoirement un nom de dynastie, un titre, un biome et un régime avant de créer."
+SETTINGS_ALLOW_NON_OMNI_ASSIMILATION,Allow non-Omni assimilation:,Permitir asimilación no-Omni:,Permitir assimilação não-Omni:,Autoriser l'assimilation non-Omni :
+SETTINGS_ALLOW_NON_OMNI_ASSIMILATION_TT,Allows non-Omni species to assimilate defeated species directly without completing Omni Assimilation first.,Permite que especies no-Omni asimilen especies derrotadas directamente sin completar primero Asimilación Omni.,Permite que espécies não-Omni assimilem espécies derrotadas diretamente sem concluir primeiro Assimilação Omni.,Permet aux espèces non-Omni d'assimiler directement les espèces vaincues sans terminer d'abord l'Assimilation Omni.
+DYNASTY_EXCLUDE_DEAD,Exclude dead dynasties,Excluir dinastías muertas,Excluir dinastias mortas,Exclure les dynasties mortes
+DYNASTY_EXCLUDE_DEAD_TT,Hide defeated dynasties from the list.,Oculta las dinastías derrotadas de la lista.,Oculta as dinastias derrotadas da lista.,Masque les dynasties vaincues de la liste.

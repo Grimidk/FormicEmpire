@@ -295,12 +295,15 @@ public class MiniMapPanel extends ZeroGamePanel {
         }
 
         final boolean cheatReveal = engine != null && engine.isCheatRevealMap();
-        final Dynasty player = world.findPlayerDynasty();
+        final Dynasty player = world.isSpectatorMode() ? null : world.findPlayerDynasty();
         final boolean revealAll = explicitWorld != null
                 || engine == null
+                || world.isSpectatorMode()
                 || cheatReveal
-                || player == null
-                || player.getKnownHexCount() == 0;
+                || player == null;
+        if (!revealAll && player.getKnownHexCount() == 0) {
+            player.initKnownHexes(world);
+        }
         final java.util.function.Predicate<Hex> discovered = hex ->
                 hex != null && (revealAll || player.isHexKnown(hex));
 
@@ -372,9 +375,12 @@ public class MiniMapPanel extends ZeroGamePanel {
         if (hex == null) return false;
         if (explicitWorld != null || engine == null || engine.isCheatRevealMap()) return true;
         World world = getWorld();
-        if (world == null) return true;
+        if (world == null || world.isSpectatorMode()) return true;
         Dynasty playerDynasty = world.findPlayerDynasty();
-        if (playerDynasty == null || playerDynasty.getKnownHexCount() == 0) return true;
+        if (playerDynasty == null) return true;
+        if (playerDynasty.getKnownHexCount() == 0) {
+            playerDynasty.initKnownHexes(world);
+        }
         return playerDynasty.isHexKnown(hex);
     }
 

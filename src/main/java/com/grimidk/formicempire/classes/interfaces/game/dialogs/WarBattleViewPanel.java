@@ -274,6 +274,7 @@ public class WarBattleViewPanel extends JPanel {
         } else {
             stagePhaseLabel.setIcon(null);
         }
+        stagePhaseLabel.setToolTipText(stagePhase != null ? stagePhase.getName() : null);
 
         WarBattleState battleState = WarCreatureCombatService.getState(war);
         if (battleState == null) {
