@@ -103,6 +103,7 @@ public class SettingsPanel extends JPanel {
     private JButton resetRolesButton;
     private JButton resetSandboxButton;
     private JButton resetCheatsButton;
+    private JButton resetMapButton;
     private boolean loadedFullScreen;
     private String loadedScreenSize;
 
@@ -442,7 +443,7 @@ public class SettingsPanel extends JPanel {
         mapEditorEnabledCheck = new JCheckBox();
         styleCheckBox(mapEditorEnabledCheck);
         
-        JButton resetMapButton = new JButton("Reset Setup");
+        resetMapButton = new JButton();
         AssetStyles.styleCompactButton(resetMapButton);
         resetMapButton.addActionListener(e -> {
             for (com.grimidk.formicempire.classes.constants.unlocks.Upgrade u : com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks.getUpgrades()) {
@@ -1155,6 +1156,9 @@ public class SettingsPanel extends JPanel {
         resetRolesButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetSandboxButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         resetCheatsButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
+        if (resetMapButton != null) {
+            resetMapButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_SETUP));
+        }
         
         int currentFreq = (autosaveCombo.getSelectedItem() != null) ? ((AutosaveOption)autosaveCombo.getSelectedItem()).value : 0;
         autosaveCombo.setModel(new DefaultComboBoxModel<>(new AutosaveOption[]{

@@ -217,6 +217,9 @@ public final class GameNumbers {
     public static final float LIFESPAN_MULT_DRONE = 1.0f / 3.0f;
     public static final float LIFESPAN_MULT_PRINCESS = 2.0f;
     public static final float LIFESPAN_MULT_QUEEN = 20.0f;
+    public static final int OLD_AGE_MIN_CHANCE_PERCENT = 1;
+    public static final int OLD_AGE_MAX_CHANCE_PERCENT = 100;
+    public static final int OLD_AGE_MAX_LIFESPAN_MULTIPLIER = 2;
 
     // --- Integration / calendar ---
     public static final float INTEGRATION_MILITARY_RATIO_REQUIRED = 5f;
@@ -476,20 +479,25 @@ public final class GameNumbers {
         return (days + DAYS_PER_MONTH - 1) / DAYS_PER_MONTH;
     }
 
+    public static int hexColumn(int q, int r) {
+        return q + (r >> 1);
+    }
+
     public static int calculateTimeZoneOffset(int col, int worldWidth) {
         if (worldWidth <= 0) {
             return 0;
         }
         int minCol = -worldWidth / 2;
-        int maxCol = worldWidth / 2 - 1;
-        int normalizedCol = col;
-        while (normalizedCol < minCol) normalizedCol += worldWidth;
-        while (normalizedCol > maxCol) normalizedCol -= worldWidth;
+        int normalizedCol = Math.floorMod(col - minCol, worldWidth) + minCol;
         double colsPerZone = (double) worldWidth / 24.0;
         int offset = (int) Math.round(normalizedCol / colsPerZone);
         while (offset > 12) offset -= 24;
         while (offset < -12) offset += 24;
         return offset;
+    }
+
+    public static String formatTimeZoneOffset(int offset) {
+        return offset >= 0 ? ("UTC+" + offset) : ("UTC" + offset);
     }
 
     public static int initialModifierRemainingDays(DiplomaticReputationModifier modifier) {
@@ -613,6 +621,35 @@ public final class GameNumbers {
             return 1;
         }
         return Math.max(1, Math.round(baseDays * casteMultiplier));
+    }
+
+    public static int oldAgeDeathChancePercent(int age, int lifespan) {
+        if (lifespan <= 0) {
+            return age >= 0 ? OLD_AGE_MAX_CHANCE_PERCENT : 0;
+        }
+        if (age < lifespan) {
+            return 0;
+        }
+        long maxAge = (long) lifespan * OLD_AGE_MAX_LIFESPAN_MULTIPLIER;
+        if (age >= maxAge) {
+            return OLD_AGE_MAX_CHANCE_PERCENT;
+        }
+        return OLD_AGE_MIN_CHANCE_PERCENT + (int) (((long) (age - lifespan)
+                * (OLD_AGE_MAX_CHANCE_PERCENT - OLD_AGE_MIN_CHANCE_PERCENT)) / lifespan);
+    }
+
+    public static boolean shouldCheckOldAgeDeath(int age, int lifespan, boolean isQueen) {
+        if (lifespan <= 0) {
+            return age >= 0;
+        }
+        if (age < lifespan) {
+            return false;
+        }
+        long maxAge = (long) lifespan * OLD_AGE_MAX_LIFESPAN_MULTIPLIER;
+        if (age >= maxAge || !isQueen) {
+            return true;
+        }
+        return (age - lifespan) % DAYS_PER_MONTH == 0;
     }
 
     public static int d6TargetFromAccuracy(float accuracyMult) {

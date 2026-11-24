@@ -23,8 +23,29 @@ import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.Map;
 
 public class WorldGenVisualizerDialog extends JDialog implements WorldGenStepListener {
+    private static final Map<String, String> STEP_NAME_KEYS = Map.ofEntries(
+            Map.entry("Initialize World", LanguageStrings.WORLDGEN_STEP_INIT),
+            Map.entry("Allocate Hex Grid", LanguageStrings.WORLDGEN_STEP_ALLOCATE),
+            Map.entry("Link Neighbors", LanguageStrings.WORLDGEN_STEP_LINK),
+            Map.entry("Generate Tectonic Plates", LanguageStrings.WORLDGEN_STEP_PLATES),
+            Map.entry("Generate Fault Lines & Elevation", LanguageStrings.WORLDGEN_STEP_FAULTS),
+            Map.entry("Grow Continents", LanguageStrings.WORLDGEN_STEP_CONTINENTS),
+            Map.entry("Convert Enclosed Lakes", LanguageStrings.WORLDGEN_STEP_ENCLOSED_LAKES),
+            Map.entry("Compute Coastal Distance", LanguageStrings.WORLDGEN_STEP_COASTAL),
+            Map.entry("Generate Inland Lakes", LanguageStrings.WORLDGEN_STEP_INLAND_LAKES),
+            Map.entry("Assign Biomes", LanguageStrings.WORLDGEN_STEP_BIOMES),
+            Map.entry("Generate Archipelagos & Islands", LanguageStrings.WORLDGEN_STEP_ISLANDS),
+            Map.entry("Classify Landmasses", LanguageStrings.WORLDGEN_STEP_LANDMASSES),
+            Map.entry("Enforce Biome Quotas", LanguageStrings.WORLDGEN_STEP_QUOTAS),
+            Map.entry("Generate Downhill River Networks", LanguageStrings.WORLDGEN_STEP_RIVERS),
+            Map.entry("Spawn Dynasties", LanguageStrings.WORLDGEN_STEP_DYNASTIES),
+            Map.entry("Generate World Complete", LanguageStrings.WORLDGEN_STEP_GEN_COMPLETE),
+            Map.entry("Finalize World", LanguageStrings.WORLDGEN_STEP_FINALIZE)
+    );
+
     private final MiniMapPanel miniMapPanel;
     private final JLabel stepLabel;
     private final JProgressBar progressBar;
@@ -108,13 +129,29 @@ public class WorldGenVisualizerDialog extends JDialog implements WorldGenStepLis
         this.skipped = skipped;
     }
 
+    public static String localizeStepName(String stepName) {
+        if (stepName == null) {
+            return "";
+        }
+        String key = STEP_NAME_KEYS.get(stepName);
+        return key != null ? LanguageStrings.get(key) : stepName;
+    }
+
+    public static String formatStepProgress(int stepNumber, String stepName) {
+        return LanguageStrings.format(
+                LanguageStrings.WORLDGEN_STEP_PROGRESS_FMT,
+                stepNumber,
+                16,
+                localizeStepName(stepName));
+    }
+
     @Override
     public void onStepCompleted(int stepNumber, String stepName, World world) {
         if (skipped) {
             return;
         }
         SwingUtilities.invokeLater(() -> {
-            stepLabel.setText("Step " + stepNumber + "/16: " + stepName);
+            stepLabel.setText(formatStepProgress(stepNumber, stepName));
             progressBar.setValue(stepNumber);
             miniMapPanel.setExplicitWorld(world);
             miniMapPanel.repaint();

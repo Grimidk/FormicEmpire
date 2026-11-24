@@ -1749,7 +1749,7 @@ STAT_LONGEVITY_3,Enduring Longevity,Longevidad Perdurável,Longevidade duradoura
 STAT_LONGEVITY_3_FLAVOR,Quadrupled Lifespan,Vida Cuadruplicada,Vida quadruplicada,Durée de vie quadruplée,,,
 STAT_LONGEVITY_3_DESC,"Further doubles the base lifespan of all ants in your colony to 720 days before caste multipliers.","Duplica aún más la vida base de todas las hormigas de tu colonia a 720 días antes de multiplicadores de casta.","Aumenta a vida útil básica de todas as formigas para 720 dias antes dos multiplicadores de casta.","Double à nouveau la durée de vie de base de toutes les fourmis à 720 jours avant les multiplicateurs de caste.",,,
 STAT_RESEARCH_1,Research I,Investigación I,Pesquisa I,Recherche I,,,
-STAT_RESEARCH_1_FLAVOR,Micro Scopes,Micro Scopes,Microscópios,Microscopes,,,
+STAT_RESEARCH_1_FLAVOR,Micro Scopes,Microscopios,Microscópios,Microscopes,,,
 STAT_RESEARCH_1_DESC,Increases research speed by 1 point per hour.,Aumenta la velocidad de investigación en 1 punto por hora.,Aumenta a pesquisa em 1 ponto por hora.,+1 point de recherche par heure.,,,
 STAT_RESEARCH_2,Research II,Investigación II,Pesquisa II,Recherche II,,,
 STAT_RESEARCH_2_FLAVOR,Miniature Laboratories,Laboratorios en Miniatura,Laboratórios em miniatura,Laboratoires miniatures,,,
@@ -2209,7 +2209,7 @@ STAT_HEX_COLONY_FMT, (Colony: %s), (Colonia: %s), (Colônia: %s), (Colonie : %s)
 STAT_LABEL_ID,ID,ID,ID,ID,,,
 STAT_LABEL_ERROR,Error,Error,Erro,Erreur,,,
 STAT_LABEL_PROGRESS,Progress,Progreso,Progresso,Progrès,,,
-STAT_GLOBAL_RESOURCE_FMT,Global %s,Global %s,Global %s,Global %s,,,
+STAT_GLOBAL_RESOURCE_FMT,Global %s,Global: %s,Global: %s,Global : %s,,,
 STAT_DEFEATED_UNKNOWN_FMT,ID:%s,ID:%s,ID:%s,ID:%s,,,
 STAT_JOB_FARMING,Farming,Agricultura,Agricultura,Agriculture,,,
 STAT_JOB_FARMERS_EFF_FMT,%s Eff. Farmers,%s granjeras ef.,%s agr. efic.,%s agricultrices eff.,,,
@@ -2595,7 +2595,7 @@ DIALOG_INVASION_BATTLE_TITLE,Invasion Battle,Batalla de invasión,Batalha de inv
 INVASION_BATTLE_UNAVAILABLE,Invasion battle unavailable.,Batalla de invasión no disponible.,Batalha de invasão indisponível.,Bataille d'invasion indisponible.,,,
 INVASION_BATTLE_STATUS_FMT,%s HP %s%% — %s defenders alive.,%s PV %s%% — %s defensoras vivas.,%s PV %s%% — %s defensoras vivas.,%s PV %s%% — %s défenseuses vivantes.,,,
 INVASION_OPEN_BATTLE,Open Battle,Abrir batalla,Abrir batalha,Ouvrir la bataille,,,
-INVASION_ACTIVE_BATTLES_FMT,(%s active),(%s activa),(%s ativa),(%s active),,,
+INVASION_ACTIVE_BATTLES_FMT,(%s active),(%s activa),(%s ativa),(%s en cours),,,
 INVASION_EXPEDITION_PHASE_FIGHTING,Fighting,Combatiendo,Combater,Lutte,,,
 INVASION_EXPEDITION_COMBAT_DETAIL_FMT,Bug %s%% HP — %s / %s defenders alive.,Bicho %s%% PV — %s / %s defensoras vivas.,Inseto %s%% PV — %s / %s defensoras vivas.,Insecte %s%% PV — %s / %s défenseuses vivantes.,,,
 LOG_INVASION_COMBAT_STARTED_FMT,Defense party of %s ants engages the %s.,Partida de defensa de %s hormigas enfrenta al %s.,Grupo de defesa de %s formigas enfrenta o %s.,Groupe de défense de %s fourmis affronte le %s.,,,
@@ -2707,7 +2707,7 @@ HELP_UI_MAP_LAYERS_DESC,"Toggle Tunnels, Trade routes, Battles, and Dynasty bord
 HELP_BUILDINGS_SPECIAL_TITLE,Mound & Silk Storage,Montículos y Almacenes de Seda,Montículos e Depósitos de Seda,Monticules et Entrepôts de Soie
 HELP_BUILDINGS_SPECIAL_BODY,"<b>Hivebuild Mounds:</b> Tier 2 and Tier 4 surface carton mounds that grant +35% storage capacity per tier to their respective resource without taking subterranean room space.<br><br><b>Silk Storage Chambers:</b> Tier 3 leaf-woven storage chambers unlocked via Silkweave that substitute resin costs with plants, stacking with standard resin chambers.","<b>Montículos de nido:</b> Montículos de cartón de nivel 2 y 4 en superficie que otorgan +35% de capacidad por nivel a su recurso correspondiente sin ocupar espacio subterráneo.<br><br><b>Almacenes de Seda:</b> Cámaras de nivel 3 tejidas con hojas desbloqueadas con Tejido de Seda que sustituyen el coste de resina por plantas, acumulándose con los almacenes estándar.","<b>Montículos de ninho:</b> Montículos de papelão de nível 2 e 4 na superfície que concedem +35% de capacidade por nível ao seu recurso sem ocupar espaço subterrâneo.<br><br><b>Depósitos de Seda:</b> Câmaras de nível 3 tecidas com folhas desbloqueadas por Tecelagem de Seda que substituem o custo de resina por plantas, acumulando-se com os depósitos padrão.","<b>Monticules de nid :</b> Monticules en carton de surface de niveaux 2 et 4 offrant +35 % de capacité par niveau à leur ressource sans occuper d'espace souterrain.<br><br><b>Entrepôts de Soie :</b> Chambres de niveau 3 tissées de feuilles débloquées par Tissage de soie qui remplacent les coûts de résine par des plantes, se cumulant avec les entrepôts classiques."
 HELP_ANT_AGING_TITLE,Ant Aging & Lifespan,Envejecimiento y Esperanza de Vida,Envelhecimento e Esperança de Vida,Vieillissement et Espérance de Vie
-HELP_ANT_AGING_DESC,"Ants age 1 hour every in-game hour. Lifespans vary by caste: 90 days baseline for workers, soldiers, and majors, 30 days for drones, 180 days for princesses, and 1,800 days for queens. Longevity upgrades multiply natural lifespans (up to 4× at Longevity 3). Ants reaching their maximum lifespan die naturally of old age.","Las hormigas envejecen 1 hora cada hora de juego. La esperanza de vida varía según la casta: base de 90 días para obreras, soldados y mayores, 30 días para zánganos, 180 días para princesas y 1.800 días para reinas. Las mejoras de Longevidad multiplican la vida útil (hasta 4× en Longevidad 3). Al alcanzar su vida máxima, mueren de vejez.","As formigas envelhecem 1 hora a cada hora de jogo. A vida útil varia por casta: base de 90 dias para operárias, soldados e majores, 30 dias para zangões, 180 dias para princesas e 1.800 dias para rainhas. Melhorias de Longevidade multiplicam a vida útil (até 4× em Longevidade 3). Ao atingir o limite, morrem de velhice.","Les fourmis vieillissent d'une heure chaque heure de jeu. L'espérance de vie varie selon la caste : 90 jours de base pour les ouvrières, soldats et majors, 30 jours pour les mâles, 180 jours pour les princesses et 1 800 jours pour les reines. Les améliorations de Longévité multiplient cette durée (jusqu'à 4× au niveau 3). À terme, elles meurent de vieillesse."
+HELP_ANT_AGING_DESC,"Ants age 1 day every in-game day. Life expectancies vary by caste: 90 days baseline for workers, soldiers, and majors, 30 days for drones, 180 days for princesses, and 1,800 days for queens. Longevity upgrades multiply natural life expectancies (up to 4× at Longevity 3). Once an adult ant reaches its expectancy, its chance to die of old age starts at 1% and rises linearly to 100% at double its expectancy (checked daily for non-queens and every 30 days for queens).","Las hormigas envejecen 1 día cada día de juego. La esperanza de vida varía según la casta: base de 90 días para obreras, soldados y mayores, 30 días para zánganos, 180 días para princesas y 1.800 días para reinas. Las mejoras de Longevidad multiplican la esperanza de vida (hasta 4× en Longevidad 3). Al alcanzar su esperanza de vida, la probabilidad de morir por vejez empieza en 1% y sube linealmente hasta 100% al doble de esa edad (comprobada a diario en no reinas y cada 30 días en reinas).","As formigas envelhecem 1 dia a cada dia de jogo. A expectativa de vida varia por casta: base de 90 dias para operárias, soldados e majores, 30 dias para zangões, 180 dias para princesas e 1.800 dias para rainhas. Melhorias de Longevidade multiplicam a expectativa de vida (até 4× em Longevidade 3). Ao atingir sua expectativa de vida, a chance de morrer de velhice começa em 1% e sobe linearmente até 100% no dobro dessa idade (verificada diariamente para não rainhas e a cada 30 dias para rainhas).","Les fourmis vieillissent d'un jour chaque jour de jeu. L'espérance de vie varie selon la caste : 90 jours de base pour les ouvrières, soldats et majors, 30 jours pour les mâles, 180 jours pour les princesses et 1 800 jours pour les reines. Les améliorations de Longévité multiplient cette espérance (jusqu'à 4× au niveau 3). Une fois son espérance de vie atteinte, une fourmi adulte a 1 % de risque de mourir de vieillesse, augmentant linéairement jusqu'à 100 % au double de cette durée (vérifié chaque jour hors reines et tous les 30 jours pour les reines)."
 HELP_COMBAT_WATER_CROSSING,Water Crossing & Rafting,Cruce de Agua y Balsas,Travessia de Água e Jangadas,Traversée d'Eau et Radeaux
 HELP_COMBAT_WATER_CROSSING_BODY,"Crossing aquatic hexes (oceans, lakes) during military campaigns requires the Rafting assimilation and upgrades (Rafting 1 and 2). Without rafting adaptations, armies cannot march across open water borders or suffer heavy combat and movement penalties unless utilizing subterranean tunnels.","Cruzar hexágonos acuáticos (océanos, lagos) en campañas militares requiere la asimilación de Balsas y sus mejoras (Balsas 1 y 2). Sin adaptaciones de balsa, los ejércitos no pueden cruzar fronteras acuáticas o sufren graves penalizaciones de combate y velocidad a menos que utilicen túneles subterráneos.","Atravessar hexágonos aquáticos (oceanos, lagos) em campanhas militares requer a assimilação de Jangadas e suas melhorias (Jangada 1 e 2). Sem adaptação, os exércitos não podem cruzar fronteiras aquáticas ou sofrem pesadas penalidades de combate e velocidade, exceto via túneis subterrâneos.","Traverser des hexagones aquatiques (océans, lacs) en campagne militaire nécessite l'assimilation Radeaux et ses améliorations (Radeaux 1 et 2). Sans cette adaptation, les armées ne peuvent franchir les frontières aquatiques ou subissent de lourdes pénalités de combat et de vitesse, sauf via des tunnels souterrains."
 HELP_COMBAT_CARRIER_DESC,"Major Troop-Carriers transport reserve military ants to frontline battle lines. Each carrier increases daily reinforcement rates up to the daily allowance, remaining in reserve and not fighting directly.","Los transportes de tropas (Mayores) transportan hormigas de reserva a las líneas del frente. Cada transporte aumenta la tasa de refuerzo diario hasta el cupo permitido, permaneciendo en reserva sin combatir directamente.","Os transportes de tropas (Majores) levam formigas de reserva para as linhas de combate. Cada transporte aumenta a taxa diária de reforços até ao limite diário, ficando na reserva sem combater diretamente.","Les transporteurs de troupes (Majors) acheminent les fourmis de réserve vers les lignes de front. Chaque transporteur augmente le taux de renfort quotidien jusqu'à la limite autorisée, restant en réserve sans combattre directement."
@@ -3033,3 +3033,80 @@ SETTINGS_ALLOW_NON_OMNI_ASSIMILATION,Allow non-Omni assimilation:,Permitir asimi
 SETTINGS_ALLOW_NON_OMNI_ASSIMILATION_TT,Allows non-Omni species to assimilate defeated species directly without completing Omni Assimilation first.,Permite que especies no-Omni asimilen especies derrotadas directamente sin completar primero Asimilación Omni.,Permite que espécies não-Omni assimilem espécies derrotadas diretamente sem concluir primeiro Assimilação Omni.,Permet aux espèces non-Omni d'assimiler directement les espèces vaincues sans terminer d'abord l'Assimilation Omni.
 DYNASTY_EXCLUDE_DEAD,Exclude dead dynasties,Excluir dinastías muertas,Excluir dinastias mortas,Exclure les dynasties mortes
 DYNASTY_EXCLUDE_DEAD_TT,Hide defeated dynasties from the list.,Oculta las dinastías derrotadas de la lista.,Oculta as dinastias derrotadas da lista.,Masque les dynasties vaincues de la liste.
+STAT_SEASON,Season,Estación,Estação,Saison
+STAT_WEATHER,Weather,Clima,Clima,Météo
+SETTINGS_RESET_SETUP,Reset Setup,Restablecer diseño,Redefinir layout,Réinitialiser la disposition
+HELP_TEMP_MAX_FMT,%s (Max %s°C),%s (Máx. %s°C),%s (Máx. %s°C),%s (Max %s°C)
+UI_HOURS_FMT,%s Hours,%s Horas,%s horas,%s heures
+UI_PREVIOUS,Previous,Anterior,Anterior,Précédent
+UI_LOADING,Loading...,Cargando...,Carregando...,Chargement...
+MULTI_MAP_PARAM_CONTINENTS_TT,"0 = Auto, 1 - 10","0 = Automático, 1 - 10","0 = Automático, 1 - 10","0 = Auto, 1 - 10"
+MULTI_MAP_PARAM_ISLANDS_TT,"-1 = Auto, 0 - 50","-1 = Automático, 0 - 50","-1 = Automático, 0 - 50","-1 = Auto, 0 - 50"
+MULTI_MAP_PARAM_ICECAP_TT,"0% = None, 50% = Max","0% = Ninguno, 50% = Máx.","0% = Nenhum, 50% = Máx.","0% = Aucun, 50% = Max"
+MULTI_MAP_PARAM_PLATES_TT,"0 = Auto, 4 - 16","0 = Automático, 4 - 16","0 = Automático, 4 - 16","0 = Auto, 4 - 16"
+MULTI_MAP_PARAM_RANDOMIZE_TT,Randomize parameters uniquely for each generated map,Aleatorizar parámetros de forma única para cada mapa generado,Aleatorizar parâmetros de forma única para cada mapa gerado,Randomiser les paramètres de manière unique pour chaque carte générée
+MULTI_MAP_GENERATING,Generating...,Generando...,Gerando...,Génération...
+MULTI_MAP_GENERATING_COUNT_FMT,Generating %s standalone maps...,Generando %s mapas independientes...,Gerando %s mapas independentes...,Génération de %s cartes indépendantes...
+MULTI_MAP_GENERATED_PROGRESS_FMT,Generated %s/%s maps...,Generados %s/%s mapas...,Gerados %s/%s mapas...,%s/%s cartes générées...
+MULTI_MAP_GENERATED_DONE_FMT,Generated %s standalone maps.,Se generaron %s mapas independientes.,%s mapas independentes gerados.,%s cartes indépendantes générées.
+MULTI_MAP_DEFAULT_NAME_FMT,Map %s,Mapa %s,Mapa %s,Carte %s
+MULTI_MAP_WORLD_NAME_FMT,World %s,Mundo %s,Mundo %s,Monde %s
+MULTI_MAP_STATS_FMT,Cont: %d | Isl: %d | Land: %.0f%% | Ice: %.0f%%,Cont.: %d | Islas: %d | Tierra: %.0f%% | Hielo: %.0f%%,Cont.: %d | Ilhas: %d | Terra: %.0f%% | Gelo: %.0f%%,Cont. : %d | Îles : %d | Terre : %.0f%% | Glace : %.0f%%
+SAVED_MAP_STATS_FMT,%dx%d | Land: %.1f%% | Cont: %d | Isl: %d,%dx%d | Tierra: %.1f%% | Cont.: %d | Islas: %d,%dx%d | Terra: %.1f%% | Cont.: %d | Ilhas: %d,%dx%d | Terre : %.1f%% | Cont. : %d | Îles : %d
+WORLD_BUILDER_CAT_AQUATIC,Aquatic & Coastal,Acuático y costero,Aquático e costeiro,Aquatique et côtier
+WORLD_BUILDER_CAT_TEMPERATE,Temperate & Lush,Templado y frondoso,Temperado e exuberante,Tempéré et luxuriant
+WORLD_BUILDER_CAT_COLD,Cold & Highland,Frío y altiplano,Frio e terras altas,Froid et hauts plateaux
+WORLD_BUILDER_CAT_ARID,Arid & Extreme,Árido y extremo,Árido e extremo,Aride et extrême
+WORLD_BUILDER_DEFAULT_NAME,Custom World,Mundo personalizado,Mundo personalizado,Monde personnalisé
+WORLD_BUILDER_DIMENSIONS_FMT,Dimensions: %s x %s (%s hexes),Dimensiones: %s x %s (%s hexágonos),Dimensões: %s x %s (%s hexágonos),Dimensions : %s x %s (%s hexagones)
+WORLD_BUILDER_PRESET_TINY,"16 (Tiny, 32x16)","16 (Diminuto, 32x16)","16 (Minúsculo, 32x16)","16 (Minuscule, 32x16)"
+WORLD_BUILDER_PRESET_SMALL,"32 (Small, 64x32)","32 (Pequeño, 64x32)","32 (Pequeno, 64x32)","32 (Petit, 64x32)"
+WORLD_BUILDER_PRESET_MEDIUM,"48 (Medium, 96x48)","48 (Mediano, 96x48)","48 (Médio, 96x48)","48 (Moyen, 96x48)"
+WORLD_BUILDER_PRESET_LARGE,"64 (Large, 128x64)","64 (Grande, 128x64)","64 (Grande, 128x64)","64 (Grand, 128x64)"
+WORLD_BUILDER_APPLY_GRID,Apply Dimensions & Generate Grid,Aplicar dimensiones y generar cuadrícula,Aplicar dimensões e gerar grade,Appliquer les dimensions et générer la grille
+WORLD_BUILDER_STATUS_INIT_GRID_FMT,Initialized %sx%s world grid.,Cuadrícula del mundo %sx%s inicializada.,Grade do mundo %sx%s inicializada.,Grille du monde %sx%s initialisée.
+WORLD_BUILDER_STATUS_NO_UNDO,No actions to undo.,No hay acciones para deshacer.,Nenhuma ação para desfazer.,Aucune action à annuler.
+WORLD_BUILDER_STATUS_UNDID_FMT,Undid action. (%s undo steps remaining),Acción deshecha. (%s pasos para deshacer restantes),Ação desfeita. (%s passos de desfazer restantes),Action annulée. (%s étapes d'annulation restantes)
+WORLD_BUILDER_STATUS_NO_BASELINE,No baseline state recorded for this step.,No hay un estado base registrado para este paso.,Nenhum estado base registrado para esta etapa.,Aucun état de référence enregistré pour cette étape.
+WORLD_BUILDER_STATUS_RESET_BASELINE,Reset current step to baseline state.,Paso actual restablecido al estado base.,Etapa atual redefinida ao estado base.,Étape actuelle réinitialisée à l'état de référence.
+WORLD_BUILDER_FAULT_TYPE_LABEL,Fault Type: ,Tipo de falla: ,Tipo de falha: ,Type de faille : 
+WORLD_BUILDER_CLEAR_FAULTS,Clear Faults,Limpiar fallas,Limpar falhas,Effacer les failles
+WORLD_BUILDER_BIOMES_LABEL,Biomes: ,Biomas: ,Biomas: ,Biomes : 
+WORLD_BUILDER_REFRESH_RIVERS,Refresh Rivers,Actualizar ríos,Atualizar rios,Actualiser les rivières
+WORLD_BUILDER_REFRESH_RIVERS_TT,Generate or refresh algorithmic rivers and geographic features from current biomes,Genera o actualiza ríos algorítmicos y accidentes geográficos a partir de los biomas actuales,Gera ou atualiza rios algorítmicos e acidentes geográficos a partir dos biomas atuais,Génère ou actualise les rivières algorithmiques et les éléments géographiques à partir des biomes actuels
+WORLD_BUILDER_DYNASTIES_LABEL,Dynasties: ,Dinastías: ,Dinastias: ,Dynasties : 
+WORLD_BUILDER_PLACE_CAPITAL,Place Capital,Colocar capital,Colocar capital,Placer la capitale
+WORLD_BUILDER_CLAIM_TERRITORY,Claim Territory,Reclamar territorio,Reivindicar território,Revendiquer un territoire
+WORLD_BUILDER_REMOVE,Remove,Eliminar,Remover,Supprimer
+WORLD_BUILDER_STATUS_GEN_PLATES,Auto-generated tectonic plates & fault lines.,Placas tectónicas y líneas de falla generadas automáticamente.,Placas tectônicas e linhas de falha geradas automaticamente.,Plaques tectoniques et lignes de faille générées automatiquement.
+WORLD_BUILDER_STATUS_GEN_LAND,Auto-generated landmasses & elevation.,Masas terrestres y elevación generadas automáticamente.,Massas terrestres e elevação geradas automáticamente.,Masses terrestres et élévation générées automatiquement.
+WORLD_BUILDER_STATUS_GEN_BIOMES,"Auto-assigned biomes, rivers & features.","Biomas, ríos y rasgos asignados automáticamente.","Biomas, rios e características atribuídos automaticamente.","Biomes, rivières et caractéristiques attribués automatiquement."
+WORLD_BUILDER_STATUS_GEN_DYNASTIES,Auto-generated dynasties on landmasses.,Dinastías generadas automáticamente en las masas terrestres.,Dinastias geradas automaticamente nas massas terrestres.,Dynasties générées automatiquement sur les masses terrestres.
+WORLD_BUILDER_STATUS_REFRESH_RIVERS,Generated / refreshed rivers & geographic features.,Ríos y accidentes geográficos generados / actualizados.,Rios e acidentes geográficos generados / atualizados.,Rivières et éléments géographiques générés / actualisés.
+WORLD_BUILDER_STATUS_SAVED_FMT,Saved to %s,Guardado en %s,Salvo em %s,Enregistré dans %s
+WORLD_BUILDER_ERR_SAVE_FMT,Failed to save map: %s,Error al guardar el mapa: %s,Falha ao salvar o mapa: %s,Échec de l'enregistrement de la carte : %s
+WORLD_BUILDER_ERR_LAUNCH_FMT,Error launching game: %s,Error al iniciar la partida: %s,Erro ao iniciar o jogo: %s,Erreur lors du lancement de la partie : %s
+WORLD_BUILDER_CAPITAL_FMT,%s Capital,Capital de %s,Capital de %s,Capitale de %s
+WORLD_BUILDER_OUTPOST_FMT,%s Outpost,Puesto de %s,Posto de %s,Avant-poste de %s
+WORLDGEN_STEP_PROGRESS_FMT,Step %s/%s: %s,Paso %s/%s: %s,Etapa %s/%s: %s,Étape %s/%s : %s
+WORLDGEN_STEP_INIT,Initialize World,Inicializar mundo,Inicializar mundo,Initialiser le monde
+WORLDGEN_STEP_ALLOCATE,Allocate Hex Grid,Asignar cuadrícula hexagonal,Alocar grade hexagonal,Allouer la grille hexagonale
+WORLDGEN_STEP_LINK,Link Neighbors,Vincular vecinos,Vincular vizinhos,Lier les voisins
+WORLDGEN_STEP_PLATES,Generate Tectonic Plates,Generar placas tectónicas,Gerar placas tectônicas,Générer les plaques tectoniques
+WORLDGEN_STEP_FAULTS,Generate Fault Lines & Elevation,Generar líneas de falla y elevación,Gerar linhas de falha e elevação,Générer les failles et l'élévation
+WORLDGEN_STEP_CONTINENTS,Grow Continents,Formar continentes,Formar continentes,Développer les continents
+WORLDGEN_STEP_ENCLOSED_LAKES,Convert Enclosed Lakes,Convertir lagos cerrados,Converter lagos fechados,Convertir les lacs fermés
+WORLDGEN_STEP_COASTAL,Compute Coastal Distance,Calcular distancia costera,Calcular distância costeira,Calculer la distance côtière
+WORLDGEN_STEP_INLAND_LAKES,Generate Inland Lakes,Generar lagos interiores,Gerar lagos interiores,Générer les lacs intérieurs
+WORLDGEN_STEP_BIOMES,Assign Biomes,Asignar biomas,Atribuir biomas,Attribuer les biomes
+WORLDGEN_STEP_ISLANDS,Generate Archipelagos & Islands,Generar archipiélagos e islas,Gerar arquipélagos e ilhas,Générer les archipels et les îles
+WORLDGEN_STEP_LANDMASSES,Classify Landmasses,Clasificar masas terrestres,Classificar massas terrestres,Classer les masses terrestres
+WORLDGEN_STEP_QUOTAS,Enforce Biome Quotas,Aplicar cuotas de biomas,Aplicar cotas de biomas,Appliquer les quotas de biomes
+WORLDGEN_STEP_RIVERS,Generate Downhill River Networks,Generar redes fluviales,Gerar redes fluviais,Générer les réseaux fluviaux
+WORLDGEN_STEP_DYNASTIES,Spawn Dynasties,Generar dinastías,Gerar dinastias,Générer les dynasties
+WORLDGEN_STEP_GEN_COMPLETE,Generate World Complete,Generación del mundo completada,Geração do mundo concluída,Génération du monde terminée
+WORLDGEN_STEP_FINALIZE,Finalize World,Finalizar mundo,Finalizar mundo,Finaliser le monde
+MAP_MODE_TIMEZONES,Timezones,Zonas horarias,Fusos horários,Fuseaux horaires
+MAP_TOOLTIP_TIMEZONE,<br><b>Timezone:</b> ,<br><b>Zona horaria:</b> ,<br><b>Fuso horário:</b> ,<br><b>Fuseau horaire :</b> 
+MAP_TOOLTIP_LOCAL_TIME,<br><b>Local Time:</b> ,<br><b>Hora local:</b> ,<br><b>Hora local:</b> ,<br><b>Heure locale :</b> 
+STAT_TIMEZONE,Timezone,Zona horaria,Fuso horário,Fuseau horaire

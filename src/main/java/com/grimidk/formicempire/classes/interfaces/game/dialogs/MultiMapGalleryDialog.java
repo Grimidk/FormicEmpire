@@ -113,7 +113,7 @@ public class MultiMapGalleryDialog extends JDialog {
         continentSpinner = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
         continentSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
         AssetStyles.styleSpinner(continentSpinner);
-        continentSpinner.setToolTipText("0 = Auto, 1 - 10");
+        continentSpinner.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_CONTINENTS_TT));
 
         JLabel islandLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_ISLANDS));
         islandLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -121,7 +121,7 @@ public class MultiMapGalleryDialog extends JDialog {
         islandSpinner = new JSpinner(new SpinnerNumberModel(10, -1, 50, 1));
         islandSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
         AssetStyles.styleSpinner(islandSpinner);
-        islandSpinner.setToolTipText("-1 = Auto, 0 - 50");
+        islandSpinner.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_ISLANDS_TT));
 
         JLabel landLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_LAND_SHARE));
         landLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -137,7 +137,7 @@ public class MultiMapGalleryDialog extends JDialog {
         icecapSpinner = new JSpinner(new SpinnerNumberModel(18, 0, 50, 1));
         icecapSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
         AssetStyles.styleSpinner(icecapSpinner);
-        icecapSpinner.setToolTipText("0% = None, 50% = Max");
+        icecapSpinner.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_ICECAP_TT));
 
         JLabel plateLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_PLATES));
         plateLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -145,13 +145,13 @@ public class MultiMapGalleryDialog extends JDialog {
         plateSpinner = new JSpinner(new SpinnerNumberModel(6, 0, 16, 1));
         plateSpinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
         AssetStyles.styleSpinner(plateSpinner);
-        plateSpinner.setToolTipText("0 = Auto, 4 - 16");
+        plateSpinner.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_PLATES_TT));
 
         randomizeCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_RANDOMIZE));
         randomizeCheck.setFont(AssetStyles.FONT_NORMAL);
         randomizeCheck.setForeground(AssetStyles.FONT_COLOR);
         AssetStyles.styleCheckBox(randomizeCheck);
-        randomizeCheck.setToolTipText("Randomize parameters uniquely for each generated map");
+        randomizeCheck.setToolTipText(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_RANDOMIZE_TT));
         randomizeCheck.addActionListener(e -> updateParamControlsState());
 
         resetParamsButton = new JButton(LanguageStrings.get(LanguageStrings.MULTI_MAP_PARAM_RESET));
@@ -192,7 +192,7 @@ public class MultiMapGalleryDialog extends JDialog {
             JPanel cardSouth = new JPanel(new BorderLayout(0, 4));
             cardSouth.setOpaque(false);
 
-            JLabel statLabel = new JLabel("Generating...", SwingConstants.CENTER);
+            JLabel statLabel = new JLabel(LanguageStrings.get(LanguageStrings.MULTI_MAP_GENERATING), SwingConstants.CENTER);
             statLabel.setFont(AssetStyles.FONT_NORMAL);
             statLabel.setForeground(AssetStyles.FONT_COLOR);
             statLabels.add(statLabel);
@@ -467,7 +467,10 @@ public class MultiMapGalleryDialog extends JDialog {
         if (targetWorld == null) {
             return;
         }
-        SavedMapData data = SavedMapService.createSavedMapData(targetWorld, "Map " + (index + 1), 3);
+        SavedMapData data = SavedMapService.createSavedMapData(
+                targetWorld,
+                LanguageStrings.format(LanguageStrings.MULTI_MAP_DEFAULT_NAME_FMT, index + 1),
+                3);
         Window owner = getOwner();
         MainFrame mf = (owner instanceof MainFrame m)
                 ? m
@@ -488,7 +491,7 @@ public class MultiMapGalleryDialog extends JDialog {
         if (targetWorld == null) {
             return;
         }
-        String defaultName = "Map " + (index + 1);
+        String defaultName = LanguageStrings.format(LanguageStrings.MULTI_MAP_DEFAULT_NAME_FMT, index + 1);
         String input = UiOptionPane.showInputDialog(
                 this,
                 LanguageStrings.get(LanguageStrings.SAVED_MAP_PROMPT_NAME),
@@ -521,9 +524,9 @@ public class MultiMapGalleryDialog extends JDialog {
         }
         regenerateButton.setEnabled(false);
         generatedCount = 0;
-        statusLabel.setText("Generating " + MAP_COUNT + " standalone maps...");
+        statusLabel.setText(LanguageStrings.format(LanguageStrings.MULTI_MAP_GENERATING_COUNT_FMT, MAP_COUNT));
         for (int i = 0; i < MAP_COUNT; i++) {
-            statLabels.get(i).setText("Generating...");
+            statLabels.get(i).setText(LanguageStrings.get(LanguageStrings.MULTI_MAP_GENERATING));
             copyButtons.get(i).setEnabled(false);
             copyButtons.get(i).setText(LanguageStrings.get(LanguageStrings.MULTI_MAP_COPY_BUTTON));
             editButtons.get(i).setEnabled(false);
@@ -583,7 +586,12 @@ public class MultiMapGalleryDialog extends JDialog {
                                     world.setIceCapPolarLimit(1.0 - (icecapPct / 100.0));
                                 }
                             }
-                            world.generateRectangularWorld(null, null, "World " + (mapIndex + 1), null, false);
+                            world.generateRectangularWorld(
+                                    null,
+                                    null,
+                                    LanguageStrings.format(LanguageStrings.MULTI_MAP_WORLD_NAME_FMT, mapIndex + 1),
+                                    null,
+                                    false);
                             if (!isCancelled()) {
                                 publish(world);
                             }
@@ -629,13 +637,14 @@ public class MultiMapGalleryDialog extends JDialog {
                         }
                         double contPct = (totalHexes > 0) ? (100.0 * contHexes / totalHexes) : 0.0;
                         double icePct = (totalHexes > 0) ? (100.0 * iceHexes / totalHexes) : 0.0;
-                        String info = String.format("Cont: %d | Isl: %d | Land: %.0f%% | Ice: %.0f%%",
+                        String info = String.format(LanguageStrings.get(LanguageStrings.MULTI_MAP_STATS_FMT),
                                 w.getContinentCount(), w.getIslandCount(), contPct, icePct);
                         statLabels.get(index).setText(info);
                         copyButtons.get(index).setEnabled(true);
                         editButtons.get(index).setEnabled(true);
                         generatedCount++;
-                        statusLabel.setText("Generated " + generatedCount + "/" + MAP_COUNT + " maps...");
+                        statusLabel.setText(LanguageStrings.format(
+                                LanguageStrings.MULTI_MAP_GENERATED_PROGRESS_FMT, generatedCount, MAP_COUNT));
                     }
                 }
             }
@@ -646,7 +655,8 @@ public class MultiMapGalleryDialog extends JDialog {
                 if (isCancelled()) {
                     return;
                 }
-                statusLabel.setText("Generated " + generatedCount + " standalone maps.");
+                statusLabel.setText(LanguageStrings.format(
+                        LanguageStrings.MULTI_MAP_GENERATED_DONE_FMT, generatedCount));
             }
         };
         currentWorker.execute();

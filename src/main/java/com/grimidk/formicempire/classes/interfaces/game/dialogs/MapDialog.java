@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.DisasterType;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.world.Hex;
@@ -61,6 +62,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class MapDialog extends ZeroDialog {
 
@@ -111,14 +113,55 @@ public class MapDialog extends ZeroDialog {
     private int lastLegendSortMode = -1;
     private boolean lastLegendExcludeDead = true;
     public enum MapMode {
-        BIOME, HEIGHT, TECTONIC_PLATES, DYNASTIC
+        BIOME, HEIGHT, TECTONIC_PLATES, DYNASTIC, TIMEZONES
     }
     private MapMode mapMode = MapMode.BIOME;
     public static final Color FAULT_CONVERGENT_COLOR = new Color(175, 65, 230);
     public static final Color FAULT_DIVERGENT_COLOR = new Color(245, 215, 30);
     public static final Color FAULT_TRANSFORM_COLOR = new Color(50, 150, 255);
+    public static final Color TIMEZONE_BORDER_COLOR = new Color(245, 245, 250, 200);
+    public static final Color INTERNATIONAL_DATE_LINE_COLOR = new Color(255, 115, 95, 235);
+    private static final Color[] TIMEZONE_COLORS = {
+        new Color(70, 165, 165),
+        new Color(205, 155, 70),
+        new Color(85, 130, 195),
+        new Color(105, 175, 105),
+        new Color(195, 100, 90),
+        new Color(145, 105, 185),
+        new Color(165, 175, 80)
+    };
     private static final Color UNCOLONIZED_DYNASTIC_LAND_COLOR = new Color(145, 145, 145);
     private static final Color UNCOLONIZED_DYNASTIC_SEA_COLOR = new Color(70, 76, 86);
+
+    static Color resolveTimezoneColorForHex(Hex hex) {
+        if (hex == null) {
+            return TIMEZONE_COLORS[0];
+        }
+        Color base = TIMEZONE_COLORS[Math.floorMod(hex.getTimeOffset() + 12, TIMEZONE_COLORS.length)];
+        if (HexWaterCrossing.isWaterBiome(hex.getBiome())) {
+            return new Color(
+                    Math.round(base.getRed() * 0.72f),
+                    Math.round(base.getGreen() * 0.72f),
+                    Math.round(base.getBlue() * 0.72f));
+        }
+        return base;
+    }
+
+    static Color resolveTimezoneBoundaryColor(Hex a, Hex b) {
+        if (a == null || b == null || a.getTimeOffset() == b.getTimeOffset()) {
+            return null;
+        }
+        return Math.abs(a.getTimeOffset() - b.getTimeOffset()) > 1
+                ? INTERNATIONAL_DATE_LINE_COLOR
+                : TIMEZONE_BORDER_COLOR;
+    }
+
+    static String formatTimezoneBandLabel(int offset) {
+        if (offset == 0) {
+            return "UTC";
+        }
+        return offset > 0 ? ("+" + offset) : String.valueOf(offset);
+    }
 
     static Color resolveDynasticColorForHex(Hex hex) {
         if (hex != null && hex.getColony() != null && hex.getColony().getDynasty() != null
@@ -609,6 +652,12 @@ public class MapDialog extends ZeroDialog {
             int year = activeHex != null ? w.getLocalYear(activeHex) : w.getYear();
             dateTimeLabel.setText(String.format("%02d:%02d %02d/%02d/%04d",
                     hour, w.getMinute(), day, month, year));
+            if (activeHex != null && w.getWorldWidth() > 0) {
+                dateTimeLabel.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_TIMEZONE)
+                        + ": " + GameNumbers.formatTimeZoneOffset(activeHex.getTimeOffset()));
+            } else {
+                dateTimeLabel.setToolTipText(null);
+            }
         }
         if (tickLabel != null) {
             if (eng == null) {
@@ -1110,12 +1159,16 @@ public class MapDialog extends ZeroDialog {
         JCheckBox dynasticBox = new JCheckBox(LanguageStrings.get(LanguageStrings.MAP_MODE_DYNASTIC), mapMode == MapMode.DYNASTIC);
         AssetStyles.styleCheckBox(dynasticBox);
 
+        JCheckBox timezoneBox = new JCheckBox(LanguageStrings.get(LanguageStrings.MAP_MODE_TIMEZONES), mapMode == MapMode.TIMEZONES);
+        AssetStyles.styleCheckBox(timezoneBox);
+
         biomeBox.addActionListener(e -> {
             setMapMode(MapMode.BIOME);
             biomeBox.setSelected(true);
             heightBox.setSelected(false);
             tectonicBox.setSelected(false);
             dynasticBox.setSelected(false);
+            timezoneBox.setSelected(false);
         });
         panel.add(biomeBox);
 
@@ -1127,6 +1180,7 @@ public class MapDialog extends ZeroDialog {
             biomeBox.setSelected(false);
             tectonicBox.setSelected(false);
             dynasticBox.setSelected(false);
+            timezoneBox.setSelected(false);
         });
         panel.add(heightBox);
 
@@ -1138,6 +1192,7 @@ public class MapDialog extends ZeroDialog {
             biomeBox.setSelected(false);
             heightBox.setSelected(false);
             dynasticBox.setSelected(false);
+            timezoneBox.setSelected(false);
         });
         panel.add(tectonicBox);
 
@@ -1149,8 +1204,21 @@ public class MapDialog extends ZeroDialog {
             biomeBox.setSelected(false);
             heightBox.setSelected(false);
             tectonicBox.setSelected(false);
+            timezoneBox.setSelected(false);
         });
         panel.add(dynasticBox);
+
+        panel.add(Box.createVerticalStrut(6));
+
+        timezoneBox.addActionListener(e -> {
+            setMapMode(MapMode.TIMEZONES);
+            timezoneBox.setSelected(true);
+            biomeBox.setSelected(false);
+            heightBox.setSelected(false);
+            tectonicBox.setSelected(false);
+            dynasticBox.setSelected(false);
+        });
+        panel.add(timezoneBox);
 
         JPopupMenu menu = new JPopupMenu();
         menu.setBorder(BorderFactory.createEmptyBorder());
@@ -3323,6 +3391,16 @@ public class MapDialog extends ZeroDialog {
                     }
                 }
             }
+            if (mapMode == MapMode.TIMEZONES && world.getWorldWidth() > 0) {
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_TIMEZONE))
+                        .append(GameNumbers.formatTimeZoneOffset(hex.getTimeOffset()));
+                TimeOfDay tod = world.getTimeOfDay(hex);
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_LOCAL_TIME))
+                        .append(String.format("%02d:%02d", world.getLocalHour(hex), world.getMinute()));
+                if (tod != null) {
+                    sb.append(" (").append(tod.getName()).append(")");
+                }
+            }
 
             Continent cont = world.getContinentForHex(hex);
             if (cont != null && cont.getName() != null) {
@@ -3471,6 +3549,8 @@ public class MapDialog extends ZeroDialog {
                     face -> isHexDiscovered(face.hex));
             if (mapMode == MapMode.TECTONIC_PLATES) {
                 mesh.paintFaultBoundariesWithStyles(bg, this::resolveVisibleFaultStyle);
+            } else if (mapMode == MapMode.TIMEZONES) {
+                mesh.paintFaultBoundariesWithStyles(bg, this::resolveVisibleTimezoneBoundaryStyle);
             }
             if (showRivers) {
                 mesh.paintRivers(bg, 1.0f, edge -> isHexDiscovered(edge.faceA != null ? edge.faceA.hex : null) || isHexDiscovered(edge.faceB != null ? edge.faceB.hex : null));
@@ -3493,13 +3573,19 @@ public class MapDialog extends ZeroDialog {
                     bg.setStroke(lineStroke);
                     bg.drawLine(0, (int) Math.round(topY), 0, (int) Math.round(botY));
                 }
+                double leftX = -worldW / 2.0;
+                double rightX = worldW / 2.0;
                 if (showEquator) {
                     bg.setColor(new Color(255, 255, 255, 130));
                     bg.setStroke(lineStroke);
                     double eqY = -0.75 * hexSize;
-                    double leftX = -worldW / 2.0;
-                    double rightX = worldW / 2.0;
                     bg.drawLine((int) Math.round(leftX), (int) Math.round(eqY), (int) Math.round(rightX), (int) Math.round(eqY));
+                }
+                if (mapMode == MapMode.TIMEZONES) {
+                    bg.setColor(INTERNATIONAL_DATE_LINE_COLOR);
+                    bg.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash, 0f));
+                    bg.drawLine((int) Math.round(leftX), (int) Math.round(topY), (int) Math.round(leftX), (int) Math.round(botY));
+                    bg.drawLine((int) Math.round(rightX), (int) Math.round(topY), (int) Math.round(rightX), (int) Math.round(botY));
                 }
             }
             bg.dispose();
@@ -3662,6 +3748,8 @@ public class MapDialog extends ZeroDialog {
                             face -> isHexDiscovered(face.hex));
                     if (mapMode == MapMode.TECTONIC_PLATES) {
                         mesh.paintFaultBoundariesWithStyles(sg, this::resolveVisibleFaultStyle);
+                    } else if (mapMode == MapMode.TIMEZONES) {
+                        mesh.paintFaultBoundariesWithStyles(sg, this::resolveVisibleTimezoneBoundaryStyle);
                     }
                     if (showRivers) {
                         mesh.paintRivers(sg, 1.0f, edge -> isHexDiscovered(edge.faceA != null ? edge.faceA.hex : null) || isHexDiscovered(edge.faceB != null ? edge.faceB.hex : null));
@@ -3684,13 +3772,19 @@ public class MapDialog extends ZeroDialog {
                             sg.setStroke(lineStroke);
                             sg.drawLine(0, (int) Math.round(topY), 0, (int) Math.round(botY));
                         }
+                        double leftX = -worldW / 2.0;
+                        double rightX = worldW / 2.0;
                         if (showEquator) {
                             sg.setColor(new Color(255, 255, 255, 130));
                             sg.setStroke(lineStroke);
                             double eqY = -0.75 * hexSize;
-                            double leftX = -worldW / 2.0;
-                            double rightX = worldW / 2.0;
                             sg.drawLine((int) Math.round(leftX), (int) Math.round(eqY), (int) Math.round(rightX), (int) Math.round(eqY));
+                        }
+                        if (mapMode == MapMode.TIMEZONES) {
+                            sg.setColor(INTERNATIONAL_DATE_LINE_COLOR);
+                            sg.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash, 0f));
+                            sg.drawLine((int) Math.round(leftX), (int) Math.round(topY), (int) Math.round(leftX), (int) Math.round(botY));
+                            sg.drawLine((int) Math.round(rightX), (int) Math.round(topY), (int) Math.round(rightX), (int) Math.round(botY));
                         }
                     }
                 }
@@ -3742,6 +3836,15 @@ public class MapDialog extends ZeroDialog {
                     Graphics2D sg = (Graphics2D) g2d.create();
                     sg.translate(centerOffset.x + shiftX, centerOffset.y);
                     paintGeographicNames(sg, world, mesh);
+                    sg.dispose();
+                }
+            }
+
+            if (mapMode == MapMode.TIMEZONES && world.getWorldWidth() > 0) {
+                for (double shiftX : horizontalShifts) {
+                    Graphics2D sg = (Graphics2D) g2d.create();
+                    sg.translate(centerOffset.x + shiftX, centerOffset.y);
+                    paintTimezoneLabels(sg, world, mesh);
                     sg.dispose();
                 }
             }
@@ -4075,6 +4178,117 @@ public class MapDialog extends ZeroDialog {
                     (int) Math.round(getHeight() / 2.0 + vertAdjust + panY));
         }
 
+        private void paintTimezoneLabels(Graphics2D g2, World world, HexGridMesh mesh) {
+            if (world == null || mesh == null || world.getWorldWidth() <= 0) {
+                return;
+            }
+            Map<Integer, double[]> zoneBounds = new TreeMap<>();
+            for (HexGridMesh.Face face : mesh.faces()) {
+                if (face == null || face.hex == null || !isHexDiscovered(face.hex)) {
+                    continue;
+                }
+                int offset = face.hex.getTimeOffset();
+                double[] bounds = zoneBounds.get(offset);
+                if (bounds == null) {
+                    zoneBounds.put(offset, new double[] { face.centerX, face.centerX, face.centerY, face.centerY });
+                } else {
+                    bounds[0] = Math.min(bounds[0], face.centerX);
+                    bounds[1] = Math.max(bounds[1], face.centerX);
+                    bounds[2] = Math.min(bounds[2], face.centerY);
+                    bounds[3] = Math.max(bounds[3], face.centerY);
+                }
+            }
+            if (zoneBounds.isEmpty()) {
+                return;
+            }
+
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            Font font = AssetStyles.FONT_BOLD.deriveFont(11f);
+            g2.setFont(font);
+            FontMetrics fm = g2.getFontMetrics(font);
+            int padW = 8;
+            int padH = 4;
+            int ph = fm.getHeight() + padH;
+            Color bgBox = new Color(18, 22, 28, 215);
+            double equatorY = -0.75 * hexSize;
+            Rectangle clip = g2.getClipBounds();
+            List<Rectangle> placed = new ArrayList<>();
+
+            for (Map.Entry<Integer, double[]> entry : zoneBounds.entrySet()) {
+                int offset = entry.getKey();
+                double[] bounds = entry.getValue();
+                double bandW = (bounds[1] - bounds[0]) + hexSize * Math.sqrt(3.0);
+                double centerX = (bounds[0] + bounds[1]) * 0.5;
+                double centerY = Math.max(bounds[2], Math.min(bounds[3], equatorY));
+
+                int localHour = Math.floorMod(world.getHour() + offset, 24);
+                String zoneLabel = formatTimezoneBandLabel(offset);
+                String fullText = zoneLabel + " " + String.format("%02d:00", localHour);
+
+                String chosenText = null;
+                int fullW = fm.stringWidth(fullText) + padW;
+                int zoneW = fm.stringWidth(zoneLabel) + padW;
+                if (fullW <= bandW - 6) {
+                    chosenText = fullText;
+                } else if (zoneW <= bandW - 2) {
+                    chosenText = zoneLabel;
+                } else if (offset == 0 && fm.stringWidth("0") + padW <= bandW - 2) {
+                    chosenText = "0";
+                }
+                if (chosenText == null) {
+                    continue;
+                }
+
+                int tw = fm.stringWidth(chosenText);
+                int pw = tw + padW;
+                int rx = (int) Math.round(centerX - pw / 2.0);
+                int ry = (int) Math.round(centerY - ph / 2.0);
+                Rectangle rect = new Rectangle(rx, ry, pw, ph);
+                Rectangle testRect = new Rectangle(rx - 2, ry - 2, pw + 4, ph + 4);
+                boolean collides = false;
+                for (Rectangle p : placed) {
+                    if (testRect.intersects(p)) {
+                        collides = true;
+                        break;
+                    }
+                }
+                if (collides) {
+                    continue;
+                }
+                placed.add(testRect);
+                if (clip != null && !clip.intersects(rect)) {
+                    continue;
+                }
+
+                Color borderColor = (offset == 12 || offset == -12)
+                        ? INTERNATIONAL_DATE_LINE_COLOR
+                        : TIMEZONE_BORDER_COLOR;
+                g2.setColor(bgBox);
+                g2.fillRoundRect(rect.x, rect.y, rect.width, rect.height, 6, 6);
+                g2.setColor(borderColor);
+                g2.setStroke(new BasicStroke(1.2f));
+                g2.drawRoundRect(rect.x, rect.y, rect.width, rect.height, 6, 6);
+                g2.setColor(Color.WHITE);
+                g2.drawString(chosenText, rect.x + (rect.width - tw) / 2, rect.y + (rect.height - fm.getHeight()) / 2 + fm.getAscent());
+            }
+        }
+
+        private HexGridMesh.FaultStyle resolveVisibleTimezoneBoundaryStyle(HexGridMesh.Edge edge) {
+            if (edge == null || edge.faceA == null || edge.faceB == null) {
+                return null;
+            }
+            boolean aVisible = isHexDiscovered(edge.faceA.hex);
+            boolean bVisible = isHexDiscovered(edge.faceB.hex);
+            if (!aVisible && !bVisible) {
+                return null;
+            }
+            Color color = resolveTimezoneBoundaryColor(edge.faceA.hex, edge.faceB.hex);
+            if (color == null) {
+                return null;
+            }
+            return new HexGridMesh.FaultStyle(color, color == INTERNATIONAL_DATE_LINE_COLOR ? 2 : 1);
+        }
+
         private HexGridMesh.FaultStyle resolveVisibleFaultStyle(HexGridMesh.Edge edge) {
             if (edge == null) {
                 return null;
@@ -4146,6 +4360,11 @@ public class MapDialog extends ZeroDialog {
                 float fade = AssetStyles.mapInactiveHexFade();
                 return AssetStyles.fadeTowardBackground(base, fade);
             }
+            if (mapMode == MapMode.TIMEZONES) {
+                Color base = resolveTimezoneColorForHex(hex);
+                float fade = AssetStyles.mapInactiveHexFade();
+                return AssetStyles.fadeTowardBackground(base, fade);
+            }
             Biome biome = hex.getBiome();
             if (biome == null) {
                 return AssetStyles.BACKGROUND_COLOR;
@@ -4174,6 +4393,9 @@ public class MapDialog extends ZeroDialog {
             }
             if (mapMode == MapMode.DYNASTIC) {
                 return resolveDynasticColor(hex);
+            }
+            if (mapMode == MapMode.TIMEZONES) {
+                return resolveTimezoneColorForHex(hex);
             }
             Biome biome = hex.getBiome();
             return biome != null ? getBiomeColor(biome) : AssetStyles.BACKGROUND_COLOR;

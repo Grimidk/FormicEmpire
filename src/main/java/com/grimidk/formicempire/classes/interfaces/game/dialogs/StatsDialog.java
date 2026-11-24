@@ -41,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
 public class StatsDialog extends ZeroDialog {
 
@@ -154,6 +155,82 @@ public class StatsDialog extends ZeroDialog {
         }
         if (worldHistoryOwnOnly != null) {
             worldHistoryOwnOnly.setText(LanguageStrings.get(LanguageStrings.HISTORY_FILTER_OWN_ONLY));
+        }
+    }
+
+    @Override
+    public void refreshTranslations() {
+        if (dynastyModeToggle != null) {
+            dynastyModeToggle.setText(LanguageStrings.get(LanguageStrings.STATS_DYNASTY_MODE));
+        }
+        updateTabTitles();
+        updateTableColumnHeaders();
+        super.refreshTranslations();
+    }
+
+    private void updateTableColumnHeaders() {
+        setTableHeaders(generalTable, new String[]{
+                LanguageStrings.get(LanguageStrings.COL_CATEGORY),
+                LanguageStrings.get(LanguageStrings.COL_PROPERTY),
+                LanguageStrings.get(LanguageStrings.COL_VALUE)
+        });
+        setTableHeaders(dynastyTable, new String[]{
+                "",
+                LanguageStrings.get(LanguageStrings.COL_SCOPE),
+                LanguageStrings.get(LanguageStrings.COL_METRIC),
+                LanguageStrings.get(LanguageStrings.COL_VALUE)
+        });
+        setTableHeaders(worldHistoryTable, new String[]{
+                LanguageStrings.get(LanguageStrings.HISTORY_COL_DATE),
+                LanguageStrings.get(LanguageStrings.HISTORY_COL_CATEGORY),
+                LanguageStrings.get(LanguageStrings.HISTORY_COL_EVENT)
+        });
+        setTableHeaders(resourcesTable, new String[]{
+                "",
+                LanguageStrings.get(LanguageStrings.COL_RESOURCE),
+                LanguageStrings.get(LanguageStrings.COL_CURRENT),
+                LanguageStrings.get(LanguageStrings.COL_CAPACITY),
+                LanguageStrings.get(LanguageStrings.COL_SOURCES),
+                LanguageStrings.get(LanguageStrings.COL_PROD_DAY),
+                LanguageStrings.get(LanguageStrings.COL_CONS_DAY),
+                LanguageStrings.get(LanguageStrings.COL_NET)
+        });
+        setTableHeaders(populationTable, new String[]{
+                "",
+                LanguageStrings.get(LanguageStrings.COL_TYPE),
+                LanguageStrings.get(LanguageStrings.COL_ROLE),
+                LanguageStrings.get(LanguageStrings.COL_COUNT),
+                LanguageStrings.get(LanguageStrings.COL_AVG_AGE),
+                LanguageStrings.get(LanguageStrings.COL_CAPACITY)
+        });
+        setTableHeaders(localHexTable, new String[]{
+                LanguageStrings.get(LanguageStrings.COL_CATEGORY),
+                LanguageStrings.get(LanguageStrings.COL_PROPERTY),
+                LanguageStrings.get(LanguageStrings.COL_VALUE)
+        });
+        setTableHeaders(ratesTable, new String[]{
+                LanguageStrings.get(LanguageStrings.COL_ACTIVITY),
+                LanguageStrings.get(LanguageStrings.COL_ASSIGNED),
+                LanguageStrings.get(LanguageStrings.COL_RATE_CAP),
+                LanguageStrings.get(LanguageStrings.COL_COV_OUT)
+        });
+        setTableHeaders(deathTable, new String[]{
+                LanguageStrings.get(LanguageStrings.COL_CAUSE),
+                LanguageStrings.get(LanguageStrings.COL_TOTAL)
+        });
+    }
+
+    private static void setTableHeaders(JTable table, String[] headers) {
+        if (table == null || headers == null) {
+            return;
+        }
+        TableColumnModel colModel = table.getColumnModel();
+        int count = Math.min(colModel.getColumnCount(), headers.length);
+        for (int i = 0; i < count; i++) {
+            colModel.getColumn(i).setHeaderValue(headers[i]);
+        }
+        if (table.getTableHeader() != null) {
+            table.getTableHeader().resizeAndRepaint();
         }
     }
 
@@ -572,6 +649,9 @@ public class StatsDialog extends ZeroDialog {
 
         // Hex Coordinates & Basic Info
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_COORDS), hex.getQ() + ", " + hex.getR()});
+        if (world.getWorldWidth() > 0) {
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_TIMEZONE), GameNumbers.formatTimeZoneOffset(hex.getTimeOffset())});
+        }
         
         Weather localWeather = hex.getLocalWeather();
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_LOCAL_WEATHER), localWeather != null ? localWeather.getName() : LanguageStrings.get(LanguageStrings.STAT_USING_GLOBAL)});
@@ -744,14 +824,17 @@ public class StatsDialog extends ZeroDialog {
             TimeOfDay tod = (activeHex != null) ? world.getTimeOfDay(activeHex) : world.getTimeOfDay();
             
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_DATE_TIME), dateTime});
+            if (activeHex != null && world.getWorldWidth() > 0) {
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_TIMEZONE), GameNumbers.formatTimeZoneOffset(activeHex.getTimeOffset())});
+            }
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_TIME_DAY), tod != null ? tod.getName() : ""});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_MOON_PHASE), world.getMoonPhase().getName()});
             
             Season season = world.getSeason();
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.SEASON_SPRING), season.getName()});
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.STAT_SEASON), season.getName()});
             
             Weather weather = world.getWeather();
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.PANEL_WORLD), weather.getName()});
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.STAT_WEATHER), weather.getName()});
             
             if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX), world.getActiveHex().getBiome().getName()});

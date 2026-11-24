@@ -223,10 +223,17 @@ public class ColonyPopulationService {
                 continue;
             }
             boolean isAdult = GameConstants.isAdultClass(antClass);
+            boolean isQueen = antClass == GameConstants.CLASS_QUEEN;
             int lifespan = isAdult ? colony.getStatsService().getAntLifespan(colony, antClass) : Integer.MAX_VALUE;
             for (Ant ant : antList) {
-                ant.setAge(ant.getAge() + 1);
-                if (isAdult && ant.getAge() >= lifespan) {
+                int age = ant.getAge() + 1;
+                ant.setAge(age);
+                if (!isAdult || !GameNumbers.shouldCheckOldAgeDeath(age, lifespan, isQueen)) {
+                    continue;
+                }
+                int deathChance = GameNumbers.oldAgeDeathChancePercent(age, lifespan);
+                if (deathChance >= GameNumbers.OLD_AGE_MAX_CHANCE_PERCENT
+                        || (deathChance > 0 && GameRandom.nextDouble() * GameNumbers.OLD_AGE_MAX_CHANCE_PERCENT < deathChance)) {
                     antsToKill.add(ant);
                 }
             }

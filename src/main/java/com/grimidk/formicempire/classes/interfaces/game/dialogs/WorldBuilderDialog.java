@@ -121,11 +121,11 @@ public class WorldBuilderDialog extends JDialog {
             new Color(140, 140, 160), new Color(195, 195, 80), new Color(105, 205, 155)
     };
 
-    private static final String[] BIOME_CATEGORY_NAMES = new String[] {
-            "Aquatic & Coastal",
-            "Temperate & Lush",
-            "Cold & Highland",
-            "Arid & Extreme"
+    private static final String[] BIOME_CATEGORY_KEYS = new String[] {
+            LanguageStrings.WORLD_BUILDER_CAT_AQUATIC,
+            LanguageStrings.WORLD_BUILDER_CAT_TEMPERATE,
+            LanguageStrings.WORLD_BUILDER_CAT_COLD,
+            LanguageStrings.WORLD_BUILDER_CAT_ARID
     };
 
     private static final Biome[][] BIOME_CATEGORIES = new Biome[][] {
@@ -295,7 +295,7 @@ public class WorldBuilderDialog extends JDialog {
     private final Engine engine;
 
     private World world;
-    private String mapName = "Custom World";
+    private String mapName = LanguageStrings.get(LanguageStrings.WORLD_BUILDER_DEFAULT_NAME);
     private int currentStage = STAGE_SETUP;
 
     private Tool currentTool = Tool.BRUSH;
@@ -342,7 +342,11 @@ public class WorldBuilderDialog extends JDialog {
 
     private final JTextField nameField = new JTextField(16);
     private final JTextField heightField = new JTextField(String.valueOf(GameNumbers.WORLD_RECT_HEIGHT), 16);
-    private final JLabel dimensionsDisplay = new JLabel("Dimensions: 128 x 64 (8,192 hexes)");
+    private final JLabel dimensionsDisplay = new JLabel(LanguageStrings.format(
+            LanguageStrings.WORLD_BUILDER_DIMENSIONS_FMT,
+            GameNumbers.WORLD_RECT_WIDTH,
+            GameNumbers.WORLD_RECT_HEIGHT,
+            AssetStyles.formatNumber(GameNumbers.WORLD_RECT_WIDTH * GameNumbers.WORLD_RECT_HEIGHT)));
     private final JTextField iceCapMarginField = new JTextField("18", 16);
     private final JLabel statusMessageLabel = new JLabel(" ");
 
@@ -461,7 +465,7 @@ public class WorldBuilderDialog extends JDialog {
 
     private void performUndo() {
         if (undoStack.isEmpty()) {
-            statusMessageLabel.setText("No actions to undo.");
+            statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_NO_UNDO));
             return;
         }
         WorldSnapshot snapshot = undoStack.removeLast();
@@ -471,7 +475,8 @@ public class WorldBuilderDialog extends JDialog {
         }
         canvas.invalidateStageImages();
         canvas.repaint();
-        statusMessageLabel.setText("Undid action. (" + undoStack.size() + " undo steps remaining)");
+        statusMessageLabel.setText(LanguageStrings.format(
+                LanguageStrings.WORLD_BUILDER_STATUS_UNDID_FMT, undoStack.size()));
     }
 
     private void resetCurrentStageToBaseline() {
@@ -480,7 +485,7 @@ public class WorldBuilderDialog extends JDialog {
         }
         WorldSnapshot baseline = stageBaselineSnapshots[currentStage];
         if (baseline == null) {
-            statusMessageLabel.setText("No baseline state recorded for this step.");
+            statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_NO_BASELINE));
             return;
         }
         pushUndoSnapshot();
@@ -495,7 +500,7 @@ public class WorldBuilderDialog extends JDialog {
         }
         canvas.invalidateStageImages();
         canvas.repaint();
-        statusMessageLabel.setText("Reset current step to baseline state.");
+        statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_RESET_BASELINE));
     }
 
     private void initUI() {
@@ -669,10 +674,10 @@ public class WorldBuilderDialog extends JDialog {
         c.fill = GridBagConstraints.NONE;
         JPanel presetsRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         presetsRow.setOpaque(false);
-        addPresetButton(presetsRow, "16 (Tiny, 32x16)", 16);
-        addPresetButton(presetsRow, "32 (Small, 64x32)", 32);
-        addPresetButton(presetsRow, "48 (Medium, 96x48)", 48);
-        addPresetButton(presetsRow, "64 (Large, 128x64)", 64);
+        addPresetButton(presetsRow, LanguageStrings.get(LanguageStrings.WORLD_BUILDER_PRESET_TINY), 16);
+        addPresetButton(presetsRow, LanguageStrings.get(LanguageStrings.WORLD_BUILDER_PRESET_SMALL), 32);
+        addPresetButton(presetsRow, LanguageStrings.get(LanguageStrings.WORLD_BUILDER_PRESET_MEDIUM), 48);
+        addPresetButton(presetsRow, LanguageStrings.get(LanguageStrings.WORLD_BUILDER_PRESET_LARGE), 64);
         setupPanel.add(presetsRow, c);
 
         c.gridx = 0;
@@ -697,7 +702,7 @@ public class WorldBuilderDialog extends JDialog {
         c.fill = GridBagConstraints.NONE;
         JPanel actionsRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsRow.setOpaque(false);
-        JButton initGridBtn = new JButton("Apply Dimensions & Generate Grid");
+        JButton initGridBtn = new JButton(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_APPLY_GRID));
         AssetStyles.styleButton(initGridBtn);
         initGridBtn.addActionListener(e -> applyGridSetup());
         actionsRow.add(initGridBtn);
@@ -719,7 +724,9 @@ public class WorldBuilderDialog extends JDialog {
     private void updateDimensionsPreview() {
         int h = parseBoundedInt(heightField.getText(), GameNumbers.WORLD_RECT_HEIGHT, 6, 128);
         int w = 2 * h;
-        dimensionsDisplay.setText("Dimensions: " + w + " x " + h + " (" + AssetStyles.formatNumber(w * h) + " hexes)");
+        dimensionsDisplay.setText(LanguageStrings.format(
+                LanguageStrings.WORLD_BUILDER_DIMENSIONS_FMT,
+                w, h, AssetStyles.formatNumber(w * h)));
     }
 
     private void addPresetButton(JPanel parent, String title, int h) {
@@ -763,7 +770,7 @@ public class WorldBuilderDialog extends JDialog {
         stageBaselineSnapshots[STAGE_PLATES] = new WorldSnapshot(STAGE_PLATES, world);
         canvas.invalidateCaches();
         canvas.resetCamera();
-        statusMessageLabel.setText("Initialized " + w + "x" + h + " world grid.");
+        statusMessageLabel.setText(LanguageStrings.format(LanguageStrings.WORLD_BUILDER_STATUS_INIT_GRID_FMT, w, h));
         setStage(STAGE_PLATES);
     }
 
@@ -909,7 +916,7 @@ public class WorldBuilderDialog extends JDialog {
     private void refreshPalette() {
         dynamicPalettePanel.removeAll();
         if (currentStage == STAGE_PLATES) {
-            JLabel faultLbl = new JLabel("Fault Type: ");
+            JLabel faultLbl = new JLabel(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_FAULT_TYPE_LABEL));
             faultLbl.setFont(AssetStyles.FONT_BOLD);
             dynamicPalettePanel.add(faultLbl);
 
@@ -971,7 +978,7 @@ public class WorldBuilderDialog extends JDialog {
             }
 
             dynamicPalettePanel.add(Box.createHorizontalStrut(10));
-            JButton clearFaultsBtn = new JButton("Clear Faults");
+            JButton clearFaultsBtn = new JButton(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_CLEAR_FAULTS));
             AssetStyles.styleCompactButton(clearFaultsBtn);
             applyUniformTextButtonHeight(clearFaultsBtn);
             clearFaultsBtn.addActionListener(e -> {
@@ -1060,13 +1067,13 @@ public class WorldBuilderDialog extends JDialog {
             JPanel catRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
             catRow.setOpaque(false);
             catRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-            JLabel biomeLbl = new JLabel("Biomes: ");
+            JLabel biomeLbl = new JLabel(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_BIOMES_LABEL));
             biomeLbl.setFont(AssetStyles.FONT_BOLD);
             catRow.add(biomeLbl);
 
-            for (int cIdx = 0; cIdx < BIOME_CATEGORY_NAMES.length; cIdx++) {
+            for (int cIdx = 0; cIdx < BIOME_CATEGORY_KEYS.length; cIdx++) {
                 final int categoryIdx = cIdx;
-                JButton catBtn = new JButton(BIOME_CATEGORY_NAMES[cIdx]);
+                JButton catBtn = new JButton(LanguageStrings.get(BIOME_CATEGORY_KEYS[cIdx]));
                 AssetStyles.styleCompactButton(catBtn);
                 applyUniformTextButtonHeight(catBtn);
                 if (cIdx == selectedBiomeCategory) {
@@ -1102,10 +1109,10 @@ public class WorldBuilderDialog extends JDialog {
             JPanel riverRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
             riverRow.setOpaque(false);
             riverRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-            JButton refreshRiversBtn = new JButton("Refresh Rivers");
+            JButton refreshRiversBtn = new JButton(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_REFRESH_RIVERS));
             AssetStyles.styleCompactButton(refreshRiversBtn);
             applyUniformTextButtonHeight(refreshRiversBtn);
-            refreshRiversBtn.setToolTipText("Generate or refresh algorithmic rivers and geographic features from current biomes");
+            refreshRiversBtn.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_REFRESH_RIVERS_TT));
             refreshRiversBtn.addActionListener(e -> refreshRiversAndFeatures());
             riverRow.add(refreshRiversBtn);
             biomeContainer.add(riverRow);
@@ -1137,7 +1144,7 @@ public class WorldBuilderDialog extends JDialog {
             JPanel topRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
             topRow.setOpaque(false);
             topRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-            JLabel dynLbl = new JLabel("Dynasties: ");
+            JLabel dynLbl = new JLabel(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_DYNASTIES_LABEL));
             dynLbl.setFont(AssetStyles.FONT_BOLD);
             topRow.add(dynLbl);
 
@@ -1175,7 +1182,7 @@ public class WorldBuilderDialog extends JDialog {
                             ? GameConstants.ROLE_COMMANDER.getIcon()
                             : UiResourceLoader.loadDialogIcon(getClass(), "/icons/roles/Commander.png", 16),
                     16);
-            JButton placeCapBtn = new JButton("Place Capital", capIcon);
+            JButton placeCapBtn = new JButton(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_PLACE_CAPITAL), capIcon);
             AssetStyles.styleCompactButton(placeCapBtn);
             applyUniformTextButtonHeight(placeCapBtn);
             if (dynastyAction == 0) {
@@ -1187,7 +1194,7 @@ public class WorldBuilderDialog extends JDialog {
                 refreshPalette();
             });
 
-            JButton claimBtn = new JButton("Claim Territory");
+            JButton claimBtn = new JButton(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_CLAIM_TERRITORY));
             AssetStyles.styleCompactButton(claimBtn);
             applyUniformTextButtonHeight(claimBtn);
             if (dynastyAction == 1) {
@@ -1199,7 +1206,7 @@ public class WorldBuilderDialog extends JDialog {
                 refreshPalette();
             });
 
-            JButton removeBtn = new JButton("Remove");
+            JButton removeBtn = new JButton(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_REMOVE));
             AssetStyles.styleCompactButton(removeBtn);
             applyUniformTextButtonHeight(removeBtn);
             if (dynastyAction == 2) {
@@ -1459,17 +1466,17 @@ public class WorldBuilderDialog extends JDialog {
         if (currentStage == STAGE_PLATES) {
             world.generateTectonicPlates();
             world.generateFaultLinesFromPlates();
-            statusMessageLabel.setText("Auto-generated tectonic plates & fault lines.");
+            statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_GEN_PLATES));
         } else if (currentStage == STAGE_LAND) {
             if (world.getTectonicPlates().isEmpty()) {
                 world.generateTectonicPlates();
                 world.generateFaultLinesFromPlates();
             }
             world.generateAlgorithmicLandmasses();
-            statusMessageLabel.setText("Auto-generated landmasses & elevation.");
+            statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_GEN_LAND));
         } else if (currentStage == STAGE_BIOMES) {
             world.generateAlgorithmicBiomesAndFeatures();
-            statusMessageLabel.setText("Auto-assigned biomes, rivers & features.");
+            statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_GEN_BIOMES));
         } else if (currentStage == STAGE_DYNASTIES) {
             world.getDynastys().clear();
             for (Hex h : world.getHexes()) {
@@ -1481,7 +1488,7 @@ public class WorldBuilderDialog extends JDialog {
             world.classifyLandmasses();
             DynastyTitle playerTitle = dynastyNamingService.pickRandomTitle();
             world.populateDynasties(GameConstants.BIOME_PLAINS, null, "Player", playerTitle.getNameKey());
-            statusMessageLabel.setText("Auto-generated dynasties on landmasses.");
+            statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_GEN_DYNASTIES));
         }
         canvas.invalidateStageImages();
         canvas.repaint();
@@ -1493,7 +1500,7 @@ public class WorldBuilderDialog extends JDialog {
         }
         pushUndoSnapshot();
         world.generateAlgorithmicRiversAndFeatures();
-        statusMessageLabel.setText("Generated / refreshed rivers & geographic features.");
+        statusMessageLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_BUILDER_STATUS_REFRESH_RIVERS));
         canvas.invalidateStageImages();
         canvas.repaint();
     }
@@ -1510,7 +1517,8 @@ public class WorldBuilderDialog extends JDialog {
         }
         try {
             File savedFile = SavedMapService.saveMap(world, name, currentStage);
-            statusMessageLabel.setText("Saved to " + savedFile.getName());
+            statusMessageLabel.setText(LanguageStrings.format(
+                    LanguageStrings.WORLD_BUILDER_STATUS_SAVED_FMT, savedFile.getName()));
             if (showDialog) {
                 UiOptionPane.showMessageDialog(this,
                         LanguageStrings.get(LanguageStrings.UI_WORLD_SAVE_SUCCESS) + "\n" + savedFile.getAbsolutePath(),
@@ -1520,7 +1528,7 @@ public class WorldBuilderDialog extends JDialog {
             return true;
         } catch (Exception ex) {
             UiOptionPane.showMessageDialog(this,
-                    "Failed to save map: " + ex.getMessage(),
+                    LanguageStrings.format(LanguageStrings.WORLD_BUILDER_ERR_SAVE_FMT, ex.getMessage()),
                     LanguageStrings.get(LanguageStrings.UI_ERROR),
                     JOptionPane.ERROR_MESSAGE);
             return false;
@@ -1549,7 +1557,7 @@ public class WorldBuilderDialog extends JDialog {
             mainFrame.openGameWithSave(save);
         } catch (Exception ex) {
             UiOptionPane.showMessageDialog(this,
-                    "Error launching game: " + ex.getMessage(),
+                    LanguageStrings.format(LanguageStrings.WORLD_BUILDER_ERR_LAUNCH_FMT, ex.getMessage()),
                     LanguageStrings.get(LanguageStrings.UI_ERROR),
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -1746,7 +1754,10 @@ public class WorldBuilderDialog extends JDialog {
             if (oldCol != null && oldCol.getDynasty() != null) {
                 oldCol.getDynasty().removeColony(oldCol);
             }
-            Colony cap = new Colony(world.getNextColonyId(), targetDyn.getName() + " Capital", targetDyn.isPlayer());
+            Colony cap = new Colony(
+                    world.getNextColonyId(),
+                    LanguageStrings.format(LanguageStrings.WORLD_BUILDER_CAPITAL_FMT, targetDyn.getName()),
+                    targetDyn.isPlayer());
             cap.setDynasty(targetDyn);
             targetDyn.addColony(cap);
             ColonyStarterService.shared().initializeNewColony(cap);
@@ -1755,7 +1766,10 @@ public class WorldBuilderDialog extends JDialog {
             world.markColonizedHexIndexDirty();
         } else if (dynastyAction == 1) {
             if (hex.getColony() == null) {
-                Colony outpost = new Colony(world.getNextColonyId(), targetDyn.getName() + " Outpost", targetDyn.isPlayer());
+                Colony outpost = new Colony(
+                        world.getNextColonyId(),
+                        LanguageStrings.format(LanguageStrings.WORLD_BUILDER_OUTPOST_FMT, targetDyn.getName()),
+                        targetDyn.isPlayer());
                 outpost.setDynasty(targetDyn);
                 targetDyn.addColony(outpost);
                 ColonyStarterService.shared().initializeNewColony(outpost);

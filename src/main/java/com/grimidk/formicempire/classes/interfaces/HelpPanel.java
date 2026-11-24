@@ -1359,7 +1359,7 @@ public class HelpPanel extends JPanel {
         panel.add(titleLabel);
         
         for (Temperature constant : constants) {
-            JLabel item = new JLabel(constant.getName() + " (Max " + constant.getMaxTemp() + "°C)", constant.getIcon(), SwingConstants.LEFT);
+            JLabel item = new JLabel(LanguageStrings.format(LanguageStrings.HELP_TEMP_MAX_FMT, constant.getName(), constant.getMaxTemp()), constant.getIcon(), SwingConstants.LEFT);
             item.setFont(AssetStyles.FONT_NORMAL);
             item.setForeground(AssetStyles.FONT_COLOR);
             panel.add(item);
@@ -1938,7 +1938,7 @@ public class HelpPanel extends JPanel {
                              if (b.getPlantCost() > 0) {
                                  body.append(AssetStyles.formatNumber(b.getPlantCost())).append(" ").append(LanguageStrings.get("RESOURCE_PLANT")).append(", ");
                              }
-                             body.append(AssetStyles.formatNumber(b.getBuildTime())).append(" Hours");
+                             body.append(LanguageStrings.format(LanguageStrings.UI_HOURS_FMT, AssetStyles.formatNumber(b.getBuildTime())));
                         }
                     } else if (selected instanceof Assimilation) {
                         Assimilation a = (Assimilation) selected;

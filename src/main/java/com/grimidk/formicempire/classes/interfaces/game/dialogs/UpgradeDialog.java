@@ -374,6 +374,7 @@ public class UpgradeDialog extends ZeroDialog {
         private final JLabel geneticIntegrityLabel;
         private final JLabel rpPauseNoteLabel;
         private final Map<JButton, Assimilation> buttonMap = new HashMap<>();
+        private boolean showingActiveAssimilation = false;
 
         public AssimilationPanel(Colony colony) {
             super(new BorderLayout());
@@ -428,8 +429,10 @@ public class UpgradeDialog extends ZeroDialog {
             updateStatusLabel();
 
             if (dynasty.getCurrentAssimilation() != null) {
+                showingActiveAssimilation = true;
                 listPanel.add(createProgressPanel(dynasty.getCurrentAssimilation()));
             } else {
+                showingActiveAssimilation = false;
                 List<Assimilation> available = new ArrayList<>();
 
                 for (Assimilation a : GameUnlocks.getAssimilations()) {
@@ -575,11 +578,8 @@ public class UpgradeDialog extends ZeroDialog {
             }
             updateGeneticIntegrityDisplay(d);
             if (d.getCurrentAssimilation() == null) {
-                if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
-                    JPanel p = (JPanel) listPanel.getComponent(0);
-                    if (p.getBorder() instanceof TitledBorder && ((TitledBorder)p.getBorder()).getTitle().contains("Assimilating:")) {
-                        updateData();
-                    }
+                if (showingActiveAssimilation) {
+                    updateData();
                 }
                 return;
             }

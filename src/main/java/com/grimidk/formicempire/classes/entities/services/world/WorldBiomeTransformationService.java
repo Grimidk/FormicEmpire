@@ -76,7 +76,7 @@ public class WorldBiomeTransformationService {
                 colony != null ? colony.getId() : -1,
                 -1,
                 locationArg,
-                WorldHistoryEvent.plainArg(oldBiome != null ? oldBiome.getName() : "Unknown"),
+                WorldHistoryEvent.plainArg(oldBiome != null ? oldBiome.getName() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)),
                 WorldHistoryEvent.plainArg(newBiome.getName() + " (" + (reason != null ? reason : "") + ")"));
 
         return true;

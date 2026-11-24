@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 import javax.swing.*;
 import java.awt.*;
@@ -107,14 +108,19 @@ public class WorldPanel extends ZeroGamePanel {
         super.refreshTranslations();
         if (lastWorldRef != null) {
             updateStaticData(lastWorldRef);
+            updateDateTimeTooltip(lastWorldRef);
             
             if (lastTimeOfDay != null) timeOfDayLabel.setToolTipText(lastTimeOfDay.getName());
             if (lastWeather != null) weatherLabel.setToolTipText(lastWeather.getName());
             if (lastMoonPhase != null) moonPhaseLabel.setToolTipText(lastMoonPhase.getName());
             if (lastSeason != null) seasonLabel.setToolTipText(lastSeason.getName());
             
-            temperatureLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_TEMP_PREFIX) + lastTemperature + "°C" + " (" + lastWorldRef.getTemperatureIcon().getName() + ")");
-            humidityLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_HUMIDITY_PREFIX) + lastWorldRef.getHumidityIcon().getName());
+            if (lastTemperature != -999 && lastWorldRef.getTemperatureIcon() != null) {
+                temperatureLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_TEMP_PREFIX) + lastTemperature + "°C" + " (" + lastWorldRef.getTemperatureIcon().getName() + ")");
+            }
+            if (lastWorldRef.getHumidityIcon() != null) {
+                humidityLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_HUMIDITY_PREFIX) + lastWorldRef.getHumidityIcon().getName());
+            }
         }
     }
     
@@ -166,6 +172,17 @@ public class WorldPanel extends ZeroGamePanel {
         if (!dateTime.equals(lastDateTime)) {
             dateTimeLabel.setText(dateTime);
             lastDateTime = dateTime;
+        }
+        updateDateTimeTooltip(world);
+    }
+
+    private void updateDateTimeTooltip(World world) {
+        Hex activeHex = world != null ? world.getActiveHex() : null;
+        if (world != null && activeHex != null && world.getWorldWidth() > 0) {
+            dateTimeLabel.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_TIMEZONE)
+                    + ": " + GameNumbers.formatTimeZoneOffset(activeHex.getTimeOffset()));
+        } else {
+            dateTimeLabel.setToolTipText(null);
         }
     }
     

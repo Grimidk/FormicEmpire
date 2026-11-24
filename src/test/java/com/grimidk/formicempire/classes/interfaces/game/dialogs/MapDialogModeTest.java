@@ -21,6 +21,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MapDialogModeTest {
@@ -227,6 +229,97 @@ class MapDialogModeTest {
                         .anyMatch(e -> e.getType() == WorldHistoryEventType.DISASTER);
                 assertTrue(anyHexMarked);
                 assertTrue(anyHistory);
+            } finally {
+                dialog.dispose();
+            }
+        });
+    }
+
+    @Test
+    void timezoneMapModeColorsBoundariesAndPaintsCleanly() throws Exception {
+        assertEquals("UTC", MapDialog.formatTimezoneBandLabel(0));
+        assertEquals("+1", MapDialog.formatTimezoneBandLabel(1));
+        assertEquals("+12", MapDialog.formatTimezoneBandLabel(12));
+        assertEquals("-1", MapDialog.formatTimezoneBandLabel(-1));
+        assertEquals("-12", MapDialog.formatTimezoneBandLabel(-12));
+        for (int offset = -12; offset <= 12; offset++) {
+            String label = MapDialog.formatTimezoneBandLabel(offset);
+            if (offset != 0) {
+                assertFalse(label.contains("UTC"));
+            }
+        }
+
+        for (int offset = -12; offset < 12; offset++) {
+            Hex a = new Hex();
+            a.setBiome(GameConstants.BIOME_PLAINS);
+            a.setTimeOffset(offset);
+            Hex b = new Hex();
+            b.setBiome(GameConstants.BIOME_PLAINS);
+            b.setTimeOffset(offset + 1);
+            assertNotEquals(
+                    MapDialog.resolveTimezoneColorForHex(a),
+                    MapDialog.resolveTimezoneColorForHex(b));
+        }
+
+        Hex negTwelve = new Hex();
+        negTwelve.setBiome(GameConstants.BIOME_PLAINS);
+        negTwelve.setTimeOffset(-12);
+        Hex posTwelve = new Hex();
+        posTwelve.setBiome(GameConstants.BIOME_PLAINS);
+        posTwelve.setTimeOffset(12);
+        Hex posEleven = new Hex();
+        posEleven.setBiome(GameConstants.BIOME_PLAINS);
+        posEleven.setTimeOffset(11);
+        assertNotEquals(
+                MapDialog.resolveTimezoneColorForHex(negTwelve),
+                MapDialog.resolveTimezoneColorForHex(posTwelve));
+        assertNotEquals(
+                MapDialog.resolveTimezoneColorForHex(negTwelve),
+                MapDialog.resolveTimezoneColorForHex(posEleven));
+
+        Hex waterZero = new Hex();
+        waterZero.setBiome(GameConstants.BIOME_OCEAN);
+        waterZero.setTimeOffset(0);
+        Hex landZero = new Hex();
+        landZero.setBiome(GameConstants.BIOME_PLAINS);
+        landZero.setTimeOffset(0);
+        assertNotEquals(
+                MapDialog.resolveTimezoneColorForHex(waterZero),
+                MapDialog.resolveTimezoneColorForHex(landZero));
+
+        assertNull(MapDialog.resolveTimezoneBoundaryColor(waterZero, landZero));
+        Hex landOne = new Hex();
+        landOne.setBiome(GameConstants.BIOME_PLAINS);
+        landOne.setTimeOffset(1);
+        assertEquals(MapDialog.TIMEZONE_BORDER_COLOR,
+                MapDialog.resolveTimezoneBoundaryColor(landZero, landOne));
+        assertEquals(MapDialog.INTERNATIONAL_DATE_LINE_COLOR,
+                MapDialog.resolveTimezoneBoundaryColor(negTwelve, posTwelve));
+
+        World world = new World();
+        world.generateRectangularWorld(
+                GameConstants.BIOME_PLAINS,
+                new Colony(1, "Capital", true),
+                "Player",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+        Engine engine = new Engine();
+        engine.setWorld(world);
+
+        SwingUtilities.invokeAndWait(() -> {
+            MapDialog dialog = new MapDialog(null, engine, world, null, null);
+            try {
+                dialog.setSize(800, 600);
+                dialog.doLayout();
+                dialog.setMapMode(MapDialog.MapMode.TIMEZONES);
+                assertEquals(MapDialog.MapMode.TIMEZONES, dialog.getMapMode());
+
+                BufferedImage img = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = img.createGraphics();
+                dialog.paint(g);
+
+                engine.setCheatRevealMap(true);
+                dialog.paint(g);
+                g.dispose();
             } finally {
                 dialog.dispose();
             }

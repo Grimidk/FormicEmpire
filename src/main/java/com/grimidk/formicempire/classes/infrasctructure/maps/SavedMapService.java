@@ -242,7 +242,10 @@ public class SavedMapService {
                 h.setBiome(world.getBiomeById(sh.biomeId));
                 h.setElevation(sh.elevation);
                 h.setHydrology(sh.hydrology);
-                h.setTimeOffset(sh.timeOffset);
+                int timeOffset = data.worldWidth > 0
+                        ? GameNumbers.calculateTimeZoneOffset(GameNumbers.hexColumn(sh.q, sh.r), data.worldWidth)
+                        : sh.timeOffset;
+                h.setTimeOffset(timeOffset);
                 h.setLocalWeather(world.getWeatherById(sh.weatherId));
                 h.setContinentId(sh.continentId);
                 h.setIsland(sh.island);
@@ -339,7 +342,10 @@ public class SavedMapService {
         List<Savefile.SavedHex> hexes = new ArrayList<>();
         if (data.hexes != null) {
             for (SavedMapData.SavedMapHex sh : data.hexes) {
-                Savefile.SavedHex hex = new Savefile.SavedHex(sh.q, sh.r, sh.biomeId, false, sh.timeOffset, sh.weatherId);
+                int timeOffset = data.worldWidth > 0
+                        ? GameNumbers.calculateTimeZoneOffset(GameNumbers.hexColumn(sh.q, sh.r), data.worldWidth)
+                        : sh.timeOffset;
+                Savefile.SavedHex hex = new Savefile.SavedHex(sh.q, sh.r, sh.biomeId, false, timeOffset, sh.weatherId);
                 hex.elevation = sh.elevation;
                 hex.hydrology = sh.hydrology;
                 hex.island = sh.island;

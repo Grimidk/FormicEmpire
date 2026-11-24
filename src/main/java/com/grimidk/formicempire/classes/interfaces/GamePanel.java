@@ -471,6 +471,9 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.refreshTranslations();
         colonyPanel.refreshTranslations();
         alertPanel.refreshTranslations();
+        if (alertManager != null) {
+            alertManager.checkStatus();
+        }
         if (miniMapPanel != null) {
             miniMapPanel.refreshTranslations();
         }
@@ -482,11 +485,35 @@ public class GamePanel extends ZeroGamePanel {
         // Refresh open dialogs
         if (hatchDialog != null && hatchDialog.isShowing()) hatchDialog.refreshTranslations();
         if (roleDialog != null && roleDialog.isShowing()) roleDialog.refreshTranslations();
-        if (upgradeDialog != null && upgradeDialog.isShowing()) upgradeDialog.refreshTranslations();
+        if (upgradeDialog != null) {
+            if (upgradeDialog.isShowing()) {
+                upgradeDialog.refreshTranslations();
+            } else {
+                upgradeDialog.dispose();
+                upgradeDialog = null;
+            }
+        }
         if (abilitiesDialog != null && abilitiesDialog.isShowing()) abilitiesDialog.refreshTranslations();
-        if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTranslations();
+        if (critterManagementDialog != null && critterManagementDialog.isShowing()) critterManagementDialog.refreshTranslations();
+        if (huntBattleDialog != null && huntBattleDialog.isShowing()) huntBattleDialog.refreshTranslations();
+        if (invasionBattleDialog != null && invasionBattleDialog.isShowing()) invasionBattleDialog.refreshTranslations();
+        if (mapDialog != null) {
+            if (mapDialog.isShowing()) {
+                mapDialog.refreshTranslations();
+            } else {
+                mapDialog.dispose();
+                mapDialog = null;
+            }
+        }
         if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTranslations();
-        if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTranslations();
+        if (dynastyDialog != null) {
+            if (dynastyDialog.isShowing()) {
+                dynastyDialog.refreshTranslations();
+            } else {
+                dynastyDialog.dispose();
+                dynastyDialog = null;
+            }
+        }
         if (warBattleDialog != null && warBattleDialog.isShowing()) warBattleDialog.refreshTranslations();
         if (convoyDialog != null && convoyDialog.isShowing()) convoyDialog.refreshTranslations();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshDialog();

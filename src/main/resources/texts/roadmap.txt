@@ -6,6 +6,9 @@ To Fix (By decreasing priority):
 	High:
 		Hunts to battle sim
 		add continue (points to last file opened) make other button a save select, if no file only have a new game
+		Rework death by old age
+		Weather effects on tile
+		Cheat weather selector
 	Mid:
 		(none right now)
 	Low:
@@ -51,6 +54,8 @@ To Draw (PascalCase filenames; under src/main/resources):
 			DisasterIceCollapse.png, DisasterIceCollapse2.png — Fractured, shattered ice-shelf chasm decals showing deep dark water beneath broken ice slabs.
 		Ocean Freeze (128x128):
 			DisasterOceanFreeze.png, DisasterOceanFreeze2.png — Creeping jagged frost crystal sheets and ice crust spreading over the surface.
+	Map labels:
+		Redraw asset for map labels manually (path TBD)
 
 To Compose (.mp3 in resources/audio)
 	Songs:
@@ -92,8 +97,8 @@ Needed for launch (v1.0) (Launch Version):
 			saved for later: RoomDecorationRenderer (storage/farm/nursery/royal two-band overlays, interior clip, door-aware padding)
 			saved for later: sprites/buildings/rooms/*.png wired on GameUnlocks Building.getSprite()
 			saved for later: GameConstantsRoomSpritesTest + RoomDecorationRendererTest
-		promo video and images 
-		recheck langs
+		promo video and images with proper quality
+		recheck langs for mistranlations MANUALLY 
 		more proper start animation and roadmap and credits design
 		global stats such as total playtime, games started, games finished, games won, maps created etc
 		register Grim Games or Grimidk in steam as dev team amd re do personal icon 
@@ -101,7 +106,7 @@ Needed for launch (v1.0) (Launch Version):
 			TODO code (optional for listing; needed for Steam-native features): Steamworks init + App ID; cloud saves; achievements/stats API; demo build flavor (separate App ID/depot)
 			TODO ops: partner page, depots/builds, caps/trailers, wishlist, pricing
 			wishlist button
-		versioning to go back to previous stable patches
+		versioning to go back to previous stable patches (only major)
 		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments tests and audits, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code, no vibe code or bloated code, no assets made by someone other than me
 
 Post launch (v1.1) (Improvements Update):
@@ -115,8 +120,9 @@ Post launch (v1.1) (Improvements Update):
 		deeper air battle resolution (not just passive air support)
 		paratroopers — attacker skips border clash → hex siege (paid drop, landing debuff; not instant capture)
 	editable stat panel 
+	more species
 	more stats (kills, historic productions, graphs?)
-	further dynasty editing like color species and starting upgrades and species assimilation
+	further dynasty editing like color species and starting upgrades and species assimilation, and nest type like tree, burrow or mound
 	console and commands for debugging (to include in core)
 	native universal modding support (to include in core)
 	custom key bind settings for all keys (to include in core)

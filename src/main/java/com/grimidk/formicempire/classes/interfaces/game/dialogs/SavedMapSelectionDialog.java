@@ -188,18 +188,17 @@ public class SavedMapSelectionDialog extends JDialog {
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         navPanel.setOpaque(false);
 
-        prevButton = new JButton("< " + LanguageStrings.get(LanguageStrings.SAVED_MAP_PAGE_FMT).split(" ")[0]);
-        prevButton.setText("Previous");
+        prevButton = new JButton(LanguageStrings.get(LanguageStrings.UI_PREVIOUS));
         AssetStyles.styleButton(prevButton);
         prevButton.addActionListener(e -> changePage(-1));
         navPanel.add(prevButton);
 
-        pageLabel = new JLabel("Page 1 / 1");
+        pageLabel = new JLabel(LanguageStrings.format(LanguageStrings.SAVED_MAP_PAGE_FMT, 1, 1));
         pageLabel.setFont(AssetStyles.FONT_BOLD);
         pageLabel.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         navPanel.add(pageLabel);
 
-        nextButton = new JButton("Next >");
+        nextButton = new JButton(LanguageStrings.get(LanguageStrings.UI_NEXT) + " >");
         AssetStyles.styleButton(nextButton);
         nextButton.addActionListener(e -> changePage(1));
         navPanel.add(nextButton);
@@ -300,7 +299,7 @@ public class SavedMapSelectionDialog extends JDialog {
             int fileIndex = startIndex + i;
             if (fileIndex < totalFiles) {
                 cards.get(i).setVisible(true);
-                nameLabels.get(i).setText("Loading...");
+                nameLabels.get(i).setText(LanguageStrings.get(LanguageStrings.UI_LOADING));
                 statLabels.get(i).setText("");
                 if (allowSelect && i < selectButtons.size()) {
                     selectButtons.get(i).setEnabled(false);
@@ -361,7 +360,7 @@ public class SavedMapSelectionDialog extends JDialog {
 
                     String displayName = (d.mapName != null && !d.mapName.isEmpty())
                             ? d.mapName
-                            : ("Map " + (startIndex + idx + 1));
+                            : LanguageStrings.format(LanguageStrings.MULTI_MAP_DEFAULT_NAME_FMT, startIndex + idx + 1);
                     nameLabels.get(idx).setText(displayName);
                     miniMaps.get(idx).setExplicitWorld(w);
 
@@ -378,7 +377,7 @@ public class SavedMapSelectionDialog extends JDialog {
                         }
                     }
                     double landPct = (totalHexes > 0) ? (100.0 * landHexes / totalHexes) : 0.0;
-                    String info = String.format("%dx%d | Land: %.1f%% | Cont: %d | Isl: %d",
+                    String info = String.format(LanguageStrings.get(LanguageStrings.SAVED_MAP_STATS_FMT),
                             w.getWorldWidth(), w.getWorldHeight(), landPct, w.getContinentCount(), w.getIslandCount());
                     statLabels.get(idx).setText(info);
                     if (allowSelect && idx < selectButtons.size()) {

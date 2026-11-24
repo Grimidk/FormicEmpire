@@ -25,6 +25,7 @@ public class ColonyPanel extends ZeroGamePanel {
     // --- Container Components ---
     private JPanel contentPanel;
     private JPanel emptyPanel;
+    private JLabel noColonyLabel;
     private boolean isShowingContent = true;
 
     // --- Rank Components ---
@@ -98,7 +99,7 @@ public class ColonyPanel extends ZeroGamePanel {
     private int lastEffectiveLoyalty = -1;
     private Rank lastRank = null;
     private String lastColonyName = "";
-    private boolean lastAtWar = false;
+    private Boolean lastAtWar = null;
 
     public ColonyPanel() {
         super(new CardLayout()); 
@@ -168,7 +169,6 @@ public class ColonyPanel extends ZeroGamePanel {
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
         researchRateLabel.setIcon(GameConstants.ROLE_RESEARCHER.getIcon());
         militaryPowerLabel.setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
-        militaryPowerLabel.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
         loyaltyLabel.setIcon(GameConstants.ICON_STAT_LOYALTY);
         loyaltyLabel.setIconTextGap(6);
         
@@ -181,7 +181,7 @@ public class ColonyPanel extends ZeroGamePanel {
         
         emptyPanel = new JPanel(new BorderLayout());
         emptyPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        JLabel noColonyLabel = new JLabel(LanguageStrings.get(LanguageStrings.PANEL_NO_COLONY), SwingConstants.CENTER);
+        noColonyLabel = new JLabel(LanguageStrings.get(LanguageStrings.PANEL_NO_COLONY), SwingConstants.CENTER);
         noColonyLabel.setForeground(AssetStyles.BACKGROUND_SECONDARY);
         emptyPanel.add(noColonyLabel, BorderLayout.CENTER);
     }
@@ -211,6 +211,7 @@ public class ColonyPanel extends ZeroGamePanel {
         parasiteAntCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITE_ANTS));
         policeStatsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING));
         researchPointsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
+        militaryPowerLabel.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
     }
 
     private void setupConstantLabel(JLabel label, AntClass type) {
@@ -274,7 +275,7 @@ public class ColonyPanel extends ZeroGamePanel {
         lastEffectiveLoyalty = -1;
         lastRank = null;
         lastColonyName = "";
-        lastAtWar = false;
+        lastAtWar = null;
         
         setView(false);
     }
@@ -283,6 +284,10 @@ public class ColonyPanel extends ZeroGamePanel {
     public void refreshTranslations() {
         super.refreshTranslations();
         updateTooltips();
+        if (noColonyLabel != null) {
+            noColonyLabel.setText(LanguageStrings.get(LanguageStrings.PANEL_NO_COLONY));
+        }
+        lastAtWar = null;
         if (lastColonyRef != null) {
             lastMushrooms = -1;
             lastTotalConsumption = -1;
@@ -292,6 +297,28 @@ public class ColonyPanel extends ZeroGamePanel {
             updateMinuteData(lastColonyRef);
             updateHourData(lastColonyRef);
             updateDayData(lastColonyRef);
+        } else {
+            warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_PEACE));
+            setupStatLabel(warStatusLabel, GameConstants.ROLE_DIPLOMAT.getIcon());
+            rankLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_RANK));
+            totalResourcesLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_RESOURCES, 0));
+            totalAntLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_ANTS, 0));
+            queensLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_QUEENS, 0, 0));
+            totalConsumptionLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_CONSUMPTION, 0));
+            totalProductionLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_MAX_FOOD_PROD, 0));
+            netMushroomsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_NET_FOOD, 0));
+            layingRateLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_LAYING_RATE, 0));
+            nurseCoverageLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_NURSE_COVERAGE, 0, 0));
+            graveKeepingLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_GRAVE_CLEANING, 0, 0));
+            petInsectsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_PET_INSECTS, 0, 0));
+            parasiticMiteCountLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_PARASITIC_MITES, 0, 0));
+            parasiteAntCountLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_PARASITE_ANTS, LanguageStrings.get(LanguageStrings.WORLD_NA)));
+            policeStatsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_POLICING, 0));
+            researchPointsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_RESEARCH, 0));
+            researchRateLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_RESEARCH_RATE, 0));
+            babyAntsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_JUVENILE_ANTS, 0));
+            adultAntsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_ADULT_ANTS, 0));
+            militaryPowerLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_MILITARY_POWER, 0));
         }
     }
     
@@ -541,7 +568,7 @@ public class ColonyPanel extends ZeroGamePanel {
         }
 
         boolean atWar = colony.getDynasty() != null && colony.getDynasty().isAtWar();
-        if (atWar != lastAtWar) {
+        if (lastAtWar == null || atWar != lastAtWar) {
             if (atWar) {
                 warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_WAR));
                 setupStatLabel(warStatusLabel, GameConstants.ICON_STAT_MILITARY_POWER);

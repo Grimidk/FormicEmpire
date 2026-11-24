@@ -298,60 +298,49 @@ public class World {
         updateEnvironmentalConditions();
     }
 
+    private int getLocalTotalDays(Hex hex) {
+        int daysPerMonth = GameNumbers.DAYS_PER_MONTH;
+        int daysPerYear = daysPerMonth * 12;
+        int baseDays = this.year * daysPerYear + (this.month - 1) * daysPerMonth + (this.day - 1);
+        int eff = this.hour + hex.getTimeOffset();
+        int dayDelta = Math.floorDiv(eff, 24);
+        return Math.max(0, baseDays + dayDelta);
+    }
+
     public int getLocalHour(Hex hex) {
         if (hex == null || this.worldWidth <= 0) {
-            return this.hour;
+            return Math.floorMod(this.hour, 24);
         }
-        int eff = this.hour + hex.getTimeOffset();
-        return ((eff % 24) + 24) % 24;
+        return Math.floorMod(this.hour + hex.getTimeOffset(), 24);
     }
 
     public int getLocalDay(Hex hex) {
         if (hex == null || this.worldWidth <= 0) {
             return this.day;
         }
-        int eff = this.hour + hex.getTimeOffset();
-        if (eff >= 24) {
-            int d = this.day + 1;
-            return d > 30 ? 1 : d;
-        } else if (eff < 0) {
-            int d = this.day - 1;
-            return d < 1 ? 30 : d;
-        }
-        return this.day;
+        return (getLocalTotalDays(hex) % GameNumbers.DAYS_PER_MONTH) + 1;
     }
 
     public int getLocalMonth(Hex hex) {
         if (hex == null || this.worldWidth <= 0) {
             return this.month;
         }
-        int eff = this.hour + hex.getTimeOffset();
-        if (eff >= 24 && this.day + 1 > 30) {
-            int m = this.month + 1;
-            return m > 12 ? 1 : m;
-        } else if (eff < 0 && this.day - 1 < 1) {
-            int m = this.month - 1;
-            return m < 1 ? 12 : m;
-        }
-        return this.month;
+        return ((getLocalTotalDays(hex) / GameNumbers.DAYS_PER_MONTH) % 12) + 1;
     }
 
     public int getLocalYear(Hex hex) {
         if (hex == null || this.worldWidth <= 0) {
             return this.year;
         }
-        int eff = this.hour + hex.getTimeOffset();
-        if (eff >= 24 && this.day + 1 > 30 && this.month + 1 > 12) {
-            return this.year + 1;
-        } else if (eff < 0 && this.day - 1 < 1 && this.month - 1 < 1) {
-            return this.year - 1;
-        }
-        return this.year;
+        return getLocalTotalDays(hex) / (GameNumbers.DAYS_PER_MONTH * 12);
     }
 
     public TimeOfDay getTimeOfDay(Hex hex) {
         if (this.timeOfDay == GameConstants.TIME_SOLAR_ECLIPSE || this.timeOfDay == GameConstants.TIME_LUNAR_ECLIPSE) {
             return this.timeOfDay;
+        }
+        if (hex == null || this.worldWidth <= 0) {
+            return this.timeOfDay != null ? this.timeOfDay : GameConstants.getTimeOfDayForHour(this.hour);
         }
         return GameConstants.getTimeOfDayForHour(getLocalHour(hex));
     }
@@ -6618,6 +6607,7 @@ public class World {
     public void loadWorld(Savefile savefile) {
         this.minute = savefile.getMinute();
         this.hour = savefile.getHour();
+        this.timeOfDay = GameConstants.getTimeOfDayForHour(this.hour);
         this.day = savefile.getDay();
         this.month = savefile.getMonth();
         this.year = savefile.getYear();
@@ -6722,7 +6712,7 @@ public class World {
                 hex.setQ(sh.q);
                 hex.setR(sh.r);
                 hex.setBiome(getBiomeById(sh.biomeId));
-                hex.setTimeOffset(GameNumbers.calculateTimeZoneOffset(sh.q + (sh.r >> 1), this.worldWidth));
+                hex.setTimeOffset(GameNumbers.calculateTimeZoneOffset(GameNumbers.hexColumn(sh.q, sh.r), this.worldWidth));
                 hex.setLocalWeather(getWeatherById(sh.weatherId));
                 hex.setActive(false); 
                 
@@ -7038,8 +7028,9 @@ public class World {
             calcHumid *= this.season.getHumidityMult();
         }
 
-        if (this.timeOfDay != null) {
-            calcTemp *= this.timeOfDay.getTempMult();
+        TimeOfDay activeTimeOfDay = getTimeOfDay(this.activeHex);
+        if (activeTimeOfDay != null) {
+            calcTemp *= activeTimeOfDay.getTempMult();
         }
 
         Weather localW = this.activeHex.getLocalWeather();

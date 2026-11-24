@@ -58,7 +58,9 @@ public class AlertPanel extends ZeroGamePanel {
     @Override
     public void refreshTranslations() {
         super.refreshTranslations();
-        updateAlerts(lastAlerts);
+        List<Alert> current = lastAlerts;
+        lastAlerts = null;
+        updateAlerts(current);
     }
 
     public String getHoveredAlertKey() {
