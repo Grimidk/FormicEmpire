@@ -1,9 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -11,7 +9,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -654,34 +651,27 @@ public final class HexMapOverlays {
         return null;
     }
 
-    private static Image mapCloudSprite;
-    private static long mapCloudAnimTimeMs = 0L;
-    private static long lastMapCloudRealTimeMs = 0L;
-
-    private static Image getMapCloudSprite() {
-        if (mapCloudSprite == null) {
-            try {
-                URL url = HexMapOverlays.class.getResource("/sprites/environment/MapCloud.png");
-                if (url != null) {
-                    mapCloudSprite = new ImageIcon(url).getImage();
-                }
-            } catch (Throwable ignore) {
-            }
+    private static Weather effectiveFaceWeather(HexGridMesh.Face face, World world) {
+        if (face == null || face.hex == null) {
+            return null;
         }
-        return mapCloudSprite;
+        Weather w = face.hex.getLocalWeather();
+        return w != null ? w : (world != null ? world.getWeather() : null);
     }
 
-    private static synchronized long advanceMapCloudTime(boolean isPaused) {
-        long now = System.currentTimeMillis();
-        if (lastMapCloudRealTimeMs == 0L) {
-            lastMapCloudRealTimeMs = now;
+    public static void paintWeatherBadge(Graphics2D g2d, Weather weather, double centerX, double centerY, int iconSize) {
+        if (g2d == null || !WorldWeatherService.hasVisualWeather(weather) || iconSize <= 0) {
+            return;
         }
-        long delta = now - lastMapCloudRealTimeMs;
-        lastMapCloudRealTimeMs = now;
-        if (!isPaused && delta > 0 && delta < 500) {
-            mapCloudAnimTimeMs += delta;
+        ImageIcon icon = weather.getIcon();
+        if (icon == null || icon.getImage() == null || icon == GameConstants.ICON_UNKNOWN) {
+            return;
         }
-        return mapCloudAnimTimeMs;
+        Object prevInterp = g2d.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        drawCenteredIcon(g2d, icon, centerX, centerY, iconSize);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                prevInterp != null ? prevInterp : RenderingHints.VALUE_INTERPOLATION_BILINEAR);
     }
 
     public static void paintWeatherClouds(Graphics2D g2d, World world, HexGridMesh mesh, Predicate<Hex> isHexDiscovered) {
@@ -692,71 +682,40 @@ public final class HexMapOverlays {
         if (g2d == null || world == null || mesh == null) {
             return;
         }
-        Rectangle clip = g2d.getClipBounds();
         double radius = mesh.layoutSize();
         if (radius <= 0) {
             return;
         }
-        long timeMs = advanceMapCloudTime(isPaused);
-        double driftOffset = Math.sin((timeMs % 10000) / 10000.0 * Math.PI * 2) * (radius * 0.08);
-
-        for (HexGridMesh.Face face : mesh.faces()) {
-            if (face == null || face.hex == null) {
-                continue;
+        int iconSize = Math.max(6, (int) Math.round(radius * 0.72));
+        Rectangle clip = g2d.getClipBounds();
+        Graphics2D g = (Graphics2D) g2d.create();
+        try {
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            for (HexGridMesh.Face face : mesh.faces()) {
+                if (face == null || face.hex == null) {
+                    continue;
+                }
+                if (isHexDiscovered != null && !isHexDiscovered.test(face.hex)) {
+                    continue;
+                }
+                if (clip != null && !clip.intersects(
+                        face.centerX - iconSize,
+                        face.centerY - iconSize,
+                        iconSize * 2.0,
+                        iconSize * 2.0)) {
+                    continue;
+                }
+                Weather w = effectiveFaceWeather(face, world);
+                if (!WorldWeatherService.hasVisualWeather(w)) {
+                    continue;
+                }
+                ImageIcon icon = w.getIcon();
+                if (icon != null && icon.getImage() != null && icon != GameConstants.ICON_UNKNOWN) {
+                    drawCenteredIcon(g, icon, face.centerX, face.centerY, iconSize);
+                }
             }
-            if (isHexDiscovered != null && !isHexDiscovered.test(face.hex)) {
-                continue;
-            }
-            if (clip != null && !face.intersects(clip)) {
-                continue;
-            }
-            Weather w = face.hex.getLocalWeather();
-            if (w == null) {
-                w = world.getWeather();
-            }
-            if (!WorldWeatherService.isPrecipitation(w)) {
-                continue;
-            }
-            drawFaceCloudCluster(g2d, face, radius, driftOffset, w);
+        } finally {
+            g.dispose();
         }
-    }
-
-    private static void drawFaceCloudCluster(Graphics2D g2d, HexGridMesh.Face face, double r, double drift, Weather weather) {
-        double cx = face.centerX + drift;
-        double cy = face.centerY;
-        Image sprite = getMapCloudSprite();
-        if (sprite != null) {
-            int size = (int) Math.round(r * 1.25);
-            int x = (int) Math.round(cx - size / 2.0);
-            int y = (int) Math.round(cy - size / 2.0);
-            Composite origComp = g2d.getComposite();
-            float alpha = (weather == GameConstants.WEATHER_THUNDER || weather == GameConstants.WEATHER_HEAVY_RAIN) ? 0.85f : 0.65f;
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-            g2d.drawImage(sprite, x, y, size, size, null);
-            g2d.setComposite(origComp);
-            return;
-        }
-
-        Color cloudColor;
-        if (weather == GameConstants.WEATHER_THUNDER || weather == GameConstants.WEATHER_HEAVY_RAIN) {
-            cloudColor = new Color(75, 80, 95, 175);
-        } else if (weather == GameConstants.WEATHER_ACID_RAIN) {
-            cloudColor = new Color(130, 160, 85, 165);
-        } else {
-            cloudColor = new Color(210, 220, 235, 150);
-        }
-        g2d.setColor(cloudColor);
-
-        double p1 = r * 0.65;
-        g2d.fill(new Ellipse2D.Double(cx - p1 * 0.5, cy - p1 * 0.5, p1, p1));
-
-        double p2 = r * 0.52;
-        g2d.fill(new Ellipse2D.Double(cx - r * 0.35, cy - r * 0.1, p2, p2));
-
-        double p3 = r * 0.50;
-        g2d.fill(new Ellipse2D.Double(cx + r * 0.05, cy - r * 0.18, p3, p3));
-
-        double p4 = r * 0.44;
-        g2d.fill(new Ellipse2D.Double(cx - r * 0.15, cy + r * 0.08, p4, p4));
     }
 }

@@ -3,6 +3,8 @@ package com.grimidk.formicempire.classes.interfaces.game.rendering;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Graphics2D;
@@ -11,8 +13,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.ImageIcon;
+
 import org.junit.jupiter.api.Test;
 
+import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Trade;
@@ -119,6 +124,73 @@ class HexMapOverlaysTest {
         assertDoesNotThrow(() -> HexMapOverlays.paintWeatherClouds(null, null, null, null, true));
 
         g2d.dispose();
+    }
+
+    @Test
+    void paintWeatherCloudsDrawsWeatherIconPerDiscoveredWeatherHex() {
+        for (Weather weather : GameConstants.getWeathers()) {
+            World world = new World();
+            Hex h1 = new Hex();
+            h1.setQ(0);
+            h1.setR(0);
+            h1.setBiome(GameConstants.BIOME_PLAINS);
+            h1.setLocalWeather(weather);
+            ArrayList<Hex> hexes = new ArrayList<>();
+            hexes.add(h1);
+            world.setHexes(hexes);
+
+            HexGridMesh mesh = HexGridMesh.build(hexes, 50.0, 50.0, 28.0, (q, r) -> h1.getQ() == q && h1.getR() == r ? h1 : null);
+            BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = img.createGraphics();
+            HexMapOverlays.paintWeatherClouds(g2d, world, mesh, hex -> true, false);
+            g2d.dispose();
+
+            BufferedImage hiddenImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gHidden = hiddenImg.createGraphics();
+            HexMapOverlays.paintWeatherClouds(gHidden, world, mesh, hex -> false, false);
+            gHidden.dispose();
+            assertFalse(hasNonZeroAlphaNear(hiddenImg, 50, 50, 28));
+
+            BufferedImage badgeImg = new BufferedImage(60, 60, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gBadge = badgeImg.createGraphics();
+            HexMapOverlays.paintWeatherBadge(gBadge, weather, 30.0, 30.0, 18);
+            gBadge.dispose();
+
+            boolean hasMapPixels = hasNonZeroAlphaNear(img, 50, 50, 12);
+            boolean hasBadgePixels = hasNonZeroAlphaNear(badgeImg, 30, 30, 12);
+            if (weather == GameConstants.WEATHER_CLEAR) {
+                assertFalse(hasMapPixels, "WEATHER_CLEAR should not paint map weather icon");
+                assertFalse(hasBadgePixels, "WEATHER_CLEAR should not paint weather badge");
+            } else {
+                ImageIcon icon = weather.getIcon();
+                assertNotNull(icon, "Missing weather icon for " + weather.getNameKey());
+                assertNotEquals(GameConstants.ICON_UNKNOWN, icon, "Unknown icon for " + weather.getNameKey());
+                assertNotNull(icon.getImage(), "Null icon image for " + weather.getNameKey());
+                assertTrue(hasMapPixels, "Expected visible weather icon on map for " + weather.getNameKey());
+                assertTrue(hasBadgePixels, "Expected visible weather badge for " + weather.getNameKey());
+            }
+        }
+
+        World nullWeatherWorld = new World();
+        Hex nullHex = new Hex();
+        nullHex.setQ(0);
+        nullHex.setR(0);
+        nullHex.setBiome(GameConstants.BIOME_PLAINS);
+        nullHex.setLocalWeather(null);
+        nullWeatherWorld.setWeather(null);
+        ArrayList<Hex> nullHexes = new ArrayList<>(List.of(nullHex));
+        HexGridMesh nullMesh = HexGridMesh.build(nullHexes, 50.0, 50.0, 28.0, (q, r) -> nullHex);
+        BufferedImage nullMapImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gNullMap = nullMapImg.createGraphics();
+        HexMapOverlays.paintWeatherClouds(gNullMap, nullWeatherWorld, nullMesh, hex -> true, false);
+        gNullMap.dispose();
+        assertFalse(hasNonZeroAlphaNear(nullMapImg, 50, 50, 28));
+
+        BufferedImage nullBadgeImg = new BufferedImage(60, 60, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gNullBadge = nullBadgeImg.createGraphics();
+        HexMapOverlays.paintWeatherBadge(gNullBadge, null, 30.0, 30.0, 18);
+        gNullBadge.dispose();
+        assertFalse(hasNonZeroAlphaNear(nullBadgeImg, 30, 30, 14));
     }
 
     @Test

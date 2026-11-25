@@ -447,6 +447,8 @@ public final class LanguageStrings {
     public static final String UI_TUTORIAL = "UI_TUTORIAL";
     public static final String UI_PAUSE = "UI_PAUSE";
     public static final String UI_PLAY = "UI_PLAY";
+    public static final String UI_CONTINUE = "UI_CONTINUE";
+    public static final String UI_LOAD_GAME = "UI_LOAD_GAME";
     public static final String UI_SPEED_UP = "UI_SPEED_UP";
     public static final String UI_SPEED_DOWN = "UI_SPEED_DOWN";
     public static final String UI_SPEED_VERY_SLOW = "UI_SPEED_VERY_SLOW";
@@ -3387,6 +3389,10 @@ public final class LanguageStrings {
     public static final String SETTINGS_CHEAT_RANDOM_WAR_TT = "SETTINGS_CHEAT_RANDOM_WAR_TT";
     public static final String MAP_WAR_CHEAT = "MAP_WAR_CHEAT";
     public static final String MAP_WAR_CHEAT_TT = "MAP_WAR_CHEAT_TT";
+    public static final String SETTINGS_CHEAT_RANDOM_WEATHER = "SETTINGS_CHEAT_RANDOM_WEATHER";
+    public static final String SETTINGS_CHEAT_RANDOM_WEATHER_TT = "SETTINGS_CHEAT_RANDOM_WEATHER_TT";
+    public static final String MAP_WEATHER_CHEAT = "MAP_WEATHER_CHEAT";
+    public static final String MAP_WEATHER_CHEAT_TT = "MAP_WEATHER_CHEAT_TT";
     public static final String LOG_BIOME_TRANSFORM_FMT = "LOG_BIOME_TRANSFORM_FMT";
     public static final String LOG_OVERHARVEST_DEPLETION_FMT = "LOG_OVERHARVEST_DEPLETION_FMT";
     public static final String LOG_BIOME_RECOVERY_FMT = "LOG_BIOME_RECOVERY_FMT";

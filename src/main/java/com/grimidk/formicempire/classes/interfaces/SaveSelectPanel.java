@@ -10,6 +10,8 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.DiceRollResource;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.maps.SavedMapData;
@@ -25,6 +27,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,22 +40,39 @@ public class SaveSelectPanel extends JPanel {
     private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 360);
     private static final Dimension SLOT_LABEL_SIZE = new Dimension(AssetStyles.MENU_BUTTON_WIDTH, 28);
     private static final int SLOT_ACTION_GAP = 8;
+    private static final int VISIBLE_SLOT_COUNT = 3;
+    private static final double SCROLL_PIXELS_PER_NOTCH = 36.0;
+    private static final int SMOOTH_SCROLL_TIMER_MS = 16;
+    private static final double SMOOTH_SCROLL_LERP = 0.35;
+    private static final double SMOOTH_SCROLL_SNAP_EPSILON = 0.75;
 
     private final MainFrame frame;
     private final SaveManager saveManager;
 
-    private final JButton[] slotButtons = new JButton[3];
-    private final JButton[] deleteButtons = new JButton[3];
-    private final JLabel[] slotLabels = new JLabel[3];
+    private final JButton[] slotButtons = new JButton[SaveManager.MAX_SAVE_SLOTS];
+    private final JButton[] deleteButtons = new JButton[SaveManager.MAX_SAVE_SLOTS];
+    private final JLabel[] slotLabels = new JLabel[SaveManager.MAX_SAVE_SLOTS];
+    private final JPanel[] actionRows = new JPanel[SaveManager.MAX_SAVE_SLOTS];
+    private final JPanel slotsContainer = new JPanel(new GridBagLayout());
+    private final JScrollPane slotsScrollPane = new JScrollPane(slotsContainer);
+    private final FlatChevronButton scrollUpIndicator = new FlatChevronButton();
+    private final FlatChevronButton scrollDownIndicator = new FlatChevronButton();
+    private final JPanel scrollUpHolder = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    private final JPanel scrollDownHolder = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    private final Timer smoothScrollTimer;
     private final MenuHeaderPanel menuHeader = new MenuHeaderPanel();
     private final JButton backButton;
     
-    private final Savefile[] cachedSaves = new Savefile[3];
+    private final Savefile[] cachedSaves = new Savefile[SaveManager.MAX_SAVE_SLOTS];
     private boolean slotActionsEnabled = true;
+    private double currentScrollY = 0.0;
+    private double targetScrollY = 0.0;
 
     public SaveSelectPanel(MainFrame frame) {
         this.frame = frame;
         this.saveManager = frame.getEngine().getSaveManager();
+        this.smoothScrollTimer = new Timer(SMOOTH_SCROLL_TIMER_MS, e -> onSmoothScrollTick());
+        this.smoothScrollTimer.setCoalesce(true);
         setOpaque(false);
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -61,8 +84,12 @@ public class SaveSelectPanel extends JPanel {
         c.gridy = 0;
         add(menuHeader, c);
 
-        int row = 1;
-        for (int i = 0; i < 3; i++) {
+        GridBagConstraints sc = new GridBagConstraints();
+        sc.gridx = 0;
+        sc.anchor = GridBagConstraints.CENTER;
+        sc.fill = GridBagConstraints.NONE;
+        int slotRow = 0;
+        for (int i = 0; i < SaveManager.MAX_SAVE_SLOTS; i++) {
             int slotId = i + 1;
             slotLabels[i] = new JLabel(LanguageStrings.get(LanguageStrings.SAVE_EMPTY_SLOT));
             slotLabels[i].setFont(AssetStyles.FONT_NORMAL);
@@ -86,10 +113,18 @@ public class SaveSelectPanel extends JPanel {
             int idx = i;
             slotButtons[i].addActionListener(e -> onCreateOrLoad(slotId, idx));
             deleteButtons[i].addActionListener(e -> onDelete(slotId, idx));
+            FocusAdapter slotFocusScroll = new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    scrollSlotIntoView(idx);
+                }
+            };
+            slotButtons[i].addFocusListener(slotFocusScroll);
+            deleteButtons[i].addFocusListener(slotFocusScroll);
 
-            c.gridy = row++;
-            c.insets = new Insets(i == 0 ? 8 : 16, 8, 4, 8);
-            add(slotLabels[i], c);
+            sc.gridy = slotRow++;
+            sc.insets = new Insets(i == 0 ? 8 : 16, 8, 4, 8);
+            slotsContainer.add(slotLabels[i], sc);
 
             JPanel actions = new JPanel(new GridLayout(1, 2, SLOT_ACTION_GAP, 0));
             actions.setOpaque(false);
@@ -101,11 +136,43 @@ public class SaveSelectPanel extends JPanel {
             actions.setMaximumSize(actionsSize);
             actions.add(slotButtons[i]);
             actions.add(deleteButtons[i]);
+            actionRows[i] = actions;
 
-            c.gridy = row++;
-            c.insets = new Insets(4, 8, 8, 8);
-            add(actions, c);
+            sc.gridy = slotRow++;
+            sc.insets = new Insets(4, 8, 8, 8);
+            slotsContainer.add(actions, sc);
         }
+
+        scrollUpIndicator.setChevronDirection(FlatChevronButton.ChevronDirection.UP);
+        scrollDownIndicator.setChevronDirection(FlatChevronButton.ChevronDirection.DOWN);
+        scrollUpIndicator.addActionListener(e -> nudgeSmoothScroll(-slotScrollStep()));
+        scrollDownIndicator.addActionListener(e -> nudgeSmoothScroll(slotScrollStep()));
+        scrollUpHolder.add(scrollUpIndicator);
+        scrollDownHolder.add(scrollDownIndicator);
+        configureScrollIndicators();
+
+        configureScrollPaneAppearance();
+        slotsScrollPane.getViewport().addChangeListener(e -> updateScrollIndicators());
+        MouseWheelListener wheelScroller = e -> {
+            double deltaY = computeWheelDelta(e.getPreciseWheelRotation(), e.getWheelRotation());
+            if (nudgeSmoothScroll(deltaY)) {
+                e.consume();
+            }
+        };
+        slotsScrollPane.addMouseWheelListener(wheelScroller);
+        addMouseWheelListener(wheelScroller);
+
+        c.gridy = 1;
+        c.insets = new Insets(4, 8, 2, 8);
+        add(scrollUpHolder, c);
+
+        c.gridy = 2;
+        c.insets = new Insets(0, 8, 0, 8);
+        add(slotsScrollPane, c);
+
+        c.gridy = 3;
+        c.insets = new Insets(2, 8, 4, 8);
+        add(scrollDownHolder, c);
 
         backButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BACK));
         AssetStyles.styleMenuButton(backButton);
@@ -114,8 +181,8 @@ public class SaveSelectPanel extends JPanel {
             frame.showCard(MainFrame.CARD_INIT);
         });
 
-        c.gridy = row;
-        c.insets = new Insets(16, 8, 8, 8);
+        c.gridy = 4;
+        c.insets = new Insets(10, 8, 8, 8);
         add(backButton, c);
 
         addAncestorListener(new AncestorListener() {
@@ -124,17 +191,192 @@ public class SaveSelectPanel extends JPanel {
                 if (!isShowing()) {
                     return;
                 }
+                smoothScrollTimer.stop();
+                currentScrollY = 0.0;
+                targetScrollY = 0.0;
+                slotsScrollPane.getViewport().setViewPosition(new Point(0, 0));
                 if (slotButtons[0] != null) {
                     slotButtons[0].requestFocusInWindow();
                 }
+                SwingUtilities.invokeLater(SaveSelectPanel.this::updateScrollIndicators);
             }
 
             @Override
-            public void ancestorRemoved(AncestorEvent event) {}
+            public void ancestorRemoved(AncestorEvent event) {
+                smoothScrollTimer.stop();
+            }
 
             @Override
             public void ancestorMoved(AncestorEvent event) {}
         });
+    }
+
+    private void configureScrollIndicators() {
+        Color bg = AssetStyles.BACKGROUND_COLOR;
+        Color menuBg = AssetStyles.colorFromRgba(
+                bg.getRed(), bg.getGreen(), bg.getBlue(), AssetStyles.MENU_BUTTON_ALPHA);
+        Dimension holderSize = new Dimension(
+                AssetStyles.MENU_BUTTON_WIDTH,
+                AssetStyles.minControlHitSize().height);
+
+        scrollUpHolder.setOpaque(false);
+        scrollUpHolder.setPreferredSize(holderSize);
+        scrollUpHolder.setMinimumSize(holderSize);
+        scrollUpHolder.setMaximumSize(holderSize);
+
+        scrollDownHolder.setOpaque(false);
+        scrollDownHolder.setPreferredSize(holderSize);
+        scrollDownHolder.setMinimumSize(holderSize);
+        scrollDownHolder.setMaximumSize(holderSize);
+
+        scrollUpIndicator.setOpaque(false);
+        scrollUpIndicator.setContentAreaFilled(true);
+        scrollUpIndicator.setBackground(menuBg);
+
+        scrollDownIndicator.setOpaque(false);
+        scrollDownIndicator.setContentAreaFilled(true);
+        scrollDownIndicator.setBackground(menuBg);
+    }
+
+    private void configureScrollPaneAppearance() {
+        slotsContainer.setOpaque(false);
+        slotsScrollPane.setOpaque(false);
+        slotsScrollPane.getViewport().setOpaque(false);
+        slotsScrollPane.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
+        slotsScrollPane.setBorder(null);
+        slotsScrollPane.setViewportBorder(null);
+        slotsScrollPane.getVerticalScrollBar().setUnitIncrement((int) SCROLL_PIXELS_PER_NOTCH);
+        UiScrollBarStyles.hide(slotsScrollPane);
+        Dimension viewportSize = computeVisibleSlotsViewportSize(slotButtons[0].getPreferredSize().height);
+        slotsScrollPane.setPreferredSize(viewportSize);
+        slotsScrollPane.setMinimumSize(viewportSize);
+        slotsScrollPane.setMaximumSize(viewportSize);
+    }
+
+    static int computeVisibleSlotsViewportHeight(int buttonHeight, int visibleSlots) {
+        if (visibleSlots <= 0) {
+            return 0;
+        }
+        int rowHeight = SLOT_LABEL_SIZE.height + buttonHeight;
+        return 24 + (visibleSlots - 1) * 32 + visibleSlots * rowHeight;
+    }
+
+    private static Dimension computeVisibleSlotsViewportSize(int buttonHeight) {
+        return new Dimension(
+                AssetStyles.MENU_BUTTON_WIDTH + 16,
+                computeVisibleSlotsViewportHeight(buttonHeight, VISIBLE_SLOT_COUNT));
+    }
+
+    private double slotScrollStep() {
+        return 32.0 + SLOT_LABEL_SIZE.height + slotButtons[0].getPreferredSize().height;
+    }
+
+    static double computeWheelDelta(double preciseWheelRotation, int wheelRotation) {
+        double rot = (Double.isFinite(preciseWheelRotation) && preciseWheelRotation != 0.0)
+                ? preciseWheelRotation
+                : wheelRotation;
+        return rot * SCROLL_PIXELS_PER_NOTCH;
+    }
+
+    static double stepSmoothScroll(double currentY, double targetY, int maxY) {
+        if (maxY <= 0) {
+            return 0.0;
+        }
+        double clampedTarget = Math.max(0.0, Math.min(maxY, targetY));
+        double diff = clampedTarget - currentY;
+        if (Math.abs(diff) <= SMOOTH_SCROLL_SNAP_EPSILON) {
+            return clampedTarget;
+        }
+        return currentY + diff * SMOOTH_SCROLL_LERP;
+    }
+
+    static boolean canScrollUp(int viewY, int maxY) {
+        return maxY > 0 && viewY > 0;
+    }
+
+    static boolean canScrollDown(int viewY, int maxY) {
+        return maxY > 0 && viewY < maxY;
+    }
+
+    private int getMaxScrollY() {
+        JViewport viewport = slotsScrollPane.getViewport();
+        if (viewport == null) {
+            return 0;
+        }
+        return Math.max(0, viewport.getViewSize().height - viewport.getExtentSize().height);
+    }
+
+    private boolean nudgeSmoothScroll(double deltaY) {
+        int maxY = getMaxScrollY();
+        if (maxY <= 0 || deltaY == 0.0) {
+            return false;
+        }
+        if (!smoothScrollTimer.isRunning()) {
+            currentScrollY = slotsScrollPane.getViewport().getViewPosition().y;
+            targetScrollY = currentScrollY;
+        }
+        targetScrollY = Math.max(0.0, Math.min(maxY, targetScrollY + deltaY));
+        if (!smoothScrollTimer.isRunning()) {
+            smoothScrollTimer.start();
+        }
+        return true;
+    }
+
+    private void onSmoothScrollTick() {
+        JViewport viewport = slotsScrollPane.getViewport();
+        if (viewport == null) {
+            smoothScrollTimer.stop();
+            return;
+        }
+        int maxY = getMaxScrollY();
+        if (maxY <= 0) {
+            currentScrollY = 0.0;
+            targetScrollY = 0.0;
+            smoothScrollTimer.stop();
+            updateScrollIndicators();
+            return;
+        }
+        targetScrollY = Math.max(0.0, Math.min(maxY, targetScrollY));
+        currentScrollY = stepSmoothScroll(currentScrollY, targetScrollY, maxY);
+        int nextY = (int) Math.round(currentScrollY);
+        Point pos = viewport.getViewPosition();
+        if (pos.y != nextY) {
+            viewport.setViewPosition(new Point(pos.x, nextY));
+        }
+        if (Math.abs(targetScrollY - currentScrollY) <= SMOOTH_SCROLL_SNAP_EPSILON) {
+            currentScrollY = targetScrollY;
+            int finalY = (int) Math.round(targetScrollY);
+            if (viewport.getViewPosition().y != finalY) {
+                viewport.setViewPosition(new Point(pos.x, finalY));
+            }
+            smoothScrollTimer.stop();
+        }
+    }
+
+    private void updateScrollIndicators() {
+        int maxY = getMaxScrollY();
+        int viewY = slotsScrollPane.getViewport().getViewPosition().y;
+        scrollUpIndicator.setVisible(canScrollUp(viewY, maxY));
+        scrollDownIndicator.setVisible(canScrollDown(viewY, maxY));
+    }
+
+    private void scrollSlotIntoView(int idx) {
+        if (idx < 0 || idx >= SaveManager.MAX_SAVE_SLOTS) {
+            return;
+        }
+        smoothScrollTimer.stop();
+        Rectangle labelBounds = slotLabels[idx].getBounds();
+        Rectangle actionsBounds = actionRows[idx].getBounds();
+        Rectangle combined = labelBounds.union(actionsBounds);
+        if (combined.height > 0) {
+            combined.y = Math.max(0, combined.y - 8);
+            combined.height += 16;
+            slotsContainer.scrollRectToVisible(combined);
+            int viewY = slotsScrollPane.getViewport().getViewPosition().y;
+            currentScrollY = viewY;
+            targetScrollY = viewY;
+            updateScrollIndicators();
+        }
     }
 
     private static void sizePairedMenuButton(JButton button) {
@@ -153,10 +395,21 @@ public class SaveSelectPanel extends JPanel {
 
     public void refreshTheme() {
         AssetStyles.applyThemeToContainer(this);
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < SaveManager.MAX_SAVE_SLOTS; i++) {
             sizePairedMenuButton(slotButtons[i]);
             sizePairedMenuButton(deleteButtons[i]);
+            Dimension actionsSize = new Dimension(
+                    AssetStyles.MENU_BUTTON_WIDTH,
+                    slotButtons[i].getPreferredSize().height);
+            actionRows[i].setPreferredSize(actionsSize);
+            actionRows[i].setMinimumSize(actionsSize);
+            actionRows[i].setMaximumSize(actionsSize);
         }
+        configureScrollIndicators();
+        configureScrollPaneAppearance();
+        updateScrollIndicators();
+        revalidate();
+        repaint();
     }
     
     private void setupNavigation(JButton button) {
@@ -180,7 +433,7 @@ public class SaveSelectPanel extends JPanel {
     }
 
     public void refreshSlots() {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < SaveManager.MAX_SAVE_SLOTS; i++) {
             cachedSaves[i] = saveManager.loadSlotMetadata(i + 1);
         }
         applySlotLabels();
@@ -188,14 +441,14 @@ public class SaveSelectPanel extends JPanel {
 
     public void setSlotActionsEnabled(boolean enabled) {
         slotActionsEnabled = enabled;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < SaveManager.MAX_SAVE_SLOTS; i++) {
             slotButtons[i].setEnabled(enabled);
             deleteButtons[i].setEnabled(enabled && cachedSaves[i] != null);
         }
     }
 
     private void applySlotLabels() {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < SaveManager.MAX_SAVE_SLOTS; i++) {
             int slotId = i + 1;
             Savefile s = cachedSaves[i];
 
@@ -327,35 +580,44 @@ public class SaveSelectPanel extends JPanel {
                 frame.openGameWithSave(save);
             });
         } else {
-            Savefile fresh = saveManager.loadSlot(slotId);
-            if (fresh == null) {
-                refreshSlots();
-                UiOptionPane.showMessageDialog(frame,
-                        LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING),
-                        LanguageStrings.get(LanguageStrings.UI_ERROR),
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if (!confirmAchievementTaintIfNeeded(false, fresh)) {
-                return;
-            }
-            taintSavefileIfSandboxActive(fresh);
-            if (fresh.getVersion() == null || !fresh.getVersion().equals(SaveManager.getAppVersion())) {
-                int choice = UiOptionPane.showConfirmDialog(
-                        frame,
-                        LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_PROMPT),
-                        LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_TITLE),
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE);
-                if (choice == JOptionPane.YES_OPTION) {
-                    fresh.setVersion(SaveManager.getAppVersion());
-                    saveManager.saveUserSlotAsync(fresh, null);
-                }
-            }
-            cachedSaves[idx] = fresh;
-            applySlotLabels();
-            frame.openGameWithSave(fresh);
+            loadExistingSlot(slotId);
         }
+    }
+
+    public boolean loadExistingSlot(int slotId) {
+        if (slotId < 1 || slotId > SaveManager.MAX_SAVE_SLOTS) {
+            return false;
+        }
+        Savefile fresh = saveManager.loadSlot(slotId);
+        if (fresh == null) {
+            refreshSlots();
+            frame.refreshInitMenuOptions();
+            UiOptionPane.showMessageDialog(frame,
+                    LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING),
+                    LanguageStrings.get(LanguageStrings.UI_ERROR),
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (!confirmAchievementTaintIfNeeded(false, fresh)) {
+            return false;
+        }
+        taintSavefileIfSandboxActive(fresh);
+        if (fresh.getVersion() == null || !fresh.getVersion().equals(SaveManager.getAppVersion())) {
+            int choice = UiOptionPane.showConfirmDialog(
+                    frame,
+                    LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_PROMPT),
+                    LanguageStrings.get(LanguageStrings.SAVE_UPDATE_VERSION_TITLE),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            if (choice == JOptionPane.YES_OPTION) {
+                fresh.setVersion(SaveManager.getAppVersion());
+                saveManager.saveUserSlotAsync(fresh, null);
+            }
+        }
+        cachedSaves[slotId - 1] = fresh;
+        applySlotLabels();
+        frame.openGameWithSave(fresh);
+        return true;
     }
 
     private NewSaveRequest promptNewSave() {

@@ -739,6 +739,11 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     public void showCard(String card) {
+        if (CARD_INIT.equals(card)) {
+            try {
+                initPanel.refreshMenuOptions();
+            } catch (Exception ignore) {}
+        }
         if (CARD_SAVE.equals(card)) {
             try {
                 saveSelectPanel.refreshSlots();
@@ -785,7 +790,19 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
     }
 
+    public void refreshInitMenuOptions() {
+        if (initPanel != null) {
+            initPanel.refreshMenuOptions();
+        }
+    }
+
     public void openGameWithSave(Savefile savefile) {
+        if (savefile != null && savefile.getId() >= 1 && savefile.getId() <= SaveManager.MAX_SAVE_SLOTS) {
+            if (engine.getLastPlayedSlotId() != savefile.getId()) {
+                engine.setLastPlayedSlotId(savefile.getId());
+                engine.saveGlobalSettings();
+            }
+        }
         showCard(CARD_GAME);
         gamePanel.enterWithSavefile(savefile);
         applyRuntimeSettings();

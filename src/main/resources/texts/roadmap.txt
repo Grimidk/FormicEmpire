@@ -5,16 +5,13 @@ To Fix (By decreasing priority):
 		(none right now)
 	High:
 		Hunts to battle sim
-		add continue (points to last file opened) make other button a save select, if no file only have a new game
-		Rework death by old age
-		Weather effects on tile
-		Cheat weather selector
 	Mid:
 		(none right now)
 	Low:
 		(none right now)
 	Important not Urgent:
-		(none right now)
+		look into rust refactor
+		look into procedurally animated legs
 	Can't reproduce:
 		(none right now)
 
@@ -54,6 +51,22 @@ To Draw (PascalCase filenames; under src/main/resources):
 			DisasterIceCollapse.png, DisasterIceCollapse2.png — Fractured, shattered ice-shelf chasm decals showing deep dark water beneath broken ice slabs.
 		Ocean Freeze (128x128):
 			DisasterOceanFreeze.png, DisasterOceanFreeze2.png — Creeping jagged frost crystal sheets and ice crust spreading over the surface.
+	Weather environment sprites — Overworld colony view (sprites/environment/ — transparent background; top-down colony view; currently rendered procedurally until hand-drawn sprites are added):
+		Cloud & Fog Banks (256x128):
+			OverworldCloud.png — Redraw manually (soft drifting shadow cloud for clear/rain/snow skies).
+			OverworldFog.png — Soft translucent pale-grey drifting mist bank for Fog.
+			OverworldPyroFog.png — Dense dark smoky volcanic ash cloud bank for Pyroclastic Fog.
+		Particle & Atmospheric Overlays:
+			OverworldWeatherRain1.png, OverworldWeatherRain2.png (128x128) — 2-frame seamless slanted blue raindrops (used denser/faster for Heavy Rain and Thunder).
+			OverworldWeatherLightning1.png, OverworldWeatherLightning2.png (128x128) — 2-frame forked yellow-white lightning strike flashes for Thunder.
+			OverworldWeatherAcidRain1.png, OverworldWeatherAcidRain2.png (128x128) — 2-frame toxic yellow-green acid raindrops.
+			OverworldWeatherBloodRain1.png, OverworldWeatherBloodRain2.png (128x128) — 2-frame crimson raindrops for Blood Rain.
+			OverworldWeatherFrog1.png, OverworldWeatherFrog2.png (16x16) — 2-frame small tumbling green pixel frog sprite spawned over light rain for Frog Rain.
+			OverworldWeatherSnow1.png, OverworldWeatherSnow2.png (128x128) — 2-frame seamless falling pixel snowflakes (used denser for Heavy Snow).
+			OverworldWeatherSand1.png, OverworldWeatherSand2.png (128x128) — 2-frame fast horizontal blowing ochre sand streaks and dust grit for Sand Storm.
+			OverworldWeatherWind1.png, OverworldWeatherWind2.png (128x128) — 2-frame sweeping curved translucent air-gust streaks for Heavy Wind.
+			OverworldWeatherEmber1.png, OverworldWeatherEmber2.png (64x64) — 2-frame rising glowing orange sparks and grey ash flecks layered over OverworldPyroFog.png.
+			OverworldWeatherHeat1.png, OverworldWeatherHeat2.png (128x128) — 2-frame rising wavy golden heat-haze distortion ripples for Heat Wave.
 	Map labels:
 		Redraw asset for map labels manually (path TBD)
 
@@ -124,6 +137,7 @@ Post launch (v1.1) (Improvements Update):
 	more stats (kills, historic productions, graphs?)
 	further dynasty editing like color species and starting upgrades and species assimilation, and nest type like tree, burrow or mound
 	console and commands for debugging (to include in core)
+	debug disaster and weather picker
 	native universal modding support (to include in core)
 	custom key bind settings for all keys (to include in core)
 	ant menus (detailed per ant)

@@ -413,9 +413,16 @@ public final class OverworldAtmosphereRenderer {
         Graphics2D g = (Graphics2D) g2d.create();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        boolean isRaining = isRain(weather);
-        boolean isStormy = weather == GameConstants.WEATHER_THUNDER || weather == GameConstants.WEATHER_HEAVY_RAIN;
-        float baseAlpha = isStormy ? 0.35f : (isRaining ? 0.25f : 0.14f);
+        boolean isHeat = weather == GameConstants.WEATHER_HEAT;
+        boolean isStormy = weather == GameConstants.WEATHER_THUNDER
+                || weather == GameConstants.WEATHER_HEAVY_RAIN
+                || weather == GameConstants.WEATHER_BLOOD
+                || weather == GameConstants.WEATHER_PYROCLASTIC_FOG;
+        boolean isMediumCloud = isRain(weather)
+                || isSnow(weather)
+                || weather == GameConstants.WEATHER_FOG
+                || weather == GameConstants.WEATHER_FROG;
+        float baseAlpha = isHeat ? 0.05f : (isStormy ? 0.35f : (isMediumCloud ? 0.25f : 0.14f));
 
         int period1 = 120000;
         double progress1 = (timeMs % period1) / (double) period1;
@@ -471,6 +478,16 @@ public final class OverworldAtmosphereRenderer {
             renderSnow(g2d, w, h, timeMs, weather);
         } else if (weather == GameConstants.WEATHER_SAND_STORM) {
             renderSand(g2d, w, h, timeMs);
+        } else if (weather == GameConstants.WEATHER_FROG) {
+            renderFrogs(g2d, w, h, timeMs);
+        } else if (weather == GameConstants.WEATHER_WIND) {
+            renderWind(g2d, w, h, timeMs);
+        } else if (weather == GameConstants.WEATHER_FOG) {
+            renderFog(g2d, w, h, timeMs);
+        } else if (weather == GameConstants.WEATHER_PYROCLASTIC_FOG) {
+            renderPyroclasticFog(g2d, w, h, timeMs);
+        } else if (weather == GameConstants.WEATHER_HEAT) {
+            renderHeatWave(g2d, w, h, timeMs);
         }
     }
 
@@ -487,6 +504,8 @@ public final class OverworldAtmosphereRenderer {
         Color dropColor;
         if (weather == GameConstants.WEATHER_ACID_RAIN) {
             dropColor = new Color(175, 235, 60, 160);
+        } else if (weather == GameConstants.WEATHER_BLOOD) {
+            dropColor = new Color(185, 35, 45, 165);
         } else if (weather == GameConstants.WEATHER_THUNDER) {
             dropColor = new Color(205, 225, 255, 175);
         } else {
@@ -505,6 +524,17 @@ public final class OverworldAtmosphereRenderer {
             double fallX = (seedX + (fallY / (double) h) * angleDx * 30.0) % w;
 
             g.draw(new Line2D.Double(fallX, fallY, fallX + angleDx, fallY + dropLength));
+        }
+
+        if (weather == GameConstants.WEATHER_THUNDER && (timeMs / 160L) % 29 == 0) {
+            g.setColor(new Color(230, 240, 255, 45));
+            g.fillRect(0, 0, w, h);
+            double bx = w * 0.28 + ((timeMs / 160L * 97) % Math.max(1, (int) (w * 0.45)));
+            g.setColor(new Color(255, 248, 175, 220));
+            g.setStroke(new BasicStroke(2.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.draw(new Line2D.Double(bx, 0, bx - 18, h * 0.24));
+            g.draw(new Line2D.Double(bx - 18, h * 0.24, bx + 12, h * 0.26));
+            g.draw(new Line2D.Double(bx + 12, h * 0.26, bx - 10, h * 0.56));
         }
 
         g.dispose();
@@ -553,11 +583,140 @@ public final class OverworldAtmosphereRenderer {
         g.dispose();
     }
 
+    private static void renderFrogs(Graphics2D g2d, int w, int h, long timeMs) {
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g.setStroke(new BasicStroke(1.1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+        g.setColor(new Color(140, 210, 145, 130));
+        for (int i = 0; i < 65; i++) {
+            int seedX = (i * 47) % w;
+            int seedY = (i * 83) % h;
+            double fallY = (seedY + (timeMs * 0.048 * (16 + (i % 10)))) % (h + 14);
+            double fallX = (seedX + (fallY / (double) h) * 80.0) % w;
+            g.draw(new Line2D.Double(fallX, fallY, fallX + 3.0, fallY + 14.0));
+        }
+
+        Color frogBody = new Color(90, 190, 65, 220);
+        Color frogAccent = new Color(40, 105, 30, 225);
+        for (int i = 0; i < 24; i++) {
+            int seedX = (i * 73) % w;
+            int seedY = (i * 107) % h;
+            int size = 7 + (i % 4);
+            double fallRate = 10.0 + (i % 7);
+            double fallY = (seedY + (timeMs * 0.025 * fallRate)) % (h + size);
+            double sway = Math.sin((timeMs * 0.004) + i * 1.7) * 14.0;
+            double fallX = (seedX + sway + w) % w;
+            g.setColor(frogBody);
+            g.fill(new Ellipse2D.Double(fallX, fallY, size + 2.0, size));
+            g.setColor(frogAccent);
+            g.fill(new Ellipse2D.Double(fallX + 2.0, fallY + 2.0, Math.max(2.0, size * 0.45), Math.max(2.0, size * 0.45)));
+        }
+
+        g.dispose();
+    }
+
+    private static void renderWind(Graphics2D g2d, int w, int h, long timeMs) {
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setColor(new Color(225, 245, 255, 130));
+
+        for (int i = 0; i < 42; i++) {
+            int seedX = (i * 97) % w;
+            int seedY = (i * 59) % h;
+            int length = 35 + (i % 45);
+            double x0 = (seedX + (timeMs * 0.14 * (14 + (i % 10)))) % (w + length) - length;
+            double y0 = (seedY + Math.sin(timeMs * 0.004 + i) * 12.0 + h) % h;
+            double midX = x0 + length * 0.5;
+            double midY = y0 - 6.0;
+            g.draw(new Line2D.Double(x0, y0, midX, midY));
+            g.draw(new Line2D.Double(midX, midY, x0 + length, y0));
+        }
+
+        g.dispose();
+    }
+
+    private static void renderFog(Graphics2D g2d, int w, int h, long timeMs) {
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(new Color(228, 234, 242, 75));
+
+        int bandW = Math.max(180, (int) (w * 0.35));
+        int bandH = Math.max(70, (int) (h * 0.22));
+        for (int i = 0; i < 8; i++) {
+            int seedX = (i * 151) % Math.max(1, w);
+            int seedY = (i * 113) % Math.max(1, h);
+            double x = ((seedX + timeMs * (0.015 + (i % 3) * 0.008)) % (w + bandW)) - bandW * 0.5;
+            double y = (seedY + Math.sin(timeMs * 0.0008 + i) * 18.0 + h) % h - bandH * 0.35;
+            g.fill(new Ellipse2D.Double(x, y, bandW, bandH));
+        }
+
+        g.dispose();
+    }
+
+    private static void renderPyroclasticFog(Graphics2D g2d, int w, int h, long timeMs) {
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(new Color(62, 54, 54, 95));
+
+        int bandW = Math.max(190, (int) (w * 0.38));
+        int bandH = Math.max(75, (int) (h * 0.24));
+        for (int i = 0; i < 8; i++) {
+            int seedX = (i * 149) % Math.max(1, w);
+            int seedY = (i * 103) % Math.max(1, h);
+            double x = ((seedX + timeMs * (0.02 + (i % 3) * 0.01)) % (w + bandW)) - bandW * 0.5;
+            double y = (seedY + Math.sin(timeMs * 0.001 + i) * 16.0 + h) % h - bandH * 0.35;
+            g.fill(new Ellipse2D.Double(x, y, bandW, bandH));
+        }
+
+        g.setColor(new Color(145, 138, 136, 150));
+        for (int i = 0; i < 55; i++) {
+            int seedX = (i * 67) % w;
+            int seedY = (i * 89) % h;
+            double x = (seedX + timeMs * (0.04 + (i % 4) * 0.012)) % w;
+            double y = (seedY + Math.sin(timeMs * 0.003 + i) * 10.0 + h) % h;
+            g.fill(new Ellipse2D.Double(x, y, 3, 3));
+        }
+
+        g.setColor(new Color(255, 155, 45, 200));
+        for (int i = 0; i < 36; i++) {
+            int seedX = (i * 83) % w;
+            int seedY = (i * 59) % h;
+            double x = (seedX + Math.sin(timeMs * 0.004 + i) * 18.0 + w) % w;
+            double y = (h - ((seedY + timeMs * 0.055) % h));
+            g.fill(new Ellipse2D.Double(x, y, 4, 4));
+        }
+
+        g.dispose();
+    }
+
+    private static void renderHeatWave(Graphics2D g2d, int w, int h, long timeMs) {
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g.setColor(new Color(255, 195, 70, 28));
+        g.fillRect(0, 0, w, h);
+
+        g.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setColor(new Color(255, 225, 120, 115));
+        for (int i = 0; i < 28; i++) {
+            double baseX = ((i * 83) % w);
+            double baseY = (h - (((i * 67) + timeMs * 0.04) % (h + 40)));
+            double sway = Math.sin(timeMs * 0.006 + i) * 7.0;
+            g.draw(new Line2D.Double(baseX - sway, baseY, baseX + sway, baseY - 18.0));
+            g.draw(new Line2D.Double(baseX + sway, baseY - 18.0, baseX - sway, baseY - 36.0));
+        }
+
+        g.dispose();
+    }
+
     public static boolean isRain(Weather weather) {
         return weather == GameConstants.WEATHER_RAIN
                 || weather == GameConstants.WEATHER_HEAVY_RAIN
                 || weather == GameConstants.WEATHER_THUNDER
-                || weather == GameConstants.WEATHER_ACID_RAIN;
+                || weather == GameConstants.WEATHER_ACID_RAIN
+                || weather == GameConstants.WEATHER_BLOOD;
     }
 
     public static boolean isSnow(Weather weather) {

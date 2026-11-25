@@ -7082,6 +7082,15 @@ public class World {
         WorldWeatherService.applyCoherentWeatherPatches(this);
     }
 
+    public int randomizeAllWeather() {
+        int affected = WorldWeatherService.randomizeWorldWeather(this);
+        if (this.activeHex != null && this.activeHex.getLocalWeather() != null) {
+            this.weather = this.activeHex.getLocalWeather();
+        }
+        updateEnvironmentalConditions();
+        return affected;
+    }
+
     public void runMinute() {
         try (SimulationDiagnostics.TimedSection section = SimulationDiagnostics.start(Scope.WORLD_MINUTE)) {
             this.minute++;

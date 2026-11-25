@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.entities.world.FaultLine;
@@ -17,7 +18,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -320,6 +323,56 @@ class MapDialogModeTest {
                 engine.setCheatRevealMap(true);
                 dialog.paint(g);
                 g.dispose();
+            } finally {
+                dialog.dispose();
+            }
+        });
+    }
+
+    @Test
+    void randomWeatherCheatButtonRespectsSettingAndRandomizesWorldWeather() throws Exception {
+        World world = new World();
+        world.setSpectatorMode(false);
+        world.generateRectangularWorld(
+                GameConstants.BIOME_PLAINS,
+                new Colony(1, "Capital", true),
+                "Player",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        Engine engine = new Engine();
+        engine.setFreeAbilities(false);
+        engine.setInfiniteResearch(false);
+        engine.setInstantBuildings(false);
+        engine.setAssimilateAll(false);
+        engine.setEasyConquering(false);
+        engine.setInstantIntegration(false);
+        engine.setCheatFogOfWarToggle(false);
+        engine.setCheatRandomWeather(false);
+        engine.setWorld(world);
+
+        SwingUtilities.invokeAndWait(() -> {
+            MapDialog dialog = new MapDialog(null, engine, world, null, null);
+            try {
+                assertFalse(dialog.getWeatherCheatButton().isVisible());
+                assertFalse(dialog.getWeatherCheatButton().isEnabled());
+                assertTrue(world.allowsAchievements());
+
+                engine.setCheatRandomWeather(true);
+                dialog.liveUpdate();
+
+                assertTrue(dialog.getWeatherCheatButton().isVisible());
+                assertTrue(dialog.getWeatherCheatButton().isEnabled());
+
+                dialog.getWeatherCheatButton().doClick();
+
+                Set<Weather> seen = new HashSet<>();
+                for (Hex h : world.getHexes()) {
+                    if (h != null && h.getLocalWeather() != null) {
+                        seen.add(h.getLocalWeather());
+                    }
+                }
+                assertTrue(seen.size() > 3);
+                assertFalse(world.allowsAchievements());
             } finally {
                 dialog.dispose();
             }

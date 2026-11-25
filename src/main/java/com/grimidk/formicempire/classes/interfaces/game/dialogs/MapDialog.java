@@ -90,6 +90,7 @@ public class MapDialog extends ZeroDialog {
     private final JButton fogCheatButton;
     private final JButton disasterCheatButton;
     private final JButton warCheatButton;
+    private final JButton weatherCheatButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
     private final Runnable onOpenWarDialog;
@@ -391,6 +392,17 @@ public class MapDialog extends ZeroDialog {
         warCheatButton.addActionListener(e -> triggerRandomWarCheat());
         zoomRail.add(Box.createVerticalStrut(4));
         zoomRail.add(warCheatButton);
+
+        weatherCheatButton = new JButton();
+        weatherCheatButton.setFocusable(false);
+        weatherCheatButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        configureMapActionIconButton(weatherCheatButton, "/icons/weather/Thunder.png", LanguageStrings.MAP_WEATHER_CHEAT, LanguageStrings.MAP_WEATHER_CHEAT_TT, true);
+        if (weatherCheatButton.getIcon() == null) {
+            weatherCheatButton.setText("R");
+        }
+        weatherCheatButton.addActionListener(e -> triggerRandomWeatherCheat());
+        zoomRail.add(Box.createVerticalStrut(4));
+        zoomRail.add(weatherCheatButton);
 
         conquerButton = new JButton();
         conquerButton.setFocusable(false);
@@ -1307,6 +1319,10 @@ public class MapDialog extends ZeroDialog {
         return disasterCheatButton;
     }
 
+    JButton getWeatherCheatButton() {
+        return weatherCheatButton;
+    }
+
     public void setShowCapitals(boolean showCapitals) {
         setLayerVisible(Layer.CAPITALS, showCapitals);
     }
@@ -1491,6 +1507,15 @@ public class MapDialog extends ZeroDialog {
             }
         }
 
+        if (weatherCheatButton != null) {
+            boolean cheatWeather = eng != null && eng.isCheatRandomWeather();
+            weatherCheatButton.setVisible(cheatWeather);
+            weatherCheatButton.setEnabled(cheatWeather);
+            if (cheatWeather) {
+                weatherCheatButton.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_WEATHER_CHEAT_TT));
+            }
+        }
+
         if (zoomRail != null) {
             zoomRail.revalidate();
             zoomRail.repaint();
@@ -1563,6 +1588,26 @@ public class MapDialog extends ZeroDialog {
             if (legendPanel != null) {
                 legendPanel.updateLegend();
                 legendPanel.repaint();
+            }
+            if (onHexChange != null) {
+                onHexChange.run();
+            }
+        }
+    }
+
+    private void triggerRandomWeatherCheat() {
+        World w = currentWorld();
+        if (w == null) {
+            return;
+        }
+        int affected = w.randomizeAllWeather();
+        if (affected > 0) {
+            if (!isSpectatorMode()) {
+                w.disableAchievements();
+            }
+            if (mapPanel != null) {
+                mapPanel.invalidateBakedImage();
+                mapPanel.repaint();
             }
             if (onHexChange != null) {
                 onHexChange.run();
@@ -1934,6 +1979,10 @@ public class MapDialog extends ZeroDialog {
         configureMapActionIconButton(warCheatButton, "/icons/misc/MilitaryPower.png", LanguageStrings.MAP_WAR_CHEAT, LanguageStrings.MAP_WAR_CHEAT_TT, true);
         if (warCheatButton != null && warCheatButton.getIcon() == null) {
             warCheatButton.setText("W");
+        }
+        configureMapActionIconButton(weatherCheatButton, "/icons/weather/Thunder.png", LanguageStrings.MAP_WEATHER_CHEAT, LanguageStrings.MAP_WEATHER_CHEAT_TT, true);
+        if (weatherCheatButton != null && weatherCheatButton.getIcon() == null) {
+            weatherCheatButton.setText("R");
         }
         configureMapActionIconButton(fogCheatButton, "/icons/weather/Fog.png", null, LanguageStrings.MAP_FOG_CHEAT_TOOLTIP, true);
         if (fogCheatButton != null && fogCheatButton.getIcon() == null) {
@@ -3432,6 +3481,12 @@ public class MapDialog extends ZeroDialog {
                         .append(LanguageStrings.get(LanguageStrings.ALERT_DETAIL_DISASTER))
                         .append(": ")
                         .append(hex.getDisasterType().getName());
+            }
+            if (hex.getLocalWeather() != null) {
+                sb.append("<br><b>")
+                        .append(LanguageStrings.get(LanguageStrings.STAT_WEATHER))
+                        .append(":</b> ")
+                        .append(hex.getLocalWeather().getName());
             }
 
             if (c != null) {

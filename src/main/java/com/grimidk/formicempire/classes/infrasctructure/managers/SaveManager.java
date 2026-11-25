@@ -56,6 +56,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
 public class SaveManager {
+    public static final int MAX_SAVE_SLOTS = 10;
+
     private static final ExecutorService SHARED_EXECUTOR =
             Executors.newSingleThreadExecutor(r -> new Thread(r, "save-worker"));
 
@@ -339,6 +341,31 @@ public class SaveManager {
             return autosave.getTimestamp() > manualSave.getTimestamp() ? autosave : manualSave;
         }
         return manualSave != null ? manualSave : autosave;
+    }
+
+    public boolean hasAnySaveSlot() {
+        for (int slotId = 1; slotId <= MAX_SAVE_SLOTS; slotId++) {
+            if (loadSlotMetadata(slotId) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int resolveContinueSlotId(int preferredSlotId) {
+        if (preferredSlotId >= 1 && preferredSlotId <= MAX_SAVE_SLOTS && loadSlotMetadata(preferredSlotId) != null) {
+            return preferredSlotId;
+        }
+        int bestSlot = 0;
+        long bestTimestamp = Long.MIN_VALUE;
+        for (int slotId = 1; slotId <= MAX_SAVE_SLOTS; slotId++) {
+            Savefile meta = loadSlotMetadata(slotId);
+            if (meta != null && meta.getTimestamp() > bestTimestamp) {
+                bestTimestamp = meta.getTimestamp();
+                bestSlot = slotId;
+            }
+        }
+        return bestSlot;
     }
 
     public Savefile loadAutosaveForSlot(int slotId) {
@@ -962,6 +989,7 @@ public class SaveManager {
             writeJsonLine(w, "cheatRevealMap", false, false);
             writeJsonLine(w, "cheatRandomDisaster", engine.isCheatRandomDisaster(), false);
             writeJsonLine(w, "cheatRandomWar", engine.isCheatRandomWar(), false);
+            writeJsonLine(w, "cheatRandomWeather", engine.isCheatRandomWeather(), false);
             writeJsonLine(w, "animateWorldGen", engine.isAnimateWorldGen(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
@@ -992,6 +1020,7 @@ public class SaveManager {
             writeJsonLine(w, "mapLayerDayNight", engine.isMapLayerDayNight(), false);
             writeJsonLine(w, "mapLayerWeather", engine.isMapLayerWeather(), false);
             writeJsonLine(w, "mapLayerDisasters", engine.isMapLayerDisasters(), false);
+            writeJsonLine(w, "lastPlayedSlotId", engine.getLastPlayedSlotId(), false);
             
             // Serialize Upgrade Coordinates
             StringBuilder sb = new StringBuilder();
@@ -1121,6 +1150,7 @@ public class SaveManager {
             engine.setCheatRevealMap(false);
             engine.setCheatRandomDisaster(Boolean.parseBoolean(m.getOrDefault("cheatRandomDisaster", "false")));
             engine.setCheatRandomWar(Boolean.parseBoolean(m.getOrDefault("cheatRandomWar", "false")));
+            engine.setCheatRandomWeather(Boolean.parseBoolean(m.getOrDefault("cheatRandomWeather", "false")));
             engine.setAnimateWorldGen(Boolean.parseBoolean(m.getOrDefault("animateWorldGen", "true")));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.CLASS_WORKER,
@@ -1190,6 +1220,8 @@ public class SaveManager {
                     String.valueOf(engine.isMapLayerWeather()))));
             engine.setMapLayerDisasters(Boolean.parseBoolean(m.getOrDefault("mapLayerDisasters",
                     String.valueOf(engine.isMapLayerDisasters()))));
+            engine.setLastPlayedSlotId(Integer.parseInt(m.getOrDefault("lastPlayedSlotId",
+                    String.valueOf(engine.getLastPlayedSlotId()))));
 
             loadUpgradePositionsFromFile();
             if (m.containsKey("upgradePositions")) {

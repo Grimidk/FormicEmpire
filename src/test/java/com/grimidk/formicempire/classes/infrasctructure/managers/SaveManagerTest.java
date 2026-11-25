@@ -543,4 +543,48 @@ public class SaveManagerTest {
         assertEquals(4, loaded.getMonth());
         assertEquals(9, loaded.getDay());
     }
+
+    @Test
+    public void testLastPlayedSlotIdPersistsAndClampsOutOfRange(@TempDir Path tempDir) {
+        SaveManager manager = new SaveManager(tempDir.toFile());
+        Engine writer = new Engine();
+        writer.setLastPlayedSlotId(7);
+        manager.saveSettings(writer);
+
+        Engine reader = new Engine();
+        reader.setLastPlayedSlotId(0);
+        manager.loadSettings(reader);
+        assertEquals(7, reader.getLastPlayedSlotId());
+
+        reader.setLastPlayedSlotId(-1);
+        assertEquals(0, reader.getLastPlayedSlotId());
+        reader.setLastPlayedSlotId(0);
+        assertEquals(0, reader.getLastPlayedSlotId());
+        reader.setLastPlayedSlotId(SaveManager.MAX_SAVE_SLOTS + 1);
+        assertEquals(0, reader.getLastPlayedSlotId());
+    }
+
+    @Test
+    public void testHasAnySaveSlotAndResolveContinueSlotId(@TempDir Path tempDir) throws Exception {
+        SaveManager manager = new SaveManager(tempDir.toFile());
+        assertFalse(manager.hasAnySaveSlot());
+        assertEquals(0, manager.resolveContinueSlotId(0));
+        assertEquals(0, manager.resolveContinueSlotId(3));
+
+        Savefile slot10 = new Savefile(SaveManager.MAX_SAVE_SLOTS, "Tenth");
+        manager.saveUserSlot(slot10);
+        assertTrue(manager.hasAnySaveSlot());
+        assertEquals(SaveManager.MAX_SAVE_SLOTS, manager.resolveContinueSlotId(0));
+
+        Thread.sleep(15);
+        Savefile slot4 = new Savefile(4, "Fourth");
+        manager.saveUserSlot(slot4);
+
+        assertEquals(SaveManager.MAX_SAVE_SLOTS, manager.resolveContinueSlotId(SaveManager.MAX_SAVE_SLOTS));
+        assertEquals(4, manager.resolveContinueSlotId(0));
+        assertEquals(4, manager.resolveContinueSlotId(2));
+
+        manager.deleteSlot(4);
+        assertEquals(SaveManager.MAX_SAVE_SLOTS, manager.resolveContinueSlotId(4));
+    }
 }

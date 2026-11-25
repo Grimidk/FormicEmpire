@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.grimidk.formicempire.classes.constants.world.DisasterType;
+import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.world.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -35,6 +36,23 @@ class OverworldAtmosphereRendererTest {
         assertDoesNotThrow(() -> OverworldAtmosphereRenderer.render(null, 0, 0, null, null, false, false, true));
 
         g2d.dispose();
+    }
+
+    @Test
+    void renderDrawsVisibleEffectsForEveryNonClearWeather() {
+        World world = new World();
+        Hex hex = new Hex();
+        for (Weather weather : GameConstants.getWeathers()) {
+            hex.setLocalWeather(weather);
+            BufferedImage img = new BufferedImage(320, 220, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = img.createGraphics();
+            assertDoesNotThrow(() -> OverworldAtmosphereRenderer.render(g2d, 320, 220, world, hex, false, true, false));
+            g2d.dispose();
+            if (weather != GameConstants.WEATHER_CLEAR) {
+                assertTrue(OverworldAtmosphereRenderer.hasVisiblePixels(img),
+                        "Expected visible overworld weather effect for " + weather.getNameKey());
+            }
+        }
     }
 
     @Test

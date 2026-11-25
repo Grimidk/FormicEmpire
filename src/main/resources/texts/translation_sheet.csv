@@ -2954,6 +2954,10 @@ SETTINGS_CHEAT_RANDOM_WAR,Random War Button (Cheat),Botón de Guerra Aleatoria (
 SETTINGS_CHEAT_RANDOM_WAR_TT,Shows a cheat button inside the World Map that starts a war between two random bordering dynasties.,Muestra un botón de truco en el Mapa Mundial que inicia una guerra entre dos dinastias fronterizas aleatorias.,Mostra um botão de trapaça no Mapa Mundial que inicia uma guerra entre duas dinastias fronteiriças aleatórias.,Affiche un bouton de triche dans la Carte du Monde qui déclenche une guerre entre deux dynasties frontalières aléatoires.
 MAP_WAR_CHEAT,★ War,★ Guerra,★ Guerra,★ Guerre
 MAP_WAR_CHEAT_TT,Instigate a war between a random bordering pair of dynasties.,Provoca una guerra entre un par aleatorio de dinastías fronterizas.,Instiga uma guerra entre um par aleatório de dinastias fronteiriças.,Provoque une guerre entre deux dynasties frontalières aléatoires.
+SETTINGS_CHEAT_RANDOM_WEATHER,Random Weather Button (Cheat),Botón de Clima Aleatorio (Truco),Botão de Clima Aleatório (Trapaça),Bouton Météo Aléatoire (Triche)
+SETTINGS_CHEAT_RANDOM_WEATHER_TT,Shows a cheat button inside the World Map that randomizes weather patterns across the entire world.,Muestra un botón de truco en el Mapa Mundial que aleatoriza los patrones climáticos en todo el mundo.,Mostra um botão de trapaça no Mapa Mundial que aleatoriza os padrões climáticos em todo o mundo.,Affiche un bouton de triche dans la Carte du Monde qui randomise la météo dans le monde entier.
+MAP_WEATHER_CHEAT,★ Weather,★ Clima,★ Clima,★ Météo
+MAP_WEATHER_CHEAT_TT,Randomize weather systems across the entire world.,Aleatoriza los sistemas climáticos en todo el mundo.,Aleatoriza os sistemas climáticos em todo o mundo.,Randomise les systèmes météorologiques dans le monde entier.
 REASON_RECOVERY,Ecological Recovery,Recuperación Ecológica,Recuperação Ecológica,Restauration Écologique
 BIOME_BARREN,Barren,Yermo,Estéril,Stérile
 UI_WORLD_MAKING,World Making,Creación de Mundos,Criação de Mundos,Création de Mondes
@@ -3110,3 +3114,5 @@ MAP_MODE_TIMEZONES,Timezones,Zonas horarias,Fusos horários,Fuseaux horaires
 MAP_TOOLTIP_TIMEZONE,<br><b>Timezone:</b> ,<br><b>Zona horaria:</b> ,<br><b>Fuso horário:</b> ,<br><b>Fuseau horaire :</b> 
 MAP_TOOLTIP_LOCAL_TIME,<br><b>Local Time:</b> ,<br><b>Hora local:</b> ,<br><b>Hora local:</b> ,<br><b>Heure locale :</b> 
 STAT_TIMEZONE,Timezone,Zona horaria,Fuso horário,Fuseau horaire
+UI_CONTINUE,Continue,Continuar,Continuar,Continuer
+UI_LOAD_GAME,Load Game,Cargar Partida,Carregar Jogo,Charger une Partie

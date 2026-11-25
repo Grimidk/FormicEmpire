@@ -47,6 +47,7 @@ public class Engine extends Thread {
     private String screenSize = "1000x700";
     private boolean fullScreen = true;
     private int autosaveFrequency = 1; // 1 = every month
+    private int lastPlayedSlotId = 0;
     
     private boolean daylightColorOverlayEnabled = true;
     private boolean weatherColorOverlayEnabled = true;
@@ -82,6 +83,7 @@ public class Engine extends Thread {
     private boolean cheatRevealMap = false;
     private boolean cheatRandomDisaster = false;
     private boolean cheatRandomWar = false;
+    private boolean cheatRandomWeather = false;
     private boolean animateWorldGen = true;
     private WorldGenStepListener worldGenStepListener;
     private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
@@ -744,6 +746,14 @@ public class Engine extends Thread {
         this.cheatRandomWar = cheatRandomWar;
     }
 
+    public boolean isCheatRandomWeather() {
+        return cheatRandomWeather;
+    }
+
+    public void setCheatRandomWeather(boolean cheatRandomWeather) {
+        this.cheatRandomWeather = cheatRandomWeather;
+    }
+
     public boolean isAnimateWorldGen() {
         return animateWorldGen;
     }
@@ -822,6 +832,16 @@ public class Engine extends Thread {
             return 1;
         }
         return Math.max(1, 1000 / hz);
+    }
+
+    public int getLastPlayedSlotId() {
+        return lastPlayedSlotId;
+    }
+
+    public void setLastPlayedSlotId(int lastPlayedSlotId) {
+        this.lastPlayedSlotId = (lastPlayedSlotId >= 1 && lastPlayedSlotId <= SaveManager.MAX_SAVE_SLOTS)
+                ? lastPlayedSlotId
+                : 0;
     }
 
     public int getDefaultRoleWorker() {

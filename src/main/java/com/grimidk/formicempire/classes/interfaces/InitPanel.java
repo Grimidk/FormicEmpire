@@ -15,7 +15,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class InitPanel extends JPanel {
@@ -28,6 +30,8 @@ public class InitPanel extends JPanel {
     private final VersionLicenseFooter footer =
             new VersionLicenseFooter(AssetStyles.COLOR_ABSOLUTE_BLACK);
     
+    private JButton continueGame;
+    private JButton loadGame;
     private JButton play;
     private JButton worldMaking;
     private JButton battleSimulator;
@@ -65,7 +69,8 @@ public class InitPanel extends JPanel {
                     return;
                 }
                 refreshMenuOptions();
-                play.requestFocusInWindow();
+                JButton primaryButton = continueGame.isVisible() ? continueGame : play;
+                primaryButton.requestFocusInWindow();
             }
 
             @Override
@@ -77,6 +82,8 @@ public class InitPanel extends JPanel {
     }
     
     private void initComponents() {
+        continueGame = createMenuButton(LanguageStrings.UI_CONTINUE, e -> onContinue());
+        loadGame = createMenuButton(LanguageStrings.UI_LOAD_GAME, e -> frame.showCard(MainFrame.CARD_SAVE));
         play = createMenuButton(LanguageStrings.UI_PLAY, e -> frame.showCard(MainFrame.CARD_SAVE));
         worldMaking = createMenuButton(LanguageStrings.UI_WORLD_MAKING, e -> new WorldMakingDialog(frame, frame.getEngine()).setVisible(true));
         battleSimulator = createMenuButton(LanguageStrings.UI_BATTLE_SIMULATOR, e -> new BattleSimulatorDialog(frame, frame.getEngine()).showDialog());
@@ -88,6 +95,16 @@ public class InitPanel extends JPanel {
         refreshMenuOptions();
     }
 
+    private void onContinue() {
+        int slotId = frame.getEngine().getSaveManager()
+                .resolveContinueSlotId(frame.getEngine().getLastPlayedSlotId());
+        if (slotId <= 0) {
+            refreshMenuOptions();
+            return;
+        }
+        frame.getSaveSelectPanel().loadExistingSlot(slotId);
+    }
+
     private JButton createMenuButton(String labelKey, java.awt.event.ActionListener action) {
         JButton button = new JButton(LanguageStrings.get(labelKey));
         button.addActionListener(action);
@@ -97,6 +114,10 @@ public class InitPanel extends JPanel {
     }
 
     public void refreshMenuOptions() {
+        boolean hasSaves = frame.getEngine().getSaveManager().hasAnySaveSlot();
+        continueGame.setVisible(hasSaves);
+        loadGame.setVisible(hasSaves);
+        play.setVisible(!hasSaves);
         boolean showAudit = frame.getEngine().isShowAuditMenu();
         audit.setVisible(showAudit);
         layoutMenuButtons();
@@ -122,13 +143,25 @@ public class InitPanel extends JPanel {
         c.gridy = 0;
         menuColumn.add(menuHeader, c);
 
-        JButton[] buttons = audit.isVisible()
-                ? new JButton[] { play, worldMaking, battleSimulator, audit, roadmap, credits, quit }
-                : new JButton[] { play, worldMaking, battleSimulator, roadmap, credits, quit };
+        List<JButton> buttons = new ArrayList<>();
+        if (continueGame.isVisible()) {
+            buttons.add(continueGame);
+            buttons.add(loadGame);
+        } else {
+            buttons.add(play);
+        }
+        buttons.add(worldMaking);
+        buttons.add(battleSimulator);
+        if (audit.isVisible()) {
+            buttons.add(audit);
+        }
+        buttons.add(roadmap);
+        buttons.add(credits);
+        buttons.add(quit);
 
-        for (int i = 0; i < buttons.length; i++) {
+        for (int i = 0; i < buttons.size(); i++) {
             c.gridy = i + 1;
-            menuColumn.add(buttons[i], c);
+            menuColumn.add(buttons.get(i), c);
         }
 
         menuColumn.revalidate();
@@ -136,6 +169,8 @@ public class InitPanel extends JPanel {
     }
     
     public void refreshTranslations() {
+        continueGame.setText(LanguageStrings.get(LanguageStrings.UI_CONTINUE));
+        loadGame.setText(LanguageStrings.get(LanguageStrings.UI_LOAD_GAME));
         play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
         worldMaking.setText(LanguageStrings.get(LanguageStrings.UI_WORLD_MAKING));
         battleSimulator.setText(LanguageStrings.get(LanguageStrings.UI_BATTLE_SIMULATOR));
