@@ -131,6 +131,34 @@ class ColonyInvasionServiceTest {
     }
 
     @Test
+    void invasionEnforcesSamePartyCapacityLimitAsHunts() {
+        assertEquals(ColonyHuntService.maxPartyCapacity(colony), ColonyInvasionService.maxPartyCapacity(colony));
+        int cap = ColonyInvasionService.maxPartyCapacity(colony);
+        assertEquals(100, cap);
+
+        InvasionAlert alert = new InvasionAlert(
+                1,
+                GameConstants.TYPE_ANT_LION.getId(),
+                InvasionAlert.Scope.COLONY,
+                colony.getId(),
+                InvasionAlert.toAbsoluteHour(0, 0) + GameNumbers.INVASION_RESPONSE_HOURS);
+        colony.getInvasionAlerts().add(alert);
+
+        for (int i = 0; i < cap + 5; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.CLASS_WORKER));
+        }
+        colony.runRoleAssignment(null);
+
+        Map<AntClass, Integer> overLimit = new HashMap<>();
+        overLimit.put(GameConstants.CLASS_WORKER, cap + 1);
+        assertFalse(ColonyInvasionService.dispatchDefense(colony, 1, overLimit, 0, 0));
+
+        Map<AntClass, Integer> atLimit = new HashMap<>();
+        atLimit.put(GameConstants.CLASS_WORKER, cap);
+        assertTrue(ColonyInvasionService.dispatchDefense(colony, 1, atLimit, 0, 0));
+    }
+
+    @Test
     void invasionPeriodRequiresSixMonths() {
         assertFalse(ColonyInvasionService.isInvasionPeriodReached(null));
 

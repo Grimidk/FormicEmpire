@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.Constant;
+import com.grimidk.formicempire.classes.constants.critter.BugRole;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntMod;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntModProfile;
@@ -8,6 +10,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntModSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -15,8 +18,13 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.entities.hunt.KnownHuntTarget;
+import com.grimidk.formicempire.classes.entities.invasion.InvasionAlert;
 import com.grimidk.formicempire.classes.entities.services.colony.AntModService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.entities.services.colony.HuntBattleState;
+import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
+import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService.TickOutcome;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleState;
 import com.grimidk.formicempire.classes.entities.services.world.WarCreatureCombatService;
 import com.grimidk.formicempire.classes.entities.world.Hex;
@@ -50,6 +58,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -141,6 +150,12 @@ public class BattleSimulatorDialog extends ZeroDialog {
             SideConfig defender) {
     }
 
+    public record CritterSimulationConfig(
+            Biome biome,
+            SideConfig army,
+            Species critter) {
+    }
+
     public record BuiltSimulation(
             World world,
             Dynasty attacker,
@@ -150,8 +165,129 @@ public class BattleSimulatorDialog extends ZeroDialog {
             War war) {
     }
 
+    public static final class BuiltCritterSimulation {
+        private final World world;
+        private final Dynasty dynasty;
+        private final Colony colony;
+        private final Species critter;
+        private final int battleId;
+        private final HuntBattleViewPanel.BattleKind battleKind;
+        private volatile TickOutcome finalOutcome = TickOutcome.CONTINUE;
+
+        BuiltCritterSimulation(
+                World world,
+                Dynasty dynasty,
+                Colony colony,
+                Species critter,
+                int battleId,
+                HuntBattleViewPanel.BattleKind battleKind) {
+            this.world = world;
+            this.dynasty = dynasty;
+            this.colony = colony;
+            this.critter = critter;
+            this.battleId = battleId;
+            this.battleKind = battleKind;
+        }
+
+        public World world() {
+            return world;
+        }
+
+        public Dynasty dynasty() {
+            return dynasty;
+        }
+
+        public Colony colony() {
+            return colony;
+        }
+
+        public Species critter() {
+            return critter;
+        }
+
+        public int battleId() {
+            return battleId;
+        }
+
+        public HuntBattleViewPanel.BattleKind battleKind() {
+            return battleKind;
+        }
+
+        public HuntBattleState getBattleState() {
+            return battleKind == HuntBattleViewPanel.BattleKind.INVASION
+                    ? HuntCreatureCombatService.getInvasionState(colony, battleId)
+                    : HuntCreatureCombatService.getState(colony, battleId);
+        }
+
+        public boolean isFinished() {
+            return finalOutcome != TickOutcome.CONTINUE;
+        }
+
+        public TickOutcome getFinalOutcome() {
+            return finalOutcome;
+        }
+
+        public TickOutcome tickHour() {
+            if (isFinished()) {
+                return finalOutcome;
+            }
+            TickOutcome outcome = battleKind == HuntBattleViewPanel.BattleKind.INVASION
+                    ? HuntCreatureCombatService.tickInvasion(colony, battleId)
+                    : HuntCreatureCombatService.tick(colony, battleId);
+            if (outcome != TickOutcome.CONTINUE) {
+                finalOutcome = outcome;
+                clear();
+            }
+            return outcome;
+        }
+
+        public void clear() {
+            if (battleKind == HuntBattleViewPanel.BattleKind.INVASION) {
+                HuntCreatureCombatService.clearInvasion(colony, battleId);
+            } else {
+                HuntCreatureCombatService.clear(colony, battleId);
+            }
+        }
+    }
+
     record BattleRunResult(boolean completed, GameSpeed endingSpeed) {
     }
+
+    public enum RankPreset {
+        COLONY(GameConstants.RANK_COLONY),
+        COUNTY(GameConstants.RANK_COUNTY),
+        DUCHY(GameConstants.RANK_DUCHY),
+        KINGDOM(GameConstants.RANK_KINGDOM),
+        EMPIRE(GameConstants.RANK_EMPIRE),
+        SUPER(GameConstants.RANK_SUPER),
+        ULTRA(GameConstants.RANK_ULTRA),
+        HYPER(GameConstants.RANK_HYPER),
+        MEGA(GameConstants.RANK_MEGA),
+        ULTIMATE(GameConstants.RANK_ULTIMATE),
+        SUPREME(GameConstants.RANK_SUPREME),
+        GIGA(GameConstants.RANK_GIGA);
+
+        private final Rank rank;
+
+        RankPreset(Rank rank) {
+            this.rank = rank;
+        }
+
+        public Rank getRank() {
+            return rank;
+        }
+
+        public ImageIcon getIcon() {
+            return rank != null ? rank.getIcon() : null;
+        }
+
+        public String getLabel() {
+            return rank != null ? rank.getName() : name();
+        }
+    }
+
+    static final int TAB_ARMY_VS_ARMY = 0;
+    static final int TAB_ARMY_VS_CRITTER = 1;
 
     private static final Biome[] SIMULATOR_BIOMES = new Biome[] {
             GameConstants.BIOME_PLAINS,
@@ -250,12 +386,19 @@ public class BattleSimulatorDialog extends ZeroDialog {
     private final AntSpecies defaultAttackerSpecies;
     private final AntSpecies defaultDefenderSpecies;
 
+    private final JTabbedPane modeTabs = new JTabbedPane();
     private final JComboBox<BattleMode> modeCombo = new JComboBox<>(BattleMode.values());
     private final JCheckBox riverCheckBox = new JCheckBox(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RIVER));
     private final JComboBox<Biome> attackerBiomeCombo = new JComboBox<>(SIMULATOR_BIOMES);
     private final JComboBox<Biome> defenderBiomeCombo = new JComboBox<>(SIMULATOR_BIOMES);
     private final SideConfigPanel attackerPanel;
     private final SideConfigPanel defenderPanel;
+    private final JComboBox<Biome> critterBiomeCombo = new JComboBox<>(SIMULATOR_BIOMES);
+    private final SideConfigPanel critterArmyPanel;
+    private final CritterPickerPanel critterPickerPanel;
+    private final JLabel warWinChanceLabel = new JLabel();
+    private final JLabel critterWinChanceLabel = new JLabel();
+    private final JLabel critterPartyLimitLabel = new JLabel();
     private final JButton resetDefaultsButton = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RESET_DEFAULTS));
     private final JButton copyAttackerToDefenderButton = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_COPY_ATK_TO_DEF));
     private final JButton randomizeArmiesButton = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RANDOMIZE));
@@ -278,6 +421,9 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.BATTLE_SIM_ATTACKER), this.defaultAttackerSpecies);
         defenderPanel = new SideConfigPanel(
                 LanguageStrings.get(LanguageStrings.BATTLE_SIM_DEFENDER), this.defaultDefenderSpecies);
+        critterArmyPanel = new SideConfigPanel(
+                LanguageStrings.get(LanguageStrings.BATTLE_SIM_ARMY), this.defaultAttackerSpecies);
+        critterPickerPanel = new CritterPickerPanel(LanguageStrings.get(LanguageStrings.BATTLE_SIM_CRITTER));
 
         buildLayout();
         southPanel.removeAll();
@@ -309,11 +455,24 @@ public class BattleSimulatorDialog extends ZeroDialog {
         southPanel.add(actionButtonsPanel, BorderLayout.CENTER);
         southPanel.add(closeButtonPanel, BorderLayout.EAST);
 
-        resetDefaultsButton.addActionListener(e -> resetToDefaults());
+        resetDefaultsButton.addActionListener(e -> onResetDefaults());
         copyAttackerToDefenderButton.addActionListener(e -> copyAttackerToDefender());
-        randomizeArmiesButton.addActionListener(e -> randomizeArmies());
+        randomizeArmiesButton.addActionListener(e -> onRandomize());
         battleRushButton.addActionListener(e -> launchBattleRush());
         startBattleButton.addActionListener(e -> launchBattle());
+        modeTabs.addChangeListener(e -> syncButtonsForActiveTab());
+        modeCombo.addActionListener(e -> updateWarPreview());
+        riverCheckBox.addActionListener(e -> updateWarPreview());
+        attackerBiomeCombo.addActionListener(e -> updateWarPreview());
+        defenderBiomeCombo.addActionListener(e -> updateWarPreview());
+        attackerPanel.setOnConfigChanged(this::updateWarPreview);
+        defenderPanel.setOnConfigChanged(this::updateWarPreview);
+        critterBiomeCombo.addActionListener(e -> updateCritterPreview());
+        critterArmyPanel.setOnConfigChanged(this::updateCritterPreview);
+        critterPickerPanel.setOnSelectionChanged(this::updateCritterPreview);
+        syncButtonsForActiveTab();
+        updateWarPreview();
+        updateCritterPreview();
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -329,6 +488,29 @@ public class BattleSimulatorDialog extends ZeroDialog {
 
     JButton getCloseButton() {
         return closeButton;
+    }
+
+    JButton getCopyAttackerToDefenderButton() {
+        return copyAttackerToDefenderButton;
+    }
+
+    int getSelectedTabIndex() {
+        return modeTabs.getSelectedIndex();
+    }
+
+    void selectTab(int index) {
+        modeTabs.setSelectedIndex(index);
+        syncButtonsForActiveTab();
+    }
+
+    private boolean isCritterTabSelected() {
+        return modeTabs.getSelectedIndex() == TAB_ARMY_VS_CRITTER;
+    }
+
+    private void syncButtonsForActiveTab() {
+        copyAttackerToDefenderButton.setVisible(!isCritterTabSelected());
+        southPanel.revalidate();
+        southPanel.repaint();
     }
 
     @Override
@@ -363,6 +545,35 @@ public class BattleSimulatorDialog extends ZeroDialog {
         closeButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
         attackerPanel.setTitle(LanguageStrings.get(LanguageStrings.BATTLE_SIM_ATTACKER));
         defenderPanel.setTitle(LanguageStrings.get(LanguageStrings.BATTLE_SIM_DEFENDER));
+        attackerPanel.refreshTranslations();
+        defenderPanel.refreshTranslations();
+        critterArmyPanel.setTitle(LanguageStrings.get(LanguageStrings.BATTLE_SIM_ARMY));
+        critterArmyPanel.refreshTranslations();
+        critterPickerPanel.setTitle(LanguageStrings.get(LanguageStrings.BATTLE_SIM_CRITTER));
+        critterPickerPanel.refreshTranslations();
+        if (modeTabs.getTabCount() > TAB_ARMY_VS_CRITTER) {
+            modeTabs.setTitleAt(TAB_ARMY_VS_ARMY, LanguageStrings.get(LanguageStrings.BATTLE_SIM_TAB_ARMY_VS_ARMY));
+            modeTabs.setTitleAt(TAB_ARMY_VS_CRITTER, LanguageStrings.get(LanguageStrings.BATTLE_SIM_TAB_ARMY_VS_CRITTER));
+        }
+        syncButtonsForActiveTab();
+        updateWarPreview();
+        updateCritterPreview();
+    }
+
+    private void onResetDefaults() {
+        if (isCritterTabSelected()) {
+            resetCritterToDefaults();
+        } else {
+            resetToDefaults();
+        }
+    }
+
+    private void onRandomize() {
+        if (isCritterTabSelected()) {
+            randomizeCritterBattle();
+        } else {
+            randomizeArmies();
+        }
     }
 
     void randomizeArmies() {
@@ -377,6 +588,13 @@ public class BattleSimulatorDialog extends ZeroDialog {
         DiceRollResource.triggerRollAnimation(randomizeArmiesButton, 16);
     }
 
+    void randomizeCritterBattle() {
+        critterBiomeCombo.setSelectedItem(SIMULATOR_BIOMES[GameRandom.nextInt(SIMULATOR_BIOMES.length)]);
+        critterArmyPanel.randomize(GameConstants.getSpecies());
+        critterPickerPanel.randomize();
+        DiceRollResource.triggerRollAnimation(randomizeArmiesButton, 16);
+    }
+
     void resetToDefaults() {
         modeCombo.setSelectedItem(BattleMode.FULL_STAGE);
         riverCheckBox.setSelected(false);
@@ -386,6 +604,12 @@ public class BattleSimulatorDialog extends ZeroDialog {
         defenderPanel.resetToDefaults();
     }
 
+    void resetCritterToDefaults() {
+        critterBiomeCombo.setSelectedItem(GameConstants.BIOME_PLAINS);
+        critterArmyPanel.resetToDefaults();
+        critterPickerPanel.resetToDefaults();
+    }
+
     void copyAttackerToDefender() {
         Biome atkBiome = (Biome) attackerBiomeCombo.getSelectedItem();
         defenderBiomeCombo.setSelectedItem(atkBiome);
@@ -393,11 +617,22 @@ public class BattleSimulatorDialog extends ZeroDialog {
     }
 
     private void buildLayout() {
+        AssetStyles.styleTabbedPane(modeTabs);
+        modeTabs.addTab(
+                LanguageStrings.get(LanguageStrings.BATTLE_SIM_TAB_ARMY_VS_ARMY),
+                buildArmyVsArmyTab());
+        modeTabs.addTab(
+                LanguageStrings.get(LanguageStrings.BATTLE_SIM_TAB_ARMY_VS_CRITTER),
+                buildArmyVsCritterTab());
+        add(modeTabs, BorderLayout.CENTER);
+    }
+
+    private JPanel buildArmyVsArmyTab() {
         JPanel root = new JPanel(new BorderLayout(10, 10));
         root.setBackground(AssetStyles.UI_BG_PRIMARY);
         root.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
 
-        JPanel conditionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
+        JPanel conditionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
         conditionsPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         conditionsPanel.setBorder(BorderFactory.createCompoundBorder(
                 AssetStyles.INTERNAL_BORDER,
@@ -423,14 +658,18 @@ public class BattleSimulatorDialog extends ZeroDialog {
         defBiomeLabel.setForeground(AssetStyles.FONT_COLOR);
         configureBiomeCombo(defenderBiomeCombo);
 
+        warWinChanceLabel.setFont(AssetStyles.FONT_BOLD);
+        warWinChanceLabel.setForeground(AssetStyles.FONT_COLOR_HIGHLIGHT);
+
         conditionsPanel.add(modeLabel);
         conditionsPanel.add(modeCombo);
         conditionsPanel.add(riverCheckBox);
-        conditionsPanel.add(Box.createHorizontalStrut(8));
         conditionsPanel.add(atkBiomeLabel);
         conditionsPanel.add(attackerBiomeCombo);
         conditionsPanel.add(defBiomeLabel);
         conditionsPanel.add(defenderBiomeCombo);
+        conditionsPanel.add(Box.createHorizontalStrut(6));
+        conditionsPanel.add(warWinChanceLabel);
 
         JPanel sidesPanel = new JPanel(new GridLayout(1, 2, 12, 0));
         sidesPanel.setOpaque(false);
@@ -439,18 +678,67 @@ public class BattleSimulatorDialog extends ZeroDialog {
 
         root.add(conditionsPanel, BorderLayout.NORTH);
         root.add(sidesPanel, BorderLayout.CENTER);
-        add(root, BorderLayout.CENTER);
+        return root;
+    }
+
+    private JPanel buildArmyVsCritterTab() {
+        JPanel root = new JPanel(new BorderLayout(10, 10));
+        root.setBackground(AssetStyles.UI_BG_PRIMARY);
+        root.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
+
+        JPanel conditionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
+        conditionsPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
+        conditionsPanel.setBorder(BorderFactory.createCompoundBorder(
+                AssetStyles.INTERNAL_BORDER,
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+
+        JLabel biomeLabel = new JLabel(LanguageStrings.get(LanguageStrings.BATTLE_SIM_BIOME) + ":");
+        biomeLabel.setFont(AssetStyles.FONT_BOLD);
+        biomeLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        configureBiomeCombo(critterBiomeCombo);
+
+        critterPartyLimitLabel.setFont(AssetStyles.FONT_BOLD);
+        critterPartyLimitLabel.setForeground(AssetStyles.FONT_COLOR);
+        critterWinChanceLabel.setFont(AssetStyles.FONT_BOLD);
+        critterWinChanceLabel.setForeground(AssetStyles.FONT_COLOR_HIGHLIGHT);
+
+        conditionsPanel.add(biomeLabel);
+        conditionsPanel.add(critterBiomeCombo);
+        conditionsPanel.add(Box.createHorizontalStrut(8));
+        conditionsPanel.add(critterPartyLimitLabel);
+        conditionsPanel.add(Box.createHorizontalStrut(8));
+        conditionsPanel.add(critterWinChanceLabel);
+
+        JPanel sidesPanel = new JPanel(new GridLayout(1, 2, 12, 0));
+        sidesPanel.setOpaque(false);
+        sidesPanel.add(critterArmyPanel);
+        sidesPanel.add(critterPickerPanel);
+
+        root.add(conditionsPanel, BorderLayout.NORTH);
+        root.add(sidesPanel, BorderLayout.CENTER);
+        return root;
     }
 
     private void launchBattle() {
-        runSingleBattle(true, null, true);
+        if (isCritterTabSelected()) {
+            runSingleCritterBattle(true, null, true);
+        } else {
+            runSingleBattle(true, null, true);
+        }
     }
 
     private void launchBattleRush() {
-        runBattleRush(engine, this::isDisplayable, startingSpeed -> {
-            randomizeArmies();
-            return runSingleBattle(false, startingSpeed, false);
-        });
+        if (isCritterTabSelected()) {
+            runBattleRush(engine, this::isDisplayable, startingSpeed -> {
+                randomizeCritterBattle();
+                return runSingleCritterBattle(false, startingSpeed, false);
+            });
+        } else {
+            runBattleRush(engine, this::isDisplayable, startingSpeed -> {
+                randomizeArmies();
+                return runSingleBattle(false, startingSpeed, false);
+            });
+        }
     }
 
     static void runBattleRush(
@@ -596,6 +884,509 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.UI_OK));
     }
 
+    private BattleRunResult runSingleCritterBattle(
+            boolean showOutcomeFanfare,
+            GameSpeed startingSpeed,
+            boolean restoreSpeedAfterBattle) {
+        CritterSimulationConfig config = buildCritterConfigFromUi();
+        BuiltCritterSimulation sim = buildCritterSimulation(config);
+
+        World previousWorld = engine != null ? engine.getWorld() : null;
+        boolean previousPaused = engine == null || engine.isPaused();
+        GameSpeed previousSpeed = engine != null ? engine.getSpeed() : GameConstants.SPEED_NORMAL;
+        GameSpeed endingSpeed = startingSpeed != null ? startingSpeed : previousSpeed;
+
+        if (engine != null) {
+            engine.pauseEngine();
+            engine.getSema().acquireUninterruptibly();
+            try {
+                engine.setWorld(sim.world());
+                if (startingSpeed != null) {
+                    engine.setSpeed(startingSpeed);
+                }
+            } finally {
+                engine.getSema().release();
+            }
+        }
+
+        HuntBattleDialog battleDialog = new HuntBattleDialog(
+                this,
+                sim.colony(),
+                engine,
+                sim.battleId(),
+                sim.battleKind(),
+                ModalityType.DOCUMENT_MODAL);
+        Runnable hourTickListener = () -> {
+            TickOutcome outcome = sim.tickHour();
+            if (outcome != TickOutcome.CONTINUE) {
+                SwingUtilities.invokeLater(() -> {
+                    if (battleDialog.isDisplayable()) {
+                        battleDialog.liveUpdate();
+                    }
+                });
+            }
+        };
+        Runnable minuteTickListener = () -> SwingUtilities.invokeLater(() -> {
+            if (battleDialog.isDisplayable()) {
+                battleDialog.liveUpdate();
+            }
+        });
+
+        if (engine != null) {
+            engine.addHourTickListener(hourTickListener);
+            engine.addTickListener(minuteTickListener);
+            if (engine.getState() == Thread.State.NEW) {
+                engine.start();
+            }
+            engine.resumeEngine();
+        }
+
+        boolean battleCompleted = false;
+        try {
+            battleDialog.showDialog();
+            battleCompleted = sim.isFinished();
+        } finally {
+            if (battleDialog.isDisplayable()) {
+                battleDialog.dispose();
+            }
+            if (engine != null) {
+                engine.pauseEngine();
+                endingSpeed = engine.getSpeed();
+                engine.removeHourTickListener(hourTickListener);
+                engine.removeTickListener(minuteTickListener);
+                engine.getSema().acquireUninterruptibly();
+                try {
+                    sim.clear();
+                    engine.setWorld(previousWorld);
+                } finally {
+                    engine.getSema().release();
+                }
+                if (restoreSpeedAfterBattle && previousSpeed != null) {
+                    engine.setSpeed(previousSpeed);
+                }
+                if (!previousPaused && previousWorld != null) {
+                    engine.resumeEngine();
+                }
+            } else {
+                sim.clear();
+            }
+        }
+        if (battleCompleted && showOutcomeFanfare) {
+            showCritterBattleOutcomeFanfare(sim);
+        }
+        return new BattleRunResult(battleCompleted, endingSpeed);
+    }
+
+    private void showCritterBattleOutcomeFanfare(BuiltCritterSimulation sim) {
+        if (sim == null) {
+            return;
+        }
+        SfxService.play(SoundEffects.ASSIMILATION);
+        TickOutcome outcome = sim.getFinalOutcome();
+        String headline;
+        ImageIcon winnerIcon = null;
+        if (outcome == TickOutcome.HUNTERS_WIN) {
+            String sideLabel = LanguageStrings.get(LanguageStrings.BATTLE_SIM_ARMY)
+                    + " (" + sim.dynasty().getSpecies().getName() + ")";
+            headline = LanguageStrings.format(LanguageStrings.BATTLE_SIM_VICTORY_FMT, sideLabel);
+            winnerIcon = sim.dynasty().getSpecies().getIcon();
+        } else if (outcome == TickOutcome.BUG_WINS) {
+            String sideLabel = LanguageStrings.get(LanguageStrings.BATTLE_SIM_CRITTER)
+                    + " (" + sim.critter().getName() + ")";
+            headline = LanguageStrings.format(LanguageStrings.BATTLE_SIM_VICTORY_FMT, sideLabel);
+            winnerIcon = sim.critter().getIcon();
+        } else {
+            headline = LanguageStrings.get(LanguageStrings.BATTLE_SIM_DRAW);
+        }
+
+        JLabel messageLabel = new JLabel(headline);
+        messageLabel.setFont(AssetStyles.FONT_BOLD);
+        messageLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        UiOptionPane.showOptionDialog(
+                this,
+                messageLabel,
+                LanguageStrings.get(LanguageStrings.BATTLE_SIM_VICTORY_TITLE),
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                winnerIcon,
+                new Object[] { LanguageStrings.get(LanguageStrings.UI_OK) },
+                LanguageStrings.get(LanguageStrings.UI_OK));
+    }
+
+    JLabel getWarWinChanceLabel() {
+        return warWinChanceLabel;
+    }
+
+    JLabel getCritterWinChanceLabel() {
+        return critterWinChanceLabel;
+    }
+
+    JLabel getCritterPartyLimitLabel() {
+        return critterPartyLimitLabel;
+    }
+
+    void applyAttackerRankPreset(RankPreset preset) {
+        attackerPanel.applyRankPreset(preset);
+    }
+
+    void applyDefenderRankPreset(RankPreset preset) {
+        defenderPanel.applyRankPreset(preset);
+    }
+
+    void applyCritterArmyRankPreset(RankPreset preset) {
+        critterArmyPanel.applyRankPreset(preset);
+    }
+
+    Map<RankPreset, JButton> getAttackerRankPresetButtons() {
+        return Map.copyOf(attackerPanel.rankPresetButtons);
+    }
+
+    private void updateWarPreview() {
+        float winChance = estimateArmyWinChance(buildConfigFromUi());
+        warWinChanceLabel.setText(LanguageStrings.format(
+                LanguageStrings.BATTLE_SIM_ATTACKER_WIN_CHANCE_FMT, Math.round(winChance * 100f)));
+    }
+
+    private void updateCritterPreview() {
+        CritterSimulationConfig cfg = buildCritterConfigFromUi();
+        int totalUnits = countConfiguredUnits(cfg.army());
+        int partyCap = computeCritterPartyCap(cfg.army());
+        critterPartyLimitLabel.setText(LanguageStrings.format(
+                LanguageStrings.HUNT_PARTY_LIMIT_FMT,
+                AssetStyles.formatNumber(totalUnits),
+                AssetStyles.formatNumber(partyCap)));
+        critterPartyLimitLabel.setForeground(
+                totalUnits > partyCap ? AssetStyles.FONT_COLOR_WARNING : AssetStyles.FONT_COLOR);
+        float winChance = estimateCritterWinChance(cfg);
+        critterWinChanceLabel.setText(LanguageStrings.format(
+                LanguageStrings.HUNT_WIN_CHANCE_FMT, Math.round(winChance * 100f)));
+    }
+
+    public static SideConfig buildPresetConfig(RankPreset preset, AntSpecies species, Biome biome) {
+        AntSpecies resolvedSpecies = species != null ? species : GameConstants.SPECIES_OMNI;
+        Map<AntRole, Integer> counts = new LinkedHashMap<>();
+        Set<Upgrade> upgrades = new LinkedHashSet<>(resolvedSpecies.getBaseUpgrades());
+        AntMod headMod = GameConstants.MOD_HEAD_NONE;
+        AntMod abdomenMod = GameConstants.MOD_ABDOMEN_NONE;
+
+        for (AntMod mod : GameConstants.getModsForSlot(AntModSlot.HEAD)) {
+            if (!mod.isNone() && mod.getRequiredUpgrade() != null
+                    && resolvedSpecies.getBaseUpgrades().contains(mod.getRequiredUpgrade())) {
+                headMod = mod;
+                break;
+            }
+        }
+        for (AntMod mod : GameConstants.getModsForSlot(AntModSlot.ABDOMEN)) {
+            if (!mod.isNone() && mod.getRequiredUpgrade() != null
+                    && resolvedSpecies.getBaseUpgrades().contains(mod.getRequiredUpgrade())) {
+                abdomenMod = mod;
+                break;
+            }
+        }
+
+        RankPreset resolved = preset != null ? preset : RankPreset.DUCHY;
+        switch (resolved) {
+            case COLONY:
+                counts.put(GameConstants.ROLE_WARRIOR, 15);
+                break;
+            case COUNTY:
+                counts.put(GameConstants.ROLE_WARRIOR, 50);
+                break;
+            case DUCHY:
+                counts.put(GameConstants.ROLE_WARRIOR, 80);
+                counts.put(GameConstants.ROLE_BRUTE, 20);
+                break;
+            case KINGDOM:
+                counts.put(GameConstants.ROLE_WARRIOR, 70);
+                counts.put(GameConstants.ROLE_BRUTE, 30);
+                upgrades.add(GameUnlocks.STAT_HEALTH_1);
+                upgrades.add(GameUnlocks.STAT_ATTACK_1);
+                upgrades.add(GameUnlocks.STAT_DEFENSE_1);
+                break;
+            case EMPIRE:
+                counts.put(GameConstants.ROLE_WARRIOR, 140);
+                counts.put(GameConstants.ROLE_BRUTE, 80);
+                counts.put(GameConstants.ROLE_ARTILLERY, 29);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                addEmpireBaseUpgrades(upgrades);
+                break;
+            case SUPER:
+                counts.put(GameConstants.ROLE_WARRIOR, 220);
+                counts.put(GameConstants.ROLE_BRUTE, 110);
+                counts.put(GameConstants.ROLE_DEFENDER, 50);
+                counts.put(GameConstants.ROLE_ARTILLERY, 60);
+                counts.put(GameConstants.ROLE_AIR_SUPPORT, 15);
+                counts.put(GameConstants.ROLE_CAPTAIN, 4);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                addEmpireBaseUpgrades(upgrades);
+                upgrades.add(GameUnlocks.ASSIMILATED_FIREVENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_FASTBITE);
+                break;
+            case ULTRA:
+                counts.put(GameConstants.ROLE_WARRIOR, 320);
+                counts.put(GameConstants.ROLE_BRUTE, 160);
+                counts.put(GameConstants.ROLE_DEFENDER, 80);
+                counts.put(GameConstants.ROLE_ARTILLERY, 100);
+                counts.put(GameConstants.ROLE_BOMBER, 40);
+                counts.put(GameConstants.ROLE_AIR_SUPPORT, 35);
+                counts.put(GameConstants.ROLE_CAPTAIN, 6);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                addEmpireBaseUpgrades(upgrades);
+                upgrades.add(GameUnlocks.ASSIMILATED_FIREVENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_FASTBITE);
+                upgrades.add(GameUnlocks.ASSIMILATED_DEADLYVENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_JUMPING);
+                upgrades.add(GameUnlocks.ASSIMILATED_ACIDSPIT);
+                break;
+            case HYPER:
+                counts.put(GameConstants.ROLE_WARRIOR, 450);
+                counts.put(GameConstants.ROLE_BRUTE, 240);
+                counts.put(GameConstants.ROLE_DEFENDER, 120);
+                counts.put(GameConstants.ROLE_ARTILLERY, 150);
+                counts.put(GameConstants.ROLE_BOMBER, 60);
+                counts.put(GameConstants.ROLE_AIR_SUPPORT, 60);
+                counts.put(GameConstants.ROLE_AIR_BOMBER, 20);
+                counts.put(GameConstants.ROLE_CAPTAIN, 8);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                addEmpireBaseUpgrades(upgrades);
+                upgrades.add(GameUnlocks.ASSIMILATED_FIREVENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_FASTBITE);
+                upgrades.add(GameUnlocks.ASSIMILATED_DEADLYVENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_JUMPING);
+                upgrades.add(GameUnlocks.ASSIMILATED_ACIDSPIT);
+                upgrades.add(GameUnlocks.SYNERGY_SUPER_VENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_SWARMING);
+                upgrades.add(GameUnlocks.ASSIMILATED_SELFDESTRUCT);
+                break;
+            case MEGA:
+                counts.put(GameConstants.ROLE_WARRIOR, 650);
+                counts.put(GameConstants.ROLE_BRUTE, 340);
+                counts.put(GameConstants.ROLE_DEFENDER, 180);
+                counts.put(GameConstants.ROLE_ARTILLERY, 220);
+                counts.put(GameConstants.ROLE_SIEGE, 100);
+                counts.put(GameConstants.ROLE_BOMBER, 80);
+                counts.put(GameConstants.ROLE_AIR_SUPPORT, 90);
+                counts.put(GameConstants.ROLE_AIR_BOMBER, 40);
+                counts.put(GameConstants.ROLE_CAPTAIN, 12);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                addEmpireBaseUpgrades(upgrades);
+                upgrades.add(GameUnlocks.ASSIMILATED_FIREVENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_FASTBITE);
+                upgrades.add(GameUnlocks.ASSIMILATED_DEADLYVENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_JUMPING);
+                upgrades.add(GameUnlocks.ASSIMILATED_ACIDSPIT);
+                upgrades.add(GameUnlocks.SYNERGY_SUPER_VENOM);
+                upgrades.add(GameUnlocks.ASSIMILATED_SWARMING);
+                upgrades.add(GameUnlocks.ASSIMILATED_SELFDESTRUCT);
+                upgrades.add(GameUnlocks.SYNERGY_CORROSIVE_BOMBS);
+                upgrades.add(GameUnlocks.ASSIMILATED_HEATRESIST);
+                upgrades.add(GameUnlocks.STAT_RAFTING_1);
+                break;
+            case ULTIMATE:
+                counts.put(GameConstants.ROLE_WARRIOR, 900);
+                counts.put(GameConstants.ROLE_BRUTE, 480);
+                counts.put(GameConstants.ROLE_DEFENDER, 250);
+                counts.put(GameConstants.ROLE_ARTILLERY, 300);
+                counts.put(GameConstants.ROLE_SIEGE, 160);
+                counts.put(GameConstants.ROLE_BOMBER, 120);
+                counts.put(GameConstants.ROLE_AIR_SUPPORT, 130);
+                counts.put(GameConstants.ROLE_AIR_BOMBER, 60);
+                counts.put(GameConstants.ROLE_CAPTAIN, 16);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                upgrades.addAll(COMBAT_UPGRADES);
+                break;
+            case SUPREME:
+                counts.put(GameConstants.ROLE_WARRIOR, 1300);
+                counts.put(GameConstants.ROLE_BRUTE, 700);
+                counts.put(GameConstants.ROLE_DEFENDER, 350);
+                counts.put(GameConstants.ROLE_ARTILLERY, 420);
+                counts.put(GameConstants.ROLE_SIEGE, 240);
+                counts.put(GameConstants.ROLE_BOMBER, 180);
+                counts.put(GameConstants.ROLE_AIR_SUPPORT, 180);
+                counts.put(GameConstants.ROLE_AIR_BOMBER, 90);
+                counts.put(GameConstants.ROLE_CAPTAIN, 24);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                upgrades.addAll(COMBAT_UPGRADES);
+                break;
+            case GIGA:
+                counts.put(GameConstants.ROLE_WARRIOR, 1800);
+                counts.put(GameConstants.ROLE_BRUTE, 1000);
+                counts.put(GameConstants.ROLE_DEFENDER, 500);
+                counts.put(GameConstants.ROLE_ARTILLERY, 600);
+                counts.put(GameConstants.ROLE_SIEGE, 350);
+                counts.put(GameConstants.ROLE_BOMBER, 250);
+                counts.put(GameConstants.ROLE_AIR_SUPPORT, 250);
+                counts.put(GameConstants.ROLE_AIR_BOMBER, 130);
+                counts.put(GameConstants.ROLE_CAPTAIN, 35);
+                counts.put(GameConstants.ROLE_COMMANDER, 1);
+                upgrades.addAll(COMBAT_UPGRADES);
+                break;
+        }
+        if (resolved.ordinal() >= RankPreset.EMPIRE.ordinal()) {
+            if (headMod.isNone()) {
+                headMod = GameConstants.MOD_HEAD_TRAPJAW;
+            }
+            if (abdomenMod.isNone()) {
+                abdomenMod = GameConstants.MOD_ABDOMEN_STINGER;
+            }
+        }
+        return new SideConfig(resolvedSpecies, biome, counts, upgrades, headMod, abdomenMod);
+    }
+
+    private static void addEmpireBaseUpgrades(Set<Upgrade> upgrades) {
+        upgrades.add(GameUnlocks.STAT_HEALTH_1);
+        upgrades.add(GameUnlocks.STAT_HEALTH_2);
+        upgrades.add(GameUnlocks.STAT_ATTACK_1);
+        upgrades.add(GameUnlocks.STAT_ATTACK_2);
+        upgrades.add(GameUnlocks.STAT_DEFENSE_1);
+        upgrades.add(GameUnlocks.STAT_DEFENSE_2);
+        upgrades.add(GameUnlocks.STAT_ATTACK_SPEED_1);
+    }
+
+    static int countConfiguredUnits(SideConfig army) {
+        if (army == null || army.unitCounts() == null) {
+            return 0;
+        }
+        int total = 0;
+        for (Integer count : army.unitCounts().values()) {
+            if (count != null && count > 0) {
+                total += count;
+            }
+        }
+        return total;
+    }
+
+    static int computeCritterPartyCap(SideConfig army) {
+        int cap = GameNumbers.COMBAT_CAPACITY_BASE;
+        if (army != null) {
+            if (army.unitCounts() != null && army.unitCounts().getOrDefault(GameConstants.ROLE_COMMANDER, 0) > 0) {
+                cap = GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER;
+            }
+            boolean hasSwarming = (army.upgrades() != null && army.upgrades().contains(GameUnlocks.ASSIMILATED_SWARMING))
+                    || (army.species() != null && army.species().getBaseUpgrades().contains(GameUnlocks.ASSIMILATED_SWARMING));
+            if (hasSwarming) {
+                cap = Math.round(cap * GameNumbers.ASSIMILATED_SWARMING_COMBAT_CAPACITY_MULT);
+            }
+        }
+        return Math.max(1, cap / GameNumbers.HUNT_MAX_PARTY_FROM_CAPACITY_DIVISOR);
+    }
+
+    public static float estimateCritterWinChance(CritterSimulationConfig config) {
+        if (config == null) {
+            return 0f;
+        }
+        SideConfig armyCfg = config.army();
+        if (countConfiguredUnits(armyCfg) <= 0) {
+            return 0f;
+        }
+        Species critter = config.critter() != null ? config.critter() : GameConstants.TYPE_COCKROACH;
+        AntSpecies armySpecies = armyCfg != null && armyCfg.species() != null
+                ? armyCfg.species()
+                : GameConstants.SPECIES_OMNI;
+
+        Dynasty dynasty = new Dynasty(1, LanguageStrings.get(LanguageStrings.BATTLE_SIM_ARMY), true, armySpecies);
+        Colony colony = new Colony(1, LanguageStrings.get(LanguageStrings.BATTLE_SIM_ARMY), false);
+        dynasty.addColony(colony);
+        dynasty.setCapital(colony);
+        colony.setDynasty(dynasty);
+        populateSide(dynasty, colony, armyCfg, false, false);
+
+        List<Ant> party = new ArrayList<>();
+        collectLivingAnts(colony.getWorkers(), party);
+        collectLivingAnts(colony.getSoldiers(), party);
+        collectLivingAnts(colony.getMajors(), party);
+        collectLivingAnts(colony.getPrincesses(), party);
+        collectLivingAnts(colony.getQueens(), party);
+        return HuntCreatureCombatService.estimateWinChance(critter, party, colony);
+    }
+
+    public static float estimateArmyWinChance(SimulationConfig config) {
+        if (config == null) {
+            return 0.5f;
+        }
+        BattleMode mode = config.mode() != null ? config.mode() : BattleMode.FULL_STAGE;
+        float atkPower = estimateSideWarPower(config.attacker(), mode == BattleMode.HEX, false);
+        float defPower = estimateSideWarPower(config.defender(), mode == BattleMode.HEX, true);
+        if (config.riverCrossing()) {
+            atkPower *= 0.8f;
+        }
+        if (atkPower <= 0f && defPower <= 0f) {
+            return 0.5f;
+        }
+        if (atkPower <= 0f) {
+            return 0.05f;
+        }
+        if (defPower <= 0f) {
+            return 0.95f;
+        }
+        if (atkPower >= defPower) {
+            return GameNumbers.warBattleWinChance(atkPower / defPower);
+        }
+        return 1f - GameNumbers.warBattleWinChance(defPower / atkPower);
+    }
+
+    private static float estimateSideWarPower(SideConfig cfg, boolean hexAssault, boolean isDefender) {
+        if (cfg == null || cfg.unitCounts() == null) {
+            return 0f;
+        }
+        Set<Upgrade> upgrades = cfg.upgrades() != null ? cfg.upgrades() : Set.of();
+        float hpMult = 1f
+                + (upgrades.contains(GameUnlocks.STAT_HEALTH_1) ? GameNumbers.STAT_HEALTH_1_BONUS : 0f)
+                + (upgrades.contains(GameUnlocks.STAT_HEALTH_2) ? GameNumbers.STAT_HEALTH_2_BONUS : 0f);
+        float atkMult = 1f
+                + (upgrades.contains(GameUnlocks.STAT_ATTACK_1) ? GameNumbers.STAT_ATTACK_1_BONUS : 0f)
+                + (upgrades.contains(GameUnlocks.STAT_ATTACK_2) ? GameNumbers.STAT_ATTACK_2_BONUS : 0f);
+        int baseSpd = GameNumbers.MILITARY_BASELINE_ATTACK_SPEED
+                + (upgrades.contains(GameUnlocks.STAT_ATTACK_SPEED_1) ? GameNumbers.STAT_ATTACK_SPEED_1_FLAT : 0);
+        int baseDef = (upgrades.contains(GameUnlocks.STAT_DEFENSE_1) ? GameNumbers.STAT_DEFENSE_FLAT_BONUS : 0)
+                + (upgrades.contains(GameUnlocks.STAT_DEFENSE_2) ? GameNumbers.STAT_DEFENSE_FLAT_BONUS : 0);
+
+        float skillMult = 1f;
+        if (cfg.headMod() == GameConstants.MOD_HEAD_TRAPJAW || upgrades.contains(GameUnlocks.ASSIMILATED_TRAPJAW)) {
+            skillMult += 0.25f;
+        }
+        if (cfg.abdomenMod() == GameConstants.MOD_ABDOMEN_STINGER || upgrades.contains(GameUnlocks.ASSIMILATED_STINGING)) {
+            skillMult += 0.20f;
+        }
+        if (upgrades.contains(GameUnlocks.ASSIMILATED_FIREVENOM) || upgrades.contains(GameUnlocks.ASSIMILATED_DEADLYVENOM)) {
+            skillMult += 0.15f;
+        }
+        if (upgrades.contains(GameUnlocks.SYNERGY_SUPER_VENOM)) {
+            skillMult += 0.20f;
+        }
+
+        double total = 0.0;
+        for (UnitSpec spec : UNIT_SPECS) {
+            int count = Math.min(spec.maxCount(), Math.max(0, cfg.unitCounts().getOrDefault(spec.role(), 0)));
+            if (count <= 0) {
+                continue;
+            }
+            if (!hexAssault && !GameConstants.isBorderBattleRole(spec.role())) {
+                continue;
+            }
+            AntClass ac = spec.antClass();
+            float hp = GameNumbers.MILITARY_BASELINE_HEALTH * hpMult * ac.getHealtMult();
+            float atk = GameNumbers.MILITARY_BASELINE_ATTACK * atkMult * ac.getAttackMult();
+            float spd = Math.max(0.5f, baseSpd * ac.getAttackSpeedMult());
+            float defPct = GameNumbers.clampDefensePercent(ac.getDefenseMult() + baseDef);
+            float ehpFactor = 1f / Math.max(0.15f, 1f - defPct / 100f);
+            double unitPower = hp * ehpFactor * atk * spd * skillMult;
+            if (hexAssault) {
+                if (isDefender) {
+                    unitPower *= (spec.role() == GameConstants.ROLE_DEFENDER
+                            ? GameNumbers.WAR_HEX_DEFENDER_ROLE_STAT_MULT
+                            : GameNumbers.WAR_HEX_DEFENDING_STAT_MULT);
+                } else {
+                    unitPower *= (spec.role() == GameConstants.ROLE_SIEGE
+                            ? GameNumbers.WAR_HEX_SIEGE_ATTACKER_STAT_MULT
+                            : GameNumbers.WAR_HEX_ATTACKER_STAT_MULT);
+                }
+            }
+            total += count * unitPower;
+        }
+        return (float) total;
+    }
+
     SimulationConfig buildConfigFromUi() {
         BattleMode mode = (BattleMode) modeCombo.getSelectedItem();
         if (mode == null) {
@@ -604,6 +1395,87 @@ public class BattleSimulatorDialog extends ZeroDialog {
         SideConfig atk = attackerPanel.readSideConfig((Biome) attackerBiomeCombo.getSelectedItem());
         SideConfig def = defenderPanel.readSideConfig((Biome) defenderBiomeCombo.getSelectedItem());
         return new SimulationConfig(mode, riverCheckBox.isSelected(), atk, def);
+    }
+
+    CritterSimulationConfig buildCritterConfigFromUi() {
+        Biome biome = (Biome) critterBiomeCombo.getSelectedItem();
+        SideConfig army = critterArmyPanel.readSideConfig(biome);
+        Species critter = critterPickerPanel.getSelectedCritter();
+        return new CritterSimulationConfig(biome, army, critter);
+    }
+
+    public static BuiltCritterSimulation buildCritterSimulation(CritterSimulationConfig config) {
+        World simWorld = new World();
+        simWorld.initializeBlankGrid(4, 4, false, 1.0);
+        simWorld.setSpectatorMode(true);
+
+        Hex hex = simWorld.getHexAt(0, 0);
+        if (hex == null) {
+            hex = new Hex();
+            hex.setQ(0);
+            hex.setR(0);
+            simWorld.getHexes().add(hex);
+        }
+        Biome biome = config != null && config.biome() != null ? config.biome() : GameConstants.BIOME_PLAINS;
+        configureSimHex(hex, biome);
+
+        SideConfig armyCfg = config != null ? config.army() : null;
+        AntSpecies armySpecies = armyCfg != null && armyCfg.species() != null
+                ? armyCfg.species()
+                : GameConstants.SPECIES_OMNI;
+        Dynasty armyDynasty = new Dynasty(
+                simWorld.allocateDynastyId(),
+                LanguageStrings.get(LanguageStrings.BATTLE_SIM_ARMY) + " " + armySpecies.getName(),
+                true,
+                armySpecies);
+        Colony armyColony = new Colony(
+                simWorld.getNextColonyId(),
+                LanguageStrings.get(LanguageStrings.BATTLE_SIM_ARMY),
+                false);
+        attachSimColony(armyDynasty, armyColony, hex);
+        simWorld.getDynastys().add(armyDynasty);
+        simWorld.markColonizedHexIndexDirty();
+
+        populateSide(armyDynasty, armyColony, armyCfg, false, false);
+
+        List<Ant> party = new ArrayList<>();
+        collectLivingAnts(armyColony.getWorkers(), party);
+        collectLivingAnts(armyColony.getSoldiers(), party);
+        collectLivingAnts(armyColony.getMajors(), party);
+        collectLivingAnts(armyColony.getPrincesses(), party);
+        collectLivingAnts(armyColony.getQueens(), party);
+
+        Species critter = config != null && config.critter() != null
+                ? config.critter()
+                : GameConstants.TYPE_COCKROACH;
+        HuntBattleViewPanel.BattleKind kind = critter.hasBugRole(BugRole.INVASION)
+                ? HuntBattleViewPanel.BattleKind.INVASION
+                : HuntBattleViewPanel.BattleKind.HUNT;
+        int battleId = 1;
+        if (kind == HuntBattleViewPanel.BattleKind.INVASION) {
+            InvasionAlert alert = new InvasionAlert(
+                    battleId, critter.getId(), InvasionAlert.Scope.COLONY, armyColony.getId(), 999999);
+            alert.setDefenseDispatched(true);
+            HuntCreatureCombatService.startInvasionBattle(armyColony, alert, party);
+        } else {
+            KnownHuntTarget target = new KnownHuntTarget(
+                    battleId, critter.getId(), 0, 0, 1, 999999);
+            HuntCreatureCombatService.startBattle(armyColony, target, party);
+        }
+
+        simWorld.changeActiveHex(hex);
+        return new BuiltCritterSimulation(simWorld, armyDynasty, armyColony, critter, battleId, kind);
+    }
+
+    private static void collectLivingAnts(List<Ant> source, List<Ant> dest) {
+        if (source == null) {
+            return;
+        }
+        for (Ant ant : source) {
+            if (ant != null && ant.isAlive()) {
+                dest.add(ant);
+            }
+        }
     }
 
     public static BuiltSimulation buildSimulation(SimulationConfig config) {
@@ -867,6 +1739,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
     private static final class SideConfigPanel extends JPanel {
         private final AntSpecies defaultSpecies;
         private final JLabel titleLabel;
+        private final JLabel presetLabel;
         private final JComboBox<AntSpecies> speciesCombo;
         private final JComboBox<AntMod> headModCombo = new JComboBox<>(
                 GameConstants.getModsForSlot(AntModSlot.HEAD).toArray(new AntMod[0]));
@@ -874,10 +1747,13 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 GameConstants.getModsForSlot(AntModSlot.ABDOMEN).toArray(new AntMod[0]));
         private final Map<AntRole, JSpinner> unitSpinners = new LinkedHashMap<>();
         private final Map<Upgrade, JCheckBox> upgradeCheckBoxes = new LinkedHashMap<>();
+        private final Map<RankPreset, JButton> rankPresetButtons = new LinkedHashMap<>();
         private final Set<Upgrade> lastAutoSpeciesTraits = new LinkedHashSet<>();
         private AntMod lastAutoHeadMod = GameConstants.MOD_HEAD_NONE;
         private AntMod lastAutoAbdomenMod = GameConstants.MOD_ABDOMEN_NONE;
         private boolean suppressSpeciesSync = false;
+        private boolean suppressChangeCallback = false;
+        private Runnable onConfigChanged;
 
         SideConfigPanel(String title, AntSpecies defaultSpecies) {
             super(new BorderLayout(8, 8));
@@ -919,11 +1795,35 @@ public class BattleSimulatorDialog extends ZeroDialog {
                     return label;
                 }
             });
-            speciesCombo.addActionListener(e -> syncSpeciesDefaults());
+            speciesCombo.addActionListener(e -> {
+                syncSpeciesDefaults();
+                fireConfigChanged();
+            });
 
             speciesRow.add(speciesLabel, BorderLayout.WEST);
             speciesRow.add(speciesCombo, BorderLayout.CENTER);
             topPanel.add(speciesRow, BorderLayout.CENTER);
+
+            JPanel presetRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 2));
+            presetRow.setOpaque(false);
+            presetLabel = new JLabel(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RANK_PRESET) + ":");
+            presetLabel.setFont(AssetStyles.FONT_BOLD);
+            presetLabel.setForeground(AssetStyles.FONT_COLOR);
+            presetRow.add(presetLabel);
+            Dimension iconBtnSize = new Dimension(26, 26);
+            for (RankPreset preset : RankPreset.values()) {
+                JButton btn = new JButton(preset.getIcon());
+                btn.setText("");
+                AssetStyles.styleCompactButton(btn);
+                btn.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+                btn.setPreferredSize(iconBtnSize);
+                btn.setMinimumSize(AssetStyles.minControlHitSize());
+                btn.setToolTipText(preset.getLabel());
+                btn.addActionListener(e -> applyRankPreset(preset));
+                rankPresetButtons.put(preset, btn);
+                presetRow.add(btn);
+            }
+            topPanel.add(presetRow, BorderLayout.SOUTH);
 
             JPanel centerContent = new JPanel();
             centerContent.setOpaque(false);
@@ -950,8 +1850,32 @@ public class BattleSimulatorDialog extends ZeroDialog {
             titleLabel.setText(title);
         }
 
+        void setOnConfigChanged(Runnable onConfigChanged) {
+            this.onConfigChanged = onConfigChanged;
+        }
+
+        void refreshTranslations() {
+            presetLabel.setText(LanguageStrings.get(LanguageStrings.BATTLE_SIM_RANK_PRESET) + ":");
+            for (Map.Entry<RankPreset, JButton> entry : rankPresetButtons.entrySet()) {
+                entry.getValue().setText("");
+                entry.getValue().setToolTipText(entry.getKey().getLabel());
+            }
+        }
+
+        void applyRankPreset(RankPreset preset) {
+            AntSpecies sp = (AntSpecies) speciesCombo.getSelectedItem();
+            applyConfig(buildPresetConfig(preset, sp != null ? sp : defaultSpecies, null));
+        }
+
+        private void fireConfigChanged() {
+            if (!suppressChangeCallback && onConfigChanged != null) {
+                onConfigChanged.run();
+            }
+        }
+
         void resetToDefaults() {
             suppressSpeciesSync = true;
+            suppressChangeCallback = true;
             try {
                 lastAutoSpeciesTraits.clear();
                 lastAutoHeadMod = GameConstants.MOD_HEAD_NONE;
@@ -968,8 +1892,10 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 setAllUpgrades(false);
             } finally {
                 suppressSpeciesSync = false;
+                suppressChangeCallback = false;
             }
             syncSpeciesDefaults();
+            fireConfigChanged();
         }
 
         void randomize(List<AntSpecies> allSpecies) {
@@ -1019,6 +1945,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 return;
             }
             suppressSpeciesSync = true;
+            suppressChangeCallback = true;
             try {
                 lastAutoSpeciesTraits.clear();
                 lastAutoHeadMod = GameConstants.MOD_HEAD_NONE;
@@ -1042,7 +1969,9 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 }
             } finally {
                 suppressSpeciesSync = false;
+                suppressChangeCallback = false;
             }
+            fireConfigChanged();
         }
 
         private JComponent buildUnitsSection() {
@@ -1059,9 +1988,15 @@ public class BattleSimulatorDialog extends ZeroDialog {
             JButton clearUnitsBtn = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_CLEAR_ALL));
             AssetStyles.styleCompactButton(clearUnitsBtn);
             clearUnitsBtn.addActionListener(e -> {
-                for (JSpinner spinner : unitSpinners.values()) {
-                    spinner.setValue(0);
+                suppressChangeCallback = true;
+                try {
+                    for (JSpinner spinner : unitSpinners.values()) {
+                        spinner.setValue(0);
+                    }
+                } finally {
+                    suppressChangeCallback = false;
                 }
+                fireConfigChanged();
             });
             header.add(heading, BorderLayout.WEST);
             header.add(clearUnitsBtn, BorderLayout.EAST);
@@ -1099,6 +2034,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
                     JSpinner spinner = new JSpinner(new SpinnerNumberModel(spec.defaultCount(), 0, spec.maxCount(), step));
                     AssetStyles.styleSpinner(spinner);
                     spinner.setPreferredSize(AssetStyles.preferredSpinnerSize(82));
+                    spinner.addChangeListener(e -> fireConfigChanged());
                     unitSpinners.put(spec.role(), spinner);
 
                     gbc.gridx = 0;
@@ -1140,6 +2076,8 @@ public class BattleSimulatorDialog extends ZeroDialog {
 
             configureModCombo(headModCombo, GameConstants.MOD_HEAD_NONE);
             configureModCombo(abdomenModCombo, GameConstants.MOD_ABDOMEN_NONE);
+            headModCombo.addActionListener(e -> fireConfigChanged());
+            abdomenModCombo.addActionListener(e -> fireConfigChanged());
 
             JLabel headLabel = new JLabel(LanguageStrings.get(LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION) + ":");
             headLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -1205,10 +2143,26 @@ public class BattleSimulatorDialog extends ZeroDialog {
             actions.setOpaque(false);
             JButton selectAllBtn = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_SELECT_ALL));
             AssetStyles.styleCompactButton(selectAllBtn);
-            selectAllBtn.addActionListener(e -> setAllUpgrades(true));
+            selectAllBtn.addActionListener(e -> {
+                suppressChangeCallback = true;
+                try {
+                    setAllUpgrades(true);
+                } finally {
+                    suppressChangeCallback = false;
+                }
+                fireConfigChanged();
+            });
             JButton clearAllBtn = new JButton(LanguageStrings.get(LanguageStrings.BATTLE_SIM_CLEAR_ALL));
             AssetStyles.styleCompactButton(clearAllBtn);
-            clearAllBtn.addActionListener(e -> setAllUpgrades(false));
+            clearAllBtn.addActionListener(e -> {
+                suppressChangeCallback = true;
+                try {
+                    setAllUpgrades(false);
+                } finally {
+                    suppressChangeCallback = false;
+                }
+                fireConfigChanged();
+            });
             actions.add(selectAllBtn);
             actions.add(clearAllBtn);
 
@@ -1224,6 +2178,7 @@ public class BattleSimulatorDialog extends ZeroDialog {
                 AssetStyles.styleCheckBox(box);
                 box.setToolTipText(upgrade.getDescription());
                 box.setSelected(false);
+                box.addActionListener(e -> fireConfigChanged());
                 upgradeCheckBoxes.put(upgrade, box);
 
                 ImageIcon rawIcon = upgrade.getIcon();

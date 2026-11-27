@@ -112,7 +112,7 @@ public final class ColonyHuntService {
             species = GameConstants.TYPE_COCKROACH;
         }
         float travelHours = computeTravelHours(colony, target, party);
-        float winChance = estimateWinChance(species, party);
+        float winChance = estimateWinChance(species, party, colony);
         GameNumbers.HuntRewards rewards = GameNumbers.huntRewardsFor(species);
         return new HuntDispatchPreview(
                 party.size(), travelHours, winChance,
@@ -120,28 +120,11 @@ public final class ColonyHuntService {
     }
 
     public static float estimateWinChance(Species species, List<Ant> party) {
-        if (species == null || party == null || party.isEmpty()) {
-            return 0f;
-        }
-        float hunterPower = 0f;
-        for (Ant ant : party) {
-            if (ant == null || !ant.isAlive()) {
-                continue;
-            }
-            hunterPower += Math.max(1f, ant.getAttack())
-                    * Math.max(1f, ant.getAttackSpeed())
-                    * Math.max(1f, ant.getHealth());
-        }
-        if (hunterPower <= 0f) {
-            return 0f;
-        }
-        float bugPower = HuntCreatureCombatService.resolveBugMaxHealth(species)
-                * HuntCreatureCombatService.resolveBugAttack(species)
-                * Math.max(1, HuntCreatureCombatService.resolveBugAttackSpeed(species));
-        if (bugPower <= 0f) {
-            return 1f;
-        }
-        return GameNumbers.warBattleWinChance(hunterPower / bugPower);
+        return estimateWinChance(species, party, null);
+    }
+
+    public static float estimateWinChance(Species species, List<Ant> party, Colony colony) {
+        return HuntCreatureCombatService.estimateWinChance(species, party, colony);
     }
 
     public static void runScoutBugDiscovery(Colony colony, Biome biome, Hex currentHex, int worldDay) {

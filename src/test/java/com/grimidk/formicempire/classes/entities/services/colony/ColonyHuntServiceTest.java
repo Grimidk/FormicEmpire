@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -113,8 +115,48 @@ class ColonyHuntServiceTest {
         ColonyHuntService.HuntDispatchPreview largePreview =
                 ColonyHuntService.previewDispatch(colony, target, large);
 
-        assertTrue(largePreview.winChance >= smallPreview.winChance);
+        assertTrue(largePreview.winChance > smallPreview.winChance);
+        assertTrue(smallPreview.winChance < 0.25f, "Single soldier should have low win chance without 50% floor");
+        assertEquals(0f, ColonyHuntService.estimateWinChance(GameConstants.TYPE_COCKROACH, List.of()));
         assertEquals(GameNumbers.HUNT_COCKROACH_REWARD_PROTEIN, largePreview.rewardProtein);
         assertFalse(largePreview.travelHours <= 0f);
+    }
+
+    @Test
+    void partyCapacityScalesAsCombatCapacityDividedByTenAndWinRateGrowsWithRank() {
+        assertEquals(GameNumbers.COMBAT_CAPACITY_BASE / GameNumbers.HUNT_MAX_PARTY_FROM_CAPACITY_DIVISOR,
+                ColonyHuntService.maxPartyCapacity(colony));
+        assertEquals(100, ColonyHuntService.maxPartyCapacity(colony));
+
+        colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_COMMANDER, 1);
+        assertEquals(250, ColonyHuntService.maxPartyCapacity(colony));
+
+        colony.getDynasty().unlockUpgrade(GameUnlocks.STAT_SKELETON);
+        colony.getDynasty().unlockUpgrade(GameUnlocks.STAT_ACID);
+
+        List<Ant> duchy = new ArrayList<>();
+        for (int i = 0; i < 80; i++) {
+            duchy.add(new Ant(colony, GameConstants.CLASS_SOLDIER));
+        }
+        for (int i = 0; i < 20; i++) {
+            duchy.add(new Ant(colony, GameConstants.CLASS_MAJOR));
+        }
+        float duchyChance = ColonyHuntService.estimateWinChance(GameConstants.TYPE_BOMBARDIER, duchy, colony);
+
+        colony.getDynasty().unlockUpgrade(GameUnlocks.STAT_HEALTH_1);
+        colony.getDynasty().unlockUpgrade(GameUnlocks.STAT_ATTACK_1);
+        colony.getDynasty().unlockUpgrade(GameUnlocks.STAT_DEFENSE_1);
+        List<Ant> kingdom = new ArrayList<>();
+        for (int i = 0; i < 70; i++) {
+            kingdom.add(new Ant(colony, GameConstants.CLASS_SOLDIER));
+        }
+        for (int i = 0; i < 30; i++) {
+            kingdom.add(new Ant(colony, GameConstants.CLASS_MAJOR));
+        }
+        float kingdomChance = ColonyHuntService.estimateWinChance(GameConstants.TYPE_BOMBARDIER, kingdom, colony);
+
+        assertTrue(duchyChance < 0.35f, "Duchy should struggle vs Bombardier: " + duchyChance);
+        assertTrue(kingdomChance > 0.55f, "Kingdom should be favorable vs Bombardier: " + kingdomChance);
+        assertTrue(kingdomChance > duchyChance);
     }
 }

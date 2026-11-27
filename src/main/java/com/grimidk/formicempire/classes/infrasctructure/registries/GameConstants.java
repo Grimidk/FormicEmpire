@@ -2578,6 +2578,16 @@ public final class GameConstants {
         return Collections.unmodifiableList(matched);
     }
 
+    public static List<Species> getCombatCritterSpecies() {
+        List<Species> matched = new ArrayList<>();
+        for (Species species : critterSpecies) {
+            if (species.hasBugRole(BugRole.HUNT) || species.hasBugRole(BugRole.INVASION)) {
+                matched.add(species);
+            }
+        }
+        return Collections.unmodifiableList(matched);
+    }
+
     public static boolean isHuntBiome(Biome biome) {
         if (biome == null) {
             return false;

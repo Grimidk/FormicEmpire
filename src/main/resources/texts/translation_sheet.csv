@@ -3116,3 +3116,9 @@ MAP_TOOLTIP_LOCAL_TIME,<br><b>Local Time:</b> ,<br><b>Hora local:</b> ,<br><b>Ho
 STAT_TIMEZONE,Timezone,Zona horaria,Fuso horário,Fuseau horaire
 UI_CONTINUE,Continue,Continuar,Continuar,Continuer
 UI_LOAD_GAME,Load Game,Cargar Partida,Carregar Jogo,Charger une Partie
+BATTLE_SIM_TAB_ARMY_VS_ARMY,Army vs Army,Ejército vs Ejército,Exército vs Exército,Armée vs Armée
+BATTLE_SIM_TAB_ARMY_VS_CRITTER,Army vs Critter,Ejército vs Bicho,Exército vs Criatura,Armée vs Créature
+BATTLE_SIM_ARMY,Army,Ejército,Exército,Armée
+BATTLE_SIM_CRITTER,Critter,Bicho,Criatura,Créature
+BATTLE_SIM_RANK_PRESET,Rank Preset,Preajuste de Rango,Predefinição de Posto,Préréglage de Rang
+BATTLE_SIM_ATTACKER_WIN_CHANCE_FMT,Attacker win: %s%%,Victoria atacante: %s%%,Vitória atacante: %s%%,Victoire attaquant : %s %%

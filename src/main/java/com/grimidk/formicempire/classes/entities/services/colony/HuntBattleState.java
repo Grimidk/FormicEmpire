@@ -5,9 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.shared.BattleNumericFeed;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 public final class HuntBattleState {
     private final Colony colony;
     private final int contextId;
@@ -16,6 +18,9 @@ public final class HuntBattleState {
     private final List<HuntBattleFallenBody> fallenBodies = new ArrayList<>();
     private final BattleNumericFeed numericFeed = new BattleNumericFeed();
     private final int orbitSlotCount;
+    private final int infantrySlotCount;
+    private final int artillerySlotCount;
+    private final int airSupportSlotCount;
     private float bugHealth;
     private final float bugMaxHealth;
     private final float bugAttack;
@@ -31,14 +36,38 @@ public final class HuntBattleState {
         this.species = species;
         this.hunters.addAll(hunters);
         this.orbitSlotCount = hunters.size();
+        int infCount = 0;
+        int artCount = 0;
+        int airCount = 0;
         for (int i = 0; i < hunters.size(); i++) {
-            hunters.get(i).setOrbitSlot(i);
+            HuntBattleParticipant participant = hunters.get(i);
+            participant.setOrbitSlot(i);
+            BattleLine line = resolveBattleLine(participant.getAnt());
+            participant.setBattleLine(line);
+            if (line == GameConstants.BATTLE_LINE_ARTILLERY) {
+                participant.setLineSlot(artCount++);
+            } else if (line == GameConstants.BATTLE_LINE_AIR_SUPPORT) {
+                participant.setLineSlot(airCount++);
+            } else {
+                participant.setLineSlot(infCount++);
+            }
         }
+        this.infantrySlotCount = infCount;
+        this.artillerySlotCount = artCount;
+        this.airSupportSlotCount = airCount;
         this.bugMaxHealth = bugMaxHealth;
         this.bugHealth = bugMaxHealth;
         this.bugAttack = bugAttack;
         this.bugDefense = bugDefense;
         this.bugAttackSpeed = bugAttackSpeed;
+    }
+
+    public static BattleLine resolveBattleLine(Ant ant) {
+        if (ant == null || ant.getRole() == null) {
+            return GameConstants.BATTLE_LINE_INFANTRY;
+        }
+        BattleLine line = GameConstants.getBattleLineForRole(ant.getRole());
+        return line != null ? line : GameConstants.BATTLE_LINE_INFANTRY;
     }
 
     public static HuntBattleState restore(Colony colony, int contextId, Species species,
@@ -75,6 +104,18 @@ public final class HuntBattleState {
         return orbitSlotCount;
     }
 
+    public int getInfantrySlotCount() {
+        return infantrySlotCount;
+    }
+
+    public int getArtillerySlotCount() {
+        return artillerySlotCount;
+    }
+
+    public int getAirSupportSlotCount() {
+        return airSupportSlotCount;
+    }
+
     public List<HuntBattleFallenBody> getFallenBodies() {
         return Collections.unmodifiableList(fallenBodies);
     }
@@ -92,7 +133,9 @@ public final class HuntBattleState {
                 ant.getAntClass(),
                 ant.getModProfile(),
                 victim.getOrbitSlot(),
-                bodyRotationDegrees));
+                bodyRotationDegrees,
+                victim.getBattleLine(),
+                victim.getLineSlot()));
     }
 
     public List<HuntBattleParticipant> getHunters() {
@@ -107,6 +150,21 @@ public final class HuntBattleState {
             }
         }
         return living;
+    }
+
+    public List<HuntBattleParticipant> livingFrontlineHunters() {
+        List<HuntBattleParticipant> frontline = new ArrayList<>();
+        List<HuntBattleParticipant> allLiving = new ArrayList<>();
+        for (HuntBattleParticipant hunter : hunters) {
+            if (!hunter.isAlive()) {
+                continue;
+            }
+            allLiving.add(hunter);
+            if (hunter.getBattleLine() == GameConstants.BATTLE_LINE_INFANTRY) {
+                frontline.add(hunter);
+            }
+        }
+        return frontline.isEmpty() ? allLiving : frontline;
     }
 
     public float getBugHealth() {
@@ -154,14 +212,11 @@ public final class HuntBattleState {
     }
 
     public HuntBattleParticipant getFocusTarget() {
-        List<HuntBattleParticipant> living = livingHunters();
+        List<HuntBattleParticipant> living = livingFrontlineHunters();
         if (living.isEmpty()) {
             return null;
         }
-        focusTargetIndex = focusTargetIndex % living.size();
-        if (focusTargetIndex < 0) {
-            focusTargetIndex += living.size();
-        }
+        focusTargetIndex = Math.floorMod(focusTargetIndex, living.size());
         return living.get(focusTargetIndex);
     }
 

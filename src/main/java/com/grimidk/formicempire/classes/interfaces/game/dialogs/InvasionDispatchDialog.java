@@ -27,6 +27,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
     private final java.util.function.IntConsumer onDispatched;
     private final Map<AntClass, JSpinner> antSpinners = new HashMap<>();
     private final Map<AntClass, Integer> availableByType = new HashMap<>();
+    private final int maxParty;
     private boolean updating;
 
     private final JLabel winChanceLabel = new JLabel(" ");
@@ -42,6 +43,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
         this.worldDay = worldDay;
         this.worldHour = worldHour;
         this.onDispatched = onDispatched;
+        this.maxParty = ColonyInvasionService.maxPartyCapacity(colony);
         availableByType.putAll(ColonyInvasionService.getAvailableDefenderCountsByClass(colony));
 
         JPanel headerPanel = new JPanel(new GridLayout(1, 3, 16, 8));
@@ -103,6 +105,7 @@ public final class InvasionDispatchDialog extends ZeroDialog {
             if (updating) {
                 return;
             }
+            enforcePartyLimit(type);
             updatePreview();
         });
         antSpinners.put(type, spinner);
@@ -112,9 +115,47 @@ public final class InvasionDispatchDialog extends ZeroDialog {
         maxBtn.setFocusable(false);
         AssetStyles.styleCompactButton(maxBtn);
         maxBtn.setEnabled(available > 0);
-        maxBtn.addActionListener(e -> spinner.setValue(available));
+        maxBtn.addActionListener(e -> setMaxForType(type));
         row.add(maxBtn);
         return row;
+    }
+
+    private void setMaxForType(AntClass type) {
+        JSpinner spinner = antSpinners.get(type);
+        if (spinner == null) {
+            return;
+        }
+        int available = availableByType.getOrDefault(type, 0);
+        int others = getTotalSelected() - (Integer) spinner.getValue();
+        int room = Math.max(0, maxParty - others);
+        spinner.setValue(Math.min(available, room));
+        updatePreview();
+    }
+
+    private void enforcePartyLimit(AntClass changedType) {
+        int total = getTotalSelected();
+        if (total <= maxParty) {
+            return;
+        }
+        JSpinner spinner = antSpinners.get(changedType);
+        if (spinner == null) {
+            return;
+        }
+        updating = true;
+        try {
+            int val = (Integer) spinner.getValue();
+            spinner.setValue(Math.max(0, val - (total - maxParty)));
+        } finally {
+            updating = false;
+        }
+    }
+
+    private int getTotalSelected() {
+        int total = 0;
+        for (JSpinner spinner : antSpinners.values()) {
+            total += (Integer) spinner.getValue();
+        }
+        return total;
     }
 
     private Map<AntClass, Integer> getSelectedCounts() {
@@ -133,19 +174,24 @@ public final class InvasionDispatchDialog extends ZeroDialog {
         deadlineLabel.setText(LanguageStrings.format(
                 LanguageStrings.INVASION_DEADLINE_FMT, AssetStyles.formatNumber(preview.hoursRemaining)));
         partySizeLabel.setText(LanguageStrings.format(
-                LanguageStrings.INVASION_PARTY_SIZE_FMT, AssetStyles.formatNumber(preview.partySize)));
+                LanguageStrings.HUNT_PARTY_LIMIT_FMT,
+                AssetStyles.formatNumber(preview.partySize),
+                AssetStyles.formatNumber(maxParty)));
         dispatchBtn.setEnabled(preview.partySize > 0 && ColonyInvasionService.canDispatchDefense(colony, alert));
     }
 
     private void applyDefaultSelection() {
         updating = true;
         try {
+            int remaining = maxParty;
             for (AntClass type : ColonyInvasionService.INVASION_ANT_CLASSES) {
                 int available = availableByType.getOrDefault(type, 0);
-                if (available > 0) {
+                if (available > 0 && remaining > 0) {
                     JSpinner spinner = antSpinners.get(type);
                     if (spinner != null) {
-                        spinner.setValue(Math.min(available, Math.max(1, available / 4)));
+                        int chosen = Math.min(remaining, Math.min(available, Math.max(1, available / 4)));
+                        spinner.setValue(chosen);
+                        remaining -= chosen;
                     }
                 }
             }

@@ -1,8 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.Species;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntClass;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -13,8 +14,8 @@ import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCom
 import com.grimidk.formicempire.classes.entities.services.shared.BattleNumericFeed;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
@@ -36,12 +37,29 @@ public class HuntBattleViewPanel extends JPanel {
         INVASION
     }
 
+    record SlotPosition(float x, float y, float radius, double angleRadians) {
+    }
+
+    private record BandGeometry(
+            float infStart,
+            float infMax,
+            float infOuter,
+            float artStart,
+            float artMax,
+            float airBaseRadius) {
+    }
+
     private static final int HEADER_HEIGHT = 0;
     private static final int ANT_SPRITE_SCALE = 2;
     private static final int CRITTER_SPRITE_SCALE = 1;
     private static final int ANIMATION_FRAME_MS = 50;
-    private static final float ORBIT_RADIUS_MIN = 32f;
-    private static final float ORBIT_RADIUS_MAX = 68f;
+    private static final int MAX_VISUAL_ANTS_PER_LINE = 360;
+    private static final float BASE_RING_STEP_PX = 22f;
+    private static final float BASE_ARC_SPACING_PX = 22f;
+    private static final float CRITTER_TURN_DEG_PER_SEC = 720f;
+    private static final float CRITTER_MIN_FOCUS_DELTA_DEG = 45f;
+    private static final float CRITTER_HOLD_MIN_SEC = 0.28f;
+    private static final float CRITTER_HOLD_RANGE_SEC = 0.42f;
 
     private final Colony colony;
     private final Engine engine;
@@ -89,6 +107,12 @@ public class HuntBattleViewPanel extends JPanel {
     private Timer animationTimer;
     private float animationSeconds;
     private long lastTickNanos;
+    private float critterFacingDegrees;
+    private float critterTargetDegrees;
+    private float critterFocusHoldSec;
+    private boolean critterFacingInitialized;
+    private int lastObservedTick = -1;
+    private int visualFocusSlot = -1;
 
     public HuntBattleViewPanel(Colony colony, Engine engine, int battleId) {
         this(colony, engine, battleId, BattleKind.HUNT);
@@ -146,6 +170,10 @@ public class HuntBattleViewPanel extends JPanel {
         battleProgressBar.repaint();
     }
 
+    public boolean hasActiveState() {
+        return resolveBattleState() != null;
+    }
+
     private HuntBattleState resolveBattleState() {
         if (colony == null) {
             return null;
@@ -170,6 +198,11 @@ public class HuntBattleViewPanel extends JPanel {
                 deltaSec = ANIMATION_FRAME_MS / 1000f;
             }
             animationSeconds += deltaSec;
+            if (state != null) {
+                int fieldW = Math.max(240, getWidth());
+                int fieldH = Math.max(120, getHeight() - headerPanel.getHeight());
+                updateCritterFocus(deltaSec, fieldW, fieldH);
+            }
             BattleNumericFeed feed = state != null ? state.getNumericFeed() : null;
             int stateTickIndex = state != null ? state.getTickIndex() : -1;
             World w = engine != null ? engine.getWorld() : null;
@@ -211,12 +244,15 @@ public class HuntBattleViewPanel extends JPanel {
 
         int centerX = fieldW / 2;
         int centerY = fieldY + fieldH / 2;
-        float radius = orbitRadius(fieldH);
-        int slotCount = Math.max(1, state.getOrbitSlotCount());
-        drawFallenHunters(g2d, centerX, centerY, radius, slotCount);
-        List<HuntBattleParticipant> living = state.livingHunters();
-        drawOrbitingHunters(g2d, living, centerX, centerY, radius, slotCount);
-        drawCenterCritter(g2d, centerX, centerY, radius, slotCount);
+        BandGeometry band = computeBandGeometry(fieldW, fieldH, state);
+        if (!critterFacingInitialized) {
+            updateCritterFocus(0f, fieldW, fieldH);
+        }
+
+        drawFallenHunters(g2d, centerX, centerY, band);
+        drawGroundHunters(g2d, state.livingHunters(), centerX, centerY, band);
+        drawCenterCritter(g2d, centerX, centerY);
+        drawAirSupportHunters(g2d, state.livingHunters(), centerX, centerY, band);
         g2d.dispose();
     }
 
@@ -298,16 +334,39 @@ public class HuntBattleViewPanel extends JPanel {
         og.dispose();
     }
 
-    private float orbitRadius(int fieldH) {
-        return Math.max(ORBIT_RADIUS_MIN, Math.min(fieldH * 0.18f, ORBIT_RADIUS_MAX));
+    private static BandGeometry computeBandGeometry(int fieldW, int fieldH, HuntBattleState state) {
+        int minDim = Math.max(120, Math.min(fieldW, fieldH));
+        boolean hasArtillery = state != null && state.getArtillerySlotCount() > 0;
+        int infTotal = state != null ? state.getInfantrySlotCount() : 0;
+        float infStart = Math.max(46f, Math.min(minDim * 0.13f, 68f));
+        float infMax = hasArtillery
+                ? Math.max(infStart + 40f, minDim * 0.31f)
+                : Math.max(infStart + 60f, minDim * 0.44f);
+        float infOuter = outerRingRadius(infTotal, infStart, infMax, BASE_RING_STEP_PX, BASE_ARC_SPACING_PX);
+        float artMax = Math.max(infOuter + 44f, minDim * 0.46f);
+        float artStart = Math.min(artMax - 12f, Math.max(infOuter + 38f, infStart + 72f));
+        artStart = Math.max(infOuter + 24f, artStart);
+        float airBaseRadius = Math.max(infStart + 36f, Math.min(minDim * 0.38f, artMax));
+        return new BandGeometry(infStart, infMax, infOuter, artStart, artMax, airBaseRadius);
     }
 
-    private void drawFallenHunters(Graphics2D g2d, int centerX, int centerY, float radius, int slotCount) {
+    private SlotPosition positionForLineSlot(BattleLine line, int lineSlot, BandGeometry band) {
+        if (line == GameConstants.BATTLE_LINE_ARTILLERY || line == GameConstants.BATTLE_LINE_AIR_SUPPORT) {
+            int artTotal = state != null ? Math.max(1, state.getArtillerySlotCount()) : 1;
+            return computeRingPosition(lineSlot, artTotal, band.artStart, band.artMax, BASE_RING_STEP_PX,
+                    BASE_ARC_SPACING_PX);
+        }
+        int infTotal = state != null ? Math.max(1, state.getInfantrySlotCount()) : 1;
+        return computeRingPosition(lineSlot, infTotal, band.infStart, band.infMax, BASE_RING_STEP_PX,
+                BASE_ARC_SPACING_PX);
+    }
+
+    private void drawFallenHunters(Graphics2D g2d, int centerX, int centerY, BandGeometry band) {
         AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : GameConstants.SPECIES_OMNI;
         for (HuntBattleFallenBody body : state.getFallenBodies()) {
-            double angle = slotAngle(body.getOrbitSlot(), slotCount);
-            int drawX = centerX + (int) Math.round(Math.cos(angle) * radius);
-            int drawY = centerY + (int) Math.round(Math.sin(angle) * radius);
+            SlotPosition pos = positionForLineSlot(body.getBattleLine(), body.getLineSlot(), band);
+            int drawX = centerX + Math.round(pos.x());
+            int drawY = centerY + Math.round(pos.y());
             ImageIcon icon = GameConstants.getAntSprite(
                     GameConstants.CLASS_DEAD,
                     species,
@@ -321,55 +380,296 @@ public class HuntBattleViewPanel extends JPanel {
         }
     }
 
-    private void drawOrbitingHunters(Graphics2D g2d, List<HuntBattleParticipant> hunters, int centerX, int centerY,
-            float radius, int slotCount) {
+    private void drawGroundHunters(Graphics2D g2d, List<HuntBattleParticipant> hunters, int centerX, int centerY,
+            BandGeometry band) {
         if (hunters.isEmpty()) {
             return;
         }
+        List<HuntBattleParticipant> artillery = new ArrayList<>();
+        List<HuntBattleParticipant> infantry = new ArrayList<>();
         for (HuntBattleParticipant hunter : hunters) {
-            Ant ant = hunter.getAnt();
-            if (ant == null) {
+            if (hunter.getAnt() == null || hunter.getBattleLine() == GameConstants.BATTLE_LINE_AIR_SUPPORT) {
                 continue;
             }
-            double angle = slotAngle(hunter.getOrbitSlot(), slotCount);
-            int drawX = centerX + (int) Math.round(Math.cos(angle) * radius);
-            int drawY = centerY + (int) Math.round(Math.sin(angle) * radius);
+            if (hunter.getBattleLine() == GameConstants.BATTLE_LINE_ARTILLERY) {
+                artillery.add(hunter);
+            } else {
+                infantry.add(hunter);
+            }
+        }
+        drawGroundLine(g2d, artillery, centerX, centerY, band, true);
+        drawGroundLine(g2d, infantry, centerX, centerY, band, false);
+    }
+
+    private void drawGroundLine(Graphics2D g2d, List<HuntBattleParticipant> lineHunters, int centerX, int centerY,
+            BandGeometry band, boolean artillery) {
+        if (lineHunters.isEmpty()) {
+            return;
+        }
+        AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : GameConstants.SPECIES_OMNI;
+        int total = lineHunters.size();
+        int step = total > MAX_VISUAL_ANTS_PER_LINE ? Math.max(1, total / MAX_VISUAL_ANTS_PER_LINE) : 1;
+        float wobbleAmp = artillery ? 1.1f : 2.2f;
+        float rate = artillery ? 0.7f : 1.0f;
+        for (int i = 0; i < total; i += step) {
+            HuntBattleParticipant hunter = lineHunters.get(i);
+            Ant ant = hunter.getAnt();
+            SlotPosition pos = positionForLineSlot(hunter.getBattleLine(), hunter.getLineSlot(), band);
+            double phase = hunter.getOrbitSlot() * 0.7;
+            double radialOffset = Math.sin(animationSeconds * 5.2 * rate + phase) * wobbleAmp;
+            int drawX = centerX + Math.round(pos.x() + (float) (Math.cos(pos.angleRadians()) * radialOffset));
+            int drawY = centerY + Math.round(pos.y() + (float) (Math.sin(pos.angleRadians()) * radialOffset));
             AntClass type = ant.getAntClass();
-            AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : GameConstants.SPECIES_OMNI;
-            int slot = hunter.getOrbitSlot();
-            int legFrame = RouteViewVisuals.resolveLegFrame(type, false, true, slot * 0.7f, animationSeconds, 1f);
-            int jawFrame = RouteViewVisuals.resolveJawFrame(type, false, slot * 0.7f, animationSeconds, 1f);
-            int wingFrame = 1;
-            int antennaFrame = RouteViewVisuals.resolveAntennaFrame(type, slot * 0.7f, animationSeconds, 1f);
-            ImageIcon icon = GameConstants.getAntSprite(type, species, ant.getModProfile(), legFrame, jawFrame,
-                    wingFrame, antennaFrame, false);
+            int legFrame = RouteViewVisuals.resolveLegFrame(type, false, true, (float) phase, animationSeconds, rate);
+            int jawFrame = RouteViewVisuals.resolveJawFrame(type, false, (float) phase, animationSeconds, rate);
+            int antennaFrame = RouteViewVisuals.resolveAntennaFrame(type, (float) phase, animationSeconds, rate);
+            ImageIcon icon = GameConstants.getAntSprite(type, species, ant.getModProfile(), legFrame, jawFrame, 1,
+                    antennaFrame, false);
             float faceDegrees = (float) Math.toDegrees(Math.atan2(centerY - drawY, centerX - drawX)) + 90f;
             drawScaledSprite(g2d, icon, drawX, drawY, ANT_SPRITE_SCALE, faceDegrees);
         }
     }
 
-    private double slotAngle(int slot, int slotCount) {
-        return Math.PI * 2.0 * slot / Math.max(1, slotCount);
+    private void drawAirSupportHunters(Graphics2D g2d, List<HuntBattleParticipant> hunters, int centerX, int centerY,
+            BandGeometry band) {
+        List<HuntBattleParticipant> flyers = new ArrayList<>();
+        for (HuntBattleParticipant hunter : hunters) {
+            if (hunter.getAnt() != null && hunter.getBattleLine() == GameConstants.BATTLE_LINE_AIR_SUPPORT) {
+                flyers.add(hunter);
+            }
+        }
+        if (flyers.isEmpty()) {
+            return;
+        }
+        AntSpecies species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : GameConstants.SPECIES_OMNI;
+        int total = flyers.size();
+        int step = total > MAX_VISUAL_ANTS_PER_LINE ? Math.max(1, total / MAX_VISUAL_ANTS_PER_LINE) : 1;
+        int airTotal = Math.max(1, state.getAirSupportSlotCount());
+        for (int i = 0; i < total; i += step) {
+            HuntBattleParticipant hunter = flyers.get(i);
+            Ant ant = hunter.getAnt();
+            AntClass type = ant.getAntClass();
+            int slot = hunter.getLineSlot();
+            double basePhase = (2.0 * Math.PI * slot) / airTotal;
+            double omega = (slot % 2 == 0 ? 1.0 : -1.0) * (1.15 + (slot % 5) * 0.14);
+            double t = basePhase + animationSeconds * omega;
+            float rx = band.airBaseRadius * (0.76f + 0.18f * (slot % 3));
+            float ry = rx * 0.58f;
+            double tilt = basePhase * 0.5;
+            double cosTilt = Math.cos(tilt);
+            double sinTilt = Math.sin(tilt);
+            double lx = Math.cos(t) * rx;
+            double ly = Math.sin(t) * ry;
+            double wx = lx * cosTilt - ly * sinTilt;
+            double wy = lx * sinTilt + ly * cosTilt;
+            double lvx = -Math.sin(t) * rx * omega;
+            double lvy = Math.cos(t) * ry * omega;
+            double vx = lvx * cosTilt - lvy * sinTilt;
+            double vy = lvx * sinTilt + lvy * cosTilt;
+
+            int drawX = centerX + (int) Math.round(wx);
+            int drawY = centerY + (int) Math.round(wy);
+            boolean winged = RouteViewVisuals.isWinged(type);
+            float wobble = (float) basePhase;
+            int legFrame = RouteViewVisuals.resolveLegFrame(type, winged, !winged, wobble, animationSeconds, 1f);
+            int jawFrame = RouteViewVisuals.resolveJawFrame(type, false, wobble, animationSeconds, 1f);
+            int wingFrame = RouteViewVisuals.resolveWingFrame(type, winged, wobble, animationSeconds, 1f);
+            int antennaFrame = RouteViewVisuals.resolveAntennaFrame(type, wobble, animationSeconds, 1f);
+            ImageIcon icon = GameConstants.getAntSprite(type, species, ant.getModProfile(), legFrame, jawFrame,
+                    wingFrame, antennaFrame, false);
+            float faceDegrees = RouteViewVisuals.movementFacingDegrees((float) vx, (float) vy);
+            drawScaledSprite(g2d, icon, drawX, drawY, ANT_SPRITE_SCALE, faceDegrees);
+        }
     }
 
-    private void drawCenterCritter(Graphics2D g2d, int centerX, int centerY, float radius, int slotCount) {
+    private void drawCenterCritter(Graphics2D g2d, int centerX, int centerY) {
         Species species = state.getSpecies();
         if (species == null) {
             return;
-        }
-        float faceAngle = 0f;
-        if (slotCount > 0 && !state.livingHunters().isEmpty()) {
-            int focusSlot = state.getFocusOrbitIndex();
-            double angle = slotAngle(focusSlot, slotCount);
-            int targetX = centerX + (int) Math.round(Math.cos(angle) * radius);
-            int targetY = centerY + (int) Math.round(Math.sin(angle) * radius);
-            faceAngle = (float) Math.toDegrees(Math.atan2(targetY - centerY, targetX - centerX)) + 90f;
         }
         int legFrame = RouteViewVisuals.resolveCritterLegFrame(species, true, animationSeconds, animationSeconds, 1f);
         int antennaFrame = RouteViewVisuals.resolveCritterAntennaFrame(species, animationSeconds, animationSeconds,
                 1f);
         ImageIcon icon = GameConstants.getCritterSprite(species, legFrame, antennaFrame);
-        drawScaledSprite(g2d, icon, centerX, centerY, CRITTER_SPRITE_SCALE, faceAngle);
+        drawScaledSprite(g2d, icon, centerX, centerY, CRITTER_SPRITE_SCALE, critterFacingDegrees);
+    }
+
+    private void updateCritterFocus(float deltaSec, int fieldW, int fieldH) {
+        if (state == null) {
+            return;
+        }
+        List<HuntBattleParticipant> focusPool = state.livingFrontlineHunters();
+        if (focusPool.isEmpty()) {
+            return;
+        }
+        boolean currentTargetAlive = false;
+        for (HuntBattleParticipant candidate : focusPool) {
+            if (candidate.getOrbitSlot() == visualFocusSlot) {
+                currentTargetAlive = true;
+                break;
+            }
+        }
+        int tick = state.getTickIndex();
+        boolean needNewFocus = !critterFacingInitialized
+                || tick != lastObservedTick
+                || critterFocusHoldSec <= 0f
+                || !currentTargetAlive;
+        if (needNewFocus) {
+            BandGeometry band = computeBandGeometry(fieldW, fieldH, state);
+            List<HuntBattleParticipant> farCandidates = new ArrayList<>();
+            for (HuntBattleParticipant candidate : focusPool) {
+                float angle = angleDegreesForParticipant(candidate, band);
+                if (!critterFacingInitialized
+                        || Math.abs(wrapDegrees180(angle - critterFacingDegrees)) >= CRITTER_MIN_FOCUS_DELTA_DEG) {
+                    farCandidates.add(candidate);
+                }
+            }
+            List<HuntBattleParticipant> pickFrom = farCandidates.isEmpty() ? focusPool : farCandidates;
+            HuntBattleParticipant chosen = pickFrom.get(GameRandom.nextInt(pickFrom.size()));
+            critterTargetDegrees = angleDegreesForParticipant(chosen, band);
+            visualFocusSlot = chosen.getOrbitSlot();
+            if (!critterFacingInitialized) {
+                critterFacingDegrees = critterTargetDegrees;
+                critterFacingInitialized = true;
+            }
+            critterFocusHoldSec = CRITTER_HOLD_MIN_SEC + GameRandom.nextFloat() * CRITTER_HOLD_RANGE_SEC;
+            lastObservedTick = tick;
+        }
+        critterFocusHoldSec -= deltaSec;
+        critterFacingDegrees = stepAngleToward(critterFacingDegrees, critterTargetDegrees,
+                CRITTER_TURN_DEG_PER_SEC * Math.max(0f, deltaSec));
+    }
+
+    private float angleDegreesForParticipant(HuntBattleParticipant participant, BandGeometry band) {
+        SlotPosition pos = positionForLineSlot(participant.getBattleLine(), participant.getLineSlot(), band);
+        float angle = (float) Math.toDegrees(Math.atan2(pos.y(), pos.x())) + 90f;
+        return ((angle % 360f) + 360f) % 360f;
+    }
+
+    static SlotPosition computeRingPosition(int lineSlot, int lineTotal, float startRadius, float maxRadius,
+            float baseRingStep, float baseArcSpacing) {
+        int total = Math.max(1, lineTotal);
+        int slot = Math.floorMod(lineSlot, total);
+        float start = Math.max(8f, startRadius);
+        float max = Math.max(start, maxRadius);
+        float[] spacing = resolveRingSpacing(total, start, max, baseRingStep, baseArcSpacing);
+        float chosenStep = spacing[0];
+        float chosenArc = spacing[1];
+
+        int ringIdx = 0;
+        int remainingBefore = 0;
+        int slotsOnRing = total;
+        float ringRadius = start;
+        int remaining = total;
+        while (remaining > 0) {
+            float candidateR = start + ringIdx * chosenStep;
+            int cap = Math.max(8, (int) Math.floor(2.0 * Math.PI * candidateR / Math.max(1f, chosenArc)));
+            float nextR = start + (ringIdx + 1) * chosenStep;
+            boolean isLastAllowedRing = nextR > max + 0.01f;
+            int countHere = isLastAllowedRing ? remaining : Math.min(remaining, cap);
+            if (slot < remainingBefore + countHere) {
+                ringRadius = Math.min(max, candidateR);
+                slotsOnRing = countHere;
+                break;
+            }
+            remainingBefore += countHere;
+            remaining -= countHere;
+            ringIdx++;
+        }
+        int posInRing = slot - remainingBefore;
+        double stagger = ringIdx * 0.61803399 * Math.PI * 2.0;
+        double baseAngle = stagger + (2.0 * Math.PI * posInRing) / Math.max(1, slotsOnRing);
+        double angleStep = (2.0 * Math.PI) / Math.max(8, slotsOnRing);
+        float radialJitter = hashUnit(slot * 31 + 17) * Math.min(5f, chosenStep * 0.25f);
+        double angularJitter = hashUnit(slot * 73 + 41) * angleStep * 0.38;
+        float r = Math.max(start * 0.85f, Math.min(max + 4f, ringRadius + radialJitter));
+        double angle = baseAngle + angularJitter;
+        return new SlotPosition((float) (Math.cos(angle) * r), (float) (Math.sin(angle) * r), r, angle);
+    }
+
+    static float outerRingRadius(int lineTotal, float startRadius, float maxRadius, float baseRingStep,
+            float baseArcSpacing) {
+        if (lineTotal <= 0) {
+            return startRadius;
+        }
+        float start = Math.max(8f, startRadius);
+        float max = Math.max(start, maxRadius);
+        float[] spacing = resolveRingSpacing(lineTotal, start, max, baseRingStep, baseArcSpacing);
+        float chosenStep = spacing[0];
+        float chosenArc = spacing[1];
+        int ringIdx = 0;
+        int remaining = lineTotal;
+        float outer = start;
+        while (remaining > 0) {
+            float candidateR = start + ringIdx * chosenStep;
+            outer = Math.min(max, candidateR);
+            float nextR = start + (ringIdx + 1) * chosenStep;
+            if (nextR > max + 0.01f) {
+                break;
+            }
+            int cap = Math.max(8, (int) Math.floor(2.0 * Math.PI * candidateR / Math.max(1f, chosenArc)));
+            remaining -= cap;
+            ringIdx++;
+        }
+        return outer;
+    }
+
+    private static float[] resolveRingSpacing(int total, float start, float max, float baseRingStep,
+            float baseArcSpacing) {
+        float minStep = Math.min(baseRingStep, 8f);
+        float minArc = Math.min(baseArcSpacing, 10f);
+        float chosenStep = baseRingStep;
+        float chosenArc = baseArcSpacing;
+        if (max > start && totalRequiredRadius(total, start, chosenStep, chosenArc) > max) {
+            float low = 0f;
+            float high = 1f;
+            for (int iter = 0; iter < 12; iter++) {
+                float mid = (low + high) * 0.5f;
+                float s = Math.max(minStep, baseRingStep * mid);
+                float a = Math.max(minArc, baseArcSpacing * mid);
+                if (totalRequiredRadius(total, start, s, a) <= max) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            chosenStep = Math.max(minStep, baseRingStep * low);
+            chosenArc = Math.max(minArc, baseArcSpacing * low);
+        }
+        return new float[] { chosenStep, chosenArc };
+    }
+
+    private static float totalRequiredRadius(int total, float start, float ringStep, float arcSpacing) {
+        int remaining = total;
+        int ringIdx = 0;
+        float radius = start;
+        while (remaining > 0) {
+            radius = start + ringIdx * ringStep;
+            int cap = Math.max(8, (int) Math.floor(2.0 * Math.PI * radius / Math.max(1f, arcSpacing)));
+            remaining -= cap;
+            ringIdx++;
+        }
+        return radius;
+    }
+
+    private static float hashUnit(int seed) {
+        int h = seed * 0x27d4eb2d;
+        h ^= (h >>> 15);
+        h *= 0x85ebca6b;
+        h ^= (h >>> 13);
+        return ((h & 0xFFFF) / 32767.5f) - 1f;
+    }
+
+    static float wrapDegrees180(float deltaDegrees) {
+        float wrapped = ((deltaDegrees + 180f) % 360f + 360f) % 360f - 180f;
+        return wrapped <= -180f ? 180f : wrapped;
+    }
+
+    static float stepAngleToward(float currentDegrees, float targetDegrees, float maxStepDegrees) {
+        float step = Math.max(0f, maxStepDegrees);
+        float diff = wrapDegrees180(targetDegrees - currentDegrees);
+        float next = Math.abs(diff) <= step ? targetDegrees : currentDegrees + Math.copySign(step, diff);
+        return ((next % 360f) + 360f) % 360f;
     }
 
     private void drawScaledSprite(Graphics2D g2d, ImageIcon icon, int centerX, int centerY, int scale,

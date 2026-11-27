@@ -95,6 +95,10 @@ public final class ColonyInvasionService {
         return total;
     }
 
+    public static int maxPartyCapacity(Colony colony) {
+        return ColonyHuntService.maxPartyCapacity(colony);
+    }
+
     public static InvasionDispatchPreview previewDefense(Colony colony, InvasionAlert alert,
             Map<AntClass, Integer> partyCounts, int worldDay, int worldHour) {
         List<Ant> party = buildPartyFromCounts(colony, partyCounts);
@@ -102,7 +106,7 @@ public final class ColonyInvasionService {
         if (species == null) {
             species = GameConstants.TYPE_ANT_LION;
         }
-        float winChance = ColonyHuntService.estimateWinChance(species, party);
+        float winChance = ColonyHuntService.estimateWinChance(species, party, colony);
         int hoursRemaining = alert != null ? alert.hoursRemaining(worldDay, worldHour) : 0;
         return new InvasionDispatchPreview(party.size(), winChance, hoursRemaining);
     }
@@ -131,7 +135,7 @@ public final class ColonyInvasionService {
             return false;
         }
         List<Ant> party = buildPartyFromCounts(colony, partyCounts);
-        if (party.isEmpty()) {
+        if (party.isEmpty() || party.size() > maxPartyCapacity(colony)) {
             return false;
         }
         Map<AntClass, Integer> available = getAvailableDefenderCountsByClass(colony);

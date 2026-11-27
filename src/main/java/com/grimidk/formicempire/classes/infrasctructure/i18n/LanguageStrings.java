@@ -3460,6 +3460,12 @@ public final class LanguageStrings {
     public static final String BATTLE_SIM_VICTORY_FMT = "BATTLE_SIM_VICTORY_FMT";
     public static final String BATTLE_SIM_DRAW = "BATTLE_SIM_DRAW";
     public static final String BATTLE_SIM_RUSH = "BATTLE_SIM_RUSH";
+    public static final String BATTLE_SIM_TAB_ARMY_VS_ARMY = "BATTLE_SIM_TAB_ARMY_VS_ARMY";
+    public static final String BATTLE_SIM_TAB_ARMY_VS_CRITTER = "BATTLE_SIM_TAB_ARMY_VS_CRITTER";
+    public static final String BATTLE_SIM_ARMY = "BATTLE_SIM_ARMY";
+    public static final String BATTLE_SIM_CRITTER = "BATTLE_SIM_CRITTER";
+    public static final String BATTLE_SIM_RANK_PRESET = "BATTLE_SIM_RANK_PRESET";
+    public static final String BATTLE_SIM_ATTACKER_WIN_CHANCE_FMT = "BATTLE_SIM_ATTACKER_WIN_CHANCE_FMT";
     public static final String ICON_SOCIALISM = "ICON_SOCIALISM";
     public static final String ICON_GROWTH = "ICON_GROWTH";
     public static final String ICON_COUNTER_INTELLIGENCE = "ICON_COUNTER_INTELLIGENCE";

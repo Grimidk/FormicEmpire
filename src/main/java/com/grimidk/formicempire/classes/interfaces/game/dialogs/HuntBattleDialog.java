@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.services.colony.HuntCreatureCombatService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -19,10 +18,25 @@ public class HuntBattleDialog extends ZeroDialog {
     private final Engine engine;
 
     public HuntBattleDialog(JFrame owner, Colony colony, Engine engine, int targetId) {
-        super(owner, LanguageStrings.DIALOG_HUNT_BATTLE_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE, ModalityType.MODELESS);
+        this((Window) owner, colony, engine, targetId, HuntBattleViewPanel.BattleKind.HUNT, ModalityType.MODELESS);
+    }
+
+    public HuntBattleDialog(
+            Window owner,
+            Colony colony,
+            Engine engine,
+            int battleId,
+            HuntBattleViewPanel.BattleKind battleKind,
+            ModalityType modalityType) {
+        super(owner,
+                battleKind == HuntBattleViewPanel.BattleKind.INVASION
+                        ? LanguageStrings.DIALOG_INVASION_BATTLE_TITLE
+                        : LanguageStrings.DIALOG_HUNT_BATTLE_TITLE,
+                AssetStyles.DEFAULT_DIALOG_SIZE,
+                modalityType);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.engine = engine;
-        battlePanel = new HuntBattleViewPanel(colony, engine, targetId);
+        battlePanel = new HuntBattleViewPanel(colony, engine, battleId, battleKind);
         add(battlePanel, BorderLayout.CENTER);
         dialogSupport.populateSpeedControlBar(southPanel, engine, owner, this::requestClose);
 
@@ -42,6 +56,11 @@ public class HuntBattleDialog extends ZeroDialog {
 
         if (owner instanceof MainFrame mainFrame) {
             mainFrame.applyGameCursors(this);
+        } else if (owner != null) {
+            Window root = SwingUtilities.getWindowAncestor(owner);
+            if (root instanceof MainFrame mainFrame) {
+                mainFrame.applyGameCursors(this);
+            }
         }
     }
 
@@ -52,6 +71,10 @@ public class HuntBattleDialog extends ZeroDialog {
     public void showDialog() {
         battlePanel.startAnimation();
         battlePanel.refreshScene();
+        if (!battlePanel.hasActiveState()) {
+            dispose();
+            return;
+        }
         dialogSupport.updateControls(engine);
         dialogSupport.openFullScreen(this, getOwner(), engine);
         setVisible(true);
@@ -65,8 +88,7 @@ public class HuntBattleDialog extends ZeroDialog {
         if (!isVisible()) {
             return;
         }
-        if (battlePanel.getColony() == null
-                || HuntCreatureCombatService.getState(battlePanel.getColony(), battlePanel.getTargetId()) == null) {
+        if (battlePanel.getColony() == null || !battlePanel.hasActiveState()) {
             dispose();
             return;
         }

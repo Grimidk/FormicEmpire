@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities.services.colony;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.grimidk.formicempire.classes.constants.critter.BugRole;
@@ -240,7 +241,7 @@ public final class HuntCreatureCombatService {
     }
 
     private static void resolveBugPhase(HuntBattleState state) {
-        List<HuntBattleParticipant> living = state.livingHunters();
+        List<HuntBattleParticipant> living = state.livingFrontlineHunters();
         if (living.isEmpty()) {
             return;
         }
@@ -281,7 +282,7 @@ public final class HuntCreatureCombatService {
                         skill.getName(), skill.getIcon(), null);
             }
             state.rotateFocusTarget();
-            living = state.livingHunters();
+            living = state.livingFrontlineHunters();
         }
     }
 
@@ -421,6 +422,228 @@ public final class HuntCreatureCombatService {
             return GameNumbers.huntEnemyAttackSpeed(species);
         }
         return GameNumbers.MILITARY_BASELINE_ATTACK_SPEED;
+    }
+
+    public static float estimateWinChance(Species species, List<Ant> party, Colony colony) {
+        if (species == null || party == null || party.isEmpty()) {
+            return 0f;
+        }
+        List<Ant> living = new ArrayList<>(party.size());
+        for (Ant ant : party) {
+            if (ant != null && ant.isAlive()) {
+                living.add(ant);
+            }
+        }
+        int n = living.size();
+        if (n == 0) {
+            return 0f;
+        }
+
+        float bugMaxHp = Math.max(1f, resolveBugMaxHealth(species));
+        float bugAtk = Math.max(1f, resolveBugAttack(species));
+        float bugDef = resolveBugDefense(species);
+        int bugSpd = Math.max(1, resolveBugAttackSpeed(species));
+        List<Skill> bugSkills = pickBugAttackSkills(species);
+        int bugSkillCount = bugSkills.size();
+        int[] bugBaseD6 = new int[bugSkillCount];
+        float[] bugRawDmg = new float[bugSkillCount];
+        int[] bugTargets = new int[bugSkillCount];
+        for (int i = 0; i < bugSkillCount; i++) {
+            Skill s = bugSkills.get(i);
+            bugBaseD6[i] = s.getD6Target();
+            bugRawDmg[i] = s.getDamageMult() * bugAtk;
+            bugTargets[i] = Math.max(1, s.getTargetCount());
+        }
+
+        float[] baseHp = new float[n];
+        float[] defPct = new float[n];
+        boolean[] hasEvasion = new boolean[n];
+        boolean[] isFrontline = new boolean[n];
+        int[] actions = new int[n];
+        int[][] hunterD6 = new int[n][];
+        float[][] hunterDmg = new float[n][];
+        double initTotalHp = 0.0;
+        double totalAtk = 0.0;
+
+        for (int i = 0; i < n; i++) {
+            Ant ant = living.get(i);
+            float maxHp = ant.getMaxHealth();
+            float currentHp = ant.getHealth();
+            if (maxHp <= 0f) {
+                maxHp = GameNumbers.MILITARY_BASELINE_HEALTH;
+                currentHp = maxHp;
+            } else if (currentHp <= 0f) {
+                currentHp = maxHp;
+            }
+            baseHp[i] = Math.min(currentHp, maxHp);
+            defPct[i] = ant.getDefense();
+            hasEvasion[i] = ant.getEvasionChance() >= 10f;
+            isFrontline[i] = HuntBattleState.resolveBattleLine(ant) == GameConstants.BATTLE_LINE_INFANTRY;
+            actions[i] = Math.max(1, Math.round(ant.getAttackSpeed()));
+
+            float atk = Math.max(1f, ant.getAttack());
+            initTotalHp += baseHp[i];
+            totalAtk += atk;
+
+            List<Skill> available = CritterSkillService.resolveAvailableSkills(ant, colony);
+            List<Skill> attacks = new ArrayList<>();
+            for (Skill sk : available) {
+                if (sk != null && sk.isAttack() && !sk.isPassive()) {
+                    attacks.add(sk);
+                }
+            }
+            if (attacks.isEmpty()) {
+                attacks.add(GameConstants.SKILL_BASIC_BITE);
+            }
+            int sc = attacks.size();
+            hunterD6[i] = new int[sc];
+            hunterDmg[i] = new float[sc];
+            float accBonus = AntModService.combinedAccuracyBonus(ant.getModProfile());
+            for (int k = 0; k < sc; k++) {
+                Skill sk = attacks.get(k);
+                hunterD6[i][k] = GameNumbers.computeD6HitTarget(sk.getD6Target(), accBonus, 1f, false, 0f);
+                float dmgMult = CritterSkillService.resolveDamageMult(sk, ant.getModProfile());
+                hunterDmg[i][k] = GameNumbers.damageAfterDefense(dmgMult * atk, bugDef);
+            }
+        }
+
+        int unlockedSkillCount = colony != null && colony.getDynasty() != null
+                ? colony.getDynasty().getUnlockedSkills().size()
+                : 0;
+        long seed = 1469598103934665603L;
+        seed = (seed * 1099511628211L) ^ species.getId();
+        seed = (seed * 1099511628211L) ^ n;
+        seed = (seed * 1099511628211L) ^ Math.round(initTotalHp);
+        seed = (seed * 1099511628211L) ^ Math.round(totalAtk);
+        seed = (seed * 1099511628211L) ^ unlockedSkillCount;
+        Random rng = new Random(seed);
+
+        int trials = n > 250 ? 20 : 40;
+        int wins = 0;
+        double marginSum = 0.0;
+        float[] hp = new float[n];
+        int[] aliveIdx = new int[n];
+        int[] targetableIdx = new int[n];
+        int[] pool = new int[n];
+        int[] scratch = new int[n];
+
+        for (int trial = 0; trial < trials; trial++) {
+            System.arraycopy(baseHp, 0, hp, 0, n);
+            for (int i = 0; i < n; i++) {
+                aliveIdx[i] = i;
+            }
+            int aliveCount = n;
+            float bugHp = bugMaxHp;
+            int focus = 0;
+            int ticks = 0;
+
+            while (bugHp > 0f && aliveCount > 0 && ticks < 400) {
+                ticks++;
+                for (int a = 0; a < aliveCount && bugHp > 0f; a++) {
+                    int idx = aliveIdx[a];
+                    int act = actions[idx];
+                    int[] d6s = hunterD6[idx];
+                    float[] dmgs = hunterDmg[idx];
+                    int sc = d6s.length;
+                    for (int k = 0; k < act && bugHp > 0f; k++) {
+                        int pick = sc == 1 ? 0 : rng.nextInt(sc);
+                        int roll = rng.nextInt(6) + 1;
+                        if (roll >= d6s[pick]) {
+                            bugHp -= dmgs[pick];
+                        }
+                    }
+                }
+                if (bugHp <= 0f) {
+                    break;
+                }
+
+                for (int act = 0; act < bugSpd && aliveCount > 0; act++) {
+                    int targetableCount = 0;
+                    for (int i = 0; i < aliveCount; i++) {
+                        int id = aliveIdx[i];
+                        if (isFrontline[id]) {
+                            targetableIdx[targetableCount++] = id;
+                        }
+                    }
+                    if (targetableCount == 0) {
+                        System.arraycopy(aliveIdx, 0, targetableIdx, 0, aliveCount);
+                        targetableCount = aliveCount;
+                    }
+
+                    int skIdx = bugSkillCount == 1 ? 0 : rng.nextInt(bugSkillCount);
+                    int targetCount = Math.min(bugTargets[skIdx], targetableCount);
+                    int focusPos = focus % targetableCount;
+
+                    int chosenCount = 0;
+                    pool[chosenCount++] = targetableIdx[focusPos];
+                    if (targetCount > 1) {
+                        int remaining = 0;
+                        for (int p = 0; p < targetableCount; p++) {
+                            if (p != focusPos) {
+                                scratch[remaining++] = targetableIdx[p];
+                            }
+                        }
+                        for (int t = 1; t < targetCount && remaining > 0; t++) {
+                            int r = rng.nextInt(remaining);
+                            pool[chosenCount++] = scratch[r];
+                            scratch[r] = scratch[--remaining];
+                        }
+                    }
+
+                    int bD6 = bugBaseD6[skIdx];
+                    float raw = bugRawDmg[skIdx];
+                    boolean anyKilled = false;
+                    for (int c = 0; c < chosenCount; c++) {
+                        int antIdx = pool[c];
+                        int targetD6 = hasEvasion[antIdx] ? Math.min(6, bD6 + 1) : bD6;
+                        int roll = rng.nextInt(6) + 1;
+                        if (roll >= targetD6) {
+                            float dealt = GameNumbers.damageAfterDefense(raw, defPct[antIdx]);
+                            hp[antIdx] -= dealt;
+                            if (hp[antIdx] <= 0f) {
+                                hp[antIdx] = 0f;
+                                anyKilled = true;
+                            }
+                        }
+                    }
+                    if (anyKilled) {
+                        int write = 0;
+                        for (int i = 0; i < aliveCount; i++) {
+                            int id = aliveIdx[i];
+                            if (hp[id] > 0f) {
+                                aliveIdx[write++] = id;
+                            }
+                        }
+                        aliveCount = write;
+                    }
+                    focus++;
+                }
+            }
+
+            if (bugHp <= 0f) {
+                wins++;
+                double remHp = 0.0;
+                for (int i = 0; i < aliveCount; i++) {
+                    remHp += hp[aliveIdx[i]];
+                }
+                marginSum += remHp / Math.max(1.0, initTotalHp);
+            } else {
+                marginSum -= Math.max(0f, bugHp) / Math.max(1.0, bugMaxHp);
+            }
+        }
+
+        double emp = wins / (double) trials;
+        double avgMargin = marginSum / trials;
+        double logistic = 1.0 / (1.0 + Math.exp(-7.0 * avgMargin));
+        double est;
+        if (wins == 0) {
+            est = Math.min(0.45, logistic);
+        } else if (wins == trials) {
+            est = Math.max(0.55, logistic);
+        } else {
+            est = 0.65 * emp + 0.35 * logistic;
+        }
+        return (float) Math.max(0.001, Math.min(0.999, est));
     }
 }
 

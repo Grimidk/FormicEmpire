@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public final class HuntBattleParticipant {
@@ -8,6 +10,8 @@ public final class HuntBattleParticipant {
     private float battleMaxHealth;
     private float battleHealth;
     private int orbitSlot;
+    private BattleLine battleLine = GameConstants.BATTLE_LINE_INFANTRY;
+    private int lineSlot;
 
     HuntBattleParticipant(Ant ant) {
         this.ant = ant;
@@ -20,6 +24,22 @@ public final class HuntBattleParticipant {
 
     void setOrbitSlot(int orbitSlot) {
         this.orbitSlot = orbitSlot;
+    }
+
+    public BattleLine getBattleLine() {
+        return battleLine;
+    }
+
+    void setBattleLine(BattleLine battleLine) {
+        this.battleLine = battleLine != null ? battleLine : GameConstants.BATTLE_LINE_INFANTRY;
+    }
+
+    public int getLineSlot() {
+        return lineSlot;
+    }
+
+    void setLineSlot(int lineSlot) {
+        this.lineSlot = lineSlot;
     }
 
     private void initBattleHealth() {
